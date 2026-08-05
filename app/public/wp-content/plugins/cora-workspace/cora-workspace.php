@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.32
+ * Version: 3.2.33
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.32' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.33' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -26446,20 +26446,31 @@ if ( ! class_exists( 'Cora_Workspace_Plugin_Updater' ) ) {
                 return $transient;
             }
             
-            // Fetch remote update information
-            $response = wp_remote_get( $this->update_url, array(
-                'timeout' => 15,
-                'headers' => array(
-                    'Accept' => 'application/json'
-                )
-            ) );
+            $cache_key = 'cora_workspace_plugin_update_transient';
+            $remote_data = get_transient( $cache_key );
             
-            if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
-                return $transient;
+            if ( false === $remote_data ) {
+                $response = wp_remote_get( $this->update_url, array(
+                    'timeout' => 3,
+                    'headers' => array(
+                        'Accept' => 'application/json'
+                    )
+                ) );
+                
+                if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+                    $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
+                    if ( $remote_data && ! empty( $remote_data->version ) ) {
+                        set_transient( $cache_key, $remote_data, 12 * HOUR_IN_SECONDS );
+                    }
+                }
+                
+                if ( ! $remote_data ) {
+                    $remote_data = 'none';
+                    set_transient( $cache_key, 'none', 1 * HOUR_IN_SECONDS );
+                }
             }
             
-            $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
-            if ( ! $remote_data || empty( $remote_data->version ) ) {
+            if ( 'none' === $remote_data || ! $remote_data || empty( $remote_data->version ) ) {
                 return $transient;
             }
             
@@ -26491,19 +26502,26 @@ if ( ! class_exists( 'Cora_Workspace_Plugin_Updater' ) ) {
             }
             
             if ( isset( $args->slug ) && $args->slug === 'cora-workspace' ) {
-                $response = wp_remote_get( $this->update_url, array(
-                    'timeout' => 15,
-                    'headers' => array(
-                        'Accept' => 'application/json'
-                    )
-                ) );
+                $cache_key = 'cora_workspace_plugin_update_transient';
+                $remote_data = get_transient( $cache_key );
                 
-                if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
-                    return $res;
+                if ( false === $remote_data || 'none' === $remote_data ) {
+                    $response = wp_remote_get( $this->update_url, array(
+                        'timeout' => 3,
+                        'headers' => array(
+                            'Accept' => 'application/json'
+                        )
+                    ) );
+                    
+                    if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+                        $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
+                        if ( $remote_data && ! empty( $remote_data->version ) ) {
+                            set_transient( $cache_key, $remote_data, 12 * HOUR_IN_SECONDS );
+                        }
+                    }
                 }
                 
-                $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
-                if ( ! $remote_data ) {
+                if ( ! $remote_data || 'none' === $remote_data ) {
                     return $res;
                 }
                 
@@ -26552,7 +26570,7 @@ function cora_check_workspace_update_available( $force = false ) {
     $update_info = get_transient( $cache_key );
     if ( false === $update_info ) {
         $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
-        $response = wp_remote_get( add_query_arg( 'cb', time(), $update_url ), array( 'timeout' => 15 ) );
+        $response = wp_remote_get( add_query_arg( 'cb', time(), $update_url ), array( 'timeout' => 3 ) );
         if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
             $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
             if ( $remote_data && ! empty( $remote_data->version ) ) {
