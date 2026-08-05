@@ -2035,9 +2035,94 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </aside>
 
 <!-- ═══ INVITE USER DRAWER SHEET ═════════════════════════════════════════════ -->
+<?php
+$active_industry = cora_get_active_industry();
+$industry_title = ( $active_industry === 'photography_studio' ) ? 'Invite Studio Associate' : ( ( $active_industry === 'real_estate' ) ? 'Invite Brokerage Member' : 'Invite Workspace Member' );
+$branch_label = ( $active_industry === 'photography_studio' ) ? 'Assign Studio Location' : ( ( $active_industry === 'real_estate' ) ? 'Assign Branch' : 'Assign Location' );
+
+$js_role_meta = array();
+$cora_role_permissions = get_option( 'cora_role_permissions', array() );
+$cora_custom_roles_list = get_option( 'cora_custom_roles', array() );
+$cora_permission_levels_list = get_option( 'cora_role_permission_levels', array() );
+if ( ! is_array( $cora_permission_levels_list ) ) { $cora_permission_levels_list = array(); }
+
+$categories_cols = array();
+if ( $active_industry === 'photography_studio' ) {
+    $categories_cols = array(
+        'dashboard'          => 'Dashboard',
+        'bookings'           => 'Shoots',
+        'portfolio'          => 'Portfolio',
+        'leads'              => 'Client Leads',
+        'team-roles'         => 'Team & Roles',
+        'equipment'          => 'Camera Gear',
+        'canvas'             => 'Canvas',
+        'forms'              => 'Forms',
+        'emails'             => 'Emails',
+        'review_acquisition' => 'Reviews',
+        'financials'         => 'Financials',
+        'settings'           => 'Settings',
+    );
+} else {
+    $categories_cols = array(
+        'dashboard'          => 'Dashboard',
+        'bookings'           => 'Showings CRM',
+        'feature-hub'        => 'Feature Hub',
+        'team-roles'         => 'Team & Roles',
+        'equipment'          => 'Property Listings',
+        'canvas'             => 'Canvas',
+        'forms'              => 'Forms',
+        'emails'             => 'Emails',
+        'review_acquisition' => 'Reviews',
+        'financials'         => 'Financials',
+        'settings'           => 'Settings',
+    );
+}
+
+foreach ( $role_labels as $rk => $rl ) {
+    $is_custom = false;
+    $access_level = 'contributor';
+    
+    $agency_id_raw = cora_get_current_user_agency_id();
+    $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+    $custom_roles_key = 'cora_custom_roles' . $agency_suffix;
+    $custom_roles_opt = get_option( $custom_roles_key, array() );
+    if ( is_array( $custom_roles_opt ) ) {
+        foreach ( $custom_roles_opt as $c_role ) {
+            if ( isset($c_role['role_key']) && $c_role['role_key'] === $rk ) {
+                $is_custom = true;
+                $access_level = $c_role['access_level'] ?? 'contributor';
+                break;
+            }
+        }
+    }
+
+    $perms = array();
+    foreach ( $categories_cols as $col_key => $col_lbl ) {
+        $val = 'none';
+        if ( isset( $cora_permission_levels_list[$rk][$col_key] ) ) {
+            $val = $cora_permission_levels_list[$rk][$col_key];
+        } elseif ( in_array( $col_key, $cora_role_permissions[$rk] ?? array(), true ) ) {
+            $val = 'edit';
+        }
+        $perms[$col_key] = $val;
+    }
+
+    $js_role_meta[$rk] = array(
+        'name'         => $rl,
+        'is_custom'    => $is_custom,
+        'access_level' => $access_level,
+        'permissions'  => $perms
+    );
+}
+?>
+<script>
+window.coraRolePermissionsMeta = <?php echo wp_json_encode( $js_role_meta ); ?>;
+window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
+</script>
+
 <aside id="cora-invite-user-drawer" class="collapsed fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out">
     <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-950/50 shrink-0">
-        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Invite Brokerage Member</h3>
+        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100" id="invite-drawer-title"><?php echo esc_html( $industry_title ); ?></h3>
         <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1" onclick="closeInviteDrawer()">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
@@ -2080,9 +2165,20 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 }
                 ?>
             </select>
+            
+            <!-- Dynamic Role Permissions Preview Card -->
+            <div id="invite-role-preview-card" class="bg-zinc-55/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 mt-2.5 hidden transition-all">
+                <div class="flex items-center justify-between border-b border-zinc-150 dark:border-zinc-800/80 pb-1.5 mb-2.5">
+                    <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider">Access Scope Preview</span>
+                    <span id="role-preview-badge" class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide uppercase"></span>
+                </div>
+                <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[9px]" id="role-preview-grid">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+            </div>
         </div>
         <div>
-            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5">Assign Branch</label>
+            <label class="block text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1.5" id="invite-branch-label"><?php echo esc_html( $branch_label ); ?></label>
             <select id="invite-branch" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer" <?php echo ! empty( $current_branch ) ? 'disabled' : ''; ?>>
                 <?php foreach ( $agency_branches as $b_id => $b ) : ?>
                     <option value="<?php echo esc_attr($b_id); ?>" <?php selected( $current_branch, $b_id ); ?>><?php echo esc_html($b['name']); ?></option>
@@ -2090,7 +2186,18 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </select>
         </div>
         
-        <div class="pt-4">
+        <!-- Optional Welcome Note Collapsible -->
+        <div class="space-y-1.5">
+            <button type="button" onclick="jQuery('#invite-welcome-msg-container').slideToggle(200); jQuery(this).find('svg').toggleClass('rotate-180')" class="text-xs font-semibold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 flex items-center gap-1 cursor-pointer transition-colors select-none">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                <span>Add personal welcome message (optional)</span>
+            </button>
+            <div id="invite-welcome-msg-container" class="hidden">
+                <textarea id="invite-personal-message" placeholder="Hey! Welcome to the team. Please use this link to set up your account and access our workspace." rows="3" class="w-full px-3 py-2 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg focus:border-zinc-400 focus:outline-none bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 resize-none"></textarea>
+            </div>
+        </div>
+        
+        <div class="pt-2">
             <button type="submit" id="send-invite-btn" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-950 font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm">Send Invitation Link</button>
         </div>
     </form>
@@ -2932,6 +3039,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 openInviteDrawer(inviteRole);
             }, 100);
         }
+
+        $('#invite-role').on('change', function() {
+            updateInviteRolePreview();
+        });
     });
 
     function filterActiveMembers() {
@@ -3051,6 +3162,73 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     }
 
     // Invite user drawer
+    function updateInviteRolePreview() {
+        var roleKey = $('#invite-role').val();
+        if (!roleKey || !window.coraRolePermissionsMeta || !window.coraRolePermissionsMeta[roleKey]) {
+            $('#invite-role-preview-card').addClass('hidden');
+            return;
+        }
+        
+        var meta = window.coraRolePermissionsMeta[roleKey];
+        $('#invite-role-preview-card').removeClass('hidden');
+        
+        var badge = $('#role-preview-badge');
+        badge.removeClass().addClass('inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide uppercase');
+        if (meta.is_custom) {
+            badge.text('Custom Role').addClass('bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-350 border border-zinc-200 dark:border-zinc-750');
+        } else {
+            badge.text('System Role').addClass('bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950');
+        }
+        
+        var gridHtml = '';
+        var checkIcon = '<svg class="w-3 h-3 text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        var editIcon = '<svg class="w-3 h-3 text-purple-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>';
+        var crossIcon = '<svg class="w-3 h-3 text-zinc-300 dark:text-zinc-750 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line></svg>';
+        
+        var isStudio = window.coraActiveIndustry === 'photography_studio';
+        var names = {
+            'dashboard': 'Dashboard',
+            'bookings': isStudio ? 'Shoots' : 'CRM Showings',
+            'portfolio': 'Portfolio',
+            'leads': 'Client Leads',
+            'feature-hub': 'Feature Hub',
+            'team-roles': 'Team & Roles',
+            'equipment': isStudio ? 'Camera Gear' : 'Listings',
+            'canvas': 'Canvas Hub',
+            'forms': 'Client Forms',
+            'emails': 'SMTP Emails',
+            'review_acquisition': 'Reviews Hub',
+            'financials': 'Financials',
+            'settings': 'Settings'
+        };
+        
+        Object.keys(meta.permissions).forEach(function(key) {
+            var level = meta.permissions[key];
+            var icon = crossIcon;
+            var textClass = 'text-zinc-400 dark:text-zinc-550';
+            var levelText = 'No Access';
+            
+            if (level === 'view') {
+                icon = checkIcon;
+                textClass = 'text-zinc-850 dark:text-zinc-200';
+                levelText = 'Read Only';
+            } else if (level === 'edit') {
+                icon = editIcon;
+                textClass = 'text-zinc-850 dark:text-zinc-200 font-medium';
+                levelText = 'Full Access';
+            }
+            
+            var name = names[key] || key.charAt(0).toUpperCase() + key.slice(1);
+            
+            gridHtml += '<div class="flex items-center gap-1.5 ' + textClass + '">';
+            gridHtml += icon;
+            gridHtml += '<span>' + name + ': <span class="text-[8px] opacity-70">' + levelText + '</span></span>';
+            gridHtml += '</div>';
+        });
+        
+        $('#role-preview-grid').html(gridHtml);
+    }
+
     function openInviteDrawer(role) {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
@@ -3063,6 +3241,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         } else if ($('#invite-role option:first').length) {
             $('#invite-role').val($('#invite-role option:first').val());
         }
+        
+        updateInviteRolePreview();
+        
         $('#cora-invite-user-drawer').removeClass('collapsed hidden translate-x-full pointer-events-none').addClass('translate-x-0').css({
             'display': 'flex',
             'pointer-events': 'auto',
@@ -3095,6 +3276,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         $('#invite-first-name').val('');
         $('#invite-last-name').val('');
         $('#invite-email').val('');
+        $('#invite-personal-message').val('');
+        $('#invite-welcome-msg-container').hide();
     }
     window.closeInviteDrawer = closeInviteDrawer;
 
@@ -3105,6 +3288,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         var email = $('#invite-email').val().trim();
         var role = $('#invite-role').val();
         var branch = $('#invite-branch').val();
+        var personalMsg = $('#invite-personal-message').val().trim();
 
         $('#send-invite-btn').prop('disabled', true).text('Sending invitation...');
 
@@ -3115,6 +3299,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             email: email,
             role: role,
             branch_id: branch,
+            personal_message: personalMsg,
             nonce: coraREData.ajaxNonce
         }, function(res) {
             var msg = (res && res.data && (typeof res.data === 'string' ? res.data : res.data.message)) || 'Failed to send invitation.';

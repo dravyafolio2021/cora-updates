@@ -20912,11 +20912,12 @@ function cora_ajax_send_invitation() {
         wp_send_json_error( array( 'message' => 'Unauthorized access to user invitations.' ) );
     }
 
-    $email       = sanitize_email( $_POST['email'] ?? '' );
-    $first_name  = sanitize_text_field( $_POST['first_name'] ?? '' );
-    $last_name   = sanitize_text_field( $_POST['last_name'] ?? '' );
-    $invite_role = sanitize_text_field( $_POST['role'] ?? '' );
-    $branch_id   = sanitize_text_field( $_POST['branch_id'] ?? '' );
+    $email            = sanitize_email( $_POST['email'] ?? '' );
+    $first_name       = sanitize_text_field( $_POST['first_name'] ?? '' );
+    $last_name        = sanitize_text_field( $_POST['last_name'] ?? '' );
+    $invite_role      = sanitize_text_field( $_POST['role'] ?? '' );
+    $branch_id        = sanitize_text_field( $_POST['branch_id'] ?? '' );
+    $personal_message = sanitize_textarea_field( $_POST['personal_message'] ?? '' );
 
     if ( empty( $email ) || empty( $invite_role ) ) {
         wp_send_json_error( array( 'message' => 'Email address and role are required.' ) );
@@ -21015,11 +21016,21 @@ function cora_ajax_send_invitation() {
     // Dispatch HTML email invitation via wp_mail
     $subject = "You've been invited to join workspace on Cora";
     $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+    $personal_msg_html = '';
+    if ( ! empty( $personal_message ) ) {
+        $personal_msg_html = "
+        <div style='margin: 18px 0; padding: 12px 16px; background: #F4F4F5; border-left: 3px solid #71717A; color: #3F3F46; font-size: 13px; font-style: italic; line-height: 1.5; border-radius: 0 8px 8px 0;'>
+            \"" . nl2br( esc_html( $personal_message ) ) . "\"
+        </div>";
+    }
+
     $body = "
     <div style='font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#FAFAFA;border-radius:12px;border:1px solid #E4E4E7;'>
         <h2 style='color:#09090B;margin-top:0;font-size:20px;font-weight:700;'>Workspace Team Invitation</h2>
         <p style='color:#52525B;font-size:14px;line-height:1.6;'>Hello,</p>
         <p style='color:#52525B;font-size:14px;line-height:1.6;'>You have been invited to join the workspace as <strong>" . esc_html( $role_label ) . "</strong> by " . esc_html( $user->display_name ?: $user->user_email ) . ".</p>
+        " . $personal_msg_html . "
         <div style='margin:28px 0;'>
             <a href='" . esc_url( $verification_link ) . "' style='background:#09090B;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;display:inline-block;'>Accept Invitation & Setup Account →</a>
         </div>
