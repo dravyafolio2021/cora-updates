@@ -447,25 +447,39 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
     </div>
 
     <!-- Configuration Example Card -->
-    <div class="bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
-        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
-            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Claude Desktop Integration Example</h3>
-            <p class="text-xs text-zinc-500">Configure your local Claude client settings file to connect this tool provider.</p>
+    <div class="bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4 mt-6">
+        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
+            <div>
+                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Claude Desktop & Cursor Integration</h3>
+                <p class="text-xs text-zinc-500 mt-0.5">Use the local stdio bridge script to connect external AI agents to Cora.</p>
+            </div>
+            <a href="<?php echo esc_url( CORA_WORKSPACE_URL . 'cora-bridge.py' ); ?>" download class="px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1">
+                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download Bridge Script
+            </a>
+        </div>
+
+        <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40 space-y-2">
+            <h4 class="text-xs font-bold text-zinc-850 dark:text-zinc-200">How to Setup:</h4>
+            <ol class="list-decimal list-inside text-xs text-zinc-650 dark:text-zinc-350 space-y-1">
+                <li>Click the button above to download the <code>cora-bridge.py</code> script.</li>
+                <li>Save the script to a stable folder on your local computer (e.g. <code>/Users/yourname/cora-bridge.py</code>).</li>
+                <li>Open your local AI client settings configuration (e.g. <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>).</li>
+                <li>Copy and paste the configuration code block below into your settings file, ensuring you replace the local script path.</li>
+            </ol>
         </div>
         
-        <div class="space-y-2 pt-2">
+        <div class="space-y-2">
             <div class="bg-zinc-900 text-zinc-100 rounded-xl p-4 font-mono text-[10px] leading-relaxed overflow-x-auto shadow-inner relative">
                 <button type="button" class="absolute top-3 right-3 px-2 py-1 bg-zinc-800 hover:bg-zinc-750 text-zinc-300 rounded text-[9px] cursor-pointer" onclick="coraCopyClaudeConfigDirect()">Copy Config</button>
                 <pre id="cora-claude-config-code-direct"><code>{
   "mcpServers": {
-    "cora-crm": {
-      "command": "curl",
+    "cora-workspace": {
+      "command": "python3",
       "args": [
-        "-X", "POST",
+        "/path/to/cora-bridge.py",
         "<?php echo esc_url( $mcp_url ); ?>",
-        "-H", "Authorization: Bearer <?php echo esc_attr( $mcp_token ); ?>",
-        "-H", "Content-Type: application/json",
-        "-d", "{\"jsonrpc\":\"2.0\",\"method\":\"tools/list\",\"id\":1}"
+        "<?php echo esc_attr( $mcp_token ); ?>"
       ]
     }
   }
