@@ -1429,10 +1429,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <!-- ANALYTICS CARDS (Admin only) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <!-- Card 1: Total Active Today -->
-            <!-- Card 1: Total Active Today -->
-            <div onclick="showAttendanceLogsTab()" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px] cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-all duration-300 group">
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center min-h-[90px]">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700">
+                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     </div>
                     <div class="min-w-0">
@@ -1441,15 +1440,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <p class="text-[9px] text-zinc-400 dark:text-zinc-500 truncate mt-0.5">Employees currently active</p>
                     </div>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-250/20 dark:border-zinc-800/80 text-zinc-450 dark:text-zinc-400 flex items-center justify-center shrink-0 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-850 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 group-hover:border-zinc-300 dark:group-hover:border-zinc-700 transition-all duration-300">
-                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
             </div>
             
             <!-- Card 2: Late Check-ins -->
-            <div onclick="showAttendanceLogsTab()" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px] cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-all duration-300 group">
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center min-h-[90px]">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700">
+                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </div>
                     <div class="min-w-0">
@@ -1457,9 +1453,6 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <h3 class="text-base md:text-lg font-extrabold text-zinc-900 dark:text-zinc-100 mt-0.5" id="stat-late-punches">0</h3>
                         <p class="text-[9px] text-zinc-400 dark:text-zinc-500 truncate mt-0.5">No late check-ins today</p>
                     </div>
-                </div>
-                <div class="w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-250/20 dark:border-zinc-800/80 text-zinc-450 dark:text-zinc-400 flex items-center justify-center shrink-0 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-850 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 group-hover:border-zinc-300 dark:group-hover:border-zinc-700 transition-all duration-300">
-                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </div>
 
