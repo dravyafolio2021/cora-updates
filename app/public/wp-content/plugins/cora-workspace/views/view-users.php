@@ -3319,7 +3319,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         $.post(coraREData.ajaxUrl || ajaxurl, {
             action: 'cora_regenerate_user_mcp_token',
             user_id: userId,
-            nonce: coraREData.nonce
+            nonce: coraREData.ajaxNonce
         }, function(response) {
             if (response.success) {
                 var token = response.data.token;
