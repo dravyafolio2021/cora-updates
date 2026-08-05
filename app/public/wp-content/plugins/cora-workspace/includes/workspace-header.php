@@ -49,7 +49,7 @@ function cora_render_workspace_header( $args = array() ) {
     } ) );
     
     ?>
-    <div class="cora-workspace-header select-none <?php echo esc_attr( $args['container_class'] ); ?>">
+    <div class="cora-workspace-header select-none w-full max-w-full min-w-0 overflow-hidden <?php echo esc_attr( $args['container_class'] ); ?>">
         <!-- Desktop Header -->
 
         <div class="hidden md:flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/40 pb-5 mb-5 select-none">
@@ -192,7 +192,7 @@ function cora_render_workspace_header( $args = array() ) {
         <!-- Sub Navigation Tabs -->
         <?php if ( ! empty( $visible_tabs ) ) : ?>
             <!-- Desktop Sub Navigation Tabs -->
-            <div class="cora-sub-tabs-container hidden md:flex border-b border-zinc-200 dark:border-zinc-800 items-center gap-1.5 overflow-x-auto pb-px shrink-0 select-none no-scrollbar mb-4">
+            <div class="cora-sub-tabs-container hidden md:flex border-b border-zinc-200 dark:border-zinc-800 items-center gap-1.5 overflow-x-auto pb-px shrink-0 select-none no-scrollbar mb-4 w-full max-w-full min-w-0">
                 <?php foreach ( $visible_tabs as $tab ) : 
                     $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 font-semibold' : 'border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 font-medium';
                     $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
