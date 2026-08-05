@@ -787,6 +787,9 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 <button onclick="switchTab('settings')" id="tab-btn-settings" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Theme Settings</button>
                 <button onclick="switchTab('code')" id="tab-btn-code" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Custom Code</button>
                 <button onclick="switchTab('theme-builder')" id="tab-btn-theme-builder" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Theme Builder</button>
+                <button onclick="switchTab('ai')" id="tab-btn-ai" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors flex items-center justify-center" title="Lovable Studio" style="display: none;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
+                </button>
             </div>
             
             <!-- Dynamic active tab actions aligned directly on the right side of the workspace tabs bar -->
@@ -961,6 +964,10 @@ $cora_bookings_count = count( cora_db_get_bookings() );
             </select>
 
             <?php
+            // Ensure git sync / AI feature is activated
+            if ( get_option('cora_git_sync_enabled') !== '1' ) {
+                update_option('cora_git_sync_enabled', '1');
+            }
             $git_enabled = get_option('cora_git_sync_enabled') === '1';
             $git_repo    = get_option('cora_git_sync_repo', '');
             $live_url    = get_option('cora_git_sync_live_url', '');
@@ -992,8 +999,6 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 </div>
             </div>
 
-            <?php include plugin_dir_path( CORA_PLUGIN_FILE ) . 'views/partials/lovable-studio-drawer.php'; ?>
-
             <!-- Bulk Actions Bar -->
             <div id="pages-bulk-actions-bar" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl py-3 px-5 items-center gap-4 hidden transition-all duration-300">
                 <span id="bulk-selected-count" class="text-xs font-semibold text-white">0 selected</span>
@@ -1006,6 +1011,11 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 <button onclick="applyBulkPagesAction()" class="px-3 py-1 bg-white hover:bg-zinc-100 text-zinc-900 font-bold rounded-lg text-[10px] cursor-pointer transition-colors shadow-sm">Apply</button>
                 <button onclick="deselectAllPages()" class="text-[10px] font-semibold text-zinc-400 hover:text-white transition-colors cursor-pointer">Deselect All</button>
             </div>
+        </div>
+
+        <!-- TAB CONTENT: LOVABLE AI STUDIO -->
+        <div id="tab-content-ai" class="space-y-6 hidden">
+            <?php include plugin_dir_path( CORA_PLUGIN_FILE ) . 'views/partials/lovable-studio-drawer.php'; ?>
         </div>
 
         <!-- TAB CONTENT: MENUS -->
@@ -3657,13 +3667,14 @@ $cora_bookings_count = count( cora_db_get_bookings() );
             jQuery('.lovable-route-col').hide();
             jQuery('#lovable-trigger-bar').hide();
             jQuery('#lovable-studio-drawer').hide();
+            jQuery('#tab-btn-ai').hide();
+            if (canvasState.activeTab === 'ai') {
+                switchTab('pages');
+            }
         } else {
             jQuery('.lovable-route-col').show();
             jQuery('#lovable-trigger-bar').hide();
-            jQuery('#lovable-studio-drawer').show();
-            if (window.openLovableStudio) {
-                window.openLovableStudio();
-            }
+            jQuery('#tab-btn-ai').show();
         }
 
         jQuery('#canvas-level-1').addClass('hidden');
@@ -3726,6 +3737,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
         jQuery('#tab-content-settings').addClass('hidden');
         jQuery('#tab-content-code').addClass('hidden');
         jQuery('#tab-content-theme-builder').addClass('hidden');
+        jQuery('#tab-content-ai').addClass('hidden');
 
         jQuery('#tab-content-' + tabId).removeClass('hidden');
 
@@ -3737,6 +3749,10 @@ $cora_bookings_count = count( cora_db_get_bookings() );
 
         if (tabId === 'menus') {
             showMenusTabContent();
+        } else if (tabId === 'ai') {
+            if (window.openLovableStudio) {
+                window.openLovableStudio();
+            }
         } else if (tabId === 'theme-builder') {
             const iframe = jQuery('#theme-builder-iframe');
             if (!iframe.attr('src')) {

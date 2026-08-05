@@ -216,48 +216,51 @@ foreach ( $cora_documents as $doc ) {
 </style>
 
 <div id="cora-vault-wrapper" class="space-y-5 relative font-sans text-zinc-900 pb-0">
-   <!-- Top Header & Navigation area (Shopify/Notion UI style alignment) -->
-   <div class="flex flex-col gap-4 border-b border-zinc-200/80 pb-0 mb-5" style="padding-bottom: 0 !important;">
-       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-           <div>
-               <h1 class="text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">File Manager & Vault</h1>
-               <p class="text-xs text-zinc-500 mt-0.5 font-medium">Manage legally binding contracts, proposals, client invoices, and e-sign registry workflows.</p>
-           </div>
-           
-           <!-- Actions inline with title on desktop -->
-           <div class="flex items-center flex-wrap sm:flex-nowrap gap-2 pb-2 w-full sm:w-auto">
-               <button onclick="coraCreateNewDocInStudio()" class="hidden md:flex px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap">
-                   <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                   Create Document Wizard
-               </button>
-               <button onclick="coraExportVaultCSV()" class="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap">
-                   <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                   CSV Export
-               </button>
-               <button onclick="coraExportGSTR1()" class="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl hover:bg-zinc-50 cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap">
-                   <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                   GSTR-1 Tax CSV
-               </button>
-           </div>
-       </div>
+<?php
+$vault_header_args = array(
+    'title'              => 'File Manager & Vault',
+    'description'        => 'Manage legally binding contracts, proposals, client invoices, and e-sign registry workflows.',
+    'icon'               => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
+    'ai_stack'           => true,
+    'tutorial_onclick'   => '', // No specific video walkthrough for Vault page, hides the YouTube button
+    'cta'                => array(
+        'text'        => 'Create Document Wizard',
+        'mobile_text' => 'Create Doc',
+        'onclick'     => 'coraCreateNewDocInStudio()',
+        'visible'     => true,
+    ),
+    'tabs'               => array(
+        array(
+            'id'           => 'vault',
+            'dom_id'       => 'vault-mode-btn-vault',
+            'label'        => 'Document Vault',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
+            'active'       => true,
+            'onclick'      => "coraSwitchVaultView('vault')",
+        ),
+        array(
+            'id'           => 'editor',
+            'dom_id'       => 'vault-mode-btn-editor',
+            'label'        => 'Document Studio Wizard',
+            'mobile_label' => 'Studio Wizard',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>',
+            'active'       => false,
+            'onclick'      => "coraSwitchVaultView('editor')",
+        ),
+        array(
+            'id'           => 'esign',
+            'dom_id'       => 'vault-mode-btn-esign',
+            'label'        => 'E-Sign Audit Registry',
+            'mobile_label' => 'Audit Registry',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
+            'active'       => false,
+            'onclick'      => "coraSwitchVaultView('esign')",
+        ),
+    ),
+);
 
-       <!-- Segmented Switcher Tab Bar -->
-       <div class="flex items-center gap-1 sm:gap-2 -mb-px">
-           <button onclick="coraSwitchVaultView('vault')" id="vault-mode-btn-vault" class="flex items-center gap-1.5 pb-2.5 px-3.5 text-xs font-bold transition-all text-zinc-950 border-b-2 border-zinc-950 bg-transparent cursor-pointer whitespace-nowrap">
-               <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-               Document Vault
-           </button>
-           <button onclick="coraSwitchVaultView('editor')" id="vault-mode-btn-editor" class="hidden md:flex items-center gap-1.5 pb-2.5 px-3.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-all border-b-2 border-transparent bg-transparent cursor-pointer whitespace-nowrap">
-               <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-               Document Studio Wizard
-           </button>
-           <button onclick="coraSwitchVaultView('esign')" id="vault-mode-btn-esign" class="flex items-center gap-1.5 pb-2.5 px-3.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-all border-b-2 border-transparent bg-transparent cursor-pointer whitespace-nowrap">
-               <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-               E-Sign Audit Registry
-           </button>
-       </div>
-   </div>
-
+cora_render_workspace_header( $vault_header_args );
+?>
     <!-- ═════════════════════════════════════════════════════════════════════════
          VIEW 1: MASTER DOCUMENT VAULT DASHBOARD (COLORED BADGES ENHANCED)
          ═════════════════════════════════════════════════════════════════════ -->
@@ -324,10 +327,19 @@ foreach ( $cora_documents as $doc ) {
                     <input type="text" id="vault-search-input" onkeyup="coraSearchVault(this.value)" placeholder="Search title, client, or doc #..." class="w-full pl-9 pr-3 py-2 bg-white border border-zinc-200 rounded-xl text-xs outline-none focus:border-zinc-950 transition-all font-medium shadow-3xs">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-2.5 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
+                <button onclick="coraExportVaultCSV()" class="p-2 border border-zinc-200 rounded-xl bg-white text-zinc-700 hover:bg-zinc-50 cursor-pointer shadow-3xs shrink-0 flex items-center gap-1 text-[11px] font-semibold" title="CSV Export">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span class="hidden sm:inline">Export CSV</span>
+                </button>
+                <button onclick="coraExportGSTR1()" class="p-2 border border-zinc-200 rounded-xl bg-white text-zinc-700 hover:bg-zinc-50 cursor-pointer shadow-3xs shrink-0 flex items-center gap-1 text-[11px] font-semibold" title="GSTR-1 Tax CSV">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    <span class="hidden sm:inline">GSTR-1</span>
+                </button>
                 <button class="p-2 border border-zinc-200 rounded-xl bg-white text-zinc-700 hover:bg-zinc-50 cursor-pointer shadow-3xs shrink-0" title="Advanced Filter Options">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
                 </button>
             </div>
+
         </div>
 
         <!-- Master Documents Table (Scrollable Container) -->

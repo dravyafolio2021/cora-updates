@@ -102,6 +102,10 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-workspace-update
 // ── Documentation Engine ───────────────────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/docs-engine.php';
 
+// ── Workspace Header Widget ────────────────────────────────────────────────
+require_once plugin_dir_path( __FILE__ ) . 'includes/workspace-header.php';
+
+
 /**
  * Add the admin menu page
  */

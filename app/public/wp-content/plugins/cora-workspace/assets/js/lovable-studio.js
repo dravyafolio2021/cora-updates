@@ -28,6 +28,9 @@
         var drawer = document.getElementById('lovable-studio-drawer');
         if (!drawer) return;
         drawer.style.display = 'none';
+        if (typeof window.switchTab === 'function') {
+            window.switchTab('pages');
+        }
     };
 
     // ── Step navigation ─────────────────────────────────────────────────
