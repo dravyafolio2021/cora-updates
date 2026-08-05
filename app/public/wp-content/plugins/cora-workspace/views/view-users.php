@@ -2167,12 +2167,12 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             </select>
             
             <!-- Dynamic Role Permissions Preview Card -->
-            <div id="invite-role-preview-card" class="bg-zinc-55/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 mt-2.5 hidden transition-all">
-                <div class="flex items-center justify-between border-b border-zinc-150 dark:border-zinc-800/80 pb-1.5 mb-2.5">
-                    <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider">Access Scope Preview</span>
+            <div id="invite-role-preview-card" class="bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl p-4 mt-3 hidden transition-all duration-300">
+                <div class="flex items-center justify-between border-b border-zinc-200/60 dark:border-zinc-800 pb-2 mb-3">
+                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-wider">Access Scope Preview</span>
                     <span id="role-preview-badge" class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide uppercase"></span>
                 </div>
-                <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[9px]" id="role-preview-grid">
+                <div class="space-y-2" id="role-preview-grid">
                     <!-- Loaded dynamically via JS -->
                 </div>
             </div>
@@ -3173,18 +3173,14 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         $('#invite-role-preview-card').removeClass('hidden');
         
         var badge = $('#role-preview-badge');
-        badge.removeClass().addClass('inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide uppercase');
+        badge.removeClass().addClass('inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide uppercase select-none');
         if (meta.is_custom) {
-            badge.text('Custom Role').addClass('bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-350 border border-zinc-200 dark:border-zinc-750');
+            badge.text('Custom Role').addClass('bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-350 border border-zinc-200/85 dark:border-zinc-700');
         } else {
-            badge.text('System Role').addClass('bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950');
+            badge.text('System Role').addClass('bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950');
         }
         
-        var gridHtml = '';
-        var checkIcon = '<svg class="w-3 h-3 text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-        var editIcon = '<svg class="w-3 h-3 text-purple-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>';
-        var crossIcon = '<svg class="w-3 h-3 text-zinc-300 dark:text-zinc-750 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line></svg>';
-        
+        var listHtml = '';
         var isStudio = window.coraActiveIndustry === 'photography_studio';
         var names = {
             'dashboard': 'Dashboard',
@@ -3202,31 +3198,52 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             'settings': 'Settings'
         };
         
+        var hasAnyGranted = false;
+        
+        // Icons
+        var viewIcon = '<svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        var editIcon = '<svg class="w-3.5 h-3.5 text-zinc-950 dark:text-zinc-100 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        
         Object.keys(meta.permissions).forEach(function(key) {
             var level = meta.permissions[key];
-            var icon = crossIcon;
-            var textClass = 'text-zinc-400 dark:text-zinc-550';
-            var levelText = 'No Access';
+            if (level === 'none') {
+                return;
+            }
+            
+            hasAnyGranted = true;
+            var levelLabel = '';
+            var levelClass = '';
+            var iconSvg = '';
             
             if (level === 'view') {
-                icon = checkIcon;
-                textClass = 'text-zinc-850 dark:text-zinc-200';
-                levelText = 'Read Only';
+                levelLabel = 'Read Only';
+                levelClass = 'bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700';
+                iconSvg = viewIcon;
             } else if (level === 'edit') {
-                icon = editIcon;
-                textClass = 'text-zinc-850 dark:text-zinc-200 font-medium';
-                levelText = 'Full Access';
+                levelLabel = 'Full Access';
+                levelClass = 'bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 font-semibold';
+                iconSvg = editIcon;
             }
             
             var name = names[key] || key.charAt(0).toUpperCase() + key.slice(1);
             
-            gridHtml += '<div class="flex items-center gap-1.5 ' + textClass + '">';
-            gridHtml += icon;
-            gridHtml += '<span>' + name + ': <span class="text-[8px] opacity-70">' + levelText + '</span></span>';
-            gridHtml += '</div>';
+            listHtml += '<div class="flex items-center justify-between py-1.5 border-b border-zinc-100/80 dark:border-zinc-800/40 last:border-b-0">';
+            listHtml += '  <div class="flex items-center gap-2 text-zinc-850 dark:text-zinc-200 text-xs">';
+            listHtml += iconSvg;
+            listHtml += '    <span>' + name + '</span>';
+            listHtml += '  </div>';
+            listHtml += '  <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] ' + levelClass + '">' + levelLabel + '</span>';
+            listHtml += '</div>';
         });
         
-        $('#role-preview-grid').html(gridHtml);
+        if (!hasAnyGranted) {
+            listHtml = '<div class="flex items-center gap-2 py-2.5 text-zinc-400 dark:text-zinc-550 text-xs justify-center">';
+            listHtml += '  <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line></svg>';
+            listHtml += '  <span>No permissions granted to this role.</span>';
+            listHtml += '</div>';
+        }
+        
+        $('#role-preview-grid').html(listHtml);
     }
 
     function openInviteDrawer(role) {
