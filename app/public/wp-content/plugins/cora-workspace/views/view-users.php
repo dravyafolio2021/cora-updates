@@ -1429,9 +1429,10 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <!-- ANALYTICS CARDS (Admin only) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <!-- Card 1: Total Active Today -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px]">
+            <!-- Card 1: Total Active Today -->
+            <div onclick="showAttendanceLogsTab()" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px] cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-all duration-300 group">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     </div>
                     <div class="min-w-0">
@@ -1440,15 +1441,15 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <p class="text-[9px] text-zinc-400 dark:text-zinc-500 truncate mt-0.5">Employees currently active</p>
                     </div>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-250/20 dark:border-zinc-800/80 text-zinc-450 dark:text-zinc-400 flex items-center justify-center shrink-0">
+                <div class="w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-250/20 dark:border-zinc-800/80 text-zinc-450 dark:text-zinc-400 flex items-center justify-center shrink-0 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-850 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 group-hover:border-zinc-300 dark:group-hover:border-zinc-700 transition-all duration-300">
                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </div>
             
             <!-- Card 2: Late Check-ins -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px]">
+            <div onclick="showAttendanceLogsTab()" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex items-center justify-between min-h-[90px] cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-all duration-300 group">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </div>
                     <div class="min-w-0">
@@ -1457,7 +1458,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         <p class="text-[9px] text-zinc-400 dark:text-zinc-500 truncate mt-0.5">No late check-ins today</p>
                     </div>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-250/20 dark:border-zinc-800/80 text-zinc-450 dark:text-zinc-400 flex items-center justify-center shrink-0">
+                <div class="w-7 h-7 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-250/20 dark:border-zinc-800/80 text-zinc-450 dark:text-zinc-400 flex items-center justify-center shrink-0 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-850 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 group-hover:border-zinc-300 dark:group-hover:border-zinc-700 transition-all duration-300">
                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </div>
@@ -1479,9 +1480,9 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 $current_address_txt = $office_loc['lat'] . ', ' . $office_loc['lng'];
             }
             ?>
-            <div onclick="openGeofenceDrawer()" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px] cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-colors group">
+            <div onclick="openGeofenceDrawer()" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px] cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-zinc-850/55 transition-all duration-300 group">
                 <div class="flex items-start gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     </div>
                     <div class="min-w-0 flex-1">
@@ -1511,13 +1512,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             <!-- Card 4: Cron Automations -->
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 md:p-4 shadow-2xs flex flex-col justify-between min-h-[90px]">
                 <div class="flex items-start gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 transition-all duration-300">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center justify-between gap-1">
                             <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider truncate">CRON AUTOMATIONS</span>
-                            <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] font-bold rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-450 border border-emerald-500/20 shrink-0">Active</span>
+                            <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] font-bold rounded bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 shrink-0">Active</span>
                         </div>
                         <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate mt-0.5">Daily Reports &amp; Automated Alerts</p>
                         <p class="text-[9px] text-zinc-400 dark:text-zinc-500 truncate mt-0.5">Automated reports and alerts are active</p>
@@ -3245,6 +3246,17 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         
         $('#role-preview-grid').html(listHtml);
     }
+
+    function showAttendanceLogsTab() {
+        var $tab = $('#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab[data-target="tab-attendance-logs"]');
+        if ($tab.length) {
+            $tab.trigger('click');
+            jQuery('html, body').animate({
+                scrollTop: $('#cora-page-team-roles .cora-sub-tabs-container').offset().top - 80
+            }, 400);
+        }
+    }
+    window.showAttendanceLogsTab = showAttendanceLogsTab;
 
     function openInviteDrawer(role) {
         if (typeof window.coraCloseAllDrawers === 'function') {
