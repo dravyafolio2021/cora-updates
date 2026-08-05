@@ -728,59 +728,66 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 
     <!-- TAB 3: PERMISSIONS MATRIX -->
     <div id="tab-permissions-matrix" class="cora-tab-content space-y-4 hidden">
-        <div class="cora-card bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-5">
+        <div class="cora-card bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-4">
             <!-- Header Title Row -->
-            <div class="flex flex-col gap-1 w-full pb-1">
-                <div class="flex items-center gap-2.5">
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        Granular Role Permissions Matrix
-                    </h3>
-                    <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-950/30 border border-emerald-500/20 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 select-none">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full pb-1">
+                <div class="flex items-start gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 block">Granular Role Permissions Matrix</h3>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed">Control dashboard visibility and feature access for each workspace role. Super Admin permissions are locked globally.</p>
+                    </div>
+                </div>
+                <div class="shrink-0 self-start sm:self-center">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-750 dark:text-emerald-450 text-[10px] font-bold border border-emerald-500/20 select-none">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         Live Sync Active
                     </div>
                 </div>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">Determine dashboard screen visibilities and feature access controls for each workspace role. Super Admin permissions are locked globally.</p>
+            </div>
+
+            <!-- Full-Width Search Input -->
+            <div class="relative w-full">
+                <input type="text" id="matrix-role-search" placeholder="Search roles..." class="w-full h-10 pl-9 pr-12 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-450 transition-all placeholder-zinc-400 dark:placeholder-zinc-500">
+                <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+                <div class="absolute right-3 top-0 bottom-0 flex items-center pointer-events-none">
+                    <kbd class="px-1.5 py-0.5 text-[9px] font-mono text-zinc-400 bg-zinc-100 dark:bg-zinc-800 rounded border border-zinc-200 dark:border-zinc-700 select-none">⌘ K</kbd>
+                </div>
             </div>
 
             <!-- Action Controls Toolbar Row -->
-            <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-zinc-800 w-full pt-1.5">
-                    <!-- Quick Search input -->
-                    <div class="relative w-full md:w-52">
-                        <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        </div>
-                        <input type="text" id="matrix-role-search" placeholder="Search roles..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/70 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-950 dark:focus:ring-zinc-100 transition-all">
-                    </div>
+            <div class="flex items-center justify-between gap-3 flex-wrap pb-2 w-full pt-1">
+                <!-- Left Action Buttons group -->
+                <div class="flex items-center gap-2">
+                    <!-- Reset Defaults Button -->
+                    <button type="button" id="matrix-reset-defaults-btn" onclick="coraResetMatrixDefaults()" class="h-9 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        <span>Reset</span>
+                    </button>
 
-                    <!-- Row Action Buttons Grid (3-columns on mobile, flex row on desktop) -->
-                    <div class="grid grid-cols-4 md:flex items-center gap-2 md:gap-2.5 w-full md:w-auto">
-                        <!-- Reset Defaults Button -->
-                        <button type="button" id="matrix-reset-defaults-btn" onclick="coraResetMatrixDefaults()" class="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center justify-center gap-1 md:gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-                            <span class="truncate">Reset</span>
-                        </button>
+                    <!-- Grant All Button -->
+                    <button type="button" id="matrix-grant-all-btn" onclick="coraGrantAllSelectedRolePermissions()" class="h-9 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Grant All</span>
+                    </button>
 
-                        <!-- Grant All Button -->
-                        <button type="button" id="matrix-grant-all-btn" onclick="coraGrantAllSelectedRolePermissions()" class="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center justify-center gap-1 md:gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span class="truncate">Grant All</span>
-                        </button>
-
-                        <!-- Configure AI Trainer Button -->
-                        <button type="button" id="matrix-ai-trainer-btn" onclick="openAiTrainerDrawer('gemini')" class="px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-750 transition-colors flex items-center justify-center gap-1 md:gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
-                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 text-amber-500"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-                            <span class="truncate">AI Trainer</span>
-                        </button>
-
-                        <!-- Save Matrix Button -->
-                        <button type="button" id="matrix-save-btn" onclick="coraSavePermissionsMatrix()" class="px-2 md:px-3.5 py-1.5 text-[11px] md:text-xs font-bold text-white dark:text-zinc-950 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 rounded-lg transition-colors flex items-center justify-center gap-1 md:gap-1.5 cursor-pointer active:scale-95 shadow-2xs whitespace-nowrap">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                            <span class="truncate">Save</span>
-                        </button>
-                    </div>
+                    <!-- Configure AI Trainer Button -->
+                    <button type="button" id="matrix-ai-trainer-btn" onclick="openAiTrainerDrawer('gemini')" class="h-9 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 text-amber-500"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                        <span>AI Trainer</span>
+                    </button>
                 </div>
+
+                <!-- Right Save Matrix Button -->
+                <button type="button" id="matrix-save-btn" onclick="coraSavePermissionsMatrix()" class="h-9 px-4 text-xs font-bold text-white dark:text-zinc-950 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm whitespace-nowrap">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    <span>Save Changes</span>
+                </button>
+            </div>
             </div>
             
             <?php
@@ -1000,65 +1007,216 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
             </div>
 
             <!-- Mobile Permissions Matrix Stacked Cards (Vertical Stack, No Horizontal Scroll) -->
-            <div class="md:hidden space-y-3.5">
-                <div class="grid grid-cols-1 gap-3.5 w-full">
-                    <?php foreach ($target_roles as $role_key => $role_name): 
+            <div class="md:hidden space-y-4">
+                <div class="grid grid-cols-1 gap-4 w-full">
+                    <?php 
+                    $role_metadata = array(
+                        'cora_branch_manager' => array(
+                            'desc' => 'Full access to operational and sales data.',
+                            'color' => 'indigo',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+                        ),
+                        'cora_studio_manager' => array(
+                            'desc' => 'Full access to studio ops, dispatch, and financials.',
+                            'color' => 'indigo',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+                        ),
+                        'cora_re_agent' => array(
+                            'desc' => 'Operational access with client listing management.',
+                            'color' => 'indigo',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
+                        ),
+                        'cora_photographer' => array(
+                            'desc' => 'Shoot calendars, listings, and equipment check-ins.',
+                            'color' => 'indigo',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>'
+                        ),
+                        'cora_viewer' => array(
+                            'desc' => 'Read-only access to essential data.',
+                            'color' => 'indigo',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                        ),
+                        'editor' => array(
+                            'desc' => 'Full editorial and operational access.',
+                            'color' => 'indigo',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                        ),
+                        'contributor' => array(
+                            'desc' => 'Limited collaborative access.',
+                            'color' => 'emerald',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                        ),
+                        'subscriber' => array(
+                            'desc' => 'Default read-only client access.',
+                            'color' => 'zinc',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                        )
+                    );
+
+                    $category_details = array(
+                        'CORE NAVIGATION' => array(
+                            'subtitle' => 'Access to primary navigation and dashboard modules',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>'
+                        ),
+                        'OPERATIONAL' => array(
+                            'subtitle' => 'Access to operational tools and workflows',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+                        ),
+                        'SALES CHANNEL' => array(
+                            'subtitle' => 'Access to sales channel and customer data',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>'
+                        ),
+                        'ADMINISTRATIVE' => array(
+                            'subtitle' => 'Access to administrative and settings',
+                            'icon' => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
+                        )
+                    );
+
+                    $role_idx = 0;
+                    foreach ($target_roles as $role_key => $role_name): 
+                        $role_idx++;
+                        $is_role_collapsed = ($role_idx > 2); // Collapse all roles after the first two
+                        
                         $allowed_features = isset($cora_permissions[$role_key]) ? $cora_permissions[$role_key] : array();
                         
-                        $access_badge_label = 'Contributor';
-                        $access_badge_class = 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 font-semibold';
+                        // Default metadata
+                        $desc = 'Custom configured workspace role.';
+                        $color = 'indigo';
+                        $icon_html = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>';
                         
+                        if ( isset( $role_metadata[$role_key] ) ) {
+                            $desc = $role_metadata[$role_key]['desc'];
+                            $color = $role_metadata[$role_key]['color'];
+                            $icon_html = $role_metadata[$role_key]['icon'];
+                        }
+                        
+                        // Access level badge
+                        $access_badge_label = 'Contributor';
                         if ( isset( $cora_custom_roles[$role_key] ) ) {
                             $cdef = $cora_custom_roles[$role_key];
                             $lvl = isset($cdef['access_level']) ? $cdef['access_level'] : 'contributor';
                             if ($lvl === 'manager') {
                                 $access_badge_label = 'Manager';
-                                $access_badge_class = 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-bold';
                             } elseif ($lvl === 'read_only') {
                                 $access_badge_label = 'Read-Only';
-                                $access_badge_class = 'bg-zinc-100/80 text-zinc-650 dark:bg-zinc-800/60 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-750 font-semibold';
-                            } else {
-                                $access_badge_label = 'Custom';
                             }
                         } else {
                             if ( in_array($role_key, array('cora_branch_manager', 'editor')) ) {
                                 $access_badge_label = 'Manager';
-                                $access_badge_class = 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-bold';
                             } elseif ( in_array($role_key, array('cora_viewer', 'subscriber')) ) {
                                 $access_badge_label = 'Read-Only';
-                                $access_badge_class = 'bg-zinc-100/80 text-zinc-655 dark:bg-zinc-800/60 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-750 font-semibold';
                             }
                         }
+
+                        // Colors for the access level dropdown select
+                        $select_theme_classes = '';
+                        if ( $access_badge_label === 'Manager' ) {
+                            $select_theme_classes = 'text-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/40';
+                        } elseif ( $access_badge_label === 'Read-Only' ) {
+                            $select_theme_classes = 'text-blue-600 bg-blue-50/50 dark:bg-blue-950/20 dark:text-blue-400 border-blue-100 dark:border-blue-900/40';
+                        } else {
+                            $select_theme_classes = 'text-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40';
+                        }
                     ?>
-                        <div class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 rounded-xl p-3.5 shadow-2xs flex flex-col justify-between" data-mobile-role="<?php echo esc_attr($role_key); ?>">
+                        <div class="w-full bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between" data-mobile-role="<?php echo esc_attr($role_key); ?>">
                             <div>
-                                <div class="flex items-center justify-between gap-3 pb-2.5 border-b border-zinc-200 dark:border-zinc-800 mb-2.5">
-                                    <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100"><?php echo esc_html($role_name); ?></span>
-                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] shadow-2xs <?php echo esc_attr($access_badge_class); ?>">
-                                        <?php echo esc_html($access_badge_label); ?>
-                                    </span>
+                                <!-- Header Row -->
+                                <div class="flex items-center justify-between gap-3 pb-3">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                                            <?php echo $icon_html; ?>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100 block truncate"><?php echo esc_html($role_name); ?></span>
+                                            <span class="text-[10px] text-zinc-400 dark:text-zinc-500 block truncate mt-0.5"><?php echo esc_html($desc); ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <!-- Access Level Picker Dropdown -->
+                                        <select onchange="coraChangeMobileRoleAccessLevel('<?php echo esc_attr($role_key); ?>', this.value)" class="h-8 px-2 pr-6 rounded-lg border text-xs font-semibold cursor-pointer focus:outline-none transition-all select-none appearance-none <?php echo $select_theme_classes; ?>" style="background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%234B5563\' stroke-width=\'2.5\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'/%3E%3C/svg%3E'); background-position: right 6px center; background-size: 10px 10px; background-repeat: no-repeat;">
+                                            <option value="manager" <?php selected($access_badge_label, 'Manager'); ?>>Manager</option>
+                                            <option value="contributor" <?php selected($access_badge_label, 'Contributor'); ?>>Contributor</option>
+                                            <option value="read_only" <?php selected($access_badge_label, 'Read-Only'); ?>>Read-Only</option>
+                                        </select>
+                                        
+                                        <!-- Expand/Collapse Chevron -->
+                                        <button type="button" onclick="coraToggleRoleCardAccordion('<?php echo esc_attr($role_key); ?>')" class="p-1 text-zinc-400 hover:text-zinc-655 dark:hover:text-zinc-300 transition-colors cursor-pointer focus:outline-none">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform duration-200 transform <?php echo $is_role_collapsed ? '' : 'rotate-180'; ?>" id="role-arrow-<?php echo $role_key; ?>"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="space-y-2">
+                                
+                                <!-- Categories Accordion Area -->
+                                <div id="role-categories-<?php echo $role_key; ?>" class="<?php echo $is_role_collapsed ? 'hidden' : ''; ?> space-y-2.5 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                                     <?php 
                                     $cat_idx = 0;
                                     foreach ( $categories as $cat_label => $cat_cols ) : 
                                         $cat_idx++;
                                         $accordion_id = "matrix-acc-{$role_key}-{$cat_idx}";
+                                        
+                                        // Calculate category status dynamically
+                                        $has_edit = false;
+                                        $has_view = false;
+                                        $has_none = false;
+
+                                        foreach ( $cat_cols as $feature_key => $feature_label ) {
+                                            $m_level = isset( $cora_permission_levels[$role_key][$feature_key] ) 
+                                                ? $cora_permission_levels[$role_key][$feature_key] 
+                                                : ( in_array( $feature_key, $allowed_features, true ) ? 'edit' : 'none' );
+                                            if ( $m_level === 'edit' ) {
+                                                $has_edit = true;
+                                            } elseif ( $m_level === 'view' ) {
+                                                $has_view = true;
+                                            } else {
+                                                $has_none = true;
+                                            }
+                                        }
+
+                                        $status_icon = '';
+                                        if ( $has_edit && ! $has_view && ! $has_none ) {
+                                            // All Edit: checkmark circle
+                                            $status_icon = '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-500 shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+                                        } elseif ( ! $has_edit && ! $has_view && $has_none ) {
+                                            // All None: slash circle
+                                            $status_icon = '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>';
+                                        } else {
+                                            // Mixed/View: eye circle
+                                            $status_icon = '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-blue-500 shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+                                        }
+                                        
+                                        $cat_meta = isset($category_details[$cat_label]) ? $category_details[$cat_label] : array('subtitle' => '', 'icon' => '');
                                     ?>
-                                        <div class="border border-zinc-200/60 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-950">
-                                            <button type="button" onclick="coraToggleMatrixAccordion('<?php echo $accordion_id; ?>')" class="w-full px-3 py-2 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/30 text-[10px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/30 transition-colors select-none">
-                                                <span><?php echo esc_html( $cat_label ); ?></span>
-                                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200 transform" id="arrow-<?php echo $accordion_id; ?>"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                            </button>
-                                            <div id="content-<?php echo $accordion_id; ?>" class="hidden px-3 py-2.5 space-y-2 border-t border-zinc-100 dark:border-zinc-900">
+                                        <div class="border border-zinc-200/60 dark:border-zinc-800 rounded-xl overflow-hidden bg-zinc-50/40 dark:bg-zinc-850/40">
+                                            <div class="w-full px-3 py-2.5 flex items-center justify-between transition-colors select-none">
+                                                <div class="flex items-center gap-2.5 min-w-0">
+                                                    <div class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                                                        <?php echo $cat_meta['icon']; ?>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 block truncate"><?php echo esc_html( ucfirst(strtolower($cat_label)) ); ?></span>
+                                                        <span class="text-[10px] text-zinc-400 dark:text-zinc-500 block truncate mt-0.5"><?php echo esc_html($cat_meta['subtitle']); ?></span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-center gap-2 shrink-0">
+                                                    <!-- Category Status Indicator -->
+                                                    <?php echo $status_icon; ?>
+                                                    
+                                                    <!-- Expand/Collapse Chevron -->
+                                                    <button type="button" onclick="coraToggleMatrixAccordion('<?php echo $accordion_id; ?>')" class="p-1 text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-300 focus:outline-none">
+                                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200 transform" id="arrow-<?php echo $accordion_id; ?>"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <!-- Feature Rows -->
+                                            <div id="content-<?php echo $accordion_id; ?>" class="hidden px-3.5 py-2.5 space-y-2 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                                                 <?php foreach ( $cat_cols as $feature_key => $feature_label ) : 
                                                     $m_level = isset( $cora_permission_levels[$role_key][$feature_key] ) 
                                                         ? $cora_permission_levels[$role_key][$feature_key] 
                                                         : ( in_array( $feature_key, $allowed_features, true ) ? 'edit' : 'none' );
                                                 ?>
-                                                    <div class="flex items-center justify-between gap-3 text-[11px] text-zinc-700 dark:text-zinc-300 select-none py-1 border-b border-zinc-100/50 dark:border-zinc-900/50 last:border-b-0">
-                                                         <span><?php echo esc_html($feature_label); ?></span>
-                                                         <div class="mobile-matrix-cell cursor-pointer" data-role="<?php echo esc_attr($role_key); ?>" data-feature="<?php echo esc_attr($feature_key); ?>" data-level="<?php echo esc_attr($m_level); ?>">
+                                                    <div class="flex items-center justify-between gap-3 text-xs text-zinc-700 dark:text-zinc-300 select-none py-1.5 border-b border-zinc-100/50 dark:border-zinc-800/50 last:border-b-0">
+                                                         <span class="font-medium"><?php echo esc_html($feature_label); ?></span>
+                                                         <div class="mobile-matrix-cell cursor-pointer shrink-0" data-role="<?php echo esc_attr($role_key); ?>" data-feature="<?php echo esc_attr($feature_key); ?>" data-level="<?php echo esc_attr($m_level); ?>">
                                                              <?php echo cora_get_matrix_cell_badge($role_key, $feature_key, $m_level); ?>
                                                          </div>
                                                      </div>
@@ -1067,7 +1225,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
-                            </div>
+                             </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -3759,6 +3917,33 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         } else {
             $content.addClass('hidden');
             $arrow.removeClass('rotate-180');
+        }
+    };
+
+    window.coraToggleRoleCardAccordion = function(roleKey) {
+        var $content = $('#role-categories-' + roleKey);
+        var $arrow = $('#role-arrow-' + roleKey);
+        if ($content.hasClass('hidden')) {
+            $content.removeClass('hidden');
+            $arrow.addClass('rotate-180');
+        } else {
+            $content.addClass('hidden');
+            $arrow.removeClass('rotate-180');
+        }
+    };
+
+    window.coraChangeMobileRoleAccessLevel = function(roleKey, val) {
+        var $select = $('[data-mobile-role="' + roleKey + '"] select');
+        // Remove old theme classes
+        $select.removeClass('text-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/40 text-blue-600 bg-blue-50/50 dark:bg-blue-950/20 dark:text-blue-400 border-blue-100 dark:border-blue-900/40 text-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40');
+        
+        // Add new theme classes based on value
+        if (val === 'manager') {
+            $select.addClass('text-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/40');
+        } else if (val === 'read_only') {
+            $select.addClass('text-blue-600 bg-blue-50/50 dark:bg-blue-950/20 dark:text-blue-400 border-blue-100 dark:border-blue-900/40');
+        } else {
+            $select.addClass('text-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40');
         }
     };
 
