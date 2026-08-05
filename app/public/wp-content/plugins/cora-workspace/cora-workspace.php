@@ -3435,7 +3435,7 @@ add_action( 'rest_api_init', function () {
     ) );
 
     register_rest_route( 'cora/v1', '/mcp', array(
-        'methods'             => 'POST',
+        'methods'             => array( 'GET', 'POST' ),
         'callback'            => 'cora_rest_mcp_handler',
         'permission_callback' => '__return_true',
     ) );
@@ -4473,30 +4473,75 @@ function cora_rest_mcp_handler( $request ) {
         ), 401 );
     }
 
+    // Handle GET request - Establish Server-Sent Events (SSE) Stream Connection
+    if ( $request->get_method() === 'GET' ) {
+        header( 'Content-Type: text/event-stream' );
+        header( 'Cache-Control: no-cache' );
+        header( 'Connection: keep-alive' );
+        header( 'X-Accel-Buffering: no' );
+
+        $session_id = bin2hex( wp_generate_password( 16, false ) );
+        $post_url = home_url( '/wp-json/cora/v1/mcp?session_id=' . $session_id );
+        if ( ! empty( $provided_token ) ) {
+            $post_url = add_query_arg( 'token', $provided_token, $post_url );
+        }
+
+        echo "event: endpoint\n";
+        echo "data: " . esc_url_raw( $post_url ) . "\n\n";
+        ob_flush();
+        flush();
+
+        // Loop to poll for message transients sent by POST client requests
+        $start_time = time();
+        while ( time() - $start_time < 35 ) {
+            if ( connection_aborted() ) {
+                break;
+            }
+            $sse_message = get_transient( 'cora_mcp_sse_' . $session_id );
+            if ( $sse_message ) {
+                delete_transient( 'cora_mcp_sse_' . $session_id );
+                echo "event: message\n";
+                echo "data: " . wp_json_encode( $sse_message ) . "\n\n";
+                ob_flush();
+                flush();
+            }
+            // Send heartbeat pulse comment to prevent timeouts
+            echo ": heartbeat\n\n";
+            ob_flush();
+            flush();
+            sleep( 1 );
+        }
+        exit;
+    }
+
+    // Process incoming JSON-RPC POST request
     $params = $request->get_json_params();
     $method = isset( $params['method'] ) ? sanitize_text_field( $params['method'] ) : '';
     $id     = isset( $params['id'] ) ? $params['id'] : null;
 
     if ( ! $method ) {
-        return new WP_REST_Response( array(
+        $error_response = array(
             'jsonrpc' => '2.0',
             'error'   => array(
                 'code'    => -32600,
                 'message' => 'Invalid Request: Missing method.'
             ),
             'id'      => $id
-        ), 400 );
+        );
+        return cora_rest_mcp_respond( $error_response, 400, $request );
     }
 
     switch ( $method ) {
         case 'tools/list':
-            return cora_mcp_handle_list_tools( $id );
+            $response = cora_mcp_handle_list_tools( $id );
+            break;
         case 'tools/call':
             $tool_name = isset( $params['params']['name'] ) ? sanitize_text_field( $params['params']['name'] ) : '';
             $tool_args = isset( $params['params']['arguments'] ) ? $params['params']['arguments'] : array();
-            return cora_mcp_handle_call_tool( $tool_name, $tool_args, $id );
+            $response = cora_mcp_handle_call_tool( $tool_name, $tool_args, $id );
+            break;
         default:
-            return new WP_REST_Response( array(
+            $response = new WP_REST_Response( array(
                 'jsonrpc' => '2.0',
                 'error'   => array(
                     'code'    => -32601,
@@ -4504,7 +4549,30 @@ function cora_rest_mcp_handler( $request ) {
                 ),
                 'id'      => $id
             ), 404 );
+            break;
     }
+
+    return cora_rest_mcp_respond( $response, 200, $request );
+}
+}
+
+/**
+ * Helper to respond to POST requests, supporting SSE transients when session_id is active.
+ */
+if ( ! function_exists( 'cora_rest_mcp_respond' ) ) {
+function cora_rest_mcp_respond( $response, $fallback_status, $request ) {
+    $session_id = sanitize_text_field( $request->get_param( 'session_id' ) ?? '' );
+    $response_data = ( $response instanceof WP_REST_Response ) ? $response->get_data() : $response;
+    $status_code = ( $response instanceof WP_REST_Response ) ? $response->get_status() : $fallback_status;
+
+    if ( ! empty( $session_id ) ) {
+        // SSE transport: store response in transient for GET connection loop and return 202
+        set_transient( 'cora_mcp_sse_' . $session_id, $response_data, 30 );
+        return new WP_REST_Response( null, 202 );
+    }
+
+    // Standard HTTP transport: return regular JSON response
+    return new WP_REST_Response( $response_data, $status_code );
 }
 }
 
