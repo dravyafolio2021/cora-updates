@@ -2114,13 +2114,13 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         </div>
 
         <!-- Drawer Sub-Tabs -->
-        <div class="flex items-center gap-1 border-b border-zinc-200 dark:border-zinc-800 px-5 pt-2 bg-zinc-50/30 dark:bg-zinc-950/30 shrink-0 select-none">
-            <button type="button" class="drawer-edit-tab active px-3 py-2 text-xs font-bold border-b-2 border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 transition-colors cursor-pointer" data-drawer-tab="tab-edit-general">General</button>
-            <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-specializations">Role & Tags</button>
-            <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-financials">Financials</button>
-            <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-actions">Actions</button>
-            <button type="button" class="drawer-edit-tab px-3 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" data-drawer-tab="tab-edit-ai-security">
-                <span class="flex items-center gap-1"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3V6a4 4 0 0 1 4-4z"></path><circle cx="12" cy="14" r="2"></circle><path d="M12 16v2"></path></svg> AI & Security</span>
+        <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-3 pt-2 bg-zinc-50/30 dark:bg-zinc-950/30 shrink-0 select-none">
+            <button type="button" class="drawer-edit-tab active px-1.5 pb-2 pt-1 text-[11px] font-bold border-b-2 border-zinc-950 dark:border-zinc-100 text-zinc-950 dark:text-zinc-100 transition-colors cursor-pointer whitespace-nowrap" data-drawer-tab="tab-edit-general">General</button>
+            <button type="button" class="drawer-edit-tab px-1.5 pb-2 pt-1 text-[11px] font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer whitespace-nowrap" data-drawer-tab="tab-edit-specializations">Role & Tags</button>
+            <button type="button" class="drawer-edit-tab px-1.5 pb-2 pt-1 text-[11px] font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer whitespace-nowrap" data-drawer-tab="tab-edit-financials">Financials</button>
+            <button type="button" class="drawer-edit-tab px-1.5 pb-2 pt-1 text-[11px] font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer whitespace-nowrap" data-drawer-tab="tab-edit-actions">Actions</button>
+            <button type="button" class="drawer-edit-tab px-1.5 pb-2 pt-1 text-[11px] font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer whitespace-nowrap" data-drawer-tab="tab-edit-ai-security">
+                <span class="flex items-center gap-1.5"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3V6a4 4 0 0 1 4-4z"></path><circle cx="12" cy="14" r="2"></circle><path d="M12 16v2"></path></svg> AI & Security</span>
             </button>
         </div>
 
