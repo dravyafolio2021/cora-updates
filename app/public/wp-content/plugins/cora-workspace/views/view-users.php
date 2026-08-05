@@ -748,45 +748,48 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                 </div>
             </div>
 
-            <!-- Full-Width Search Input -->
-            <div class="relative w-full">
-                <input type="text" id="matrix-role-search" placeholder="Search roles..." class="w-full h-10 pl-9 pr-12 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-450 transition-all placeholder-zinc-400 dark:placeholder-zinc-500">
-                <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </div>
-                <div class="absolute right-3 top-0 bottom-0 flex items-center pointer-events-none">
-                    <kbd class="px-1.5 py-0.5 text-[9px] font-mono text-zinc-400 bg-zinc-100 dark:bg-zinc-800 rounded border border-zinc-200 dark:border-zinc-700 select-none">⌘ K</kbd>
-                </div>
-            </div>
-
-            <!-- Action Controls Toolbar Row -->
-            <div class="grid grid-cols-2 md:flex md:items-center md:justify-between gap-2.5 w-full pt-1">
-                <!-- Left Action Buttons group -->
-                <div class="contents md:flex md:items-center md:gap-2">
-                    <!-- Reset Defaults Button -->
-                    <button type="button" id="matrix-reset-defaults-btn" onclick="coraResetMatrixDefaults()" class="h-9 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs w-full md:w-auto">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                        <span>Reset</span>
-                    </button>
-
-                    <!-- Grant All Button -->
-                    <button type="button" id="matrix-grant-all-btn" onclick="coraGrantAllSelectedRolePermissions()" class="h-9 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs w-full md:w-auto">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <span>Grant All</span>
-                    </button>
-
-                    <!-- Configure AI Trainer Button -->
-                    <button type="button" id="matrix-ai-trainer-btn" onclick="openAiTrainerDrawer('gemini')" class="h-9 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs w-full md:w-auto">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 text-amber-500"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-                        <span>AI Trainer</span>
-                    </button>
+            <!-- Search & Actions Row -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 w-full pt-1 pb-2">
+                <!-- Search Input -->
+                <div class="relative w-full md:w-64 shrink-0">
+                    <input type="text" id="matrix-role-search" placeholder="Search roles..." class="w-full h-10 pl-9 pr-12 text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-450 transition-all placeholder-zinc-400 dark:placeholder-zinc-500">
+                    <div class="absolute left-3 top-0 bottom-0 flex items-center pointer-events-none text-zinc-400">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <div class="absolute right-3 top-0 bottom-0 flex items-center pointer-events-none">
+                        <kbd class="px-1.5 py-0.5 text-[9px] font-mono text-zinc-400 bg-zinc-100 dark:bg-zinc-800 rounded border border-zinc-200 dark:border-zinc-700 select-none">⌘ K</kbd>
+                    </div>
                 </div>
 
-                <!-- Right Save Matrix Button -->
-                <button type="button" id="matrix-save-btn" onclick="coraSavePermissionsMatrix()" class="h-9 px-4 text-xs font-bold text-white dark:text-zinc-950 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-sm w-full md:w-auto">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                    <span>Save Changes</span>
-                </button>
+                <!-- Action Controls Toolbar -->
+                <div class="grid grid-cols-2 md:flex md:items-center md:justify-end gap-2.5 w-full md:w-auto">
+                    <!-- Left Action Buttons group -->
+                    <div class="contents md:flex md:items-center md:gap-2">
+                        <!-- Reset Defaults Button -->
+                        <button type="button" id="matrix-reset-defaults-btn" onclick="coraResetMatrixDefaults()" class="h-9 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs w-full md:w-auto">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            <span>Reset</span>
+                        </button>
+
+                        <!-- Grant All Button -->
+                        <button type="button" id="matrix-grant-all-btn" onclick="coraGrantAllSelectedRolePermissions()" class="h-9 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs w-full md:w-auto">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Grant All</span>
+                        </button>
+
+                        <!-- Configure AI Trainer Button -->
+                        <button type="button" id="matrix-ai-trainer-btn" onclick="openAiTrainerDrawer('gemini')" class="h-9 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs w-full md:w-auto">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 text-amber-500"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                            <span>AI Trainer</span>
+                        </button>
+                    </div>
+
+                    <!-- Right Save Matrix Button -->
+                    <button type="button" id="matrix-save-btn" onclick="coraSavePermissionsMatrix()" class="h-9 px-4 text-xs font-bold text-white dark:text-zinc-950 bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-sm w-full md:w-auto">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        <span>Save Changes</span>
+                    </button>
+                </div>
             </div>
             </div>
             
