@@ -9873,52 +9873,7 @@ function cora_ajax_get_preview_url() {
 }
 add_action( 'wp_ajax_cora_ajax_get_preview_url', 'cora_ajax_get_preview_url' );
 
-/**
- * Elementor Reskin Module
- */
-function cora_enqueue_elementor_reskin_styles() {
 
-    // Core reskin
-    wp_enqueue_style(
-        'cora-elementor-reskin-css',
-        plugin_dir_url( __FILE__ ) . 'assets/css/cora-elementor-reskin.css',
-        array(),
-        time()
-    );
-    // Git integration drawer styles
-    wp_enqueue_style(
-        'cora-git-integration-css',
-        plugin_dir_url( __FILE__ ) . 'assets/css/cora-git-integration.css',
-        array(),
-        time()
-    );
-}
-add_action( 'elementor/editor/after_enqueue_styles', 'cora_enqueue_elementor_reskin_styles' );
-add_action( 'elementor/preview/enqueue_styles', 'cora_enqueue_elementor_reskin_styles' );
-
-function cora_enqueue_elementor_reskin_scripts() {
-    // Core reskin
-    wp_enqueue_script(
-        'cora-elementor-reskin-js',
-        plugin_dir_url( __FILE__ ) . 'assets/js/cora-elementor-reskin.js',
-        array(),
-        time(),
-        true
-    );
-    // Git integration
-    wp_enqueue_script(
-        'cora-git-integration-js',
-        plugin_dir_url( __FILE__ ) . 'assets/js/cora-git-integration.js',
-        array(),
-        time(),
-        true
-    );
-    wp_localize_script( 'cora-git-integration-js', 'coraGitData', array(
-        'ajax_url' => admin_url( 'admin-ajax.php' ),
-        'nonce'    => wp_create_nonce( 'cora_ajax_nonce' ),
-    ) );
-}
-add_action( 'elementor/editor/after_enqueue_scripts', 'cora_enqueue_elementor_reskin_scripts' );
 
 /**
  * Optimize Elementor Editor performance and remove admin bar

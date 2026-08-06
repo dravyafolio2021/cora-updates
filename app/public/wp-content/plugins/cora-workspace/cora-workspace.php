@@ -16498,8 +16498,8 @@ add_action( 'wp_ajax_cora_ajax_get_preview_url', 'cora_ajax_get_preview_url' );
 /**
  * Elementor Reskin Module
  */
-if ( ! function_exists( 'cora_enqueue_elementor_reskin_styles' ) ) {
-function cora_enqueue_elementor_reskin_styles() {
+if ( ! function_exists( 'cora_workspace_enqueue_elementor_reskin_styles' ) ) {
+function cora_workspace_enqueue_elementor_reskin_styles() {
 
     // Core reskin
     wp_enqueue_style(
@@ -16517,11 +16517,11 @@ function cora_enqueue_elementor_reskin_styles() {
     );
 }
 }
-add_action( 'elementor/editor/after_enqueue_styles', 'cora_enqueue_elementor_reskin_styles' );
-add_action( 'elementor/preview/enqueue_styles', 'cora_enqueue_elementor_reskin_styles' );
+add_action( 'elementor/editor/after_enqueue_styles', 'cora_workspace_enqueue_elementor_reskin_styles' );
+add_action( 'elementor/preview/enqueue_styles', 'cora_workspace_enqueue_elementor_reskin_styles' );
 
-if ( ! function_exists( 'cora_enqueue_elementor_reskin_scripts' ) ) {
-function cora_enqueue_elementor_reskin_scripts() {
+if ( ! function_exists( 'cora_workspace_enqueue_elementor_reskin_scripts' ) ) {
+function cora_workspace_enqueue_elementor_reskin_scripts() {
     // Core reskin
     wp_enqueue_script(
         'cora-elementor-reskin-js',
@@ -16570,7 +16570,7 @@ function cora_enqueue_elementor_reskin_scripts() {
     ) );
 }
 }
-add_action( 'elementor/editor/after_enqueue_scripts', 'cora_enqueue_elementor_reskin_scripts' );
+add_action( 'elementor/editor/after_enqueue_scripts', 'cora_workspace_enqueue_elementor_reskin_scripts' );
 
 /**
  * Optimize Elementor Editor performance and remove admin bar
