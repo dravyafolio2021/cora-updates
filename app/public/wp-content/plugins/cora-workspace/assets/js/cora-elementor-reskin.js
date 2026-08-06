@@ -104,6 +104,8 @@
         var docType   = getDocType();
         var typeBadge = getTypeBadge(docType);
 
+        var isThemeBuilder = ['header', 'footer', 'single', 'archive', 'error-404'].indexOf(docType) >= 0;
+
         // Get Cora theme context (passed via wp_localize_script)
         var ctx = window.coraEditorContext || {};
         var themeIsLive = (ctx.themeStatus === 'live');
@@ -119,11 +121,7 @@
             '<div class="cora-tb-row cora-tb-row1">' +
                 '<div class="cora-tb-group">' +
                     '<div class="cora-tb-logo">' +
-                        '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-                            '<polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" stroke-width="2"></polygon>' +
-                            '<circle cx="12" cy="12" r="3.5" stroke-width="1.5"></circle>' +
-                        '</svg>' +
-                        '<span class="cora-tb-logo-text">cora</span>' +
+                        '<span class="cora-tb-logo-text">CORA</span>' +
                     '</div>' +
                     '<button class="cora-tb-back-btn" onclick="window.location.href=\'' + getBackUrl() + '\'">' +
                         '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
@@ -147,13 +145,56 @@
                 '</div>' +
                 '<div class="cora-tb-group">' +
                     '<button class="cora-tb-text-btn" onclick="coraPreviewTemplate()" title="Preview">' +
-                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>' +
+                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>' +
                         'Preview' +
                     '</button>' +
+                    '<div class="cora-tb-divider-v"></div>' +
+                    '<div class="cora-tb-profile-wrap" id="cora-tb-profile-wrap">' +
+                        '<button class="cora-tb-profile-btn" onclick="coraToggleProfileMenu(event)" title="Account">' +
+                            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>' +
+                            '<svg class="cora-tb-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>' +
+                        '</button>' +
+                        '<div class="cora-tb-profile-dropdown" id="cora-tb-profile-dropdown">' +
+                            '<div class="cora-tb-profile-header">' +
+                                '<div class="cora-tb-profile-avatar">S</div>' +
+                                '<div>' +
+                                    '<div class="cora-tb-profile-name">Shruti</div>' +
+                                    '<div class="cora-tb-profile-role">Super Admin</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="cora-tb-profile-divider"></div>' +
+                            '<button onclick="window.open(\'' + window.location.origin + '/wp-admin/admin.php?page=cora-workspace\', \'_self\')" class="cora-tb-profile-item">' +
+                                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' +
+                                'Dashboard' +
+                            '</button>' +
+                            '<button onclick="window.open(\'' + window.location.origin + '/wp-admin/profile.php\', \'_blank\')" class="cora-tb-profile-item">' +
+                                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>' +
+                                'Profile' +
+                            '</button>' +
+                            '<div class="cora-tb-profile-divider"></div>' +
+                            '<button onclick="window.location.href=\'' + window.location.origin + '/wp-login.php?action=logout\'" class="cora-tb-profile-item cora-tb-profile-item--danger">' +
+                                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>' +
+                                'Sign out' +
+                            '</button>' +
+                        '</div>' +
+                    '</div>' +
                 '</div>' +
             '</div>' +
             '<div class="cora-tb-row cora-tb-row2">' +
                 '<div class="cora-tb-group">' +
+                    '<button class="cora-tb-text-btn" onclick="coraOpenTemplates()" title="Templates">' +
+                        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
+                        'Templates' +
+                    '</button>' +
+                    '<button class="cora-tb-text-btn" onclick="coraOpenGitDrawer()" title="Git">' +
+                        '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>' +
+                        'Git' +
+                    '</button>' +
+                    '<button class="cora-tb-text-btn" onclick="coraOpenSettings()" title="Settings">' +
+                        '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>' +
+                        'Settings' +
+                    '</button>' +
+                    '<div class="cora-tb-divider-v"></div>' +
                     '<button class="cora-tb-icon-btn" onclick="coraRunCmd(\'document/history/undo\')" title="Undo">' +
                         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>' +
                     '</button>' +
@@ -175,8 +216,7 @@
                             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>' +
                         '</button>' +
                     '</div>' +
-                    '<div class="cora-tb-divider-v"></div>' +
-                    '<span class="cora-tb-theme-badge ' + themeBadgeCls + '">' + themeLabel + '</span>' +
+                    (isThemeBuilder ? '' : '<div class="cora-tb-divider-v"></div><span class="cora-tb-theme-badge ' + themeBadgeCls + '">' + themeLabel + '</span>') +
                 '</div>' +
                 '<div class="cora-tb-group">' +
                     '<button class="cora-tb-text-btn" onclick="coraToggleNavigator()" title="Navigator">' +
@@ -211,6 +251,43 @@
      * TOOLBAR COMMAND HELPERS (exposed globally)
      * ═══════════════════════════════════════════════════════ */
 
+    window.coraOpenTemplates = function () {
+        try {
+            if (window.$e && $e.run) {
+                $e.run('library/open');
+            } else {
+                var btn = document.querySelector('.elementor-template-library-button, [data-dialog-class="elementor-templates-modal"]');
+                if (btn) btn.click();
+            }
+        } catch (e) {}
+    };
+
+    window.coraOpenSettings = function () {
+        var selectors = [
+            '#elementor-panel-footer-settings',
+            '.elementor-panel-footer-settings',
+            '.eicon-cog',
+            'i.eicon-cog',
+            '[data-tooltip="Settings"]',
+            'button[aria-label="Settings"]'
+        ];
+        for (var i = 0; i < selectors.length; i++) {
+            try {
+                var btn = document.querySelector(selectors[i]);
+                if (btn) { btn.click(); return; }
+            } catch (e) {}
+        }
+    };
+
+    window.coraOpenGitDrawer = function () {
+        if (window.coraToggleGitDrawer) {
+            window.coraToggleGitDrawer();
+        } else {
+            var btn = document.getElementById('cora-git-topbar-btn');
+            if (btn) btn.click();
+        }
+    };
+
     window.coraRunCmd = function (command, args) {
         try {
             if (window.$e && window.$e.run) {
@@ -232,11 +309,41 @@
     };
 
     window.coraToggleNavigator = function () {
-        try { if ($e && $e.run) { $e.run('navigator/toggle'); return; } } catch (e) {}
+        // Try Elementor v3 panel route first
+        var opened = false;
         try {
-            var navBtn = document.querySelector('[data-tooltip="Structure"], [aria-label="Structure"], [data-tooltip="Navigator"], [aria-label="Navigator"]');
-            if (navBtn) navBtn.click();
-        } catch (e) {}
+            if (window.$e && $e.run) {
+                // Elementor v3.x: toggle the navigator panel
+                var route = $e.routes ? $e.routes.current : null;
+                if (route && route['panel/page'] === 'navigator') {
+                    $e.run('panel/open-default', { autoFocusSearch: false });
+                } else {
+                    $e.run('panel/page-views/navigator');
+                }
+                opened = true;
+            }
+        } catch (e1) {
+            opened = false;
+        }
+        if (!opened) {
+            // Elementor v2 / fallback: click the native footer navigator button
+            var selectors = [
+                '.elementor-panel-footer-tool[data-tooltip="Structure"]',
+                '.elementor-panel-footer-tool[data-tooltip="Navigator"]',
+                '[aria-label="Structure"]',
+                '[aria-label="Navigator"]',
+                '[data-tooltip="Structure"]',
+                '[data-tooltip="Navigator"]',
+                '#elementor-panel-footer-navigator',
+                '.elementor-panel-footer-navigator'
+            ];
+            for (var i = 0; i < selectors.length; i++) {
+                try {
+                    var btn = document.querySelector(selectors[i]);
+                    if (btn) { btn.click(); opened = true; break; }
+                } catch (e2) {}
+            }
+        }
     };
 
     window.coraPreviewTemplate = function () {
@@ -247,13 +354,42 @@
     };
 
     window.coraPublishTemplate = function () {
+        // Only publish if there are unsaved changes
+        var publishBtn = document.querySelector('.cora-tb-publish-btn');
+        if (publishBtn && publishBtn.disabled) return;
         updateSaveStatus('Publishing...');
         try {
-            if ($e && $e.run) {
+            if (window.$e && $e.run) {
                 $e.run('document/save/publish');
-                setTimeout(function () { updateSaveStatus('Published'); }, 1500);
+                setTimeout(function () {
+                    updateSaveStatus('All changes saved');
+                    setPublishBtnState(false);
+                }, 1800);
             }
         } catch (e) {}
+    };
+
+    window.coraToggleProfileMenu = function (e) {
+        if (e) e.stopPropagation();
+        var dd = document.getElementById('cora-tb-profile-dropdown');
+        if (!dd) return;
+        var isVisible = dd.classList.contains('visible');
+        // Close any other open dropdowns first
+        document.querySelectorAll('.cora-tb-publish-dropdown, .cora-tb-profile-dropdown').forEach(function(d) {
+            d.classList.remove('visible');
+        });
+        if (!isVisible) {
+            dd.classList.add('visible');
+            setTimeout(function () {
+                document.addEventListener('click', function closeDD(evt) {
+                    var wrap = document.getElementById('cora-tb-profile-wrap');
+                    if (wrap && !wrap.contains(evt.target)) {
+                        dd.classList.remove('visible');
+                        document.removeEventListener('click', closeDD);
+                    }
+                });
+            }, 10);
+        }
     };
 
     window.coraTogglePublishMenu = function (e) {
@@ -272,12 +408,45 @@
      * STATUS & HELPERS
      * ═══════════════════════════════════════════════════════ */
 
+    /* Publish button enabled/disabled state */
+    function setPublishBtnState(hasChanges) {
+        var publishBtn  = document.querySelector('.cora-tb-publish-btn');
+        var chevronBtn  = document.querySelector('.cora-tb-publish-chevron');
+        var splitWrap   = document.querySelector('.cora-tb-publish-split');
+        if (!publishBtn) return;
+        publishBtn.disabled  = !hasChanges;
+        if (chevronBtn) chevronBtn.disabled = !hasChanges;
+        if (splitWrap) splitWrap.classList.toggle('cora-publish-idle', !hasChanges);
+    }
+
     function observeSaveStatus() {
+        // Start in disabled/idle state — nothing unsaved yet
+        setPublishBtnState(false);
+
         if (!window.elementor) return;
         try {
             if (elementor.saver) {
-                elementor.saver.on('before:save', function () { updateSaveStatus('Saving...'); });
-                elementor.saver.on('after:save', function () { updateSaveStatus('All changes saved'); });
+                elementor.saver.on('before:save', function () {
+                    updateSaveStatus('Saving...');
+                });
+                elementor.saver.on('after:save', function () {
+                    updateSaveStatus('All changes saved');
+                    setPublishBtnState(false);
+                });
+                // Mark as having changes whenever anything is modified
+                if (elementor.channels && elementor.channels.data) {
+                    elementor.channels.data.on('change', function () {
+                        updateSaveStatus('Unsaved changes');
+                        setPublishBtnState(true);
+                    });
+                }
+            }
+            // Hook elementor's own hasChanges flag as backup
+            if (elementor.on) {
+                elementor.on('change', function () {
+                    updateSaveStatus('Unsaved changes');
+                    setPublishBtnState(true);
+                });
             }
         } catch (e) {}
     }
@@ -351,7 +520,7 @@
     }
 
     function getBackUrl() {
-        return window.location.origin + '/wp-admin/admin.php?page=cora-workspace#canvas';
+        return window.location.origin + '/wp-admin/admin.php?page=cora-workspace&sub_page=canvas';
     }
 
     function escHtml(str) {
