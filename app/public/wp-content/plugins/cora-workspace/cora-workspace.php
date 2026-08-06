@@ -24089,15 +24089,13 @@ function cora_canvas_get_unique_slug( $theme_id, $base_slug, $current_page_id = 
     while ( true ) {
         if ( $current_page_id > 0 ) {
             $exists = $wpdb->get_var( $wpdb->prepare(
-                "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s AND id != %d LIMIT 1",
-                $theme_id,
+                "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = %s AND id != %d LIMIT 1",
                 $slug,
                 $current_page_id
             ) );
         } else {
             $exists = $wpdb->get_var( $wpdb->prepare(
-                "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1",
-                $theme_id,
+                "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = %s LIMIT 1",
                 $slug
             ) );
         }
@@ -24123,14 +24121,13 @@ function cora_ajax_canvas_create_page() {
     $template = sanitize_text_field( $_POST['template'] );
     $status = sanitize_text_field( $_POST['status'] );
 
-    // Check slug uniqueness in this theme
+    // Check slug uniqueness globally across all Canvas pages
     $duplicate = $wpdb->get_var( $wpdb->prepare(
-        "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1",
-        $theme_id,
+        "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = %s LIMIT 1",
         $slug
     ) );
     if ( $duplicate ) {
-        wp_send_json_error( array( 'message' => 'A page with this URL slug already exists in this theme. Please choose a unique slug.' ) );
+        wp_send_json_error( array( 'message' => 'A page with this URL slug already exists. Please choose a unique slug.' ) );
     }
 
     // Query theme source setting to check if we are building under Elementor
@@ -24341,15 +24338,14 @@ function cora_ajax_canvas_change_slug() {
 
     $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $page_id ) );
     if ( $page ) {
-        // Validate slug uniqueness in this theme (excluding the page itself)
+        // Validate slug uniqueness globally (excluding the page itself)
         $duplicate = $wpdb->get_var( $wpdb->prepare(
-            "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s AND id != %d LIMIT 1",
-            $page->theme_id,
+            "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = %s AND id != %d LIMIT 1",
             $slug,
             $page_id
         ) );
         if ( $duplicate ) {
-            wp_send_json_error( array( 'message' => 'A page with this URL slug already exists in this theme. Please choose a unique slug.' ) );
+            wp_send_json_error( array( 'message' => 'A page with this URL slug already exists. Please choose a unique slug.' ) );
         }
 
         wp_update_post( array(
