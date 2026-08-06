@@ -1014,7 +1014,10 @@ function cora_workspace_handle_workspace_route() {
     if ( $path === 'cora-manifest.json' ) {
         status_header( 200 );
         header( 'Content-Type: application/json' );
-        echo file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/manifest.json' );
+        $manifest = file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/manifest.json' );
+        $manifest = str_replace( '"icon_192.png"', '"' . CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png"', $manifest );
+        $manifest = str_replace( '"icon_512.png"', '"' . CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png"', $manifest );
+        echo $manifest;
         exit;
     }
     if ( $path === 'cora-offline.html' ) {
@@ -8540,6 +8543,9 @@ function cora_ajax_submit_lead() {
     );
     $inserted_id = $wpdb->insert_id;
 
+    // Trigger PWA Push Notification to owner and agency members
+    cora_pwa_notify_agency( $agency_id, 'New Lead Submitted', "Lead {$names} from {$city} is available.", home_url( '/workspace/crm_leads' ) );
+
     $leads = get_option( 'cora_workspace_leads', array() );
     if ( ! is_array( $leads ) ) {
         $leads = array();
@@ -9225,6 +9231,9 @@ function cora_ajax_save_booking() {
         ),
         array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s')
     );
+
+    // Trigger PWA Push Notification to owner and agency members
+    cora_pwa_notify_agency( $agency_id, 'New Booking Confirmed', "Booking for {$name} ({$type}) at {$location} has been created.", home_url( '/workspace/showings_bookings' ) );
 
     $clients = get_option( 'cora_workspace_clients', array() );
     if ( ! is_array( $clients ) ) {
@@ -14405,6 +14414,9 @@ function cora_ajax_save_client_task() {
     if ( ! empty($_POST['notify_wa']) && ! empty($task['whatsapp_phone']) ) {
         // Log or trigger WhatsApp API dispatch
         error_log("WhatsApp alert dispatched to " . $task['whatsapp_phone'] . " for task: " . $task['title']);
+        
+        // Also dispatch dynamic PWA Push Notification as a free alternative
+        cora_pwa_notify_agency( $current_agency, 'High Priority Task Alert', "Priority task: '{$task['title']}' is pending review.", home_url( '/workspace/client_task_manager' ) );
     }
 
     wp_send_json_success(array('message' => 'Task saved successfully', 'task' => $task, 'tasks' => $tasks));
@@ -24067,6 +24079,39 @@ function cora_ajax_canvas_get_theme_pages() {
 }
 add_action( 'wp_ajax_cora_ajax_get_theme_pages', 'cora_ajax_canvas_get_theme_pages' );
 
+if ( ! function_exists( 'cora_canvas_get_unique_slug' ) ) {
+function cora_canvas_get_unique_slug( $theme_id, $base_slug, $current_page_id = 0 ) {
+    global $wpdb;
+    $slug = sanitize_title( $base_slug );
+    $original_slug = $slug;
+    $counter = 1;
+    
+    while ( true ) {
+        if ( $current_page_id > 0 ) {
+            $exists = $wpdb->get_var( $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s AND id != %d LIMIT 1",
+                $theme_id,
+                $slug,
+                $current_page_id
+            ) );
+        } else {
+            $exists = $wpdb->get_var( $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1",
+                $theme_id,
+                $slug
+            ) );
+        }
+        
+        if ( ! $exists ) {
+            return $slug;
+        }
+        
+        $counter++;
+        $slug = $original_slug . '-' . $counter;
+    }
+}
+}
+
 if ( ! function_exists( 'cora_ajax_canvas_create_page' ) ) {
 function cora_ajax_canvas_create_page() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
@@ -24077,6 +24122,16 @@ function cora_ajax_canvas_create_page() {
     $slug = sanitize_title( $_POST['slug'] );
     $template = sanitize_text_field( $_POST['template'] );
     $status = sanitize_text_field( $_POST['status'] );
+
+    // Check slug uniqueness in this theme
+    $duplicate = $wpdb->get_var( $wpdb->prepare(
+        "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1",
+        $theme_id,
+        $slug
+    ) );
+    if ( $duplicate ) {
+        wp_send_json_error( array( 'message' => 'A page with this URL slug already exists in this theme. Please choose a unique slug.' ) );
+    }
 
     // Query theme source setting to check if we are building under Elementor
     $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
@@ -24286,6 +24341,17 @@ function cora_ajax_canvas_change_slug() {
 
     $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $page_id ) );
     if ( $page ) {
+        // Validate slug uniqueness in this theme (excluding the page itself)
+        $duplicate = $wpdb->get_var( $wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s AND id != %d LIMIT 1",
+            $page->theme_id,
+            $slug,
+            $page_id
+        ) );
+        if ( $duplicate ) {
+            wp_send_json_error( array( 'message' => 'A page with this URL slug already exists in this theme. Please choose a unique slug.' ) );
+        }
+
         wp_update_post( array(
             'ID' => $page->wp_post_id,
             'post_name' => $slug
@@ -24330,7 +24396,7 @@ function cora_ajax_canvas_duplicate_page() {
     $page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d", $page_id ), ARRAY_A );
     if ( $page ) {
         $new_title = $page['title'] . ' (Copy)';
-        $new_slug = $page['slug'] . '-copy';
+        $new_slug = cora_canvas_get_unique_slug( $page['theme_id'], $page['slug'] . '-copy' );
         
         $wp_post_id = wp_insert_post( array(
             'post_title' => $new_title,
@@ -37654,4 +37720,380 @@ function cora_ajax_test_dispatch_automation() {
 }
 }
 add_action( 'wp_ajax_cora_ajax_test_dispatch_automation', 'cora_ajax_test_dispatch_automation' );
+
+// ── PWA & Web Push Notification System ─────────────────────────────────────
+
+add_action( 'init', 'cora_pwa_init' );
+
+if ( ! function_exists( 'cora_pwa_init' ) ) {
+function cora_pwa_init() {
+    cora_pwa_get_vapid_keys();
+}
+}
+
+if ( ! function_exists( 'cora_pwa_base64url_encode' ) ) {
+function cora_pwa_base64url_encode( $data ) {
+    return str_replace( array( '+', '/', '=' ), array( '-', '_', '' ), base64_encode( $data ) );
+}
+}
+
+if ( ! function_exists( 'cora_pwa_der_to_es256' ) ) {
+function cora_pwa_der_to_es256( $der ) {
+    $der = (string) $der;
+    if ( empty( $der ) || ord( $der[0] ) !== 0x30 ) {
+        return '';
+    }
+    
+    $len = ord( $der[1] );
+    $start = 2;
+    if ( $len & 0x80 ) {
+        $bytes = $len & 0x7f;
+        $start += $bytes;
+    }
+    
+    if ( ord( $der[$start] ) !== 0x02 ) {
+        return '';
+    }
+    
+    $len_r = ord( $der[$start + 1] );
+    $r = substr( $der, $start + 2, $len_r );
+    
+    $start_s = $start + 2 + $len_r;
+    if ( ord( $der[$start_s] ) !== 0x02 ) {
+        return '';
+    }
+    
+    $len_s = ord( $der[$start_s + 1] );
+    $s = substr( $der, $start_s + 2, $len_s );
+    
+    if ( ord( $r[0] ) === 0x00 ) {
+        $r = substr( $r, 1 );
+    }
+    if ( ord( $s[0] ) === 0x00 ) {
+        $s = substr( $s, 1 );
+    }
+    
+    $r = str_pad( $r, 32, "\0", STR_PAD_LEFT );
+    $s = str_pad( $s, 32, "\0", STR_PAD_LEFT );
+    
+    return $r . $s;
+}
+}
+
+if ( ! function_exists( 'cora_pwa_get_vapid_keys' ) ) {
+function cora_pwa_get_vapid_keys() {
+    $public_key = get_option( 'cora_pwa_vapid_public_key' );
+    $private_key = get_option( 'cora_pwa_vapid_private_key' );
+    
+    if ( empty( $public_key ) || empty( $private_key ) ) {
+        // Write temporary openssl.cnf to make EC key pair generation reliable on all platforms
+        $temp_cnf = CORA_WORKSPACE_PATH . 'assets/pwa/temp_openssl.cnf';
+        $cnf_content = "[req]\ndefault_bits = 2048\ndistinguished_name = req_distinguished_name\n[req_distinguished_name]\n";
+        file_put_contents( $temp_cnf, $cnf_content );
+        
+        $config = array(
+            "private_key_type" => OPENSSL_KEYTYPE_EC,
+            "curve_name"       => "prime256v1",
+            "config"           => $temp_cnf
+        );
+        
+        $res = openssl_pkey_new( $config );
+        if ( ! $res ) {
+            // Try with environment variable as fallback
+            putenv( "OPENSSL_CONF=" . $temp_cnf );
+            $res = openssl_pkey_new( array(
+                "private_key_type" => OPENSSL_KEYTYPE_EC,
+                "curve_name"       => "prime256v1"
+            ) );
+        }
+        
+        if ( $res ) {
+            openssl_pkey_export( $res, $private_key_pem, null, array( "config" => $temp_cnf ) );
+            $details = openssl_pkey_get_details( $res );
+            if ( $details && isset( $details['ec'] ) ) {
+                $x = $details['ec']['x'];
+                $y = $details['ec']['y'];
+                $public_key_bin = "\x04" . $x . $y;
+                $public_key_b64 = cora_pwa_base64url_encode( $public_key_bin );
+                
+                update_option( 'cora_pwa_vapid_public_key', $public_key_b64 );
+                update_option( 'cora_pwa_vapid_private_key', $private_key_pem );
+                
+                $public_key = $public_key_b64;
+                $private_key = $private_key_pem;
+            }
+        }
+        @unlink( $temp_cnf );
+    }
+    
+    return array(
+        'public'  => $public_key,
+        'private' => $private_key
+    );
+}
+}
+
+// Register REST API endpoints
+add_action( 'rest_api_init', 'cora_pwa_register_routes' );
+
+if ( ! function_exists( 'cora_pwa_register_routes' ) ) {
+function cora_pwa_register_routes() {
+    register_rest_route( 'cora-pwa/v1', '/save-subscription', array(
+        'methods'             => 'POST',
+        'callback'            => 'cora_pwa_save_subscription_endpoint',
+        'permission_callback' => function() {
+            return is_user_logged_in();
+        }
+    ) );
+    
+    register_rest_route( 'cora-pwa/v1', '/get-notification', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_pwa_get_notification_endpoint',
+        'permission_callback' => '__return_true' // Auth verified internally via token
+    ) );
+}
+}
+
+if ( ! function_exists( 'cora_pwa_save_subscription_endpoint' ) ) {
+function cora_pwa_save_subscription_endpoint( $request ) {
+    $params = $request->get_json_params();
+    if ( empty( $params ) || empty( $params['endpoint'] ) ) {
+        return new WP_REST_Response( array( 'success' => false, 'message' => 'Invalid parameters' ), 400 );
+    }
+    
+    $user_id = get_current_user_id();
+    $subscriptions = get_user_meta( $user_id, 'cora_pwa_subscriptions', true );
+    if ( ! is_array( $subscriptions ) ) {
+        $subscriptions = array();
+    }
+    
+    // Check if subscription endpoint already exists, if not, add it
+    $exists = false;
+    foreach ( $subscriptions as $sub ) {
+        if ( isset( $sub['endpoint'] ) && $sub['endpoint'] === $params['endpoint'] ) {
+            $exists = true;
+            break;
+        }
+    }
+    
+    if ( ! $exists ) {
+        $subscriptions[] = $params;
+        update_user_meta( $user_id, 'cora_pwa_subscriptions', $subscriptions );
+    }
+    
+    // Ensure user has auth token
+    $token = get_user_meta( $user_id, 'cora_pwa_auth_token', true );
+    if ( empty( $token ) ) {
+        $token = wp_generate_password( 32, false );
+        update_user_meta( $user_id, 'cora_pwa_auth_token', $token );
+    }
+    
+    return new WP_REST_Response( array( 'success' => true, 'data' => array( 'token' => $token ) ), 200 );
+}
+}
+
+if ( ! function_exists( 'cora_pwa_get_notification_endpoint' ) ) {
+function cora_pwa_get_notification_endpoint( $request ) {
+    $token = $request->get_param( 'token' );
+    if ( empty( $token ) ) {
+        return new WP_REST_Response( array( 'success' => false, 'message' => 'Token required' ), 401 );
+    }
+    
+    // Find user with this auth token
+    global $wpdb;
+    $user_id = $wpdb->get_var( $wpdb->prepare(
+        "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = 'cora_pwa_auth_token' AND meta_value = %s LIMIT 1",
+        $token
+    ) );
+    
+    if ( ! $user_id ) {
+        return new WP_REST_Response( array( 'success' => false, 'message' => 'Invalid token' ), 401 );
+    }
+    
+    // Get latest notification
+    $notif = get_option( 'cora_pwa_latest_notification_' . $user_id );
+    if ( ! $notif ) {
+        $notif = array(
+            'title' => 'Cora Workspace Active',
+            'body'  => 'You are connected to Cora Push Services.',
+            'url'   => home_url( '/workspace/dashboard' )
+        );
+    }
+    
+    return new WP_REST_Response( array( 'success' => true, 'notification' => $notif ), 200 );
+}
+}
+
+// Native Push sending mechanism using VAPID
+if ( ! function_exists( 'cora_pwa_send_push_notification' ) ) {
+function cora_pwa_send_push_notification( $user_id, $title, $body, $url = '' ) {
+    $subscriptions = get_user_meta( $user_id, 'cora_pwa_subscriptions', true );
+    if ( empty( $subscriptions ) || ! is_array( $subscriptions ) ) {
+        return false;
+    }
+    
+    // Store latest notification for retrieval on push-to-pull
+    $notif = array(
+        'title' => $title,
+        'body'  => $body,
+        'url'   => ! empty( $url ) ? $url : home_url( '/workspace/dashboard' ),
+        'icon'  => CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png',
+        'badge' => CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png',
+        'time'  => time()
+    );
+    update_option( 'cora_pwa_latest_notification_' . $user_id, $notif );
+    
+    $vapid_keys = cora_pwa_get_vapid_keys();
+    if ( empty( $vapid_keys['public'] ) || empty( $vapid_keys['private'] ) ) {
+        return false;
+    }
+    
+    $success_count = 0;
+    
+    foreach ( $subscriptions as $sub ) {
+        if ( empty( $sub['endpoint'] ) ) {
+            continue;
+        }
+        
+        $endpoint = $sub['endpoint'];
+        $parsed_url = parse_url( $endpoint );
+        if ( ! $parsed_url || empty( $parsed_url['host'] ) ) {
+            continue;
+        }
+        
+        $origin = $parsed_url['scheme'] . '://' . $parsed_url['host'];
+        
+        // Construct JWT claims
+        $claims = array(
+            'aud' => $origin,
+            'exp' => time() + 12 * 3600, // 12 hours
+            'sub' => 'mailto:' . get_option( 'admin_email' )
+        );
+        
+        $header = cora_pwa_base64url_encode( json_encode( array( 'alg' => 'ES256', 'typ' => 'JWT' ) ) );
+        $payload = cora_pwa_base64url_encode( json_encode( $claims ) );
+        
+        $input = $header . '.' . $payload;
+        $signature = '';
+        
+        // Write temporary cnf to load key securely
+        $temp_cnf = CORA_WORKSPACE_PATH . 'assets/pwa/temp_openssl.cnf';
+        $cnf_content = "[req]\ndefault_bits = 2048\ndistinguished_name = req_distinguished_name\n[req_distinguished_name]\n";
+        file_put_contents( $temp_cnf, $cnf_content );
+        putenv( "OPENSSL_CONF=" . $temp_cnf );
+        
+        openssl_sign( $input, $signature, $vapid_keys['private'], OPENSSL_ALGO_SHA256 );
+        @unlink( $temp_cnf );
+        
+        $es256_signature = cora_pwa_der_to_es256( $signature );
+        if ( empty( $es256_signature ) ) {
+            continue;
+        }
+        
+        $jwt = $input . '.' . cora_pwa_base64url_encode( $es256_signature );
+        
+        // Make request
+        $headers = array(
+            'TTL'           => '86400',
+            'Urgency'       => 'high',
+            'Authorization' => 'vapid t=' . $jwt . ', k=' . $vapid_keys['public'],
+            'Content-Length'=> '0'
+        );
+        
+        $response = wp_remote_post( $endpoint, array(
+            'headers' => $headers,
+            'body'    => '',
+            'timeout' => 10
+        ) );
+        
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            if ( $code === 201 || $code === 200 ) {
+                $success_count++;
+            } elseif ( $code === 410 || $code === 404 ) {
+                // Subscription is expired or invalid, remove it
+                cora_pwa_remove_subscription( $user_id, $endpoint );
+            }
+        }
+    }
+    
+    return $success_count > 0;
+}
+}
+
+// Remove expired/invalid subscriptions
+if ( ! function_exists( 'cora_pwa_remove_subscription' ) ) {
+function cora_pwa_remove_subscription( $user_id, $endpoint ) {
+    $subscriptions = get_user_meta( $user_id, 'cora_pwa_subscriptions', true );
+    if ( is_array( $subscriptions ) ) {
+        $filtered = array();
+        foreach ( $subscriptions as $sub ) {
+            if ( isset( $sub['endpoint'] ) && $sub['endpoint'] !== $endpoint ) {
+                $filtered[] = $sub;
+            }
+        }
+        update_user_meta( $user_id, 'cora_pwa_subscriptions', $filtered );
+    }
+}
+}
+
+// Dispatch to all users belonging to the agency (hierarchy down to workspace owner)
+if ( ! function_exists( 'cora_pwa_notify_agency' ) ) {
+function cora_pwa_notify_agency( $agency_id, $title, $body, $url = '' ) {
+    $agency_slug = '';
+    global $wpdb;
+    
+    if ( is_numeric( $agency_id ) ) {
+        $agency_slug = $wpdb->get_var( $wpdb->prepare( "SELECT slug FROM {$wpdb->prefix}cora_agencies WHERE id = %d", intval( $agency_id ) ) );
+    } else {
+        $agency_slug = $agency_id;
+    }
+    
+    if ( empty( $agency_slug ) ) {
+        return;
+    }
+    
+    // Find all users in this agency
+    $user_query_args = array(
+        'meta_query' => array(
+            array(
+                'key'     => 'cora_agency_id',
+                'value'   => function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $agency_slug ) : $agency_slug,
+                'compare' => 'IN'
+            )
+        )
+    );
+    $users = get_users( $user_query_args );
+    
+    foreach ( $users as $u ) {
+        cora_pwa_send_push_notification( $u->ID, $title, $body, $url );
+    }
+}
+}
+
+// AJAX handler for test push
+add_action( 'wp_ajax_cora_pwa_send_test_push', 'cora_ajax_pwa_send_test_push' );
+if ( ! function_exists( 'cora_ajax_pwa_send_test_push' ) ) {
+function cora_ajax_pwa_send_test_push() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'Not logged in' );
+    }
+    
+    $user_id = get_current_user_id();
+    $sent = cora_pwa_send_push_notification(
+        $user_id,
+        'Test Push Notification',
+        'Your PWA Push Notification System is working successfully!',
+        home_url( '/workspace/dashboard' )
+    );
+    
+    if ( $sent ) {
+        wp_send_json_success( 'Test notification sent successfully!' );
+    } else {
+        wp_send_json_error( 'Failed to send notification. Make sure you are subscribed.' );
+    }
+}
+}
+
 

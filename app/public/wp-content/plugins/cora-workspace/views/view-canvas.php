@@ -4371,7 +4371,8 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                     fetchThemePages(canvasState.activeThemeId);
                 }
             } else {
-                window.coraShowToast('Failed to create page.');
+                const msg = (res.data && res.data.message) ? res.data.message : 'Failed to create page.';
+                window.coraShowToast(msg, 'error');
             }
         });
     }
@@ -4494,7 +4495,8 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 closeChangePageSlugDrawer();
                 fetchThemePages(canvasState.activeThemeId);
             } else {
-                window.coraShowToast('Failed to update slug.');
+                const msg = (res.data && res.data.message) ? res.data.message : 'Failed to update slug.';
+                window.coraShowToast(msg, 'error');
             }
         });
     }
