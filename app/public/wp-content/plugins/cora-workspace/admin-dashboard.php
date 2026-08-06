@@ -255,6 +255,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         window.coraClients = <?php echo json_encode( $cora_workspace_clients ); ?>;
         window.coraDocuments = <?php echo json_encode( $cora_documents ); ?>;
         window.coraPortfolios = <?php echo json_encode( $cora_portfolios ); ?>;
+        window.coraPwaVapidPublicKey = <?php echo json_encode( get_option( 'cora_pwa_vapid_public_key' ) ); ?>;
+        window.coraPwaNonce = <?php echo json_encode( wp_create_nonce( 'wp_rest' ) ); ?>;
+        window.coraAjaxNonce = <?php echo json_encode( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>;
     </script>
     
     <!-- Load QuillJS Rich Text ListingCoordinator -->
@@ -4053,6 +4056,35 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                 <div class="border-t border-zinc-100 dark:border-zinc-800"></div>
 
+                <!-- PWA & Push Notifications Settings -->
+                <div class="px-2.5 py-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 rounded-xl space-y-2.5 select-none">
+                    <div class="flex items-center justify-between px-0.5">
+                        <span class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">App & Push (PWA)</span>
+                        <span id="cora-pwa-badge" class="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-400 dark:bg-zinc-700 text-white rounded uppercase">Inactive</span>
+                    </div>
+                    
+                    <div class="flex flex-col gap-1.5">
+                        <!-- Install Button -->
+                        <button type="button" id="cora-pwa-install-btn" class="hidden w-full py-1.5 bg-zinc-950 dark:bg-zinc-100 hover:opacity-85 text-white dark:text-zinc-950 font-bold rounded-lg text-[10px] transition-colors cursor-pointer text-center select-none shadow-3xs border-none outline-none">
+                            Install Desktop/Phone App
+                        </button>
+                        
+                        <!-- Push Notifications Button -->
+                        <button type="button" id="cora-pwa-push-btn" class="w-full py-1.5 bg-zinc-950 dark:bg-zinc-100 hover:opacity-85 text-white dark:text-zinc-950 font-bold rounded-lg text-[10px] transition-colors cursor-pointer text-center select-none shadow-3xs border-none outline-none" onclick="coraRequestPushSubscription()">
+                            Enable Push Notifications
+                        </button>
+
+                        <!-- Send Test Push Button -->
+                        <button type="button" id="cora-pwa-test-btn" class="hidden w-full py-1.5 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 font-semibold rounded-lg text-[10px] transition-colors cursor-pointer text-center select-none shadow-3xs border border-zinc-200 dark:border-zinc-700 outline-none" onclick="coraSendTestPushNotification()">
+                            Send Test Notification
+                        </button>
+                        
+                        <p id="cora-pwa-status-text" class="text-[9px] text-zinc-500 text-center leading-normal font-medium m-0">Install app & enable alerts for immediate updates.</p>
+                    </div>
+                </div>
+
+                <div class="border-t border-zinc-100 dark:border-zinc-800"></div>
+
                 <a href="<?php echo esc_url( wp_logout_url( home_url() ) ); ?>" class="w-full text-left px-2.5 py-2.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-red-600 dark:hover:text-red-400 font-semibold flex items-center gap-3 transition-colors select-none">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 shrink-0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                     Sign out
@@ -6257,6 +6289,13 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             <?php if ( $sub_page === 'pages' ) : ?>
             <section id="cora-page-pages" class="cora-page-section cora-active space-y-6">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-pages.php'; ?>
+            </section>
+            <?php endif; ?>
+
+            <!-- SECTION: VISUAL BUILDER -->
+            <?php if ( $sub_page === 'visual-builder' ) : ?>
+            <section id="cora-page-visual-builder" class="cora-page-section cora-active" style="padding:0;margin:0;overflow:hidden;flex:1;min-height:0;display:flex;flex-direction:column;height:100%;">
+                <?php include CORA_WORKSPACE_PATH . 'views/view-visual-builder.php'; ?>
             </section>
             <?php endif; ?>
 
@@ -12815,6 +12854,189 @@ jQuery(document).ready(function($) {
 });
 </script>
 <?php endif; ?>
+
+<script>
+// PWA Installation & Push Subscription Logic
+let coraPwaDeferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    coraPwaDeferredPrompt = e;
+    const installBtn = document.getElementById('cora-pwa-install-btn');
+    if (installBtn) {
+        installBtn.classList.remove('hidden');
+    }
+});
+
+function coraUrlB64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+function coraRequestPushSubscription() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        if (window.coraShowToast) {
+            window.coraShowToast('Push notifications are not supported in this browser.', 'error');
+        }
+        return;
+    }
+    
+    Notification.requestPermission().then(permission => {
+        if (permission !== 'granted') {
+            if (window.coraShowToast) {
+                window.coraShowToast('Notification permission denied.', 'error');
+            }
+            return;
+        }
+        
+        navigator.serviceWorker.ready.then(registration => {
+            if (!window.coraPwaVapidPublicKey) {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Push services not configured yet. Try reloading.', 'error');
+                }
+                return;
+            }
+            
+            const applicationServerKey = coraUrlB64ToUint8Array(window.coraPwaVapidPublicKey);
+            registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: applicationServerKey
+            })
+            .then(subscription => {
+                fetch('/wp-json/cora-pwa/v1/save-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': window.coraPwaNonce
+                    },
+                    body: JSON.stringify(subscription)
+                })
+                .then(res => res.json())
+                .then(resData => {
+                    if (resData.success) {
+                        if (window.coraShowToast) {
+                            window.coraShowToast('Notifications enabled successfully!', 'success');
+                        }
+                        
+                        const token = resData.data.token;
+                        navigator.serviceWorker.register('<?php echo home_url('/cora-service-worker.js'); ?>?token=' + token, { scope: '/' })
+                            .then(() => {
+                                const badge = document.getElementById('cora-pwa-badge');
+                                if (badge) {
+                                    badge.innerText = 'Active';
+                                    badge.className = 'text-[9px] font-bold px-1.5 py-0.5 bg-emerald-600 dark:bg-emerald-500 text-white rounded uppercase';
+                                }
+                                const pushBtn = document.getElementById('cora-pwa-push-btn');
+                                if (pushBtn) pushBtn.classList.add('hidden');
+                                const testBtn = document.getElementById('cora-pwa-test-btn');
+                                if (testBtn) testBtn.classList.remove('hidden');
+                                const statusText = document.getElementById('cora-pwa-status-text');
+                                if (statusText) statusText.innerText = 'Notifications are active on this device.';
+                            });
+                    } else {
+                        if (window.coraShowToast) {
+                            window.coraShowToast('Failed to save subscription on server.', 'error');
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Subscription save error:', err);
+                    if (window.coraShowToast) {
+                        window.coraShowToast('Error connecting to notification server.', 'error');
+                    }
+                });
+            })
+            .catch(err => {
+                console.error('Push registration error:', err);
+                if (window.coraShowToast) {
+                    window.coraShowToast('Failed to subscribe to browser push notifications.', 'error');
+                }
+            });
+        });
+    });
+}
+
+function coraSendTestPushNotification() {
+    jQuery.ajax({
+        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+        type: 'POST',
+        data: {
+            action: 'cora_pwa_send_test_push',
+            nonce: window.coraAjaxNonce
+        },
+        success: function(res) {
+            if (res.success) {
+                if (window.coraShowToast) {
+                    window.coraShowToast(res.data, 'success');
+                }
+            } else {
+                if (window.coraShowToast) {
+                    window.coraShowToast(res.data, 'error');
+                }
+            }
+        },
+        error: function() {
+            if (window.coraShowToast) {
+                window.coraShowToast('Failed to trigger test notification.', 'error');
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const installBtn = document.getElementById('cora-pwa-install-btn');
+    if (installBtn) {
+        installBtn.addEventListener('click', (e) => {
+            if (!coraPwaDeferredPrompt) return;
+            coraPwaDeferredPrompt.prompt();
+            coraPwaDeferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    installBtn.classList.add('hidden');
+                }
+                coraPwaDeferredPrompt = null;
+            });
+        });
+    }
+    
+    // Auto check if running inside standalone PWA
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        if (installBtn) installBtn.classList.add('hidden');
+        const statusText = document.getElementById('cora-pwa-status-text');
+        if (statusText) statusText.innerText = 'App is installed and running.';
+    }
+    
+    // Auto check push status
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.pushManager.getSubscription().then(subscription => {
+                if (subscription) {
+                    const badge = document.getElementById('cora-pwa-badge');
+                    if (badge) {
+                        badge.innerText = 'Active';
+                        badge.className = 'text-[9px] font-bold px-1.5 py-0.5 bg-emerald-600 dark:bg-emerald-500 text-white rounded uppercase';
+                    }
+                    const pushBtn = document.getElementById('cora-pwa-push-btn');
+                    if (pushBtn) pushBtn.classList.add('hidden');
+                    const testBtn = document.getElementById('cora-pwa-test-btn');
+                    if (testBtn) testBtn.classList.remove('hidden');
+                    const statusText = document.getElementById('cora-pwa-status-text');
+                    if (statusText) statusText.innerText = 'Notifications are active on this device.';
+                }
+            });
+        });
+    }
+});
+</script>
 
 </body>
 </html>

@@ -108,6 +108,7 @@
     }
 
     function toggleDrawer() { state.drawerOpen ? closeDrawer() : openDrawer(); }
+    window.coraToggleGitDrawer = toggleDrawer;
     function openDrawer() {
         buildDrawer();
         document.getElementById('cora-git-drawer').classList.add('cora-git-drawer--open');

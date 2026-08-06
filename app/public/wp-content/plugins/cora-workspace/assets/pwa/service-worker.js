@@ -83,3 +83,58 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Push event listener for dynamic Push-to-Pull notification delivery
+self.addEventListener('push', event => {
+  const params = new URLSearchParams(self.location.search);
+  const token = params.get('token') || '';
+  
+  event.waitUntil(
+    fetch('/wp-json/cora-pwa/v1/get-notification?token=' + token)
+      .then(response => {
+        if (response.status !== 200) {
+          throw new Error('Failed to fetch notification data');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data && data.success && data.notification) {
+          const notif = data.notification;
+          return self.registration.showNotification(notif.title, {
+            body: notif.body,
+            icon: notif.icon || '/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png',
+            badge: notif.badge || '/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png',
+            data: {
+              url: notif.url || '/workspace/dashboard'
+            }
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching notification content:', err);
+      })
+  );
+});
+
+// Handle notification click: focus or open workspace window
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const urlToOpen = event.notification.data?.url || '/workspace/dashboard';
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(windowClients => {
+        // Find existing workspace window and navigate/focus it
+        for (let i = 0; i < windowClients.length; i++) {
+          const client = windowClients[i];
+          if (client.url.includes('/workspace/') && 'focus' in client) {
+            return client.navigate(urlToOpen).then(c => c.focus());
+          }
+        }
+        // Otherwise open a new tab/window
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
+      })
+  );
+});
+

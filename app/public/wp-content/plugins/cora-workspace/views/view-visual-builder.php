@@ -426,6 +426,165 @@ jQuery(document).ready(function($) {
         category: 'Cora Templates'
     });
 
+    // 2.2 Define Level 04 Marketing blocks
+    editor.BlockManager.add('cora-header-hero', {
+        label: `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="6" rx="1"></rect><rect x="3" y="11" width="18" height="10" rx="1"></rect><line x1="7" y1="15" x2="17" y2="15"></line></svg><div>Hero Header</div>`,
+        content: `<div class="w-full bg-white font-sans text-zinc-900 border-b border-zinc-200">
+            <!-- Navigation Header -->
+            <header class="border-b border-zinc-100 bg-white/90 backdrop-blur-md">
+                <div class="max-w-[1200px] mx-auto px-6 py-4 flex items-center justify-between">
+                    <a href="#" class="flex items-center gap-2 font-bold text-base text-zinc-950">
+                        <div class="w-7 h-7 rounded bg-zinc-950 flex items-center justify-center text-white text-xs font-black">C</div>
+                        <span>Cora</span>
+                    </a>
+                    <div class="flex items-center gap-5 text-xs font-semibold text-zinc-500">
+                        <a href="#features" class="hover:text-zinc-950 transition-colors">Features</a>
+                        <a href="#pricing" class="hover:text-zinc-950 transition-colors">Pricing</a>
+                        <a href="#" class="hover:text-zinc-950 transition-colors">Log in</a>
+                        <a href="#" class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-full font-bold transition-all">Start Free</a>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Hero Assembly Section -->
+            <section class="py-24 px-6 text-center max-w-4xl mx-auto flex flex-col items-center gap-6">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-zinc-200 bg-zinc-50 text-[11px] font-semibold text-zinc-500 shadow-xs">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    Now in Public Beta — v0.1
+                </div>
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-zinc-950 leading-tight">
+                    The AI-powered suite for <span class="text-zinc-400">modern real estate</span>
+                </h1>
+                <p class="text-sm md:text-base text-zinc-500 leading-relaxed max-w-2xl">
+                    Listings, client pipelines, marketing automation, document generation, and intelligent closings — all unified in one platform built for agencies that move fast.
+                </p>
+                <div class="flex items-center gap-3 mt-3">
+                    <a href="#" class="px-6 py-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold rounded-full uppercase tracking-wider transition shadow-sm">Start Your Free Trial</a>
+                    <a href="#" class="px-6 py-3 border border-zinc-250 hover:bg-zinc-50 text-zinc-650 text-xs font-semibold rounded-full uppercase tracking-wider transition">Watch Demo</a>
+                </div>
+            </section>
+        </div>`,
+        category: 'Cora Level 04'
+    });
+
+    editor.BlockManager.add('cora-marquee-ticker', {
+        label: `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="8" width="18" height="8" rx="1"></rect><line x1="7" y1="12" x2="17" y2="12"></line><polyline points="14 9 17 12 14 15"></polyline></svg><div>Marquee Ticker</div>`,
+        content: `<section class="py-5 overflow-hidden border-y border-zinc-200 bg-zinc-50/50 font-sans">
+            <div class="flex whitespace-nowrap gap-10 justify-center text-zinc-400 text-xs font-bold uppercase tracking-wider select-none">
+                <span>&bull; AI Listing Generator</span>
+                <span>&bull; Client Pipeline CRM</span>
+                <span>&bull; Smart Scheduling</span>
+                <span>&bull; Document AI</span>
+                <span>&bull; Market Intelligence</span>
+                <span>&bull; Photo Enhancement</span>
+            </div>
+        </section>`,
+        category: 'Cora Level 04'
+    });
+
+    editor.BlockManager.add('cora-feature-cards', {
+        label: `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="4" width="5" height="16" rx="1"></rect><rect x="9.5" y="4" width="5" height="16" rx="1"></rect><rect x="17" y="4" width="5" height="16" rx="1"></rect></svg><div>Feature Cards</div>`,
+        content: `<section class="py-20 bg-white font-sans">
+            <div class="max-w-[1200px] mx-auto px-6">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <div class="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">Features</div>
+                    <h2 class="text-3xl font-extrabold text-zinc-950 tracking-tight">Every tool your agency needs to scale</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Feature Card 1 -->
+                    <div class="p-7 border border-zinc-200 rounded-2xl bg-white hover:shadow-lg transition duration-300">
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center mb-5 text-zinc-700">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-zinc-950 mb-2">AI Listing Generator</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed">Generate compelling property descriptions, SEO-optimized titles, and social media copy from a few bullet points.</p>
+                    </div>
+                    <!-- Feature Card 2 -->
+                    <div class="p-7 border border-zinc-200 rounded-2xl bg-white hover:shadow-lg transition duration-300">
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center mb-5 text-zinc-700">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-zinc-950 mb-2">Smart CRM Pipeline</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed">AI-scored leads, automated follow-ups, and visual deal pipelines. Know exactly which clients need attention.</p>
+                    </div>
+                    <!-- Feature Card 3 -->
+                    <div class="p-7 border border-zinc-200 rounded-2xl bg-white hover:shadow-lg transition duration-300">
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center mb-5 text-zinc-700">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-zinc-950 mb-2">Document Intelligence</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed">Auto-generate contracts, disclosures, and offer letters. AI reviews clauses for risks and compliance.</p>
+                    </div>
+                </div>
+            </div>
+        </section>`,
+        category: 'Cora Level 04'
+    });
+
+    editor.BlockManager.add('cora-pricing-matrix', {
+        label: `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="6" width="5" height="12" rx="1"></rect><rect x="9.5" y="4" width="5" height="16" rx="1"></rect><rect x="17" y="6" width="5" height="12" rx="1"></rect></svg><div>Pricing Matrix</div>`,
+        content: `<section class="py-20 bg-zinc-50 border-y border-zinc-200 font-sans">
+            <div class="max-w-[1000px] mx-auto px-6">
+                <div class="text-center mb-16">
+                    <div class="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">Pricing</div>
+                    <h2 class="text-3xl font-extrabold text-zinc-950 tracking-tight">Simple plans, powerful results</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                    <!-- Starter -->
+                    <div class="p-7 bg-white border border-zinc-200 rounded-2xl flex flex-col">
+                        <div class="text-xs font-bold text-zinc-400 mb-2">Starter</div>
+                        <div class="text-3xl font-extrabold text-zinc-950 mb-1">$0<span class="text-xs font-normal text-zinc-500">/month</span></div>
+                        <p class="text-[11px] text-zinc-400 mb-6">Perfect for solo agents starting out</p>
+                        <a href="#" class="py-2.5 text-center text-xs font-semibold border border-zinc-250 rounded-full hover:bg-zinc-50 mb-6 text-zinc-700 transition">Get Started Free</a>
+                        <ul class="space-y-3 text-xs text-zinc-600">
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>Up to 25 listings</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>Basic CRM pipeline</li>
+                        </ul>
+                    </div>
+                    <!-- Pro -->
+                    <div class="p-7 bg-zinc-950 border border-zinc-900 rounded-2xl text-white flex flex-col relative shadow-xl scale-105">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-white text-zinc-950 text-[9px] font-extrabold rounded-full border border-zinc-200 uppercase tracking-wider">Popular</div>
+                        <div class="text-xs font-bold text-zinc-400 mb-2">Professional</div>
+                        <div class="text-3xl font-extrabold mb-1">$79<span class="text-xs font-normal text-zinc-400">/month</span></div>
+                        <p class="text-[11px] text-zinc-400 mb-6">For growing teams ready to scale</p>
+                        <a href="#" class="py-2.5 text-center text-xs font-semibold bg-white text-zinc-950 rounded-full hover:bg-zinc-100 mb-6 transition">Start 14-Day Trial</a>
+                        <ul class="space-y-3 text-xs text-zinc-300">
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-white"><polyline points="20 6 9 17 4 12"/></svg>Unlimited listings</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-white"><polyline points="20 6 9 17 4 12"/></svg>Full AI suite</li>
+                        </ul>
+                    </div>
+                    <!-- Enterprise -->
+                    <div class="p-7 bg-white border border-zinc-200 rounded-2xl flex flex-col">
+                        <div class="text-xs font-bold text-zinc-400 mb-2">Enterprise</div>
+                        <div class="text-3xl font-extrabold text-zinc-950 mb-1">Custom</div>
+                        <p class="text-[11px] text-zinc-400 mb-6">For large brokerages and agencies</p>
+                        <a href="#" class="py-2.5 text-center text-xs font-semibold border border-zinc-250 rounded-full hover:bg-zinc-50 mb-6 text-zinc-700 transition">Contact Sales</a>
+                        <ul class="space-y-3 text-xs text-zinc-600">
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>Everything in Pro</li>
+                            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>Custom AI training</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>`,
+        category: 'Cora Level 04'
+    });
+
+    editor.BlockManager.add('cora-cta-banner', {
+        label: `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><rect x="9" y="13" width="6" height="3" rx="0.5"></rect></svg><div>CTA Banner</div>`,
+        content: `<section class="py-24 bg-white relative font-sans">
+            <div class="max-w-3xl mx-auto text-center px-6">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-zinc-950 mb-4">Ready to transform your real estate business?</h2>
+                <p class="text-zinc-500 text-sm mb-8 leading-relaxed">Join 50+ agencies already using Cora to close more deals, save time, and deliver exceptional client experiences.</p>
+                <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="px-6 py-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold rounded-full uppercase tracking-wider transition">Start Free Trial</a>
+                    <a href="#" class="px-6 py-3 border border-zinc-200 hover:bg-zinc-50 text-zinc-650 text-xs font-semibold rounded-full uppercase tracking-wider transition">Schedule Demo</a>
+                </div>
+            </div>
+        </section>`,
+        category: 'Cora Level 04'
+    });
+
     editor.BlockManager.add('section', {
         label: `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg><div>Section</div>`,
         content: '<section class="py-16 px-8 bg-[#FBFaf7] border-b border-zinc-200"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-light tracking-tight mb-4">Section Heading</h2><p class="text-neutral-600 leading-relaxed text-sm">Add your custom text or details inside this section wrapper...</p></div></section>',

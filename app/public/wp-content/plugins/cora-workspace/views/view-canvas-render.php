@@ -21,7 +21,17 @@ echo '<body ';
 body_class();
 echo '>';
 
+// Render Elementor Header
+if ( function_exists( 'elementor_theme_do_location' ) ) {
+    elementor_theme_do_location( 'header' );
+}
+
 the_content();
+
+// Render Elementor Footer
+if ( function_exists( 'elementor_theme_do_location' ) ) {
+    elementor_theme_do_location( 'footer' );
+}
 
 // Output preview bar script if applicable
 if ( isset( $GLOBALS['cora_preview_bar_script'] ) ) {
