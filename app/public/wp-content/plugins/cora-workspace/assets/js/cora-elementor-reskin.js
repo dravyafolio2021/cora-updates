@@ -148,36 +148,6 @@
                         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>' +
                         'Preview' +
                     '</button>' +
-                    '<div class="cora-tb-divider-v"></div>' +
-                    '<div class="cora-tb-profile-wrap" id="cora-tb-profile-wrap">' +
-                        '<button class="cora-tb-profile-btn" onclick="coraToggleProfileMenu(event)" title="Account">' +
-                            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>' +
-                            '<svg class="cora-tb-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>' +
-                        '</button>' +
-                        '<div class="cora-tb-profile-dropdown" id="cora-tb-profile-dropdown">' +
-                            '<div class="cora-tb-profile-header">' +
-                                '<div class="cora-tb-profile-avatar">S</div>' +
-                                '<div>' +
-                                    '<div class="cora-tb-profile-name">Shruti</div>' +
-                                    '<div class="cora-tb-profile-role">Super Admin</div>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="cora-tb-profile-divider"></div>' +
-                            '<button onclick="window.open(\'' + window.location.origin + '/wp-admin/admin.php?page=cora-workspace\', \'_self\')" class="cora-tb-profile-item">' +
-                                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' +
-                                'Dashboard' +
-                            '</button>' +
-                            '<button onclick="window.open(\'' + window.location.origin + '/wp-admin/profile.php\', \'_blank\')" class="cora-tb-profile-item">' +
-                                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>' +
-                                'Profile' +
-                            '</button>' +
-                            '<div class="cora-tb-profile-divider"></div>' +
-                            '<button onclick="window.location.href=\'' + window.location.origin + '/wp-login.php?action=logout\'" class="cora-tb-profile-item cora-tb-profile-item--danger">' +
-                                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>' +
-                                'Sign out' +
-                            '</button>' +
-                        '</div>' +
-                    '</div>' +
                 '</div>' +
             '</div>' +
             '<div class="cora-tb-row cora-tb-row2">' +
