@@ -6165,10 +6165,21 @@ HTML;
                 status_header( 200 );
                 nocache_headers();
 
-                // Setup global post data
-                global $post;
+                // Setup global post and query data to force Elementor/WordPress to resolve the correct page ID
+                global $post, $wp_query;
                 $post = get_post( $page_id );
                 setup_postdata( $post );
+                if ( isset( $wp_query ) ) {
+                    $wp_query->post = $post;
+                    $wp_query->posts = array( $post );
+                    $wp_query->post_count = 1;
+                    $wp_query->is_404 = false;
+                    $wp_query->is_page = true;
+                    $wp_query->is_single = true;
+                    $wp_query->is_singular = true;
+                    $wp_query->queried_object = $post;
+                    $wp_query->queried_object_id = $page_id;
+                }
 
                 // If theme builder source is elementor or the page is edited with Elementor, load it with complete WordPress head/footer context
                 // so that Elementor styles and scripts render properly.
