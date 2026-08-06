@@ -9,6 +9,10 @@
     'use strict';
 
     function initCoraReskin() {
+        if (window.self !== window.top && document.body) {
+            document.body.classList.add('cora-in-iframe');
+        }
+
         // Override browser alert inside the editor
         window.alert = function (msg) {
             if (window.coraShowToast) {
@@ -288,9 +292,9 @@
     }
 
     function hideNativeTopBar() {
-        ['header.MuiAppBar-root', '.e-top-bar', '#e-top-bar', '.elementor-editor-top-bar'].forEach(function (sel) {
+        ['header.MuiAppBar-root', '.e-top-bar', '#e-top-bar', '.elementor-editor-top-bar', '#elementor-editor-wrapper-v2'].forEach(function (sel) {
             var el = document.querySelector(sel);
-            if (el && document.getElementById('cora-editor-toolbar')) {
+            if (el) {
                 el.style.setProperty('display', 'none', 'important');
             }
         });

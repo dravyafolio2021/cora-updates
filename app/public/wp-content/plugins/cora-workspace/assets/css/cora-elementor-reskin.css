@@ -394,11 +394,23 @@
 header.MuiAppBar-root,
 .e-top-bar,
 #e-top-bar,
-.elementor-editor-top-bar {
+.elementor-editor-top-bar,
+#elementor-editor-wrapper-v2 {
     display: none !important;
     height: 0 !important;
     min-height: 0 !important;
     overflow: hidden !important;
+}
+
+/* Reset Elementor v2 CSS variables to prevent header spacing/panels offset gaps */
+:root {
+    --editor-v2-top-bar-height: 0px !important;
+    --e-top-bar-header-height: 0px !important;
+}
+
+body.cora-in-iframe {
+    --editor-v2-top-bar-height: 0px !important;
+    --e-top-bar-header-height: 0px !important;
 }
 
 
@@ -408,7 +420,6 @@ header.MuiAppBar-root,
  * ═══════════════════════════════════════════════════════════ */
 
 /* Editor wrapper — offset by toolbar height and fill remaining viewport */
-#elementor-editor-wrapper-v2,
 #elementor-editor-wrapper {
     top: 96px !important;
     height: calc(100dvh - 96px) !important;
@@ -418,6 +429,13 @@ header.MuiAppBar-root,
     position: fixed !important;
     left: 0 !important;
     right: 0 !important;
+}
+
+/* Editor wrapper inside iframe — take full viewport height (parent handles the offset) */
+body.cora-in-iframe #elementor-editor-wrapper {
+    top: 0 !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
 }
 
 /* Side panel — stretch to fill the wrapper */
