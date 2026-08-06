@@ -42,6 +42,9 @@ test.describe('Tier 4: Workload Flows', () => {
     await page.click('#cora-drawer-new-menu button:has-text("Create Menu")');
     await expect(page.locator('#cora-toast-container')).toContainText('Menu created successfully.');
     await page.waitForLoadState('networkidle');
+    const menuUrlAfterCreate = page.url();
+    const menuIdMatch = menuUrlAfterCreate.match(/menu_id=(\d+)/);
+    const createdMenuId = menuIdMatch ? menuIdMatch[1] : null;
 
     // 3. Add Custom Menu item
     await page.goto('/workspace/appearance');
@@ -61,7 +64,20 @@ test.describe('Tier 4: Workload Flows', () => {
     await page.waitForSelector('#cora-confirm-modal:not(.hidden)', { state: 'visible' });
     await page.click('#cora-confirm-btn');
     await expect(page.locator('#cora-toast-container')).toContainText('Menu item deleted successfully.');
+
+    // Teardown: delete the created test menu via AJAX to keep DB clean
+    if (createdMenuId) {
+      await page.evaluate(async (mid) => {
+        const nonce = (window as any).coraAjax?.nonce || '';
+        const fd = new FormData();
+        fd.append('action', 'cora_delete_nav_menu');
+        fd.append('nonce', nonce);
+        fd.append('menu_id', mid);
+        await fetch('/wp-admin/admin-ajax.php', { method: 'POST', body: fd, credentials: 'include' });
+      }, createdMenuId);
+    }
   });
+
 
   test('Workload - 2. Backup, Migration & Import Flow', async ({ page }) => {
     // 1. Export Pages WXR

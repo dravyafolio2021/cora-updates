@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.41
+ * Version: 3.2.42
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.41' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.42' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -6008,16 +6008,38 @@ function cora_canvas_theme_frontend_router() {
         return;
     }
 
-    // Match path in cora_canvas_pages
+    // Match path in cora_canvas_pages or WordPress pages
     $canvas_page = null;
-    if ( empty( $target_page_slug ) || $target_page_slug === 'home' ) {
-        $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $active_theme_id ), ARRAY_A );
+
+    // Check if there is a WordPress page with visual builder enabled matching the slug/path
+    $wp_page = null;
+    if ( ! empty( $target_page_slug ) ) {
+        $wp_page = get_page_by_path( $target_page_slug );
     }
-    if ( ! $canvas_page && ! empty( $target_page_slug ) ) {
-        $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1", $active_theme_id, $target_page_slug ), ARRAY_A );
+    if ( ! $wp_page ) {
+        $current_post_id = get_queried_object_id();
+        if ( $current_post_id ) {
+            $wp_page = get_post( $current_post_id );
+        }
     }
+    if ( $wp_page && get_post_meta( $wp_page->ID, '_cora_is_visual_builder', true ) === '1' ) {
+        $canvas_page = array(
+            'wp_post_id' => $wp_page->ID,
+            'title'      => $wp_page->post_title,
+            'slug'       => $wp_page->post_name
+        );
+    }
+
     if ( ! $canvas_page ) {
-        $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $active_theme_id ), ARRAY_A );
+        if ( empty( $target_page_slug ) || $target_page_slug === 'home' ) {
+            $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $active_theme_id ), ARRAY_A );
+        }
+        if ( ! $canvas_page && ! empty( $target_page_slug ) ) {
+            $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1", $active_theme_id, $target_page_slug ), ARRAY_A );
+        }
+        if ( ! $canvas_page ) {
+            $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $active_theme_id ), ARRAY_A );
+        }
     }
 
     // Try by post ID if not found and is single page
@@ -15637,6 +15659,25 @@ function cora_ajax_create_nav_menu() {
 }
 add_action( 'wp_ajax_cora_create_nav_menu', 'cora_ajax_create_nav_menu' );
 
+if ( ! function_exists( 'cora_ajax_delete_nav_menu' ) ) {
+function cora_ajax_delete_nav_menu() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+    $menu_id = isset( $_POST['menu_id'] ) ? intval( $_POST['menu_id'] ) : 0;
+    if ( ! $menu_id ) {
+        wp_send_json_error( array( 'message' => 'Menu ID is required.' ) );
+    }
+    $result = wp_delete_nav_menu( $menu_id );
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+    }
+    wp_send_json_success( array( 'message' => 'Menu deleted successfully.' ) );
+}
+}
+add_action( 'wp_ajax_cora_delete_nav_menu', 'cora_ajax_delete_nav_menu' );
+
 if ( ! function_exists( 'cora_ajax_moderate_comment' ) ) {
 function cora_ajax_moderate_comment() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
@@ -18809,6 +18850,8 @@ function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
         'tasks'              => 'dashboard',
         'client-task-manager'=> 'dashboard',
         'canvas'             => 'dashboard',
+        'visual-builder'     => 'dashboard',
+        'visual_builder'     => 'dashboard',
         'forms'              => 'dashboard',
         'emails'             => 'dashboard',
         'review_acquisition' => 'dashboard',

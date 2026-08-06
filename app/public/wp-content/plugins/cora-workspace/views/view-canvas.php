@@ -48,6 +48,32 @@ $themes = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes O
 // Fetch WP pages for dropdown selectors
 $wp_pages = get_pages();
 
+// Fetch real WordPress nav menus so Canvas UI and Elementor stay in sync
+$wp_nav_menus_raw = wp_get_nav_menus();
+$wp_nav_menus_for_js = array();
+foreach ( $wp_nav_menus_raw as $nav_menu ) {
+    $menu_items_raw = wp_get_nav_menu_items( $nav_menu->term_id );
+    $menu_items     = array();
+    if ( $menu_items_raw ) {
+        foreach ( $menu_items_raw as $item ) {
+            $menu_items[] = array(
+                'id'     => 'mi_' . $item->ID,
+                'label'  => $item->title,
+                'url'    => $item->url,
+                'newTab' => (bool) $item->target,
+                'level'  => (int) $item->menu_item_parent > 0 ? 1 : 0,
+            );
+        }
+    }
+    $wp_nav_menus_for_js[] = array(
+        'id'         => 'menu_wp_' . $nav_menu->term_id,
+        'wp_term_id' => $nav_menu->term_id,
+        'name'       => $nav_menu->name,
+        'handle'     => $nav_menu->slug,
+        'items'      => $menu_items,
+    );
+}
+
 // Fetch Platform Data for Statistics
 $cora_listings_count = count( cora_db_get_properties() );
 $cora_leads_count = count( cora_db_get_leads() );
@@ -805,6 +831,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                     <button onclick="window.coraShowToast('URL Redirects panel loading...', 'success')" id="menu-btn-redirects" class="px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">URL redirects</button>
                     <button onclick="triggerCreateNewMenu()" id="menu-btn-create" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Create menu</button>
                     <button onclick="duplicateActiveMenu()" id="menu-btn-duplicate" class="hidden px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Duplicate</button>
+                    <button onclick="deleteActiveMenu()" id="menu-btn-delete" class="hidden px-3 py-1.5 border border-red-200 text-red-600 bg-white hover:bg-red-50 rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Delete menu</button>
                 </div>
                 <?php endif; ?>
 
@@ -3316,18 +3343,9 @@ $cora_bookings_count = count( cora_db_get_bookings() );
         isReadOnly: <?php echo $is_read_only ? 'true' : 'false'; ?>,
         themes: <?php echo json_encode($themes); ?>,
         pages: [],
-        menus: [
-            { id: 'menu_1', name: 'Header Main Menu', items: [
-                { id: 'mi_1', label: 'Home', url: '/home', newTab: false, level: 0 },
-                { id: 'mi_2', label: 'Listings', url: '/listings', newTab: false, level: 0 },
-                { id: 'mi_3', label: 'About Us', url: '/about', newTab: false, level: 0 }
-            ]},
-            { id: 'menu_2', name: 'Footer Links', items: [
-                { id: 'mi_4', label: 'Privacy Policy', url: '/privacy', newTab: false, level: 0 },
-                { id: 'mi_5', label: 'Support Desk', url: '/support', newTab: true, level: 0 }
-            ]}
-        ],
-        activeMenuId: 'menu_1',
+        menus: <?php echo json_encode( $wp_nav_menus_for_js ); ?> || [],
+        wpMenusBase: <?php echo json_encode( $wp_nav_menus_for_js ); ?> || [],
+        activeMenuId: <?php echo ! empty( $wp_nav_menus_for_js ) ? "'menu_wp_" . intval( $wp_nav_menus_for_js[0]['wp_term_id'] ) . "'" : "''" ; ?>,
         activeMenuDetailId: null,
         cssEditor: null,
     };
@@ -4567,14 +4585,14 @@ $cora_bookings_count = count( cora_db_get_bookings() );
             jQuery('#menus-detail-view').removeClass('hidden');
             // In detail view: show Duplicate, hide list-level actions
             jQuery('#menu-btn-redirects, #menu-btn-create').addClass('hidden');
-            jQuery('#menu-btn-duplicate').removeClass('hidden');
+            jQuery('#menu-btn-duplicate, #menu-btn-delete').removeClass('hidden');
             renderMenuDetailEditor();
         } else {
             jQuery('#menus-list-view').removeClass('hidden');
             jQuery('#menus-detail-view').addClass('hidden');
             // In list view: show URL redirects + Create menu, hide Duplicate
             jQuery('#menu-btn-redirects, #menu-btn-create').removeClass('hidden');
-            jQuery('#menu-btn-duplicate').addClass('hidden');
+            jQuery('#menu-btn-duplicate, #menu-btn-delete').addClass('hidden');
             renderMenusList();
         }
     }
@@ -4654,17 +4672,55 @@ $cora_bookings_count = count( cora_db_get_bookings() );
         const duplicatedName = currentMenu.name + ' (Copy)';
         const duplicatedHandle = (currentMenu.handle || 'menu') + '-copy';
         const copiedItems = currentMenu.items ? JSON.parse(JSON.stringify(currentMenu.items)) : [];
-        
-        canvasState.menus.push({
-            id: newMenuId,
-            name: duplicatedName,
-            handle: duplicatedHandle,
-            items: copiedItems
-        });
 
-        syncMenusToSettings();
-        window.coraShowToast(`Duplicated theme menu as "${duplicatedName}"`, 'success');
-        openMenuDetailEditor(newMenuId);
+        // Create a real WP nav_menu term for the duplicate
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_create_nav_menu',
+            menu_name: duplicatedName,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            const wpTermId = res.success && res.data && res.data.menu_id ? res.data.menu_id : null;
+            canvasState.menus.push({
+                id: newMenuId,
+                wp_term_id: wpTermId,
+                name: duplicatedName,
+                handle: duplicatedHandle,
+                items: copiedItems
+            });
+            syncMenusToSettings();
+            window.coraShowToast(`Duplicated theme menu as "${duplicatedName}"`, 'success');
+            openMenuDetailEditor(newMenuId);
+        }).fail(function() {
+            canvasState.menus.push({ id: newMenuId, name: duplicatedName, handle: duplicatedHandle, items: copiedItems });
+            syncMenusToSettings();
+            window.coraShowToast(`Duplicated theme menu as "${duplicatedName}"`, 'success');
+            openMenuDetailEditor(newMenuId);
+        });
+    }
+
+    function deleteActiveMenu() {
+        if (canvasState.isReadOnly) return;
+        const currentMenu = canvasState.menus.find(m => m.id === canvasState.activeMenuDetailId);
+        if (!currentMenu) return;
+
+        window.coraConfirmAction(
+            'Delete Menu',
+            `Are you sure you want to permanently delete "${currentMenu.name}"? This cannot be undone.`,
+            function() {
+                // Delete the real WP nav_menu term if we have its ID
+                if (currentMenu.wp_term_id) {
+                    jQuery.post(coraREData.ajaxUrl, {
+                        action: 'cora_delete_nav_menu',
+                        menu_id: currentMenu.wp_term_id,
+                        nonce: coraREData.ajaxNonce
+                    });
+                }
+                canvasState.menus = canvasState.menus.filter(m => m.id !== canvasState.activeMenuDetailId);
+                syncMenusToSettings();
+                window.coraShowToast(`Menu "${currentMenu.name}" deleted.`, 'success');
+                exitMenuDetail();
+            }
+        );
     }
 
     // Inline items editing states
@@ -4930,16 +4986,31 @@ $cora_bookings_count = count( cora_db_get_bookings() );
             .replace(/^-+|-+$/g, '');
 
         const newMenuId = 'menu_' + Date.now();
-        canvasState.menus.push({
-            id: newMenuId,
-            name: nameVal,
-            handle: handle,
-            items: []
-        });
 
-        syncMenusToSettings();
-        window.coraShowToast(`Menu "${nameVal}" created.`, 'success');
-        openMenuDetailEditor(newMenuId);
+        // Create a real WordPress nav_menu term so Elementor can see it
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_create_nav_menu',
+            menu_name: nameVal,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            const wpTermId = res.success && res.data && res.data.menu_id ? res.data.menu_id : null;
+            canvasState.menus.push({
+                id: newMenuId,
+                wp_term_id: wpTermId,
+                name: nameVal,
+                handle: handle,
+                items: []
+            });
+            syncMenusToSettings();
+            window.coraShowToast(`Menu "${nameVal}" created.`, 'success');
+            openMenuDetailEditor(newMenuId);
+        }).fail(function() {
+            // Still add locally even if AJAX fails
+            canvasState.menus.push({ id: newMenuId, name: nameVal, handle: handle, items: [] });
+            syncMenusToSettings();
+            window.coraShowToast(`Menu "${nameVal}" created (offline).`, 'success');
+            openMenuDetailEditor(newMenuId);
+        });
     };
 
     window.cancelNewMenuInline = function() {
@@ -4996,38 +5067,12 @@ $cora_bookings_count = count( cora_db_get_bookings() );
             canvasState.activeMenuDetailId = null;
             const settings = safeGetSettings(themeObj);
             
-            // Dynamic menus extraction from theme settings
-            if (settings && settings.menus && Array.isArray(settings.menus)) {
+            // Dynamic menus extraction: prefer saved theme settings, fall back to real WP nav menus
+            if (settings && settings.menus && Array.isArray(settings.menus) && settings.menus.length > 0) {
                 canvasState.menus = settings.menus;
             } else {
-                canvasState.menus = [
-                    { id: 'menu_1', name: 'Main menu', handle: 'main-menu', items: [
-                        { id: 'mi_1', label: 'Home', url: '/' },
-                        { id: 'mi_2', label: 'Shop', url: '/shop' },
-                        { id: 'mi_3', label: 'About Us', url: '/about' },
-                        { id: 'mi_4', label: 'FF Blogs', url: '/blogs' },
-                        { id: 'mi_5', label: 'Contact', url: '/contact' }
-                    ]},
-                    { id: 'menu_2', name: 'Footer menu', handle: 'footer-menu', items: [
-                        { id: 'mi_6', label: 'Search', url: '/search' }
-                    ]},
-                    { id: 'menu_3', name: 'foot 2', handle: 'foot-2', items: [
-                        { id: 'mi_7', label: 'Privacy Policy', url: '/privacy' },
-                        { id: 'mi_8', label: 'Shipping Policy', url: '/shipping' },
-                        { id: 'mi_9', label: 'Returns & Exchanges', url: '/returns' },
-                        { id: 'mi_10', label: 'Terms of Service', url: '/terms' }
-                    ]},
-                    { id: 'menu_4', name: 'foot 1', handle: 'foot-1', items: [
-                        { id: 'mi_11', label: 'About Us', url: '/about' },
-                        { id: 'mi_12', label: 'FF Blogs', url: '/blogs' },
-                        { id: 'mi_13', label: 'Contact Us', url: '/contact-us' },
-                        { id: 'mi_14', label: 'FAQs', url: '/faqs' }
-                    ]},
-                    { id: 'menu_5', name: 'Customer account main menu', handle: 'customer-account-main-menu', items: [
-                        { id: 'mi_15', label: 'Orders', url: '/orders' },
-                        { id: 'mi_16', label: 'Profile', url: '/profile' }
-                    ]}
-                ];
+                // Seed from real WordPress nav_menu terms (fetched server-side)
+                canvasState.menus = canvasState.wpMenusBase ? canvasState.wpMenusBase.slice() : [];
             }
             if (canvasState.menus.length > 0) {
                 if (!canvasState.menus.some(m => m.id === canvasState.activeMenuId)) {

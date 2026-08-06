@@ -602,3 +602,17 @@ button[data-event][data-settings*="install-plugin"] {
     color: #18181b !important;
     font-weight: 700 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════
+ * HIDE ELEMENTOR PRO UPSELL PANELS (Custom Widget, AI, etc.)
+ * ═══════════════════════════════════════════════════════════ */
+
+/* Custom Widget "Try for free" category block */
+#elementor-panel-category-custom-widgets {
+    display: none !important;
+}
+
+/* "Try for free" CTA buttons anywhere in the panel heading */
+.elementor-panel-custom-widgets__cta {
+    display: none !important;
+}
