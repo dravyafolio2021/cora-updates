@@ -2030,11 +2030,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 <!-- Left: Logo & Theme Selector -->
                 <div class="flex items-center gap-3">
                     <div class="flex items-center gap-1.5 select-none shrink-0 mr-1">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-850 dark:text-zinc-150">
-                            <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" stroke-width="2"></polygon>
-                            <circle cx="12" cy="12" r="3.5" stroke-width="1.5"></circle>
-                        </svg>
-                        <span class="text-xs font-black tracking-tight text-zinc-900 dark:text-zinc-100">cora</span>
+                        <span class="text-xs font-black tracking-tight text-zinc-900 dark:text-zinc-100 uppercase">CORA</span>
                     </div>
                     <button onclick="closeElementorEditor()" class="h-8 px-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-150 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 bg-white dark:bg-zinc-900">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -2061,26 +2057,12 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                     </div>
                 </div>
                 
-                <!-- Right: Preview + Avatar -->
+                <!-- Right: Preview -->
                 <div class="flex items-center gap-1.5">
                     <button onclick="previewPage()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         Preview
                     </button>
-                    <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
-                    <div class="flex items-center gap-1 cursor-pointer select-none">
-                        <div class="w-7 h-7 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800">
-                            <?php 
-                            $current_user = wp_get_current_user();
-                            $avatar_url = get_avatar_url($current_user->ID, array('size' => 56));
-                            if (!$avatar_url) {
-                                $avatar_url = CORA_WORKSPACE_URL . 'assets/images/avatar.png';
-                            }
-                            ?>
-                            <img src="<?php echo esc_url($avatar_url); ?>" class="w-full h-full object-cover" alt="User" />
-                        </div>
-                        <svg class="w-3 h-3 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </div>
                 </div>
             </div>
 
