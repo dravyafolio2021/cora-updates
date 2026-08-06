@@ -2125,11 +2125,17 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                             <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         <!-- Page dropdown -->
-                        <div id="cora-page-switcher-dropdown" class="hidden absolute top-full left-0 mt-1 w-64 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl z-[99999] overflow-hidden">
-                            <div class="p-2 border-b border-zinc-150 dark:border-zinc-800">
+                        <div id="cora-page-switcher-dropdown" class="hidden absolute top-full left-0 mt-1 w-80 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl z-[99999] flex flex-col max-h-[420px] overflow-hidden">
+                            <div class="p-2 border-b border-zinc-150 dark:border-zinc-800 shrink-0">
                                 <input id="cora-page-switcher-search" type="text" placeholder="Search pages..." oninput="filterPageSwitcher(this.value)" class="w-full px-2.5 py-1.5 text-[11px] border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400" />
                             </div>
-                            <div id="cora-page-switcher-list" class="max-h-60 overflow-y-auto py-1"></div>
+                            <div id="cora-page-switcher-list" class="flex-1 overflow-y-auto max-h-[300px] py-1"></div>
+                            <div class="border-t border-zinc-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-950">
+                                <button onclick="ddOpenNewPageDrawer(event)" class="w-full text-left px-3.5 py-2.5 text-[11px] font-bold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-250 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    Add new page
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800"></div>
@@ -7361,31 +7367,37 @@ $cora_bookings_count = count( cora_db_get_bookings() );
         let html = '';
         
         // "Recent" section title heading
-        html += `<div class="px-3 py-1.5 text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest select-none">Recent</div>`;
+        html += `<div class="px-3.5 py-1.5 text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest select-none">Recent</div>`;
         
         if (!filtered.length) {
-            html += '<div class="px-3 py-4 text-center text-[11px] text-zinc-400">No pages found</div>';
+            html += '<div class="px-3.5 py-4 text-center text-[11px] text-zinc-400">No pages found</div>';
         } else {
             const currentId = state.activePageId || state.currentPageId;
             html += filtered.map(p => {
                 const active = p.id == currentId;
                 const badge = getPageTypeBadge(p);
-                return `<button onclick="switchToPage(${p.id},'${(p.title||'').replace(/'/g,"\\'")}',${ p.wp_post_id||0})"
-                    class="w-full text-left px-3 py-2 text-[11px] font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors flex items-center gap-2 ${active?'text-zinc-950 dark:text-white':'text-zinc-600 dark:text-zinc-400'}">
-                    <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${active?'bg-emerald-500':'bg-zinc-200 dark:bg-zinc-700'}"></span>
-                    <span class="truncate flex-1">${p.title||'Untitled'}</span>
-                    <span class="flex-shrink-0 ml-1">${badge}</span>
-                </button>`;
+                const escTitle = (p.title||'').replace(/'/g,"\\'");
+                
+                return `<div class="group flex items-center justify-between px-3.5 py-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 cursor-pointer transition-colors border-b border-zinc-50/50 dark:border-zinc-900/30">
+                    <div class="flex-1 min-w-0" onclick="switchToPage(${p.id}, '${escTitle}', ${p.wp_post_id||0})">
+                        <div class="flex items-center gap-1.5 mb-0.5">
+                            <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${active?'bg-emerald-500':'bg-zinc-200 dark:bg-zinc-700'}"></span>
+                            <span class="text-[11px] font-semibold ${active?'text-zinc-950 dark:text-white':'text-zinc-700 dark:text-zinc-300'} truncate">${p.title||'Untitled'}</span>
+                            <span class="flex-shrink-0 ml-1">${badge}</span>
+                        </div>
+                        <div class="text-[9px] text-zinc-400 dark:text-zinc-500 pl-3 font-mono truncate">/${p.slug||''}</div>
+                    </div>
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity pl-2 shrink-0">
+                        <button onclick="event.stopPropagation(); window.open('${window.location.origin}/?p=${p.wp_post_id||0}&preview=true', '_blank')" class="w-6.5 h-6.5 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Preview Page">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                        <button onclick="switchToPage(${p.id}, '${escTitle}', ${p.wp_post_id||0})" class="w-6.5 h-6.5 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Edit Page">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        </button>
+                    </div>
+                </div>`;
             }).join('');
         }
-        
-        // Add footer divider and "+ Add new page" button at the bottom of the page list
-        html += `<div class="border-t border-zinc-100 dark:border-zinc-800 mt-1">
-            <button onclick="ddOpenNewPageDrawer(event)" class="w-full text-left px-3 py-2.5 text-[11px] font-bold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Add new page
-            </button>
-        </div>`;
         
         list.innerHTML = html;
     }
