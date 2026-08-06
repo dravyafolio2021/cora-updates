@@ -5983,6 +5983,15 @@ function cora_canvas_theme_frontend_router() {
         }
     }
 
+    if ( $active_theme_id ) {
+        $active_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $active_theme_id ), ARRAY_A );
+        $theme_settings = $active_theme ? (json_decode( $active_theme['settings'], true ) ?: array()) : array();
+        $source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : '';
+        if ( 'lovable' === $source ) {
+            return; // Delegate routing to cora_git_sync_serve_frontend running at priority 4
+        }
+    }
+
     if ( ! $active_theme_id ) {
         if ( $is_explicit_site_request || $matched_ws || $target_agency_id > 0 ) {
             cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );
@@ -6149,15 +6158,53 @@ HTML;
                 if ( empty( $title ) ) {
                     $title = ! empty( $canvas_page['title'] ) ? $canvas_page['title'] : $ws_name;
                 }
-                $tailwind_css_url = CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css';
-                $content = apply_filters( 'the_content', $post->post_content );
                 
                 while ( ob_get_level() > 0 ) {
                     ob_end_clean();
                 }
                 status_header( 200 );
                 nocache_headers();
-                echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' . esc_html( $title ) . '</title><link rel="stylesheet" href="' . esc_url( $tailwind_css_url ) . '"></head><body class="bg-[#FBFaf7] text-zinc-900 antialiased p-8"><div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-zinc-200">' . $content . '</div></body></html>';
+
+                // Setup global post data
+                global $post;
+                $post = get_post( $page_id );
+                setup_postdata( $post );
+
+                // If theme builder source is elementor or the page is edited with Elementor, load it with complete WordPress head/footer context
+                // so that Elementor styles and scripts render properly.
+                if ( 'elementor' === $source || get_post_meta( $page_id, '_elementor_edit_mode', true ) === 'builder' ) {
+                    echo '<!DOCTYPE html>';
+                    echo '<html ';
+                    language_attributes();
+                    echo '>';
+                    echo '<head>';
+                    echo '<meta charset="' . get_bloginfo( 'charset' ) . '">';
+                    echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
+                    wp_head();
+                    echo '</head>';
+                    echo '<body ';
+                    body_class();
+                    echo '>';
+                    
+                    the_content();
+                    
+                    if ( $is_preview ) {
+                        echo $preview_bar_script;
+                    }
+                    wp_footer();
+                    echo '</body>';
+                    echo '</html>';
+                    exit;
+                }
+
+                // Fallback for simple content pages (non-Elementor)
+                $tailwind_css_url = CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css';
+                $content = apply_filters( 'the_content', $post->post_content );
+                echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' . esc_html( $title ) . '</title><link rel="stylesheet" href="' . esc_url( $tailwind_css_url ) . '"></head><body class="bg-[#FBFaf7] text-zinc-900 antialiased p-8"><div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-zinc-200">' . $content . '</div>';
+                if ( $is_preview ) {
+                    echo $preview_bar_script;
+                }
+                echo '</body></html>';
                 exit;
             } else {
                 cora_render_default_workspace_welcome_site( $ws_name, $ws_slug );

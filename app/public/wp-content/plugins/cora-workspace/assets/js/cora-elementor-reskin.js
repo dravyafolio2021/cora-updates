@@ -20,6 +20,30 @@
             }
         };
 
+        // Override browser confirm inside the editor
+        window.confirm = function (msg) {
+            if (window.coraShowToast) {
+                window.coraShowToast(msg);
+            } else if (window.parent && window.parent.coraShowToast) {
+                window.parent.coraShowToast(msg);
+            } else {
+                console.log('Intercepted Elementor Confirm:', msg);
+            }
+            return true; // Auto-confirm
+        };
+
+        // Override browser prompt inside the editor
+        window.prompt = function (msg, defaultText) {
+            if (window.coraShowToast) {
+                window.coraShowToast(msg);
+            } else if (window.parent && window.parent.coraShowToast) {
+                window.parent.coraShowToast(msg);
+            } else {
+                console.log('Intercepted Elementor Prompt:', msg);
+            }
+            return defaultText || '';
+        };
+
         // Auto-click "Take Over" modal button if it appears
         setInterval(function () {
             document.querySelectorAll('button').forEach(function (btn) {
