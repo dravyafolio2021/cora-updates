@@ -33,7 +33,26 @@ if ( ! $live_theme ) {
 }
 $live_settings = $live_theme ? (json_decode($live_theme['settings'], true) ?: array()) : array();
 
-// Fetch all themes and automatically clean up excess drafts (limit to maximum 10 inactive themes)
+// ── Editor Resume Fast-Path ──────────────────────────────────────────────
+// When the user refreshes the browser while inside an Elementor editor session,
+// the URL still contains cv_page=X. Detect this at PHP render time so we can
+// pre-wire the iframe src and skip the canvas card flash entirely.
+$_cv_page_id  = isset($_GET['cv_page'])  ? intval($_GET['cv_page'])  : 0;
+$_cv_theme_id = isset($_GET['cv_theme']) ? intval($_GET['cv_theme']) : 0;
+$_editor_resume_url = '';
+if ($_cv_page_id > 0) {
+    $resume_page = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d LIMIT 1",
+            $_cv_page_id
+        ),
+        ARRAY_A
+    );
+    if (!empty($resume_page['wp_post_id'])) {
+        $_editor_resume_url = admin_url('post.php') . '?post=' . intval($resume_page['wp_post_id']) . '&action=elementor';
+    }
+}
+
 $all_draft_ids = $wpdb->get_col( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status != 'live' ORDER BY id DESC" );
 if ( count( $all_draft_ids ) > 10 ) {
     $to_delete_ids = array_slice( $all_draft_ids, 10 );
@@ -212,10 +231,13 @@ $cora_bookings_count = count( cora_db_get_bookings() );
     }
 </style>
 
+<?php if ( ! empty($_editor_resume_url) ) : ?>
+<script>document.body.classList.add('cora-canvas-editor-active');</script>
+<?php endif; ?>
 <div class="space-y-6" id="cora-canvas-container">
     
     <!-- LEVEL 1 — CANVAS HUB -->
-    <div id="canvas-level-1" class="space-y-6">
+    <div id="canvas-level-1" class="space-y-6<?php echo ! empty($_editor_resume_url) ? ' hidden' : ''; ?>">
         <!-- Page Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
             <div>
@@ -2000,7 +2022,7 @@ $cora_bookings_count = count( cora_db_get_bookings() );
     </div>
 
     <!-- LEVEL 3 — ELEMENTOR PAGE EDITOR iframe wrapper -->
-    <div id="canvas-level-3" class="fixed inset-0 z-[9999] bg-white hidden flex flex-col">
+    <div id="canvas-level-3" class="fixed inset-0 z-[9999] bg-white<?php echo ! empty($_editor_resume_url) ? '' : ' hidden'; ?> flex flex-col">
         <!-- Editor Topbar Wrapper -->
         <div id="cora-parent-editor-topbar" class="h-24 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex flex-col hidden select-none">
             <!-- Row 1 -->
@@ -2156,8 +2178,9 @@ $cora_bookings_count = count( cora_db_get_bookings() );
         <!-- iframe container -->
         <div id="elementor-iframe-container" class="flex-1 min-h-0 w-full bg-zinc-50 relative flex items-center justify-center">
 
-            <!-- Loading Indicator -->
-            <div id="iframe-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-10 gap-3 text-xs text-zinc-500 font-semibold">
+        <!-- Loading Indicator -->
+            <div id="iframe-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-10 gap-3 text-xs text-zinc-500 font-semibold<?php echo $_editor_resume_url ? '' : ' hidden'; ?>">
+
                 <div class="animate-spin rounded-full h-6 w-6 border-2 border-zinc-900 border-t-transparent"></div>
                 <span>Spawning Elementor design workspace...</span>
             </div>
@@ -2180,7 +2203,8 @@ $cora_bookings_count = count( cora_db_get_bookings() );
             </div>
 
             <!-- Editor Iframe -->
-            <iframe id="elementor-editor-iframe" src="" class="w-full h-full border-none hidden"></iframe>
+            <iframe id="elementor-editor-iframe" src="<?php echo esc_url($_editor_resume_url); ?>" class="w-full h-full border-none<?php echo $_editor_resume_url ? '' : ' hidden'; ?>"></iframe>
+
         </div>
     </div>
 
@@ -5774,8 +5798,12 @@ $cora_bookings_count = count( cora_db_get_bookings() );
         jQuery('#cora-direct-elementor-btn').attr('href', elementorUrl);
         jQuery('#cora-direct-elementor-card-btn').attr('href', elementorUrl);
         
-        // Load target frame URL
-        jQuery('#elementor-editor-iframe').attr('src', elementorUrl).off('load').on('load', function() {
+        // Load target frame URL (avoid double-load on refresh by checking current src)
+        const currentSrc = jQuery('#elementor-editor-iframe').attr('src');
+        if (currentSrc !== elementorUrl) {
+            jQuery('#elementor-editor-iframe').attr('src', elementorUrl);
+        }
+        jQuery('#elementor-editor-iframe').off('load').on('load', function() {
             jQuery('#iframe-loader').addClass('hidden');
             jQuery('#elementor-editor-iframe').removeClass('hidden');
 
