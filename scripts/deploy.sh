@@ -11,7 +11,7 @@ SSH_USER="u484406462"
 SSH_IP="145.79.213.97"
 SSH_PORT="65002"
 LOCAL_ZIP="/Users/shrutian/Desktop/cora/updates/cora-workspace.zip"
-REMOTE_TMP="/tmp/cora-workspace-deploy.zip"
+REMOTE_TMP="/home/u484406462/cora-workspace-deploy.zip"
 
 MAIN_PATH="/home/u484406462/domains/heycora.in/public_html"
 DEMO_PATH="/home/u484406462/domains/heycora.in/public_html/demo"
