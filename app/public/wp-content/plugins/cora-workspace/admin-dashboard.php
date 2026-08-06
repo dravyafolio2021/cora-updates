@@ -12855,9 +12855,56 @@ jQuery(document).ready(function($) {
 </script>
 <?php endif; ?>
 
+<div id="cora-pwa-prompt-banner" class="fixed bottom-6 right-6 z-[9999] max-w-sm w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl p-5 transform translate-y-12 opacity-0 pointer-events-none transition-all duration-300 ease-out font-sans">
+    <div class="flex items-start gap-4">
+        <!-- Monochromatic Icon -->
+        <div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-white shrink-0 border border-zinc-200 dark:border-zinc-700">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+        </div>
+        <div class="flex-1">
+            <h4 class="text-sm font-bold text-zinc-950 dark:text-white mb-1">Get the Cora Desktop App</h4>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mb-3">Install the workspace for a faster, offline-capable experience with real-time push notifications.</p>
+            <div class="flex items-center gap-2">
+                <button id="cora-pwa-prompt-install" class="px-3 py-1.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-semibold rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-100 transition">
+                    Install App
+                </button>
+                <button id="cora-pwa-prompt-dismiss" class="px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-850 text-zinc-650 dark:text-zinc-400 text-xs font-semibold rounded-lg transition">
+                    Later
+                </button>
+            </div>
+            <button id="cora-pwa-prompt-never" class="mt-2.5 block text-[10px] text-zinc-400 dark:text-zinc-500 hover:text-zinc-650 dark:hover:text-zinc-350 transition underline">
+                Don't ask me again
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
 // PWA Installation & Push Subscription Logic
 let coraPwaDeferredPrompt;
+
+function coraShowPwaPrompt() {
+    const neverPrompt = localStorage.getItem('cora_pwa_never_prompt') === 'true';
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    
+    if (neverPrompt || isStandalone) return;
+    
+    setTimeout(() => {
+        const banner = document.getElementById('cora-pwa-prompt-banner');
+        if (banner) {
+            banner.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+            banner.classList.add('translate-y-0', 'opacity-100');
+        }
+    }, 2000);
+}
+
+function coraHidePwaPrompt() {
+    const banner = document.getElementById('cora-pwa-prompt-banner');
+    if (banner) {
+        banner.classList.remove('translate-y-0', 'opacity-100');
+        banner.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+    }
+}
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -12866,6 +12913,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     if (installBtn) {
         installBtn.classList.remove('hidden');
     }
+    coraShowPwaPrompt();
 });
 
 function coraUrlB64ToUint8Array(base64String) {
@@ -13005,6 +13053,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 coraPwaDeferredPrompt = null;
             });
+        });
+    }
+
+    // Prompt banner buttons
+    const promptInstall = document.getElementById('cora-pwa-prompt-install');
+    if (promptInstall) {
+        promptInstall.addEventListener('click', () => {
+            if (!coraPwaDeferredPrompt) return;
+            coraPwaDeferredPrompt.prompt();
+            coraPwaDeferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    if (installBtn) installBtn.classList.add('hidden');
+                }
+                coraHidePwaPrompt();
+                coraPwaDeferredPrompt = null;
+            });
+        });
+    }
+
+    const promptDismiss = document.getElementById('cora-pwa-prompt-dismiss');
+    if (promptDismiss) {
+        promptDismiss.addEventListener('click', () => {
+            coraHidePwaPrompt();
+        });
+    }
+
+    const promptNever = document.getElementById('cora-pwa-prompt-never');
+    if (promptNever) {
+        promptNever.addEventListener('click', () => {
+            localStorage.setItem('cora_pwa_never_prompt', 'true');
+            coraHidePwaPrompt();
         });
     }
     
