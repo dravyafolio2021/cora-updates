@@ -7259,6 +7259,22 @@ $cora_bookings_count = count( cora_db_get_bookings() );
         }
     }
 
+    function getPageTypeBadge(p) {
+        const title = (p.title || '').toLowerCase();
+        const slug = (p.slug || '').toLowerCase();
+        
+        if (title.includes('header') || slug.includes('header')) {
+            return `<span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider border border-teal-500/30 text-teal-500 bg-teal-500/5 dark:border-teal-800/40 dark:text-teal-400 dark:bg-teal-400/5">Header</span>`;
+        }
+        if (title.includes('footer') || slug.includes('footer')) {
+            return `<span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider border border-orange-500/30 text-orange-500 bg-orange-500/5 dark:border-orange-800/40 dark:text-orange-400 dark:bg-orange-400/5">Footer</span>`;
+        }
+        if (title.includes('archive') || slug.includes('archive')) {
+            return `<span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider border border-blue-500/30 text-blue-500 bg-blue-500/5 dark:border-blue-800/40 dark:text-blue-400 dark:bg-blue-400/5">Archive</span>`;
+        }
+        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider border border-fuchsia-500/30 text-fuchsia-500 bg-fuchsia-500/5 dark:border-fuchsia-800/40 dark:text-fuchsia-400 dark:bg-fuchsia-400/5">Page</span>`;
+    }
+
     function renderPageSwitcherList(query) {
         const list = document.getElementById('cora-page-switcher-list');
         if (!list) return;
@@ -7266,20 +7282,49 @@ $cora_bookings_count = count( cora_db_get_bookings() );
         const pages = state.pages || [];
         const q = (query || '').toLowerCase();
         const filtered = q ? pages.filter(p => p.title && p.title.toLowerCase().includes(q)) : pages;
-        if (!filtered.length) { list.innerHTML = '<div class="px-3 py-4 text-center text-[11px] text-zinc-400">No pages found</div>'; return; }
-        const currentId = state.activePageId || state.currentPageId;
-        list.innerHTML = filtered.map(p => {
-            const active = p.id == currentId;
-            return `<button onclick="switchToPage(${p.id},'${(p.title||'').replace(/'/g,"\\'")}',${ p.wp_post_id||0})"
-                class="w-full text-left px-3 py-2 text-[11px] font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors flex items-center gap-2 ${active?'text-zinc-950 dark:text-white':'text-zinc-600 dark:text-zinc-400'}">
-                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${active?'bg-emerald-500':'bg-zinc-200 dark:bg-zinc-700'}"></span>
-                <span class="truncate flex-1">${p.title||'Untitled'}</span>
-                <span class="text-[9px] text-zinc-400 flex-shrink-0">${p.slug||''}</span>
-            </button>`;
-        }).join('');
+        
+        let html = '';
+        
+        // "Recent" section title heading
+        html += `<div class="px-3 py-1.5 text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest select-none">Recent</div>`;
+        
+        if (!filtered.length) {
+            html += '<div class="px-3 py-4 text-center text-[11px] text-zinc-400">No pages found</div>';
+        } else {
+            const currentId = state.activePageId || state.currentPageId;
+            html += filtered.map(p => {
+                const active = p.id == currentId;
+                const badge = getPageTypeBadge(p);
+                return `<button onclick="switchToPage(${p.id},'${(p.title||'').replace(/'/g,"\\'")}',${ p.wp_post_id||0})"
+                    class="w-full text-left px-3 py-2 text-[11px] font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors flex items-center gap-2 ${active?'text-zinc-950 dark:text-white':'text-zinc-600 dark:text-zinc-400'}">
+                    <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${active?'bg-emerald-500':'bg-zinc-200 dark:bg-zinc-700'}"></span>
+                    <span class="truncate flex-1">${p.title||'Untitled'}</span>
+                    <span class="flex-shrink-0 ml-1">${badge}</span>
+                </button>`;
+            }).join('');
+        }
+        
+        // Add footer divider and "+ Add new page" button at the bottom of the page list
+        html += `<div class="border-t border-zinc-100 dark:border-zinc-800 mt-1">
+            <button onclick="ddOpenNewPageDrawer(event)" class="w-full text-left px-3 py-2.5 text-[11px] font-bold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add new page
+            </button>
+        </div>`;
+        
+        list.innerHTML = html;
     }
 
     function filterPageSwitcher(q) { renderPageSwitcherList(q); }
+
+    function ddOpenNewPageDrawer(e) {
+        e.stopPropagation();
+        const dd = document.getElementById('cora-page-switcher-dropdown');
+        if (dd) dd.classList.add('hidden');
+        if (typeof openNewPageDrawer === 'function') {
+            openNewPageDrawer();
+        }
+    }
 
     function switchToPage(pageId, title, wpPostId) {
         const dd = document.getElementById('cora-page-switcher-dropdown');
