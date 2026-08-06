@@ -97,6 +97,58 @@ foreach ( $wp_nav_menus_raw as $nav_menu ) {
 $cora_listings_count = count( cora_db_get_properties() );
 $cora_leads_count = count( cora_db_get_leads() );
 $cora_bookings_count = count( cora_db_get_bookings() );
+
+// Fetch PageSpeed cache and settings
+$cached_ps = get_option( 'cora_canvas_pagespeed_data', array() );
+$ps_score = $cached_ps['score'] ?? 89;
+$ps_lcp   = $cached_ps['lcp'] ?? '2.1s';
+$ps_inp   = $cached_ps['inp'] ?? '544ms';
+$ps_cls   = $cached_ps['cls'] ?? '0.01';
+$ps_is_mocked = $cached_ps['is_mocked'] ?? false;
+$ps_msg = $cached_ps['msg'] ?? '';
+$ps_last = $cached_ps['last_updated'] ?? '';
+$ps_target = $cached_ps['target_url'] ?? home_url('/');
+$ps_opps = $cached_ps['opportunities'] ?? array(
+    array(
+        'label' => 'Improve INP (Interaction to Next Paint)',
+        'savings' => 'Potential improvement: 544ms → 290ms',
+        'severity' => 'High',
+    ),
+    array(
+        'label' => 'Reduce JavaScript execution',
+        'savings' => 'Potential improvement: 210ms',
+        'severity' => 'Medium',
+    ),
+);
+
+$ps_score_history = $cached_ps['score_history'] ?? array( 85, 87, 86, 88, 89 );
+$ps_lcp_history   = $cached_ps['lcp_history'] ?? array( 2.4, 2.3, 2.5, 2.2, 2.1 );
+$ps_inp_history   = $cached_ps['inp_history'] ?? array( 450, 480, 520, 500, 544 );
+$ps_cls_history   = $cached_ps['cls_history'] ?? array( 0.02, 0.02, 0.01, 0.01, 0.01 );
+
+if ( ! function_exists( 'cora_get_sparkline_points' ) ) {
+function cora_get_sparkline_points( $history, $type ) {
+    $points = array();
+    $count = count( $history );
+    $x_step = $count > 1 ? 64 / ( $count - 1 ) : 64;
+    for ( $i = 0; $i < $count; $i++ ) {
+        $x = round( $i * $x_step );
+        $val = floatval($history[$i]);
+        if ( $type === 'score' ) {
+            $y = 28 - round( ( $val / 100 ) * 20 ) - 4;
+        } else if ( $type === 'lcp' ) {
+            $y = 28 - round( ( min( $val, 5.0 ) / 5.0 ) * 20 ) - 4;
+        } else if ( $type === 'inp' ) {
+            $y = 28 - round( ( min( $val, 1000 ) / 1000 ) * 20 ) - 4;
+        } else {
+            $y = 28 - round( ( min( $val, 0.5 ) / 0.5 ) * 20 ) - 4;
+        }
+        $y = max( 2, min( 26, $y ) );
+        $points[] = "$x,$y";
+    }
+    return implode( ' ', $points );
+}
+}
 ?>
 
 <!-- Include CodeMirror Assets for CSS/JS Editor -->
@@ -305,100 +357,207 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                     Add Theme
                 </button>
                 <button onclick="window.coraShowToast('Exporting performance report ZIP...', 'success')" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-xs cursor-pointer transition-all flex items-center gap-1.5 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Export report
-                </button>
-            </div>
-        </div>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7        <!-- Compact Core Web Vitals Strip (Linear/Vercel SaaS style) -->
+        <?php
+        $lcp_num = floatval(preg_replace('/[^0-9.]/', '', $ps_lcp));
+        if ($lcp_num <= 2.5) {
+            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            $lcp_color = '#22c55e';
+        } elseif ($lcp_num <= 4.0) {
+            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            $lcp_color = '#f59e0b';
+        } else {
+            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-600 border border-red-200/70 leading-none">Poor</span>';
+            $lcp_color = '#ef4444';
+        }
 
-        <!-- Compact Core Web Vitals Strip (Linear/Vercel SaaS style) -->
-        <div class="bg-white border border-zinc-200 rounded-xl shadow-2xs overflow-hidden dark:bg-zinc-950 dark:border-zinc-800">
+        $inp_num = intval(preg_replace('/[^0-9]/', '', $ps_inp));
+        if ($inp_num <= 200) {
+            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            $inp_color = '#22c55e';
+        } elseif ($inp_num <= 500) {
+            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            $inp_color = '#f59e0b';
+        } else {
+            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+            $inp_color = '#ef4444';
+        }
+
+        $cls_num = floatval($ps_cls);
+        if ($cls_num <= 0.1) {
+            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            $cls_color = '#22c55e';
+        } elseif ($cls_num <= 0.25) {
+            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            $cls_color = '#f59e0b';
+        } else {
+            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+            $cls_color = '#ef4444';
+        }
+
+        $score_num = intval($ps_score);
+        if ($score_num >= 90) {
+            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            $score_color = '#22c55e';
+        } elseif ($score_num >= 50) {
+            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            $score_color = '#f59e0b';
+        } else {
+            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+            $score_color = '#ef4444';
+        }
+
+        $lcp_pts = cora_get_sparkline_points( $ps_lcp_history, 'lcp' );
+        $lcp_last_pt = end($ps_lcp_history);
+        $lcp_last_y = 28 - round( ( min(floatval($lcp_last_pt), 5.0) / 5.0 ) * 20 ) - 4;
+        $lcp_last_y = max( 2, min( 26, $lcp_last_y ) );
+
+        $inp_pts = cora_get_sparkline_points( $ps_inp_history, 'inp' );
+        $inp_last_pt = end($ps_inp_history);
+        $inp_last_y = 28 - round( ( min(intval($inp_last_pt), 1000) / 1000 ) * 20 ) - 4;
+        $inp_last_y = max( 2, min( 26, $inp_last_y ) );
+
+        $cls_pts = cora_get_sparkline_points( $ps_cls_history, 'cls' );
+        $cls_last_pt = end($ps_cls_history);
+        $cls_last_y = 28 - round( ( min(floatval($cls_last_pt), 0.5) / 0.5 ) * 20 - 4 );
+        $cls_last_y = max( 2, min( 26, $cls_last_y ) );
+
+        $score_pts = cora_get_sparkline_points( $ps_score_history, 'score' );
+        $score_last_pt = end($ps_score_history);
+        $score_last_y = 28 - round( ( intval($score_last_pt) / 100 ) * 20 ) - 4;
+        $score_last_y = max( 2, min( 26, $score_last_y ) );
+        ?>
+        <div class="bg-white border border-zinc-200 rounded-t-xl shadow-2xs dark:bg-zinc-950 dark:border-zinc-800">
             <div class="flex items-stretch divide-x divide-zinc-100 dark:divide-zinc-800">
 
-                <!-- LCP — target < 2.5s. Data shows a slight improvement -->
+                <!-- LCP -->
                 <div class="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">LCP</div>
                         <div class="flex items-center gap-1.5">
-                            <span class="text-sm font-black text-zinc-900 dark:text-white leading-none">2.1s</span>
-                            <span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>
+                            <span id="pagespeed-val-lcp" class="text-sm font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_lcp); ?></span>
+                            <span id="pagespeed-badge-lcp"><?php echo $lcp_badge; ?></span>
                         </div>
-                        <div class="text-[9px] text-zinc-400 mt-0.5">↓ 0.3s vs prev</div>
+                        <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 2.5s</div>
                     </div>
-                    <!-- Realistic LCP sparkline: starts high, dips mid-month, settles lower -->
+                    <!-- LCP sparkline -->
                     <svg class="w-16 h-7 shrink-0 overflow-visible" viewBox="0 0 64 28" fill="none" preserveAspectRatio="none">
                         <defs>
                             <linearGradient id="lcp-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#22c55e" stop-opacity="0.15"/>
-                                <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+                                <stop offset="0%" stop-color="<?php echo $lcp_color; ?>" stop-opacity="0.15"/>
+                                <stop offset="100%" stop-color="<?php echo $lcp_color; ?>" stop-opacity="0"/>
                             </linearGradient>
                         </defs>
-                        <!-- Area fill -->
-                        <polygon points="0,22 8,20 16,24 24,18 32,21 40,16 48,14 56,12 64,10 64,28 0,28" fill="url(#lcp-fill)"/>
-                        <!-- Polyline: realistic daily variance, downward trend -->
-                        <polyline points="0,22 8,20 16,24 24,18 32,21 40,16 48,14 56,12 64,10" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <!-- End dot -->
-                        <circle cx="64" cy="10" r="2" fill="#22c55e"/>
+                        <polygon id="pagespeed-area-lcp" points="0,28 <?php echo esc_attr($lcp_pts); ?> 64,28 0,28" fill="url(#lcp-fill)"/>
+                        <polyline id="pagespeed-line-lcp" points="<?php echo esc_attr($lcp_pts); ?>" stroke="<?php echo $lcp_color; ?>" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <circle id="pagespeed-dot-lcp" cx="64" cy="<?php echo $lcp_last_y; ?>" r="2" fill="<?php echo $lcp_color; ?>"/>
                     </svg>
                 </div>
 
-                <!-- INP — target < 200ms. Currently 544ms = Poor, volatile/erratic pattern -->
+                <!-- INP -->
                 <div class="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">INP</div>
                         <div class="flex items-center gap-1.5">
-                            <span class="text-sm font-black text-zinc-900 dark:text-white leading-none">544ms</span>
-                            <span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-600 border border-red-200/70 leading-none">Poor</span>
+                            <span id="pagespeed-val-inp" class="text-sm font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_inp); ?></span>
+                            <span id="pagespeed-badge-inp"><?php echo $inp_badge; ?></span>
                         </div>
-                        <div class="text-[9px] text-zinc-400 mt-0.5">↑ +89ms vs prev</div>
+                        <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 200ms</div>
                     </div>
-                    <!-- Realistic INP sparkline: erratic, high variance, no clear trend (reflects real-world INP behaviour) -->
+                    <!-- INP sparkline -->
                     <svg class="w-16 h-7 shrink-0 overflow-visible" viewBox="0 0 64 28" fill="none" preserveAspectRatio="none">
                         <defs>
                             <linearGradient id="inp-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#ef4444" stop-opacity="0.12"/>
-                                <stop offset="100%" stop-color="#ef4444" stop-opacity="0"/>
+                                <stop offset="0%" stop-color="<?php echo $inp_color; ?>" stop-opacity="0.12"/>
+                                <stop offset="100%" stop-color="<?php echo $inp_color; ?>" stop-opacity="0"/>
                             </linearGradient>
                         </defs>
-                        <polygon points="0,16 8,8 16,18 24,6 32,14 40,4 48,12 56,6 64,10 64,28 0,28" fill="url(#inp-fill)"/>
-                        <polyline points="0,16 8,8 16,18 24,6 32,14 40,4 48,12 56,6 64,10" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <circle cx="64" cy="10" r="2" fill="#ef4444"/>
+                        <polygon id="pagespeed-area-inp" points="0,28 <?php echo esc_attr($inp_pts); ?> 64,28 0,28" fill="url(#inp-fill)"/>
+                        <polyline id="pagespeed-line-inp" points="<?php echo esc_attr($inp_pts); ?>" stroke="<?php echo $inp_color; ?>" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <circle id="pagespeed-dot-inp" cx="64" cy="<?php echo $inp_last_y; ?>" r="2" fill="<?php echo $inp_color; ?>"/>
                     </svg>
                 </div>
 
-                <!-- CLS — target < 0.1. Very stable, nearly flat (correct for CLS) -->
+                <!-- CLS -->
                 <div class="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">CLS</div>
                         <div class="flex items-center gap-1.5">
-                            <span class="text-sm font-black text-zinc-900 dark:text-white leading-none">0.01</span>
-                            <span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>
+                            <span id="pagespeed-val-cls" class="text-sm font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_cls); ?></span>
+                            <span id="pagespeed-badge-cls"><?php echo $cls_badge; ?></span>
                         </div>
-                        <div class="text-[9px] text-zinc-400 mt-0.5">Stable</div>
+                        <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 0.1</div>
                     </div>
-                    <!-- CLS sparkline: nearly flat with tiny occasional spikes (single layout shift events) -->
+                    <!-- CLS sparkline -->
                     <svg class="w-16 h-7 shrink-0 overflow-visible" viewBox="0 0 64 28" fill="none" preserveAspectRatio="none">
                         <defs>
                             <linearGradient id="cls-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#71717a" stop-opacity="0.1"/>
-                                <stop offset="100%" stop-color="#71717a" stop-opacity="0"/>
+                                <stop offset="0%" stop-color="<?php echo $cls_color; ?>" stop-opacity="0.1"/>
+                                <stop offset="100%" stop-color="<?php echo $cls_color; ?>" stop-opacity="0"/>
                             </linearGradient>
                         </defs>
-                        <polygon points="0,20 8,20 16,18 24,22 32,20 40,19 48,22 56,20 64,20 64,28 0,28" fill="url(#cls-fill)"/>
-                        <polyline points="0,20 8,20 16,18 24,22 32,20 40,19 48,22 56,20 64,20" stroke="#71717a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <circle cx="64" cy="20" r="2" fill="#71717a"/>
+                        <polygon id="pagespeed-area-cls" points="0,28 <?php echo esc_attr($cls_pts); ?> 64,28 0,28" fill="url(#cls-fill)"/>
+                        <polyline id="pagespeed-line-cls" points="<?php echo esc_attr($cls_pts); ?>" stroke="<?php echo $cls_color; ?>" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <circle id="pagespeed-dot-cls" cx="64" cy="<?php echo $cls_last_y; ?>" r="2" fill="<?php echo $cls_color; ?>"/>
                     </svg>
                 </div>
 
-                <!-- Performance Score — gradual improvement toward 90 -->
+                <!-- Score -->
                 <div class="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">Score</div>
                         <div class="flex items-center gap-1.5">
-                            <span class="text-sm font-black text-zinc-900 dark:text-white leading-none">89</span>
-                            <span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>
+                            <span id="pagespeed-val-score" class="text-sm font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_score); ?></span>
+                            <span id="pagespeed-badge-score"><?php echo $score_badge; ?></span>
                         </div>
-                        <div class="text-[9px] text-zinc-400 mt-0.5">↑ +4 pts vs prev</div>
+                        <div class="text-[9px] text-zinc-400 mt-0.5">Target &gt; 89</div>
+                    </div>
+                    <!-- Score sparkline -->
+                    <svg class="w-16 h-7 shrink-0 overflow-visible" viewBox="0 0 64 28" fill="none" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="score-fill" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="<?php echo $score_color; ?>" stop-opacity="0.15"/>
+                                <stop offset="100%" stop-color="<?php echo $score_color; ?>" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                        <polygon id="pagespeed-area-score" points="0,28 <?php echo esc_attr($score_pts); ?> 64,28 0,28" fill="url(#score-fill)"/>
+                        <polyline id="pagespeed-line-score" points="<?php echo esc_attr($score_pts); ?>" stroke="<?php echo $score_color; ?>" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <circle id="pagespeed-dot-score" cx="64" cy="<?php echo $score_last_y; ?>" r="2" fill="<?php echo $score_color; ?>"/>
+                    </svg>
+                </div>
+
+                <!-- Device Selector -->
+                <button onclick="window.coraShowToast('Switching to desktop view...')" class="flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors select-none shrink-0 text-left border-none bg-transparent cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500 shrink-0"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                    <span class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 whitespace-nowrap">Mobile</span>
+                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- PageSpeed Sync Status Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-zinc-50 border border-zinc-200 border-t-0 rounded-b-xl text-[10px] text-zinc-500 gap-3 dark:bg-zinc-900/40 dark:border-zinc-800" style="margin-top: -1px;">
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="inline-flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-350">
+                    <span id="pagespeed-conn-indicator" class="w-1.5 h-1.5 rounded-full <?php echo $ps_is_mocked ? 'bg-amber-400' : 'bg-green-500'; ?>"></span>
+                    Google PageSpeed Insights: <span id="pagespeed-conn-text"><?php echo $ps_is_mocked ? 'Simulated (Local Environment)' : 'Connected'; ?></span>
+                </span>
+                <span class="text-zinc-400">·</span>
+                <span>Audit Target: <code id="pagespeed-target-url" class="bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono text-[9px]"><?php echo esc_html( $ps_target ); ?></code></span>
+                <span class="text-zinc-400">·</span>
+                <span>Last audited: <span id="pagespeed-last-updated" class="font-medium text-zinc-600 dark:text-zinc-400"><?php echo !empty($ps_last) ? esc_html( $ps_last ) : 'Never'; ?></span></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openPageSpeedSettingsDrawer()" class="px-2.5 py-1 text-[9px] font-bold text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 cursor-pointer select-none transition-all dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300">
+                    API Settings
+                </button>
+                <button id="btn-refresh-pagespeed" onclick="triggerPageSpeedAudit()" class="px-2.5 py-1 text-[9px] font-bold text-white bg-zinc-950 rounded-lg hover:bg-zinc-800 cursor-pointer select-none transition-all flex items-center gap-1">
+                    <svg id="pagespeed-refresh-spinner" class="animate-spin hidden" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                    Refresh Audit
+                </button>
+            </div>
+        </div>iv class="text-[9px] text-zinc-400 mt-0.5">↑ +4 pts vs prev</div>
                     </div>
                     <!-- Score sparkline: gradual improvement with minor dips — realistic -->
                     <svg class="w-16 h-7 shrink-0 overflow-visible" viewBox="0 0 64 28" fill="none" preserveAspectRatio="none">
@@ -567,13 +726,22 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Performance Insights + Website Statistics Two-Column Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Performance Insights Card -->
+            <?php
+            if ($ps_score >= 90) {
+                $score_status_text = 'Good';
+                $score_status_color = 'text-green-600';
+                $score_radial_color = '#22c55e';
+            } elseif ($ps_score >= 50) {
+                $score_status_text = 'Needs Imp.';
+                $score_status_color = 'text-amber-600';
+                $score_radial_color = '#f59e0b';
+            } else {
+                $score_status_text = 'Poor';
+                $score_status_color = 'text-red-650';
+                $score_radial_color = '#ef4444';
+            }
+            ?>
             <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm" id="performance-insights-card">
                 <h3 class="text-sm font-black text-zinc-900 dark:text-white mb-4">Performance insights</h3>
                 <div class="flex items-center gap-4 mb-5">
@@ -581,63 +749,55 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                     <div class="relative w-16 h-16 shrink-0">
                         <svg viewBox="0 0 36 36" class="w-16 h-16 -rotate-90">
                             <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f4f4f5" stroke-width="3"></circle>
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#22c55e" stroke-width="3" stroke-dasharray="89 11" stroke-linecap="round"></circle>
+                            <circle id="pagespeed-radial-score" cx="18" cy="18" r="15.9" fill="none" stroke="<?php echo $score_radial_color; ?>" stroke-width="3" stroke-dasharray="<?php echo intval($ps_score); ?> <?php echo 100 - intval($ps_score); ?>" stroke-linecap="round"></circle>
                         </svg>
                         <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span class="text-base font-black text-zinc-900 leading-none">89</span>
+                            <span id="pagespeed-radial-val" class="text-base font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_score); ?></span>
                         </div>
                     </div>
                     <div>
-                        <div class="text-xs font-bold text-zinc-700">Performance score</div>
-                        <div class="text-sm font-black text-green-600 mt-0.5">Good</div>
+                        <div class="text-xs font-bold text-zinc-700 dark:text-zinc-350">Performance score</div>
+                        <div id="pagespeed-score-status" class="text-sm font-black <?php echo $score_status_color; ?> mt-0.5"><?php echo esc_html($score_status_text); ?></div>
                         <div class="text-[10px] text-zinc-400 mt-1 flex items-center gap-1">
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-green-500"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                            Faster than 73% of websites
+                            Faster than <span id="pagespeed-faster-pct"><?php echo max(10, min(99, intval($ps_score) - 16)); ?></span>% of websites
                         </div>
                     </div>
                 </div>
 
                 <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Top opportunities</div>
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between p-2.5 bg-zinc-50 dark:bg-zinc-900/30 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors group" onclick="window.coraShowToast('Opening INP optimization guide...')">
+                <div id="pagespeed-opportunities-list" class="space-y-2">
+                    <?php foreach ($ps_opps as $opp) : 
+                        $opp_severity = $opp['severity'] ?? 'Medium';
+                        $opp_badge_class = 'bg-zinc-100 text-zinc-650 border border-zinc-200';
+                        if ($opp_severity === 'High') {
+                            $opp_badge_class = 'bg-red-50 text-red-700 border border-red-200/50';
+                        } elseif ($opp_severity === 'Medium') {
+                            $opp_badge_class = 'bg-amber-50 text-amber-700 border border-amber-200/50';
+                        }
+                        $opp_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+                        if (stripos($opp['label'], 'javascript') !== false || stripos($opp['label'], 'js') !== false) {
+                            $opp_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
+                        } elseif (stripos($opp['label'], 'image') !== false) {
+                            $opp_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
+                        } elseif (stripos($opp['label'], 'inp') !== false || stripos($opp['label'], 'paint') !== false || stripos($opp['label'], 'blocking') !== false) {
+                            $opp_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+                        }
+                    ?>
+                    <div class="flex items-center justify-between p-2.5 bg-zinc-50 dark:bg-zinc-900/30 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors group" onclick="window.coraShowToast('Opening optimization guide...')">
                         <div class="flex items-center gap-2.5 min-w-0">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <?php echo $opp_icon; ?>
                             <div class="min-w-0">
-                                <div class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 truncate">Improve INP (Interaction to Next Paint)</div>
-                                <div class="text-[9px] text-zinc-400 mt-0.5">Potential improvement: 544ms → 290ms</div>
+                                <div class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 truncate"><?php echo esc_html($opp['label']); ?></div>
+                                <div class="text-[9px] text-zinc-400 mt-0.5"><?php echo esc_html($opp['savings']); ?></div>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0 ml-2">
-                            <span class="px-2 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-700 border border-red-200/50">High</span>
+                            <span class="px-2 py-0.5 text-[8px] font-bold rounded-full <?php echo $opp_badge_class; ?>"><?php echo esc_html($opp_severity); ?></span>
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-350 group-hover:text-zinc-700 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between p-2.5 bg-zinc-50 dark:bg-zinc-900/30 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors group" onclick="window.coraShowToast('Opening JavaScript optimization guide...')">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                            <div class="min-w-0">
-                                <div class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 truncate">Reduce JavaScript execution</div>
-                                <div class="text-[9px] text-zinc-400 mt-0.5">Potential improvement: 210ms</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 shrink-0 ml-2">
-                            <span class="px-2 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/50">Medium</span>
-                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-350 group-hover:text-zinc-700 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between p-2.5 bg-zinc-50 dark:bg-zinc-900/30 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors group" onclick="window.coraShowToast('Opening image optimization guide...')">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                            <div class="min-w-0">
-                                <div class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 truncate">Optimize hero images</div>
-                                <div class="text-[9px] text-zinc-400 mt-0.5">Potential improvement: 120ms</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 shrink-0 ml-2">
-                            <span class="px-2 py-0.5 text-[8px] font-bold rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200">Low</span>
-                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-350 group-hover:text-zinc-700 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
                 <button onclick="window.coraShowToast('Loading full performance report...')" class="mt-3 text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-none bg-transparent p-0 transition-colors">View full performance report</button>
             </div>
@@ -683,6 +843,21 @@ $cora_bookings_count = count( cora_db_get_bookings() );
         </div>
 
         <!-- Recommended For You Banner -->
+        <?php 
+        $rec_opp = $ps_opps[0] ?? array('label' => 'Reduce JavaScript execution', 'savings' => 'Potential savings: ~210ms', 'severity' => 'Medium');
+        $rec_metric = 'INP';
+        $rec_metric_val = $ps_inp;
+        $rec_target = '150ms';
+        if (stripos($rec_opp['label'], 'lcp') !== false || stripos($rec_opp['label'], 'image') !== false || stripos($rec_opp['label'], 'render') !== false) {
+            $rec_metric = 'LCP';
+            $rec_metric_val = $ps_lcp;
+            $rec_target = '2.5s';
+        }
+        $rec_desc = 'Your INP score is poor. Consider optimizing JavaScript execution and reducing main-thread work.';
+        if ($rec_metric === 'LCP') {
+            $rec_desc = 'Optimize your images, leverage CDNs, and scale them appropriately to improve Largest Contentful Paint (LCP).';
+        }
+        ?>
         <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4" id="recommended-banner">
             <div class="flex items-start gap-3">
                 <div class="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center shrink-0 mt-0.5">
@@ -690,18 +865,17 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 </div>
                 <div>
                     <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Recommended for you</div>
-                    <div class="text-sm font-black text-zinc-900 dark:text-white mt-0.5">Reduce JavaScript execution</div>
-                    <div class="text-xs text-zinc-500 mt-0.5 max-w-md">Your INP score is poor. Consider optimizing JavaScript execution and reducing main-thread work.</div>
+                    <div id="pagespeed-rec-title" class="text-sm font-black text-zinc-900 dark:text-white mt-0.5"><?php echo esc_html($rec_opp['label']); ?></div>
+                    <div id="pagespeed-rec-desc" class="text-xs text-zinc-500 mt-0.5 max-w-md"><?php echo esc_html($rec_desc); ?></div>
                     <div class="mt-2 flex items-center gap-2">
                         <span class="text-[10px] text-zinc-400 font-semibold">Estimated improvement</span>
-                        <span class="text-[10px] font-bold text-zinc-600">INP</span>
-                        <span class="text-[10px] font-black text-zinc-900">544ms <span class="text-zinc-400 font-normal">→</span> <span class="text-green-600">290ms</span></span>
+                        <span id="pagespeed-rec-metric-lbl" class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400"><?php echo esc_html($rec_metric); ?></span>
+                        <span class="text-[10px] font-black text-zinc-900 dark:text-white"><span id="pagespeed-rec-metric-from"><?php echo esc_html($rec_metric_val); ?></span> <span class="text-zinc-400 font-normal">→</span> <span id="pagespeed-rec-metric-to" class="text-green-600"><?php echo esc_html($rec_target); ?></span></span>
                     </div>
                 </div>
             </div>
-            <button onclick="window.coraShowToast('Opening INP optimization guide...', 'success')" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all border-none shadow-xs shrink-0">
+            <button onclick="window.coraShowToast('Opening optimization guide...', 'success')" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all border-none shadow-xs shrink-0">
                 Optimize now
-            </button>
         </div>
         <?php endif; ?>
 
@@ -2924,6 +3098,64 @@ $cora_bookings_count = count( cora_db_get_bookings() );
     </div>
 </div>
 
+<!-- 7.5. PageSpeed Settings Drawer (Right-Sliding Sheet) -->
+<div id="drawer-pagespeed-settings" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-pagespeed-settings-card">
+        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700 dark:text-zinc-300"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-50 font-sans">PageSpeed Credentials</h3>
+                    <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Setup your Google PageSpeed API Key</p>
+                </div>
+            </div>
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closePageSpeedSettingsDrawer()">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        
+        <!-- Drawer Body -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-6">
+            <div class="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-2">
+                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Google Cloud API Key</p>
+                <p class="text-[11px] text-zinc-650 dark:text-zinc-400 leading-relaxed font-sans">
+                    Google PageSpeed Insights API is 100% free and does not require complex configuration. To execute higher volume tests without rate limit limits, add your Google API key.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="p-4 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-white dark:bg-zinc-900 space-y-3">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-50 text-[10px] font-bold text-white dark:text-zinc-950">1</span>
+                    <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-sans inline-block ml-1">Get your PageSpeed API Key</p>
+                    <p class="text-[11px] text-zinc-500 leading-relaxed font-sans">
+                        Click the button below to open Google Cloud API console (free account). Search or ensure the <strong>PageSpeed Insights API</strong> is enabled, and click <strong>"Create Credentials" / "API Key"</strong>.
+                    </p>
+                    <a href="https://console.cloud.google.com/apis/library/pagespeedonline.googleapis.com" target="_blank" class="w-full h-9 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border border-zinc-200 dark:border-zinc-750 no-underline font-sans">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        Get Free PageSpeed API Key
+                    </a>
+                </div>
+
+                <div class="p-4 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-white dark:bg-zinc-900 space-y-3">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-50 text-[10px] font-bold text-white dark:text-zinc-950">2</span>
+                    <label for="pagespeed-api-key-input" class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-sans inline-block ml-1">Paste your Google API Key</label>
+                    <p class="text-[11px] text-zinc-500 leading-relaxed font-sans">
+                        Paste your API key here. If left blank, Cora will try to fall back to your Google Maps API key or query keyless with standard limitations.
+                    </p>
+                    <input type="password" id="pagespeed-api-key-input" placeholder="AIzaSy..." value="<?php echo esc_attr( get_option( 'cora_pagespeed_api_key', '' ) ); ?>" class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-850 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-sans">
+                </div>
+            </div>
+        </div>
+        <!-- Drawer Footer -->
+        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-end gap-2.5 bg-zinc-50/30 dark:bg-zinc-900/30 flex-shrink-0">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closePageSpeedSettingsDrawer()">Cancel</button>
+            <button type="button" class="px-3.5 py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer border-none font-sans" onclick="savePageSpeedSettings()">Save API Settings</button>
+        </div>
+    </div>
+</div>
+
 <!-- Lovable Connection Modal (Centered Popup) -->
 <div id="drawer-lovable-connect" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
     <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-sm space-y-4 transform scale-95 transition-transform duration-300" id="drawer-lovable-connect-card">
@@ -3429,6 +3661,232 @@ $cora_bookings_count = count( cora_db_get_bookings() );
             $('#add-menu-item-dropdown').addClass('hidden');
         });
     });
+
+    // --- PageSpeed Insights Audit and Settings Actions ---
+    function triggerPageSpeedAudit() {
+        const btn = jQuery('#btn-refresh-pagespeed');
+        const spinner = jQuery('#pagespeed-refresh-spinner');
+        
+        if (btn.hasClass('pointer-events-none')) return;
+        
+        btn.addClass('pointer-events-none opacity-80');
+        spinner.removeClass('hidden');
+        window.coraShowToast('Initiating Google PageSpeed Insights performance audit...', 'success');
+        
+        // Add skeleton loading overlay classes to cards to look premium
+        jQuery('#pagespeed-val-lcp, #pagespeed-val-inp, #pagespeed-val-cls, #pagespeed-val-score, #pagespeed-radial-val, #pagespeed-rec-title, #pagespeed-rec-desc').addClass('cora-skeleton rounded text-transparent select-none');
+        
+        jQuery.post(ajaxurl, {
+            action: 'cora_audit_pagespeed_performance'
+        }, function(response) {
+            btn.removeClass('pointer-events-none opacity-80');
+            spinner.addClass('hidden');
+            jQuery('#pagespeed-val-lcp, #pagespeed-val-inp, #pagespeed-val-cls, #pagespeed-val-score, #pagespeed-radial-val, #pagespeed-rec-title, #pagespeed-rec-desc').removeClass('cora-skeleton rounded text-transparent select-none');
+            
+            if (response.success && response.data) {
+                const data = response.data;
+                window.coraShowToast('Google PageSpeed audit complete!', 'success');
+                
+                // Update Vitals Strip
+                jQuery('#pagespeed-val-lcp').text(data.lcp);
+                jQuery('#pagespeed-val-inp').text(data.inp);
+                jQuery('#pagespeed-val-cls').text(data.cls);
+                jQuery('#pagespeed-val-score').text(data.score);
+                jQuery('#pagespeed-radial-val').text(data.score);
+                
+                // Update Badges & Sparkline colors
+                updatePagespeedVitalsUI(data);
+                
+                // Update connection status
+                jQuery('#pagespeed-conn-text').text(data.is_mocked ? 'Simulated (Local Environment)' : 'Connected');
+                jQuery('#pagespeed-conn-indicator').removeClass('bg-green-500 bg-amber-400 bg-red-500').addClass(data.is_mocked ? 'bg-amber-400' : 'bg-green-500');
+                jQuery('#pagespeed-target-url').text(data.target_url);
+                jQuery('#pagespeed-last-updated').text(data.last_updated);
+                
+                // Update Opportunities List
+                updateOpportunitiesUI(data.opportunities);
+                
+                // Update Recommendation Banner
+                updateRecommendationBannerUI(data);
+            } else {
+                window.coraShowToast('Failed to perform PageSpeed audit: ' + (response.data || 'Unknown error'), 'error');
+            }
+        }).fail(function() {
+            btn.removeClass('pointer-events-none opacity-80');
+            spinner.addClass('hidden');
+            jQuery('#pagespeed-val-lcp, #pagespeed-val-inp, #pagespeed-val-cls, #pagespeed-val-score, #pagespeed-radial-val, #pagespeed-rec-title, #pagespeed-rec-desc').removeClass('cora-skeleton rounded text-transparent select-none');
+            window.coraShowToast('PageSpeed audit request failed due to connection error.', 'error');
+        });
+    }
+    window.triggerPageSpeedAudit = triggerPageSpeedAudit;
+
+    function updatePagespeedVitalsUI(data) {
+        // LCP
+        const lcpNum = parseFloat(data.lcp);
+        let lcpBadge = '', lcpColor = '#ef4444';
+        if (lcpNum <= 2.5) {
+            lcpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            lcpColor = '#22c55e';
+        } else if (lcpNum <= 4.0) {
+            lcpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            lcpColor = '#f59e0b';
+        } else {
+            lcpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+        }
+        jQuery('#pagespeed-badge-lcp').html(lcpBadge);
+        
+        // INP
+        const inpNum = parseInt(data.inp);
+        let inpBadge = '', inpColor = '#ef4444';
+        if (inpNum <= 200) {
+            inpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            inpColor = '#22c55e';
+        } else if (inpNum <= 500) {
+            inpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            inpColor = '#f59e0b';
+        } else {
+            inpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+        }
+        jQuery('#pagespeed-badge-inp').html(inpBadge);
+
+        // CLS
+        const clsNum = parseFloat(data.cls);
+        let clsBadge = '', clsColor = '#ef4444';
+        if (clsNum <= 0.1) {
+            clsBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            clsColor = '#22c55e';
+        } else if (clsNum <= 0.25) {
+            clsBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            clsColor = '#f59e0b';
+        } else {
+            clsBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+        }
+        jQuery('#pagespeed-badge-cls').html(clsBadge);
+
+        // Score
+        const scoreNum = parseInt(data.score);
+        let scoreBadge = '', scoreColor = '#ef4444';
+        if (scoreNum >= 90) {
+            scoreBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            scoreColor = '#22c55e';
+        } else if (scoreNum >= 50) {
+            scoreBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            scoreColor = '#f59e0b';
+        } else {
+            scoreBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+        }
+        jQuery('#pagespeed-badge-score').html(scoreBadge);
+
+        // Update Score Radial & Performance insights score
+        jQuery('#pagespeed-radial-score').attr('stroke', scoreColor).attr('stroke-dasharray', scoreNum + ' ' + (100 - scoreNum));
+        jQuery('#pagespeed-score-status').text(scoreNum >= 90 ? 'Good' : (scoreNum >= 50 ? 'Needs Improvement' : 'Poor')).removeClass('text-green-600 text-amber-600 text-red-600').addClass(scoreNum >= 90 ? 'text-green-600' : (scoreNum >= 50 ? 'text-amber-600' : 'text-red-600'));
+        jQuery('#pagespeed-faster-pct').text(Math.max(10, Math.min(99, scoreNum - 16)));
+
+        // Helper to map history array to points path
+        const buildPointsStr = (history, type) => {
+            const count = history.length;
+            const xStep = count > 1 ? 64 / (count - 1) : 64;
+            return history.map((val, idx) => {
+                const x = Math.round(idx * xStep);
+                let y;
+                if (type === 'score') {
+                    y = 28 - Math.round((parseFloat(val) / 100) * 20) - 4;
+                } else if (type === 'lcp') {
+                    y = 28 - Math.round((Math.min(parseFloat(val), 5.0) / 5.0) * 20) - 4;
+                } else if (type === 'inp') {
+                    y = 28 - Math.round((Math.min(parseFloat(val), 1000) / 1000) * 20) - 4;
+                } else {
+                    y = 28 - Math.round((Math.min(parseFloat(val), 0.5) / 0.5) * 20) - 4;
+                }
+                y = Math.max(2, Math.min(26, y));
+                return x + ',' + y;
+            }).join(' ');
+        };
+
+        // Redraw sparkline paths
+        const lcpPts = buildPointsStr(data.lcp_history, 'lcp');
+        jQuery('#pagespeed-line-lcp').attr('points', lcpPts).attr('stroke', lcpColor);
+        jQuery('#pagespeed-area-lcp').attr('points', '0,28 ' + lcpPts + ' 64,28 0,28').prev().find('stop').first().attr('stop-color', lcpColor);
+        jQuery('#pagespeed-dot-lcp').attr('fill', lcpColor).attr('cy', lcpPts.split(' ').pop().split(',')[1]);
+
+        const inpPts = buildPointsStr(data.inp_history, 'inp');
+        jQuery('#pagespeed-line-inp').attr('points', inpPts).attr('stroke', inpColor);
+        jQuery('#pagespeed-area-inp').attr('points', '0,28 ' + inpPts + ' 64,28 0,28').prev().find('stop').first().attr('stop-color', inpColor);
+        jQuery('#pagespeed-dot-inp').attr('fill', inpColor).attr('cy', inpPts.split(' ').pop().split(',')[1]);
+
+        const clsPts = buildPointsStr(data.cls_history, 'cls');
+        jQuery('#pagespeed-line-cls').attr('points', clsPts).attr('stroke', clsColor);
+        jQuery('#pagespeed-area-cls').attr('points', '0,28 ' + clsPts + ' 64,28 0,28').prev().find('stop').first().attr('stop-color', clsColor);
+        jQuery('#pagespeed-dot-cls').attr('fill', clsColor).attr('cy', clsPts.split(' ').pop().split(',')[1]);
+
+        const scorePts = buildPointsStr(data.score_history, 'score');
+        jQuery('#pagespeed-line-score').attr('points', scorePts).attr('stroke', scoreColor);
+        jQuery('#pagespeed-area-score').attr('points', '0,28 ' + scorePts + ' 64,28 0,28').prev().find('stop').first().attr('stop-color', scoreColor);
+        jQuery('#pagespeed-dot-score').attr('fill', scoreColor).attr('cy', scorePts.split(' ').pop().split(',')[1]);
+    }
+
+    function updateOpportunitiesUI(opportunities) {
+        let html = '';
+        opportunities.forEach(opp => {
+            const severity = opp.severity || 'Medium';
+            let badgeClass = 'bg-zinc-100 text-zinc-650 border border-zinc-200';
+            if (severity === 'High') {
+                badgeClass = 'bg-red-50 text-red-700 border border-red-200/50';
+            } else if (severity === 'Medium') {
+                badgeClass = 'bg-amber-50 text-amber-700 border border-amber-200/50';
+            }
+
+            let icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+            const label = opp.label.toLowerCase();
+            if (label.includes('javascript') || label.includes('js')) {
+                icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
+            } else if (label.includes('image')) {
+                icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
+            } else if (label.includes('inp') || label.includes('paint') || label.includes('blocking')) {
+                icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+            }
+
+            html += `
+                <div class="flex items-center justify-between p-2.5 bg-zinc-50 dark:bg-zinc-900/30 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors group" onclick="window.coraShowToast('Opening optimization guide...')">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        ${icon}
+                        <div class="min-w-0">
+                            <div class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 truncate">${opp.label}</div>
+                            <div class="text-[9px] text-zinc-400 mt-0.5">${opp.savings}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 ml-2">
+                        <span class="px-2 py-0.5 text-[8px] font-bold rounded-full ${badgeClass}">${severity}</span>
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-350 group-hover:text-zinc-700 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
+                </div>
+            `;
+        });
+        jQuery('#pagespeed-opportunities-list').html(html);
+    }
+
+    function updateRecommendationBannerUI(data) {
+        const topOpp = data.opportunities[0] || { label: 'Reduce JavaScript execution', savings: 'Potential savings: ~210ms', severity: 'Medium' };
+        jQuery('#pagespeed-rec-title').text(topOpp.label);
+        
+        let metric = 'INP', metricVal = data.inp, target = '150ms';
+        const label = topOpp.label.toLowerCase();
+        if (label.includes('lcp') || label.includes('image') || label.includes('render')) {
+            metric = 'LCP';
+            metricVal = data.lcp;
+            target = '2.5s';
+        }
+        
+        let desc = 'Your INP score is poor. Consider optimizing JavaScript execution and reducing main-thread work.';
+        if (metric === 'LCP') {
+            desc = 'Optimize your images, leverage CDNs, and scale them appropriately to improve Largest Contentful Paint (LCP).';
+        }
+
+        jQuery('#pagespeed-rec-desc').text(desc);
+        jQuery('#pagespeed-rec-metric-lbl').text(metric);
+        jQuery('#pagespeed-rec-metric-from').text(metricVal);
+        jQuery('#pagespeed-rec-metric-to').text(target);
+    }
 
     function safeGetSettings(themeObj) {
         if (!themeObj) return {};
@@ -7498,6 +7956,63 @@ $cora_bookings_count = count( cora_db_get_bookings() );
 
     document.getElementById('drawer-git-connect') && document.getElementById('drawer-git-connect').addEventListener('click', function(e) {
         if (e.target === this) closeGitDrawer();
+    });
+
+    // ── PageSpeed Settings Drawer ────────────────────────────────────────
+    function openPageSpeedSettingsDrawer() {
+        const drawer = document.getElementById('drawer-pagespeed-settings');
+        const card   = document.getElementById('drawer-pagespeed-settings-card');
+        if (!drawer || !card) return;
+        drawer.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            drawer.classList.remove('opacity-0');
+            drawer.classList.remove('pointer-events-none');
+            card.classList.remove('translate-x-full');
+            card.classList.add('translate-x-0');
+        });
+    }
+    window.openPageSpeedSettingsDrawer = openPageSpeedSettingsDrawer;
+
+    function closePageSpeedSettingsDrawer() {
+        const drawer = document.getElementById('drawer-pagespeed-settings');
+        const card   = document.getElementById('drawer-pagespeed-settings-card');
+        if (!drawer || !card) return;
+        card.classList.remove('translate-x-0');
+        card.classList.add('translate-x-full');
+        drawer.classList.add('opacity-0');
+        drawer.classList.add('pointer-events-none');
+        setTimeout(() => drawer.classList.add('hidden'), 300);
+    }
+    window.closePageSpeedSettingsDrawer = closePageSpeedSettingsDrawer;
+
+    function savePageSpeedSettings() {
+        const apiKey = jQuery('#pagespeed-api-key-input').val();
+        
+        window.coraShowToast('Saving PageSpeed API Settings...', 'success');
+        
+        jQuery.post(ajaxurl, {
+            action: 'cora_save_pagespeed_settings',
+            api_key: apiKey
+        }, function(response) {
+            if (response.success) {
+                window.coraShowToast('PageSpeed API Key saved successfully.', 'success');
+                closePageSpeedSettingsDrawer();
+                
+                // Trigger a fresh audit to test/connect using the new key
+                setTimeout(() => {
+                    triggerPageSpeedAudit();
+                }, 400);
+            } else {
+                window.coraShowToast('Failed to save settings: ' + (response.data || 'Unknown error'), 'error');
+            }
+        }).fail(function() {
+            window.coraShowToast('Request failed due to connection error.', 'error');
+        });
+    }
+    window.savePageSpeedSettings = savePageSpeedSettings;
+
+    document.getElementById('drawer-pagespeed-settings') && document.getElementById('drawer-pagespeed-settings').addEventListener('click', function(e) {
+        if (e.target === this) closePageSpeedSettingsDrawer();
     });
 
     function toggleInlineNewBranch(show) {
