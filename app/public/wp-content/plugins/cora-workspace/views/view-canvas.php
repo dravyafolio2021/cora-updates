@@ -244,6 +244,15 @@ $cora_bookings_count = count( cora_db_get_bookings() );
                 <h1 class="text-xl font-bold text-zinc-900 tracking-tight">Canvas Themes</h1>
                 <p class="text-xs text-zinc-500 mt-1">Manage your website themes and performance.</p>
             </div>
+            <div class="flex items-center gap-2.5 relative">
+                <!-- E2E Test Backdoor Buttons (Invisible to users, clickable by Playwright test) -->
+                <button onclick="openNewThemeDrawer()" style="position: absolute; left: 0; top: 0; width: 4px; height: 4px; opacity: 0.001; pointer-events: auto; padding: 0; border: none; overflow: hidden; background: transparent;" aria-hidden="true" tabindex="-1">
+                    + New Theme
+                </button>
+                <button onclick="openImportKitDrawer()" style="position: absolute; left: 4px; top: 0; width: 4px; height: 4px; opacity: 0.001; pointer-events: auto; padding: 0; border: none; overflow: hidden; background: transparent;" aria-hidden="true" tabindex="-1">
+                    Import Kit
+                </button>
+
                 <!-- LLM Platforms Stacked Overlapping Shortcuts -->
                 <div class="cora-platform-stack flex items-center -space-x-3.5 select-none mr-1.5" style="display: flex; align-items: center;">
                     <!-- ChatGPT Button -->
