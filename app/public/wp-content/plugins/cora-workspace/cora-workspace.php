@@ -6181,31 +6181,16 @@ HTML;
                     $wp_query->queried_object_id = $page_id;
                 }
 
-                // If theme builder source is elementor or the page is edited with Elementor, load it with complete WordPress head/footer context
-                // so that Elementor styles and scripts render properly.
+                // If theme builder source is elementor or the page is edited with Elementor, register template override
+                // and return early. Elementor will then correctly init and enqueue assets on template load.
                 if ( 'elementor' === $source || get_post_meta( $page_id, '_elementor_edit_mode', true ) === 'builder' ) {
-                    echo '<!DOCTYPE html>';
-                    echo '<html ';
-                    language_attributes();
-                    echo '>';
-                    echo '<head>';
-                    echo '<meta charset="' . get_bloginfo( 'charset' ) . '">';
-                    echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
-                    wp_head();
-                    echo '</head>';
-                    echo '<body ';
-                    body_class();
-                    echo '>';
-                    
-                    the_content();
-                    
                     if ( $is_preview ) {
-                        echo $preview_bar_script;
+                        $GLOBALS['cora_preview_bar_script'] = $preview_bar_script;
                     }
-                    wp_footer();
-                    echo '</body>';
-                    echo '</html>';
-                    exit;
+                    add_filter( 'template_include', function() {
+                        return plugin_dir_path( __FILE__ ) . 'views/view-canvas-render.php';
+                    }, 9999 );
+                    return;
                 }
 
                 // Fallback for simple content pages (non-Elementor)
