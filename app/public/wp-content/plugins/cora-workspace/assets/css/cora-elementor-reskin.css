@@ -1,18 +1,62 @@
-/* 
- * Cora Elementor Editor Reskin
- * Custom two-row toolbar + white-labeling styles for the Elementor editor.
- * Matches the Canvas editor control panel aesthetic.
+/*
+ * Cora Elementor Editor Reskin — Design System Edition
+ * ─────────────────────────────────────────────────────
+ * Applies the global Cora design system (zinc neutral ramp, Inter typeface,
+ * refined elevation, 1.8px SVG strokes, and premium micro-transitions)
+ * to the injected two-row toolbar and all white-label overrides.
+ *
+ * Token reference:
+ *   zinc-50   #fafafa    zinc-100  #f4f4f5    zinc-200  #e4e4e7
+ *   zinc-300  #d4d4d8    zinc-400  #a1a1aa    zinc-500  #71717a
+ *   zinc-600  #52525b    zinc-700  #3f3f46    zinc-800  #27272a
+ *   zinc-900  #18181b    zinc-950  #09090b
  */
 
+/* ── Google Fonts: Inter ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* ─────────────────────────────────────────────────────
+ * CSS CUSTOM PROPERTIES (Design Tokens)
+ * ───────────────────────────────────────────────────── */
+#cora-editor-toolbar {
+    --cz-50:  #fafafa;
+    --cz-100: #f4f4f5;
+    --cz-200: #e4e4e7;
+    --cz-300: #d4d4d8;
+    --cz-400: #a1a1aa;
+    --cz-500: #71717a;
+    --cz-600: #52525b;
+    --cz-700: #3f3f46;
+    --cz-800: #27272a;
+    --cz-900: #18181b;
+    --cz-950: #09090b;
+
+    --cora-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --cora-radius-sm: 6px;
+    --cora-radius-md: 8px;
+    --cora-radius-lg: 10px;
+    --cora-transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+    --cora-shadow-xs: 0 1px 2px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+    --cora-shadow-sm: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+    --cora-shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+
+    --cora-row1-bg: #ffffff;
+    --cora-row2-bg: var(--cz-50);
+    --cora-border: var(--cz-200);
+}
+
 /* ═══════════════════════════════════════════════════════════
- * CORA TOOLBAR — Two-row control panel
+ * TOOLBAR SHELL
  * ═══════════════════════════════════════════════════════════ */
 
 #cora-editor-toolbar {
     display: flex;
     flex-direction: column;
     width: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--cora-font);
+    font-size: 12px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     user-select: none;
     -webkit-user-select: none;
     z-index: 200000;
@@ -28,127 +72,158 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
-    height: 48px;
+    padding: 0 14px;
+    height: 44px;
     box-sizing: border-box;
+    border-bottom: 1px solid var(--cora-border);
 }
 
 .cora-tb-row1 {
-    background-color: #fafafa;
-    border-bottom: 1px solid #e4e4e7;
+    background-color: var(--cora-row1-bg);
+    height: 48px;
 }
 
 .cora-tb-row2 {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e4e4e7;
+    background-color: var(--cora-row2-bg);
+    height: 40px;
 }
 
-/* ── Group (flex container for items) ── */
+/* ── Group ── */
 .cora-tb-group {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 2px;
 }
 
 /* ── Logo ── */
 .cora-tb-logo {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     flex-shrink: 0;
-    margin-right: 4px;
+    margin-right: 6px;
+    padding: 0 2px;
 }
 
 .cora-tb-logo svg {
-    color: #18181b;
+    color: var(--cz-900);
+    flex-shrink: 0;
 }
 
 .cora-tb-logo-text {
-    font-size: 12px;
-    font-weight: 900;
-    letter-spacing: -0.025em;
-    color: #18181b;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--cz-900);
+    font-family: var(--cora-font);
 }
 
-/* ── Back button ── */
+/* ── Back / Return button ── */
 .cora-tb-back-btn {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    height: 32px;
-    padding: 0 12px;
-    border: 1px solid #e4e4e7;
-    background-color: #ffffff;
-    color: #3f3f46;
-    border-radius: 8px;
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid var(--cora-border);
+    background-color: var(--cz-50);
+    color: var(--cz-600);
+    border-radius: var(--cora-radius-md);
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: var(--cora-transition);
     line-height: 1;
-    font-family: inherit;
+    font-family: var(--cora-font);
+    white-space: nowrap;
+    box-shadow: var(--cora-shadow-xs);
+}
+
+.cora-tb-back-btn svg {
+    color: var(--cz-400);
+    flex-shrink: 0;
+    transition: var(--cora-transition);
 }
 
 .cora-tb-back-btn:hover {
-    background-color: #f4f4f5;
-    border-color: #18181b;
+    background-color: var(--cz-100);
+    border-color: var(--cz-300);
+    color: var(--cz-900);
+}
+
+.cora-tb-back-btn:hover svg {
+    color: var(--cz-700);
+    transform: translateX(-1px);
+}
+
+.cora-tb-back-btn:active {
+    transform: scale(0.97);
 }
 
 /* ── Breadcrumbs ── */
 .cora-tb-breadcrumbs {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     font-size: 11px;
     font-weight: 500;
-    color: #a1a1aa;
+    color: var(--cz-400);
+    font-family: var(--cora-font);
+    margin-left: 2px;
 }
 
 .cora-tb-breadcrumbs svg {
     flex-shrink: 0;
+    color: var(--cz-400);
+}
+
+.cora-tb-breadcrumbs > span {
+    color: var(--cz-400);
 }
 
 .cora-tb-crumb-active {
-    color: #18181b;
+    color: var(--cz-800) !important;
     font-weight: 700;
 }
 
-/* ── Type badge ── */
+/* ── Type badges (Header / Footer / Single / Archive / 404 / Page) ── */
 .cora-tb-badge {
-    margin-left: 6px;
+    margin-left: 4px;
     padding: 2px 6px;
     border-radius: 4px;
-    font-size: 8px;
-    font-weight: 800;
+    font-size: 9px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    background-color: #e4e4e7;
-    color: #52525b;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+    font-family: var(--cora-font);
 }
 
-.cora-tb-badge-header { background-color: #dbeafe; color: #1d4ed8; }
-.cora-tb-badge-footer { background-color: #f3e8ff; color: #7c3aed; }
-.cora-tb-badge-single { background-color: #dcfce7; color: #15803d; }
-.cora-tb-badge-archive { background-color: #fef3c7; color: #a16207; }
-.cora-tb-badge-404    { background-color: #fce4ec; color: #c62828; }
-.cora-tb-badge-page   { background-color: #e4e4e7; color: #52525b; }
+.cora-tb-badge-header  { background: #dbeafe; color: #1e40af; }
+.cora-tb-badge-footer  { background: #ede9fe; color: #6d28d9; }
+.cora-tb-badge-single  { background: #dcfce7; color: #166534; }
+.cora-tb-badge-archive { background: #fef9c3; color: #92400e; }
+.cora-tb-badge-404     { background: #fee2e2; color: #b91c1c; }
+.cora-tb-badge-page    { background: var(--cz-100); color: var(--cz-600); }
 
 /* ── Vertical divider ── */
 .cora-tb-divider-v {
     width: 1px;
-    height: 14px;
-    background-color: #d4d4d8;
+    height: 16px;
+    background-color: var(--cz-200);
     flex-shrink: 0;
+    margin: 0 6px;
 }
 
-/* ── Save status ── */
+/* ── Save status indicator ── */
 .cora-tb-save-status {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 500;
-    color: #71717a;
+    color: var(--cz-500);
+    font-family: var(--cora-font);
 }
 
 .cora-tb-status-dot {
@@ -160,111 +235,91 @@
     transition: background-color 0.2s ease;
 }
 
-.cora-tb-status-dot.saving {
-    background-color: #f59e0b;
-    animation: cora-pulse 1s ease-in-out infinite;
-}
-
-@keyframes cora-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-}
-
-/* Status dot: draft theme = amber */
 .cora-tb-status-dot.draft {
     background-color: #f59e0b;
 }
 
-/* ── Theme status badge (DRAFT / LIVE) next to device icons ── */
+.cora-tb-status-dot.saving {
+    background-color: #f59e0b;
+    animation: cora-blink 1.2s ease-in-out infinite;
+}
+
+@keyframes cora-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+}
+
+/* ── Theme LIVE / DRAFT badge ── */
 .cora-tb-theme-badge {
-    padding: 3px 8px;
-    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 4px;
     font-size: 9px;
-    font-weight: 800;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    line-height: 1;
+    line-height: 1.4;
+    font-family: var(--cora-font);
 }
 
 .cora-tb-theme-draft {
-    background-color: #fef3c7;
+    background: #fef3c7;
     color: #92400e;
     border: 1px solid #fde68a;
 }
 
 .cora-tb-theme-live {
-    background-color: #dcfce7;
+    background: #dcfce7;
     color: #166534;
     border: 1px solid #bbf7d0;
 }
 
-/* ── Text button (Preview, Navigator) ── */
+/* ─────────────────────────────────────────────────────
+ * BUTTON PRIMITIVES
+ * ───────────────────────────────────────────────────── */
+
+/* Ghost text button (Templates, Git, Settings, Navigator, Preview) */
 .cora-tb-text-btn {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    height: 32px;
-    padding: 0 12px;
+    height: 28px;
+    padding: 0 9px;
     border: none;
     background: transparent;
-    color: #52525b;
-    border-radius: 8px;
+    color: var(--cz-600);
+    border-radius: var(--cora-radius-md);
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: var(--cora-transition);
     line-height: 1;
-    font-family: inherit;
-}
-
-.cora-tb-text-btn:hover {
-    background-color: rgba(0, 0, 0, 0.04);
-    color: #18181b;
-}
-
-/* ── Icon-only button (Undo, Redo) ── */
-.cora-tb-icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    color: #52525b;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    font-family: inherit;
-}
-
-.cora-tb-icon-btn:hover {
-    background-color: #f4f4f5;
-    color: #18181b;
-}
-
-/* ── Document title label ── */
-.cora-tb-doc-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: #18181b;
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-family: var(--cora-font);
     white-space: nowrap;
 }
 
-/* ── Device toggle pill ── */
-.cora-tb-devices {
-    display: flex;
-    align-items: center;
-    background-color: #f4f4f5;
-    padding: 2px;
-    border-radius: 8px;
-    gap: 0;
+.cora-tb-text-btn svg {
+    flex-shrink: 0;
+    color: var(--cz-400);
+    transition: var(--cora-transition);
 }
 
-.cora-tb-device {
+.cora-tb-text-btn:hover {
+    background-color: var(--cz-100);
+    color: var(--cz-900);
+}
+
+.cora-tb-text-btn:hover svg {
+    color: var(--cz-700);
+}
+
+.cora-tb-text-btn:active {
+    transform: scale(0.96);
+}
+
+/* Icon-only button (Undo, Redo) */
+.cora-tb-icon-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -272,92 +327,162 @@
     height: 28px;
     border: none;
     background: transparent;
-    border-radius: 6px;
-    color: #a1a1aa;
+    color: var(--cz-500);
+    border-radius: var(--cora-radius-md);
     cursor: pointer;
-    transition: all 0.15s ease;
-    font-family: inherit;
+    transition: var(--cora-transition);
+    font-family: var(--cora-font);
+    flex-shrink: 0;
+}
+
+.cora-tb-icon-btn:hover {
+    background-color: var(--cz-100);
+    color: var(--cz-900);
+}
+
+.cora-tb-icon-btn:active {
+    transform: scale(0.92);
+}
+
+/* ─────────────────────────────────────────────────────
+ * DOCUMENT TITLE LABEL
+ * ───────────────────────────────────────────────────── */
+.cora-tb-doc-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cz-800);
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--cora-font);
+    letter-spacing: -0.01em;
+}
+
+/* ─────────────────────────────────────────────────────
+ * DEVICE TOGGLE PILL
+ * ───────────────────────────────────────────────────── */
+.cora-tb-devices {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--cz-100);
+    padding: 2px;
+    border-radius: var(--cora-radius-md);
+    gap: 0;
+    border: 1px solid var(--cz-200);
+}
+
+.cora-tb-device {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    border-radius: var(--cora-radius-sm);
+    color: var(--cz-400);
+    cursor: pointer;
+    transition: var(--cora-transition);
+    font-family: var(--cora-font);
 }
 
 .cora-tb-device:hover {
-    color: #52525b;
+    color: var(--cz-600);
+    background-color: rgba(0,0,0,0.04);
 }
 
 .cora-tb-device.active {
     background-color: #ffffff;
-    color: #18181b;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    color: var(--cz-900);
+    box-shadow: var(--cora-shadow-xs);
 }
 
-/* ── Split Publish Button ── */
+/* ─────────────────────────────────────────────────────
+ * SPLIT PUBLISH BUTTON
+ * ───────────────────────────────────────────────────── */
 .cora-tb-publish-split {
     display: inline-flex;
     align-items: center;
-    border-radius: 8px;
+    border-radius: var(--cora-radius-md);
     overflow: visible;
     position: relative;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--cora-shadow-sm);
 }
 
 .cora-tb-publish-btn {
-    height: 32px;
+    height: 30px;
     padding: 0 16px;
-    background-color: #18181b;
+    background-color: var(--cz-900);
     color: #ffffff;
     border: none;
-    border-radius: 8px 0 0 8px;
+    border-radius: var(--cora-radius-md) 0 0 var(--cora-radius-md);
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
+    letter-spacing: 0.01em;
     cursor: pointer;
-    transition: background-color 0.15s ease;
-    font-family: inherit;
+    transition: var(--cora-transition);
+    font-family: var(--cora-font);
+    white-space: nowrap;
 }
 
 .cora-tb-publish-btn:hover {
-    background-color: #27272a;
+    background-color: var(--cz-800);
+}
+
+.cora-tb-publish-btn:active {
+    background-color: var(--cz-950);
+    transform: scale(0.98);
 }
 
 .cora-tb-publish-divider {
     width: 1px;
-    height: 32px;
-    background-color: #3f3f46;
+    height: 30px;
+    background-color: var(--cz-700);
+    flex-shrink: 0;
 }
 
 .cora-tb-publish-chevron {
-    height: 32px;
-    padding: 0 8px;
-    background-color: #18181b;
-    color: #ffffff;
+    height: 30px;
+    width: 28px;
+    padding: 0;
+    background-color: var(--cz-900);
+    color: rgba(255,255,255,0.75);
     border: none;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 var(--cora-radius-md) var(--cora-radius-md) 0;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.15s ease;
-    font-family: inherit;
+    transition: var(--cora-transition);
+    font-family: var(--cora-font);
 }
 
 .cora-tb-publish-chevron:hover {
-    background-color: #27272a;
+    background-color: var(--cz-800);
+    color: #ffffff;
 }
 
-/* ── Publish dropdown ── */
+.cora-tb-publish-chevron:active {
+    background-color: var(--cz-950);
+}
+
+/* ── Publish dropdown menu ── */
 .cora-tb-publish-dropdown {
     position: absolute;
     right: 0;
-    top: calc(100% + 4px);
-    width: 160px;
+    top: calc(100% + 6px);
+    min-width: 168px;
     background-color: #ffffff;
-    border: 1px solid #e4e4e7;
-    border-radius: 10px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    padding: 4px 0;
+    border: 1px solid var(--cz-200);
+    border-radius: var(--cora-radius-lg);
+    box-shadow: var(--cora-shadow-md);
+    padding: 4px;
     z-index: 99999;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(-4px);
-    transition: all 0.15s ease;
+    transform: translateY(-6px);
+    transition: opacity 0.12s ease, transform 0.12s ease;
 }
 
 .cora-tb-publish-dropdown.visible {
@@ -367,28 +492,30 @@
 }
 
 .cora-tb-publish-dropdown button {
-    display: block;
+    display: flex;
+    align-items: center;
     width: 100%;
     text-align: left;
-    padding: 8px 16px;
+    padding: 7px 12px;
     border: none;
     background: transparent;
-    font-size: 12px;
-    font-weight: 700;
-    color: #3f3f46;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cz-700);
     cursor: pointer;
-    transition: background-color 0.1s ease;
-    font-family: inherit;
+    transition: var(--cora-transition);
+    font-family: var(--cora-font);
+    border-radius: var(--cora-radius-sm);
+    gap: 8px;
 }
 
 .cora-tb-publish-dropdown button:hover {
-    background-color: #f4f4f5;
-    color: #18181b;
+    background-color: var(--cz-50);
+    color: var(--cz-900);
 }
 
-
 /* ═══════════════════════════════════════════════════════════
- * NATIVE ELEMENTOR TOP BAR — always hide (replaced by Cora toolbar)
+ * NATIVE ELEMENTOR TOP BAR — always hidden (replaced by Cora toolbar)
  * ═══════════════════════════════════════════════════════════ */
 
 header.MuiAppBar-root,
@@ -402,7 +529,7 @@ header.MuiAppBar-root,
     overflow: hidden !important;
 }
 
-/* Reset Elementor v2 CSS variables to prevent header spacing/panels offset gaps */
+/* Reset Elementor v2 CSS variables to prevent header spacing / panel offset gaps */
 :root {
     --editor-v2-top-bar-height: 0px !important;
     --e-top-bar-header-height: 0px !important;
@@ -416,14 +543,13 @@ body.cora-in-iframe {
 
 /* ═══════════════════════════════════════════════════════════
  * EDITOR LAYOUT ADJUSTMENTS
- * Push everything below the fixed 96px Cora toolbar
+ * Push everything below the 88px Cora toolbar (48px row1 + 40px row2)
  * ═══════════════════════════════════════════════════════════ */
 
-/* Editor wrapper — offset by toolbar height and fill remaining viewport */
 #elementor-editor-wrapper {
-    top: 96px !important;
-    height: calc(100dvh - 96px) !important;
-    max-height: calc(100dvh - 96px) !important;
+    top: 88px !important;
+    height: calc(100dvh - 88px) !important;
+    max-height: calc(100dvh - 88px) !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
     position: fixed !important;
@@ -431,14 +557,12 @@ body.cora-in-iframe {
     right: 0 !important;
 }
 
-/* Editor wrapper inside iframe — take full viewport height (parent handles the offset) */
 body.cora-in-iframe #elementor-editor-wrapper {
     top: 0 !important;
     height: 100dvh !important;
     max-height: 100dvh !important;
 }
 
-/* Side panel — stretch to fill the wrapper */
 #elementor-panel {
     top: 0 !important;
     height: 100% !important;
@@ -447,7 +571,6 @@ body.cora-in-iframe #elementor-editor-wrapper {
     box-sizing: border-box !important;
 }
 
-/* Elementor canvas area — fill remaining space next to side panel */
 #elementor-preview,
 #elementor-preview-iframe,
 .elementor-editor-preview {
@@ -461,7 +584,6 @@ body.cora-in-iframe #elementor-editor-wrapper {
  * WHITE-LABEL: Hide unwanted Elementor / WordPress UI
  * ═══════════════════════════════════════════════════════════ */
 
-/* Hide Exit to WordPress options and branding */
 .elementor-panel-menu-item-exit,
 .elementor-panel-menu-item-exit-to-dashboard,
 #elementor-panel-footer-exit-to-dashboard,
@@ -472,7 +594,6 @@ a[href*="wp-admin/post.php"],
     display: none !important;
 }
 
-/* Hide AI Angie, Checklist, and What's New features */
 [data-tooltip="Angie"],
 [aria-label="Angie"],
 [title="Angie"],
@@ -485,12 +606,10 @@ a[href*="wp-admin/post.php"],
     display: none !important;
 }
 
-/* Hide Elementor onboarding toast alerts */
 #elementor-toast {
     display: none !important;
 }
 
-/* Hide "Edit with AI" sparkle button on all controls */
 .e-ai-button,
 [class*="e-ai-button"],
 button.e-ai-button {
@@ -504,7 +623,6 @@ button.e-ai-button {
     padding: 0 !important;
 }
 
-/* Block all Elementor in-panel plugin install / upsell notice banners */
 .elementor-control-notice,
 .elementor-control-notice-type-info,
 .elementor-control-notice-type-warning,
@@ -520,7 +638,6 @@ button.e-ai-button {
     padding: 0 !important;
 }
 
-/* Hide stray Elementor admin notice / Go Pro promo bars */
 .elementor-promotion,
 .elementor-panel-scheme-choose .elementor-panel-scheme-item[data-scheme="custom"],
 .e-notice,
@@ -539,9 +656,60 @@ button[data-event][data-settings*="install-plugin"] {
     pointer-events: none !important;
 }
 
+/* ═══════════════════════════════════════════════════════════
+ * HIDE ELEMENTOR PRO UPSELL PANELS (Custom Widget, AI, etc.)
+ * ═══════════════════════════════════════════════════════════ */
+
+#elementor-panel-category-custom-widgets {
+    display: none !important;
+}
+
+.elementor-panel-custom-widgets__cta {
+    display: none !important;
+}
+
 
 /* ═══════════════════════════════════════════════════════════
- * LEGACY — Old injected nav classes (kept for backwards compat)
+ * ELEMENTOR PANEL — Design system alignment
+ * Subtle refinements to make the native Elementor panel feel
+ * consistent with the Cora zinc/Inter design language
+ * ═══════════════════════════════════════════════════════════ */
+
+#elementor-panel {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* Panel search input */
+#elementor-panel-elements-search-input {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+
+/* Panel category headings */
+.elementor-panel-category-title {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.03em !important;
+}
+
+/* Widget titles */
+.elementor-element-wrapper .elementor-element-title {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+}
+
+/* Panel section / control labels */
+.elementor-control-title,
+.elementor-section-title {
+    font-family: 'Inter', sans-serif !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+ * LEGACY — Injected nav classes (backwards compat)
  * ═══════════════════════════════════════════════════════════ */
 
 .cora-editor-injected-nav {
@@ -550,7 +718,7 @@ button[data-event][data-settings*="install-plugin"] {
     gap: 12px !important;
     margin-right: 16px !important;
     margin-left: 12px !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
 .cora-injected-exit-btn {
@@ -563,9 +731,9 @@ button[data-event][data-settings*="install-plugin"] {
     color: #18181b !important;
     border-radius: 6px !important;
     font-size: 10px !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
     cursor: pointer !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.12s ease !important;
     line-height: 1 !important;
 }
 
@@ -592,6 +760,7 @@ button[data-event][data-settings*="install-plugin"] {
     font-size: 10px !important;
     font-weight: 600 !important;
     color: #71717a !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
 .cora-injected-crumb-theme {
@@ -601,18 +770,4 @@ button[data-event][data-settings*="install-plugin"] {
 .cora-injected-crumb-page {
     color: #18181b !important;
     font-weight: 700 !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
- * HIDE ELEMENTOR PRO UPSELL PANELS (Custom Widget, AI, etc.)
- * ═══════════════════════════════════════════════════════════ */
-
-/* Custom Widget "Try for free" category block */
-#elementor-panel-category-custom-widgets {
-    display: none !important;
-}
-
-/* "Try for free" CTA buttons anywhere in the panel heading */
-.elementor-panel-custom-widgets__cta {
-    display: none !important;
 }
