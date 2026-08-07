@@ -211,6 +211,10 @@ window.coraPublicLoadPage = function(event, slug, element, pushToHistory = true)
                 if (slug === 'platform-overview') {
                     if (specialGrid) specialGrid.classList.remove('hidden');
                     if (bodyContainer) bodyContainer.classList.add('hidden');
+                    const overviewDbContent = document.getElementById('cora-platform-overview-db-content');
+                    if (overviewDbContent) {
+                        overviewDbContent.innerHTML = res.data.html;
+                    }
                 } else {
                     if (specialGrid) specialGrid.classList.add('hidden');
                     if (bodyContainer) bodyContainer.classList.remove('hidden');

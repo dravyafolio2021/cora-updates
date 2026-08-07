@@ -1094,5 +1094,9 @@ $template = isset( $found_portfolio['template'] ) ? $found_portfolio['template']
     </div>
 <?php endif; ?>
 
+<?php
+// Inject Made in Cora backlink badge
+include CORA_WORKSPACE_PATH . 'views/view-backlink-badge.php';
+?>
 </body>
 </html>

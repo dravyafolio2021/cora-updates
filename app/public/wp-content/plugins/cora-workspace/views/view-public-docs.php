@@ -97,5 +97,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     <!-- TASK 5 & 6: Search modal & AJAX routing script -->
     <?php include CORA_WORKSPACE_PATH . 'views/view-public-docs-search.php'; ?>
 
+    <!-- Cora Backlink Badge -->
+    <?php include CORA_WORKSPACE_PATH . 'views/view-backlink-badge.php'; ?>
+
 </body>
 </html>

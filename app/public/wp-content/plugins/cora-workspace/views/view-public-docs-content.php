@@ -131,11 +131,11 @@ $reading_time = max( 1, ceil( $word_count / 200 ) ) . ' min read';
     <div id="cora-platform-overview-special" class="<?php echo 'platform-overview' === $slug ? '' : 'hidden'; ?> mt-6 space-y-8">
         
         <!-- Optional intro content from DB if any -->
-        <?php if ( 'platform-overview' === $slug && ! empty( $active_page['content'] ) ) : ?>
-            <div class="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-350 text-xs font-sans leading-relaxed mb-6">
-                <?php echo cora_markdown_to_html( $active_page['content'] ); ?>
-            </div>
-        <?php endif; ?>
+        <div id="cora-platform-overview-db-content" class="prose dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-350 text-xs font-sans leading-relaxed mb-6">
+            <?php if ( 'platform-overview' === $slug && ! empty( $active_page['content'] ) ) {
+                echo cora_markdown_to_html( $active_page['content'] );
+            } ?>
+        </div>
 
         <!-- Core Features 2x2 Grid -->
         <div class="space-y-4">

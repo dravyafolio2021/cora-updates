@@ -871,7 +871,7 @@ function cora_docs_handle_public_route() {
     $path_parts = explode( '/', $path );
 
     if ( isset( $path_parts[0] ) && 'docs' === $path_parts[0] ) {
-        global $wpdb;
+        global $wpdb, $active_page;
         $t_pages = $wpdb->prefix . 'cora_docs_pages';
         $t_changelog = $wpdb->prefix . 'cora_docs_changelog';
         $t_api = $wpdb->prefix . 'cora_docs_api_endpoints';

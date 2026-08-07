@@ -754,5 +754,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 </script>
 <?php endif; ?>
 
+<?php
+// Inject Made in Cora backlink badge
+include CORA_WORKSPACE_PATH . 'views/view-backlink-badge.php';
+?>
 </body>
 </html>

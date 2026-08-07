@@ -6855,6 +6855,135 @@ function cora_canvas_filter_menu_item_preview_url( $menu_item ) {
 }
 }
 
+// ── Dynamically override nav menu items based on active/preview theme menus ──
+add_filter( 'wp_get_nav_menu_items', 'cora_canvas_filter_nav_menu_items', 10, 3 );
+if ( ! function_exists( 'cora_canvas_filter_nav_menu_items' ) ) {
+function cora_canvas_filter_nav_menu_items( $items, $menu, $args ) {
+    $preview_theme_id = cora_get_preview_theme_id();
+    global $wpdb;
+    
+    if ( $preview_theme_id > 0 ) {
+        $theme_id = $preview_theme_id;
+    } else {
+        $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+        $theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+    }
+    
+    if ( ! $theme_id ) {
+        return $items;
+    }
+    
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d LIMIT 1", $theme_id ), ARRAY_A );
+    if ( ! $theme ) {
+        return $items;
+    }
+    
+    $settings = json_decode( $theme['settings'], true ) ?: array();
+    if ( empty( $settings['menus'] ) || ! is_array( $settings['menus'] ) ) {
+        return $items;
+    }
+    
+    $menu_term_id = 0;
+    $menu_slug = '';
+    
+    if ( is_object( $menu ) ) {
+        $menu_term_id = $menu->term_id;
+        $menu_slug = $menu->slug;
+    } elseif ( is_numeric( $menu ) ) {
+        $menu_term_id = intval( $menu );
+    } elseif ( is_string( $menu ) ) {
+        $menu_slug = $menu;
+    }
+    
+    $matched_menu = null;
+    foreach ( $settings['menus'] as $m ) {
+        if ( $menu_term_id > 0 && isset( $m['wp_term_id'] ) && intval( $m['wp_term_id'] ) === $menu_term_id ) {
+            $matched_menu = $m;
+            break;
+        }
+        if ( ! empty( $menu_slug ) && isset( $m['handle'] ) && $m['handle'] === $menu_slug ) {
+            $matched_menu = $m;
+            break;
+        }
+    }
+    
+    if ( ! $matched_menu && $menu_term_id > 0 ) {
+        $term = get_term( $menu_term_id, 'nav_menu' );
+        if ( $term && ! is_wp_error( $term ) ) {
+            foreach ( $settings['menus'] as $m ) {
+                if ( isset( $m['handle'] ) && $m['handle'] === $term->slug ) {
+                    $matched_menu = $m;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if ( $matched_menu && isset( $matched_menu['items'] ) && is_array( $matched_menu['items'] ) ) {
+        $mock_items = array();
+        $menu_order = 1;
+        
+        foreach ( $matched_menu['items'] as $item ) {
+            $id = 2000000 + $menu_order;
+            
+            $post = new stdClass();
+            $post->ID = $id;
+            $post->post_author = 1;
+            $post->post_date = current_time('mysql');
+            $post->post_date_gmt = current_time('mysql');
+            $post->post_content = '';
+            $post->post_title = $item['label'] ?? '';
+            $post->post_excerpt = '';
+            $post->post_status = 'publish';
+            $post->comment_status = 'closed';
+            $post->ping_status = 'closed';
+            $post->post_password = '';
+            $post->post_name = (string) $id;
+            $post->to_ping = '';
+            $post->pinged = '';
+            $post->post_modified = current_time('mysql');
+            $post->post_modified_gmt = current_time('mysql');
+            $post->post_content_filtered = '';
+            $post->post_parent = 0;
+            $post->guid = '';
+            $post->menu_order = $menu_order;
+            $post->post_type = 'nav_menu_item';
+            $post->post_mime_type = '';
+            $post->comment_count = 0;
+            $post->filter = 'raw';
+            
+            $post->db_id = $id;
+            $post->menu_item_parent = 0;
+            $post->object_id = 0;
+            $post->object = 'custom';
+            $post->type = 'custom';
+            $post->type_label = 'Custom Link';
+            
+            $url = $item['url'] ?? '';
+            if ( ! empty( $url ) && strpos( $url, 'http' ) !== 0 && $url !== '#' ) {
+                $url = home_url( '/' . ltrim( $url, '/' ) );
+            }
+            $post->url = $url;
+            $post->title = $item['label'] ?? '';
+            $post->target = '';
+            $post->classes = array();
+            $post->description = '';
+            $post->xfn = '';
+            
+            $setup_item = wp_setup_nav_menu_item( $post );
+            if ( $setup_item ) {
+                $mock_items[] = $setup_item;
+            }
+            $menu_order++;
+        }
+        
+        return $mock_items;
+    }
+    
+    return $items;
+}
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // ██  CANVAS DRAFT PREVIEW BAR — REST endpoint + client-side injection
 // ██  Architecture: a tiny JS snippet (injected via wp_footer) reads
@@ -7341,6 +7470,13 @@ add_action( 'wp_footer', function () {
         }
     }
 }, 100 );
+
+// ── Inject floating 'Made in Cora' backlink badge into frontend pages ──
+add_action( 'wp_footer', function () {
+    if ( ! is_admin() ) {
+        include CORA_WORKSPACE_PATH . 'views/view-backlink-badge.php';
+    }
+}, 110 );
 
 
 
@@ -24483,14 +24619,8 @@ function cora_ajax_canvas_create_page() {
     $template = sanitize_text_field( $_POST['template'] );
     $status = sanitize_text_field( $_POST['status'] );
 
-    // Check slug uniqueness globally across all Canvas pages
-    $duplicate = $wpdb->get_var( $wpdb->prepare(
-        "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = %s LIMIT 1",
-        $slug
-    ) );
-    if ( $duplicate ) {
-        wp_send_json_error( array( 'message' => 'A page with this URL slug already exists. Please choose a unique slug.' ) );
-    }
+    // Automatically generate a unique slug if duplicate exists
+    $slug = cora_canvas_get_unique_slug( $theme_id, $slug );
 
     // Query theme source setting to check if we are building under Elementor
     $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
@@ -25003,6 +25133,31 @@ function cora_ajax_canvas_save_theme_settings() {
     }
     foreach ( $bool_fields as $k ) {
         if ( isset( $incoming[$k] ) ) $safe_incoming[$k] = intval( $incoming[$k] );
+    }
+    // Sanitize and whitelist the menus settings array
+    if ( isset( $incoming['menus'] ) && is_array( $incoming['menus'] ) ) {
+        $safe_menus = array();
+        foreach ( $incoming['menus'] as $menu ) {
+            if ( ! is_array( $menu ) ) continue;
+            $safe_menu = array(
+                'id'         => isset( $menu['id'] ) ? sanitize_key( $menu['id'] ) : '',
+                'wp_term_id' => isset( $menu['wp_term_id'] ) ? intval( $menu['wp_term_id'] ) : 0,
+                'name'       => isset( $menu['name'] ) ? sanitize_text_field( $menu['name'] ) : '',
+                'handle'     => isset( $menu['handle'] ) ? sanitize_key( $menu['handle'] ) : '',
+                'items'      => array()
+            );
+            if ( isset( $menu['items'] ) && is_array( $menu['items'] ) ) {
+                foreach ( $menu['items'] as $item ) {
+                    if ( ! is_array( $item ) ) continue;
+                    $safe_menu['items'][] = array(
+                        'label' => isset( $item['label'] ) ? sanitize_text_field( $item['label'] ) : '',
+                        'url'   => isset( $item['url'] ) ? esc_url_raw( $item['url'] ) : ''
+                    );
+                }
+            }
+            $safe_menus[] = $safe_menu;
+        }
+        $safe_incoming['menus'] = $safe_menus;
     }
     // Type scale keys
     foreach ( ['h1','h2','h3','body','small','btn'] as $level ) {

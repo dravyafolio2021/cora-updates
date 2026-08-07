@@ -942,7 +942,18 @@ function cora_get_sparkline_points( $history, $type ) {
                             
                             <!-- Theme Details & Upgrade Information -->
                             <div class="min-w-0">
-                                <h4 class="text-xs font-bold text-zinc-900 dark:text-white leading-none truncate"><?php echo esc_html($th['name']); ?></h4>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <h4 class="text-xs font-bold text-zinc-900 dark:text-white leading-none truncate"><?php echo esc_html($th['name']); ?></h4>
+                                    <?php
+                                    $th_settings = json_decode( $th['settings'], true ) ?: array();
+                                    $th_source = isset( $th_settings['source'] ) ? $th_settings['source'] : 'elementor';
+                                    if ( strtolower($th_source) === 'lovable' ) :
+                                    ?>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-extrabold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-250">Lovable</span>
+                                    <?php else: ?>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-extrabold bg-zinc-50 text-zinc-600 border border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800">Elementor</span>
+                                    <?php endif; ?>
+                                </div>
                                 <div class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1.5"><?php echo esc_html($modified_time); ?></div>
                                 <!-- Version tracking is not available for custom themes -->
                                 <div class="mt-1.5 inline-flex items-center gap-1 text-[9.5px] text-zinc-400 dark:text-zinc-600 font-medium">
@@ -2570,10 +2581,10 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
-<!-- 2. New Page Setup Modal (Sliding Right-Drawer) -->
-<div id="drawer-new-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-new-page-card">
-        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+<!-- 2. New Page Setup Modal (Centered Popup) -->
+<div id="drawer-new-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-new-page-card">
+        <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-sm font-bold text-zinc-950">Add Page to Theme</h3>
                 <p class="text-[10px] text-zinc-500 mt-0.5">Configure new page settings and layout templates.</p>
@@ -2582,7 +2593,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="flex-1 overflow-y-auto p-5 space-y-5">
+        <div class="space-y-4">
             <div class="space-y-2">
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Title *</label>
                 <input type="text" id="new-page-title-input" onkeyup="autoGenerateSlug(this)" placeholder="e.g. Featured Penthouse Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
@@ -2591,7 +2602,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">URL Slug Path *</label>
                 <input type="text" id="new-page-slug-input" placeholder="e.g. penthouse-listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
             </div>
-            <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2">
                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Layout Template</label>
                     <select id="new-page-template-input" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium">
@@ -2610,7 +2621,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
             </div>
         </div>
-        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/30">
+        <div class="flex items-center justify-end gap-2.5 pt-2">
             <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeNewPageDrawer()">Cancel</button>
             <button type="button" class="px-3.5 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewPage(false)">Create Only</button>
             <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewPage(true)">Create & Edit</button>
@@ -2618,10 +2629,10 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
-<!-- 2.5. Menu Item Setup Drawer (Sliding Right-Drawer) -->
-<div id="drawer-menu-item" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-menu-item-card">
-        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+<!-- 2.5. Menu Item Setup Drawer (Centered Popup Modal) -->
+<div id="drawer-menu-item" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-menu-item-card">
+        <div class="flex items-center justify-between">
             <div>
                 <h3 id="drawer-menu-item-title" class="text-sm font-bold text-zinc-950">Add Menu Item</h3>
                 <p class="text-[10px] text-zinc-500 mt-0.5">Configure link text, destination, and target options.</p>
@@ -2630,7 +2641,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="flex-1 overflow-y-auto p-5 space-y-5">
+        <div class="space-y-4">
             <input type="hidden" id="menu-item-edit-index" value="">
             
             <div class="space-y-2">
@@ -2665,17 +2676,17 @@ function cora_get_sparkline_points( $history, $type ) {
                 </label>
             </div>
         </div>
-        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/30">
+        <div class="flex items-center justify-end gap-2.5 pt-2">
             <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeMenuItemDrawer()">Cancel</button>
             <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveMenuItem()">Apply Changes</button>
         </div>
     </div>
 </div>
 
-<!-- Rename Page Modal (Sliding Right-Drawer) -->
-<div id="drawer-rename-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-rename-page-card">
-        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+<!-- Rename Page Modal (Centered Popup) -->
+<div id="drawer-rename-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-rename-page-card">
+        <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-sm font-bold text-zinc-950">Rename Page</h3>
                 <p class="text-[10px] text-zinc-500 mt-0.5">Specify a new display title for this page.</p>
@@ -2684,24 +2695,24 @@ function cora_get_sparkline_points( $history, $type ) {
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="flex-1 overflow-y-auto p-5 space-y-5">
+        <div class="space-y-4">
             <input type="hidden" id="rename-page-id-input">
             <div class="space-y-2">
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Title *</label>
                 <input type="text" id="rename-page-title-input" placeholder="e.g. Featured Penthouse Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
             </div>
         </div>
-        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/30">
+        <div class="flex items-center justify-end gap-2.5 pt-2">
             <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeRenamePageDrawer()">Cancel</button>
             <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveRenamedPage()">Rename Page</button>
         </div>
     </div>
 </div>
 
-<!-- Change Page Slug Modal (Sliding Right-Drawer) -->
-<div id="drawer-change-page-slug" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-change-page-slug-card">
-        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+<!-- Change Page Slug Modal (Centered Popup) -->
+<div id="drawer-change-page-slug" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-change-page-slug-card">
+        <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-sm font-bold text-zinc-950">Change Page Slug URL</h3>
                 <p class="text-[10px] text-zinc-500 mt-0.5">Specify a new URL path slug for this page route.</p>
@@ -2710,14 +2721,14 @@ function cora_get_sparkline_points( $history, $type ) {
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="flex-1 overflow-y-auto p-5 space-y-5">
+        <div class="space-y-4">
             <input type="hidden" id="change-page-slug-id-input">
             <div class="space-y-2">
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">URL Slug Path *</label>
                 <input type="text" id="change-page-slug-input" placeholder="e.g. penthouse-listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
             </div>
         </div>
-        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/30">
+        <div class="flex items-center justify-end gap-2.5 pt-2">
             <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeChangePageSlugDrawer()">Cancel</button>
             <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="savePageSlug()">Update Slug</button>
         </div>
@@ -2817,10 +2828,10 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
-<!-- 6. Theme Rename Modal (Sliding Right-Drawer) -->
-<div id="drawer-rename-theme" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[420px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-rename-theme-card">
-        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+<!-- 6. Theme Rename Modal (Centered Popup) -->
+<div id="drawer-rename-theme" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-rename-theme-card">
+        <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-sm font-bold text-zinc-950">Rename Theme</h3>
                 <p class="text-[10px] text-zinc-500 mt-0.5">Specify a new display name for this theme workspace.</p>
@@ -2829,14 +2840,14 @@ function cora_get_sparkline_points( $history, $type ) {
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="flex-1 overflow-y-auto p-5 space-y-5">
+        <div class="space-y-4">
             <input type="hidden" id="rename-theme-id-input">
             <div class="space-y-2">
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Theme Name *</label>
                 <input type="text" id="rename-theme-name-input" placeholder="e.g. Cora Custom Theme" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
             </div>
         </div>
-        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/30">
+        <div class="flex items-center justify-end gap-2.5 pt-2">
             <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeRenameThemeDrawer()">Cancel</button>
             <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="saveRenamedTheme()">Rename Theme</button>
         </div>
@@ -4135,11 +4146,11 @@ function cora_get_sparkline_points( $history, $type ) {
         modal.removeClass('hidden').css('pointer-events', 'auto');
         setTimeout(() => {
             modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-rename-theme-card').removeClass('translate-x-full').addClass('translate-x-0');
+            jQuery('#drawer-rename-theme-card').removeClass('scale-95').addClass('scale-100');
         }, 10);
     }
     function closeRenameThemeDrawer() {
-        jQuery('#drawer-rename-theme-card').removeClass('translate-x-0').addClass('translate-x-full');
+        jQuery('#drawer-rename-theme-card').removeClass('scale-100').addClass('scale-95');
         const modal = jQuery('#drawer-rename-theme');
         modal.addClass('opacity-0').css('opacity', '0').css('pointer-events', 'none');
         setTimeout(function() {
@@ -4866,11 +4877,11 @@ function cora_get_sparkline_points( $history, $type ) {
         modal.removeClass('hidden');
         setTimeout(() => {
             modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-new-page-card').removeClass('translate-x-full').addClass('translate-x-0');
+            jQuery('#drawer-new-page-card').removeClass('scale-95').addClass('scale-100');
         }, 10);
     }
     function closeNewPageDrawer() {
-        jQuery('#drawer-new-page-card').removeClass('translate-x-0').addClass('translate-x-full');
+        jQuery('#drawer-new-page-card').removeClass('scale-100').addClass('scale-95');
         const modal = jQuery('#drawer-new-page');
         modal.addClass('opacity-0').css('opacity', '0');
         setTimeout(function() {
@@ -4967,11 +4978,11 @@ function cora_get_sparkline_points( $history, $type ) {
         modal.removeClass('hidden');
         setTimeout(() => {
             modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-rename-page-card').removeClass('translate-x-full').addClass('translate-x-0');
+            jQuery('#drawer-rename-page-card').removeClass('scale-95').addClass('scale-100');
         }, 10);
     }
     function closeRenamePageDrawer() {
-        jQuery('#drawer-rename-page-card').removeClass('translate-x-0').addClass('translate-x-full');
+        jQuery('#drawer-rename-page-card').removeClass('scale-100').addClass('scale-95');
         const modal = jQuery('#drawer-rename-page');
         modal.addClass('opacity-0').css('opacity', '0');
         setTimeout(function() {
@@ -5012,11 +5023,11 @@ function cora_get_sparkline_points( $history, $type ) {
         modal.removeClass('hidden');
         setTimeout(() => {
             modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-change-page-slug-card').removeClass('translate-x-full').addClass('translate-x-0');
+            jQuery('#drawer-change-page-slug-card').removeClass('scale-95').addClass('scale-100');
         }, 10);
     }
     function closeChangePageSlugDrawer() {
-        jQuery('#drawer-change-page-slug-card').removeClass('translate-x-0').addClass('translate-x-full');
+        jQuery('#drawer-change-page-slug-card').removeClass('scale-100').addClass('scale-95');
         const modal = jQuery('#drawer-change-page-slug');
         modal.addClass('opacity-0').css('opacity', '0');
         setTimeout(function() {
@@ -6415,6 +6426,9 @@ function cora_get_sparkline_points( $history, $type ) {
         
         jQuery('body').removeClass('cora-canvas-editor-active');
         jQuery('#canvas-level-3').addClass('hidden');
+        if (canvasState.activeThemeId) {
+            fetchThemePages(canvasState.activeThemeId);
+        }
         syncStateToUrl();
     }
 

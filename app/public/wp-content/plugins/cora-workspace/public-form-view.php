@@ -1421,5 +1421,9 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
             renderStep(0);
         });
     </script>
+<?php
+// Inject Made in Cora backlink badge
+include CORA_WORKSPACE_PATH . 'views/view-backlink-badge.php';
+?>
 </body>
 </html>
