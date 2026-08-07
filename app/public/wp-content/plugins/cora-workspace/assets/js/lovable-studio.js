@@ -37,6 +37,7 @@
 
     window.lsGoToStep = function(n) {
         lsState.step = n;
+        sessionStorage.setItem('ls_step', n);
         for (var i = 1; i <= 5; i++) {
             var el = document.getElementById('ls-step-' + i);
             if (el) el.style.display = (i === n) ? '' : 'none';
@@ -226,7 +227,14 @@
                     }
 
                     // Auto-advance to map step
-                    setTimeout(function() { lsGoToStep(5); }, 700);
+                    if (res.data && res.data.pages_created > 0) {
+                        if (window.coraShowToast) window.coraShowToast('Auto-created & mapped ' + res.data.pages_created + ' pages!', 'success');
+                        sessionStorage.setItem('ls_step', 5);
+                        setTimeout(function() { window.location.reload(); }, 1200);
+                    } else {
+                        sessionStorage.setItem('ls_step', 5);
+                        setTimeout(function() { lsGoToStep(5); }, 700);
+                    }
                 } else {
                     var errMsg = (res.data && res.data.message) ? res.data.message : 'Sync failed. Please check your repo details.';
                     if (window.coraShowToast) window.coraShowToast(errMsg, 'error');
