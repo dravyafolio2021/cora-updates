@@ -104,6 +104,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     #gjs {
         border: none;
         height: 100% !important;
+        overflow: hidden !important;
     }
     .gjs-mdl-dialog {
         border-radius: 6px !important;
@@ -189,7 +190,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
     
     <!-- Main Canvas Area -->
-    <div class="flex-1 bg-zinc-150 relative flex flex-col">
+    <div class="flex-1 bg-zinc-150 relative flex flex-col min-w-0 overflow-hidden">
         <div id="gjs" class="flex-1">
             <!-- GrapesJS editor canvas container -->
         </div>
@@ -599,7 +600,7 @@ jQuery(document).ready(function($) {
 
     editor.BlockManager.add('image', {
         label: `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><div>Image</div>`,
-        content: '<img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80" class="w-full h-auto object-cover max-w-full" alt="Villa Exterior Placeholder">',
+        content: '<img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80" class="w-full h-auto object-cover max-w-full" alt="Villa Exterior Placeholder" loading="lazy">',
         category: 'Basic'
     });
 

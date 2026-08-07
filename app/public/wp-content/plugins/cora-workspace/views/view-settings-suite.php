@@ -1141,7 +1141,7 @@ $cora_settings_tabs = array(
                             <?php $logo_url = get_option('cora_brand_logo_url', ''); ?>
                             <div id="cora-suite-logo-preview" class="w-full h-full flex flex-col items-center justify-center overflow-hidden">
                                 <?php if ( ! empty( $logo_url ) ) : ?>
-                                    <img src="<?php echo esc_url( $logo_url ); ?>" class="max-h-full max-w-full object-contain transition-transform group-hover:scale-102" alt="Logo Preview">
+                                    <img src="<?php echo esc_url( $logo_url ); ?>" class="max-h-full max-w-full object-contain transition-transform group-hover:scale-102" alt="Logo Preview" loading="lazy">
                                 <?php else : ?>
                                     <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-650 dark:group-hover:text-zinc-300 transition-colors mb-1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                     <span class="text-xs font-bold text-zinc-850 dark:text-zinc-200">Upload Agency Logo</span>
@@ -1179,7 +1179,7 @@ $cora_settings_tabs = array(
                             ?>
                             <div id="cora-suite-favicon-preview" class="w-full h-full flex flex-col items-center justify-center overflow-hidden">
                                 <?php if ( ! empty( $favicon_url ) ) : ?>
-                                    <img src="<?php echo esc_url( $favicon_url ); ?>" class="w-8 h-8 object-contain transition-transform group-hover:scale-105" alt="Favicon Preview">
+                                    <img src="<?php echo esc_url( $favicon_url ); ?>" class="w-8 h-8 object-contain transition-transform group-hover:scale-105" alt="Favicon Preview" loading="lazy">
                                 <?php else : ?>
                                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-650 dark:group-hover:text-zinc-350 transition-colors mb-1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                     <span class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Upload</span>

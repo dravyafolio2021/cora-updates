@@ -801,7 +801,7 @@ window.coraGbpLoadReviews = function() {
                 }
 
                 var avatarHtml = avatar 
-                    ? `<img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-zinc-200 dark:border-zinc-700 shadow-2xs" onerror="this.style.display='none'; $(this).next().show();">` 
+                    ? `<img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-zinc-200 dark:border-zinc-700 shadow-2xs" onerror="this.style.display='none'; $(this).next().show();" loading="lazy">` 
                     : '';
                 var avatarFallbackHtml = `<div class="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center font-black text-zinc-500 dark:text-zinc-400 text-xs shadow-2xs shrink-0">${author.substring(0,2).toUpperCase()}</div>`;
                 var finalAvatar = `<div class="shrink-0 relative">${avatarHtml}<div style="${avatar ? 'display:none;' : ''}" class="fallback-wrap">${avatarFallbackHtml}</div></div>`;

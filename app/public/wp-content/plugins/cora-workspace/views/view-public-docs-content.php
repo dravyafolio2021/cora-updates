@@ -49,6 +49,9 @@ $reading_time = max( 1, ceil( $word_count / 200 ) ) . ' min read';
 <!-- Standard markdown page output box -->
 <div class="flex-1 min-w-0 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-6 md:p-8 shadow-xs transition-all duration-200" id="cora-public-main-content">
     
+    <!-- Sub-container 1: Standard Page Layout -->
+    <div id="cora-public-page-layout" class="space-y-6">
+    
     <!-- Top Bar: Breadcrumbs & Action Buttons -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-100 dark:border-zinc-900 pb-5 mb-6">
         
@@ -104,7 +107,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) ) . ' min read';
         <span class="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-800"></span>
         
         <!-- Version badge -->
-        <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400">v2.2.1</span>
+        <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400">v<?php echo defined('CORA_WORKSPACE_VERSION') ? esc_html(CORA_WORKSPACE_VERSION) : '3.2.46'; ?></span>
         <span class="w-1 h-1 rounded-full bg-zinc-200 dark:bg-zinc-800"></span>
         
         <!-- Category tags -->
@@ -263,6 +266,17 @@ $reading_time = max( 1, ceil( $word_count / 200 ) ) . ' min read';
         </div>
 
     </div>
+    
+    </div> <!-- End of #cora-public-page-layout -->
+
+    <!-- Sub-container 2: API Registry Layout -->
+    <div id="cora-public-api-layout" class="hidden space-y-6"></div>
+    
+    <!-- Sub-container 3: Changelog Layout -->
+    <div id="cora-public-changelog-layout" class="hidden space-y-6"></div>
+    
+    <!-- Sub-container 4: AI Copilot Layout -->
+    <div id="cora-public-ai-layout" class="hidden space-y-6"></div>
 
 </div>
 
@@ -324,100 +338,4 @@ function coraPublicCopyLink() {
     });
 }
 
-// Intercept and wrap AJAX dynamic router page switches to trigger layout toggles
-(function() {
-    function coraUpdateSpecialContentVisibility(slug) {
-        const gridContainer = document.getElementById('cora-platform-overview-special');
-        const standardContainer = document.getElementById('cora-public-markdown-body');
-        
-        if (!gridContainer || !standardContainer) return;
-        
-        if (slug === 'platform-overview') {
-            gridContainer.classList.remove('hidden');
-            standardContainer.classList.add('hidden');
-        } else {
-            gridContainer.classList.add('hidden');
-            standardContainer.classList.remove('hidden');
-        }
-    }
-
-    function coraUpdateBreadcrumbsAndMeta(slug, element) {
-        let category = 'Overview';
-        if (element) {
-            const group = element.closest('.cora-sidebar-group');
-            if (group) {
-                const header = group.querySelector('button span');
-                if (header) {
-                    category = header.textContent.trim();
-                }
-            }
-        }
-        
-        // Update breadcrumb category
-        const breadcrumbCategory = document.getElementById('cora-public-breadcrumb-category');
-        if (breadcrumbCategory) {
-            breadcrumbCategory.textContent = category;
-        }
-        
-        // Wait briefly for main dynamic script to write title/body elements
-        setTimeout(() => {
-            const titleEl = document.getElementById('cora-public-page-title');
-            const breadcrumbTitle = document.getElementById('cora-public-breadcrumb-title');
-            if (titleEl && breadcrumbTitle) {
-                let titleText = titleEl.textContent.trim();
-                // Strip emojis from the breadcrumb text for cleaner visual hierarchy
-                breadcrumbTitle.textContent = titleText.replace(/[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, '').trim();
-            }
-            
-            // Recalculate reading time on AJAX change
-            const bodyEl = document.getElementById('cora-public-markdown-body');
-            const readingTimeEl = document.getElementById('cora-public-page-reading-time');
-            if (bodyEl && readingTimeEl) {
-                const words = bodyEl.textContent.trim().split(/\s+/).length || 350;
-                const time = Math.max(1, Math.ceil(words / 200));
-                readingTimeEl.textContent = time + ' min read';
-            }
-            
-            // Format category badge uppercase
-            const pageCategoryEl = document.getElementById('cora-public-page-category');
-            if (pageCategoryEl) {
-                pageCategoryEl.textContent = category;
-            }
-            
-            // Prepend emoji to Platform Overview title
-            if (slug === 'platform-overview' && titleEl) {
-                let titleText = titleEl.textContent.trim();
-                if (!titleText.startsWith('👋')) {
-                    titleEl.textContent = '👋 ' + titleText;
-                }
-            }
-        }, 150);
-    }
-
-    // Intercept function registration dynamically via getter/setter
-    let _coraPublicLoadPage = window.coraPublicLoadPage;
-    Object.defineProperty(window, 'coraPublicLoadPage', {
-        get() {
-            return _coraPublicLoadPage;
-        },
-        set(newVal) {
-            _coraPublicLoadPage = function(event, slug, element) {
-                newVal.apply(this, arguments);
-                coraUpdateSpecialContentVisibility(slug);
-                coraUpdateBreadcrumbsAndMeta(slug, element);
-            };
-        },
-        configurable: true
-    });
-    
-    // If it was already defined before this script loaded
-    if (typeof _coraPublicLoadPage === 'function') {
-        const orig = _coraPublicLoadPage;
-        _coraPublicLoadPage = function(event, slug, element) {
-            orig.apply(this, arguments);
-            coraUpdateSpecialContentVisibility(slug);
-            coraUpdateBreadcrumbsAndMeta(slug, element);
-        };
-    }
-})();
 </script>

@@ -174,7 +174,7 @@ $stage_keys = array_keys($stages);
           
           <?php if(!empty($item['thumbnail_url'])): ?>
             <div class="w-full h-24 rounded-lg bg-zinc-100 overflow-hidden cursor-pointer" onclick="coraEditArticle(<?php echo $post_id; ?>, '<?php echo esc_js($item['title']); ?>')">
-              <img src="<?php echo esc_url($item['thumbnail_url']); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+               <img src="<?php echo esc_url($item['thumbnail_url']); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
             </div>
           <?php endif; ?>
 
@@ -491,7 +491,7 @@ window.renderItemCard = function(item, currentColKey) {
 
       ${item.thumbnail_url ? 
         `<div class="w-full h-24 rounded-lg bg-zinc-100 overflow-hidden cursor-pointer" onclick="coraEditArticle(${postId}, '${window.escHtml(item.title).replace(/'/g,"\\'")}')">
-          <img src="${window.escHtml(item.thumbnail_url)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+           <img src="${window.escHtml(item.thumbnail_url)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
          </div>` : ''
       }
 

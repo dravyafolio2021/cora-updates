@@ -870,17 +870,17 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
                                 </div>
                             </div>
                             <div class="cora-fh-mockup-body">
-                                <img id="cora-mockup-image" src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80" alt="Feature Preview" class="cora-fh-mockup-img">
+                                <img id="cora-mockup-image" src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80" alt="Feature Preview" class="cora-fh-mockup-img" loading="lazy">
                                 <div class="cora-fh-mockup-overlay">
                                     <span id="cora-mockup-tag" class="cora-fh-mockup-tag">Modern 4BHK Villa with Infinity Pool</span>
                                     <h4 id="cora-mockup-title" class="cora-fh-mockup-title">Sunnyvale Luxury Villa</h4>
                                 </div>
                             </div>
                             <div id="cora-mockup-thumbs" class="cora-fh-thumbs-strip">
-                                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=200&q=80" class="cora-fh-thumb-img">
-                                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=200&q=80" class="cora-fh-thumb-img">
-                                <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=200&q=80" class="cora-fh-thumb-img">
-                                <img src="https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?auto=format&fit=crop&w=200&q=80" class="cora-fh-thumb-img">
+                                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=200&q=80" class="cora-fh-thumb-img" loading="lazy">
+                                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=200&q=80" class="cora-fh-thumb-img" loading="lazy">
+                                <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=200&q=80" class="cora-fh-thumb-img" loading="lazy">
+                                <img src="https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?auto=format&fit=crop&w=200&q=80" class="cora-fh-thumb-img" loading="lazy">
                             </div>
                         </div>
 
@@ -899,7 +899,7 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
                         <div class="cora-fh-mobile-frame">
                             <div class="cora-fh-mobile-inner">
                                 <div style="width: 24px; height: 3px; background: #e4e4e7; border-radius: 99px; margin: 0 auto 4px auto;"></div>
-                                <img id="cora-mockup-mobile-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=200&q=80" style="width: 100%; height: 50px; object-fit: cover; border-radius: 4px; display: block;">
+                                <img id="cora-mockup-mobile-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=200&q=80" style="width: 100%; height: 50px; object-fit: cover; border-radius: 4px; display: block;" loading="lazy">
                                 <div style="font-size: 8px; font-weight: 700; color: #18181b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px;">Sunnyvale Villa</div>
                                 <div style="font-size: 7px; color: #a1a1aa;">Modern 4BHK</div>
                             </div>
@@ -1407,7 +1407,7 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
                 $('#cora-mockup-mobile-img').attr('src', data.imgThumbs[1]);
                 var $t = $('#cora-mockup-thumbs').empty();
                 $.each(data.imgThumbs, function(i, srcUrl) {
-                    $t.append('<img src="' + srcUrl + '" class="cora-fh-thumb-img">');
+                    $t.append('<img src="' + srcUrl + '" class="cora-fh-thumb-img" loading="lazy">');
                 });
             }
 

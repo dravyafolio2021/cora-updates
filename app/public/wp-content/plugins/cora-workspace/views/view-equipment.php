@@ -297,7 +297,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
                     elseif ( strpos( $img_src, '/' ) === 0 ) $img_url = $img_src;
                     elseif ( strpos( $img_src, '/' ) !== false ) $img_url = '/wp-content/' . $img_src;
                     else $img_url = '/wp-content/plugins/cora-workspace/assets/images/' . $img_src;
-                    $img_html = '<img src="' . esc_url( $img_url ) . '" class="w-10 h-10 rounded-xl object-cover shrink-0 border border-zinc-200 dark:border-zinc-800" alt="' . esc_attr( $gear['name'] ) . '">';
+                    $img_html = '<img src="' . esc_url( $img_url ) . '" class="w-10 h-10 rounded-xl object-cover shrink-0 border border-zinc-200 dark:border-zinc-800" alt="' . esc_attr( $gear['name'] ) . '" loading="lazy">';
                 } else {
                     $img_html = '<div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-750/60 flex items-center justify-center shrink-0">' . $cat_icon . '</div>';
                 }
@@ -692,7 +692,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
                     <div class="border border-zinc-200 rounded-xl bg-white overflow-hidden p-4 space-y-4">
                         <div id="add-gear-upload-box" class="flex items-center gap-4">
                             <div class="w-16 h-16 rounded-lg bg-zinc-100 border border-zinc-250 flex items-center justify-center shrink-0 overflow-hidden relative">
-                                <img id="add-gear-image-preview" src="" class="w-full h-full object-cover hidden">
+                                <img id="add-gear-image-preview" src="" class="w-full h-full object-cover hidden" loading="lazy">
                                 <svg id="add-gear-image-placeholder" viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                             </div>
                             <div class="flex-1 space-y-2">
@@ -878,7 +878,7 @@ if ( is_array( $cora_gear_maintenance ) ) {
                     <div class="border border-zinc-200 rounded-xl bg-white overflow-hidden p-4 space-y-4">
                         <div id="edit-gear-upload-box" class="flex items-center gap-4">
                             <div class="w-16 h-16 rounded-lg bg-zinc-100 border border-zinc-250 flex items-center justify-center shrink-0 overflow-hidden relative">
-                                <img id="edit-gear-image-preview" src="" class="w-full h-full object-cover hidden">
+                                <img id="edit-gear-image-preview" src="" class="w-full h-full object-cover hidden" loading="lazy">
                                 <svg id="edit-gear-image-placeholder" viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                             </div>
                             <div class="flex-1 space-y-2">

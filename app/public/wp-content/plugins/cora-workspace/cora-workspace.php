@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.46
+ * Version: 3.2.47
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.46' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.47' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -3461,7 +3461,7 @@ add_action( 'rest_api_init', function () {
     register_rest_route( 'cora/v1', '/team', array(
         'methods'             => 'GET',
         'callback'            => 'cora_get_team_members_rest',
-        'permission_callback' => '__return_true', // Publicly accessible REST endpoint
+        'permission_callback' => 'is_user_logged_in',
     ) );
 
     register_rest_route( 'cora/v1', '/mcp', array(
@@ -4967,14 +4967,24 @@ function cora_mcp_handle_call_tool( $name, $args, $id ) {
 
         case 'cora_get_leads':
             $limit = isset( $args['limit'] ) ? intval( $args['limit'] ) : 10;
-            $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_leads ORDER BY id DESC LIMIT %d", $limit ), ARRAY_A );
+            $agency_id = cora_db_get_agency_id();
+            $user_agency = cora_get_current_user_agency_id();
+            if ( $user_agency !== 'super' ) {
+                $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_leads WHERE agency_id = %d ORDER BY id DESC LIMIT %d", $agency_id, $limit ), ARRAY_A );
+            } else {
+                $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_leads ORDER BY id DESC LIMIT %d", $limit ), ARRAY_A );
+            }
 
             $content = "Recent CRM Leads:\n";
             if ( empty( $rows ) ) {
                 $content .= "No leads found.\n";
             } else {
                 foreach ( $rows as $r ) {
-                    $content .= "- ID: {$r['id']} | Name: {$r['name']} | Email: {$r['email']} | Status: {$r['status']} | Notes: {$r['notes']}\n";
+                    $l_name = trim( ( $r['first_name'] ?? '' ) . ' ' . ( $r['last_name'] ?? '' ) );
+                    if ( empty( $l_name ) ) {
+                        $l_name = $r['name'] ?? 'N/A';
+                    }
+                    $content .= "- ID: {$r['id']} | Name: {$l_name} | Email: {$r['email']} | Status: {$r['status']} | Notes: {$r['notes']}\n";
                 }
             }
             return cora_mcp_make_tool_response( $content, $id );
@@ -4989,16 +4999,28 @@ function cora_mcp_handle_call_tool( $name, $args, $id ) {
                 return cora_mcp_make_tool_error( "Name and email are required parameters to create a lead.", $id );
             }
 
+            $name_parts = explode( ' ', trim( $lead_name ), 2 );
+            $first_name = $name_parts[0] ?? '';
+            $last_name  = $name_parts[1] ?? '';
+
+            $agency_id = cora_db_get_agency_id();
+            $branch_id = cora_db_get_branch_id();
+
             $success = $wpdb->insert(
                 "{$wpdb->prefix}cora_leads",
                 array(
-                    'name'       => $lead_name,
+                    'agency_id'  => $agency_id,
+                    'branch_id'  => $branch_id,
+                    'first_name' => $first_name,
+                    'last_name'  => $last_name,
                     'email'      => $lead_email,
                     'phone'      => $lead_phone,
                     'notes'      => $lead_notes,
                     'status'     => 'new',
-                    'created_at' => current_time( 'mysql' )
-                )
+                    'created_at' => current_time( 'mysql' ),
+                    'updated_at' => current_time( 'mysql' )
+                ),
+                array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
             );
 
             if ( $success ) {
@@ -5018,14 +5040,23 @@ function cora_mcp_handle_call_tool( $name, $args, $id ) {
                 return cora_mcp_make_tool_error( "lead_id and status parameters are required.", $id );
             }
 
+            $agency_id = cora_db_get_agency_id();
+            $user_agency = cora_get_current_user_agency_id();
+
             $data = array( 'status' => $status );
             if ( ! empty( $notes ) ) {
                 $data['notes'] = $notes;
             }
+
+            $where = array( 'id' => $lead_id );
+            if ( $user_agency !== 'super' ) {
+                $where['agency_id'] = $agency_id;
+            }
+
             $updated = $wpdb->update(
                 "{$wpdb->prefix}cora_leads",
                 $data,
-                array( 'id' => $lead_id )
+                $where
             );
 
             if ( $updated !== false ) {
@@ -5162,13 +5193,31 @@ function cora_mcp_handle_call_tool( $name, $args, $id ) {
             $limit  = isset( $args['limit'] ) ? intval( $args['limit'] ) : 10;
             $status = isset( $args['status'] ) ? sanitize_text_field( $args['status'] ) : '';
 
-            $sql = "SELECT * FROM {$wpdb->prefix}cora_bookings";
-            if ( ! empty( $status ) ) {
-                $sql .= $wpdb->prepare( " WHERE status = %s", $status );
-            }
-            $sql .= $wpdb->prepare( " ORDER BY showing_date DESC LIMIT %d", $limit );
+            $agency_id = cora_db_get_agency_id();
+            $user_agency = cora_get_current_user_agency_id();
 
-            $rows = $wpdb->get_results( $sql, ARRAY_A );
+            $sql = "SELECT * FROM {$wpdb->prefix}cora_bookings";
+            $where_clauses = array();
+            $params = array();
+
+            if ( $user_agency !== 'super' ) {
+                $where_clauses[] = "agency_id = %d";
+                $params[] = $agency_id;
+            }
+
+            if ( ! empty( $status ) ) {
+                $where_clauses[] = "status = %s";
+                $params[] = $status;
+            }
+
+            if ( ! empty( $where_clauses ) ) {
+                $sql .= " WHERE " . implode( " AND ", $where_clauses );
+            }
+
+            $sql .= " ORDER BY showing_date DESC LIMIT %d";
+            $params[] = $limit;
+
+            $rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
 
             $content = "Shoot Bookings & Showings:\n";
             if ( empty( $rows ) ) {
@@ -5191,11 +5240,14 @@ function cora_mcp_handle_call_tool( $name, $args, $id ) {
                 return cora_mcp_make_tool_error( "client_name, client_phone, shoot_type, and scheduled_at parameters are required.", $id );
             }
 
+            $agency_id = cora_db_get_agency_id();
+            $branch_id = cora_db_get_branch_id();
+
             $success = $wpdb->insert(
                 "{$wpdb->prefix}cora_bookings",
                 array(
-                    'agency_id'      => 1,
-                    'branch_id'      => 1,
+                    'agency_id'      => $agency_id,
+                    'branch_id'      => $branch_id,
                     'showing_date'   => $scheduled_at,
                     'status'         => 'confirmed',
                     'deal_type'      => $shoot_type,
@@ -5341,7 +5393,22 @@ function cora_mcp_make_tool_error( $error_msg, $id ) {
  */
 if ( ! function_exists( 'cora_get_team_members_rest' ) ) {
 function cora_get_team_members_rest() {
-    $users = get_users();
+    $agency_id = cora_get_current_user_agency_id();
+    if ( empty( $agency_id ) ) {
+        return new WP_Error( 'rest_forbidden', __( 'Unauthorized access.', 'cora-workspace' ), array( 'status' => 401 ) );
+    }
+
+    $args = array();
+    if ( $agency_id !== 'super' ) {
+        $args['meta_query'] = array(
+            array(
+                'key'     => 'cora_agency_id',
+                'value'   => $agency_id,
+                'compare' => '='
+            )
+        );
+    }
+    $users = get_users( $args );
     $cora_role_labels = cora_get_all_roles();
 
     $team = array();
@@ -5369,7 +5436,18 @@ function cora_get_team_members_rest() {
 
 if ( ! function_exists( 'cora_get_workspace_team_members' ) ) {
     function cora_get_workspace_team_members() {
-        $users = get_users();
+        $agency_id = cora_get_current_user_agency_id();
+        $args = array();
+        if ( ! empty( $agency_id ) && $agency_id !== 'super' ) {
+            $args['meta_query'] = array(
+                array(
+                    'key'     => 'cora_agency_id',
+                    'value'   => $agency_id,
+                    'compare' => '='
+                )
+            );
+        }
+        $users = get_users( $args );
         $cora_role_labels = function_exists( 'cora_get_all_roles' ) ? cora_get_all_roles() : array();
         $team = array();
 
@@ -19629,14 +19707,13 @@ function cora_db_get_activity_logs() {
     $branch_id = function_exists('cora_db_get_branch_id') ? cora_db_get_branch_id() : 1;
 
     $user = wp_get_current_user();
-    $current_role = ! empty( $user->roles ) ? $user->roles[0] : '';
-    $is_admin = current_user_can('manage_options') || in_array( $current_role, array( 'administrator', 'cora_manager', 'super_admin', 'agency_owner' ) );
+    $is_super_admin = cora_is_super_owner( $user );
 
     $mapped = array();
     $table_name = $wpdb->prefix . 'cora_activity_logs';
 
     if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) === $table_name ) {
-        if ( $is_admin ) {
+        if ( $is_super_admin ) {
             $query = "SELECT * FROM {$table_name} ORDER BY created_at DESC LIMIT 1000";
             $rows = $wpdb->get_results( $query, ARRAY_A );
         } else {
@@ -20020,9 +20097,12 @@ if ( ! function_exists( 'cora_seed_default_canvas_data' ) ) {
 function cora_seed_default_canvas_data() {
     global $wpdb;
     
-    // Migration: Update existing PropOS names to Cora in database
-    $wpdb->query( "UPDATE {$wpdb->prefix}cora_canvas_themes SET name = REPLACE(name, 'PropOS', 'Cora'), settings = REPLACE(settings, 'PropOS', 'Cora')" );
-    $wpdb->query( "UPDATE {$wpdb->prefix}cora_canvas_pages SET seo_title = REPLACE(seo_title, 'PropOS', 'Cora'), seo_description = REPLACE(seo_description, 'PropOS', 'Cora')" );
+    // Migration: Update existing PropOS names to Cora in database (run once)
+    if ( ! get_option( 'cora_canvas_names_updated_to_cora_v2' ) ) {
+        $wpdb->query( "UPDATE {$wpdb->prefix}cora_canvas_themes SET name = REPLACE(name, 'PropOS', 'Cora'), settings = REPLACE(settings, 'PropOS', 'Cora')" );
+        $wpdb->query( "UPDATE {$wpdb->prefix}cora_canvas_pages SET seo_title = REPLACE(seo_title, 'PropOS', 'Cora'), seo_description = REPLACE(seo_description, 'PropOS', 'Cora')" );
+        update_option( 'cora_canvas_names_updated_to_cora_v2', 1 );
+    }
 
     // Check if themes table has entries
     $themes_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes" );
@@ -20570,56 +20650,63 @@ function cora_seed_3_leads_per_column() {
 
 if ( ! function_exists( 'cora_ensure_default_agency_setup' ) ) {
 function cora_ensure_default_agency_setup() {
-    cora_create_custom_tables();
-    cora_migrate_options_to_custom_tables();
-    cora_seed_3_leads_per_column();
-    $agencies = get_option( 'cora_agencies', array() );
-    if ( empty( $agencies ) ) {
-        $agencies = array(
-            'agency_1' => array(
-                'id'          => 'agency_1',
-                'name'        => 'Cora Default Agency',
-                'subdomain'   => 'default',
-                'plan'        => 'enterprise',
-                'status'      => 'active',
-                'created_at'  => date( 'Y-m-d H:i:s' )
-            )
-        );
-        update_option( 'cora_agencies', $agencies );
-    }
-
-    $branches = get_option( 'cora_branches', array() );
-    if ( empty( $branches ) ) {
-        $branches = array(
-            'branch_1' => array(
-                'id'         => 'branch_1',
-                'agency_id'  => 'agency_1',
-                'name'       => 'Main Branch',
-                'city'       => 'Default City',
-                'address'    => 'Default Address',
-                'manager_id' => 0
-            )
-        );
-        update_option( 'cora_branches', $branches );
-    }
-
-    $branches = get_option( 'cora_branches', array() );
-    if ( is_array( $branches ) ) {
-        $seen_chennai = false;
-        $modified = false;
-        foreach ( $branches as $key => $b ) {
-            if ( isset( $b['name'] ) && $b['name'] === 'Chennai Hub' ) {
-                if ( $seen_chennai ) {
-                    unset( $branches[$key] );
-                    $modified = true;
-                } else {
-                    $seen_chennai = true;
-                }
-            }
+    if ( ! get_option( 'cora_platform_setup_complete_v2' ) ) {
+        cora_create_custom_tables();
+        cora_migrate_options_to_custom_tables();
+        cora_seed_3_leads_per_column();
+        $agencies = get_option( 'cora_agencies', array() );
+        if ( empty( $agencies ) ) {
+            $agencies = array(
+                'agency_1' => array(
+                    'id'          => 'agency_1',
+                    'name'        => 'Cora Default Agency',
+                    'subdomain'   => 'default',
+                    'plan'        => 'enterprise',
+                    'status'      => 'active',
+                    'created_at'  => date( 'Y-m-d H:i:s' )
+                )
+            );
+            update_option( 'cora_agencies', $agencies );
         }
-        if ( $modified ) {
+
+        $branches = get_option( 'cora_branches', array() );
+        if ( empty( $branches ) ) {
+            $branches = array(
+                'branch_1' => array(
+                    'id'         => 'branch_1',
+                    'agency_id'  => 'agency_1',
+                    'name'       => 'Main Branch',
+                    'city'       => 'Default City',
+                    'address'    => 'Default Address',
+                    'manager_id' => 0
+                )
+            );
             update_option( 'cora_branches', $branches );
         }
+
+        $branches = get_option( 'cora_branches', array() );
+        if ( is_array( $branches ) ) {
+            $seen_chennai = false;
+            $modified = false;
+            foreach ( $branches as $key => $b ) {
+                if ( isset( $b['name'] ) && $b['name'] === 'Chennai Hub' ) {
+                    if ( $seen_chennai ) {
+                        unset( $branches[$key] );
+                        $modified = true;
+                    } else {
+                        $seen_chennai = true;
+                    }
+                }
+            }
+            if ( $modified ) {
+                update_option( 'cora_branches', $branches );
+            }
+        }
+
+        cora_seed_default_canvas_data();
+        cora_sync_db_tables_to_options();
+
+        update_option( 'cora_platform_setup_complete_v2', 1 );
     }
 
     $user_id = get_current_user_id();
@@ -20637,9 +20724,6 @@ function cora_ensure_default_agency_setup() {
     if ( ! get_option( 'cora_workspace_industry' ) ) {
         add_option( 'cora_workspace_industry', 'real_estate' );
     }
-
-    cora_seed_default_canvas_data();
-    cora_sync_db_tables_to_options();
 }
 }
 add_action( 'init', 'cora_create_custom_tables', 0 );

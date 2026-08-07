@@ -405,7 +405,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     onclick="openEditUserDrawer(this)">
                     <!-- Avatar -->
                     <?php if ( ! empty($avatar) ) : ?>
-                        <img src="<?php echo ( strpos( $avatar, 'data:' ) === 0 ) ? $avatar : esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0">
+                        <img src="<?php echo ( strpos( $avatar, 'data:' ) === 0 ) ? $avatar : esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0" loading="lazy">
                     <?php else : ?>
                         <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 border border-zinc-100 dark:border-zinc-800/80" style="background-color: <?php echo esc_attr($name_color); ?>"><?php echo esc_html($name_initials); ?></div>
                     <?php endif; ?>
@@ -526,7 +526,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                             <tr class="hover:bg-zinc-50/20 active-member-row" data-name="<?php echo esc_attr(strtolower($u->display_name)); ?>" data-email="<?php echo esc_attr(strtolower($u->user_email)); ?>" data-role="<?php echo esc_attr($u_role); ?>" data-branch="<?php echo esc_attr($u_branch_id); ?>" data-status="<?php echo esc_attr($u_status); ?>">
                                 <td class="px-5 py-3 flex items-center gap-3">
                                     <?php if ( ! empty( $avatar ) ) : ?>
-                                        <img src="<?php echo ( strpos( $avatar, 'data:' ) === 0 ) ? $avatar : esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover border border-zinc-200">
+                                        <img src="<?php echo ( strpos( $avatar, 'data:' ) === 0 ) ? $avatar : esc_url($avatar); ?>" class="w-8 h-8 rounded-full object-cover border border-zinc-200" loading="lazy">
                                     <?php else : ?>
                                         <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs border border-zinc-200" style="background-color: <?php echo esc_attr($name_color); ?>">
                                             <?php echo esc_html( $name_initials ); ?>
@@ -2296,7 +2296,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                     <div class="relative mb-2">
                         <!-- Banner -->
                         <div id="edit-banner-preview" class="w-full h-[100px] rounded-xl bg-zinc-100 dark:bg-zinc-800 relative overflow-hidden cursor-pointer group" onclick="coraSelectBanner()">
-                            <img id="edit-banner-img" src="" alt="" class="w-full h-full object-cover hidden">
+                            <img id="edit-banner-img" src="" alt="" class="w-full h-full object-cover hidden" loading="lazy">
                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                                 <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-zinc-900/90 rounded-lg px-3 py-1.5 flex items-center gap-1.5 shadow-sm">
                                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-300"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
@@ -2307,7 +2307,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                         <!-- Avatar -->
                         <div class="absolute -bottom-5 left-4 z-10">
                             <div id="edit-avatar-preview" class="w-16 h-16 rounded-full border-[3px] border-white dark:border-zinc-900 bg-zinc-200 dark:bg-zinc-700 overflow-hidden cursor-pointer group relative shadow-md" onclick="coraSelectAvatar()">
-                                <img id="edit-avatar-img" src="" alt="" class="w-full h-full object-cover hidden">
+                                <img id="edit-avatar-img" src="" alt="" class="w-full h-full object-cover hidden" loading="lazy">
                                 <div id="edit-avatar-initials" class="w-full h-full flex items-center justify-center text-lg font-bold text-zinc-500 dark:text-zinc-400"></div>
                                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="white" stroke-width="2" fill="none" class="opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-md"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>

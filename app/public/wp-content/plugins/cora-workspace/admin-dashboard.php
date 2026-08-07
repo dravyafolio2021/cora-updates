@@ -238,6 +238,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     
     <!-- Compiled Tailwind CSS -->
     <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css'; ?>" />
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     
     <!-- PWA Manifest & Service Worker -->
     <link rel="manifest" href="<?php echo home_url('/cora-manifest.json'); ?>">
@@ -261,14 +262,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     </script>
     
     <!-- Load QuillJS Rich Text ListingCoordinator -->
-    <link href="<?php echo CORA_WORKSPACE_URL . 'assets/css/quill.snow.css'; ?>" rel="stylesheet">
+    <link href="<?php echo CORA_WORKSPACE_URL . 'assets/css/quill.snow.css'; ?>" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/quill.min.js'; ?>" defer></script>
     
     <!-- Load ChartJS -->
     <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/chart.min.js'; ?>" defer></script>
     
     <!-- Load TomSelect -->
-    <link href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tom-select.default.min.css'; ?>" rel="stylesheet">
+    <link href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tom-select.default.min.css'; ?>" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tom-select.complete.min.js'; ?>" defer></script>
     
     <!-- WordPress Enqueued Styles/Scripts for Media Uploader -->
@@ -5921,7 +5922,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                     <tr class="hover:bg-zinc-50/30 cora-eq-row" data-id="<?php echo esc_attr($item['id']); ?>" data-name="<?php echo esc_attr($item['name']); ?>">
                                         <td class="px-4 py-3.5 whitespace-nowrap">
                                             <?php if ($photo_url): ?>
-                                                <img src="<?php echo esc_url($photo_url); ?>" class="w-8 h-8 rounded-md object-cover border border-zinc-200/80" />
+                                                <img src="<?php echo esc_url($photo_url); ?>" class="w-8 h-8 rounded-md object-cover border border-zinc-200/80" loading="lazy" />
                                             <?php else: ?>
                                                 <div class="w-8 h-8 rounded-md bg-zinc-100 flex items-center justify-center border border-zinc-200/50 text-zinc-400">
                                                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -8292,7 +8293,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                                     Change Image
                                                 </span>
                                             </div>
-                                            <img src="" id="cora-thumbnail-img-bh" class="hidden w-full h-full object-cover">
+                                            <img src="" id="cora-thumbnail-img-bh" class="hidden w-full h-full object-cover" loading="lazy">
                                             <span id="cora-thumbnail-placeholder-bh" class="text-xs text-zinc-400 font-semibold flex flex-col items-center gap-1">
                                                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" class="mb-1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                                 Select Image
@@ -8365,7 +8366,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     
                     <!-- Cover Image Dropzone Header -->
                     <div id="cora-cover-image-container" class="relative group w-full rounded-2xl overflow-hidden bg-zinc-50 border border-dashed border-zinc-200 hover:border-zinc-350 hover:bg-zinc-100/50 transition-all min-h-[160px] flex items-center justify-center">
-                        <img id="cora-cover-image-img" src="" class="hidden w-full h-48 md:h-64 object-cover">
+                        <img id="cora-cover-image-img" src="" class="hidden w-full h-48 md:h-64 object-cover" loading="lazy">
                         
                         <!-- Placeholder when no cover image -->
                         <div id="cora-cover-image-placeholder" class="flex flex-col items-center gap-2.5 py-12 text-zinc-400 group-hover:text-zinc-650 cursor-pointer transition-colors w-full h-full text-center px-4" onclick="window.coraMediaSelectTarget = 'cover'; coraOpenMediaLibrary();">
@@ -8772,7 +8773,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                     Change Image
                                 </span>
                             </div>
-                            <img src="" id="cora-thumbnail-img" class="hidden w-full h-full object-cover">
+                            <img src="" id="cora-thumbnail-img" class="hidden w-full h-full object-cover" loading="lazy">
                             <div id="cora-thumbnail-placeholder" class="text-center flex flex-col items-center gap-2 select-none py-6">
                                 <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                 <span class="text-xs font-extrabold text-zinc-800 dark:text-zinc-300 block mt-1">Upload Featured Image</span>
@@ -9625,7 +9626,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 const src = img.getAttribute('src') || '';
                 const item = jQuery(`
                     <div class="relative group aspect-square bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200">
-                        <img src="${src}" class="w-full h-full object-cover">
+                        <img src="${src}" class="w-full h-full object-cover" loading="lazy">
                         <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 select-none">
                             <button type="button" onclick="window.coraFocusSidebarImage(${idx})" class="p-1 bg-white hover:bg-zinc-100 rounded text-zinc-900 shadow-3xs cursor-pointer border-none" title="Locate Image">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -11533,6 +11534,7 @@ body {
 
         const script = document.createElement('script');
         script.type = 'text/javascript';
+        script.async = true;
         script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
         document.body.appendChild(script);
     } else {

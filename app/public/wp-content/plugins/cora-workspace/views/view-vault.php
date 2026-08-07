@@ -3447,7 +3447,7 @@ window.coraRenderPaperPreviewInStep5 = function() {
 
     if (isAdminSigned) {
         if (adminSignatureImg) {
-            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1"><img src="' + adminSignatureImg + '" class="h-8 object-contain" /></div>';
+            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1"><img src="' + adminSignatureImg + '" class="h-8 object-contain" loading="lazy" /></div>';
         } else {
             html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">' + adminSignerName + '</div>';
         }
@@ -3479,7 +3479,7 @@ window.coraRenderPaperPreviewInStep5 = function() {
     
     if (isClientSigned) {
         if (clientSignatureImg) {
-            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1"><img src="' + clientSignatureImg + '" class="h-8 object-contain" /></div>';
+            html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-center justify-center pb-1"><img src="' + clientSignatureImg + '" class="h-8 object-contain" loading="lazy" /></div>';
         } else {
             html += '      <div class="h-10 border-b border-dashed border-zinc-200 flex items-end pb-1 font-serif text-xs italic text-zinc-800">' + clientSignerName + '</div>';
         }
@@ -3751,7 +3751,7 @@ window.coraHandleLogoUpload = function(input) {
         reader.onload = function(e) {
             var prev = document.getElementById('cora-logo-preview');
             if (prev) {
-                prev.innerHTML = '<img src="' + e.target.result + '" alt="Studio Logo" class="max-h-16 object-contain rounded-lg shadow-xs"><span class="text-[10px] text-zinc-400 font-mono">Logo uploaded</span>';
+                prev.innerHTML = '<img src="' + e.target.result + '" alt="Studio Logo" class="max-h-16 object-contain rounded-lg shadow-xs" loading="lazy"><span class="text-[10px] text-zinc-400 font-mono">Logo uploaded</span>';
             }
             coraShowToast('Studio logo updated on canvas!');
         };
@@ -4851,7 +4851,7 @@ window.coraOpenDocPreviewDrawer = function(docId) {
             html += '  <div class="pt-2.5 border-t border-emerald-100/50">' +
                     '    <span class="text-[8px] font-bold uppercase tracking-wider block text-zinc-400">Workspace Stamp</span>' +
                     '    <div class="mt-1.5 p-1 bg-white border border-zinc-200/80 rounded-lg inline-block">' +
-                    '      <img src="' + doc.admin_signature_data + '" class="h-8 object-contain block" style="max-height: 32px;" />' +
+                    '      <img src="' + doc.admin_signature_data + '" class="h-8 object-contain block" style="max-height: 32px;" loading="lazy" />' +
                     '    </div>' +
                     '  </div>';
         }
@@ -4882,7 +4882,7 @@ window.coraOpenDocPreviewDrawer = function(docId) {
             html += '  <div class="pt-2.5 border-t border-purple-100/50">' +
                     '    <span class="text-[8px] font-bold uppercase tracking-wider block text-zinc-400">Client Stamp</span>' +
                     '    <div class="mt-1.5 p-1 bg-white border border-zinc-200/80 rounded-lg inline-block">' +
-                    '      <img src="' + clSigImg + '" class="h-8 object-contain block" style="max-height: 32px;" />' +
+                    '      <img src="' + clSigImg + '" class="h-8 object-contain block" style="max-height: 32px;" loading="lazy" />' +
                     '    </div>' +
                     '  </div>';
         }

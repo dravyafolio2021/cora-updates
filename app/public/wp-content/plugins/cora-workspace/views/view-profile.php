@@ -427,7 +427,7 @@ if ( is_array( $leave_requests ) ) {
             <!-- Premium Avatar with Edit Trigger -->
             <div class="relative group cursor-pointer shrink-0">
                 <?php if ( ! empty( $avatar_url ) ) : ?>
-                    <img src="<?php echo esc_url( $avatar_url ); ?>" alt="Avatar" id="profile-avatar-img" class="w-24 h-24 rounded-full object-cover border-2 border-zinc-200 dark:border-zinc-800 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                    <img src="<?php echo esc_url( $avatar_url ); ?>" alt="Avatar" id="profile-avatar-img" class="w-24 h-24 rounded-full object-cover border-2 border-zinc-200 dark:border-zinc-800 shadow-sm transition-transform duration-300 group-hover:scale-105" loading="lazy">
                 <?php else : ?>
                     <div id="profile-avatar-fallback" class="w-24 h-24 rounded-full flex items-center justify-center text-white font-extrabold text-3xl border-2 border-zinc-200 dark:border-zinc-800 shadow-sm transition-transform duration-300 group-hover:scale-105" style="background-color: <?php echo esc_attr($color_hex); ?>">
                         <?php echo esc_html( $initials ); ?>

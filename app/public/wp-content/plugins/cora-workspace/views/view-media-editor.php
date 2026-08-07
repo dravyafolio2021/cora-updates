@@ -91,7 +91,7 @@ $recent_media = get_posts( array(
             <!-- Image Canvas Preview Box -->
             <div id="cora-editor-canvas-container" class="w-full bg-zinc-950 rounded-xl overflow-hidden min-h-[380px] flex items-center justify-center relative border border-zinc-900">
                 <?php if ( ! empty( $recent_media ) ) : $first_url = wp_get_attachment_url( $recent_media[0]->ID ); ?>
-                    <img id="cora-editor-preview-img" src="<?php echo esc_url( $first_url ); ?>" class="max-h-[420px] max-w-full object-contain transition-transform" alt="Editor Preview">
+                    <img id="cora-editor-preview-img" src="<?php echo esc_url( $first_url ); ?>" class="max-h-[420px] max-w-full object-contain transition-transform" alt="Editor Preview" loading="lazy">
                 <?php else : ?>
                     <div class="text-zinc-600 text-center space-y-2 p-8">
                         <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.5" fill="none" class="mx-auto"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>

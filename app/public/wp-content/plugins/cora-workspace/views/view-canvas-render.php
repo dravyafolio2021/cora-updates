@@ -39,6 +39,7 @@ if ( isset( $GLOBALS['cora_preview_bar_script'] ) ) {
 }
 
 wp_footer();
+echo '<style>html, body { overflow-x: hidden !important; } *, *:before, *:after { max-width: 100% !important; box-sizing: border-box !important; }</style>';
 echo '</body>';
 echo '</html>';
 exit;

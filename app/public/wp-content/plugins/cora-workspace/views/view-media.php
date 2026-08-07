@@ -1132,7 +1132,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             </button>
         </div>
         <div id="cm-editor-canvas">
-            <img id="cm-editor-img" src="" alt="">
+            <img id="cm-editor-img" src="" alt="" loading="lazy">
         </div>
         <div id="cm-editor-bar">
             <button class="cm-ebtn" onclick="cmEdit('rotate_left')">
@@ -1898,7 +1898,7 @@ window.cmRenderList = function(files) {
         var tr = document.createElement('tr');
         tr.className = CM.selIds.indexOf(f.id) > -1 ? 'sel' : ''; tr.dataset.id = f.id;
         var lthumb = f.type_category === 'image' && f.thumbnail
-            ? '<img class="cm-lthumb" src="' + f.thumbnail + '" alt="">'
+            ? '<img class="cm-lthumb" src="' + f.thumbnail + '" alt="" loading="lazy">'
             : '<div class="cm-lthumb" style="display:flex;align-items:center;justify-content:center;background:#f4f4f5">' + cmIcon(f.type_category, 14) + '</div>';
         
         var stars = f.rating ? ' <span style="color:#facc15">★' + f.rating + '</span>' : '';
@@ -1933,7 +1933,7 @@ window.cmOpenDetail = function(f) {
     // Preview
     var prev = document.getElementById('cm-d-preview');
     if (f.type_category === 'image') {
-        prev.innerHTML = '<img src="' + f.url + '?t=' + Date.now() + '" alt="" style="max-height:100%;max-width:100%;object-fit:contain">';
+        prev.innerHTML = '<img src="' + f.url + '?t=' + Date.now() + '" alt="" style="max-height:100%;max-width:100%;object-fit:contain" loading="lazy">';
     } else if (f.type_category === 'video') {
         prev.innerHTML = '<video src="' + f.url + '" controls style="max-height:100%;max-width:100%"></video>';
     } else {
@@ -2927,7 +2927,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.cmCloseEditor = function() {
     document.getElementById('cm-editor-modal').classList.remove('open');
     if(CM.active) {
-        document.getElementById('cm-d-preview').innerHTML='<img src="'+CM.active.url+'?t='+Date.now()+'" alt="" style="max-height:100%;max-width:100%;object-fit:contain">';
+        document.getElementById('cm-d-preview').innerHTML='<img src="'+CM.active.url+'?t='+Date.now()+'" alt="" style="max-height:100%;max-width:100%;object-fit:contain" loading="lazy">';
         
         if (CM.active.edited) {
             CM.active.edited = false;
@@ -2978,7 +2978,7 @@ window.cmEditScale = function() {
 window.cmRestoreOriginal = function() {
     if(!CM.active)return;
     $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_restore',nonce:coraREData.ajaxNonce,attachment_id:CM.active.id},
-    success:function(r){if(r.success){coraShowToast('Original restored.');document.getElementById('cm-d-preview').innerHTML='<img src="'+r.data.url+'" style="max-height:100%;max-width:100%;object-fit:contain">';document.getElementById('cm-d-restore').style.display='none';cmLoadFiles();}else coraShowToast('Restore failed.');}});
+    success:function(r){if(r.success){coraShowToast('Original restored.');document.getElementById('cm-d-preview').innerHTML='<img src="'+r.data.url+'" style="max-height:100%;max-width:100%;object-fit:contain" loading="lazy">';document.getElementById('cm-d-restore').style.display='none';cmLoadFiles();}else coraShowToast('Restore failed.');}});
 };
 window.cmRestoreFromEditor = function() { cmRestoreOriginal(); cmCloseEditor(); };
 window.cmAddWatermark = function() {

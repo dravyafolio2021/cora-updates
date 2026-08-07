@@ -357,7 +357,12 @@ function cora_get_sparkline_points( $history, $type ) {
                     Add Theme
                 </button>
                 <button onclick="window.coraShowToast('Exporting performance report ZIP...', 'success')" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-xs cursor-pointer transition-all flex items-center gap-1.5 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7        <!-- Compact Core Web Vitals Strip (Linear/Vercel SaaS style) -->
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Export Report
+                </button>
+            </div>
+        </div>
+                <!-- Compact Core Web Vitals Strip (Linear/Vercel SaaS style) -->
         <?php
         $lcp_num = floatval(preg_replace('/[^0-9.]/', '', $ps_lcp));
         if ($lcp_num <= 2.5) {
@@ -557,30 +562,6 @@ function cora_get_sparkline_points( $history, $type ) {
                     Refresh Audit
                 </button>
             </div>
-        </div>iv class="text-[9px] text-zinc-400 mt-0.5">↑ +4 pts vs prev</div>
-                    </div>
-                    <!-- Score sparkline: gradual improvement with minor dips — realistic -->
-                    <svg class="w-16 h-7 shrink-0 overflow-visible" viewBox="0 0 64 28" fill="none" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="score-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15"/>
-                                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
-                            </linearGradient>
-                        </defs>
-                        <polygon points="0,24 8,22 16,20 24,22 32,18 40,16 48,14 56,12 64,8 64,28 0,28" fill="url(#score-fill)"/>
-                        <polyline points="0,24 8,22 16,20 24,22 32,18 40,16 48,14 56,12 64,8" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <circle cx="64" cy="8" r="2" fill="#3b82f6"/>
-                    </svg>
-                </div>
-
-                <!-- Device Selector -->
-                <button onclick="window.coraShowToast('Switching to desktop view...')" class="flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors select-none shrink-0 text-left border-none bg-transparent cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500 shrink-0"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                    <span class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 whitespace-nowrap">Mobile</span>
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-
-            </div>
         </div>
 
         <!-- Active Theme Card -->
@@ -594,10 +575,10 @@ function cora_get_sparkline_points( $history, $type ) {
             }
         ?>
         <div class="bg-white border border-zinc-200 rounded-xl shadow-sm relative overflow-visible" id="active-theme-card">
-            <!-- Theme preview: Dual device frames side by side -->
-            <div class="p-5 flex flex-col lg:flex-row items-start gap-6">
+            <!-- Theme preview: Dual device frames + theme info row -->
+            <div class="p-5 flex flex-row items-stretch gap-6">
                 <!-- Left device frames block -->
-                <div class="flex gap-4 shrink-0 justify-center w-full lg:w-fit" style="width: fit-content;">
+                <div class="flex gap-4 shrink-0 justify-start items-center">
                     <!-- Desktop Frame: 280×200px | scale = 280/1280 = 0.21875 -->
                     <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 relative shadow-sm overflow-hidden flex flex-col bg-white dark:bg-zinc-950 select-none pointer-events-none shrink-0" style="width: 280px; height: 200px;">
                         <div class="flex items-center gap-1 px-2.5 py-2 border-b border-zinc-100 dark:border-zinc-800 shrink-0 bg-zinc-50/50 dark:bg-zinc-900/20">
@@ -623,12 +604,15 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
                 </div>
 
-                <!-- Right: Theme Info and Action buttons -->
-                <div class="flex-1 flex flex-col justify-between self-stretch py-0.5 min-w-[280px]">
+                <!-- Vertical Divider -->
+                <div class="w-px bg-zinc-100 dark:bg-zinc-800 self-stretch my-1 shrink-0"></div>
+
+                <!-- Right: Theme Info and Action buttons (No inner card nesting) -->
+                <div class="flex-1 flex flex-col justify-between min-w-[280px] py-1">
                     <!-- Top Info Row -->
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <span class="px-2 py-0.5 text-[9px] font-black uppercase rounded-full bg-green-500 text-white tracking-wide">Active Theme</span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-green-50/70 dark:bg-green-950/20 border border-green-200/60 dark:border-green-900/50 text-[9px] font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">Active Theme</span>
                             <?php if ( isset($live_settings['source']) && $live_settings['source'] === 'lovable' ) : ?>
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900 text-[9px] font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wide">
                                 <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
@@ -637,38 +621,38 @@ function cora_get_sparkline_points( $history, $type ) {
                             <?php endif; ?>
                             <span class="text-[10px] text-zinc-400">· Last edited 2 days ago</span>
                         </div>
-                        <h2 class="text-lg font-black text-zinc-900 dark:text-white leading-tight"><?php echo esc_html( $live_theme['name'] ); ?></h2>
-                        
-                        <!-- Optimization Feature Badges Wrap Row (Prevents clutter/overlap) -->
-                        <div class="flex flex-wrap gap-1.5 mt-1">
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-850 text-[10px] font-semibold text-zinc-650 dark:text-zinc-455">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-550"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <h2 class="text-xl font-bold text-zinc-900 dark:text-white leading-tight"><?php echo esc_html( $live_theme['name'] ); ?></h2>
+
+                        <!-- Optimization Feature Badges Wrap Row (Soft, premium gray pills) -->
+                        <div class="flex flex-wrap gap-1.5 mt-0.5">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-650 dark:text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 Optimized
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-855 text-[10px] font-semibold text-zinc-650 dark:text-zinc-455">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-550"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-655 dark:text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                                 Core Web Vitals
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-850 text-[10px] font-semibold text-zinc-655 dark:text-zinc-455">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-550"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-655 dark:text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                 SEO Ready
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-850 text-[10px] font-semibold text-zinc-655 dark:text-zinc-455">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-550"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect></svg>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-655 dark:text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect></svg>
                                 Responsive
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-850 text-[10px] font-semibold text-zinc-655 dark:text-zinc-455">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-550"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-655 dark:text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
                                 Accessibility AA
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-855 text-[10px] font-semibold text-zinc-655 dark:text-zinc-455">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-550"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-655 dark:text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                                 Elementor
                             </span>
                         </div>
 
                         <!-- Version Row -->
-                        <div class="mt-1 relative inline-flex items-center gap-2">
+                        <div class="relative inline-flex items-center gap-2 mt-1">
                             <button onclick="toggleThemeVersionDrawer(event)" class="inline-flex items-center gap-1.5 text-[9.5px] text-blue-600 hover:text-blue-800 cursor-pointer font-semibold select-none border-none bg-transparent p-0">
                                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
                                 Version 15.5.0
@@ -678,28 +662,28 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                     </div>
 
-                    <!-- Action Buttons Row (Clean wrapping flex container) -->
-                    <div class="flex items-center gap-2 flex-wrap mt-4 w-full">
+                    <!-- Action Buttons Row (Clean border-t and mt-auto so it aligns vertically) -->
+                    <div class="flex items-center gap-2 flex-wrap w-full border-t border-zinc-100 dark:border-zinc-800 pt-3 mt-auto">
                         <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true)" class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold cursor-pointer transition-all flex items-center gap-1.5 border-none shadow-xs">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                             Edit Theme
                         </button>
-                        <button onclick="window.coraShowToast('Opening Cora theme customizer...')" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-750 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
+                        <button onclick="window.coraShowToast('Opening Cora theme customizer...')" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M12 2v2M12 20v2"></path></svg>
                             Customize
                         </button>
-                        <a href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-750 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5 no-underline">
+                        <a href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5 no-underline">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                             Preview
                         </a>
-                        <button onclick="triggerDuplicateTheme(<?php echo $live_theme['id']; ?>)" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-750 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
+                        <button onclick="triggerDuplicateTheme(<?php echo $live_theme['id']; ?>)" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             Duplicate
                         </button>
                         <div class="ml-auto flex items-center gap-2">
                             <!-- Three-dot more actions -->
                             <div class="relative inline-block">
-                                <button onclick="toggleActiveThemeDropdown(event)" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-750 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
+                                <button onclick="toggleActiveThemeDropdown(event)" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
                                     More actions
                                     <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </button>
@@ -726,121 +710,136 @@ function cora_get_sparkline_points( $history, $type ) {
                             </div>
                         </div>
                     </div>
-            <!-- Performance Insights Card -->
-            <?php
-            if ($ps_score >= 90) {
-                $score_status_text = 'Good';
-                $score_status_color = 'text-green-600';
-                $score_radial_color = '#22c55e';
-            } elseif ($ps_score >= 50) {
-                $score_status_text = 'Needs Imp.';
-                $score_status_color = 'text-amber-600';
-                $score_radial_color = '#f59e0b';
-            } else {
-                $score_status_text = 'Poor';
-                $score_status_color = 'text-red-650';
-                $score_radial_color = '#ef4444';
-            }
-            ?>
-            <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm" id="performance-insights-card">
-                <h3 class="text-sm font-black text-zinc-900 dark:text-white mb-4">Performance insights</h3>
-                <div class="flex items-center gap-4 mb-5">
-                    <!-- Circular Score Radial -->
-                    <div class="relative w-16 h-16 shrink-0">
-                        <svg viewBox="0 0 36 36" class="w-16 h-16 -rotate-90">
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f4f4f5" stroke-width="3"></circle>
-                            <circle id="pagespeed-radial-score" cx="18" cy="18" r="15.9" fill="none" stroke="<?php echo $score_radial_color; ?>" stroke-width="3" stroke-dasharray="<?php echo intval($ps_score); ?> <?php echo 100 - intval($ps_score); ?>" stroke-linecap="round"></circle>
-                        </svg>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span id="pagespeed-radial-val" class="text-base font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_score); ?></span>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-xs font-bold text-zinc-700 dark:text-zinc-350">Performance score</div>
-                        <div id="pagespeed-score-status" class="text-sm font-black <?php echo $score_status_color; ?> mt-0.5"><?php echo esc_html($score_status_text); ?></div>
-                        <div class="text-[10px] text-zinc-400 mt-1 flex items-center gap-1">
-                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-green-500"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                            Faster than <span id="pagespeed-faster-pct"><?php echo max(10, min(99, intval($ps_score) - 16)); ?></span>% of websites
-                        </div>
-                    </div>
                 </div>
-
-                <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Top opportunities</div>
-                <div id="pagespeed-opportunities-list" class="space-y-2">
-                    <?php foreach ($ps_opps as $opp) : 
-                        $opp_severity = $opp['severity'] ?? 'Medium';
-                        $opp_badge_class = 'bg-zinc-100 text-zinc-650 border border-zinc-200';
-                        if ($opp_severity === 'High') {
-                            $opp_badge_class = 'bg-red-50 text-red-700 border border-red-200/50';
-                        } elseif ($opp_severity === 'Medium') {
-                            $opp_badge_class = 'bg-amber-50 text-amber-700 border border-amber-200/50';
-                        }
-                        $opp_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
-                        if (stripos($opp['label'], 'javascript') !== false || stripos($opp['label'], 'js') !== false) {
-                            $opp_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
-                        } elseif (stripos($opp['label'], 'image') !== false) {
-                            $opp_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
-                        } elseif (stripos($opp['label'], 'inp') !== false || stripos($opp['label'], 'paint') !== false || stripos($opp['label'], 'blocking') !== false) {
-                            $opp_icon = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
-                        }
-                    ?>
-                    <div class="flex items-center justify-between p-2.5 bg-zinc-50 dark:bg-zinc-900/30 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors group" onclick="window.coraShowToast('Opening optimization guide...')">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <?php echo $opp_icon; ?>
-                            <div class="min-w-0">
-                                <div class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 truncate"><?php echo esc_html($opp['label']); ?></div>
-                                <div class="text-[9px] text-zinc-400 mt-0.5"><?php echo esc_html($opp['savings']); ?></div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 shrink-0 ml-2">
-                            <span class="px-2 py-0.5 text-[8px] font-bold rounded-full <?php echo $opp_badge_class; ?>"><?php echo esc_html($opp_severity); ?></span>
-                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-350 group-hover:text-zinc-700 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-                <button onclick="window.coraShowToast('Loading full performance report...')" class="mt-3 text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-none bg-transparent p-0 transition-colors">View full performance report</button>
-            </div>
-
-            <!-- Website Statistics Card -->
-            <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm" id="website-statistics-card">
-                <h3 class="text-sm font-black text-zinc-900 dark:text-white mb-4">Website statistics</h3>
-                <div class="space-y-0 divide-y divide-zinc-100 dark:divide-zinc-800">
-                    <?php
-                    $stats_rows = [
-                        ['label' => 'Pages', 'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>', 'value' => count($live_stats), 'delta' => '+5', 'positive' => true],
-                        ['label' => 'Published', 'icon' => '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>', 'value' => $pub_count, 'delta' => 'No change', 'neutral' => true],
-                        ['label' => 'Drafts', 'icon' => '<path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>', 'value' => $dr_count, 'delta' => '-3', 'positive' => false],
-                        ['label' => 'Active Listings', 'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>', 'value' => $cora_listings_count, 'delta' => '+1', 'positive' => true],
-                        ['label' => 'Client Leads', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>', 'value' => $cora_leads_count, 'delta' => '+7', 'positive' => true],
-                        ['label' => 'Total Bookings', 'icon' => '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>', 'value' => $cora_bookings_count, 'delta' => '+2', 'positive' => true],
-                    ];
-                    foreach ($stats_rows as $row) :
-                    ?>
-                    <div class="flex items-center justify-between py-2.5">
-                        <div class="flex items-center gap-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><?php echo $row['icon']; ?></svg>
-                            <?php echo esc_html($row['label']); ?>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs font-black text-zinc-900 dark:text-white"><?php echo $row['value']; ?></span>
-                            <?php if (!empty($row['neutral'])) : ?>
-                                <span class="text-[10px] text-zinc-400 font-semibold"><?php echo esc_html($row['delta']); ?></span>
-                            <?php elseif ($row['positive']) : ?>
-                                <span class="text-[10px] text-green-600 font-bold"><?php echo esc_html($row['delta']); ?></span>
-                            <?php else : ?>
-                                <span class="text-[10px] text-red-500 font-bold"><?php echo esc_html($row['delta']); ?></span>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-                <button onclick="window.coraShowToast('Loading all website content...')" class="mt-3 w-full flex items-center justify-between text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-t border-zinc-100 dark:border-zinc-800 pt-3 bg-transparent border-l-0 border-r-0 border-b-0 p-0 transition-colors">
-                    View all content
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
             </div>
         </div>
+
+            <!-- Performance + Statistics cards in a row -->
+            <div class="flex flex-row gap-5 items-stretch mt-6">
+                <!-- Performance Insights Card -->
+                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between" id="performance-insights-card">
+                    <div>
+                        <h3 class="text-sm font-black text-zinc-900 dark:text-white mb-4">Performance insights</h3>
+                        <div class="flex items-center gap-4 mb-4">
+                            <!-- Circular Score Radial -->
+                            <div class="relative w-16 h-16 shrink-0">
+                                <svg viewBox="0 0 36 36" class="w-16 h-16 -rotate-90">
+                                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f4f4f5" stroke-width="3"></circle>
+                                    <circle id="pagespeed-radial-score" cx="18" cy="18" r="15.9" fill="none" stroke="<?php echo $score_radial_color; ?>" stroke-width="3" stroke-dasharray="<?php echo intval($ps_score); ?> <?php echo 100 - intval($ps_score); ?>" stroke-linecap="round"></circle>
+                                </svg>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span id="pagespeed-radial-val" class="text-base font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_score); ?></span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-zinc-700 dark:text-zinc-350">Performance score</div>
+                                <div id="pagespeed-score-status" class="text-sm font-black <?php echo $score_status_color; ?> mt-0.5"><?php echo esc_html($score_status_text); ?></div>
+                                <div class="text-[10px] text-zinc-400 mt-1 flex items-center gap-1">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-green-500"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                    Faster than <span id="pagespeed-faster-pct"><?php echo max(10, min(99, intval($ps_score) - 16)); ?></span>% of websites
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Core Web Vitals Metrics Grid -->
+                        <div class="grid grid-cols-3 gap-2 py-2 px-3 bg-zinc-50/50 dark:bg-zinc-900/10 rounded-lg border border-zinc-100 dark:border-zinc-800/80 mb-5">
+                            <div class="text-center">
+                                <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">LCP</div>
+                                <div class="text-xs font-black text-zinc-800 dark:text-zinc-200 mt-0.5"><?php echo esc_html($ps_lcp); ?></div>
+                            </div>
+                            <div class="text-center border-l border-zinc-100 dark:border-zinc-800">
+                                <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">INP</div>
+                                <div class="text-xs font-black text-zinc-800 dark:text-zinc-200 mt-0.5"><?php echo esc_html($ps_inp); ?></div>
+                            </div>
+                            <div class="text-center border-l border-zinc-100 dark:border-zinc-800">
+                                <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">CLS</div>
+                                <div class="text-xs font-black text-zinc-800 dark:text-zinc-200 mt-0.5"><?php echo esc_html($ps_cls); ?></div>
+                            </div>
+                        </div>
+
+                        <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Top opportunities</div>
+                        <div id="pagespeed-opportunities-list" class="space-y-2">
+                            <?php foreach ($ps_opps as $opp) : 
+                                $opp_severity = $opp['severity'] ?? 'Medium';
+                                $opp_badge_class = 'bg-zinc-150/60 text-zinc-650 border border-zinc-250/20';
+                                if ($opp_severity === 'High') {
+                                    $opp_badge_class = 'bg-red-50 text-red-700 border border-red-200/50';
+                                } elseif ($opp_severity === 'Medium') {
+                                    $opp_badge_class = 'bg-amber-50 text-amber-700 border border-amber-200/50';
+                                }
+                                $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+                                if (stripos($opp['label'], 'javascript') !== false || stripos($opp['label'], 'js') !== false) {
+                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
+                                } elseif (stripos($opp['label'], 'image') !== false) {
+                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
+                                } elseif (stripos($opp['label'], 'inp') !== false || stripos($opp['label'], 'paint') !== false || stripos($opp['label'], 'blocking') !== false) {
+                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+                                }
+                            ?>
+                            <div class="flex items-center justify-between p-2.5 bg-zinc-50/50 dark:bg-zinc-900/10 hover:bg-zinc-50 border border-zinc-100 dark:border-zinc-800 rounded-lg cursor-pointer transition-all group" onclick="window.coraShowToast('Opening optimization guide...')">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-6 h-6 rounded bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 flex items-center justify-center shrink-0">
+                                        <?php echo $opp_icon; ?>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 truncate"><?php echo esc_html($opp['label']); ?></div>
+                                        <div class="text-[9px] text-zinc-400 mt-0.5"><?php echo esc_html($opp['savings']); ?></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0 ml-2">
+                                    <span class="px-2 py-0.5 text-[8px] font-bold rounded-full <?php echo $opp_badge_class; ?>"><?php echo esc_html($opp_severity); ?></span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-350 group-hover:text-zinc-700 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <button onclick="window.coraShowToast('Loading full performance report...')" class="mt-4 text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-none bg-transparent p-0 transition-colors w-max font-sans">View full performance report</button>
+                </div>
+
+                <!-- Website Statistics Card -->
+                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between" id="website-statistics-card">
+                    <div>
+                        <h3 class="text-sm font-black text-zinc-900 dark:text-white mb-4 font-sans">Website statistics</h3>
+                        <div class="space-y-1 divide-y divide-zinc-100/60 dark:divide-zinc-850">
+                            <?php
+                            $stats_rows = [
+                                ['label' => 'Pages', 'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>', 'value' => count($live_stats), 'delta' => '+5', 'positive' => true],
+                                ['label' => 'Published', 'icon' => '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>', 'value' => $pub_count, 'delta' => 'No change', 'neutral' => true],
+                                ['label' => 'Drafts', 'icon' => '<path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>', 'value' => $dr_count, 'delta' => '-3', 'positive' => false],
+                                ['label' => 'Active Listings', 'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>', 'value' => $cora_listings_count, 'delta' => '+1', 'positive' => true],
+                                ['label' => 'Client Leads', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>', 'value' => $cora_leads_count, 'delta' => '+7', 'positive' => true],
+                                ['label' => 'Total Bookings', 'icon' => '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>', 'value' => $cora_bookings_count, 'delta' => '+2', 'positive' => true],
+                            ];
+                            foreach ($stats_rows as $row) :
+                            ?>
+                            <div class="flex items-center justify-between py-2 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 px-2 -mx-2 rounded-lg transition-colors group">
+                                <div class="flex items-center gap-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 font-sans">
+                                    <div class="w-6 h-6 rounded bg-zinc-100/60 dark:bg-zinc-800/40 flex items-center justify-center text-zinc-450 dark:text-zinc-500 transition-colors group-hover:bg-zinc-200/50 dark:group-hover:bg-zinc-700/50 shrink-0">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><?php echo $row['icon']; ?></svg>
+                                    </div>
+                                    <?php echo esc_html($row['label']); ?>
+                                </div>
+                                <div class="flex items-center gap-3 font-sans">
+                                    <span class="text-xs font-black text-zinc-900 dark:text-white"><?php echo $row['value']; ?></span>
+                                    <?php if (!empty($row['neutral'])) : ?>
+                                        <span class="text-[10px] text-zinc-400 font-semibold"><?php echo esc_html($row['delta']); ?></span>
+                                    <?php elseif ($row['positive']) : ?>
+                                        <span class="text-[10px] text-green-600 font-bold"><?php echo esc_html($row['delta']); ?></span>
+                                    <?php else : ?>
+                                        <span class="text-[10px] text-red-500 font-bold"><?php echo esc_html($row['delta']); ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <button onclick="window.coraShowToast('Loading all website content...')" class="mt-4 w-full flex items-center justify-between text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-t border-zinc-100 dark:border-zinc-800 pt-3 bg-transparent border-l-0 border-r-0 border-b-0 p-0 transition-colors font-sans">
+                        View all content
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+            </div><!-- end flex row -->
 
         <!-- Recommended For You Banner -->
         <?php 
@@ -876,6 +875,7 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
             <button onclick="window.coraShowToast('Opening optimization guide...', 'success')" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all border-none shadow-xs shrink-0">
                 Optimize now
+            </button>
         </div>
         <?php endif; ?>
 
@@ -1286,7 +1286,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
         <!-- TAB CONTENT: LOVABLE AI STUDIO -->
         <div id="tab-content-ai" class="space-y-6 hidden">
-            <?php include plugin_dir_path( CORA_PLUGIN_FILE ) . 'views/partials/lovable-studio-drawer.php'; ?>
+            <?php include CORA_WORKSPACE_PATH . 'views/partials/lovable-studio-drawer.php'; ?>
         </div>
 
         <!-- TAB CONTENT: MENUS -->
@@ -2506,7 +2506,7 @@ function cora_get_sparkline_points( $history, $type ) {
             <div class="space-y-4">
                 <!-- Dawn Theme -->
                 <div class="border border-zinc-200 rounded-xl p-4 flex gap-4 bg-white hover:border-zinc-300 transition-colors">
-                    <img src="<?php echo esc_url( plugins_url('assets/images/cora-cro-l2-preview.jpg', CORA_PLUGIN_FILE) ); ?>" class="w-24 h-16 rounded-lg object-cover border border-zinc-200 shrink-0 select-none">
+                    <img src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-cro-l2-preview.jpg' ); ?>" class="w-24 h-16 rounded-lg object-cover border border-zinc-200 shrink-0 select-none" loading="lazy">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
                             <h4 class="text-xs font-bold text-zinc-900">Dawn</h4>
@@ -2519,7 +2519,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 
                 <!-- Refresh Theme -->
                 <div class="border border-zinc-200 rounded-xl p-4 flex gap-4 bg-white hover:border-zinc-300 transition-colors">
-                    <img src="<?php echo esc_url( plugins_url('assets/images/cosmetics-pink-preview.jpg', CORA_PLUGIN_FILE) ); ?>" class="w-24 h-16 rounded-lg object-cover border border-zinc-200 shrink-0 select-none">
+                    <img src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cosmetics-pink-preview.jpg' ); ?>" class="w-24 h-16 rounded-lg object-cover border border-zinc-200 shrink-0 select-none" loading="lazy">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
                             <h4 class="text-xs font-bold text-zinc-900">Refresh</h4>
@@ -2532,7 +2532,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
                 <!-- Horizon Theme -->
                 <div class="border border-zinc-200 rounded-xl p-4 flex gap-4 bg-white hover:border-zinc-300 transition-colors">
-                    <img src="<?php echo esc_url( plugins_url('assets/images/horizon-preview.jpg', CORA_PLUGIN_FILE) ); ?>" class="w-24 h-16 rounded-lg object-cover border border-zinc-200 shrink-0 select-none">
+                    <img src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/horizon-preview.jpg' ); ?>" class="w-24 h-16 rounded-lg object-cover border border-zinc-200 shrink-0 select-none" loading="lazy">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
                             <h4 class="text-xs font-bold text-zinc-900">Horizon</h4>
@@ -3268,7 +3268,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <button onclick="wizardSelectBuilder('elementor')" id="wizard-card-elementor" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);">
                     <div style="position:relative;overflow:hidden;background:#f0f0ef;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;">
-                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-elementor-thumb.jpg' ); ?>" alt="Elementor editor" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-elementor-thumb.jpg' ); ?>" alt="Elementor editor" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
                             <div id="atw-ov-e" style="display:none;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
                                 <div style="width:48px;height:48px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -3301,7 +3301,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <button onclick="wizardSelectBuilder('lovable')" id="wizard-card-lovable" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);">
                     <div style="position:relative;overflow:hidden;background:#f5f3ff;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;">
-                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-lovable-thumb.jpg' ); ?>" alt="Lovable Studio" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-lovable-thumb.jpg' ); ?>" alt="Lovable Studio" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
                             <div id="atw-ov-l" style="display:none;position:absolute;inset:0;background:rgba(109,40,217,.42);align-items:center;justify-content:center;">
                                 <div style="width:48px;height:48px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(109,40,217,.28);">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -3612,7 +3612,7 @@ function cora_get_sparkline_points( $history, $type ) {
 <!-- Backdrop for Drawer -->
 <div id="theme-version-drawer-backdrop" class="hidden fixed inset-0 z-40 bg-black/15 dark:bg-black/35 backdrop-blur-xs transition-opacity duration-300 ease-in-out" onclick="toggleThemeVersionDrawer(event)"></div>
 
-<script src="<?php echo esc_url( plugins_url('assets/js/lovable-prompts.js', CORA_PLUGIN_FILE) ); ?>"></script>
+<script src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/js/lovable-prompts.js' ); ?>"></script>
 <script>
     // --- Lovable Mappings Configuration ---
     window.CORA_LOVABLE_ROUTES = <?php echo json_encode( cora_git_sync_get_lovable_routes() ); ?>;
@@ -3627,7 +3627,7 @@ function cora_get_sparkline_points( $history, $type ) {
         'compat_flags'=> get_option('cora_git_sync_compat_flags', []),
     ]); ?>;
 </script>
-<script src="<?php echo esc_url( plugins_url('assets/js/lovable-studio.js', CORA_PLUGIN_FILE) ); ?>"></script>
+<script src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/js/lovable-studio.js' ); ?>"></script>
 <script>
     // --- Canvas Global State ---
     const canvasState = {

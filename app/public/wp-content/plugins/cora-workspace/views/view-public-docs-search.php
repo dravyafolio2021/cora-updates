@@ -115,11 +115,28 @@ window.coraPublicLoadPage = function(event, slug, element, pushToHistory = true)
         event.preventDefault();
     }
     
-    const container = resolveContentContainer();
-    if (!container) return;
+    // Resolve sub-containers
+    const pageLayout = document.getElementById('cora-public-page-layout');
+    const apiLayout = document.getElementById('cora-public-api-layout');
+    const changelogLayout = document.getElementById('cora-public-changelog-layout');
+    const aiLayout = document.getElementById('cora-public-ai-layout');
     
-    // Display skeleton loader while loading
-    showSkeletonLoader(container);
+    if (pageLayout) pageLayout.classList.remove('hidden');
+    if (apiLayout) apiLayout.classList.add('hidden');
+    if (changelogLayout) changelogLayout.classList.add('hidden');
+    if (aiLayout) aiLayout.classList.add('hidden');
+    
+    const bodyContainer = document.getElementById('cora-public-markdown-body');
+    const specialGrid = document.getElementById('cora-platform-overview-special');
+    
+    // Display skeleton loader inside the body container while loading
+    if (bodyContainer) {
+        bodyContainer.classList.remove('hidden');
+        showSkeletonLoader(bodyContainer);
+    }
+    if (specialGrid) {
+        specialGrid.classList.add('hidden');
+    }
     
     // Reset active nav link visual selections
     document.querySelectorAll('.cora-nav-link').forEach(link => {
@@ -143,7 +160,66 @@ window.coraPublicLoadPage = function(event, slug, element, pushToHistory = true)
             if (res.success && res.data) {
                 // Update title & content area
                 document.title = `${res.data.title} | Cora Platform Developer Hub`;
-                renderPageContent(container, res.data);
+                
+                // Update dynamic DOM elements inside #cora-public-page-layout
+                const breadcrumbCategory = document.getElementById('cora-public-breadcrumb-category');
+                const breadcrumbTitle = document.getElementById('cora-public-breadcrumb-title');
+                const pageTitle = document.getElementById('cora-public-page-title');
+                const pageUpdated = document.getElementById('cora-public-page-updated');
+                const pageCategory = document.getElementById('cora-public-page-category');
+                const pageReadingTime = document.getElementById('cora-public-page-reading-time');
+                
+                // Resolve category name from sidebar grouping if element is provided, fallback to DB
+                let categoryName = res.data.category;
+                if (element) {
+                    const group = element.closest('.cora-sidebar-group');
+                    if (group) {
+                        const headerSpan = group.querySelector('button span');
+                        if (headerSpan) categoryName = headerSpan.textContent.trim();
+                    }
+                }
+                const catText = categoryName.replace('-', ' ');
+                
+                if (breadcrumbCategory) breadcrumbCategory.textContent = catText;
+                if (breadcrumbTitle) breadcrumbTitle.textContent = res.data.title.replace('👋 ', '');
+                
+                let displayTitle = res.data.title;
+                if (slug === 'platform-overview' && !displayTitle.includes('👋')) {
+                    displayTitle = '👋 ' + displayTitle;
+                }
+                if (pageTitle) pageTitle.textContent = displayTitle;
+                
+                let updatedStr = 'Updated ';
+                if (res.data.updated_at === 'yesterday' || !res.data.updated_at) {
+                    updatedStr += 'yesterday';
+                } else {
+                    updatedStr += res.data.updated_at;
+                }
+                if (pageUpdated) pageUpdated.textContent = updatedStr;
+                if (pageCategory) pageCategory.textContent = catText;
+                
+                if (bodyContainer) {
+                    bodyContainer.innerHTML = res.data.html;
+                }
+                
+                // Recalculate reading time
+                const words = bodyContainer ? bodyContainer.textContent.trim().split(/\s+/).length : 350;
+                const readingTime = Math.max(1, Math.ceil(words / 200)) + ' min read';
+                if (pageReadingTime) pageReadingTime.textContent = readingTime;
+                
+                // Show/hide platform overview special grid
+                if (slug === 'platform-overview') {
+                    if (specialGrid) specialGrid.classList.remove('hidden');
+                    if (bodyContainer) bodyContainer.classList.add('hidden');
+                } else {
+                    if (specialGrid) specialGrid.classList.add('hidden');
+                    if (bodyContainer) bodyContainer.classList.remove('hidden');
+                }
+                
+                // Refresh table of contents scrollspy
+                if (typeof window.coraDocsRefreshTOC === 'function') {
+                    window.coraDocsRefreshTOC();
+                }
                 
                 // Final check to bind newly loaded dynamic elements if needed
                 if (!activeLink) {
@@ -154,23 +230,27 @@ window.coraPublicLoadPage = function(event, slug, element, pushToHistory = true)
                     }
                 }
             } else {
-                container.innerHTML = `
-                    <div class="p-8 border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-center max-w-xl mx-auto my-12">
-                        <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-50">Error Loading Page</h2>
-                        <p class="text-xs text-zinc-500 mt-2">${res.data && res.data.message ? res.data.message : 'The requested page could not be found or loaded.'}</p>
-                        <a href="#" onclick="coraPublicLoadPage(event, 'platform-overview')" class="inline-block mt-4 text-xs font-semibold text-zinc-955 dark:text-white underline">Back to Overview</a>
-                    </div>
-                `;
+                if (bodyContainer) {
+                    bodyContainer.innerHTML = `
+                        <div class="p-8 border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-center max-w-xl mx-auto my-12">
+                            <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-550">Error Loading Page</h2>
+                            <p class="text-xs text-zinc-505 mt-2">${res.data && res.data.message ? res.data.message : 'The requested page could not be found or loaded.'}</p>
+                            <a href="#" onclick="coraPublicLoadPage(event, 'platform-overview')" class="inline-block mt-4 text-xs font-semibold text-zinc-955 dark:text-white underline">Back to Overview</a>
+                        </div>
+                    `;
+                }
             }
         })
         .catch(err => {
             console.error('AJAX router fetch error:', err);
-            container.innerHTML = `
-                <div class="p-8 border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-955 text-center max-w-xl mx-auto my-12">
-                    <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-50">Connection Refused</h2>
-                    <p class="text-xs text-zinc-500 mt-2">Failed to connect to the database router. Check your local environment server status.</p>
-                </div>
-            `;
+            if (bodyContainer) {
+                bodyContainer.innerHTML = `
+                    <div class="p-8 border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-955 text-center max-w-xl mx-auto my-12">
+                        <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-55">Connection Refused</h2>
+                        <p class="text-xs text-zinc-505 mt-2">Failed to connect to the database router. Check your local environment server status.</p>
+                    </div>
+                `;
+            }
         });
         
     // Update browser navigation state
@@ -183,8 +263,11 @@ window.coraPublicLoadPage = function(event, slug, element, pushToHistory = true)
  * Renders static reference modules (API Reference, Changelog, AI Copilot) inside the content panel.
  */
 window.coraPublicShowSection = function(section, pushToHistory = true) {
-    const container = resolveContentContainer();
-    if (!container) return;
+    // Resolve sub-containers
+    const pageLayout = document.getElementById('cora-public-page-layout');
+    const apiLayout = document.getElementById('cora-public-api-layout');
+    const changelogLayout = document.getElementById('cora-public-changelog-layout');
+    const aiLayout = document.getElementById('cora-public-ai-layout');
     
     // Clear sidebar navigation highlight highlights
     document.querySelectorAll('.cora-nav-link').forEach(link => {
@@ -199,16 +282,45 @@ window.coraPublicShowSection = function(section, pushToHistory = true) {
         activateLink(activeLink);
     }
     
-    // Render target view content area
+    // Render/show target sub-container
     if (section === 'api') {
         document.title = `API Reference Registry | Cora Developer Hub`;
-        renderApiRegistry(container);
+        if (pageLayout) pageLayout.classList.add('hidden');
+        if (apiLayout) {
+            apiLayout.classList.remove('hidden');
+            if (apiLayout.innerHTML === '') {
+                renderApiRegistry(apiLayout);
+            }
+        }
+        if (changelogLayout) changelogLayout.classList.add('hidden');
+        if (aiLayout) aiLayout.classList.add('hidden');
     } else if (section === 'changelog') {
         document.title = `Changelog & Updates | Cora Developer Hub`;
-        renderChangelogFeed(container);
+        if (pageLayout) pageLayout.classList.add('hidden');
+        if (apiLayout) apiLayout.classList.add('hidden');
+        if (changelogLayout) {
+            changelogLayout.classList.remove('hidden');
+            if (changelogLayout.innerHTML === '') {
+                renderChangelogFeed(changelogLayout);
+            }
+        }
+        if (aiLayout) aiLayout.classList.add('hidden');
     } else if (section === 'cora-ai') {
         document.title = `Ask Cora AI Copilot | Cora Developer Hub`;
-        renderCoraAiChat(container);
+        if (pageLayout) pageLayout.classList.add('hidden');
+        if (apiLayout) apiLayout.classList.add('hidden');
+        if (changelogLayout) changelogLayout.classList.add('hidden');
+        if (aiLayout) {
+            aiLayout.classList.remove('hidden');
+            if (aiLayout.innerHTML === '') {
+                renderCoraAiChat(aiLayout);
+            }
+        }
+    }
+    
+    // Refresh table of contents scrollspy
+    if (typeof window.coraDocsRefreshTOC === 'function') {
+        window.coraDocsRefreshTOC();
     }
     
     // Sync browser URL history
