@@ -105,46 +105,55 @@ $ls_partial = get_option( 'cora_git_sync_last_status', '' );
         <!-- ── STEP 3: GitHub Setup ── -->
         <div id="ls-step-3" class="ls-step-content" style="display:none;">
             <h3 style="font-size:15px;font-weight:700;color:#09090b;margin:0 0 4px;">Connect to GitHub</h3>
-            <p style="font-size:12px;color:#71717a;margin:0 0 14px;">After building in Lovable, push to GitHub and enter your repo details.</p>
+            <p style="font-size:12px;color:#71717a;margin:0 0 14px;">Connect your Lovable repository workspace to import and sync code updates.</p>
 
-            <div style="background:#f9f9f9;border:1px solid #e4e4e7;border-radius:10px;padding:14px;margin-bottom:14px;">
-                <div style="font-size:10px;font-weight:700;color:#3f3f46;margin-bottom:9px;text-transform:uppercase;letter-spacing:.06em;">Steps</div>
-                <div style="display:flex;flex-direction:column;gap:9px;">
-                    <div style="display:flex;gap:10px;align-items:flex-start;">
-                        <div style="width:20px;height:20px;background:#18181b;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">1</div>
-                        <div><div style="font-size:12px;font-weight:600;color:#09090b;">Build in Lovable</div><div style="font-size:11px;color:#71717a;margin-top:2px;">Paste your prompt into <a href="https://lovable.dev" target="_blank" style="color:#09090b;font-weight:600;">lovable.dev</a></div></div>
+            <div style="display:flex;flex-direction:column;gap:14px;background:white;border:1.5px solid #e4e4e7;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.02);margin-bottom:14px;">
+                <!-- Repo URL field -->
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                    <div style="display:flex;align-items:center;justify-content:between;width:100%;">
+                        <label style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">GitHub Repository URL *</label>
+                        <a href="https://github.com?tab=repositories" target="_blank" style="margin-left:auto;font-size:9.5px;font-weight:700;color:#7c3aed;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                            Find Repository
+                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                        </a>
                     </div>
-                    <div style="display:flex;gap:10px;align-items:flex-start;">
-                        <div style="width:20px;height:20px;background:#18181b;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">2</div>
-                        <div><div style="font-size:12px;font-weight:600;color:#09090b;">Push to GitHub</div><div style="font-size:11px;color:#71717a;margin-top:2px;">Lovable: Settings &rarr; Integrations &rarr; GitHub &rarr; Connect &amp; Push</div></div>
+                    <input id="ls-repo-url" type="text" placeholder="https://github.com/username/repo" value="<?php echo esc_attr( get_option( 'cora_git_sync_repo', '' ) ); ?>" style="width:100%;padding:8px 12px;border:1px solid #e4e4e7;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;font-family:inherit;" onfocus="this.style.borderColor='#09090b'" onblur="this.style.borderColor='#e4e4e7'">
+                </div>
+
+                <!-- PAT and Branch Row -->
+                <div style="display:grid;grid-template-cols:1fr 100px;gap:10px;">
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <label style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Access Token (PAT) *</label>
+                        <input id="ls-repo-token" type="password" placeholder="ghp_xxxxxxxxxxxx" value="<?php echo esc_attr( get_option( 'cora_git_sync_token', '' ) ); ?>" style="width:100%;padding:8px 12px;border:1px solid #e4e4e7;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;font-family:inherit;" onfocus="this.style.borderColor='#09090b'" onblur="this.style.borderColor='#e4e4e7'">
                     </div>
-                    <div style="display:flex;gap:10px;align-items:flex-start;">
-                        <div style="width:20px;height:20px;background:#18181b;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">3</div>
-                        <div><div style="font-size:12px;font-weight:600;color:#09090b;">Generate GitHub Token</div><div style="font-size:11px;color:#71717a;margin-top:2px;"><a href="https://github.com/settings/tokens/new?description=Cora+Sync&scopes=repo" target="_blank" style="color:#09090b;font-weight:600;text-decoration:underline;">Click here</a> &mdash; select <code style="background:#f4f4f5;padding:1px 5px;border-radius:3px;font-size:10px;">repo</code> scope</div></div>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <label style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Branch</label>
+                        <input id="ls-repo-branch" type="text" placeholder="main" value="<?php echo esc_attr( get_option( 'cora_git_sync_branch', 'main' ) ); ?>" style="width:100%;padding:8px 12px;border:1px solid #e4e4e7;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;font-family:inherit;" onfocus="this.style.borderColor='#09090b'" onblur="this.style.borderColor='#e4e4e7'">
                     </div>
                 </div>
-            </div>
 
-            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-                <div>
-                    <label style="font-size:11px;font-weight:600;color:#3f3f46;display:block;margin-bottom:3px;">GitHub Repository URL</label>
-                    <input id="ls-repo-url" type="text" placeholder="https://github.com/username/repo" value="<?php echo esc_attr( get_option( 'cora_git_sync_repo', '' ) ); ?>" style="width:100%;padding:8px 12px;border:1px solid #e4e4e7;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#09090b'" onblur="this.style.borderColor='#e4e4e7'">
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                    <div>
-                        <label style="font-size:11px;font-weight:600;color:#3f3f46;display:block;margin-bottom:3px;">Branch</label>
-                        <input id="ls-repo-branch" type="text" placeholder="main" value="<?php echo esc_attr( get_option( 'cora_git_sync_branch', 'main' ) ); ?>" style="width:100%;padding:8px 12px;border:1px solid #e4e4e7;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#09090b'" onblur="this.style.borderColor='#e4e4e7'">
+                <!-- PAT Helper Panel (Direct Token Generation CTAs) -->
+                <div style="background:#fafafa;border:1px solid #f4f4f5;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;">
+                    <div style="display:flex;align-items:start;gap:6px;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.5" style="margin-top:1px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <span style="font-size:9.5px;color:#71717a;line-height:1.4;">GitHub requires a Personal Access Token to authenticate safely. Generating a token takes less than 30 seconds:</span>
                     </div>
-                    <div>
-                        <label style="font-size:11px;font-weight:600;color:#3f3f46;display:block;margin-bottom:3px;">Access Token</label>
-                        <input id="ls-repo-token" type="password" placeholder="ghp_xxxxxxxxxxxx" value="<?php echo esc_attr( get_option( 'cora_git_sync_token', '' ) ); ?>" style="width:100%;padding:8px 12px;border:1px solid #e4e4e7;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#09090b'" onblur="this.style.borderColor='#e4e4e7'">
+                    <div style="display:flex;gap:8px;">
+                        <a href="https://github.com/settings/tokens/new?description=Cora-Lovable-Sync&scopes=repo" target="_blank" style="flex:1;text-align:center;padding:5px 8px;background:white;border:1px solid #e4e4e7;border-radius:6px;font-size:9px;font-weight:700;color:#18181b;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:3px;box-shadow:0 1px 2px rgba(0,0,0,0.02);" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
+                            New Classic Token
+                            <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                        </a>
+                        <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" style="flex:1;text-align:center;padding:5px 8px;background:white;border:1px solid #e4e4e7;border-radius:6px;font-size:9px;font-weight:700;color:#18181b;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:3px;box-shadow:0 1px 2px rgba(0,0,0,0.02);" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
+                            New Fine-grained Token
+                            <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                        </a>
                     </div>
                 </div>
             </div>
 
             <div style="display:flex;gap:10px;justify-content:space-between;">
-                <button onclick="lsGoToStep(2)" style="padding:8px 16px;background:#fff;border:1px solid #e4e4e7;color:#3f3f46;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">&#8592; Back</button>
-                <button onclick="lsGoToStep(4)" style="padding:9px 20px;background:#18181b;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Next: Sync &#8594;</button>
+                <button onclick="lsGoToStep(2)" style="padding:8px 16px;background:#fff;border:1px solid #e4e4e7;color:#3f3f46;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">&#8592; Back</button>
+                <button onclick="lsGoToStep(4)" style="padding:9px 20px;background:#18181b;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Next: Sync &#8594;</button>
             </div>
         </div>
 

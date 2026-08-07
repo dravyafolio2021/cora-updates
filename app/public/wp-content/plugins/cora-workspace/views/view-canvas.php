@@ -3359,140 +3359,140 @@ function cora_get_sparkline_points( $history, $type ) {
                         <div style="flex:1;min-width:0;">
                             <p id="wiz-kit-filename" style="font-size:11.5px;font-weight:700;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px;"></p>
                             <p style="font-size:9.5px;color:#a1a1aa;font-weight:500;">.zip archive · Elementor Kit</p>
-                        </div>
-                        <!-- Success check + remove -->
-                        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-                            <span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            </span>
-                            <button onclick="wizardClearFile()" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#a1a1aa;display:flex;align-items:center;" onmouseover="this.style.background='#f4f4f5';this.style.color='#18181b';" onmouseout="this.style.background='none';this.style.color='#a1a1aa';">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                            </button>
-                        </div>
+                            <!-- STEP 2B: Lovable Setup -->
+        <div id="wizard-step-2b" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;">
+            <div style="width:100%;max-width:580px;">
+                <div style="text-align:center;margin-bottom:28px;">
+                    <div style="width:52px;height:52px;background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #ddd6fe;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 2px 8px rgba(124,58,237,0.06);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                     </div>
-
-                    <!-- Scanned Pages Panel -->
-                    <div id="wiz-kit-scanned-container" style="display:none;margin-top:10px;border:1.5px solid #e4e4e7;border-radius:16px;background:white;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);">
-                        <!-- Panel Header -->
-                        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #f4f4f5;background:#fafafa;">
-                            <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;display:flex;align-items:center;gap:5px;">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                Pages found in kit
-                            </span>
-                            <span id="wiz-kit-scanned-count" style="font-size:9px;font-weight:800;background:#18181b;color:white;padding:2px 8px;border-radius:20px;letter-spacing:.04em;">0 pages</span>
-                        </div>
-                        <!-- Page Tags -->
-                        <div id="wiz-kit-scanned-list" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px;max-height:140px;overflow-y:auto;">
-                            <!-- page tags injected by JS -->
-                        </div>
+                    <div style="display:inline-flex;align-items:center;padding:4px 12px;background:#f5f3ff;border:1px solid #ede9fe;border-radius:100px;margin-bottom:12px;">
+                        <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;">Lovable Studio</span>
                     </div>
-                </div>
-
-                <!-- GitHub Area -->
-                <div id="wiz-github-area" style="display:none;flex-direction:column;gap:14px;">
-                    <div style="display:flex;flex-direction:column;gap:6px;">
-                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Repository URL *</label>
-                        <input type="text" id="wiz-github-repo" class="atw-input" placeholder="https://github.com/your-org/your-theme">
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:6px;">
-                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Branch</label>
-                        <input type="text" id="wiz-github-branch" class="atw-input" placeholder="main">
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-
-        <!-- STEP 2B: Lovable Setup -->
-        <div id="wizard-step-2b" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:52px 32px;">
-            <div style="width:100%;max-width:560px;">
-                <div style="text-align:center;margin-bottom:24px;">
-                    <div style="width:56px;height:56px;background:linear-gradient(135deg,#ede9fe,#f5f3ff);border:1.5px solid #ddd6fe;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    </div>
-                    <div style="display:inline-flex;align-items:center;padding:4px 12px;background:#f5f3ff;border:1px solid #ede9fe;border-radius:100px;margin-bottom:14px;">
-                        <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;">Lovable Studio</span>
-                    </div>
-                    <h2 style="font-size:26px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.1;margin-bottom:10px;">Setup Lovable Project</h2>
-                    <p style="font-size:13px;color:#71717a;line-height:1.6;max-width:380px;margin:0 auto;">Connect an existing project repository or let Cora guide you to build one from scratch.</p>
+                    <h2 style="font-size:24px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.1;margin-bottom:8px;">Setup Lovable Project</h2>
+                    <p style="font-size:12.5px;color:#71717a;line-height:1.6;max-width:420px;margin:0 auto;">Synchronize design changes from Lovable.dev directly to your Cora theme.</p>
                 </div>
 
                 <!-- Tab bar switcher -->
-                <div style="display:flex;background:#f4f4f5;border-radius:12px;padding:4px;gap:4px;margin-bottom:24px;">
-                    <button type="button" onclick="wizardSetLovableMode('connect')" id="wiz-lovable-tab-connect" class="atw-tab atw-tab-on" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;font-family:inherit;font-weight:700;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><rect x="18" y="8" width="5" height="5" rx="1"/></svg>
+                <div style="display:grid;grid-template-columns:1fr 1fr;background:#f4f4f5;border-radius:14px;padding:4px;gap:3px;margin-bottom:20px;">
+                    <button type="button" onclick="wizardSetLovableMode('connect')" id="wiz-lovable-tab-connect" class="atw-tab atw-tab-on" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:11px;font-size:11.5px;font-weight:700;transition:all .18s;font-family:inherit;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><rect x="18" y="8" width="5" height="5" rx="1"/></svg>
                         Connect Existing Project
                     </button>
-                    <button type="button" onclick="wizardSetLovableMode('scratch')" id="wiz-lovable-tab-scratch" class="atw-tab atw-tab-off" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;font-family:inherit;font-weight:700;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    <button type="button" onclick="wizardSetLovableMode('scratch')" id="wiz-lovable-tab-scratch" class="atw-tab atw-tab-off" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:11px;font-size:11.5px;font-weight:700;transition:all .18s;font-family:inherit;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                         Create from Scratch
                     </button>
                 </div>
 
                 <!-- SUB-CONTAINER 1: Connect Existing Project -->
-                <div id="wiz-lovable-connect-area" style="display:flex;flex-direction:column;gap:18px;background:white;border:1.5px solid #e4e4e7;border-radius:16px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.05);">
-                    <div style="display:flex;flex-direction:column;gap:6px;">
-                        <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;">GitHub Repository URL *</label>
-                        <input type="text" id="wiz-github-repo-lov" class="atw-input" placeholder="https://github.com/username/my-lovable-theme" value="<?php echo esc_attr( get_option( 'cora_git_sync_repo', '' ) ); ?>">
-                    </div>
-                    <div style="display:flex;gap:12px;width:100%;box-sizing:border-box;">
-                        <div style="flex:2;display:flex;flex-direction:column;gap:6px;">
-                            <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;">Personal Access Token (PAT) *</label>
-                            <input type="password" id="wiz-github-token-lov" class="atw-input" placeholder="ghp_xxxxxxxxxxxx" value="<?php echo esc_attr( get_option( 'cora_git_sync_token', '' ) ); ?>">
+                <div id="wiz-lovable-connect-area" style="display:flex;flex-direction:column;gap:16px;background:white;border:1.5px solid #e4e4e7;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+                    <!-- Repo URL field -->
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <div style="display:flex;align-items:center;justify-content:between;width:100%;">
+                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">GitHub Repository URL *</label>
+                            <a href="https://github.com?tab=repositories" target="_blank" style="margin-left:auto;font-size:10px;font-weight:700;color:#7c3aed;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                Find Repository
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                            </a>
                         </div>
-                        <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
-                            <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;">Branch</label>
-                            <input type="text" id="wiz-github-branch-lov" class="atw-input" placeholder="main" value="<?php echo esc_attr( get_option( 'cora_git_sync_branch', 'main' ) ); ?>">
+                        <input type="text" id="wiz-github-repo-lov" class="atw-input" placeholder="https://github.com/username/my-lovable-theme" value="<?php echo esc_attr( get_option( 'cora_git_sync_repo', '' ) ); ?>" style="font-size:12.5px;">
+                        <p style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">The repository linked to your Lovable project workspace.</p>
+                    </div>
+
+                    <!-- PAT and Branch Row -->
+                    <div style="display:grid;grid-template-cols:1fr 120px;gap:12px;">
+                        <!-- Personal Access Token -->
+                        <div style="display:flex;flex-direction:column;gap:5px;">
+                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Personal Access Token (PAT) *</label>
+                            <input type="password" id="wiz-github-token-lov" class="atw-input" placeholder="ghp_xxxxxxxxxxxx" value="<?php echo esc_attr( get_option( 'cora_git_sync_token', '' ) ); ?>" style="font-size:12.5px;">
+                        </div>
+                        <!-- Branch -->
+                        <div style="display:flex;flex-direction:column;gap:5px;">
+                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Branch</label>
+                            <input type="text" id="wiz-github-branch-lov" class="atw-input" placeholder="main" value="<?php echo esc_attr( get_option( 'cora_git_sync_branch', 'main' ) ); ?>" style="font-size:12.5px;">
                         </div>
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:6px;">
-                        <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;">Lovable Project URL *</label>
-                        <input type="text" id="wiz-lovable-url" class="atw-input" placeholder="https://lovable.dev/projects/your-project-id" value="">
+
+                    <!-- PAT Helper Panel (Direct Token Generation CTAs) -->
+                    <div style="background:#fafafa;border:1px solid #f4f4f5;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
+                        <div style="display:flex;align-items:start;gap:6px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.5" style="margin-top:1.5px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            <span style="font-size:10px;color:#71717a;line-height:1.45;">Cora requires this token to pull files from your repository. Classic token is easiest for single repos:</span>
+                        </div>
+                        <div style="display:flex;gap:10px;">
+                            <a href="https://github.com/settings/tokens/new?description=Cora-Theme-Sync&scopes=repo" target="_blank" style="flex:1;text-align:center;padding:6px 10px;background:white;border:1px solid #e4e4e7;border-radius:7px;font-size:9.5px;font-weight:700;color:#18181b;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,0.02);" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
+                                Generate Classic Token (Classic)
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                            </a>
+                            <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" style="flex:1;text-align:center;padding:6px 10px;background:white;border:1px solid #e4e4e7;border-radius:7px;font-size:9.5px;font-weight:700;color:#18181b;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,0.02);" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
+                                Generate Fine-grained Token
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Lovable Project URL -->
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <div style="display:flex;align-items:center;justify-content:between;width:100%;">
+                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Lovable Project URL *</label>
+                            <a href="https://lovable.dev/projects" target="_blank" style="margin-left:auto;font-size:10px;font-weight:700;color:#7c3aed;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                Open Lovable Dashboard
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                            </a>
+                        </div>
+                        <input type="text" id="wiz-lovable-url" class="atw-input" placeholder="https://lovable.dev/projects/your-project-id" value="" style="font-size:12.5px;">
+                        <p style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">Copy the URL directly from the address bar when viewing your project in Lovable.</p>
                     </div>
                 </div>
 
                 <!-- SUB-CONTAINER 2: Create from Scratch Guide -->
-                <div id="wiz-lovable-scratch-area" style="display:none;flex-direction:column;gap:20px;">
+                <div id="wiz-lovable-scratch-area" style="display:none;flex-direction:column;gap:18px;">
                     <!-- Template Choice Cards -->
-                    <div style="display:grid;grid-template-cols:1fr 1fr;gap:14px;">
-                        <div style="background:white;border:1.5px solid #e4e4e7;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03);display:flex;flex-direction:column;justify-content:space-between;">
-                            <div style="height:100px;background:#fbfaf7;border-bottom:1px solid #e4e4e7;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                                <div class="flex items-center justify-center"><svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
+                    <div style="display:grid;grid-template-cols:1fr 1fr;gap:12px;">
+                        <div style="background:white;border:1.5px solid #e4e4e7;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03);display:flex;flex-direction:column;justify-content:space-between;transition:all .2s;" onmouseover="this.style.borderColor='#18181b'" onmouseout="this.style.borderColor='#e4e4e7'">
+                            <div style="height:90px;background:#fbfaf7;border-bottom:1px solid #e4e4e7;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                                <div class="flex items-center justify-center text-zinc-400"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
                             </div>
-                            <div style="padding:14px;">
-                                <h4 style="font-size:12px;font-weight:700;color:#18181b;margin-bottom:4px;">Apex Luxury Real Estate</h4>
-                                <p style="font-size:10px;color:#71717a;line-height:1.4;margin-bottom:10px;">Elegant grid, dark neutral aesthetics, listings showcase, and interactive filters.</p>
-                                <button type="button" onclick="window.open('https://lovable.dev', '_blank')" style="width:100%;padding:6px;background:#18181b;color:white;border:none;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;">Start with Prompt</button>
+                            <div style="padding:12px;">
+                                <h4 style="font-size:11.5px;font-weight:750;color:#18181b;margin-bottom:3px;">Apex Luxury Real Estate</h4>
+                                <p style="font-size:9.5px;color:#71717a;line-height:1.4;margin-bottom:10px;">Elegant grid, dark neutral aesthetics, listings showcase, and interactive filters.</p>
+                                <button type="button" onclick="window.open('https://lovable.dev', '_blank')" style="width:100%;padding:6px;background:#18181b;color:white;border:none;border-radius:6px;font-size:9.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:3px;" onmouseover="this.style.background='#27272a'" onmouseout="this.style.background='#18181b'">
+                                    Start in Lovable
+                                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                                </button>
                             </div>
                         </div>
-                        <div style="background:white;border:1.5px solid #e4e4e7;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03);display:flex;flex-direction:column;justify-content:space-between;">
-                            <div style="height:100px;background:#fff5f7;border-bottom:1px solid #e4e4e7;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                                <div class="flex items-center justify-center"><svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg></div>
+                        <div style="background:white;border:1.5px solid #e4e4e7;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03);display:flex;flex-direction:column;justify-content:space-between;transition:all .2s;" onmouseover="this.style.borderColor='#18181b'" onmouseout="this.style.borderColor='#e4e4e7'">
+                            <div style="height:90px;background:#fff5f7;border-bottom:1px solid #e4e4e7;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                                <div class="flex items-center justify-center text-zinc-400"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg></div>
                             </div>
-                            <div style="padding:14px;">
-                                <h4 style="font-size:12px;font-weight:700;color:#18181b;margin-bottom:4px;">Cosmetics Blush Shop</h4>
-                                <p style="font-size:10px;color:#71717a;line-height:1.4;margin-bottom:10px;">Blush pink theme, smooth scroll, parallax catalogs, and cart widgets.</p>
-                                <button type="button" onclick="window.open('https://lovable.dev', '_blank')" style="width:100%;padding:6px;background:#18181b;color:white;border:none;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;">Start with Prompt</button>
+                            <div style="padding:12px;">
+                                <h4 style="font-size:11.5px;font-weight:750;color:#18181b;margin-bottom:3px;">Cosmetics Blush Shop</h4>
+                                <p style="font-size:9.5px;color:#71717a;line-height:1.4;margin-bottom:10px;">Blush pink theme, smooth scroll, parallax catalogs, and cart widgets.</p>
+                                <button type="button" onclick="window.open('https://lovable.dev', '_blank')" style="width:100%;padding:6px;background:#18181b;color:white;border:none;border-radius:6px;font-size:9.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:3px;" onmouseover="this.style.background='#27272a'" onmouseout="this.style.background='#18181b'">
+                                    Start in Lovable
+                                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                                </button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Step-by-Step Instructions -->
-                    <div style="background:#fcfbf9;border:1.5px dashed #e4e0d5;border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(0,0,0,.02);">
-                        <h4 style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#18181b;margin-bottom:14px;display:flex;align-items:center;gap:6px;">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    <div style="background:#fcfbf9;border:1px dashed #e4e0d5;border-radius:14px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.01);">
+                        <h4 style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#18181b;margin-bottom:12px;display:flex;align-items:center;gap:5px;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                             Instructions for Scratch Onboarding
                         </h4>
-                        <div style="display:flex;flex-direction:column;gap:12px;font-size:11.5px;color:#52525b;line-height:1.55;">
+                        <div style="display:flex;flex-direction:column;gap:10px;font-size:11px;color:#52525b;line-height:1.55;">
                             <div>
-                                <strong style="color:#18181b;">1. Launch Lovable.dev:</strong> Open <a href="https://lovable.dev" target="_blank" style="color:#7c3aed;font-weight:700;text-decoration:underline;">Lovable.dev</a>, click "New Project" and feed in your prompt.
+                                <strong style="color:#18181b;">1. Launch Lovable.dev:</strong> Open <a href="https://lovable.dev" target="_blank" style="color:#7c3aed;font-weight:700;text-decoration:underline;">Lovable.dev</a>, click "New Project" and describe your design goals.
                             </div>
                             <div>
-                                <strong style="color:#18181b;">2. Sync GitHub Repo:</strong> Go to settings inside your project and link a GitHub repository.
+                                <strong style="color:#18181b;">2. Sync GitHub Repo:</strong> Navigate to Settings inside Lovable and connect a GitHub repository to push code updates automatically.
                             </div>
                             <div>
-                                <strong style="color:#18181b;">3. Complete Setup:</strong> Copy your repository link and paste it into the <a href="javascript:void(0)" onclick="wizardSetLovableMode('connect')" style="color:#7c3aed;font-weight:700;text-decoration:underline;">Connect Existing Project</a> tab above to import your theme pages!
+                                <strong style="color:#18181b;">3. Complete Setup:</strong> Copy your repository link and paste it into the <a href="javascript:void(0)" onclick="wizardSetLovableMode('connect')" style="color:#7c3aed;font-weight:700;text-decoration:underline;">Connect Existing Project</a> tab above to pull your pages!
                             </div>
                         </div>
                     </div>
