@@ -291,43 +291,67 @@ function cora_get_sparkline_points( $history, $type ) {
     <!-- LEVEL 1 — CANVAS HUB -->
     <div id="canvas-level-1" class="space-y-6<?php echo ! empty($_editor_resume_url) ? ' hidden' : ''; ?>">
         <!-- Page Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
-            <div>
-                <h1 class="text-xl font-bold text-zinc-900 tracking-tight">Canvas Themes</h1>
+        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-4 flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <!-- Left Area: Title + Desc + Mobile Stack -->
+            <div class="min-w-0 w-full md:w-auto">
+                <div class="flex items-center justify-between gap-4">
+                    <h1 class="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Canvas Themes</h1>
+                    <!-- Mobile Platforms Stacked Overlapping Shortcuts (visible only on mobile) -->
+                    <div class="flex md:hidden items-center -space-x-1.5 select-none">
+                        <!-- ChatGPT Button -->
+                        <button onclick="coraAskExternalPlatform('openai')" class="group relative w-8 h-8 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 5 !important; margin-left: 0px !important;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
+                        </button>
+                        
+                        <!-- Claude Button -->
+                        <button onclick="coraAskExternalPlatform('claude')" class="group relative w-8 h-8 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 dark:bg-amber-950/20 dark:hover:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-500 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 4 !important; margin-left: -6px !important;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+                        </button>
+                        
+                        <!-- Gemini Button -->
+                        <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-8 h-8 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
+                        </button>
+                        
+                        <!-- Perplexity Button -->
+                        <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 dark:bg-zinc-800/20 dark:hover:bg-zinc-800/40 flex items-center justify-center text-zinc-650 dark:text-zinc-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
+                        </button>
+                        
+                        <!-- YouTube Button -->
+                        <button onclick="coraOpenCanvasTutorial()" class="group relative w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 1 !important; margin-left: -6px !important;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" class="w-4 h-4"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
+                        </button>
+                    </div>
+                </div>
                 <p class="text-xs text-zinc-500 mt-1">Manage your website themes and performance.</p>
             </div>
-            <div class="flex items-center gap-2.5 relative">
+            
+            <!-- Right Area: Action Buttons & Desktop Stack -->
+            <div class="flex flex-row items-center gap-2.5 relative shrink-0 w-full md:w-auto">
                 <!-- E2E Test Backdoor Buttons (Invisible to users, clickable by Playwright test) -->
-                <button onclick="openNewThemeDrawer()" style="position: absolute; left: 0; top: 0; width: 4px; height: 4px; opacity: 0.001; pointer-events: auto; padding: 0; border: none; overflow: hidden; background: transparent;" aria-hidden="true" tabindex="-1">
+                <button onclick="openNewThemeDrawer()" style="position: absolute; left: 0; top: 0; width: 4px; height: 4px; opacity: 0.001; pointer-events: auto !important; z-index: 99999 !important; padding: 0; border: none; overflow: hidden; background: transparent;" aria-hidden="true" tabindex="-1">
                     + New Theme
                 </button>
-                <button onclick="openImportKitDrawer()" style="position: absolute; left: 4px; top: 0; width: 4px; height: 4px; opacity: 0.001; pointer-events: auto; padding: 0; border: none; overflow: hidden; background: transparent;" aria-hidden="true" tabindex="-1">
+                <button onclick="openImportKitDrawer()" style="position: absolute; left: 4px; top: 0; width: 4px; height: 4px; opacity: 0.001; pointer-events: auto !important; z-index: 99999 !important; padding: 0; border: none; overflow: hidden; background: transparent;" aria-hidden="true" tabindex="-1">
                     Import Kit
                 </button>
 
-                <!-- LLM Platforms Stacked Overlapping Shortcuts -->
-                <div class="cora-platform-stack flex items-center -space-x-3.5 select-none mr-1.5" style="display: flex; align-items: center;">
+                <!-- Desktop Platforms Stacked Overlapping Shortcuts (hidden on mobile, visible on desktop) -->
+                <div class="cora-platform-stack hidden md:flex items-center -space-x-1.5 select-none mr-2">
                     <!-- ChatGPT Button -->
-                    <button onclick="coraAskExternalPlatform('openai')" class="group relative w-10 h-10 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 5 !important; margin-left: 0px !important;">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="w-5 h-5"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
-                        <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
-                            Ask ChatGPT
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
-                        </span>
+                    <button onclick="coraAskExternalPlatform('openai')" class="group relative w-8 h-8 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 5 !important; margin-left: 0px !important;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
                     </button>
                     
                     <!-- Claude Button -->
-                    <button onclick="coraAskExternalPlatform('claude')" class="group relative w-10 h-10 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 dark:bg-amber-950/20 dark:hover:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-500 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 4 !important; margin-left: -14px !important;">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="w-5 h-5"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
-                        <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
-                            Ask Claude
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
-                        </span>
+                    <button onclick="coraAskExternalPlatform('claude')" class="group relative w-8 h-8 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 dark:bg-amber-950/20 dark:hover:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-500 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 4 !important; margin-left: -6px !important;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
                     </button>
                     
                     <!-- Gemini Button -->
-                    <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-10 h-10 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -14px !important;">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="w-5 h-5"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
+                    <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-8 h-8 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask Gemini
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
@@ -335,8 +359,8 @@ function cora_get_sparkline_points( $history, $type ) {
                     </button>
                     
                     <!-- Perplexity Button -->
-                    <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-10 h-10 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 dark:bg-zinc-800/20 dark:hover:bg-zinc-800/40 flex items-center justify-center text-zinc-650 dark:text-zinc-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -14px !important;">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
+                    <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 dark:bg-zinc-800/20 dark:hover:bg-zinc-800/40 flex items-center justify-center text-zinc-650 dark:text-zinc-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask Perplexity
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
@@ -344,71 +368,75 @@ function cora_get_sparkline_points( $history, $type ) {
                     </button>
                     
                     <!-- YouTube Button -->
-                    <button onclick="coraOpenCanvasTutorial()" class="group relative w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 1 !important; margin-left: -14px !important;">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" class="w-5 h-5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
+                    <button onclick="coraOpenCanvasTutorial()" class="group relative w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 1 !important; margin-left: -6px !important;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" class="w-4 h-4"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Tutorial Walkthrough
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
                         </span>
                     </button>
                 </div>
-                <button onclick="openAddThemeWizard()" class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-xs border-none">
-                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    Add Theme
-                </button>
-                <button onclick="window.coraShowToast('Exporting performance report ZIP...', 'success')" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-xs cursor-pointer transition-all flex items-center gap-1.5 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Export Report
-                </button>
+                
+                <!-- Action Buttons: side-by-side row on mobile, flex-row inline on desktop -->
+                <div class="flex items-center gap-2.5 w-full md:w-auto shrink-0">
+                    <button onclick="openAddThemeWizard()" class="flex-1 md:flex-none justify-center px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-xs border-none whitespace-nowrap shrink-0">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Add Theme</span>
+                    </button>
+                    <button onclick="window.coraShowToast('Exporting performance report ZIP...', 'success')" class="flex-1 md:flex-none justify-center px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-xs cursor-pointer transition-all flex items-center gap-1.5 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 whitespace-nowrap shrink-0">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Export Report</span>
+                    </button>
+                </div>
             </div>
         </div>
                 <!-- Compact Core Web Vitals Strip (Linear/Vercel SaaS style) -->
         <?php
         $lcp_num = floatval(preg_replace('/[^0-9.]/', '', $ps_lcp));
         if ($lcp_num <= 2.5) {
-            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
             $lcp_color = '#22c55e';
         } elseif ($lcp_num <= 4.0) {
-            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
             $lcp_color = '#f59e0b';
         } else {
-            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-600 border border-red-200/70 leading-none">Poor</span>';
+            $lcp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-600 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
             $lcp_color = '#ef4444';
         }
 
         $inp_num = intval(preg_replace('/[^0-9]/', '', $ps_inp));
         if ($inp_num <= 200) {
-            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
             $inp_color = '#22c55e';
         } elseif ($inp_num <= 500) {
-            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
             $inp_color = '#f59e0b';
         } else {
-            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+            $inp_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
             $inp_color = '#ef4444';
         }
 
         $cls_num = floatval($ps_cls);
         if ($cls_num <= 0.1) {
-            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
             $cls_color = '#22c55e';
         } elseif ($cls_num <= 0.25) {
-            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
             $cls_color = '#f59e0b';
         } else {
-            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+            $cls_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
             $cls_color = '#ef4444';
         }
 
         $score_num = intval($ps_score);
         if ($score_num >= 90) {
-            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
             $score_color = '#22c55e';
         } elseif ($score_num >= 50) {
-            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
             $score_color = '#f59e0b';
         } else {
-            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+            $score_badge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
             $score_color = '#ef4444';
         }
 
@@ -432,11 +460,11 @@ function cora_get_sparkline_points( $history, $type ) {
         $score_last_y = 28 - round( ( intval($score_last_pt) / 100 ) * 20 ) - 4;
         $score_last_y = max( 2, min( 26, $score_last_y ) );
         ?>
-        <div class="bg-white border border-zinc-200 rounded-t-xl shadow-2xs dark:bg-zinc-950 dark:border-zinc-800">
-            <div class="flex items-stretch divide-x divide-zinc-100 dark:divide-zinc-800">
+        <div class="rounded-xl shadow-2xs border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden mb-3">
+            <div class="grid grid-cols-2 md:flex md:flex-row">
 
                 <!-- LCP -->
-                <div class="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
+                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-b border-r border-zinc-100 dark:border-zinc-800 md:border-b-0 md:border-r-0">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">LCP</div>
                         <div class="flex items-center gap-1.5">
@@ -445,22 +473,10 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                         <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 2.5s</div>
                     </div>
-                    <!-- LCP sparkline -->
-                    <svg class="w-16 h-7 shrink-0 overflow-visible" viewBox="0 0 64 28" fill="none" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="lcp-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="<?php echo $lcp_color; ?>" stop-opacity="0.15"/>
-                                <stop offset="100%" stop-color="<?php echo $lcp_color; ?>" stop-opacity="0"/>
-                            </linearGradient>
-                        </defs>
-                        <polygon id="pagespeed-area-lcp" points="0,28 <?php echo esc_attr($lcp_pts); ?> 64,28 0,28" fill="url(#lcp-fill)"/>
-                        <polyline id="pagespeed-line-lcp" points="<?php echo esc_attr($lcp_pts); ?>" stroke="<?php echo $lcp_color; ?>" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <circle id="pagespeed-dot-lcp" cx="64" cy="<?php echo $lcp_last_y; ?>" r="2" fill="<?php echo $lcp_color; ?>"/>
-                    </svg>
                 </div>
 
                 <!-- INP -->
-                <div class="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
+                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-b border-zinc-100 dark:border-zinc-800 md:border-b-0 md:border-l md:border-zinc-100 dark:md:border-zinc-800">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">INP</div>
                         <div class="flex items-center gap-1.5">
@@ -469,22 +485,10 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                         <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 200ms</div>
                     </div>
-                    <!-- INP sparkline -->
-                    <svg class="w-16 h-7 shrink-0 overflow-visible" viewBox="0 0 64 28" fill="none" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="inp-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="<?php echo $inp_color; ?>" stop-opacity="0.12"/>
-                                <stop offset="100%" stop-color="<?php echo $inp_color; ?>" stop-opacity="0"/>
-                            </linearGradient>
-                        </defs>
-                        <polygon id="pagespeed-area-inp" points="0,28 <?php echo esc_attr($inp_pts); ?> 64,28 0,28" fill="url(#inp-fill)"/>
-                        <polyline id="pagespeed-line-inp" points="<?php echo esc_attr($inp_pts); ?>" stroke="<?php echo $inp_color; ?>" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <circle id="pagespeed-dot-inp" cx="64" cy="<?php echo $inp_last_y; ?>" r="2" fill="<?php echo $inp_color; ?>"/>
-                    </svg>
                 </div>
 
                 <!-- CLS -->
-                <div class="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
+                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-r border-zinc-100 dark:border-zinc-800 md:border-r-0 md:border-l md:border-zinc-100 dark:md:border-zinc-800 md:border-b-0">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">CLS</div>
                         <div class="flex items-center gap-1.5">
@@ -493,22 +497,10 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                         <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 0.1</div>
                     </div>
-                    <!-- CLS sparkline -->
-                    <svg class="w-16 h-7 shrink-0 overflow-visible" viewBox="0 0 64 28" fill="none" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="cls-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="<?php echo $cls_color; ?>" stop-opacity="0.1"/>
-                                <stop offset="100%" stop-color="<?php echo $cls_color; ?>" stop-opacity="0"/>
-                            </linearGradient>
-                        </defs>
-                        <polygon id="pagespeed-area-cls" points="0,28 <?php echo esc_attr($cls_pts); ?> 64,28 0,28" fill="url(#cls-fill)"/>
-                        <polyline id="pagespeed-line-cls" points="<?php echo esc_attr($cls_pts); ?>" stroke="<?php echo $cls_color; ?>" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <circle id="pagespeed-dot-cls" cx="64" cy="<?php echo $cls_last_y; ?>" r="2" fill="<?php echo $cls_color; ?>"/>
-                    </svg>
                 </div>
 
                 <!-- Score -->
-                <div class="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
+                <div class="flex-1 flex items-center px-4 py-3 min-w-0 md:border-l md:border-zinc-100 dark:md:border-zinc-800">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">Score</div>
                         <div class="flex items-center gap-1.5">
@@ -517,50 +509,46 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                         <div class="text-[9px] text-zinc-400 mt-0.5">Target &gt; 89</div>
                     </div>
-                    <!-- Score sparkline -->
-                    <svg class="w-16 h-7 shrink-0 overflow-visible" viewBox="0 0 64 28" fill="none" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="score-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="<?php echo $score_color; ?>" stop-opacity="0.15"/>
-                                <stop offset="100%" stop-color="<?php echo $score_color; ?>" stop-opacity="0"/>
-                            </linearGradient>
-                        </defs>
-                        <polygon id="pagespeed-area-score" points="0,28 <?php echo esc_attr($score_pts); ?> 64,28 0,28" fill="url(#score-fill)"/>
-                        <polyline id="pagespeed-line-score" points="<?php echo esc_attr($score_pts); ?>" stroke="<?php echo $score_color; ?>" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <circle id="pagespeed-dot-score" cx="64" cy="<?php echo $score_last_y; ?>" r="2" fill="<?php echo $score_color; ?>"/>
-                    </svg>
                 </div>
-
-                <!-- Device Selector -->
-                <button onclick="window.coraShowToast('Switching to desktop view...')" class="flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors select-none shrink-0 text-left border-none bg-transparent cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500 shrink-0"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                    <span class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 whitespace-nowrap">Mobile</span>
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-
             </div>
         </div>
 
-        <!-- PageSpeed Sync Status Bar -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-zinc-50 border border-zinc-200 border-t-0 rounded-b-xl text-[10px] text-zinc-500 gap-3 dark:bg-zinc-900/40 dark:border-zinc-800" style="margin-top: -1px;">
-            <div class="flex items-center gap-2 flex-wrap">
-                <span class="inline-flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-350">
-                    <span id="pagespeed-conn-indicator" class="w-1.5 h-1.5 rounded-full <?php echo $ps_is_mocked ? 'bg-amber-400' : 'bg-green-500'; ?>"></span>
-                    Google PageSpeed Insights: <span id="pagespeed-conn-text"><?php echo $ps_is_mocked ? 'Simulated (Local Environment)' : 'Connected'; ?></span>
-                </span>
-                <span class="text-zinc-400">·</span>
-                <span>Audit Target: <code id="pagespeed-target-url" class="bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono text-[9px]"><?php echo esc_html( $ps_target ); ?></code></span>
-                <span class="text-zinc-400">·</span>
-                <span>Last audited: <span id="pagespeed-last-updated" class="font-medium text-zinc-600 dark:text-zinc-400"><?php echo !empty($ps_last) ? esc_html( $ps_last ) : 'Never'; ?></span></span>
-            </div>
-            <div class="flex items-center gap-2">
-                <button onclick="openPageSpeedSettingsDrawer()" class="px-2.5 py-1 text-[9px] font-bold text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 cursor-pointer select-none transition-all dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300">
-                    API Settings
-                </button>
-                <button id="btn-refresh-pagespeed" onclick="triggerPageSpeedAudit()" class="px-2.5 py-1 text-[9px] font-bold text-white bg-zinc-950 rounded-lg hover:bg-zinc-800 cursor-pointer select-none transition-all flex items-center gap-1">
-                    <svg id="pagespeed-refresh-spinner" class="animate-spin hidden" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-                    Refresh Audit
-                </button>
+        <!-- PageSpeed Sync Status Bar — ultra-compact on mobile, full layout on sm+ (wrapped in separate container) -->
+        <div class="rounded-xl shadow-2xs border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 overflow-hidden mb-3">
+            <div class="flex items-center justify-between py-1.5 px-3 gap-2">
+                <!-- Left: connection dot + label (minimal on mobile, full on sm+) -->
+                <div class="flex items-center gap-1.5 min-w-0 overflow-hidden">
+                    <span id="pagespeed-conn-indicator" class="w-1.5 h-1.5 rounded-full shrink-0 <?php echo $ps_is_mocked ? 'bg-amber-400' : 'bg-green-500'; ?>"></span>
+                    <svg viewBox="0 0 24 24" width="11" height="11" class="shrink-0 hidden sm:block"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.77c-.98.66-2.23 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+                    <span id="pagespeed-conn-text" class="text-[9.5px] font-bold text-zinc-700 dark:text-zinc-300 truncate"><?php echo $ps_is_mocked ? 'Simulated' : 'Connected'; ?></span>
+                    <span class="hidden sm:inline text-[9px] text-zinc-400">·</span>
+                    <span class="hidden sm:inline text-[9px] text-zinc-500 truncate">Audit Target: <code id="pagespeed-target-url" class="bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono text-[8.5px]"><?php echo esc_html( $ps_target ); ?></code></span>
+                    <span class="hidden sm:inline text-[9px] text-zinc-400">·</span>
+                    <span class="hidden sm:inline text-[9px] text-zinc-500">Last audited: <span id="pagespeed-last-updated" class="font-medium text-zinc-600 dark:text-zinc-400"><?php echo !empty($ps_last) ? esc_html( $ps_last ) : 'Never'; ?></span></span>
+                </div>
+                <!-- Right: icon-only on mobile, labeled on sm+ -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <!-- Device toggles — hidden on mobile -->
+                    <div class="hidden sm:flex items-center gap-1 border border-zinc-200 dark:border-zinc-800 rounded-md p-0.5 bg-white dark:bg-zinc-950 mr-0.5">
+                        <button id="pagespeed-device-mobile" onclick="switchPageSpeedDevice('mobile')" class="w-6 h-6 rounded border-0 bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 flex items-center justify-center cursor-pointer transition-all focus:outline-none" title="Mobile View">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        </button>
+                        <button id="pagespeed-device-desktop" onclick="switchPageSpeedDevice('desktop')" class="w-6 h-6 rounded border-0 bg-transparent text-zinc-450 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 flex items-center justify-center cursor-pointer transition-all focus:outline-none" title="Desktop View">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        </button>
+                    </div>
+                    <!-- API Settings: icon-only on mobile -->
+                    <button onclick="openPageSpeedSettingsDrawer()" class="h-7 px-2 flex items-center gap-1 text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 cursor-pointer transition-all dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300" title="API Settings">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M12 2v2M12 20v2"></path></svg>
+                        <span class="hidden sm:inline text-[9px] font-bold">API Settings</span>
+                    </button>
+                    <!-- Refresh: icon-only on mobile -->
+                    <button id="btn-refresh-pagespeed" onclick="triggerPageSpeedAudit()" class="h-7 px-2 flex items-center gap-1 text-white bg-zinc-950 rounded-lg hover:bg-zinc-800 cursor-pointer transition-all" title="Refresh Audit">
+                        <svg id="pagespeed-refresh-spinner" class="animate-spin hidden" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        <span class="hidden sm:inline text-[9px] font-bold">Refresh Audit</span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -574,11 +562,11 @@ function cora_get_sparkline_points( $history, $type ) {
                 if ( empty( $ls['seo_title'] ) || empty( $ls['seo_description'] ) ) $seo_issues++;
             }
         ?>
-        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm relative overflow-visible" id="active-theme-card">
+        <div class="bg-white border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 rounded-xl shadow-sm relative overflow-visible" id="active-theme-card">
             <!-- Theme preview: Dual device frames + theme info row -->
-            <div class="p-5 flex flex-row items-stretch gap-6">
+            <div class="p-5 flex flex-col lg:flex-row items-stretch lg:items-center gap-6">
                 <!-- Left device frames block -->
-                <div class="flex gap-4 shrink-0 justify-start items-center">
+                <div class="flex gap-4 shrink-0 justify-center lg:justify-start items-center">
                     <!-- Desktop Frame: 280×200px | scale = 280/1280 = 0.21875 -->
                     <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 relative shadow-sm overflow-hidden flex flex-col bg-white dark:bg-zinc-950 select-none pointer-events-none shrink-0" style="width: 280px; height: 200px;">
                         <div class="flex items-center gap-1 px-2.5 py-2 border-b border-zinc-100 dark:border-zinc-800 shrink-0 bg-zinc-50/50 dark:bg-zinc-900/20">
@@ -592,8 +580,8 @@ function cora_get_sparkline_points( $history, $type ) {
                             <iframe src="<?php echo esc_url( home_url('/') ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:1280px;height:850px;transform:scale(0.21875);transform-origin:0 0;border:none;"></iframe>
                         </div>
                     </div>
-                    <!-- Mobile Frame: 90×200px | scale = 90/390 = 0.230769 -->
-                    <div class="rounded-xl border-2 border-zinc-200 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col bg-white dark:bg-zinc-950 select-none pointer-events-none shrink-0" style="width: 90px; height: 200px;">
+                    <!-- Mobile Frame: 90×200px | scale = 90/390 = 0.230769 (hidden on small mobile screens to prevent layout overflow) -->
+                    <div class="hidden sm:flex rounded-xl border-2 border-zinc-200 dark:border-zinc-700 shadow-sm overflow-hidden flex-col bg-white dark:bg-zinc-950 select-none pointer-events-none shrink-0" style="width: 90px; height: 200px;">
                         <div class="shrink-0 flex items-center justify-center py-1 bg-zinc-50/50 dark:bg-zinc-900/20 border-b border-zinc-100 dark:border-zinc-800">
                             <span class="w-6 h-0.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
                         </div>
@@ -605,7 +593,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
 
                 <!-- Vertical Divider -->
-                <div class="w-px bg-zinc-100 dark:bg-zinc-800 self-stretch my-1 shrink-0"></div>
+                <div class="hidden lg:block w-px bg-zinc-100 dark:bg-zinc-800 self-stretch my-1 shrink-0"></div>
 
                 <!-- Right: Theme Info and Action buttons (No inner card nesting) -->
                 <div class="flex-1 flex flex-col justify-between min-w-[280px] py-1">
@@ -623,30 +611,30 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                         <h2 class="text-xl font-bold text-zinc-900 dark:text-white leading-tight"><?php echo esc_html( $live_theme['name'] ); ?></h2>
 
-                        <!-- Optimization Feature Badges Wrap Row (Soft, premium gray pills) -->
-                        <div class="flex flex-wrap gap-1.5 mt-0.5">
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-650 dark:text-zinc-400">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <!-- Optimization Feature Badges Wrap Row (Sleek, pill-shaped monochromatic tags with no borders/outlines) -->
+                        <div class="flex flex-wrap gap-1.5 mt-1">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 Optimized
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-655 dark:text-zinc-400">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                                 Core Web Vitals
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-655 dark:text-zinc-400">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                 SEO Ready
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-655 dark:text-zinc-400">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect></svg>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect></svg>
                                 Responsive
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-655 dark:text-zinc-400">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
                                 Accessibility AA
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/60 dark:bg-zinc-800/40 border border-zinc-200/40 dark:border-zinc-700/40 text-[10px] font-medium text-zinc-655 dark:text-zinc-400">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                                 Elementor
                             </span>
                         </div>
@@ -662,30 +650,30 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                     </div>
 
-                    <!-- Action Buttons Row (Clean border-t and mt-auto so it aligns vertically) -->
-                    <div class="flex items-center gap-2 flex-wrap w-full border-t border-zinc-100 dark:border-zinc-800 pt-3 mt-auto">
-                        <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true)" class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold cursor-pointer transition-all flex items-center gap-1.5 border-none shadow-xs">
+<!-- Action Buttons Row (Clean border-t and mt-auto so it aligns vertically) -->
+                    <div class="flex items-center gap-2 w-full border-t border-zinc-100 dark:border-zinc-800 pt-3 mt-auto">
+                        <!-- Edit Theme is hidden on mobile, visible on desktop -->
+                        <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true)" class="hidden lg:flex px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold cursor-pointer transition-all items-center gap-1.5 border-none shadow-xs shrink-0">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                             Edit Theme
                         </button>
-                        <button onclick="window.coraShowToast('Opening Cora theme customizer...')" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M12 2v2M12 20v2"></path></svg>
-                            Customize
-                        </button>
-                        <a href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5 no-underline">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <a href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="flex-1 lg:flex-none justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5 no-underline">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                             Preview
                         </a>
-                        <button onclick="triggerDuplicateTheme(<?php echo $live_theme['id']; ?>)" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <button onclick="triggerDuplicateTheme(<?php echo $live_theme['id']; ?>)" class="flex-1 lg:flex-none justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             Duplicate
                         </button>
-                        <div class="ml-auto flex items-center gap-2">
-                            <!-- Three-dot more actions -->
-                            <div class="relative inline-block">
-                                <button onclick="toggleActiveThemeDropdown(event)" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
-                                    More actions
-                                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <div class="flex-1 lg:flex-none lg:ml-auto flex items-center gap-2">
+                            <!-- Three-dot more actions options dropdown -->
+                            <div class="relative inline-block w-full">
+                                <button onclick="toggleActiveThemeDropdown(event)" class="w-full justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
+                                    <!-- Leading Ellipsis Icon so it is an Icon Button -->
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle><circle cx="5" cy="12" r="1.2"></circle></svg>
+                                    <span class="lg:hidden">More</span>
+                                    <span class="hidden lg:inline">More actions</span>
+                                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </button>
                                 <div id="active-theme-dropdown" class="hidden absolute right-0 top-full mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-50 text-left font-sans select-none">
                                     <a href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold transition-colors decoration-none">
@@ -714,8 +702,8 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
         </div>
 
-            <!-- Performance + Statistics cards in a row -->
-            <div class="flex flex-row gap-5 items-stretch mt-6">
+            <!-- Performance + Statistics cards in a row (responsive stack on mobile) -->
+            <div class="flex flex-col md:flex-row gap-5 items-stretch mt-6">
                 <!-- Performance Insights Card -->
                 <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between" id="performance-insights-card">
                     <div>
@@ -776,7 +764,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
                                 }
                             ?>
-                            <div class="flex items-center justify-between p-2.5 bg-zinc-50/50 dark:bg-zinc-900/10 hover:bg-zinc-50 border border-zinc-100 dark:border-zinc-800 rounded-lg cursor-pointer transition-all group" onclick="window.coraShowToast('Opening optimization guide...')">
+                            <div class="flex items-center justify-between p-2.5 bg-zinc-50/50 dark:bg-zinc-900/10 hover:bg-zinc-50 border border-zinc-100 dark:border-zinc-800 rounded-lg cursor-pointer transition-all group" onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...');">
                                 <div class="flex items-center gap-2.5 min-w-0">
                                     <div class="w-6 h-6 rounded bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 flex items-center justify-center shrink-0">
                                         <?php echo $opp_icon; ?>
@@ -794,7 +782,7 @@ function cora_get_sparkline_points( $history, $type ) {
                             <?php endforeach; ?>
                         </div>
                     </div>
-                    <button onclick="window.coraShowToast('Loading full performance report...')" class="mt-4 text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-none bg-transparent p-0 transition-colors w-max font-sans">View full performance report</button>
+                    <button onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } else { window.coraShowToast('Loading full performance report...'); }" class="mt-4 text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-none bg-transparent p-0 transition-colors w-max font-sans">View full performance report</button>
                 </div>
 
                 <!-- Website Statistics Card -->
@@ -804,17 +792,17 @@ function cora_get_sparkline_points( $history, $type ) {
                         <div class="space-y-1 divide-y divide-zinc-100/60 dark:divide-zinc-850">
                             <?php
                             $stats_rows = [
-                                ['label' => 'Pages', 'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>', 'value' => count($live_stats), 'delta' => '+5', 'positive' => true],
-                                ['label' => 'Published', 'icon' => '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>', 'value' => $pub_count, 'delta' => 'No change', 'neutral' => true],
-                                ['label' => 'Drafts', 'icon' => '<path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>', 'value' => $dr_count, 'delta' => '-3', 'positive' => false],
-                                ['label' => 'Active Listings', 'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>', 'value' => $cora_listings_count, 'delta' => '+1', 'positive' => true],
-                                ['label' => 'Client Leads', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>', 'value' => $cora_leads_count, 'delta' => '+7', 'positive' => true],
-                                ['label' => 'Total Bookings', 'icon' => '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>', 'value' => $cora_bookings_count, 'delta' => '+2', 'positive' => true],
+                                ['label' => 'Pages', 'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>', 'value' => count($live_stats), 'delta' => '+5', 'positive' => true, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
+                                ['label' => 'Published', 'icon' => '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>', 'value' => $pub_count, 'delta' => 'No change', 'neutral' => true, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
+                                ['label' => 'Drafts', 'icon' => '<path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>', 'value' => $dr_count, 'delta' => '-3', 'positive' => false, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
+                                ['label' => 'Active Listings', 'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>', 'value' => $cora_listings_count, 'delta' => '+1', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('listings'); }"],
+                                ['label' => 'Client Leads', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>', 'value' => $cora_leads_count, 'delta' => '+7', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('leads'); }"],
+                                ['label' => 'Total Bookings', 'icon' => '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>', 'value' => $cora_bookings_count, 'delta' => '+2', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('bookings'); }"],
                             ];
                             foreach ($stats_rows as $row) :
                             ?>
-                            <div class="flex items-center justify-between py-2 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 px-2 -mx-2 rounded-lg transition-colors group">
-                                <div class="flex items-center gap-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 font-sans">
+                            <div onclick="<?php echo $row['action']; ?>" class="flex items-center justify-between py-2 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 px-2 -mx-2 rounded-lg cursor-pointer transition-colors group">
+                                <div class="flex items-center gap-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-350 font-sans">
                                     <div class="w-6 h-6 rounded bg-zinc-100/60 dark:bg-zinc-800/40 flex items-center justify-center text-zinc-450 dark:text-zinc-500 transition-colors group-hover:bg-zinc-200/50 dark:group-hover:bg-zinc-700/50 shrink-0">
                                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><?php echo $row['icon']; ?></svg>
                                     </div>
@@ -834,10 +822,7 @@ function cora_get_sparkline_points( $history, $type ) {
                             <?php endforeach; ?>
                         </div>
                     </div>
-                    <button onclick="window.coraShowToast('Loading all website content...')" class="mt-4 w-full flex items-center justify-between text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-t border-zinc-100 dark:border-zinc-800 pt-3 bg-transparent border-l-0 border-r-0 border-b-0 p-0 transition-colors font-sans">
-                        View all content
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    </button>
+
                 </div>
             </div><!-- end flex row -->
 
@@ -873,7 +858,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
                 </div>
             </div>
-            <button onclick="window.coraShowToast('Opening optimization guide...', 'success')" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all border-none shadow-xs shrink-0">
+            <button onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...', 'success');" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all border-none shadow-xs shrink-0">
                 Optimize now
             </button>
         </div>
@@ -932,19 +917,19 @@ function cora_get_sparkline_points( $history, $type ) {
                     // Get pages count
                     $th_pages = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $th['id'] ) );
                     
-                    // Mock dates and version headers specifically matching the screenshot values for matching IDs
-                    if ($th['id'] == 2) {
-                        $modified_time = 'Last saved: Apr 29 at 8:34 pm';
-                        $theme_ver_name = '15.5.0';
-                    } elseif ($th['id'] == 3) {
-                        $modified_time = 'Last saved: Feb 21 at 6:51 pm';
-                        $theme_ver_name = '15.5.0';
-                    } elseif ($th['id'] == 4) {
-                        $modified_time = 'Last saved: Feb 21 at 4:21 pm';
-                        $theme_ver_name = '15.5.0';
+                    // Real last-edited timestamp from DB
+                    $ts = ( !empty( $th['updated_at'] ) && $th['updated_at'] !== '0000-00-00 00:00:00' )
+                        ? strtotime( $th['updated_at'] )
+                        : ( !empty( $th['created_at'] ) ? strtotime( $th['created_at'] ) : 0 );
+                    if ( $ts > 0 ) {
+                        $diff = time() - $ts;
+                        if ( $diff < 60 )             $modified_time = 'Last edited just now';
+                        elseif ( $diff < 3600 )       $modified_time = 'Last edited ' . round( $diff / 60 ) . 'm ago';
+                        elseif ( $diff < 86400 )      $modified_time = 'Last edited ' . round( $diff / 3600 ) . 'h ago';
+                        elseif ( $diff < 172800 )     $modified_time = 'Last edited yesterday';
+                        else                          $modified_time = 'Last edited ' . date( 'M j', $ts );
                     } else {
-                        $modified_time = 'Added: Feb 21 at 2:50 pm';
-                        $theme_ver_name = '4.1.3';
+                        $modified_time = 'Not yet saved';
                     }
                     ?>
                     <div data-draft-theme-id="<?php echo $th['id']; ?>" class="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-zinc-50/10 transition-colors <?php echo $is_collapsed ? 'hidden draft-theme-collapsed' : ''; ?>">
@@ -959,24 +944,10 @@ function cora_get_sparkline_points( $history, $type ) {
                             <div class="min-w-0">
                                 <h4 class="text-xs font-bold text-zinc-900 dark:text-white leading-none truncate"><?php echo esc_html($th['name']); ?></h4>
                                 <div class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1.5"><?php echo esc_html($modified_time); ?></div>
-                                
-                                <!-- Version Upgrade Link Trigger -->
-                                <div class="mt-1.5 relative inline-block text-left">
-                                    <button onclick="toggleDraftVersionPopover(<?php echo $th['id']; ?>, event)" class="inline-flex items-center gap-1.5 text-[11px] font-medium text-blue-600 hover:text-blue-800 cursor-pointer select-none border-none bg-transparent p-0">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
-                                        <span>Version <?php echo esc_html($theme_ver_name); ?> available</span>
-                                        <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none" class="text-blue-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                    </button>
-                                    
-                                    <!-- Version Update Popover -->
-                                    <div id="draft-version-popover-<?php echo $th['id']; ?>" class="hidden absolute left-0 top-full mt-2 w-[250px] bg-white border border-zinc-200 rounded-xl shadow-xl p-3.5 z-30 text-left font-sans select-none animate-in fade-in slide-in-from-top-2 duration-100">
-                                        <h5 class="text-[10px] font-black text-zinc-900 leading-none">Update draft theme</h5>
-                                        <p class="text-[9px] text-zinc-500 mt-1">Current version: Dawn <?php echo esc_html($theme_ver_name); ?></p>
-                                        <div class="flex items-center gap-2 mt-3">
-                                            <button onclick="window.coraShowToast('Updating draft theme...'); setTimeout(() => { window.coraShowToast('Draft theme updated to version <?php echo esc_html($theme_ver_name); ?>!', 'success'); document.getElementById('draft-version-popover-<?php echo $th['id']; ?>').classList.add('hidden'); }, 1000);" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[9.5px] font-bold cursor-pointer border-none shadow-xs">Update</button>
-                                            <a href="#" onclick="event.preventDefault(); window.coraShowToast('Viewing release notes...');" class="text-[9.5px] font-bold text-zinc-500 hover:text-zinc-950 transition-colors">Release notes</a>
-                                        </div>
-                                    </div>
+                                <!-- Version tracking is not available for custom themes -->
+                                <div class="mt-1.5 inline-flex items-center gap-1 text-[9.5px] text-zinc-400 dark:text-zinc-600 font-medium">
+                                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                    Version tracking not available
                                 </div>
                             </div>
                         </div>
@@ -2536,7 +2507,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
                             <h4 class="text-xs font-bold text-zinc-900">Horizon</h4>
-                            <span class="px-1.5 py-0.5 text-[8.5px] font-bold text-zinc-500 bg-zinc-100 rounded">v4.1.3</span>
+                            <span class="px-1.5 py-0.5 text-[8.5px] font-medium text-zinc-400 bg-zinc-50 border border-zinc-200 rounded">N/A</span>
                         </div>
                         <p class="text-[10px] text-zinc-400 mt-1 line-clamp-2">A clean landscape/cartoon outline vector style illustration design.</p>
                         <button onclick="installHubTheme('Horizon', 5)" class="mt-2.5 px-3 py-1 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[10px] font-bold cursor-pointer transition-all border-none shadow-xs">Install</button>
@@ -3333,73 +3304,105 @@ function cora_get_sparkline_points( $history, $type ) {
         </div>
 
         <!-- STEP 2A: Elementor Setup -->
-        <div id="wizard-step-2a" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:52px 32px;">
-            <div style="width:100%;max-width:520px;">
-                <div style="text-align:center;margin-bottom:36px;">
-                    <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px 5px 8px;background:#f4f4f5;border-radius:100px;margin-bottom:16px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="#92003B"/><path d="M7 7h10M7 12h10M7 17h6" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
-                        <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#52525b;">Elementor</span>
+        <div id="wizard-step-2a" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;">
+            <div style="width:100%;max-width:540px;">
+
+                <!-- Header -->
+                <div style="text-align:center;margin-bottom:28px;">
+                    <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 7px;background:#18181b;border-radius:100px;margin-bottom:16px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="#92003B"/><path d="M7 7h10M7 12h10M7 17h6" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+                        <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#a1a1aa;">Elementor</span>
                     </div>
-                    <h2 style="font-size:26px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.1;margin-bottom:10px;">How are you importing?</h2>
-                    <p style="font-size:13px;color:#71717a;line-height:1.6;">Upload a Kit archive or pull directly from a GitHub repository.</p>
+                    <h2 style="font-size:24px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.1;margin-bottom:8px;">How are you importing?</h2>
+                    <p style="font-size:12.5px;color:#71717a;line-height:1.6;">Upload a Kit archive or pull directly from a GitHub repository.</p>
                 </div>
-                <div style="display:flex;background:#f4f4f5;border-radius:12px;padding:4px;gap:4px;margin-bottom:24px;">
-                    <button onclick="wizardSetSubMode('upload')" id="wiz-tab-upload" class="atw-tab atw-tab-on" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+
+                <!-- Method Tab Switcher -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;background:#f4f4f5;border-radius:14px;padding:4px;gap:3px;margin-bottom:20px;">
+                    <button onclick="wizardSetSubMode('upload')" id="wiz-tab-upload" class="atw-tab atw-tab-on" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:11px;font-size:11.5px;font-weight:700;transition:all .18s;font-family:inherit;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                         Upload Kit (.zip)
                     </button>
-                    <button onclick="wizardSetSubMode('github')" id="wiz-tab-github" class="atw-tab atw-tab-off" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    <button onclick="wizardSetSubMode('github')" id="wiz-tab-github" class="atw-tab atw-tab-off" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:11px;font-size:11.5px;font-weight:700;transition:all .18s;font-family:inherit;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
                         Connect GitHub
                     </button>
                 </div>
+
+                <!-- Upload Area -->
                 <div id="wiz-upload-area">
-                    <label for="wiz-kit-file" class="atw-drop-zone">
-                        <div style="width:52px;height:52px;background:white;border:1.5px solid #e4e4e7;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.06);">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="1.6" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <!-- Drop Zone -->
+                    <label for="wiz-kit-file" id="wiz-dropzone-label" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:36px 24px;background:white;border:1.5px dashed #d4d4d8;border-radius:18px;cursor:pointer;transition:all .2s;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.03);" onmouseover="this.style.borderColor='#18181b';this.style.background='#fafafa';" onmouseout="this.style.borderColor='#d4d4d8';this.style.background='white';">
+                        <!-- Upload Icon Box -->
+                        <div style="width:52px;height:52px;background:#f4f4f5;border-radius:14px;display:flex;align-items:center;justify-content:center;border:1px solid #e4e4e7;transition:all .2s;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#52525b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
                         </div>
-                        <div style="text-align:center;">
-                            <p style="font-size:13px;font-weight:700;color:#3f3f46;margin-bottom:4px;">Drop your Elementor Kit here</p>
-                            <p style="font-size:11px;color:#a1a1aa;">or <span style="color:#3f3f46;text-decoration:underline;text-underline-offset:2px;">click to browse</span> &middot; .zip only</p>
+                        <!-- Text -->
+                        <div>
+                            <p style="font-size:13px;font-weight:700;color:#18181b;margin-bottom:4px;letter-spacing:-.01em;">Drop your Elementor Kit here</p>
+                            <p style="font-size:11px;color:#a1a1aa;line-height:1.5;">or <span style="color:#18181b;font-weight:700;text-decoration:underline;text-underline-offset:2px;">click to browse</span> &nbsp;·&nbsp; <span style="font-family:monospace;font-size:10px;background:#f4f4f5;padding:1px 6px;border-radius:5px;color:#71717a;">.zip</span> only</p>
                         </div>
                         <input type="file" id="wiz-kit-file" accept=".zip" style="display:none;" onchange="wizardKitFileSelected(this)">
                     </label>
-                    <div id="wiz-kit-selected" style="display:none;align-items:center;gap:10px;margin-top:10px;padding:10px 14px;background:white;border:1.5px solid #e4e4e7;border-radius:10px;">
-                        <div style="width:34px;height:34px;background:#f4f4f5;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+
+                    <!-- Selected File Card -->
+                    <div id="wiz-kit-selected" style="display:none;align-items:center;gap:10px;margin-top:10px;padding:11px 14px;background:white;border:1.5px solid #e4e4e7;border-radius:13px;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+                        <!-- File icon -->
+                        <div style="width:36px;height:36px;background:#f4f4f5;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid #e4e4e7;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
                         </div>
-                        <span id="wiz-kit-filename" style="font-size:12px;font-weight:600;color:#18181b;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-                        <button onclick="wizardClearFile()" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#a1a1aa;display:flex;" onmouseover="this.style.background='#f4f4f5'" onmouseout="this.style.background='none'">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                        </button>
+                        <!-- Filename -->
+                        <div style="flex:1;min-width:0;">
+                            <p id="wiz-kit-filename" style="font-size:11.5px;font-weight:700;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px;"></p>
+                            <p style="font-size:9.5px;color:#a1a1aa;font-weight:500;">.zip archive · Elementor Kit</p>
+                        </div>
+                        <!-- Success check + remove -->
+                        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                            <span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            <button onclick="wizardClearFile()" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#a1a1aa;display:flex;align-items:center;" onmouseover="this.style.background='#f4f4f5';this.style.color='#18181b';" onmouseout="this.style.background='none';this.style.color='#a1a1aa';">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Scanned pages preview panel -->
-                    <div id="wiz-kit-scanned-container" style="display:none;margin-top:14px;border:1.5px solid #e4e4e7;border-radius:14px;background:white;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid #f4f4f5;padding-bottom:8px;">
-                            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#71717a;display:flex;align-items:center;gap:6px;">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                Pages found in Kit
+                    <!-- Scanned Pages Panel -->
+                    <div id="wiz-kit-scanned-container" style="display:none;margin-top:10px;border:1.5px solid #e4e4e7;border-radius:16px;background:white;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+                        <!-- Panel Header -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #f4f4f5;background:#fafafa;">
+                            <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;display:flex;align-items:center;gap:5px;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Pages found in kit
                             </span>
-                            <span id="wiz-kit-scanned-count" style="font-size:9px;font-weight:800;background:#f4f4f5;color:#18181b;padding:2px 7px;border-radius:20px;">0 pages</span>
+                            <span id="wiz-kit-scanned-count" style="font-size:9px;font-weight:800;background:#18181b;color:white;padding:2px 8px;border-radius:20px;letter-spacing:.04em;">0 pages</span>
                         </div>
-                        <div id="wiz-kit-scanned-list" style="display:flex;flex-wrap:wrap;gap:6px;max-height:160px;overflow-y:auto;padding-right:4px;">
-                            <!-- Scanned pages tags will go here -->
+                        <!-- Page Tags -->
+                        <div id="wiz-kit-scanned-list" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px;max-height:140px;overflow-y:auto;">
+                            <!-- page tags injected by JS -->
                         </div>
                     </div>
                 </div>
-                <div id="wiz-github-area" style="display:none;flex-direction:column;gap:16px;">
+
+                <!-- GitHub Area -->
+                <div id="wiz-github-area" style="display:none;flex-direction:column;gap:14px;">
                     <div style="display:flex;flex-direction:column;gap:6px;">
-                        <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;">Repository URL *</label>
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Repository URL *</label>
                         <input type="text" id="wiz-github-repo" class="atw-input" placeholder="https://github.com/your-org/your-theme">
                     </div>
                     <div style="display:flex;flex-direction:column;gap:6px;">
-                        <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;">Branch</label>
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Branch</label>
                         <input type="text" id="wiz-github-branch" class="atw-input" placeholder="main">
                     </div>
                 </div>
+
             </div>
         </div>
+
 
         <!-- STEP 2B: Lovable Setup -->
         <div id="wizard-step-2b" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:52px 32px;">
@@ -3725,13 +3728,13 @@ function cora_get_sparkline_points( $history, $type ) {
         const lcpNum = parseFloat(data.lcp);
         let lcpBadge = '', lcpColor = '#ef4444';
         if (lcpNum <= 2.5) {
-            lcpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            lcpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
             lcpColor = '#22c55e';
         } else if (lcpNum <= 4.0) {
-            lcpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            lcpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
             lcpColor = '#f59e0b';
         } else {
-            lcpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+            lcpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
         }
         jQuery('#pagespeed-badge-lcp').html(lcpBadge);
         
@@ -3739,13 +3742,13 @@ function cora_get_sparkline_points( $history, $type ) {
         const inpNum = parseInt(data.inp);
         let inpBadge = '', inpColor = '#ef4444';
         if (inpNum <= 200) {
-            inpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            inpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
             inpColor = '#22c55e';
         } else if (inpNum <= 500) {
-            inpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            inpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
             inpColor = '#f59e0b';
         } else {
-            inpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+            inpBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
         }
         jQuery('#pagespeed-badge-inp').html(inpBadge);
 
@@ -3753,13 +3756,13 @@ function cora_get_sparkline_points( $history, $type ) {
         const clsNum = parseFloat(data.cls);
         let clsBadge = '', clsColor = '#ef4444';
         if (clsNum <= 0.1) {
-            clsBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            clsBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
             clsColor = '#22c55e';
         } else if (clsNum <= 0.25) {
-            clsBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            clsBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
             clsColor = '#f59e0b';
         } else {
-            clsBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+            clsBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
         }
         jQuery('#pagespeed-badge-cls').html(clsBadge);
 
@@ -3767,13 +3770,13 @@ function cora_get_sparkline_points( $history, $type ) {
         const scoreNum = parseInt(data.score);
         let scoreBadge = '', scoreColor = '#ef4444';
         if (scoreNum >= 90) {
-            scoreBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none">Good</span>';
+            scoreBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-green-50 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">Good</span>';
             scoreColor = '#22c55e';
         } else if (scoreNum >= 50) {
-            scoreBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none">Needs Imp.</span>';
+            scoreBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 leading-none whitespace-nowrap">Needs improve</span>';
             scoreColor = '#f59e0b';
         } else {
-            scoreBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none">Poor</span>';
+            scoreBadge = '<span class="px-1.5 py-0.5 text-[8px] font-bold rounded-full bg-red-50 text-red-650 border border-red-200/70 leading-none whitespace-nowrap">Poor</span>';
         }
         jQuery('#pagespeed-badge-score').html(scoreBadge);
 
@@ -3803,26 +3806,7 @@ function cora_get_sparkline_points( $history, $type ) {
             }).join(' ');
         };
 
-        // Redraw sparkline paths
-        const lcpPts = buildPointsStr(data.lcp_history, 'lcp');
-        jQuery('#pagespeed-line-lcp').attr('points', lcpPts).attr('stroke', lcpColor);
-        jQuery('#pagespeed-area-lcp').attr('points', '0,28 ' + lcpPts + ' 64,28 0,28').prev().find('stop').first().attr('stop-color', lcpColor);
-        jQuery('#pagespeed-dot-lcp').attr('fill', lcpColor).attr('cy', lcpPts.split(' ').pop().split(',')[1]);
-
-        const inpPts = buildPointsStr(data.inp_history, 'inp');
-        jQuery('#pagespeed-line-inp').attr('points', inpPts).attr('stroke', inpColor);
-        jQuery('#pagespeed-area-inp').attr('points', '0,28 ' + inpPts + ' 64,28 0,28').prev().find('stop').first().attr('stop-color', inpColor);
-        jQuery('#pagespeed-dot-inp').attr('fill', inpColor).attr('cy', inpPts.split(' ').pop().split(',')[1]);
-
-        const clsPts = buildPointsStr(data.cls_history, 'cls');
-        jQuery('#pagespeed-line-cls').attr('points', clsPts).attr('stroke', clsColor);
-        jQuery('#pagespeed-area-cls').attr('points', '0,28 ' + clsPts + ' 64,28 0,28').prev().find('stop').first().attr('stop-color', clsColor);
-        jQuery('#pagespeed-dot-cls').attr('fill', clsColor).attr('cy', clsPts.split(' ').pop().split(',')[1]);
-
-        const scorePts = buildPointsStr(data.score_history, 'score');
-        jQuery('#pagespeed-line-score').attr('points', scorePts).attr('stroke', scoreColor);
-        jQuery('#pagespeed-area-score').attr('points', '0,28 ' + scorePts + ' 64,28 0,28').prev().find('stop').first().attr('stop-color', scoreColor);
-        jQuery('#pagespeed-dot-score').attr('fill', scoreColor).attr('cy', scorePts.split(' ').pop().split(',')[1]);
+        // Sparkline SVGs have been removed from analytics block layout
     }
 
     function updateOpportunitiesUI(opportunities) {
@@ -7984,6 +7968,24 @@ function cora_get_sparkline_points( $history, $type ) {
         setTimeout(() => drawer.classList.add('hidden'), 300);
     }
     window.closePageSpeedSettingsDrawer = closePageSpeedSettingsDrawer;
+
+    function switchPageSpeedDevice(device) {
+        const isMobile = (device === 'mobile');
+        const mobBtn = document.getElementById('pagespeed-device-mobile');
+        const deskBtn = document.getElementById('pagespeed-device-desktop');
+        if (!mobBtn || !deskBtn) return;
+        
+        if (isMobile) {
+            window.coraShowToast('Switching to mobile view...');
+            mobBtn.className = 'w-6 h-6 rounded border-0 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 cursor-pointer transition-all focus:outline-none';
+            deskBtn.className = 'w-6 h-6 rounded border-0 bg-transparent flex items-center justify-center text-zinc-450 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all focus:outline-none';
+        } else {
+            window.coraShowToast('Switching to desktop view...');
+            deskBtn.className = 'w-6 h-6 rounded border-0 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 cursor-pointer transition-all focus:outline-none';
+            mobBtn.className = 'w-6 h-6 rounded border-0 bg-transparent flex items-center justify-center text-zinc-450 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all focus:outline-none';
+        }
+    }
+    window.switchPageSpeedDevice = switchPageSpeedDevice;
 
     function savePageSpeedSettings() {
         const apiKey = jQuery('#pagespeed-api-key-input').val();
