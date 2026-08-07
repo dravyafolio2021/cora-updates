@@ -195,7 +195,7 @@
         if (prog) prog.style.display = '';
         if (bar)  { bar.style.width = '0%'; setTimeout(function() { bar.style.width = '70%'; }, 80); }
 
-        $.post(ajaxUrl, {
+        $.post(coraREData.ajaxUrl, {
             action:  'cora_trigger_git_sync',
             nonce:   coraREData.ajaxNonce,
             theme_id: window.canvasState ? window.canvasState.activeThemeId : 0,
@@ -266,23 +266,38 @@
         }).join('');
 
         var rows = '';
+        var hasPages = false;
         if (pages.length === 0) {
-            // Try to read from the pages table directly
-            document.querySelectorAll('#pages-table-body tr').forEach(function(tr) {
-                var idEl = tr.querySelector('[data-page-id]');
-                if (!idEl) return;
-                var pid  = idEl.getAttribute('data-page-id');
-                var name = tr.querySelector('.page-name-cell') ? tr.querySelector('.page-name-cell').textContent.trim() : 'Page ' + pid;
-                var slug = tr.getAttribute('data-slug') || '';
-                rows += lsMapperRow(pid, name, slug, mappings[pid], routeOptions);
-            });
+            var trs = document.querySelectorAll('#pages-table-body tr');
+            if (trs.length > 0) {
+                trs.forEach(function(tr) {
+                    var idEl = tr.querySelector('[data-page-id]');
+                    if (!idEl) return;
+                    var pid  = idEl.getAttribute('data-page-id');
+                    var name = tr.querySelector('.page-name-cell') ? tr.querySelector('.page-name-cell').textContent.trim() : 'Page ' + pid;
+                    var slug = tr.getAttribute('data-slug') || '';
+                    rows += lsMapperRow(pid, name, slug, mappings[pid], routeOptions);
+                    hasPages = true;
+                });
+            }
         } else {
             pages.forEach(function(page) {
                 rows += lsMapperRow(page.id, page.name || 'Page', page.slug || '', mappings[page.id], routeOptions);
+                hasPages = true;
             });
         }
 
-        rowsEl.innerHTML = rows || '<div style="padding:16px;text-align:center;font-size:12px;color:#a1a1aa;">No pages found. Create pages in the Canvas first.</div>';
+        if (!hasPages) {
+            rows = '<div id="ls-auto-import-panel" style="padding:20px;text-align:center;border:1.5px dashed #ddd6fe;background:#f5f3ff;border-radius:12px;margin-bottom:14px;box-shadow:0 1px 3px rgba(124,58,237,0.05);">' +
+                   '  <div style="font-size:13px;font-weight:700;color:#7c3aed;margin-bottom:4px;">Import ' + routes.length + ' Pages Automatically</div>' +
+                   '  <p style="font-size:10.5px;color:#6d28d9;line-height:1.45;margin-bottom:12px;">We found ' + routes.length + ' page routes in your repository. Let Cora automatically create and map these pages in WordPress for you.</p>' +
+                   '  <button onclick="lsAutoCreatePages()" id="ls-auto-create-btn" style="padding:8px 20px;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,0.18);transition:all 0.15s;" onmouseover="this.style.background=\'#6d28d9\'" onmouseout="this.style.background=\'#7c3aed\'">' +
+                   '    Auto-Create & Map Pages' +
+                   '  </button>' +
+                   '</div>';
+        }
+
+        rowsEl.innerHTML = rows;
 
         // Compat summary
         if (compatEl) {
@@ -319,6 +334,31 @@
         if (!window.CORA_PAGE_MAPPINGS) window.CORA_PAGE_MAPPINGS = {};
         if (route) { window.CORA_PAGE_MAPPINGS[pageId] = route; }
         else { delete window.CORA_PAGE_MAPPINGS[pageId]; }
+    };
+
+    window.lsAutoCreatePages = function() {
+        var btn = document.getElementById('ls-auto-create-btn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Creating Pages\u2026'; }
+        
+        var themeId = window.canvasState ? window.canvasState.activeThemeId : 0;
+        
+        $.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_auto_create_lovable_pages',
+            nonce: coraREData.ajaxNonce,
+            theme_id: themeId
+        }, function(res) {
+            if (res.success) {
+                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Pages created successfully!', 'success');
+                setTimeout(function() { window.location.reload(); }, 1000);
+            } else {
+                var err = (res.data && res.data.message) ? res.data.message : 'Failed to auto-create pages.';
+                if (window.coraShowToast) window.coraShowToast(err, 'error');
+                if (btn) { btn.disabled = false; btn.textContent = 'Auto-Create & Map Pages'; }
+            }
+        }).fail(function() {
+            if (window.coraShowToast) window.coraShowToast('Network error while creating pages.', 'error');
+            if (btn) { btn.disabled = false; btn.textContent = 'Auto-Create & Map Pages'; }
+        });
     };
 
     // ── Init on DOMReady ────────────────────────────────────────────────

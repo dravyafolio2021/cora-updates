@@ -15520,12 +15520,12 @@ function cora_ajax_trigger_git_sync() {
         ) );
     }
 
-    $repo   = ($theme_id && isset($settings['github_repo'])) ? $settings['github_repo'] : get_option( 'cora_git_sync_repo', '' );
-    $branch = ($theme_id && isset($settings['github_branch'])) ? $settings['github_branch'] : get_option( 'cora_git_sync_branch', 'main' );
-    $token  = ($theme_id && isset($settings['lovable_pat'])) ? $settings['lovable_pat'] : get_option( 'cora_git_sync_token', '' );
+if ( ! function_exists( 'cora_git_sync_pull_repository' ) ) {
+function cora_git_sync_pull_repository( $theme_id, $repo, $branch, $token ) {
+    global $wpdb;
 
     if ( empty( $repo ) ) {
-        wp_send_json_error( array( 'message' => 'GitHub Repository path is required.' ) );
+        return new WP_Error( 'git_sync_error', 'GitHub Repository path is required.' );
     }
 
     // Support both full URL and username/repo format
@@ -15535,7 +15535,7 @@ function cora_ajax_trigger_git_sync() {
     } else {
         $repo_parts = explode( '/', trim( $repo, '/' ) );
         if ( count( $repo_parts ) !== 2 ) {
-            wp_send_json_error( array( 'message' => 'Invalid repository format. Please use "username/repo" or the full GitHub URL.' ) );
+            return new WP_Error( 'git_sync_error', 'Invalid repository format. Please use "username/repo" or the full GitHub URL.' );
         }
         $owner = $repo_parts[0];
         $repo_name = $repo_parts[1];
@@ -15563,7 +15563,7 @@ function cora_ajax_trigger_git_sync() {
     require_once ABSPATH . 'wp-admin/includes/file.php';
     
     // Safely apply headers only to GitHub and codeload domains, stripping them for S3 redirects
-    add_filter( 'http_request_args', function( $http_args, $url ) use ( $download_url, $args ) {
+    $filter_func = function( $http_args, $url ) use ( $download_url, $args ) {
         $parsed_url = parse_url( $url );
         $host = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
         if ( in_array( $host, array( 'api.github.com', 'codeload.github.com', 'github.com' ) ) ) {
@@ -15575,12 +15575,16 @@ function cora_ajax_trigger_git_sync() {
         }
         $http_args['headers']['User-Agent'] = 'Cora-Git-Sync-Plugin';
         return $http_args;
-    }, 10, 2 );
+    };
+
+    add_filter( 'http_request_args', $filter_func, 10, 2 );
 
     $tmp_file = download_url( $download_url );
 
+    remove_filter( 'http_request_args', $filter_func, 10 );
+
     if ( is_wp_error( $tmp_file ) ) {
-        wp_send_json_error( array( 'message' => 'Download failed: ' . $tmp_file->get_error_message() ) );
+        return new WP_Error( 'git_sync_error', 'Download failed: ' . $tmp_file->get_error_message() );
     }
 
     $upload_dir = wp_get_upload_dir();
@@ -15601,7 +15605,7 @@ function cora_ajax_trigger_git_sync() {
     @unlink( $tmp_file );
 
     if ( is_wp_error( $unzipped ) ) {
-        wp_send_json_error( array( 'message' => 'Extraction failed: ' . $unzipped->get_error_message() ) );
+        return new WP_Error( 'git_sync_error', 'Extraction failed: ' . $unzipped->get_error_message() );
     }
 
     $files = $wp_filesystem->dirlist( $target_dir );
@@ -15616,7 +15620,7 @@ function cora_ajax_trigger_git_sync() {
     }
 
     if ( empty( $nested_dir ) ) {
-        wp_send_json_error( array( 'message' => 'Failed to locate extracted nested directory from GitHub.' ) );
+        return new WP_Error( 'git_sync_error', 'Failed to locate extracted nested directory from GitHub.' );
     }
 
     // Scan extracted HTML for Cora bridge compatibility flags inside the target folder
@@ -15662,7 +15666,84 @@ function cora_ajax_trigger_git_sync() {
     update_option( 'cora_git_sync_nested_dir', $nested_dir );
     update_option( 'cora_git_sync_compat_flags', $compat_flags );
 
-    // Count detected routes using our dynamic method
+    return array(
+        'nested_dir'   => $nested_dir,
+        'compat_flags' => $compat_flags,
+    );
+}
+}
+
+if ( ! function_exists( 'cora_ajax_trigger_git_sync' ) ) {
+function cora_ajax_trigger_git_sync() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+
+    $theme_id = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    
+    // Auto-update values if passed from the JS form
+    if ( isset( $_POST['repo'] ) ) {
+        update_option( 'cora_git_sync_repo', sanitize_text_field( $_POST['repo'] ) );
+    }
+    if ( isset( $_POST['branch'] ) ) {
+        update_option( 'cora_git_sync_branch', sanitize_text_field( $_POST['branch'] ) );
+    }
+    if ( isset( $_POST['token'] ) ) {
+        update_option( 'cora_git_sync_token', sanitize_text_field( $_POST['token'] ) );
+    }
+    if ( isset( $_POST['live_url'] ) ) {
+        update_option( 'cora_git_sync_live_url', esc_url_raw( $_POST['live_url'] ) );
+    }
+
+    $settings = array();
+    global $wpdb;
+    if ( $theme_id ) {
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( $theme ) {
+            $settings = json_decode( $theme['settings'], true ) ?: array();
+            if ( isset( $_POST['repo'] ) ) {
+                $settings['github_repo'] = esc_url_raw( $_POST['repo'] );
+            }
+            if ( isset( $_POST['branch'] ) ) {
+                $settings['github_branch'] = sanitize_text_field( $_POST['branch'] );
+            }
+            if ( isset( $_POST['token'] ) ) {
+                $settings['lovable_pat'] = sanitize_text_field( $_POST['token'] );
+            }
+            if ( isset( $_POST['live_url'] ) ) {
+                $settings['lovable_project_url'] = esc_url_raw( $_POST['live_url'] );
+            }
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'settings' => json_encode( $settings ), 'updated_at' => current_time('mysql') ),
+                array( 'id' => $theme_id )
+            );
+        }
+    }
+
+    $live_url = ($theme_id && isset($settings['lovable_project_url'])) ? $settings['lovable_project_url'] : get_option( 'cora_git_sync_live_url', '' );
+    if ( ! empty( $live_url ) ) {
+        update_option( 'cora_git_sync_last_time', time() );
+        update_option( 'cora_git_sync_last_status', 'Success' );
+        cora_log_activity( 'git_sync', "Enabled Lovable Live URL Proxy: {$live_url}" );
+        wp_send_json_success( array(
+            'message'   => 'Live URL configured and enabled successfully!',
+            'timestamp' => date( 'Y-m-d H:i:s' ),
+            'status'    => 'Success'
+        ) );
+    }
+
+    $repo   = ($theme_id && isset($settings['github_repo'])) ? $settings['github_repo'] : get_option( 'cora_git_sync_repo', '' );
+    $branch = ($theme_id && isset($settings['github_branch'])) ? $settings['github_branch'] : get_option( 'cora_git_sync_branch', 'main' );
+    $token  = ($theme_id && isset($settings['lovable_pat'])) ? $settings['lovable_pat'] : get_option( 'cora_git_sync_token', '' );
+
+    $result = cora_git_sync_pull_repository( $theme_id, $repo, $branch, $token );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+    }
+
     $routes = cora_git_sync_get_lovable_routes( $theme_id );
 
     cora_log_activity( 'git_sync', "Synchronized repository {$repo} [branch: {$branch}]" );
@@ -15671,7 +15752,7 @@ function cora_ajax_trigger_git_sync() {
         'message'      => 'Repository synced and deployed successfully!',
         'timestamp'    => date( 'Y-m-d H:i:s' ),
         'status'       => 'Success',
-        'compat_flags' => $compat_flags,
+        'compat_flags' => $result['compat_flags'],
         'route_count'  => count( $routes ),
     ) );
 }
@@ -23847,6 +23928,84 @@ function cora_ajax_canvas_create_theme() {
         }
     }
 
+    // Automatically trigger the git pull and create pages immediately if builder is Lovable!
+    if ( isset( $_POST['builder'] ) && $_POST['builder'] === 'lovable' ) {
+        $repo   = isset( $settings['github_repo'] ) ? $settings['github_repo'] : '';
+        $branch = isset( $settings['github_branch'] ) ? $settings['github_branch'] : 'main';
+        $token  = isset( $settings['lovable_pat'] ) ? $settings['lovable_pat'] : '';
+        
+        if ( ! empty( $repo ) ) {
+            $pulled = cora_git_sync_pull_repository( $new_id, $repo, $branch, $token );
+            if ( ! is_wp_error( $pulled ) ) {
+                $routes = cora_git_sync_get_lovable_routes( $new_id );
+                if ( ! empty( $routes ) ) {
+                    if ( ! isset( $settings['page_mappings'] ) || ! is_array( $settings['page_mappings'] ) ) {
+                        $settings['page_mappings'] = array();
+                    }
+                    foreach ( $routes as $r ) {
+                        $path = $r['path'];
+                        $title = $r['title'];
+                        $slug = trim( $path, '/' );
+                        if ( empty( $slug ) ) {
+                            $slug = 'home';
+                            $title = 'Home';
+                        }
+                        
+                        $wp_post_id = wp_insert_post( array(
+                            'post_title'   => $title,
+                            'post_name'    => $slug,
+                            'post_type'    => 'page',
+                            'post_status'  => 'publish',
+                            'post_content' => '<!-- Lovable Page Template -->'
+                        ) );
+                        
+                        if ( ! is_wp_error( $wp_post_id ) ) {
+                            $resolved_slug = get_post_field( 'post_name', $wp_post_id ) ?: $slug;
+                            
+                            $wpdb->insert(
+                                $wpdb->prefix . 'cora_canvas_pages',
+                                array(
+                                    'agency_id' => 1,
+                                    'theme_id' => $new_id,
+                                    'wp_post_id' => $wp_post_id,
+                                    'title' => $title,
+                                    'slug' => $resolved_slug,
+                                    'status' => 'publish',
+                                    'is_homepage' => ($path === '/') ? 1 : 0,
+                                    'template' => 'default',
+                                    'created_by' => get_current_user_id(),
+                                    'created_at' => current_time('mysql'),
+                                    'updated_at' => current_time('mysql')
+                                ),
+                                array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s', '%s' )
+                            );
+                            
+                            $page_id = $wpdb->insert_id;
+                            $settings['page_mappings'][ $page_id ] = $path;
+                        }
+                    }
+                    
+                    // Update theme settings with the mappings
+                    $wpdb->update(
+                        $wpdb->prefix . 'cora_canvas_themes',
+                        array( 'settings' => json_encode( $settings ), 'updated_at' => current_time('mysql') ),
+                        array( 'id' => $new_id )
+                    );
+                    
+                    // Save to global mappings
+                    $global_mappings = get_option( 'cora_git_sync_page_mappings', array() );
+                    if ( ! is_array( $global_mappings ) ) {
+                        $global_mappings = array();
+                    }
+                    foreach ( $settings['page_mappings'] as $pid => $proute ) {
+                        $global_mappings[ $pid ] = $proute;
+                    }
+                    update_option( 'cora_git_sync_page_mappings', $global_mappings );
+                }
+            }
+        }
+    }
+
     cora_log_activity( 'Canvas', "Created draft theme workspace '{$name}'." );
     wp_send_json_success();
 }
@@ -24457,6 +24616,130 @@ function cora_ajax_canvas_create_page() {
 }
 }
 add_action( 'wp_ajax_cora_ajax_create_page', 'cora_ajax_canvas_create_page' );
+
+if ( ! function_exists( 'cora_ajax_canvas_auto_create_lovable_pages' ) ) {
+function cora_ajax_canvas_auto_create_lovable_pages() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    }
+    global $wpdb;
+    $theme_id = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    if ( ! $theme_id ) {
+        wp_send_json_error( array( 'message' => 'Invalid Theme ID' ) );
+    }
+
+    $routes = cora_git_sync_get_lovable_routes( $theme_id );
+    if ( empty( $routes ) ) {
+        wp_send_json_error( array( 'message' => 'No pages or routes found in the repository.' ) );
+    }
+
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    if ( ! $theme ) {
+        wp_send_json_error( array( 'message' => 'Theme workspace not found.' ) );
+    }
+
+    $settings = json_decode( $theme['settings'], true ) ?: array();
+    if ( ! isset( $settings['page_mappings'] ) || ! is_array( $settings['page_mappings'] ) ) {
+        $settings['page_mappings'] = array();
+    }
+
+    $created_pages_count = 0;
+    $existing_pages = $wpdb->get_results( $wpdb->prepare( "SELECT id, slug, wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $theme_id ), ARRAY_A );
+    $slug_to_page = array();
+    foreach ( $existing_pages as $p ) {
+        $slug_to_page[ $p['slug'] ] = $p;
+    }
+
+    foreach ( $routes as $r ) {
+        $path = $r['path'];
+        $title = $r['title'];
+        $slug = trim( $path, '/' );
+        
+        // Handle home route
+        if ( empty( $slug ) ) {
+            $slug = 'home';
+            $title = 'Home';
+        }
+
+        // Check if page already exists for this theme
+        if ( isset( $slug_to_page[ $slug ] ) ) {
+            $page_id = intval( $slug_to_page[ $slug ]['id'] );
+            // Auto map if not mapped yet
+            if ( empty( $settings['page_mappings'][ $page_id ] ) ) {
+                $settings['page_mappings'][ $page_id ] = $path;
+            }
+            continue;
+        }
+
+        // Insert WordPress Page
+        $wp_post_id = wp_insert_post( array(
+            'post_title'   => $title,
+            'post_name'    => $slug,
+            'post_type'    => 'page',
+            'post_status'  => 'publish',
+            'post_content' => '<!-- Lovable Page Template -->'
+        ) );
+
+        if ( is_wp_error( $wp_post_id ) ) {
+            continue;
+        }
+
+        $resolved_slug = get_post_field( 'post_name', $wp_post_id ) ?: $slug;
+
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_canvas_pages',
+            array(
+                'agency_id' => 1,
+                'theme_id' => $theme_id,
+                'wp_post_id' => $wp_post_id,
+                'title' => $title,
+                'slug' => $resolved_slug,
+                'status' => 'publish',
+                'is_homepage' => ($path === '/') ? 1 : 0,
+                'template' => 'default',
+                'created_by' => get_current_user_id(),
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s', '%s' )
+        );
+
+        $page_id = $wpdb->insert_id;
+        $settings['page_mappings'][ $page_id ] = $path;
+        $created_pages_count++;
+    }
+
+    // Save updated theme settings
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array( 'settings' => json_encode( $settings ), 'updated_at' => current_time('mysql') ),
+        array( 'id' => $theme_id )
+    );
+
+    // Save/update global mappings option
+    $global_mappings = get_option( 'cora_git_sync_page_mappings', array() );
+    if ( ! is_array( $global_mappings ) ) {
+        $global_mappings = array();
+    }
+    foreach ( $settings['page_mappings'] as $pid => $proute ) {
+        $global_mappings[ $pid ] = $proute;
+    }
+    update_option( 'cora_git_sync_page_mappings', $global_mappings );
+
+    // If theme is live, update WP native Reading settings (homepage selection)
+    if ( $theme['status'] === 'live' ) {
+        cora_canvas_sync_homepage_options();
+    }
+
+    cora_log_activity( 'Canvas', "Auto-created {$created_pages_count} pages from Lovable routes for theme workspace ID {$theme_id}." );
+
+    wp_send_json_success( array(
+        'message' => sprintf( 'Successfully created and mapped %d pages!', $created_pages_count )
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_auto_create_lovable_pages', 'cora_ajax_canvas_auto_create_lovable_pages' );
 
 if ( ! function_exists( 'cora_ajax_canvas_ensure_wp_post' ) ) {
 function cora_ajax_canvas_ensure_wp_post() {
