@@ -3183,43 +3183,63 @@ function cora_get_sparkline_points( $history, $type ) {
 .atw-drop-zone:hover{border-color:#71717a;background:#f5f5f5;}
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 1s linear infinite; }
+
+.atw-header-bar { padding: 0 28px !important; }
+.atw-title-text { display: inline !important; }
+.atw-lbl-text { display: inline !important; }
+.atw-line-connector { width: 44px !important; margin: 0 6px !important; }
+.atw-builder-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 18px !important; width: 100% !important; max-width: 880px !important; }
+.atw-token-branch-row { display: grid !important; grid-template-columns: 1fr 120px !important; gap: 12px !important; }
+.atw-template-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+.atw-cancel-text { display: inline !important; }
+
+@media (max-width: 640px) {
+    .atw-header-bar { padding: 0 12px !important; }
+    .atw-title-text { display: none !important; }
+    .atw-lbl-text { display: none !important; }
+    .atw-line-connector { width: 20px !important; margin: 0 3px !important; }
+    .atw-builder-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+    .atw-token-branch-row { grid-template-columns: 1fr !important; }
+    .atw-template-grid { grid-template-columns: 1fr !important; }
+    .atw-cancel-text { display: none !important; }
+}
 </style>
 
 <div id="atw" style="position:fixed;inset:0;z-index:999999;display:none;opacity:0;transition:opacity .22s ease;background:#F8F8F7;flex-direction:column;">
 
     <!-- TOP BAR -->
-    <div style="flex-shrink:0;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(248,248,247,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.07);">
+    <div style="flex-shrink:0;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(248,248,247,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.07);" class="atw-header-bar">
         <div style="display:flex;align-items:center;gap:9px;">
             <div style="width:26px;height:26px;background:#18181b;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
             </div>
-            <span style="font-size:13px;font-weight:700;color:#18181b;letter-spacing:-.025em;">Add New Theme</span>
+            <span style="font-size:13px;font-weight:700;color:#18181b;letter-spacing:-.025em;" class="atw-title-text">Add New Theme</span>
         </div>
         <div style="display:flex;align-items:center;gap:0;">
             <div id="atw-prog-1" style="display:flex;align-items:center;gap:7px;">
                 <div id="atw-dot-1" style="width:22px;height:22px;background:#18181b;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s;">
                     <span style="font-size:9px;font-weight:900;color:white;line-height:1;">1</span>
                 </div>
-                <span id="atw-lbl-1" style="font-size:11px;font-weight:700;color:#18181b;letter-spacing:-.01em;transition:color .25s;">Builder</span>
+                <span id="atw-lbl-1" style="font-size:11px;font-weight:700;color:#18181b;letter-spacing:-.01em;transition:color .25s;" class="atw-lbl-text">Builder</span>
             </div>
-            <div id="atw-line-1" style="width:44px;height:2px;margin:0 6px;background:#e4e4e7;border-radius:2px;transition:background .3s;"></div>
+            <div id="atw-line-1" style="width:44px;height:2px;margin:0 6px;background:#e4e4e7;border-radius:2px;transition:background .3s;" class="atw-line-connector"></div>
             <div id="atw-prog-2" style="display:flex;align-items:center;gap:7px;opacity:.35;transition:opacity .25s;">
                 <div id="atw-dot-2" style="width:22px;height:22px;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s;">
                     <span style="font-size:9px;font-weight:900;color:#9ca3af;line-height:1;">2</span>
                 </div>
-                <span id="atw-lbl-2" style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:-.01em;transition:color .25s;">Setup</span>
+                <span id="atw-lbl-2" style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:-.01em;transition:color .25s;" class="atw-lbl-text">Setup</span>
             </div>
-            <div id="atw-line-2" style="width:44px;height:2px;margin:0 6px;background:#e4e4e7;border-radius:2px;transition:background .3s;"></div>
+            <div id="atw-line-2" style="width:44px;height:2px;margin:0 6px;background:#e4e4e7;border-radius:2px;transition:background .3s;" class="atw-line-connector"></div>
             <div id="atw-prog-3" style="display:flex;align-items:center;gap:7px;opacity:.35;transition:opacity .25s;">
                 <div id="atw-dot-3" style="width:22px;height:22px;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s;">
                     <span style="font-size:9px;font-weight:900;color:#9ca3af;line-height:1;">3</span>
                 </div>
-                <span id="atw-lbl-3" style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:-.01em;transition:color .25s;">Save</span>
+                <span id="atw-lbl-3" style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:-.01em;transition:color .25s;" class="atw-lbl-text">Save</span>
             </div>
         </div>
         <button onclick="closeAddThemeWizard()" style="display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:8px;border:none;background:transparent;color:#a1a1aa;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(0,0,0,.05)';this.style.color='#3f3f46';" onmouseout="this.style.background='transparent';this.style.color='#a1a1aa';">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Cancel
+            <span class="atw-cancel-text">Cancel</span>
         </button>
     </div>
 
@@ -3233,7 +3253,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <h2 style="font-size:34px;font-weight:900;color:#18181b;letter-spacing:-.045em;line-height:1.08;margin-bottom:14px;">What are you<br>building with?</h2>
                 <p style="font-size:14px;color:#71717a;line-height:1.65;">Choose your frontend builder. Cora supports both Elementor-powered sites and Lovable AI-generated themes.</p>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%;max-width:880px;">
+            <div class="atw-builder-grid">
 
                 <!-- Elementor Card -->
                 <button onclick="wizardSelectBuilder('elementor')" id="wizard-card-elementor" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);">
@@ -3359,7 +3379,51 @@ function cora_get_sparkline_points( $history, $type ) {
                         <div style="flex:1;min-width:0;">
                             <p id="wiz-kit-filename" style="font-size:11.5px;font-weight:700;color:#18181b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px;"></p>
                             <p style="font-size:9.5px;color:#a1a1aa;font-weight:500;">.zip archive · Elementor Kit</p>
-                            <!-- STEP 2B: Lovable Setup -->
+                        </div>
+                        <!-- Success check + remove -->
+                        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                            <span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            <button onclick="wizardClearFile()" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#a1a1aa;display:flex;align-items:center;" onmouseover="this.style.background='#f4f4f5';this.style.color='#18181b';" onmouseout="this.style.background='none';this.style.color='#a1a1aa';">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Scanned Pages Panel -->
+                    <div id="wiz-kit-scanned-container" style="display:none;margin-top:10px;border:1.5px solid #e4e4e7;border-radius:16px;background:white;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+                        <!-- Panel Header -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #f4f4f5;background:#fafafa;">
+                            <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;display:flex;align-items:center;gap:5px;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Pages found in kit
+                            </span>
+                            <span id="wiz-kit-scanned-count" style="font-size:9px;font-weight:800;background:#18181b;color:white;padding:2px 8px;border-radius:20px;letter-spacing:.04em;">0 pages</span>
+                        </div>
+                        <!-- Page Tags -->
+                        <div id="wiz-kit-scanned-list" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px;max-height:140px;overflow-y:auto;">
+                            <!-- page tags injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GitHub Area -->
+                <div id="wiz-github-area" style="display:none;flex-direction:column;gap:14px;">
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Repository URL *</label>
+                        <input type="text" id="wiz-github-repo" class="atw-input" placeholder="https://github.com/your-org/your-theme">
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Branch</label>
+                        <input type="text" id="wiz-github-branch" class="atw-input" placeholder="main">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- STEP 2B: Lovable Setup -->
         <div id="wizard-step-2b" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;">
             <div style="width:100%;max-width:580px;">
                 <div style="text-align:center;margin-bottom:28px;">
@@ -3401,7 +3465,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
 
                     <!-- PAT and Branch Row -->
-                    <div style="display:grid;grid-template-cols:1fr 120px;gap:12px;">
+                    <div class="atw-token-branch-row">
                         <!-- Personal Access Token -->
                         <div style="display:flex;flex-direction:column;gap:5px;">
                             <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Personal Access Token (PAT) *</label>
@@ -3449,7 +3513,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- SUB-CONTAINER 2: Create from Scratch Guide -->
                 <div id="wiz-lovable-scratch-area" style="display:none;flex-direction:column;gap:18px;">
                     <!-- Template Choice Cards -->
-                    <div style="display:grid;grid-template-cols:1fr 1fr;gap:12px;">
+                    <div class="atw-template-grid">
                         <div style="background:white;border:1.5px solid #e4e4e7;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03);display:flex;flex-direction:column;justify-content:space-between;transition:all .2s;" onmouseover="this.style.borderColor='#18181b'" onmouseout="this.style.borderColor='#e4e4e7'">
                             <div style="height:90px;background:#fbfaf7;border-bottom:1px solid #e4e4e7;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;">
                                 <div class="flex items-center justify-center text-zinc-400"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
