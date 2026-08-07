@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.49
+ * Version: 3.2.50
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.49' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.50' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -6550,6 +6550,22 @@ function cora_git_sync_serve_frontend() {
         $canvas_page = $wpdb->get_row( $query, ARRAY_A );
     }
 
+    // 1.5. Check if requested path matches any mapped routes values directly
+    if ( ! $canvas_page && is_array( $mappings ) && ! empty( $mappings ) ) {
+        foreach ( $mappings as $mapped_page_id => $mapped_route ) {
+            $clean_route = trim( $mapped_route, '/' );
+            if ( $clean_route === $path ) {
+                $canvas_page = $wpdb->get_row( $wpdb->prepare(
+                    "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d LIMIT 1",
+                    $mapped_page_id
+                ), ARRAY_A );
+                if ( $canvas_page ) {
+                    break;
+                }
+            }
+        }
+    }
+
     // 2. Fall back to resolved post ID match if no direct mapped page matched
     if ( ! $canvas_page ) {
         $current_post_id = get_queried_object_id();
@@ -6624,11 +6640,19 @@ function cora_git_sync_serve_frontend() {
                 $injection = "\n<script>\n";
                 $injection .= "  (function() {\n";
                 $injection .= "    var targetRoute = '" . esc_js( $target_route ) . "';\n";
-                $injection .= "    if (targetRoute && targetRoute !== '/') {\n";
-                $injection .= "      Object.defineProperty(window.Location.prototype, 'pathname', {\n";
-                $injection .= "        get: function() { return targetRoute; },\n";
-                $injection .= "        configurable: true\n";
-                $injection .= "      });\n";
+                $injection .= "    if (targetRoute) {\n";
+                $injection .= "      try {\n";
+                $injection .= "        var cleanPath = targetRoute;\n";
+                $injection .= "        if (cleanPath && cleanPath.charAt(0) !== '/') cleanPath = '/' + cleanPath;\n";
+                $injection .= "        if (cleanPath === '/') cleanPath = '';\n";
+                $injection .= "        window.history.replaceState(window.history.state, '', window.location.protocol + '//' + window.location.host + cleanPath + window.location.search + window.location.hash);\n";
+                $injection .= "      } catch(e) {}\n";
+                $injection .= "      try {\n";
+                $injection .= "        Object.defineProperty(window.Location.prototype, 'pathname', {\n";
+                $injection .= "          get: function() { return targetRoute; },\n";
+                $injection .= "          configurable: true\n";
+                $injection .= "        });\n";
+                $injection .= "      } catch(e) {}\n";
                 $injection .= "    }\n";
                 $injection .= "  })();\n";
                 $injection .= "  window.CORA_API_URL = '" . esc_url_raw( $api_url ) . "';\n";
