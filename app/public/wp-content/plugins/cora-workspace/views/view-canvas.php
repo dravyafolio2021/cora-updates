@@ -789,7 +789,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between" id="website-statistics-card">
                     <div>
                         <h3 class="text-sm font-black text-zinc-900 dark:text-white mb-4 font-sans">Website statistics</h3>
-                        <div class="space-y-1 divide-y divide-zinc-100/60 dark:divide-zinc-850">
+                        <div class="space-y-1">
                             <?php
                             $stats_rows = [
                                 ['label' => 'Pages', 'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>', 'value' => count($live_stats), 'delta' => '+5', 'positive' => true, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
@@ -799,7 +799,8 @@ function cora_get_sparkline_points( $history, $type ) {
                                 ['label' => 'Client Leads', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>', 'value' => $cora_leads_count, 'delta' => '+7', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('leads'); }"],
                                 ['label' => 'Total Bookings', 'icon' => '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>', 'value' => $cora_bookings_count, 'delta' => '+2', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('bookings'); }"],
                             ];
-                            foreach ($stats_rows as $row) :
+                            $total_rows = count($stats_rows);
+                            foreach ($stats_rows as $index => $row) :
                             ?>
                             <div onclick="<?php echo $row['action']; ?>" class="flex items-center justify-between py-2 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 px-2 -mx-2 rounded-lg cursor-pointer transition-colors group">
                                 <div class="flex items-center gap-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-350 font-sans">
@@ -819,6 +820,9 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <?php endif; ?>
                                 </div>
                             </div>
+                            <?php if ($index < $total_rows - 1) : ?>
+                            <div class="h-px bg-zinc-100/60 dark:bg-zinc-850/60 my-0.5"></div>
+                            <?php endif; ?>
                             <?php endforeach; ?>
                         </div>
                     </div>

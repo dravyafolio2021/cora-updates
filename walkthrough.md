@@ -1,55 +1,51 @@
-# Walkthrough - User Drawer Image Change Selection Fix
+# Walkthrough - Website Statistics UI Refinement & Version Increment
 
-I have successfully resolved the issue where the user was unable to select or change their avatar in the Edit User drawer.
+I have successfully resolved the issue where the rows of the "Website statistics" card rendered with duplicate curved borders and faux shadow outlines on light and dark themes.
 
 ## Changes Completed
 
-### Core Workspace Plugin Scripts
+### Core Workspace Plugin Layouts
 
-#### [admin-script.js](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/assets/js/admin-script.js)
-- Refactored the `modalContent` lookup logic in the `wp.media` wrapper. Instead of calling `frame.$el.find('.media-modal-content')` (which returned empty because `.media-modal-content` is the parent of `.media-frame` in the DOM hierarchy), it now locates it robustly:
-  ```javascript
-  var modalContent = modal.closest('.media-modal-content');
-  if (!modalContent.length) {
-      modalContent = modal.find('.media-modal-content');
-  }
-  if (!modalContent.length) {
-      modalContent = modal.parent();
-  }
-  ```
+#### [view-canvas.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/views/view-canvas.php)
+- Removed the Tailwind v4 `.divide-y` borders from the container element. 
+- Implemented clean, straight, 1px horizontal separator line divs (`<div class="h-px bg-zinc-100/60 dark:bg-zinc-850/60 my-0.5">`) between elements in the stats foreach loop.
+- This prevents the border from curving at the corners of rows that utilize `.rounded-lg` for their hover states, yielding straight, neat lines.
+
+### Versioning & manifest Update
+
+#### [cora-workspace.php](file:///Users/shrutian/Desktop/cora/app/public/wp-content/plugins/cora-workspace/cora-workspace.php)
+- Incremented the plugin version from `3.2.52` to `3.2.53`.
+- Updated the version in the plugin file header block and the constant definition `CORA_WORKSPACE_VERSION`.
+
+#### [cora-workspace.json](file:///Users/shrutian/Desktop/cora/updates/cora-workspace.json)
+- Incremented the version property to `3.2.53`.
+- Added the `3.2.53` changelog entry to the updates manifest JSON file.
 
 ---
 
 ## Verification Results
 
-### E2E Test Verification
-I wrote a new E2E test, [test-avatar-drawer.spec.ts](file:///Users/shrutian/Desktop/cora/tests/e2e/test-avatar-drawer.spec.ts), that simulates the complete user avatar selection lifecycle:
-1. Opens the "Team & Roles" page and clicks the "Edit" button for the first active member.
-2. Clicks on the profile avatar preview, opening the WordPress media modal.
-3. Verifies that the custom monochromatic "Use as Avatar" selection button is successfully created, appended, and is initially disabled.
-4. Switches to the "Media Library" tab, selects an image, and verifies the custom button is enabled.
-5. Clicks the button, verifying that the media modal closes and the avatar image inside the drawer updates with the selected image source URL.
+### CSS Computed Styles & Visual Audit
+- Inspected row computed styles via E2E checks: Row `borderBottomWidth` was cleared to `0px` and the new straight dividers render correctly.
+- Captured E2E snapshots verifying that the curved outlines are completely gone, and rows look clean and professional.
 
-#### Test Execution Run
+### Build release zip package
+- Ran `./scripts/build.sh` successfully, verifying version matching across files:
 ```bash
-$ npx playwright test tests/e2e/test-avatar-drawer.spec.ts
-Running 1 test using 1 worker
-
-Successfully updated avatar image to: http://cora.local/wp-content/uploads/2026/07/Screenshot-2026-07-29-at-1.48.34-PM.png
-  ✓  1 [chromium] › tests/e2e/test-avatar-drawer.spec.ts:4:5 › verify user avatar select and update functionality via media modal (5.4s)
-
-  1 passed (6.4s)
+$ ./scripts/build.sh
+=== Cora Workspace Release Builder ===
+Checking version consistency...
+  Plugin Header:      3.2.53
+  Plugin Constant:    3.2.53
+  Updates Manifest:   3.2.53
+✅ Versions match.
+Analyzing PHP function definitions and safety guards...
+  Total functions:    599
+  Function guards:    700
+✅ Guard analysis complete.
+Packaging release zip...
+✅ Packaging complete: /Users/shrutian/Desktop/cora/updates/cora-workspace.zip
+  Zip file size: 4.5M
+=======================================
+Build successful! Ready for deploy.
 ```
-
-### Regression Verification
-I also ran the other member drawer and invitation tests to confirm no layout or form functionality regression:
-```bash
-$ npx playwright test tests/e2e/mcp-user-security.spec.ts tests/e2e/invite-user-flow.spec.ts
-Running 2 tests using 1 worker
-
-  ✓  1 [chromium] › tests/e2e/invite-user-flow.spec.ts:6:7 › Cora User Invitation Flow E2E Tests › Open invite drawer, verify dynamic labels... (6.0s)
-  ✓  2 [chromium] › tests/e2e/mcp-user-security.spec.ts:6:7 › Cora User MCP Security E2E Tests › Open user drawer, inspect MCP credentials UI... (6.8s)
-
-  2 passed (13.5s)
-```
-All tests completed with 100% success.
