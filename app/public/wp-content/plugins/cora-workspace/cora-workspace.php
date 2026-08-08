@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.60
+ * Version: 3.2.61
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.60' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.61' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -5971,7 +5971,17 @@ function cora_canvas_theme_frontend_router() {
     }
 
     // Prevent intercepting if inside Elementor editor/preview
-    if ( isset( $_GET['elementor-preview'] ) || ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) ) {
+    if ( isset( $_GET['elementor-preview'] ) ) {
+        $preview_post_id = intval( $_GET['elementor-preview'] );
+        if ( $preview_post_id > 0 && 'elementor_library' === get_post_type( $preview_post_id ) ) {
+            add_filter( 'template_include', function() {
+                return plugin_dir_path( __FILE__ ) . 'views/view-canvas-render.php';
+            }, 9999 );
+            return;
+        }
+        return;
+    }
+    if ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) {
         return;
     }
     if ( did_action( 'elementor/loaded' ) ) {
