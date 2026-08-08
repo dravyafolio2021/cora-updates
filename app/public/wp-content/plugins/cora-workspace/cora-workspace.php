@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.57
+ * Version: 3.2.58
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.57' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.58' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -428,6 +428,26 @@ add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
 }, 999, 4 );
 
 /**
+ * Helper to detect if the current request is for the Elementor App/Theme Builder
+ */
+function cora_is_elementor_app_request() {
+    if ( is_admin() ) {
+        if ( isset( $_GET['page'] ) && $_GET['page'] === 'elementor-app' ) {
+            return true;
+        }
+        if ( isset( $_REQUEST['action'] ) && 0 === strpos( $_REQUEST['action'], 'elementor_' ) ) {
+            return true;
+        }
+    }
+    if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+        if ( isset( $_SERVER['REQUEST_URI'] ) && false !== strpos( $_SERVER['REQUEST_URI'], '/wp-json/elementor/' ) ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Map administrator capabilities to cora_super_admin and cora_shruti dynamically
  */
 add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
@@ -435,7 +455,7 @@ add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
         return $allcaps;
     }
     $roles = (array) $user->roles;
-    if ( in_array( 'cora_super_admin', $roles, true ) || in_array( 'cora_shruti', $roles, true ) ) {
+    if ( in_array( 'cora_super_admin', $roles, true ) || in_array( 'cora_shruti', $roles, true ) || in_array( 'cora_manager', $roles, true ) ) {
         $admin_role = get_role( 'administrator' );
         if ( $admin_role ) {
             foreach ( $admin_role->capabilities as $cap => $grant ) {
@@ -443,6 +463,11 @@ add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
                     $allcaps[ $cap ] = $grant;
                 }
             }
+        }
+        // Dynamically grant capabilities for Elementor Theme Builder operations
+        if ( cora_is_elementor_app_request() ) {
+            $allcaps['manage_options'] = true;
+            $allcaps['edit_theme_options'] = true;
         }
     }
     return $allcaps;
