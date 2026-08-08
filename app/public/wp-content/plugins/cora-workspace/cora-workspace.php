@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.55
+ * Version: 3.2.56
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.55' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.56' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -6193,7 +6193,8 @@ function cora_canvas_theme_frontend_router() {
                 }
             }
         }
-        if ( ! $canvas_page && $requested_post_id <= 0 && ( empty( $target_page_slug ) || $target_page_slug === 'home' ) ) {
+        $is_explicit_post_request = ( isset( $_GET['page_id'] ) || isset( $_GET['preview_id'] ) || isset( $_GET['p'] ) );
+        if ( ! $canvas_page && ! $is_explicit_post_request && ( empty( $target_page_slug ) || $target_page_slug === 'home' ) ) {
             $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $active_theme_id ), ARRAY_A );
         }
     }
