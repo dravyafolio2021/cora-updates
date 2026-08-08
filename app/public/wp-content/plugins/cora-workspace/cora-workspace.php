@@ -26311,10 +26311,27 @@ function cora_ajax_canvas_save_theme_settings() {
         $safe_menus = array();
         foreach ( $incoming['menus'] as $menu ) {
             if ( ! is_array( $menu ) ) continue;
+
+            $wp_term_id = isset( $menu['wp_term_id'] ) ? intval( $menu['wp_term_id'] ) : 0;
+            $menu_name  = isset( $menu['name'] ) ? sanitize_text_field( $menu['name'] ) : '';
+
+            // Synchronize the WordPress taxonomy term name if it exists
+            if ( $wp_term_id > 0 && ! empty( $menu_name ) ) {
+                $term_status = wp_update_nav_menu_object( $wp_term_id, array(
+                    'menu-name' => $menu_name
+                ) );
+                if ( ! is_wp_error( $term_status ) ) {
+                    $updated_term = get_term( $wp_term_id, 'nav_menu' );
+                    if ( $updated_term && ! is_wp_error( $updated_term ) ) {
+                        $menu['handle'] = $updated_term->slug;
+                    }
+                }
+            }
+
             $safe_menu = array(
                 'id'         => isset( $menu['id'] ) ? sanitize_key( $menu['id'] ) : '',
-                'wp_term_id' => isset( $menu['wp_term_id'] ) ? intval( $menu['wp_term_id'] ) : 0,
-                'name'       => isset( $menu['name'] ) ? sanitize_text_field( $menu['name'] ) : '',
+                'wp_term_id' => $wp_term_id,
+                'name'       => $menu_name,
                 'handle'     => isset( $menu['handle'] ) ? sanitize_key( $menu['handle'] ) : '',
                 'items'      => array()
             );
