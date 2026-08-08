@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.58
+ * Version: 3.2.59
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.58' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.59' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -6008,6 +6008,22 @@ function cora_canvas_theme_frontend_router() {
     $third_part  = isset( $path_parts[2] ) ? sanitize_title( $path_parts[2] ) : '';
 
     if ( in_array( $first_part, array( 'home-5', 'onboarding' ), true ) ) {
+        return;
+    }
+
+    // Do not intercept Elementor library template edits or previews
+    $requested_post_id_check = 0;
+    if ( isset( $_GET['page_id'] ) ) {
+        $requested_post_id_check = intval( $_GET['page_id'] );
+    } elseif ( isset( $_GET['preview_id'] ) ) {
+        $requested_post_id_check = intval( $_GET['preview_id'] );
+    } elseif ( isset( $_GET['p'] ) ) {
+        $requested_post_id_check = intval( $_GET['p'] );
+    }
+    if ( $requested_post_id_check > 0 && 'elementor_library' === get_post_type( $requested_post_id_check ) ) {
+        return;
+    }
+    if ( 'elementor_library' === get_post_type( get_queried_object_id() ) ) {
         return;
     }
 
