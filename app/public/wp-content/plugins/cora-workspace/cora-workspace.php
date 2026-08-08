@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.62
+ * Version: 3.2.63
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.62' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.63' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -26457,6 +26457,34 @@ function cora_ajax_canvas_save_theme_settings() {
         array( 'settings' => json_encode( $merged ), 'updated_at' => current_time('mysql') ),
         array( 'id' => $theme_id )
     );
+
+    // Sync site title, tagline, and favicon to core WordPress options
+    $current_ind = get_option( 'cora_workspace_industry', 'real_estate' );
+    $is_studio   = ( $current_ind === 'photography' || $current_ind === 'studio' || $current_ind === 'photography_studio' );
+
+    if ( ! empty( $merged['site_title'] ) ) {
+        update_option( 'blogname', $merged['site_title'] );
+        if ( $is_studio ) {
+            update_option( 'cora_site_title_studio', $merged['site_title'] );
+        } else {
+            update_option( 'cora_site_title_real_estate', $merged['site_title'] );
+        }
+    }
+    if ( ! empty( $merged['site_tagline'] ) ) {
+        update_option( 'blogdescription', $merged['site_tagline'] );
+        if ( $is_studio ) {
+            update_option( 'cora_tagline_studio', $merged['site_tagline'] );
+        } else {
+            update_option( 'cora_tagline_real_estate', $merged['site_tagline'] );
+        }
+    }
+    if ( ! empty( $merged['site_favicon'] ) ) {
+        update_option( 'cora_brand_favicon_url', $merged['site_favicon'] );
+        $fav_id = attachment_url_to_postid( $merged['site_favicon'] );
+        if ( $fav_id > 0 ) {
+            update_option( 'site_icon', $fav_id );
+        }
+    }
 
     // ── Context-aware sync ──────────────────────────────────────────────────
     $source = $merged['source'] ?? '';
