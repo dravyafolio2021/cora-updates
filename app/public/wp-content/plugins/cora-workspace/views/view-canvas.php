@@ -701,7 +701,20 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
             </div>
         </div>
-
+            <?php
+            $score_status_text = 'Needs improve';
+            $score_status_color = 'text-amber-600';
+            $score_radial_color = '#f59e0b';
+            if ( intval( $ps_score ) >= 90 ) {
+                $score_status_text = 'Good';
+                $score_status_color = 'text-green-650';
+                $score_radial_color = '#22c55e';
+            } elseif ( intval( $ps_score ) < 50 ) {
+                $score_status_text = 'Poor';
+                $score_status_color = 'text-red-600';
+                $score_radial_color = '#ef4444';
+            }
+            ?>
             <!-- Performance + Statistics cards in a row (responsive stack on mobile) -->
             <div class="flex flex-col md:flex-row gap-5 items-stretch mt-6">
                 <!-- Performance Insights Card -->
