@@ -2535,10 +2535,10 @@ function cora_get_sparkline_points( $history, $type ) {
                 <h4 class="text-sm font-bold text-zinc-900" id="elementor-blocking-title">Elementor Page Editor</h4>
                 <p class="text-xs text-zinc-500 leading-relaxed" id="elementor-blocking-desc">If your browser security settings block iframe embedding, click below to open Elementor directly in a new tab.</p>
                 <div class="flex items-center justify-center gap-3 pt-2">
-                    <a id="cora-direct-elementor-card-btn" href="#" target="_blank" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1.5">
+                    <a id="cora-direct-elementor-card-btn" href="#" target="_blank" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1.5 hidden" style="display: none !important;">
                         Launch Direct Editor →
                     </a>
-                    <button type="button" onclick="jQuery('#iframe-loader').removeClass('hidden'); jQuery('#elementor-blocking-msg').addClass('hidden'); jQuery('#elementor-editor-iframe').removeClass('hidden').attr('src', jQuery('#elementor-editor-iframe').attr('src'));" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-lg text-xs font-bold transition-all">
+                    <button type="button" onclick="jQuery('#iframe-loader').removeClass('hidden'); jQuery('#elementor-blocking-msg').addClass('hidden'); jQuery('#elementor-editor-iframe').removeClass('hidden').attr('src', jQuery('#elementor-editor-iframe').attr('src'));" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all">
                         Retry Loading
                     </button>
                 </div>
