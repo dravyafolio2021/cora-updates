@@ -24,6 +24,12 @@ if ( $cora_canvas_agency_id > 0 ) {
     if ( ! $live_theme ) {
         $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d ORDER BY id DESC LIMIT 1", $cora_canvas_agency_id ), ARRAY_A );
     }
+    if ( ! $live_theme && function_exists( 'cora_provision_default_canvas_theme_for_agency' ) ) {
+        $new_theme_id = cora_provision_default_canvas_theme_for_agency( $cora_canvas_agency_id );
+        if ( $new_theme_id ) {
+            $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $new_theme_id ), ARRAY_A );
+        }
+    }
 }
 if ( ! $live_theme ) {
     $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
