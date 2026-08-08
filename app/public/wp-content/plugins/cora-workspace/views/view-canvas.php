@@ -6985,6 +6985,7 @@ function cora_get_sparkline_points( $history, $type ) {
         }
         jQuery('#elementor-editor-iframe').off('load').on('load', function() {
             jQuery('#iframe-loader').addClass('hidden');
+            jQuery('#elementor-blocking-msg').addClass('hidden'); // Explicitly hide blocking panel on successful load
             jQuery('#elementor-editor-iframe').removeClass('hidden');
 
             // Defensive error observer: check if Elementor threw 403 or preview error or redirected to WP Admin shell inside iframe
@@ -7028,13 +7029,13 @@ function cora_get_sparkline_points( $history, $type ) {
         });
     }
 
-        // Set timeout to handle offline/inactive blocking message if Elementor can't load
+        // Set timeout to handle offline/inactive blocking message if Elementor can't load (extend to 25s for slow servers)
         setTimeout(function() {
             if (!jQuery('#iframe-loader').hasClass('hidden') && jQuery('#elementor-editor-iframe').hasClass('hidden')) {
                 jQuery('#iframe-loader').addClass('hidden');
                 jQuery('#elementor-blocking-msg').removeClass('hidden');
             }
-        }, 8000);
+        }, 25000);
         syncStateToUrl();
     }
 
