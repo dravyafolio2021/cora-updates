@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.50
+ * Version: 3.2.51
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.50' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.51' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -6318,6 +6318,24 @@ HTML;
 }
 add_action( 'template_redirect', 'cora_canvas_theme_frontend_router', 3 );
 
+if ( ! function_exists( 'cora_resolve_lovable_live_url' ) ) {
+function cora_resolve_lovable_live_url( $url ) {
+    if ( empty( $url ) ) {
+        return '';
+    }
+    // Check if the URL is a lovable.dev project page
+    // Pattern: https://lovable.dev/projects/UUID or https://lovable.dev/projects/UUID/
+    if ( preg_match( '/lovable\.dev\/projects\/([a-f0-9\-]+)/i', $url, $matches ) ) {
+        return 'https://' . $matches[1] . '.lovableproject.com';
+    }
+    // Also support short URLs if any (e.g. lovable.dev/p/UUID)
+    if ( preg_match( '/lovable\.dev\/p\/([a-f0-9\-]+)/i', $url, $matches ) ) {
+        return 'https://' . $matches[1] . '.lovableproject.com';
+    }
+    return $url;
+}
+}
+
 /**
  * Early asset proxy to resolve CORS issues when loading React modules from different domains.
  */
@@ -6362,6 +6380,7 @@ function cora_git_sync_proxy_assets() {
         $theme_settings = $active_theme ? (json_decode( $active_theme['settings'], true ) ?: array()) : array();
 
         $live_url   = isset( $theme_settings['lovable_project_url'] ) ? $theme_settings['lovable_project_url'] : get_option( 'cora_git_sync_live_url', '' );
+        $live_url   = cora_resolve_lovable_live_url( $live_url );
         $nested_dir = isset( $theme_settings['nested_dir'] ) ? $theme_settings['nested_dir'] : get_option( 'cora_git_sync_nested_dir', '' );
 
         if ( ! empty( $live_url ) ) {
@@ -6515,6 +6534,7 @@ function cora_git_sync_serve_frontend() {
     $nested_dir = isset( $theme_settings['nested_dir'] ) ? $theme_settings['nested_dir'] : get_option( 'cora_git_sync_nested_dir', '' );
     $page_id    = intval( get_option( 'cora_git_sync_page_id', 0 ) );
     $live_url   = isset( $theme_settings['lovable_project_url'] ) ? $theme_settings['lovable_project_url'] : get_option( 'cora_git_sync_live_url', '' );
+    $live_url   = cora_resolve_lovable_live_url( $live_url );
 
     if ( empty( $live_url ) && ( empty( $repo ) || empty( $nested_dir ) ) ) {
         return;
@@ -6531,59 +6551,90 @@ function cora_git_sync_serve_frontend() {
     $canvas_page = null;
     $mappings = isset( $theme_settings['page_mappings'] ) ? $theme_settings['page_mappings'] : get_option( 'cora_git_sync_page_mappings', array() );
 
-    // 1. First check if any of the mapped pages match the requested slug (handles duplicate slugs perfectly)
-    if ( is_array( $mappings ) && ! empty( $mappings ) ) {
-        $mapped_page_ids = array_keys( $mappings );
-        $placeholders = implode( ',', array_fill( 0, count( $mapped_page_ids ), '%d' ) );
-        
-        if ( empty( $path ) ) {
-            $query = $wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id IN ($placeholders) AND is_homepage = 1 LIMIT 1",
-                $mapped_page_ids
-            );
-        } else {
-            $query = $wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id IN ($placeholders) AND slug = %s LIMIT 1",
-                array_merge( $mapped_page_ids, array( $path ) )
-            );
-        }
-        $canvas_page = $wpdb->get_row( $query, ARRAY_A );
+    // A. Detect if a specific WordPress post ID is requested or queried
+    $requested_post_id = 0;
+    if ( isset( $_GET['page_id'] ) ) {
+        $requested_post_id = intval( $_GET['page_id'] );
+    } elseif ( isset( $_GET['preview_id'] ) ) {
+        $requested_post_id = intval( $_GET['preview_id'] );
+    } elseif ( isset( $_GET['p'] ) ) {
+        $requested_post_id = intval( $_GET['p'] );
+    } else {
+        $requested_post_id = get_queried_object_id();
     }
 
-    // 1.5. Check if requested path matches any mapped routes values directly
-    if ( ! $canvas_page && is_array( $mappings ) && ! empty( $mappings ) ) {
-        foreach ( $mappings as $mapped_page_id => $mapped_route ) {
-            $clean_route = trim( $mapped_route, '/' );
-            if ( $clean_route === $path ) {
-                $canvas_page = $wpdb->get_row( $wpdb->prepare(
-                    "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d LIMIT 1",
-                    $mapped_page_id
-                ), ARRAY_A );
-                if ( $canvas_page ) {
-                    break;
+    // B. Try to find the canvas page by wp_post_id under the active theme
+    if ( $requested_post_id > 0 ) {
+        $canvas_page = $wpdb->get_row( $wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d AND theme_id = %d LIMIT 1",
+            $requested_post_id,
+            $active_theme_id
+        ), ARRAY_A );
+        
+        if ( ! $canvas_page ) {
+            $canvas_page = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1",
+                $requested_post_id
+            ), ARRAY_A );
+        }
+    }
+
+    // C. Fallback to path and route mappings under the active theme
+    if ( ! $canvas_page ) {
+        if ( is_array( $mappings ) && ! empty( $mappings ) ) {
+            $mapped_page_ids = array_keys( $mappings );
+            $placeholders = implode( ',', array_fill( 0, count( $mapped_page_ids ), '%d' ) );
+
+            // Check direct mapped routes matching the request path
+            foreach ( $mappings as $mapped_page_id => $mapped_route ) {
+                $clean_route = trim( $mapped_route, '/' );
+                if ( $clean_route === $path ) {
+                    $canvas_page = $wpdb->get_row( $wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id = %d AND theme_id = %d LIMIT 1",
+                        $mapped_page_id,
+                        $active_theme_id
+                    ), ARRAY_A );
+                    if ( $canvas_page ) {
+                        break;
+                    }
                 }
+            }
+
+            // Check slug matches among mapped pages
+            if ( ! $canvas_page ) {
+                if ( empty( $path ) ) {
+                    $query = $wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id IN ($placeholders) AND theme_id = %d AND is_homepage = 1 LIMIT 1",
+                        array_merge( $mapped_page_ids, array( $active_theme_id ) )
+                    );
+                } else {
+                    $query = $wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE id IN ($placeholders) AND theme_id = %d AND slug = %s LIMIT 1",
+                        array_merge( $mapped_page_ids, array( $active_theme_id, $path ) )
+                    );
+                }
+                $canvas_page = $wpdb->get_row( $query, ARRAY_A );
             }
         }
     }
 
-    // 2. Fall back to resolved post ID match if no direct mapped page matched
+    // D. Fallback globally in the active theme by slug or homepage
     if ( ! $canvas_page ) {
-        $current_post_id = get_queried_object_id();
-        if ( ! $current_post_id && isset( $_GET['preview_id'] ) ) {
-            $current_post_id = intval( $_GET['preview_id'] );
-        }
-        if ( ! $current_post_id && isset( $_GET['page_id'] ) && isset( $_GET['preview'] ) ) {
-            $current_post_id = intval( $_GET['page_id'] );
-        }
-        if ( ! $current_post_id && isset( $_GET['p'] ) && isset( $_GET['preview'] ) ) {
-            $current_post_id = intval( $_GET['p'] );
-        }
-        if ( $current_post_id ) {
-            $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $current_post_id ), ARRAY_A );
+        if ( empty( $path ) ) {
+            $canvas_page = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1",
+                $active_theme_id
+            ), ARRAY_A );
+        } else {
+            $canvas_page = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1",
+                $active_theme_id,
+                $path
+            ), ARRAY_A );
         }
     }
 
-    // 3. Fall back to generic slug match if still not found
+    // E. Ultimate global fallback (any theme)
     if ( ! $canvas_page ) {
         if ( empty( $path ) ) {
             $canvas_page = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE is_homepage = 1 LIMIT 1", ARRAY_A );
@@ -6664,6 +6715,26 @@ function cora_git_sync_serve_frontend() {
                     $html = str_ireplace( '<\/head>', $injection . $bridge_tag . '<\/head>', $html );
                 } else {
                     $html = $injection . $bridge_tag . $html;
+                }
+
+                if ( $preview_theme_id ) {
+                    $rest_url = esc_url( cora_get_origin_relative_url( rest_url( 'cora/v1/preview-bar-data' ) ) );
+                    $site_url = esc_url( cora_get_origin_relative_url( home_url() ) );
+                    $bar_html = '<script id="cora-preview-bar-injector">' . "\n";
+                    $bar_html .= '(function(){' . "\n";
+                    $bar_html .= '  var REST_BASE = ' . json_encode( $rest_url ) . ';' . "\n";
+                    $bar_html .= '  var SITE_URL  = ' . json_encode( $site_url ) . ';' . "\n";
+                    $bar_html .= cora_canvas_preview_bar_js();
+                    $bar_html .= '})();' . "\n";
+                    $bar_html .= '</script>' . "\n";
+
+                    if ( stripos( $html, '<\/body>' ) !== false ) {
+                        $html = str_ireplace( '<\/body>', $bar_html . '<\/body>', $html );
+                    } elseif ( stripos( $html, '</body>' ) !== false ) {
+                        $html = str_ireplace( '</body>', $bar_html . '</body>', $html );
+                    } else {
+                        $html .= $bar_html;
+                    }
                 }
 
                 while ( ob_get_level() > 0 ) {
@@ -7185,16 +7256,21 @@ function cora_canvas_preview_bar_js() { ob_start(); ?>
       var currentPath = window.location.pathname.replace(/^\/+|\/+$/g, '');
       var pageIdParam = params.get('page_id') || params.get('p') || params.get('preview_id') || params.get('elementor-preview');
 
-      var optionsHTML = data.pages.map(function(p) {
+      var currentPageTitle = "Select Page";
+      var dropdownItemsHTML = data.pages.map(function(p) {
         var slug = p.slug || '';
+        var wpPostId = p.wp_post_id || 0;
         var isSelected = false;
         if (pageIdParam) {
-          isSelected = (parseInt(pageIdParam) === p.wp_post_id);
+          isSelected = (parseInt(pageIdParam) === wpPostId);
         } else {
-          isSelected = (currentPath === slug || (p.is_homepage && currentPath === ''));
+          isSelected = (p.is_homepage && (currentPath === '' || currentPath === 'index.php'));
         }
-        var selected = isSelected ? ' selected' : '';
-        return '<option value="' + slug + '"' + selected + '>' + p.title + '</option>';
+        if (isSelected) {
+          currentPageTitle = p.title;
+        }
+        var selectedClass = isSelected ? ' selected' : '';
+        return '<li class="cpb-dropdown-item' + selectedClass + '" data-slug="' + slug + '" data-postid="' + wpPostId + '">' + p.title + '</li>';
       }).join('');
 
       // ── Inject styles ──
@@ -7202,53 +7278,93 @@ function cora_canvas_preview_bar_js() { ob_start(); ?>
       style.id = 'cora-preview-bar-style';
       style.textContent = `
         #cora-preview-bar {
-          position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-          width: calc(100% - 40px); max-width: 780px; height: 56px;
-          background: rgba(9,9,11,0.96); backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255,255,255,0.1); border-radius: 9999px;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-          z-index: 2147483647; display: flex; align-items: center;
-          justify-content: space-between; padding: 0 16px;
-          color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-          font-size: 13px; animation: coraBarSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+          position: fixed !important; bottom: 20px !important; left: 50% !important; transform: translateX(-50%) !important;
+          width: calc(100% - 40px) !important; max-width: 780px !important; height: 56px !important;
+          background: rgba(9,9,11,0.96) !important; backdrop-filter: blur(12px) !important;
+          -webkit-backdrop-filter: blur(12px) !important;
+          border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 9999px !important;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.5) !important;
+          z-index: 2147483647 !important; display: flex !important; align-items: center !important;
+          justify-content: space-between !important; padding: 0 16px !important;
+          color: #f4f4f5 !important; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+          font-size: 13px !important; animation: coraBarSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) both !important;
+          overflow: visible !important; visibility: visible !important; opacity: 1 !important;
         }
         @keyframes coraBarSlideUp {
           from { opacity:0; transform: translateX(-50%) translateY(20px); }
           to   { opacity:1; transform: translateX(-50%) translateY(0); }
         }
-        #cora-preview-bar .cpb-left { display:flex; align-items:center; gap:10px; min-width:0; }
+        #cora-preview-bar .cpb-left { display:flex !important; align-items:center !important; gap:10px !important; min-width:0 !important; overflow: visible !important; }
         #cora-preview-bar .cpb-dot  {
-          width:8px; height:8px; border-radius:50%; background:#22c55e; flex-shrink:0;
-          animation: coraDotPulse 1.8s ease-in-out infinite;
+          width:8px !important; height:8px !important; border-radius:50% !important; background:#22c55e !important; flex-shrink:0 !important;
+          animation: coraDotPulse 1.8s ease-in-out infinite !important;
         }
         @keyframes coraDotPulse {
           0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
           50%      { box-shadow: 0 0 0 5px rgba(34,197,94,0); }
         }
-        #cora-preview-bar .cpb-label { font-size:11px; color:#a1a1aa; white-space:nowrap; }
-        #cora-preview-bar .cpb-name  { font-size:12px; font-weight:700; color:#fff; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        #cora-preview-bar .cpb-divider { width:1px; height:20px; background:rgba(255,255,255,0.15); }
-        #cora-preview-bar .cpb-select {
-          background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
-          color:#fff; border-radius:8px; padding:4px 8px; font-size:11px; font-weight:600;
-          cursor:pointer; max-width:180px;
+        #cora-preview-bar .cpb-label { font-size:11px !important; color:#a1a1aa !important; white-space:nowrap !important; }
+        #cora-preview-bar .cpb-name  { font-size:12px !important; font-weight:700 !important; color:#fff !important; max-width:120px !important; overflow:hidden !important; text-overflow:ellipsis !important; white-space:nowrap !important; }
+        #cora-preview-bar .cpb-divider { width:1px !important; height:20px !important; background:rgba(255,255,255,0.15) !important; margin: 0 10px !important; }
+        
+        /* Custom Dropdown Styling */
+        #cora-preview-bar .cpb-dropdown-container {
+          position: relative !important; display: inline-block !important; overflow: visible !important;
         }
-        #cora-preview-bar .cpb-select option { background:#18181b; color:#fff; }
-        #cora-preview-bar .cpb-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+        #cora-preview-bar .cpb-dropdown-trigger {
+          background: rgba(255,255,255,0.08) !important; border: 1px solid rgba(255,255,255,0.15) !important;
+          color:#fff !important; border-radius:8px !important; padding:6px 12px !important; font-size:11px !important; font-weight:600 !important;
+          cursor:pointer !important; display: flex !important; align-items: center !important; gap: 8px !important; min-width: 140px !important;
+          justify-content: space-between !important; transition: background 0.15s !important; outline: none !important;
+          box-sizing: border-box !important; height: 32px !important; line-height: 1.2 !important;
+          user-select: none !important; -webkit-user-select: none !important;
+        }
+        #cora-preview-bar .cpb-dropdown-trigger:hover {
+          background: rgba(255,255,255,0.14) !important;
+        }
+        #cora-preview-bar .cpb-dropdown-chevron {
+          width: 8px !important; height: 8px !important; transition: transform 0.2s !important; fill: none !important; stroke: currentColor !important;
+        }
+        #cora-preview-bar .cpb-dropdown-menu {
+          position: absolute !important; bottom: calc(100% + 8px) !important; left: 0 !important;
+          background: #18181b !important; border: 1px solid rgba(255,255,255,0.15) !important;
+          border-radius: 8px !important; box-shadow: 0 -4px 16px rgba(0,0,0,0.4) !important;
+          padding: 4px 0 !important; margin: 0 !important; list-style: none !important; min-width: 180px !important;
+          display: none !important; z-index: 2147483647 !important; max-height: 220px !important; overflow-y: auto !important;
+          visibility: visible !important; opacity: 1 !important;
+        }
+        #cora-preview-bar .cpb-dropdown-menu.show {
+          display: block !important;
+        }
+        #cora-preview-bar .cpb-dropdown-item {
+          padding: 8px 12px !important; font-size: 11px !important; color: #a1a1aa !important;
+          cursor: pointer !important; transition: all 0.15s !important; text-align: left !important;
+          display: block !important; list-style-type: none !important; line-height: 1.4 !important;
+          visibility: visible !important; opacity: 1 !important; height: auto !important;
+        }
+        #cora-preview-bar .cpb-dropdown-item:hover {
+          background: rgba(255,255,255,0.08) !important; color: #fff !important;
+        }
+        #cora-preview-bar .cpb-dropdown-item.selected {
+          color: #fff !important; font-weight: 700 !important; background: rgba(255,255,255,0.04) !important;
+        }
+        
+        #cora-preview-bar .cpb-right { display:flex !important; align-items:center !important; gap:8px !important; flex-shrink:0 !important; }
         #cora-preview-bar .cpb-exit {
-          font-size:11px; font-weight:600; color:#a1a1aa; text-decoration:none;
-          padding:6px 12px; border-radius:8px; transition:background 0.15s;
+          font-size:11px !important; font-weight:600 !important; color:#a1a1aa !important; text-decoration:none !important;
+          padding:6px 12px !important; border-radius:8px !important; transition:background 0.15s !important;
+          display: inline-flex !important; align-items: center !important; height: 32px !important; box-sizing: border-box !important;
         }
-        #cora-preview-bar .cpb-exit:hover { background:rgba(255,255,255,0.08); color:#fff; }
+        #cora-preview-bar .cpb-exit:hover { background:rgba(255,255,255,0.08) !important; color:#fff !important; }
         #cora-preview-bar .cpb-publish {
-          background:#fff; color:#09090b; border:none; border-radius:8px;
-          padding:7px 14px; font-size:11px; font-weight:800; cursor:pointer;
-          transition:all 0.15s; letter-spacing:-0.01em;
+          background:#fff !important; color:#09090b !important; border:none !important; border-radius:8px !important;
+          padding:7px 14px !important; font-size:11px !important; font-weight:800 !important; cursor:pointer !important;
+          transition:all 0.15s !important; letter-spacing:-0.01em !important;
+          display: inline-flex !important; align-items: center !important; height: 32px !important; box-sizing: border-box !important;
         }
-        #cora-preview-bar .cpb-publish:hover { background:#e4e4e7; }
+        #cora-preview-bar .cpb-publish:hover { background:#e4e4e7 !important; }
         #cora-preview-bar .cpb-publish.confirming {
-          background:#ef4444; color:#fff;
+          background:#ef4444 !important; color:#fff !important;
         }
       `;
       document.head.appendChild(style);
@@ -7263,7 +7379,13 @@ function cora_canvas_preview_bar_js() { ob_start(); ?>
         '</div>' +
         '<div class="cpb-left">' +
           '<div class="cpb-divider"></div>' +
-          '<select class="cpb-select cora-preview-select" id="cpb-page-select">' + optionsHTML + '</select>' +
+          '<div class="cpb-dropdown-container">' +
+            '<div class="cpb-dropdown-trigger" id="cpb-dropdown-trigger-btn" role="button" tabindex="0">' +
+              '<span id="cpb-dropdown-current-page">' + currentPageTitle + '</span>' +
+              '<svg class="cpb-dropdown-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>' +
+            '</div>' +
+            '<ul class="cpb-dropdown-menu" id="cpb-dropdown-menu-list">' + dropdownItemsHTML + '</ul>' +
+          '</div>' +
         '</div>' +
         '<div class="cpb-right">' +
           '<a class="cpb-exit" href="' + data.canvas_url + '">← Exit</a>' +
@@ -7271,11 +7393,33 @@ function cora_canvas_preview_bar_js() { ob_start(); ?>
         '</div>';
       document.body.appendChild(bar);
 
-      // ── Page switcher ──
-      document.getElementById('cpb-page-select').addEventListener('change', function() {
-        var slug = this.value;
-        var url  = SITE_URL + (slug ? '/' + slug + '/' : '/');
-        window.location.href = url + '?cv_preview_theme=' + themeId;
+      // ── Page switcher event handlers ──
+      var triggerBtn = document.getElementById('cpb-dropdown-trigger-btn');
+      var menuList = document.getElementById('cpb-dropdown-menu-list');
+
+      var toggleMenu = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        menuList.classList.toggle('show');
+      };
+
+      triggerBtn.addEventListener('click', toggleMenu);
+      triggerBtn.addEventListener('touchstart', toggleMenu, { passive: false });
+
+      document.addEventListener('click', function() {
+        menuList.classList.remove('show');
+      });
+
+      menuList.querySelectorAll('.cpb-dropdown-item').forEach(function(item) {
+        var handler = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var wpPostId = this.getAttribute('data-postid');
+          var url = SITE_URL + '/?page_id=' + wpPostId + '&cv_preview_theme=' + themeId;
+          window.location.href = url;
+        };
+        item.addEventListener('click', handler);
+        item.addEventListener('touchstart', handler, { passive: false });
       });
 
       // ── Publish button (two-step confirm) ──
