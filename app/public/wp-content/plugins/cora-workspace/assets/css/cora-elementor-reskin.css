@@ -345,6 +345,68 @@
 }
 
 /* ─────────────────────────────────────────────────────
+ * ADD ELEMENTS BUTTON
+ * Ghost outline by default; fills solid when panel is open.
+ * Matches the cora-tb-back-btn aesthetic so it fits row 2.
+ * ───────────────────────────────────────────────────── */
+.cora-tb-add-elements-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 26px;
+    padding: 0 9px;
+    background-color: transparent;
+    color: var(--cz-700);
+    border: 1px solid var(--cz-200);
+    border-radius: var(--cora-radius-md);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--cora-transition);
+    font-family: var(--cora-font);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.cora-tb-add-elements-btn svg {
+    flex-shrink: 0;
+    color: var(--cz-500);
+    transition: var(--cora-transition);
+}
+
+.cora-tb-add-elements-btn:hover {
+    background-color: var(--cz-100);
+    border-color: var(--cz-300);
+    color: var(--cz-900);
+}
+
+.cora-tb-add-elements-btn:hover svg {
+    color: var(--cz-700);
+}
+
+.cora-tb-add-elements-btn:active {
+    transform: scale(0.96);
+}
+
+/* Active: panel is open — fill solid to signal "on" state */
+.cora-tb-add-elements-btn.active {
+    background-color: var(--cz-950);
+    border-color: var(--cz-950);
+    color: #ffffff;
+}
+
+.cora-tb-add-elements-btn.active svg {
+    color: rgba(255,255,255,0.85);
+}
+
+.cora-tb-add-elements-btn.active:hover {
+    background-color: var(--cz-800);
+    border-color: var(--cz-800);
+}
+
+
+
+/* ─────────────────────────────────────────────────────
  * DOCUMENT TITLE LABEL
  * ───────────────────────────────────────────────────── */
 .cora-tb-doc-title {
@@ -702,17 +764,33 @@
 
 /* ═══════════════════════════════════════════════════════════
  * NATIVE ELEMENTOR TOP BAR — always hidden (replaced by Cora toolbar)
+ *
+ * IMPORTANT: Do NOT hide #elementor-editor-wrapper-v2 itself.
+ * In Elementor 3.24+, the floating "+" add-widget button lives
+ * inside that wrapper. Hiding the whole element removes the button.
+ * Instead, target only the top-bar/header children inside it.
  * ═══════════════════════════════════════════════════════════ */
 
+/* Hide Elementor's native MUI top bar and the top-bar slot inside the v2 wrapper */
 header.MuiAppBar-root,
 .e-top-bar,
 #e-top-bar,
 .elementor-editor-top-bar,
-#elementor-editor-wrapper-v2 {
+#elementor-editor-wrapper-v2 > header,
+#elementor-editor-wrapper-v2 > .e-top-bar,
+#elementor-editor-wrapper-v2 > [class*="MuiAppBar"],
+#elementor-editor-wrapper-v2 > .elementor-editor-top-bar {
     display: none !important;
     height: 0 !important;
     min-height: 0 !important;
     overflow: hidden !important;
+}
+
+/* Keep the v2 wrapper itself visible so the floating add-widget button works */
+#elementor-editor-wrapper-v2 {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
 }
 
 /* Reset Elementor v2 CSS variables to prevent header spacing / panel offset gaps */

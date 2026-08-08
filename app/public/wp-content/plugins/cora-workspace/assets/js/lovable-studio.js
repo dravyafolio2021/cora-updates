@@ -22,6 +22,9 @@
         lsGoToStep(1);
         lsRenderComponentGrid();
         lsRenderMapperStep();
+        if (typeof window.switchTab === 'function' && canvasState.activeTab !== 'ai') {
+            window.switchTab('ai');
+        }
     };
 
     window.closeLovableStudio = function() {

@@ -1039,8 +1039,9 @@ function cora_get_sparkline_points( $history, $type ) {
                 <button onclick="switchTab('settings')" id="tab-btn-settings" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Theme Settings</button>
                 <button onclick="switchTab('code')" id="tab-btn-code" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Custom Code</button>
                 <button onclick="switchTab('theme-builder')" id="tab-btn-theme-builder" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors">Theme Builder</button>
-                <button onclick="switchTab('ai')" id="tab-btn-ai" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors flex items-center justify-center" title="Lovable Studio" style="display: none;">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
+                <button onclick="switchTab('ai')" id="tab-btn-ai" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors flex items-center gap-1.5" title="Lovable Studio" style="display: none;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
+                    <span>Lovable Studio</span>
                 </button>
             </div>
             
@@ -1319,7 +1320,17 @@ function cora_get_sparkline_points( $history, $type ) {
 
                 <!-- Menu Items Card -->
                 <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm space-y-4">
-                    <h3 class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Menu items</h3>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Menu items</h3>
+                        <?php if ( ! $is_read_only ) : ?>
+                        <button onclick="autoGenerateMenuFromPages()" id="auto-gen-menu-btn" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[10px] font-bold cursor-pointer transition-all active:scale-95 border-none shadow-sm" title="Auto-generate menu items from published pages">
+                            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                            </svg>
+                            Auto-Generate
+                        </button>
+                        <?php endif; ?>
+                    </div>
                     
                     <!-- Drag/list container -->
                     <div id="menu-items-list-container" class="space-y-2">
@@ -1334,6 +1345,69 @@ function cora_get_sparkline_points( $history, $type ) {
                     </button>
                     <?php endif; ?>
                 </div>
+
+                <!-- ── Auto-Generate Menu Modal ─────────────────────────────── -->
+                <div id="auto-gen-menu-modal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.45);">
+                    <div class="bg-white rounded-2xl shadow-2xl w-[460px] max-w-full flex flex-col border border-zinc-100" style="max-height:90vh;">
+
+                        <!-- ── Fixed Header ── -->
+                        <div class="flex items-start justify-between gap-3 p-5 pb-4 flex-shrink-0">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-zinc-950 flex items-center justify-center flex-shrink-0">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="white" stroke-width="2.2">
+                                            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                                        </svg>
+                                    </div>
+                                    <h2 class="text-sm font-bold text-zinc-950">Auto-Generate Menu</h2>
+                                </div>
+                                <p class="text-[11px] text-zinc-500 leading-relaxed">Select published pages to add as menu items. Only published pages are shown.</p>
+                            </div>
+                            <button onclick="closeAutoGenMenuModal()" class="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors border-none bg-transparent flex-shrink-0 mt-0.5">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- ── Fixed Select-All Bar ── -->
+                        <div class="flex items-center justify-between border-t border-b border-zinc-100 px-5 py-2.5 flex-shrink-0">
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Published Pages</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="autoGenSelectAll(true)" class="text-[10px] font-bold text-zinc-600 hover:text-zinc-900 cursor-pointer bg-transparent border-none transition-colors">Select all</button>
+                                <span class="text-zinc-300 text-[10px]">·</span>
+                                <button onclick="autoGenSelectAll(false)" class="text-[10px] font-bold text-zinc-600 hover:text-zinc-900 cursor-pointer bg-transparent border-none transition-colors">Deselect all</button>
+                            </div>
+                        </div>
+
+                        <!-- ── Scrollable Pages List ── -->
+                        <div id="auto-gen-pages-list" class="flex-1 overflow-y-auto min-h-0 py-1.5 px-2">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <!-- ── Fixed Footer: Sort + Actions ── -->
+                        <div class="flex-shrink-0 border-t border-zinc-100 px-5 py-4 space-y-3">
+                            <!-- Sort order -->
+                            <div class="flex items-center gap-3">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex-shrink-0">Sort Order</label>
+                                <select id="auto-gen-sort-order" class="flex-1 px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 focus:outline-none focus:border-zinc-400 bg-white cursor-pointer">
+                                    <option value="alpha">Alphabetical (A → Z)</option>
+                                    <option value="alpha_desc">Alphabetical (Z → A)</option>
+                                    <option value="homepage_first">Homepage First</option>
+                                </select>
+                            </div>
+                            <!-- Action buttons -->
+                            <div class="flex items-center justify-between">
+                                <span id="auto-gen-count-label" class="text-[10px] text-zinc-400 font-mono"></span>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="closeAutoGenMenuModal()" class="px-3.5 py-2 border border-zinc-200 text-zinc-600 hover:text-zinc-900 rounded-lg text-xs font-bold cursor-pointer transition-all active:scale-95 bg-transparent">Cancel</button>
+                                    <button onclick="confirmAutoGenMenu()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all active:scale-95 border-none shadow-sm">Add to Menu</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
 
                 <div class="flex items-center justify-end pt-2">
                     <button onclick="saveCurrentMenuDetails()" <?php echo $is_read_only ? 'disabled' : ''; ?> class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white rounded-lg text-xs font-bold shadow-sm cursor-pointer transition-all active:scale-95">Save</button>
@@ -1708,6 +1782,30 @@ function cora_get_sparkline_points( $history, $type ) {
                                 ?>
                             </select>
                         </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Header Template (Elementor)</label>
+                            <select id="setting-template-header" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="0">— None / Use Default —</option>
+                                <?php
+                                $headers = get_posts( array(
+                                    'post_type'      => 'elementor_library',
+                                    'posts_per_page' => -1,
+                                    'tax_query'      => array(
+                                        array(
+                                            'taxonomy' => 'elementor_library_type',
+                                            'field'    => 'slug',
+                                            'terms'    => 'header',
+                                        ),
+                                    ),
+                                ) );
+                                if ( ! empty( $headers ) ) {
+                                    foreach ( $headers as $h ) {
+                                        echo '<option value="' . esc_attr( $h->ID ) . '">' . esc_html( $h->post_title ) . '</option>';
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" id="setting-sticky-header" class="rounded cursor-pointer">
@@ -1744,6 +1842,30 @@ function cora_get_sparkline_points( $history, $type ) {
                                 <option value="2">2 Columns</option>
                                 <option value="3" selected>3 Columns</option>
                                 <option value="4">4 Columns</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase">Footer Template (Elementor)</label>
+                            <select id="setting-template-footer" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer">
+                                <option value="0">— None / Use Default —</option>
+                                <?php
+                                $footers = get_posts( array(
+                                    'post_type'      => 'elementor_library',
+                                    'posts_per_page' => -1,
+                                    'tax_query'      => array(
+                                        array(
+                                            'taxonomy' => 'elementor_library_type',
+                                            'field'    => 'slug',
+                                            'terms'    => 'footer',
+                                        ),
+                                    ),
+                                ) );
+                                if ( ! empty( $footers ) ) {
+                                    foreach ( $footers as $f ) {
+                                        echo '<option value="' . esc_attr( $f->ID ) . '">' . esc_html( $f->post_title ) . '</option>';
+                                    }
+                                }
+                                ?>
                             </select>
                         </div>
                         <div class="space-y-2">
@@ -2735,6 +2857,54 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
+<!-- Lovable Page Settings Side Drawer -->
+<div id="drawer-edit-page-settings" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-edit-page-settings-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+            <div>
+                <h3 class="text-sm font-bold text-zinc-950">Page Settings</h3>
+                <p id="edit-page-settings-drawer-title" class="text-[10px] text-zinc-500 mt-0.5">Edit page properties</p>
+            </div>
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 border-none bg-transparent" onclick="closeEditPageSettingsDrawer()">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6 space-y-5">
+            <input type="hidden" id="edit-page-settings-id">
+            
+            <div class="space-y-2">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Title</label>
+                <input type="text" id="edit-page-settings-title" placeholder="Page Title" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-zinc-400 text-zinc-800 bg-white">
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Slug</label>
+                <input type="text" id="edit-page-settings-slug" placeholder="page-slug" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-mono text-zinc-800 bg-white">
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Status</label>
+                <select id="edit-page-settings-status" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 cursor-pointer font-semibold">
+                    <option value="publish">Published</option>
+                    <option value="draft">Draft</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+
+            <div class="space-y-2" id="edit-page-settings-lovable-route-container">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Lovable Route Mapping</label>
+                <select id="edit-page-settings-lovable-route" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 cursor-pointer font-semibold">
+                    <!-- Populated dynamically -->
+                </select>
+            </div>
+        </div>
+        <div class="p-5 border-t border-zinc-100 flex items-center justify-end gap-3 bg-zinc-50/50">
+            <button type="button" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeEditPageSettingsDrawer()">Cancel</button>
+            <button type="button" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveEditPageSettings()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
 <!-- 3. Global SEO settings Side Drawer -->
 <div id="drawer-page-seo" class="fixed inset-0 z-[99999] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-page-seo-card">
@@ -3192,8 +3362,10 @@ function cora_get_sparkline_points( $history, $type ) {
 .atw-anim{animation:atw-in .22s cubic-bezier(.4,0,.2,1) both;}
 .atw-drop-zone{border:2px dashed #d4d4d8;border-radius:14px;background:#fafafa;transition:border-color .15s,background .15s;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:52px 32px;}
 .atw-drop-zone:hover{border-color:#71717a;background:#f5f5f5;}
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.animate-spin { animation: spin 1s linear infinite; }
+@keyframes wizSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.wiz-branch-pill{padding:6px 14px;background:#f4f4f5;border:1.5px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#27272a;cursor:pointer;transition:all .15s ease-in-out;}
+.wiz-branch-pill:hover{background:#e4e4e7;border-color:#d4d4d8;color:#18181b;}
+.wiz-branch-selected{background:#18181b!important;border-color:#18181b!important;color:white!important;}
 
 .atw-header-bar { padding: 0 28px !important; }
 .atw-title-text { display: inline !important; }
@@ -3299,38 +3471,46 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
                 </button>
 
-                <!-- Lovable Card -->
-                <button onclick="wizardSelectBuilder('lovable')" id="wizard-card-lovable" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);">
-                    <div style="position:relative;overflow:hidden;background:#f5f3ff;">
+                <!-- Lovable Card — LOCKED / Coming Soon -->
+                <div id="wizard-card-lovable" onclick="if(typeof window.coraShowToast==='function'){window.coraShowToast('Lovable integration is coming soon!','info');}else{console.log('Lovable coming soon');}" class="atw-card" style="text-align:left;background:#fafafa;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:not-allowed;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.04);opacity:.55;filter:grayscale(.35);position:relative;transition:opacity .2s,filter .2s;user-select:none;" onmouseover="this.style.opacity='.62';" onmouseout="this.style.opacity='.55';">
+                    <div style="position:relative;overflow:hidden;background:#f0eef5;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;">
-                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-lovable-thumb.jpg' ); ?>" alt="Lovable Studio" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
-                            <div id="atw-ov-l" style="display:none;position:absolute;inset:0;background:rgba(109,40,217,.42);align-items:center;justify-content:center;">
-                                <div style="width:48px;height:48px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(109,40,217,.28);">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-lovable-thumb.jpg' ); ?>" alt="Lovable Studio" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.3);" loading="lazy">
+                            <!-- Permanent lock overlay -->
+                            <div style="position:absolute;inset:0;background:rgba(24,24,27,.32);display:flex;align-items:center;justify-content:center;">
+                                <div style="width:48px;height:48px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.12);">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 </div>
                             </div>
                         </div>
+                        <!-- Lovable pill badge (left) -->
                         <div style="position:absolute;top:11px;left:11px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:100px;padding:4px 9px 4px 6px;box-shadow:0 1px 6px rgba(0,0,0,.14);">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                            <span style="font-size:10px;font-weight:800;color:#7c3aed;letter-spacing:-.01em;">Lovable</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2.2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            <span style="font-size:10px;font-weight:800;color:#a1a1aa;letter-spacing:-.01em;">Lovable</span>
+                        </div>
+                        <!-- Coming Soon badge (right) -->
+                        <div style="position:absolute;top:11px;right:11px;display:flex;align-items:center;gap:4px;background:rgba(24,24,27,.82);backdrop-filter:blur(8px);border-radius:100px;padding:5px 10px 5px 7px;box-shadow:0 2px 8px rgba(0,0,0,.18);">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#e4e4e7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            <span style="font-size:9px;font-weight:800;color:#e4e4e7;letter-spacing:.04em;text-transform:uppercase;">Coming Soon</span>
                         </div>
                     </div>
                     <div style="padding:18px 20px 20px;">
                         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
                             <div>
-                                <h3 style="font-size:15px;font-weight:800;color:#18181b;letter-spacing:-.025em;margin-bottom:4px;">Lovable Studio</h3>
-                                <p style="font-size:12px;color:#71717a;line-height:1.55;">Connect a live AI-built Lovable.dev project.</p>
+                                <h3 style="font-size:15px;font-weight:800;color:#a1a1aa;letter-spacing:-.025em;margin-bottom:4px;">Lovable Studio</h3>
+                                <p style="font-size:12px;color:#a1a1aa;line-height:1.55;">Connect a live AI-built Lovable.dev project.</p>
                             </div>
-                            <div id="wiz-radio-lovable" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #d4d4d8;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
-                                <div style="width:8px;height:8px;border-radius:50%;background:transparent;transition:all .18s;"></div>
+                            <!-- Lock icon instead of radio button -->
+                            <div style="width:18px;height:18px;min-width:18px;display:flex;align-items:center;justify-content:center;margin-top:2px;flex-shrink:0;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                             </div>
                         </div>
                         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;">
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f5f3ff;color:#7c3aed;border-radius:6px;border:1px solid #ede9fe;">Lovable API</span>
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f5f3ff;color:#7c3aed;border-radius:6px;border:1px solid #ede9fe;">Live Sync</span>
+                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Lovable API</span>
+                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Live Sync</span>
                         </div>
                     </div>
-                </button>
+                </div>
             </div>
         </div>
 
@@ -3462,6 +3642,27 @@ function cora_get_sparkline_points( $history, $type ) {
 
                 <!-- SUB-CONTAINER 1: Connect Existing Project -->
                 <div id="wiz-lovable-connect-area" style="display:flex;flex-direction:column;gap:16px;background:white;border:1.5px solid #e4e4e7;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+                    <!-- PAT Field with Workspace Storage control -->
+                    <?php
+                        $wiz_saved_pat = get_option( 'cora_git_sync_token', '' );
+                        $wiz_pat_is_saved = ! empty( $wiz_saved_pat );
+                    ?>
+                    <div id="wiz-pat-wrapper" style="display:flex;flex-direction:column;gap:5px;">
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Personal Access Token (PAT) *</label>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input type="password" id="wiz-github-token-lov" class="atw-input" 
+                                   placeholder="ghp_xxxxxxxxxxxx" 
+                                   value="<?php echo esc_attr( $wiz_saved_pat ); ?>"
+                                   style="font-size:12.5px;flex:1;"
+                                   oninput="wizRepoChanged()">
+                            <button type="button" id="wiz-save-pat-btn" onclick="console.log('Save Token clicked'); var saveBtnSpan = document.getElementById('wiz-save-pat-label'); if(saveBtnSpan) saveBtnSpan.textContent = 'Saving…'; if(typeof wizSavePatGlobally === 'function') { wizSavePatGlobally(); } else if(typeof window.wizSavePatGlobally === 'function') { window.wizSavePatGlobally(); } else { console.error('wizSavePatGlobally is not defined'); }" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:9px 14px;background:#18181b;color:white;border:none;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:inherit;" onmouseover="if(!this.disabled)this.style.background='#27272a'" onmouseout="if(!this.disabled)this.style.background='#18181b'">
+                                <svg id="wiz-save-pat-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                <span id="wiz-save-pat-label">Save Token</span>
+                            </button>
+                        </div>
+                        <p style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">Pasting and saving the token globally stores it in the workspace so you don't need to paste it every time.</p>
+                    </div>
+
                     <!-- Repo URL field -->
                     <div style="display:flex;flex-direction:column;gap:5px;">
                         <div style="display:flex;align-items:center;justify-content:between;width:100%;">
@@ -3471,40 +3672,30 @@ function cora_get_sparkline_points( $history, $type ) {
                                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                             </a>
                         </div>
-                        <input type="text" id="wiz-github-repo-lov" class="atw-input" placeholder="https://github.com/username/my-lovable-theme" value="<?php echo esc_attr( get_option( 'cora_git_sync_repo', '' ) ); ?>" style="font-size:12.5px;">
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input type="text" id="wiz-github-repo-lov" class="atw-input" placeholder="https://github.com/username/my-lovable-theme" value="<?php echo esc_attr( get_option( 'cora_git_sync_repo', '' ) ); ?>" style="font-size:12.5px;flex:1;" oninput="wizRepoChanged()">
+                            <button type="button" id="wiz-check-repo-btn" onclick="console.log('Button clicked'); var btnSpan = document.getElementById('wiz-check-repo-label'); if(btnSpan) btnSpan.textContent = 'Checking…'; if(typeof wizCheckRepository === 'function') { wizCheckRepository(); } else if(typeof window.wizCheckRepository === 'function') { window.wizCheckRepository(); } else { console.error('wizCheckRepository is not defined'); }" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:9px 14px;background:#18181b;color:white;border:none;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:inherit;" onmouseover="if(!this.disabled)this.style.background='#27272a'" onmouseout="if(!this.disabled)this.style.background='#18181b'">
+                                <svg id="wiz-check-repo-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                                <span id="wiz-check-repo-label">Check Repository</span>
+                            </button>
+                        </div>
                         <p style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">The repository linked to your Lovable project workspace.</p>
                     </div>
 
-                    <!-- PAT and Branch Row -->
-                    <div class="atw-token-branch-row">
-                        <!-- Personal Access Token -->
-                        <div style="display:flex;flex-direction:column;gap:5px;">
-                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Personal Access Token (PAT) *</label>
-                            <input type="password" id="wiz-github-token-lov" class="atw-input" placeholder="ghp_xxxxxxxxxxxx" value="<?php echo esc_attr( get_option( 'cora_git_sync_token', '' ) ); ?>" style="font-size:12.5px;">
+                    <!-- Branch Selector / Field -->
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Branch</label>
+                        <input type="text" id="wiz-github-branch-lov" class="atw-input" placeholder="main" value="<?php echo esc_attr( get_option( 'cora_git_sync_branch', 'main' ) ); ?>" style="font-size:12.5px;">
+                        
+                        <!-- Branch pills container, hidden by default until checked -->
+                        <div id="wiz-branch-picker" style="display:none;margin-top:6px;margin-bottom:4px;">
+                            <div id="wiz-branch-loading" style="display:none;align-items:center;gap:8px;padding:10px 12px;background:#fafafa;border:1.5px solid #e4e4e7;border-radius:9px;">
+                                <svg class="animate-spin" style="width:14px;height:14px;animation:wizSpin 1s linear infinite;" viewBox="0 0 24 24" fill="none"><circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path style="opacity:.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                                <span style="font-size:11.5px;color:#52525b;">Loading branches from GitHub…</span>
+                            </div>
+                            <div id="wiz-branch-pills" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
                         </div>
-                        <!-- Branch -->
-                        <div style="display:flex;flex-direction:column;gap:5px;">
-                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Branch</label>
-                            <input type="text" id="wiz-github-branch-lov" class="atw-input" placeholder="main" value="<?php echo esc_attr( get_option( 'cora_git_sync_branch', 'main' ) ); ?>" style="font-size:12.5px;">
-                        </div>
-                    </div>
-
-                    <!-- PAT Helper Panel (Direct Token Generation CTAs) -->
-                    <div style="background:#fafafa;border:1px solid #f4f4f5;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
-                        <div style="display:flex;align-items:start;gap:6px;">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.5" style="margin-top:1.5px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                            <span style="font-size:10px;color:#71717a;line-height:1.45;">Cora requires this token to pull files from your repository. Classic token is easiest for single repos:</span>
-                        </div>
-                        <div style="display:flex;gap:10px;">
-                            <a href="https://github.com/settings/tokens/new?description=Cora-Theme-Sync&scopes=repo" target="_blank" style="flex:1;text-align:center;padding:6px 10px;background:white;border:1px solid #e4e4e7;border-radius:7px;font-size:9.5px;font-weight:700;color:#18181b;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,0.02);" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
-                                Generate Classic Token (Classic)
-                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                            </a>
-                            <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" style="flex:1;text-align:center;padding:6px 10px;background:white;border:1px solid #e4e4e7;border-radius:7px;font-size:9.5px;font-weight:700;color:#18181b;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,0.02);" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
-                                Generate Fine-grained Token
-                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                            </a>
-                        </div>
+                        <p id="wiz-branch-hint" style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">Click "Check Repository" to load branches automatically.</p>
                     </div>
 
                     <!-- Lovable Project URL -->
@@ -3518,6 +3709,13 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                         <input type="text" id="wiz-lovable-url" class="atw-input" placeholder="https://lovable.dev/projects/your-project-id" value="" style="font-size:12.5px;">
                         <p style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">Copy the URL directly from the address bar when viewing your project in Lovable.</p>
+                    </div>
+
+                    <!-- Live / Preview URL (Optional) -->
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Live / Preview URL (Optional)</label>
+                        <input type="url" id="wiz-lovable-live-url" class="atw-input" placeholder="https://your-app.lovable.app" value="" style="font-size:12.5px;">
+                        <p style="font-size:10px;color:#a1a1aa;line-height:1.4;margin:0;">If your app is deployed, enter the live URL to configure links automatically.</p>
                     </div>
                 </div>
 
@@ -3693,8 +3891,13 @@ function cora_get_sparkline_points( $history, $type ) {
 <script src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/js/lovable-prompts.js' ); ?>"></script>
 <script>
     // --- Lovable Mappings Configuration ---
-    window.CORA_LOVABLE_ROUTES = <?php echo json_encode( cora_git_sync_get_lovable_routes() ); ?>;
-    window.CORA_PAGE_MAPPINGS = <?php echo json_encode( get_option( 'cora_git_sync_page_mappings', array() ) ); ?>;
+    <?php
+    $theme_settings_raw = $wpdb->get_var( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $current_theme_id ) );
+    $theme_settings = json_decode( $theme_settings_raw, true ) ?: array();
+    $active_theme_mappings = isset( $theme_settings['page_mappings'] ) ? $theme_settings['page_mappings'] : get_option( 'cora_git_sync_page_mappings', array() );
+    ?>
+    window.CORA_LOVABLE_ROUTES = <?php echo json_encode( cora_git_sync_get_lovable_routes( $current_theme_id ) ); ?>;
+    window.CORA_PAGE_MAPPINGS = <?php echo json_encode( $active_theme_mappings ); ?>;
     window.CORA_GIT_CONFIG = <?php echo json_encode([
         'enabled'     => get_option('cora_git_sync_enabled') === '1',
         'repo'        => get_option('cora_git_sync_repo', ''),
@@ -4272,6 +4475,12 @@ function cora_get_sparkline_points( $history, $type ) {
             jQuery('#tab-btn-ai').show();
         }
 
+        // Show settings, builder, custom code and menus tabs for all themes (dynamic capability)
+        jQuery('#tab-btn-settings').show();
+        jQuery('#tab-btn-theme-builder').show();
+        jQuery('#tab-btn-code').show();
+        jQuery('#tab-btn-menus').show();
+
         jQuery('#canvas-level-1').addClass('hidden');
         jQuery('#canvas-level-2').removeClass('hidden');
 
@@ -4398,7 +4607,13 @@ function cora_get_sparkline_points( $history, $type ) {
             },
             success: function(res) {
                 if (res.success) {
-                    canvasState.pages = res.data || [];
+                    if (res.data && res.data.pages) {
+                        canvasState.pages = res.data.pages;
+                        window.CORA_LOVABLE_ROUTES = res.data.routes || [];
+                        window.CORA_PAGE_MAPPINGS = res.data.page_mappings || {};
+                    } else {
+                        canvasState.pages = res.data || [];
+                    }
                     filterPages();
                     populatePageMappingSelectors();
 
@@ -4728,19 +4943,57 @@ function cora_get_sparkline_points( $history, $type ) {
     }
 
     function renderPagesTable(pages) {
+        const thead = jQuery('#tab-content-pages table thead');
         const body = jQuery('#pages-table-body');
         body.empty();
 
+        const isElementor = canvasState.activeThemeIsElementor;
+        if (isElementor) {
+            thead.html(`
+                <tr class="border-b border-zinc-100 text-[11px] font-semibold text-zinc-400">
+                    <th class="pl-3 pr-1 py-2 w-10">
+                        <input type="checkbox" id="pages-select-all-checkbox" onchange="toggleSelectAllPages(this)" class="rounded cursor-pointer accent-zinc-900">
+                    </th>
+                    <th class="px-3 py-2">
+                        <button onclick="setPageSort(pageSortState==='alpha'?'alpha-desc':'alpha')" class="flex items-center gap-1 text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors group font-semibold">
+                            Title
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-40 group-hover:opacity-100 transition-opacity"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
+                        </button>
+                    </th>
+                    <th class="px-3 py-2 font-semibold">Visibility</th>
+                    <th class="px-3 py-2 font-semibold">Content</th>
+                    <th class="px-3 py-2 font-semibold">Updated</th>
+                    <th class="px-3 py-2 w-28 text-right font-semibold">Actions</th>
+                </tr>
+            `);
+        } else {
+            thead.html(`
+                <tr class="border-b border-zinc-100 text-[11px] font-semibold text-zinc-400">
+                    <th class="pl-3 pr-1 py-2 w-10">
+                        <input type="checkbox" id="pages-select-all-checkbox" onchange="toggleSelectAllPages(this)" class="rounded cursor-pointer accent-zinc-900">
+                    </th>
+                    <th class="px-3 py-2">
+                        <button onclick="setPageSort(pageSortState==='alpha'?'alpha-desc':'alpha')" class="flex items-center gap-1 text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors group font-semibold">
+                            Title
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="opacity-40 group-hover:opacity-100 transition-opacity"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
+                        </button>
+                    </th>
+                    <th class="px-3 py-2 font-semibold">Cora Path</th>
+                    <th class="px-3 py-2 font-semibold">Lovable Route</th>
+                    <th class="px-3 py-2 font-semibold">Visibility</th>
+                    <th class="px-3 py-2 w-28 text-right font-semibold">Actions</th>
+                </tr>
+            `);
+        }
+
         if (pages.length === 0) {
-            body.append(`<tr><td colspan="6" class="p-8 text-center text-[12px] text-zinc-400">No pages found.</td></tr>`);
+            const cols = isElementor ? 6 : 6;
+            body.append(`<tr><td colspan="${cols}" class="p-8 text-center text-[12px] text-zinc-400">No pages found.</td></tr>`);
             return;
         }
 
         pages.forEach(p => {
             const visibilityPill = getVisibilityPill(p.status, p.scheduled_at);
-            const contentPreview = (p.content && p.content.trim())
-                ? `<span class="text-zinc-500 text-[11px]">${esc_html(p.content.replace(/<[^>]+>/g,'').substring(0,60))}…</span>`
-                : `<span class="text-zinc-300 text-[11px]">—</span>`;
             const homeBadge = p.is_homepage == 1
                 ? `<span class="ml-2 px-1.5 py-0.5 text-[8px] font-bold rounded-md bg-zinc-100 border border-zinc-200 text-zinc-500 inline-flex items-center gap-0.5"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</span>`
                 : '';
@@ -4750,93 +5003,203 @@ function cora_get_sparkline_points( $history, $type ) {
                 ? `${wsSiteBase}/?cv_preview_theme=${canvasState.activeThemeId}`
                 : `${wsSiteBase}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}`;
 
-            body.append(`
-                <tr class="border-b border-zinc-100 hover:bg-zinc-50/60 group transition-colors">
-                    <td class="pl-3 pr-1 py-2">
-                        <input type="checkbox" class="page-row-checkbox rounded cursor-pointer accent-zinc-900" data-id="${p.id}" onchange="updateBulkActionState()">
-                    </td>
-                    <td class="px-3 py-2">
-                        <div class="flex items-center flex-wrap gap-1">
-                            <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')"
-                                class="text-xs font-semibold text-zinc-900 hover:underline text-left cursor-pointer leading-snug">
-                                ${esc_html(p.title)}
-                            </button>
-                            ${homeBadge}
-                        </div>
-                    </td>
-                    <td class="px-3 py-2">${visibilityPill}</td>
-                    <td class="px-3 py-2 max-w-[220px] truncate">${contentPreview}</td>
-                    <td class="px-3 py-2 text-[11px] text-zinc-400 whitespace-nowrap">${getRelativeTime(p.updated_at)}</td>
-                    <td class="px-3 py-2 w-28 whitespace-nowrap text-right">
-                        <div class="flex items-center gap-1 justify-end">
-                            <!-- Preview/View shortcut -->
-                            <a href="${previewUrl}" target="_blank"
-                                class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
-                                title="Preview Page">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            </a>
-                            <!-- Edit/Pencil shortcut -->
-                            <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')"
-                                class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
-                                title="Edit Page">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                            </button>
-                            <!-- More Actions (Three Dots) -->
-                            <div class="relative inline-block text-left">
-                                <button onclick="togglePageRowActions(${p.id}, event)"
-                                    class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer transition-all"
-                                    title="More Actions">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            if (isElementor) {
+                const contentPreview = (p.content && p.content.trim())
+                    ? `<span class="text-zinc-500 text-[11px]">${esc_html(p.content.replace(/<[^>]+>/g,'').substring(0,60))}…</span>`
+                    : `<span class="text-zinc-300 text-[11px]">—</span>`;
+
+                body.append(`
+                    <tr class="border-b border-zinc-100 hover:bg-zinc-50/60 group transition-colors">
+                        <td class="pl-3 pr-1 py-2">
+                            <input type="checkbox" class="page-row-checkbox rounded cursor-pointer accent-zinc-900" data-id="${p.id}" onchange="updateBulkActionState()">
+                        </td>
+                        <td class="px-3 py-2">
+                            <div class="flex items-center flex-wrap gap-1">
+                                <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')"
+                                    class="text-xs font-semibold text-zinc-900 hover:underline text-left cursor-pointer leading-snug">
+                                    ${esc_html(p.title)}
                                 </button>
-                                <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left whitespace-normal">
-                                <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                    Edit page
-                                </button>
-                                <a href="${previewUrl}" target="_blank" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                                    Preview
-                                </a>
-                                <?php if ( ! $is_read_only ) : ?>
-                                <div class="border-t border-zinc-100 my-1"></div>
-                                <button onclick="triggerDuplicatePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                    Duplicate
-                                </button>
-                                <button onclick="triggerRenamePage(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                                    Rename
-                                </button>
-                                <button onclick="triggerChangePageSlug(${p.id}, '${esc_js(p.slug)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                                    Change slug
-                                </button>
-                                <button onclick="triggerSetHomepage(${p.id}, '${esc_js(p.title)}', ${p.is_homepage})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                                    Set as homepage
-                                </button>
-                                <button onclick="openSEODrawer(${p.id}, '${esc_js(p.title)}', '${esc_js(p.seo_title)}', '${esc_js(p.seo_description)}', '${esc_js(p.seo_og_image)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                                    SEO settings
-                                </button>
-                                <button onclick="openRevisionsDrawer(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    Revision history
-                                </button>
-                                <div class="border-t border-zinc-100 my-1"></div>
-                                <button onclick="triggerDeletePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-red-600 hover:bg-red-50 font-semibold cursor-pointer flex items-center gap-2">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                                    Delete
-                                </button>
-                                <?php endif; ?>
+                                ${homeBadge}
                             </div>
+                        </td>
+                        <td class="px-3 py-2">${visibilityPill}</td>
+                        <td class="px-3 py-2 max-w-[220px] truncate">${contentPreview}</td>
+                        <td class="px-3 py-2 text-[11px] text-zinc-400 whitespace-nowrap">${getRelativeTime(p.updated_at)}</td>
+                        <td class="px-3 py-2 w-28 whitespace-nowrap text-right">
+                            <div class="flex items-center gap-1 justify-end">
+                                <a href="${previewUrl}" target="_blank"
+                                    class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
+                                    title="Preview Page">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </a>
+                                <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')"
+                                    class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
+                                    title="Edit Page">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                </button>
+                                <div class="relative inline-block text-left">
+                                    <button onclick="togglePageRowActions(${p.id}, event)"
+                                        class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer transition-all"
+                                        title="More Actions">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                    </button>
+                                    <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left whitespace-normal">
+                                        <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            Edit page
+                                        </button>
+                                        <a href="${previewUrl}" target="_blank" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                            Preview
+                                        </a>
+                                        <?php if ( ! $is_read_only ) : ?>
+                                        <div class="border-t border-zinc-100 my-1"></div>
+                                        <button onclick="triggerDuplicatePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                            Duplicate
+                                        </button>
+                                        <button onclick="triggerRenamePage(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                            Rename
+                                        </button>
+                                        <button onclick="triggerChangePageSlug(${p.id}, '${esc_js(p.slug || '')}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                            Change slug
+                                        </button>
+                                        <button onclick="triggerSetHomepage(${p.id}, '${esc_js(p.title)}', ${p.is_homepage})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                            Set as homepage
+                                        </button>
+                                        <button onclick="openSEODrawer(${p.id}, '${esc_js(p.title)}', '${esc_js(p.seo_title)}', '${esc_js(p.seo_description)}', '${esc_js(p.seo_og_image)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                            SEO settings
+                                        </button>
+                                        <button onclick="openRevisionsDrawer(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                            Revision history
+                                        </button>
+                                        <div class="border-t border-zinc-100 my-1"></div>
+                                        <button onclick="triggerDeletePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-red-600 hover:bg-red-50 font-semibold cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                            Delete
+                                        </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+            } else {
+                const mappedRoute = window.CORA_PAGE_MAPPINGS ? (window.CORA_PAGE_MAPPINGS[p.id] || '') : '';
+                const relativeWpPath = `/site/<?php echo esc_js($cora_canvas_slug); ?>${p.is_homepage == 1 ? '' : '/' + p.slug}`;
+
+                let selectOptions = `<option value="">— Unmapped (Select Route) —</option>`;
+                if (window.CORA_LOVABLE_ROUTES && window.CORA_LOVABLE_ROUTES.length > 0) {
+                    window.CORA_LOVABLE_ROUTES.forEach(r => {
+                        const isSelected = r.path === mappedRoute ? 'selected' : '';
+                        selectOptions += `<option value="${esc_html(r.path)}" ${isSelected}>${esc_html(r.path)} (${esc_html(r.title)})</option>`;
+                    });
+                }
+
+                const mappingSelector = `
+                    <div class="relative inline-block w-full max-w-[220px]">
+                        <select onchange="savePageLovableMapping(${p.id}, this.value)" 
+                            class="w-full px-2.5 py-1.5 border border-zinc-200 focus:border-zinc-500 rounded-lg text-xs font-semibold bg-white text-zinc-800 focus:outline-none transition-colors appearance-none cursor-pointer pr-8">
+                            ${selectOptions}
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"/></svg>
                         </div>
                     </div>
-                </td>
-                </tr>
-            `);
+                `;
+
+                body.append(`
+                    <tr class="border-b border-zinc-100 hover:bg-zinc-50/60 group transition-colors">
+                        <td class="pl-3 pr-1 py-2">
+                            <input type="checkbox" class="page-row-checkbox rounded cursor-pointer accent-zinc-900" data-id="${p.id}" onchange="updateBulkActionState()">
+                        </td>
+                        <td class="px-3 py-2">
+                            <div class="flex items-center flex-wrap gap-1">
+                                <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')"
+                                    class="text-xs font-semibold text-zinc-900 hover:underline text-left cursor-pointer leading-snug">
+                                    ${esc_html(p.title)}
+                                </button>
+                                ${homeBadge}
+                            </div>
+                        </td>
+                        <td class="px-3 py-2 font-mono text-[11px] text-zinc-500 font-semibold">${esc_html(relativeWpPath)}</td>
+                        <td class="px-3 py-2">${mappingSelector}</td>
+                        <td class="px-3 py-2">${visibilityPill}</td>
+                        <td class="px-3 py-2 w-28 whitespace-nowrap text-right">
+                            <div class="flex items-center gap-1 justify-end">
+                                <a href="${previewUrl}" target="_blank"
+                                    class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
+                                    title="Preview Page">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </a>
+                                <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')"
+                                    class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 cursor-pointer transition-all"
+                                    title="Edit Page">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                </button>
+                                <div class="relative inline-block text-left">
+                                    <button onclick="togglePageRowActions(${p.id}, event)"
+                                        class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer transition-all"
+                                        title="More Actions">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                    </button>
+                                    <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left whitespace-normal">
+                                        <button onclick="openPageEditor(${p.id}, '${esc_js(p.title)}', ${p.wp_post_id || 0}, '${p.status || 'draft'}', '${esc_js(p.slug || '')}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            Edit page
+                                        </button>
+                                        <a href="${previewUrl}" target="_blank" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                            Preview
+                                        </a>
+                                        <?php if ( ! $is_read_only ) : ?>
+                                        <div class="border-t border-zinc-100 my-1"></div>
+                                        <button onclick="triggerDuplicatePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                            Duplicate
+                                        </button>
+                                        <button onclick="triggerRenamePage(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                            Rename
+                                        </button>
+                                        <button onclick="triggerChangePageSlug(${p.id}, '${esc_js(p.slug || '')}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                            Change slug
+                                        </button>
+                                        <button onclick="triggerSetHomepage(${p.id}, '${esc_js(p.title)}', ${p.is_homepage})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                            Set as homepage
+                                        </button>
+                                        <button onclick="openSEODrawer(${p.id}, '${esc_js(p.title)}', '${esc_js(p.seo_title)}', '${esc_js(p.seo_description)}', '${esc_js(p.seo_og_image)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                            SEO settings
+                                        </button>
+                                        <button onclick="openRevisionsDrawer(${p.id}, '${esc_js(p.title)}')" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                            Revision history
+                                        </button>
+                                        <div class="border-t border-zinc-100 my-1"></div>
+                                        <button onclick="triggerDeletePage(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-red-600 hover:bg-red-50 font-semibold cursor-pointer flex items-center gap-2 font-sans">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                            Delete
+                                        </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+            }
         });
     }
+
 
     function getVisibilityPill(status, dateStr) {
         if (status === 'published' || status === 'publish') {
@@ -4887,6 +5250,96 @@ function cora_get_sparkline_points( $history, $type ) {
         setTimeout(function() {
             modal.addClass('hidden');
         }, 300);
+    }
+
+    function openEditPageSettingsDrawer(pageId, title, status, slug) {
+        jQuery('#edit-page-settings-id').val(pageId);
+        jQuery('#edit-page-settings-title').val(title);
+        jQuery('#edit-page-settings-slug').val(slug);
+        jQuery('#edit-page-settings-status').val(status === 'published' ? 'publish' : status);
+        
+        // Populate route options
+        const routeSelect = jQuery('#edit-page-settings-lovable-route');
+        routeSelect.empty();
+        routeSelect.append('<option value="">— Unmapped (Select Route) —</option>');
+        
+        const mappedRoute = window.CORA_PAGE_MAPPINGS ? (window.CORA_PAGE_MAPPINGS[pageId] || '') : '';
+        if (window.CORA_LOVABLE_ROUTES && window.CORA_LOVABLE_ROUTES.length > 0) {
+            window.CORA_LOVABLE_ROUTES.forEach(r => {
+                const selectedAttr = r.path === mappedRoute ? 'selected' : '';
+                routeSelect.append(`<option value="${esc_html(r.path)}" ${selectedAttr}>${esc_html(r.path)} (${esc_html(r.title)})</option>`);
+            });
+        }
+
+        // Show/hide lovable route mapping field based on active theme
+        if (canvasState.activeThemeIsElementor) {
+            jQuery('#edit-page-settings-lovable-route-container').hide();
+        } else {
+            jQuery('#edit-page-settings-lovable-route-container').show();
+        }
+
+        const modal = jQuery('#drawer-edit-page-settings');
+        modal.removeClass('hidden');
+        setTimeout(() => {
+            modal.removeClass('opacity-0').css('opacity', '1');
+            jQuery('#drawer-edit-page-settings-card').removeClass('translate-x-full').addClass('translate-x-0');
+        }, 10);
+    }
+
+    function closeEditPageSettingsDrawer() {
+        jQuery('#drawer-edit-page-settings-card').removeClass('translate-x-0').addClass('translate-x-full');
+        const modal = jQuery('#drawer-edit-page-settings');
+        modal.addClass('opacity-0').css('opacity', '0');
+        setTimeout(function() {
+            modal.addClass('hidden');
+        }, 300);
+    }
+
+    function saveEditPageSettings() {
+        const pageId = jQuery('#edit-page-settings-id').val();
+        const title = jQuery('#edit-page-settings-title').val().trim();
+        const slug = jQuery('#edit-page-settings-slug').val().trim();
+        const status = jQuery('#edit-page-settings-status').val();
+        const route = jQuery('#edit-page-settings-lovable-route').val() || '';
+
+        if (!title || !slug) {
+            window.coraShowToast('Title and Slug are required.', 'error');
+            return;
+        }
+
+        window.coraShowToast('Saving page settings...', 'info');
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_update_page_properties',
+            nonce: coraREData.ajaxNonce,
+            page_id: pageId,
+            title: title,
+            slug: slug,
+            status: status,
+            route: route
+        }, function(res) {
+            if (res && res.success) {
+                window.coraShowToast('Page settings updated successfully!', 'success');
+                closeEditPageSettingsDrawer();
+                
+                // Update local page mappings state
+                if (!window.CORA_PAGE_MAPPINGS) window.CORA_PAGE_MAPPINGS = {};
+                if (route) {
+                    window.CORA_PAGE_MAPPINGS[pageId] = route;
+                } else {
+                    delete window.CORA_PAGE_MAPPINGS[pageId];
+                }
+                
+                // Reload pages table and list
+                if (typeof fetchThemePages === 'function') {
+                    fetchThemePages(canvasState.activeThemeId);
+                }
+            } else {
+                window.coraShowToast(res.data && res.data.message ? res.data.message : 'Failed to update page settings.', 'error');
+            }
+        }).fail(function() {
+            window.coraShowToast('Server connection failed.', 'error');
+        });
     }
 
     function autoGenerateSlug(input) {
@@ -5449,6 +5902,139 @@ function cora_get_sparkline_points( $history, $type ) {
         jQuery(`#inline-label-input-${items.length}`).focus();
     }
 
+    // ─── Auto-Generate Menu from Published Pages ────────────────────────────
+    window.autoGenerateMenuFromPages = function() {
+        if (canvasState.isReadOnly) return;
+        const currentMenu = canvasState.menus.find(m => m.id === canvasState.activeMenuDetailId);
+        if (!currentMenu) {
+            window.coraShowToast('Please open a menu first.', 'error');
+            return;
+        }
+
+        // Filter to published pages only
+        const publishedPages = (canvasState.pages || []).filter(p => p.wp_post_status === 'publish');
+
+        if (publishedPages.length === 0) {
+            window.coraShowToast('No published pages found for this theme.', 'error');
+            return;
+        }
+
+        // Build checklist
+        const list = jQuery('#auto-gen-pages-list').empty();
+        const existingUrls = (currentMenu.items || []).map(i => i.url);
+
+        publishedPages.forEach(p => {
+            const slug = p.is_homepage == 1 ? '/' : '/' + p.slug;
+            const alreadyAdded = existingUrls.includes(slug);
+            const label = p.is_homepage == 1 ? p.title + ' (Homepage)' : p.title;
+            list.append(`
+                <label class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-zinc-50 cursor-pointer select-none transition-colors auto-gen-page-row" data-slug="${slug}" data-title="${esc_html(p.title)}" data-homepage="${p.is_homepage}">
+                    <input type="checkbox" class="auto-gen-page-cb w-3.5 h-3.5 accent-zinc-950 cursor-pointer rounded flex-shrink-0" value="${p.id}" ${alreadyAdded ? '' : 'checked'}>
+                    <span class="flex-1 min-w-0">
+                        <span class="block text-xs font-semibold text-zinc-800 truncate">${esc_html(label)}</span>
+                        <span class="block text-[10px] font-mono text-zinc-400">${slug}</span>
+                    </span>
+                    ${alreadyAdded ? '<span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider flex-shrink-0 bg-zinc-100 px-1.5 py-0.5 rounded">Added</span>' : ''}
+                </label>
+            `);
+        });
+
+        autoGenUpdateCountLabel();
+
+        // Update count on checkbox change
+        jQuery('#auto-gen-pages-list').off('change.autogen').on('change.autogen', '.auto-gen-page-cb', function() {
+            autoGenUpdateCountLabel();
+        });
+
+        jQuery('#auto-gen-menu-modal').removeClass('hidden');
+    };
+
+    function autoGenUpdateCountLabel() {
+        const count = jQuery('.auto-gen-page-cb:checked').length;
+        jQuery('#auto-gen-count-label').text(count === 0 ? 'None selected' : count + ' page' + (count > 1 ? 's' : '') + ' selected');
+    }
+
+    window.autoGenSelectAll = function(selectAll) {
+        jQuery('.auto-gen-page-cb').prop('checked', selectAll);
+        autoGenUpdateCountLabel();
+    };
+
+    window.closeAutoGenMenuModal = function() {
+        jQuery('#auto-gen-menu-modal').addClass('hidden');
+    };
+
+    // Close modal on backdrop click
+    jQuery(document).on('click', '#auto-gen-menu-modal', function(e) {
+        if (jQuery(e.target).is('#auto-gen-menu-modal')) {
+            window.closeAutoGenMenuModal();
+        }
+    });
+
+    window.confirmAutoGenMenu = function() {
+        const currentMenu = canvasState.menus.find(m => m.id === canvasState.activeMenuDetailId);
+        if (!currentMenu) return;
+        if (!currentMenu.items) currentMenu.items = [];
+
+        const sortOrder = jQuery('#auto-gen-sort-order').val();
+
+        // Collect selected rows
+        let selected = [];
+        jQuery('.auto-gen-page-row').each(function() {
+            const cb = jQuery(this).find('.auto-gen-page-cb');
+            if (cb.is(':checked')) {
+                selected.push({
+                    slug: jQuery(this).data('slug'),
+                    title: jQuery(this).data('title'),
+                    homepage: parseInt(jQuery(this).data('homepage')) === 1
+                });
+            }
+        });
+
+        if (selected.length === 0) {
+            window.coraShowToast('Please select at least one page.', 'error');
+            return;
+        }
+
+        // Sort selected pages
+        if (sortOrder === 'alpha') {
+            selected.sort((a, b) => a.title.localeCompare(b.title));
+        } else if (sortOrder === 'alpha_desc') {
+            selected.sort((a, b) => b.title.localeCompare(a.title));
+        } else if (sortOrder === 'homepage_first') {
+            selected.sort((a, b) => (b.homepage ? 1 : 0) - (a.homepage ? 1 : 0));
+        }
+
+        // Skip duplicates that are already in the menu
+        const existingUrls = new Set(currentMenu.items.map(i => i.url));
+        let addedCount = 0;
+        selected.forEach(page => {
+            if (!existingUrls.has(page.slug)) {
+                currentMenu.items.push({
+                    id: 'mi_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                    label: page.title,
+                    url: page.slug,
+                    newTab: false,
+                    level: 0
+                });
+                existingUrls.add(page.slug);
+                addedCount++;
+            }
+        });
+
+        window.closeAutoGenMenuModal();
+        syncMenusToSettings();
+        renderMenuDetailEditor();
+
+        if (addedCount === 0) {
+            window.coraShowToast('All selected pages were already in the menu.', 'error');
+        } else {
+            window.coraShowToast(`${addedCount} page${addedCount > 1 ? 's' : ''} added to menu.`, 'success');
+        }
+    };
+    // ─── End Auto-Generate Menu ─────────────────────────────────────────────
+
+
+
     function editMenuInlineRow(index) {
         if (canvasState.isReadOnly) return;
         canvasState.activeMenuInlineIndex = index;
@@ -5750,6 +6336,8 @@ function cora_get_sparkline_points( $history, $type ) {
             setColor('setting-footer-text-color',  settings.footer_text_color || '#a1a1aa');
             jQuery('#setting-page-width').val(settings.page_width || 'boxed');
             jQuery('#setting-smooth-scroll').prop('checked', settings.smooth_scroll !== 0);
+            jQuery('#setting-template-header').val((settings.templates && settings.templates.header) ? settings.templates.header : '0');
+            jQuery('#setting-template-footer').val((settings.templates && settings.templates.footer) ? settings.templates.footer : '0');
 
             // Social & SEO
             jQuery('#setting-facebook-link').val(settings.facebook_link  || '');
@@ -5920,6 +6508,10 @@ function cora_get_sparkline_points( $history, $type ) {
             // Page Mapping
             homepage_page_id:  jQuery('#setting-homepage-page-id').val(),
             contact_page_id:   jQuery('#setting-contact-page-id').val(),
+            templates: {
+                header: jQuery('#setting-template-header').val(),
+                footer: jQuery('#setting-template-footer').val()
+            }
         };
 
         window.coraShowToast('Saving global design system settings...');
@@ -6283,6 +6875,11 @@ function cora_get_sparkline_points( $history, $type ) {
 
     // --- LEVEL 3 Elementor Iframe Page Editor Wrapper ---
     function openPageEditor(pageId, title, wpPostId, pageStatus, pageSlug) {
+        if (!canvasState.activeThemeIsElementor) {
+            openEditPageSettingsDrawer(pageId, title, pageStatus, pageSlug);
+            return;
+        }
+
         canvasState.level = 3;
         canvasState.activePageId = pageId;
         canvasState.activePageStatus = pageStatus || 'draft';
@@ -6683,6 +7280,9 @@ function cora_get_sparkline_points( $history, $type ) {
                 window.coraShowToast("Mapping saved successfully!", "success");
                 if (!window.CORA_PAGE_MAPPINGS) window.CORA_PAGE_MAPPINGS = {};
                 window.CORA_PAGE_MAPPINGS[pageId] = route;
+                if (typeof filterPages === 'function') {
+                    filterPages();
+                }
             } else {
                 window.coraShowToast("Failed to save mapping.", "error");
             }
@@ -7115,6 +7715,13 @@ function cora_get_sparkline_points( $history, $type ) {
 
     // ── Builder Selection ──────────────────────────────────────
     window.wizardSelectBuilder = function(type) {
+        // Guard: Lovable is locked as Coming Soon — block selection
+        if (type === 'lovable') {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Lovable integration is coming soon!', 'info');
+            }
+            return;
+        }
         _wizBuilder = type;
         wizardResetCards();
 
@@ -7248,43 +7855,309 @@ function cora_get_sparkline_points( $history, $type ) {
         if (scanList) scanList.innerHTML = '';
     };
 
+    // ── Lovable Wizard Helpers ─────────────────────────────────
+
+    // Safe fallback variables to prevent script compilation/execution crashes if coraREData is not localized/defined
+    var safeAjaxUrl = (typeof coraREData !== 'undefined' && coraREData && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+    var safeNonce   = (typeof coraREData !== 'undefined' && coraREData && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>';
+
+    function showToast(message, type) {
+        type = type || 'info';
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast(message, type);
+        } else if (window.parent && typeof window.parent.coraShowToast === 'function') {
+            window.parent.coraShowToast(message, type);
+        } else {
+            console.log("Toast (" + type + "): " + message);
+        }
+    }
+
+    // Called when user types in the repo URL or PAT field — debounces and auto-checks
+    var wizRepoTimeout = null;
+    function wizRepoChanged() {
+        var picker = document.getElementById('wiz-branch-picker');
+        var branchInput = document.getElementById('wiz-github-branch-lov');
+        var hint = document.getElementById('wiz-branch-hint');
+        if (picker) picker.style.display = 'none';
+        if (branchInput) branchInput.style.display = 'block';
+        if (hint) hint.textContent = 'Verifying repository link…';
+
+        // Clear existing timeout
+        if (wizRepoTimeout) clearTimeout(wizRepoTimeout);
+
+        // Set a 750ms debounce
+        wizRepoTimeout = setTimeout(function() {
+            var repo = ((document.getElementById('wiz-github-repo-lov') || {}).value || '').trim();
+            var patInput = document.getElementById('wiz-github-token-lov');
+            var pat = patInput ? (patInput.value || '').trim() : '';
+            
+            // Check if both fields are filled and it looks like a valid GitHub URL or owner/repo format
+            var isGitHub = /github\.com\/[^\/]+\/[^\/]+/i.test(repo) || repo.split('/').filter(Boolean).length === 2;
+            
+            if (isGitHub && pat) {
+                console.log('Auto-triggering wizCheckRepository from input change');
+                wizCheckRepository(true); // true to skip toasts on failure
+            } else {
+                if (hint) hint.textContent = 'Enter a valid repository URL and token to load branches automatically.';
+            }
+        }, 750);
+    }
+    window.wizRepoChanged = wizRepoChanged;
+
+    // Called when user clicks "Save Token" button next to PAT field
+    function wizSavePatGlobally() {
+        console.log('wizSavePatGlobally execution started');
+        var patInput = document.getElementById('wiz-github-token-lov');
+        var pat = patInput ? (patInput.value || '').trim() : '';
+
+        if (!pat) {
+            showToast('Please enter a Personal Access Token (PAT) first.', 'warning');
+            return;
+        }
+
+        var btn = document.getElementById('wiz-save-pat-btn');
+        var lbl = document.getElementById('wiz-save-pat-label');
+        var icon = document.getElementById('wiz-save-pat-icon');
+
+        if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+        if (lbl) lbl.textContent = 'Saving…';
+        if (icon) icon.style.animation = 'wizSpin .8s linear infinite';
+
+        jQuery.ajax({
+            url: safeAjaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_wizard_save_pat',
+                pat: pat,
+                nonce: safeNonce
+            },
+            dataType: 'text',
+            success: function(rawRes) {
+                console.log('Save PAT raw response:', rawRes);
+                if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+                if (lbl) lbl.textContent = 'Save Token';
+                if (icon) icon.style.animation = '';
+
+                var res;
+                try {
+                    var firstBrace = rawRes.indexOf('{');
+                    var lastBrace = rawRes.lastIndexOf('}');
+                    if (firstBrace > -1 && lastBrace > -1) {
+                        res = JSON.parse(rawRes.substring(firstBrace, lastBrace + 1));
+                    } else {
+                        res = { success: false, data: { message: rawRes.trim() } };
+                    }
+                } catch (e) {
+                    res = { success: false, data: { message: 'JSON Parse Error: ' + rawRes } };
+                }
+
+                if (!res || !res.success) {
+                    var msg = (res && res.data && res.data.message) ? res.data.message : 'Failed to save token.';
+                    if (msg === '-1') msg = 'Session expired. Please refresh the page.';
+                    showToast(msg, 'error');
+                    return;
+                }
+
+                showToast(res.data.message || 'Personal Access Token updated successfully.', 'success');
+            },
+            error: function(xhr, status, error) {
+                console.error('Save PAT AJAX failed:', error);
+                if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+                if (lbl) lbl.textContent = 'Save Token';
+                if (icon) icon.style.animation = '';
+                showToast('Network error saving token. Please try again.', 'error');
+            }
+        });
+    }
+    window.wizSavePatGlobally = wizSavePatGlobally;
+
+    // Called when user clicks a branch pill
+    function wizSelectBranch(branch, el) {
+        // Deselect all pills
+        document.querySelectorAll('.wiz-branch-pill').forEach(function(p) {
+            p.classList.remove('wiz-branch-selected');
+        });
+        // Select clicked pill
+        if (el) el.classList.add('wiz-branch-selected');
+        // Update the hidden text input to keep wizardSave in sync
+        var branchInput = document.getElementById('wiz-github-branch-lov');
+        if (branchInput) branchInput.value = branch;
+    }
+    window.wizSelectBranch = wizSelectBranch;
+
+    // Called when user clicks "Check Repository" button or auto-triggered
+    function wizCheckRepository(isAuto) {
+        isAuto = !!isAuto;
+        console.log('wizCheckRepository execution started, isAuto:', isAuto);
+        var repo = ((document.getElementById('wiz-github-repo-lov') || {}).value || '').trim();
+        if (!repo) {
+            if (!isAuto) showToast('Please enter a GitHub repository URL first.', 'error');
+            return;
+        }
+
+        var patInput = document.getElementById('wiz-github-token-lov');
+        var pat      = patInput ? (patInput.value || '').trim() : '';
+
+        if (!pat) {
+            if (!isAuto) showToast('Please enter your GitHub Personal Access Token (PAT).', 'error');
+            return;
+        }
+
+        // Verify it is a valid GitHub format
+        var isGitHub = /github\.com\/[^\/]+\/[^\/]+/i.test(repo) || repo.split('/').filter(Boolean).length === 2;
+        if (!isGitHub) {
+            if (!isAuto) showToast('Please enter a valid GitHub repository URL.', 'error');
+            return;
+        }
+
+        // Update button state to loading
+        var btn = document.getElementById('wiz-check-repo-btn');
+        var lbl = document.getElementById('wiz-check-repo-label');
+        var icon = document.getElementById('wiz-check-repo-icon');
+        if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+        if (lbl) lbl.textContent = 'Checking…';
+        if (icon) icon.style.animation = 'wizSpin .8s linear infinite';
+
+        // Show branch loading spinner
+        var picker  = document.getElementById('wiz-branch-picker');
+        var loading = document.getElementById('wiz-branch-loading');
+        var pills   = document.getElementById('wiz-branch-pills');
+        var input   = document.getElementById('wiz-github-branch-lov');
+        var hint    = document.getElementById('wiz-branch-hint');
+        if (picker)  { picker.style.display = 'block'; }
+        if (loading) { loading.style.display = 'flex'; }
+        if (pills)   { pills.style.display = 'none'; pills.innerHTML = ''; }
+        // Keep input field visible to maintain layout and show selected branch
+        if (input)   { input.style.display = 'block'; }
+
+        jQuery.ajax({
+            url: safeAjaxUrl,
+            method: 'POST',
+            data: {
+                action:      'cora_wizard_fetch_repo_branches',
+                repo:        repo,
+                pat:         pat,
+                save_global: '1', // always save/use token
+                nonce:       safeNonce
+            },
+            dataType: 'text', // force text to prevent jQuery JSON parser crash on PHP notices/warnings
+            success: function(rawRes) {
+                console.log('Branches fetch raw response:', rawRes);
+                
+                // Restore button
+                if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.background = '#18181b'; }
+                if (lbl) lbl.textContent = 'Check Repository';
+                if (icon) { icon.style.animation = ''; }
+                if (loading) loading.style.display = 'none';
+
+                var res;
+                try {
+                    var firstBrace = rawRes.indexOf('{');
+                    var lastBrace = rawRes.lastIndexOf('}');
+                    if (firstBrace > -1 && lastBrace > -1) {
+                        res = JSON.parse(rawRes.substring(firstBrace, lastBrace + 1));
+                    } else {
+                        res = { success: false, data: { message: rawRes.trim() } };
+                    }
+                } catch (e) {
+                    res = { success: false, data: { message: 'JSON Parse Error: ' + rawRes } };
+                }
+
+                if (!res || !res.success) {
+                    var msg = (res && res.data && res.data.message) ? res.data.message : 'Could not reach the repository. Check URL and token.';
+                    if (msg === '-1') msg = 'Session expired or invalid nonce. Please refresh the page.';
+                    if (!isAuto) showToast(msg, 'error');
+                    
+                    // Fall back to text input (hide pills but keep input visible)
+                    if (picker) picker.style.display = 'none';
+                    if (hint)   hint.textContent = isAuto ? 'Could not auto-verify repository. You can verify manually.' : 'Could not load branches. You can type the branch name manually.';
+                    return;
+                }
+
+                var branches = res.data.branches || [];
+                if (!branches.length) {
+                    if (!isAuto) showToast('Repository found, but no branches returned. Type the branch name manually.', 'warning');
+                    if (picker) picker.style.display = 'none';
+                    return;
+                }
+
+                // Build pills
+                if (pills) {
+                    pills.style.display = 'flex';
+                    pills.innerHTML = '';
+                    var defaultBranch = (input && input.value) ? input.value : 'main';
+                    branches.forEach(function(b) {
+                        var isDefault = (b === defaultBranch || (b === 'main' && !branches.includes(defaultBranch)));
+                        var pill = document.createElement('button');
+                        pill.type = 'button';
+                        pill.className = 'wiz-branch-pill' + (isDefault ? ' wiz-branch-selected' : '');
+                        pill.textContent = b;
+                        pill.onclick = function() { window.wizSelectBranch(b, pill); };
+                        pills.appendChild(pill);
+                        if (isDefault) {
+                            if (input) input.value = b;
+                        }
+                    });
+                }
+
+                if (hint) hint.textContent = branches.length + ' branch' + (branches.length === 1 ? '' : 'es') + ' found. Select one below.';
+
+                showToast('Repository verified! ' + branches.length + ' branch' + (branches.length === 1 ? '' : 'es') + ' loaded.', 'success');
+            },
+            error: function(xhr, status, error) {
+                console.error('Check repository AJAX failed:', error);
+                if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+                if (lbl) lbl.textContent = 'Check Repository';
+                if (icon) icon.style.animation = '';
+                if (loading) loading.style.display = 'none';
+                if (picker)  picker.style.display = 'none';
+                if (input)   input.style.display = 'block';
+                if (!isAuto) showToast('Network error. Check your connection and try again.', 'error');
+            }
+        });
+    }
+    window.wizCheckRepository = wizCheckRepository;
+
     // ── Navigation ─────────────────────────────────────────────
-    window.wizardNext = function() {
+    function wizardNext() {
         if (_wizStep === 1) {
-            if (!_wizBuilder) { window.coraShowToast('Please select a builder type first.', 'error'); return; }
+            if (!_wizBuilder) { showToast('Please select a builder type first.', 'error'); return; }
             wizardGoToStep(2);
         } else if (_wizStep === 2) {
             if (_wizBuilder === 'lovable') {
                 if (_wizLovableMode === 'scratch') {
-                    window.coraShowToast('Please switch to the Connect tab and input your repository details to import.', 'warning');
+                    showToast('Please switch to the Connect tab and input your repository details to import.', 'warning');
                     wizardSetLovableMode('connect');
                     return;
                 }
                 var repo = (document.getElementById('wiz-github-repo-lov') || {}).value || '';
-                var token = (document.getElementById('wiz-github-token-lov') || {}).value || '';
+                var patInput = document.getElementById('wiz-github-token-lov');
+                var pat      = patInput ? (patInput.value || '').trim() : '';
                 var u = (document.getElementById('wiz-lovable-url') || {}).value || '';
-                
-                if (!repo.trim()) { window.coraShowToast('Please enter your GitHub repository URL.', 'error'); return; }
-                if (!token.trim()) { window.coraShowToast('Please enter your GitHub Personal Access Token (PAT).', 'error'); return; }
-                if (!u.trim()) { window.coraShowToast('Please enter your Lovable project URL.', 'error'); return; }
+
+                if (!repo.trim()) { showToast('Please enter your GitHub repository URL.', 'error'); return; }
+                if (!pat) { showToast('Please enter your GitHub Personal Access Token (PAT).', 'error'); return; }
+                if (!u.trim()) { showToast('Please enter your Lovable project URL.', 'error'); return; }
             } else {
                 if (_wizSubMode === 'upload') {
                     var fi = document.getElementById('wiz-kit-file');
-                    if (!fi || !fi.files.length) { window.coraShowToast('Please select an Elementor Kit (.zip) file.', 'error'); return; }
+                    if (!fi || !fi.files.length) { showToast('Please select an Elementor Kit (.zip) file.', 'error'); return; }
                 } else {
                     var repo = (document.getElementById('wiz-github-repo') || {}).value || '';
-                    if (!repo.trim()) { window.coraShowToast('Please enter your GitHub repository URL.', 'error'); return; }
+                    if (!repo.trim()) { showToast('Please enter your GitHub repository URL.', 'error'); return; }
                 }
             }
             wizardGoToStep(3);
         } else if (_wizStep === 3) {
             wizardSave();
         }
-    };
+    }
+    window.wizardNext = wizardNext;
 
-    window.wizardBack = function() {
+    function wizardBack() {
         if (_wizStep > 1) wizardGoToStep(_wizStep - 1);
-    };
+    }
+    window.wizardBack = wizardBack;
 
     function wizardGoToStep(step) {
         ['wizard-step-1','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
@@ -7320,7 +8193,21 @@ function cora_get_sparkline_points( $history, $type ) {
 
         wizUpdateProgress(step);
         wizPushUrl({ ws: String(step) });
+
+        // Auto-check repository branches if we load step 2b with prefilled data
+        if (step === 2 && _wizBuilder === 'lovable') {
+            setTimeout(function() {
+                var repo = ((document.getElementById('wiz-github-repo-lov') || {}).value || '').trim();
+                var patInput = document.getElementById('wiz-github-token-lov');
+                var pat = patInput ? (patInput.value || '').trim() : '';
+                if (repo && pat) {
+                    console.log('Auto-triggering wizCheckRepository from step load');
+                    wizCheckRepository(true); // true to skip toasts on failure
+                }
+            }, 150);
+        }
     }
+    window.wizardGoToStep = wizardGoToStep;
 
     // ── Progress indicator ─────────────────────────────────────
     function wizUpdateProgress(step) {
@@ -7358,6 +8245,7 @@ function cora_get_sparkline_points( $history, $type ) {
         if (l1) l1.style.background = step >= 2 ? '#18181b' : '#e4e4e7';
         if (l2) l2.style.background = step >= 3 ? '#18181b' : '#e4e4e7';
     }
+    window.wizUpdateProgress = wizUpdateProgress;
 
     // ── Summary ────────────────────────────────────────────────
     function wizardPopulateSummary() {
@@ -7375,39 +8263,49 @@ function cora_get_sparkline_points( $history, $type ) {
             }
         }
     }
+    window.wizardPopulateSummary = wizardPopulateSummary;
 
     // ── Save ───────────────────────────────────────────────────
     function wizardSave() {
         var name = ((document.getElementById('wiz-theme-name') || {}).value || '').trim();
-        if (!name) { window.coraShowToast('Please enter a theme name.', 'error'); return; }
+        if (!name) { showToast('Please enter a theme name.', 'error'); return; }
 
         var nextBtn = document.getElementById('wiz-next-btn');
         if (nextBtn) { nextBtn.innerHTML = 'Saving…'; nextBtn.disabled = true; nextBtn.style.opacity = '0.6'; }
 
-        var lovUrl = ((document.getElementById('wiz-lovable-url') || {}).value || '').trim();
-        var githubRepo = (_wizBuilder === 'lovable') ? ((document.getElementById('wiz-github-repo-lov') || {}).value || '').trim() : ((document.getElementById('wiz-github-repo') || {}).value || '').trim();
-        var githubToken = (_wizBuilder === 'lovable') ? ((document.getElementById('wiz-github-token-lov') || {}).value || '').trim() : '';
-        var githubBranch = (_wizBuilder === 'lovable') ? ((document.getElementById('wiz-github-branch-lov') || {}).value || '').trim() : ((document.getElementById('wiz-github-branch') || {}).value || '').trim();
-        var kitFile = document.getElementById('wiz-kit-file');
+        var lovUrl  = ((document.getElementById('wiz-lovable-url')      || {}).value || '').trim();
+        var liveUrl = ((document.getElementById('wiz-lovable-live-url') || {}).value || '').trim();
+        var githubRepo    = (_wizBuilder === 'lovable') ? ((document.getElementById('wiz-github-repo-lov')    || {}).value || '').trim() : ((document.getElementById('wiz-github-repo') || {}).value || '').trim();
+        // Token: prefer text field if non-empty, else empty string (server will use saved token)
+        var githubToken   = (_wizBuilder === 'lovable') ? ((document.getElementById('wiz-github-token-lov')  || {}).value || '').trim() : '';
+        // Branch: prefer the value synced from pill selection or text input
+        var githubBranch  = (_wizBuilder === 'lovable') ? ((document.getElementById('wiz-github-branch-lov') || {}).value || '').trim() : ((document.getElementById('wiz-github-branch') || {}).value || '').trim();
+        if (!githubBranch) githubBranch = 'main';
+        var kitFile    = document.getElementById('wiz-kit-file');
         var kitFilename = (kitFile && kitFile.files[0]) ? kitFile.files[0].name : '';
 
+        var saveGlobalCheckbox = document.getElementById('wiz-save-pat-globally');
+        var saveGlobal = (saveGlobalCheckbox && saveGlobalCheckbox.checked) ? '1' : '0';
+
         var postData = {
-            action: 'cora_ajax_create_theme',
-            name: name,
-            start_from: _wizBuilder,
-            builder: _wizBuilder,
-            lovable_url: lovUrl,
+            action:        'cora_ajax_create_theme',
+            name:          name,
+            start_from:    _wizBuilder,
+            builder:       _wizBuilder,
+            lovable_url:   lovUrl,
+            live_url:      liveUrl,
             lovable_token: githubToken,
-            github_token: githubToken,
-            sub_mode: _wizSubMode,
-            github_repo: githubRepo,
+            github_token:  githubToken,
+            save_global:   saveGlobal,
+            sub_mode:      _wizSubMode,
+            github_repo:   githubRepo,
             github_branch: githubBranch,
             elementor_kit: kitFilename,
-            nonce: coraREData.ajaxNonce
+            nonce:         safeNonce
         };
 
         if (_wizBuilder === 'elementor' && _wizSubMode === 'upload') {
-            window.coraShowToast('Uploading and importing Elementor Kit...', 'info');
+            showToast('Uploading and importing Elementor Kit...', 'info');
 
             var formData = new FormData();
             formData.append('action', 'cora_ajax_import_kit');
@@ -7415,26 +8313,40 @@ function cora_get_sparkline_points( $history, $type ) {
             if (kitFile && kitFile.files[0]) {
                 formData.append('kit_zip', kitFile.files[0]);
             }
-            formData.append('nonce', coraREData.ajaxNonce);
+            formData.append('nonce', safeNonce);
 
             jQuery.ajax({
-                url: coraREData.ajaxUrl,
+                url: safeAjaxUrl,
                 method: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function(res) {
+                success: function(rawRes) {
+                    console.log('Elementor Kit import raw response:', rawRes);
+                    var res;
+                    try {
+                        var firstBrace = rawRes.indexOf('{');
+                        var lastBrace = rawRes.lastIndexOf('}');
+                        if (firstBrace > -1 && lastBrace > -1) {
+                            res = JSON.parse(rawRes.substring(firstBrace, lastBrace + 1));
+                        } else {
+                            res = { success: false, data: rawRes.trim() };
+                        }
+                    } catch (e) {
+                        res = { success: false, data: 'JSON Parse Error: ' + rawRes };
+                    }
+
                     if (res.success) {
-                        window.coraShowToast('Theme "' + name + '" successfully imported with pages!', 'success');
+                        showToast('Theme "' + name + '" successfully imported with pages!', 'success');
                         closeAddThemeWizard();
                         setTimeout(function() { window.location.reload(); }, 900);
                     } else {
-                        window.coraShowToast(res.data || 'Failed to import Elementor Kit.', 'error');
+                        showToast(res.data || 'Failed to import Elementor Kit.', 'error');
                         if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                     }
                 },
                 error: function() {
-                    window.coraShowToast('Failed to upload Elementor Kit.', 'error');
+                    showToast('Failed to upload Elementor Kit.', 'error');
                     if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                 }
             });
@@ -7442,41 +8354,65 @@ function cora_get_sparkline_points( $history, $type ) {
         }
 
         var postData = {
-            action: 'cora_ajax_create_theme',
-            name: name,
-            start_from: _wizBuilder,
-            builder: _wizBuilder,
-            lovable_url: lovUrl,
+            action:        'cora_ajax_create_theme',
+            name:          name,
+            start_from:    _wizBuilder,
+            builder:       _wizBuilder,
+            lovable_url:   lovUrl,
+            live_url:      liveUrl,
             lovable_token: githubToken,
-            github_token: githubToken,
-            sub_mode: _wizSubMode,
-            github_repo: githubRepo,
+            github_token:  githubToken,
+            save_global:   saveGlobal,
+            sub_mode:      _wizSubMode,
+            github_repo:   githubRepo,
             github_branch: githubBranch,
             elementor_kit: kitFilename,
-            nonce: coraREData.ajaxNonce
+            nonce:         safeNonce
         };
 
         if (_wizBuilder === 'lovable') {
-            window.coraShowToast('Connecting Lovable project...', 'info');
+            showToast('Connecting Lovable project...', 'info');
         } else {
-            window.coraShowToast('Connecting GitHub repository…', 'info');
+            showToast('Connecting GitHub repository…', 'info');
         }
 
-        jQuery.post(coraREData.ajaxUrl, postData, function(res) {
-            if (res.success) {
-                var successMsg = _wizBuilder === 'lovable' ? 'Lovable theme "' + name + '" connected!' : 'Theme "' + name + '" synced from GitHub!';
-                window.coraShowToast(successMsg, 'success');
-                closeAddThemeWizard();
-                setTimeout(function() { window.location.reload(); }, 900);
-            } else {
-                window.coraShowToast(res.data.message || 'Failed to create theme workspace.', 'error');
+        jQuery.ajax({
+            url: safeAjaxUrl,
+            method: 'POST',
+            data: postData,
+            dataType: 'text',
+            success: function(rawRes) {
+                console.log('Create theme raw response:', rawRes);
+                var res;
+                try {
+                    var firstBrace = rawRes.indexOf('{');
+                    var lastBrace = rawRes.lastIndexOf('}');
+                    if (firstBrace > -1 && lastBrace > -1) {
+                        res = JSON.parse(rawRes.substring(firstBrace, lastBrace + 1));
+                    } else {
+                        res = { success: false, data: { message: rawRes.trim() } };
+                    }
+                } catch (e) {
+                    res = { success: false, data: { message: 'JSON Parse Error: ' + rawRes } };
+                }
+
+                if (res.success) {
+                    var successMsg = _wizBuilder === 'lovable' ? 'Lovable theme "' + name + '" connected!' : 'Theme "' + name + '" synced from GitHub!';
+                    showToast(successMsg, 'success');
+                    closeAddThemeWizard();
+                    setTimeout(function() { window.location.reload(); }, 900);
+                } else {
+                    showToast(res.data.message || 'Failed to create theme workspace.', 'error');
+                    if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                }
+            },
+            error: function() {
+                showToast('Connection failed. Please check backend settings.', 'error');
                 if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
             }
-        }).fail(function() {
-            window.coraShowToast('Connection failed. Please check backend settings.', 'error');
-            if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
         });
     }
+    window.wizardSave = wizardSave;
 
     // ── Restore wizard state from URL on page load ─────────────
     (function() {
@@ -7492,6 +8428,12 @@ function cora_get_sparkline_points( $history, $type ) {
                 // Open wizard immediately without pushing URL again
                 window.openAddThemeWizard(true);
 
+                if (builder) {
+                    // Block Lovable auto-selection — it's locked as Coming Soon
+                    if (builder === 'lovable') {
+                        builder = null;
+                    }
+                }
                 if (builder) {
                     window.wizardSelectBuilder(builder);
                     _wizSubMode = mode;

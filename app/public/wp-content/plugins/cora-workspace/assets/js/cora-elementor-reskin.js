@@ -152,6 +152,11 @@
             '</div>' +
             '<div class="cora-tb-row cora-tb-row2">' +
                 '<div class="cora-tb-group">' +
+                    '<button id="cora-tb-add-elements-btn" class="cora-tb-add-elements-btn" onclick="coraOpenElementsPanel()" title="Add Element — open widgets panel">' +
+                        '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+                        'Add' +
+                    '</button>' +
+                    '<div class="cora-tb-divider-v"></div>' +
                     '<button class="cora-tb-text-btn" onclick="coraOpenTemplates()" title="Templates">' +
                         '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
                         'Templates' +
@@ -220,6 +225,85 @@
     /* ═══════════════════════════════════════════════════════
      * TOOLBAR COMMAND HELPERS (exposed globally)
      * ═══════════════════════════════════════════════════════ */
+
+    /* ── Add Elements Panel ─────────────────────────────────────── */
+    window.coraOpenElementsPanel = function () {
+        var btn = document.getElementById('cora-tb-add-elements-btn');
+
+        // ─────────────────────────────────────────────────────────────
+        // ROOT CAUSE: $e.route() and $e.run('panel/open-default') only
+        // change the route state — they don't call render() on the
+        // categoriesView child. Pressing ESC works because it fires
+        // $e.run('document/elements/deselect-all'), which goes through
+        // Elementor's editor deselect lifecycle and forces a full render.
+        //
+        // So our primary strategy is: do exactly what ESC does.
+        // ─────────────────────────────────────────────────────────────
+
+        var rendered = false;
+
+        // Strategy 1 — $e API: deselect-all triggers the same render path as ESC
+        try {
+            if (window.$e && $e.run) {
+                // Deselect all elements → triggers panel to re-render widget categories
+                $e.run('document/elements/deselect-all');
+
+                // Give the deselect event 80ms to propagate and render,
+                // then explicitly route to the Elements tab (not Globals).
+                setTimeout(function () {
+                    try { $e.route('panel/elements/elements'); } catch (x) {}
+                    if (btn) btn.classList.add('active');
+                }, 80);
+
+                rendered = true;
+            }
+        } catch (e1) { rendered = false; }
+
+        // Strategy 2 — Elementor v2: setPage() still triggers a render
+        if (!rendered) {
+            try {
+                if (window.elementor && elementor.getPanelView) {
+                    var panelView = elementor.getPanelView();
+                    if (panelView) {
+                        panelView.setPage('elements');
+                        rendered = true;
+                        if (btn) btn.classList.add('active');
+                    }
+                }
+            } catch (e2) {}
+        }
+
+        // Strategy 3 — Dispatch a real ESC keydown (browser-level, always works)
+        if (!rendered) {
+            try {
+                document.dispatchEvent(new KeyboardEvent('keydown', {
+                    key: 'Escape', code: 'Escape', keyCode: 27, which: 27,
+                    bubbles: true, cancelable: true
+                }));
+                setTimeout(function () {
+                    if (btn) btn.classList.add('active');
+                }, 150);
+                rendered = true;
+            } catch (e3) {}
+        }
+
+        // Register route-change hook ONCE to keep button active state in sync
+        if (window.$e && $e.hooks) {
+            try {
+                if (!window._coraElemPanelHookDone) {
+                    window._coraElemPanelHookDone = true;
+                    $e.hooks.registerUIAfter('route/run', function () {
+                        try {
+                            var r = $e.routes.getCurrent('panel') || '';
+                            if (btn) btn.classList.toggle('active', r === 'panel/elements/elements');
+                        } catch (x) {}
+                    });
+                }
+            } catch (ex) {}
+        }
+    };
+
+
 
     window.coraOpenTemplates = function () {
         try {
@@ -324,9 +408,6 @@
     };
 
     window.coraPublishTemplate = function () {
-        // Only publish if there are unsaved changes
-        var publishBtn = document.querySelector('.cora-tb-publish-btn');
-        if (publishBtn && publishBtn.disabled) return;
         updateSaveStatus('Publishing...');
         try {
             if (window.$e && $e.run) {
@@ -335,9 +416,21 @@
                     updateSaveStatus('All changes saved');
                     setPublishBtnState(false);
                 }, 1800);
+                return;
             }
         } catch (e) {}
+        // Fallback: use elementor.saver directly
+        try {
+            if (window.elementor && elementor.saver) {
+                elementor.saver.saveDocument({ status: 'publish' });
+                setTimeout(function () {
+                    updateSaveStatus('All changes saved');
+                    setPublishBtnState(false);
+                }, 1800);
+            }
+        } catch (e2) {}
     };
+
 
     window.coraToggleProfileMenu = function (e) {
         if (e) e.stopPropagation();
@@ -390,36 +483,66 @@
     }
 
     function observeSaveStatus() {
-        // Start in disabled/idle state — nothing unsaved yet
-        setPublishBtnState(false);
+        // Start ENABLED — always let the user publish.
+        // We'll gray it out only after a successful save,
+        // and re-enable it again when a change is detected.
+        setPublishBtnState(true);
 
-        if (!window.elementor) return;
-        try {
-            if (elementor.saver) {
-                elementor.saver.on('before:save', function () {
-                    updateSaveStatus('Saving...');
-                });
-                elementor.saver.on('after:save', function () {
-                    updateSaveStatus('All changes saved');
-                    setPublishBtnState(false);
-                });
-                // Mark as having changes whenever anything is modified
-                if (elementor.channels && elementor.channels.data) {
+        // Bind Elementor change listeners. Elementor may not be ready
+        // at toolbar-inject time (especially in Theme Builder), so we
+        // retry every 500ms until listeners are attached.
+        var _bound = false;
+        var _attempts = 0;
+        var _maxAttempts = 30; // give up after ~15 s
+
+        function tryBind() {
+            if (_bound || _attempts++ > _maxAttempts) return;
+
+            if (!window.elementor) return; // retry next tick
+
+            try {
+                // ── Saver events (before/after save) ──
+                if (elementor.saver && !elementor.saver._coraBound) {
+                    elementor.saver._coraBound = true;
+                    elementor.saver.on('before:save', function () {
+                        updateSaveStatus('Saving...');
+                    });
+                    elementor.saver.on('after:save', function () {
+                        updateSaveStatus('All changes saved');
+                        setPublishBtnState(false);
+                    });
+                }
+
+                // ── Data channel: marks button enabled on any change ──
+                if (elementor.channels && elementor.channels.data && !elementor.channels.data._coraBound) {
+                    elementor.channels.data._coraBound = true;
                     elementor.channels.data.on('change', function () {
                         updateSaveStatus('Unsaved changes');
                         setPublishBtnState(true);
                     });
+                    _bound = true; // primary listener attached
                 }
-            }
-            // Hook elementor's own hasChanges flag as backup
-            if (elementor.on) {
-                elementor.on('change', function () {
-                    updateSaveStatus('Unsaved changes');
-                    setPublishBtnState(true);
-                });
-            }
-        } catch (e) {}
+
+                // ── elementor.on('change') — Elementor v3 backup ──
+                if (elementor.on && !elementor._coraChangeBound) {
+                    elementor._coraChangeBound = true;
+                    elementor.on('change', function () {
+                        updateSaveStatus('Unsaved changes');
+                        setPublishBtnState(true);
+                    });
+                    _bound = true;
+                }
+            } catch (e) {}
+        }
+
+        // Try immediately, then retry every 500 ms until successful
+        tryBind();
+        var bindInterval = setInterval(function () {
+            tryBind();
+            if (_bound || _attempts > _maxAttempts) clearInterval(bindInterval);
+        }, 500);
     }
+
 
     function updateSaveStatus(text) {
         var dot = document.getElementById('cora-tb-status-dot');
@@ -431,13 +554,48 @@
     }
 
     function hideNativeTopBar() {
-        ['header.MuiAppBar-root', '.e-top-bar', '#e-top-bar', '.elementor-editor-top-bar', '#elementor-editor-wrapper-v2'].forEach(function (sel) {
+        // Hide native Elementor top bar elements.
+        // IMPORTANT: Do NOT hide #elementor-editor-wrapper-v2 itself — in Elementor 3.24+,
+        // the floating "+" add-widget button lives inside that wrapper. Only hide the
+        // top-bar/header direct children inside it, not the wrapper container.
+        var topBarSelectors = [
+            'header.MuiAppBar-root',
+            '.e-top-bar',
+            '#e-top-bar',
+            '.elementor-editor-top-bar'
+        ];
+        topBarSelectors.forEach(function (sel) {
             var el = document.querySelector(sel);
             if (el) {
                 el.style.setProperty('display', 'none', 'important');
             }
         });
+
+        // Target only the top-bar direct children inside #elementor-editor-wrapper-v2
+        var v2Wrapper = document.querySelector('#elementor-editor-wrapper-v2');
+        if (v2Wrapper) {
+            // Ensure the wrapper itself is visible (it houses the add-widget button)
+            v2Wrapper.style.removeProperty('display');
+            // Hide only the direct top-bar header children
+            var v2ChildSelectors = ['> header', '> .e-top-bar', '> .elementor-editor-top-bar'];
+            v2ChildSelectors.forEach(function (childSel) {
+                var child = v2Wrapper.querySelector(':scope ' + childSel);
+                if (child) {
+                    child.style.setProperty('display', 'none', 'important');
+                }
+            });
+            // Also hide MUI AppBar direct children
+            Array.from(v2Wrapper.children).forEach(function (child) {
+                if (child.classList && (
+                    child.classList.contains('MuiAppBar-root') ||
+                    Array.from(child.classList).some(function(c) { return c.indexOf('MuiAppBar') === 0; })
+                )) {
+                    child.style.setProperty('display', 'none', 'important');
+                }
+            });
+        }
     }
+
 
     function getDocTitle() {
         try {

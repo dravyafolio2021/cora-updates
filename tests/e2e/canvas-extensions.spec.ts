@@ -125,13 +125,81 @@ test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () 
 
     // Assert preview bar content
     await expect(page.locator('#cora-preview-bar')).toContainText('Previewing Draft:');
-    await expect(page.locator('#cora-preview-bar select.cpb-select')).toBeVisible();
     await expect(page.locator('#cora-preview-bar button:has-text("Publish")')).toBeVisible();
 
     // Test the Exit button redirects back to Canvas Hub
     await page.click('#cora-preview-bar a:has-text("Exit")');
     await page.waitForURL(url => url.pathname.includes('/workspace/canvas'), { timeout: 10000 });
     await page.waitForSelector('#canvas-level-1', { state: 'visible', timeout: 10000 });
+  });
+
+  test('Should enforce maximum limit of 10 draft themes and reject creation beyond limit', async ({ page }) => {
+    await login(page);
+    await page.goto('/workspace/canvas');
+    await page.waitForSelector('#canvas-level-1', { state: 'visible' });
+
+    // Grab nonce and ajaxUrl
+    const { ajaxUrl, nonce } = await page.evaluate(() => {
+      return {
+        ajaxUrl: (window as any).coraREData.ajaxUrl,
+        nonce: (window as any).coraREData.ajaxNonce
+      };
+    });
+
+    const currentDraftsCount = await page.evaluate(() => {
+      return (window as any).canvasState.themes.filter((t: any) => t.status !== 'live').length;
+    });
+
+    // Create draft themes until we reach 10
+    const createdThemeIds: number[] = [];
+    const themesToCreate = 10 - currentDraftsCount;
+    for (let i = 0; i < themesToCreate; i++) {
+      const res = await page.evaluate(async ({ ajaxUrl, nonce, i }) => {
+        const fd = new FormData();
+        fd.append('action', 'cora_ajax_create_theme');
+        fd.append('name', `Temp E2E Draft ${i}`);
+        fd.append('start_from', 'blank');
+        fd.append('nonce', nonce);
+        const response = await fetch(ajaxUrl, { method: 'POST', body: fd });
+        return response.json();
+      }, { ajaxUrl, nonce, i });
+      expect(res.success).toBe(true);
+    }
+
+    // Try to create the 11th theme, it should fail
+    const failCreateRes = await page.evaluate(async ({ ajaxUrl, nonce }) => {
+      const fd = new FormData();
+      fd.append('action', 'cora_ajax_create_theme');
+      fd.append('name', 'Temp E2E Draft Failed');
+      fd.append('start_from', 'blank');
+      fd.append('nonce', nonce);
+      const response = await fetch(ajaxUrl, { method: 'POST', body: fd });
+      return response.json();
+    }, { ajaxUrl, nonce });
+
+    expect(failCreateRes.success).toBe(false);
+    expect(failCreateRes.data.message || failCreateRes.data).toContain('maximum limit of 10 draft themes');
+
+    // Reload page to get all themes in state
+    await page.reload();
+    await page.waitForSelector('#canvas-level-1', { state: 'visible' });
+
+    // Clean up created E2E draft themes
+    const draftsToDelete = await page.evaluate(() => {
+      return (window as any).canvasState.themes
+        .filter((t: any) => t.name.startsWith('Temp E2E Draft'))
+        .map((t: any) => t.id);
+    });
+
+    for (const themeId of draftsToDelete) {
+      await page.evaluate(async ({ ajaxUrl, nonce, themeId }) => {
+        const fd = new FormData();
+        fd.append('action', 'cora_ajax_delete_theme');
+        fd.append('theme_id', themeId.toString());
+        fd.append('nonce', nonce);
+        await fetch(ajaxUrl, { method: 'POST', body: fd });
+      }, { ajaxUrl, nonce, themeId });
+    }
   });
 
 });

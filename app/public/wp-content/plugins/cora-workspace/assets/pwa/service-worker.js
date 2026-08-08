@@ -1,10 +1,56 @@
 // Service worker for Cora Admin PWA
-const CACHE_NAME = 'cora-workspace-v5';
+const CACHE_NAME = 'cora-workspace-v6';
+const DYNAMIC_CACHE = 'cora-dynamic-v6';
+const MAX_DYNAMIC_CACHE_ITEMS = 150;
+
 const URLs_TO_CACHE = [
   '/wp-content/plugins/cora-workspace/assets/pwa/manifest.json',
+  '/wp-content/plugins/cora-workspace/assets/css/admin-style.css',
+  '/wp-content/plugins/cora-workspace/assets/js/admin-script.js',
+  '/wp-content/plugins/cora-workspace/assets/js/cora-autosave-engine.js',
   '/cora-offline.html'
 ];
 
+/**
+ * Trim the dynamic cache to MAX_DYNAMIC_CACHE_ITEMS by evicting the oldest
+ * entries first (FIFO). Called after every dynamic cache write.
+ */
+async function trimCache(cacheName, maxItems) {
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  if (keys.length > maxItems) {
+    // Delete the oldest entries until we're at the limit
+    const toDelete = keys.slice(0, keys.length - maxItems);
+    await Promise.all(toDelete.map(key => cache.delete(key)));
+  }
+}
+
+/**
+ * Stale-While-Revalidate: serve from cache immediately, then fetch a fresh
+ * copy in the background and update the cache for next time.
+ */
+function staleWhileRevalidate(event) {
+  event.respondWith(
+    caches.open(DYNAMIC_CACHE).then(cache => {
+      return cache.match(event.request).then(cachedResponse => {
+        const fetchPromise = fetch(event.request).then(networkResponse => {
+          if (networkResponse.status === 200) {
+            cache.put(event.request, networkResponse.clone());
+            trimCache(DYNAMIC_CACHE, MAX_DYNAMIC_CACHE_ITEMS);
+          }
+          return networkResponse;
+        }).catch(() => {
+          // Network failed — cachedResponse (if any) was already returned
+        });
+
+        // Return the cached version immediately, or wait for network
+        return cachedResponse || fetchPromise;
+      });
+    })
+  );
+}
+
+// ─── Install ────────────────────────────────────────────────────────────────
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
@@ -15,6 +61,27 @@ self.addEventListener('install', event => {
   );
 });
 
+// ─── Activate ───────────────────────────────────────────────────────────────
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keyList => {
+      return Promise.all(keyList.map(key => {
+        if (key !== CACHE_NAME && key !== DYNAMIC_CACHE) {
+          return caches.delete(key);
+        }
+      }));
+    }).then(() => self.clients.claim())
+  );
+});
+
+// ─── Message (skipWaiting on demand) ────────────────────────────────────────
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});
+
+// ─── Fetch ──────────────────────────────────────────────────────────────────
 self.addEventListener('fetch', event => {
   // Only handle GET requests from the same origin
   if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
@@ -23,6 +90,18 @@ self.addEventListener('fetch', event => {
 
   // Bypass service worker completely for public Canvas site URLs
   if (event.request.url.includes('/site/')) {
+    return;
+  }
+
+  // Network-Only for AJAX / REST API requests (never cache)
+  if (event.request.url.includes('/wp-admin/admin-ajax.php') || event.request.url.includes('/wp-json/')) {
+    return;
+  }
+
+  // Stale-While-Revalidate for CSS, JS, and font assets
+  const url = new URL(event.request.url);
+  if (/\.(css|js|woff2?|ttf|otf|eot)(\?.*)?$/i.test(url.pathname)) {
+    staleWhileRevalidate(event);
     return;
   }
 
@@ -57,29 +136,20 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Cache-First strategy for other static assets
+  // Cache-First strategy for other static assets (images, etc.)
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request).then(networkResponse => {
         if (networkResponse.status === 200) {
           const copy = networkResponse.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+          caches.open(DYNAMIC_CACHE).then(cache => {
+            cache.put(event.request, copy);
+            trimCache(DYNAMIC_CACHE, MAX_DYNAMIC_CACHE_ITEMS);
+          });
         }
         return networkResponse;
       });
     })
-  );
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keyList => {
-      return Promise.all(keyList.map(key => {
-        if (key !== CACHE_NAME) {
-          return caches.delete(key);
-        }
-      }));
-    }).then(() => self.clients.claim())
   );
 });
 
@@ -137,4 +207,3 @@ self.addEventListener('notificationclick', event => {
       })
   );
 });
-

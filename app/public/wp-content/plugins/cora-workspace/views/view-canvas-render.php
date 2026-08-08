@@ -26,7 +26,22 @@ if ( function_exists( 'elementor_theme_do_location' ) ) {
     elementor_theme_do_location( 'header' );
 }
 
-the_content();
+$page_id = isset( $GLOBALS['cora_canvas_render_page_id'] ) ? intval( $GLOBALS['cora_canvas_render_page_id'] ) : get_the_ID();
+if ( $page_id > 0 ) {
+    global $post;
+    $post = get_post( $page_id );
+    setup_postdata( $post );
+}
+if ( class_exists( '\Elementor\Plugin' ) && $page_id ) {
+    $elementor_content = \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $page_id );
+    if ( ! empty( $elementor_content ) ) {
+        echo $elementor_content;
+    } else {
+        the_content();
+    }
+} else {
+    the_content();
+}
 
 // Render Elementor Footer
 if ( function_exists( 'elementor_theme_do_location' ) ) {

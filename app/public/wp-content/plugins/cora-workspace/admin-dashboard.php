@@ -242,12 +242,38 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     
     <!-- PWA Manifest & Service Worker -->
     <link rel="manifest" href="<?php echo home_url('/cora-manifest.json'); ?>">
+    <meta name="theme-color" content="#18181b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="<?php echo CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png'; ?>">
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('<?php echo home_url('/cora-service-worker.js'); ?>', { scope: '/' })
-                    .then(function(reg) { console.log('Service worker registered with scope:', reg.scope); })
+                    .then(function(reg) {
+                        console.log('Service worker registered with scope:', reg.scope);
+                        // Detect SW updates and auto-activate new version
+                        reg.addEventListener('updatefound', function() {
+                            var newWorker = reg.installing;
+                            if (newWorker) {
+                                newWorker.addEventListener('statechange', function() {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        // New SW ready — tell it to skip waiting and take control
+                                        newWorker.postMessage({ type: 'skipWaiting' });
+                                    }
+                                });
+                            }
+                        });
+                    })
                     .catch(function(err) { console.error('Service worker registration failed:', err); });
+            });
+            // When a new SW takes control, reload for fresh assets
+            var refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', function() {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
             });
         }
     </script>
