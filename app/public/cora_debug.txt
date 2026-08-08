@@ -1,0 +1,8 @@
+URI: /?p=1
+is_single: YES
+is_page: NO
+is_front_page: NO
+is_home: NO
+post_id: 1
+post_type: post
+post_title: Hello world!
