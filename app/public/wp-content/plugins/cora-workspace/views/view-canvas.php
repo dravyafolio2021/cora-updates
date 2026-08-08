@@ -573,11 +573,11 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                             <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                            <div class="flex-1 mx-2 bg-zinc-100 dark:bg-zinc-800 rounded text-[6px] font-mono text-zinc-400 px-2 py-0.5 text-center truncate"><?php echo esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) ); ?></div>
+                            <div class="flex-1 mx-2 bg-zinc-100 dark:bg-zinc-800 rounded text-[6px] font-mono text-zinc-400 px-2 py-0.5 text-center truncate"><?php echo esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) . '/' . $cora_canvas_slug ); ?></div>
                         </div>
                         <!-- viewport: 1280px wide × 850px tall → scale 0.21875 → renders 280px × 185px (fills 172px container height perfectly, cropping the bottom) -->
                         <div class="flex-1 relative overflow-hidden bg-white">
-                            <iframe src="<?php echo esc_url( home_url('/') ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:1280px;height:850px;transform:scale(0.21875);transform-origin:0 0;border:none;"></iframe>
+                            <iframe src="<?php echo esc_url( home_url( '/' . $cora_canvas_slug . '/' ) ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:1280px;height:850px;transform:scale(0.21875);transform-origin:0 0;border:none;"></iframe>
                         </div>
                     </div>
                     <!-- Mobile Frame: 90×200px | scale = 90/390 = 0.230769 (hidden on small mobile screens to prevent layout overflow) -->
@@ -587,7 +587,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                         <!-- viewport: 390px wide × 850px tall → scale 0.230769 → renders 90px × 196px (fills container height perfectly, cropping the bottom) -->
                         <div class="flex-1 relative overflow-hidden bg-white">
-                            <iframe src="<?php echo esc_url( home_url('/') ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:390px;height:850px;transform:scale(0.230769);transform-origin:0 0;border:none;"></iframe>
+                            <iframe src="<?php echo esc_url( home_url( '/' . $cora_canvas_slug . '/' ) ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:390px;height:850px;transform:scale(0.230769);transform-origin:0 0;border:none;"></iframe>
                         </div>
                     </div>
                 </div>
@@ -657,7 +657,7 @@ function cora_get_sparkline_points( $history, $type ) {
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                             Edit Theme
                         </button>
-                        <a href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="flex-1 lg:flex-none justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5 no-underline">
+                        <a href="<?php echo home_url( '/' . esc_attr( $cora_canvas_slug ) . '/' ); ?>" target="_blank" class="flex-1 lg:flex-none justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5 no-underline">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                             Preview
                         </a>
@@ -676,7 +676,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </button>
                                 <div id="active-theme-dropdown" class="hidden absolute right-0 top-full mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-50 text-left font-sans select-none">
-                                    <a href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold transition-colors decoration-none">
+                                    <a href="<?php echo home_url( '/' . esc_attr( $cora_canvas_slug ) . '/' ); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold transition-colors decoration-none">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         View
                                     </a>
@@ -1044,7 +1044,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <?php if ( ! $is_read_only ) : ?>
                 <button id="activate-theme-header-btn" onclick="triggerActivateThemeFromHeader()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Activate Theme</button>
                 <?php endif; ?>
-                <a id="preview-site-header-btn" href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm cursor-pointer transition-all hidden">Preview Site</a>
+                <a id="preview-site-header-btn" href="<?php echo home_url( '/' . esc_attr( $cora_canvas_slug ) . '/' ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm cursor-pointer transition-all hidden">Preview Site</a>
             </div>
         </div>
 
@@ -5015,7 +5015,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 ? `<span class="ml-2 px-1.5 py-0.5 text-[8px] font-bold rounded-md bg-zinc-100 border border-zinc-200 text-zinc-500 inline-flex items-center gap-0.5"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</span>`
                 : '';
 
-            const wsSiteBase = `${coraREData.siteUrl}/site/<?php echo esc_js($cora_canvas_slug); ?>`;
+            const wsSiteBase = `${coraREData.siteUrl}/<?php echo esc_js($cora_canvas_slug); ?>`;
             const previewUrl = p.is_homepage == 1
                 ? `${wsSiteBase}/?cv_preview_theme=${canvasState.activeThemeId}`
                 : `${wsSiteBase}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}`;
@@ -5109,7 +5109,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 `);
             } else {
                 const mappedRoute = window.CORA_PAGE_MAPPINGS ? (window.CORA_PAGE_MAPPINGS[p.id] || '') : '';
-                const relativeWpPath = `/site/<?php echo esc_js($cora_canvas_slug); ?>${p.is_homepage == 1 ? '' : '/' + p.slug}`;
+                const relativeWpPath = `/<?php echo esc_js($cora_canvas_slug); ?>${p.is_homepage == 1 ? '' : '/' + p.slug}`;
 
                 let selectOptions = `<option value="">— Unmapped (Select Route) —</option>`;
                 if (window.CORA_LOVABLE_ROUTES && window.CORA_LOVABLE_ROUTES.length > 0) {

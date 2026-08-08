@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.54
+ * Version: 3.2.55
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.54' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.55' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -5963,6 +5963,19 @@ function cora_canvas_theme_frontend_router() {
     $home_path = parse_url( home_url(), PHP_URL_PATH );
     $path = substr( $request_uri, strlen( $home_path ) );
     $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
+
+    if ( empty( $path ) ) {
+        $has_preview = false;
+        if ( function_exists( 'cora_get_preview_theme_id' ) && cora_get_preview_theme_id() ) {
+            $has_preview = true;
+        }
+        if ( isset( $_GET['cv_preview_theme'] ) || isset( $_GET['cv_page'] ) || isset( $_GET['preview_theme_id'] ) ) {
+            $has_preview = true;
+        }
+        if ( ! $has_preview ) {
+            return;
+        }
+    }
 
     $path_parts = explode( '/', $path );
     $first_part  = isset( $path_parts[0] ) ? sanitize_title( $path_parts[0] ) : '';
