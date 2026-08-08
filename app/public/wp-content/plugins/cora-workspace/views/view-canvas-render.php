@@ -54,7 +54,7 @@ if ( isset( $GLOBALS['cora_preview_bar_script'] ) ) {
 }
 
 wp_footer();
-echo '<style>html, body { overflow-x: hidden !important; } body.hostinger-ai-builder-elementor, body.hostinger-ai-builder-gutenberg { padding-top: 0px !important; } *, *:before, *:after { max-width: 100% !important; box-sizing: border-box !important; }</style>';
+echo '<style>html, body { overflow-x: hidden !important; } body.hostinger-ai-builder-elementor, body.hostinger-ai-builder-gutenberg { padding-top: 0px !important; } #wpadminbar { display: none !important; } body.admin-bar { margin-top: 0 !important; padding-top: 0 !important; } *, *:before, *:after { max-width: 100% !important; box-sizing: border-box !important; }</style>';
 echo '</body>';
 echo '</html>';
 exit;
