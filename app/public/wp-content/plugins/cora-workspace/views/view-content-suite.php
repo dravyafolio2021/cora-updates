@@ -1753,7 +1753,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     width: 100%;
 }
 
-.dark .cora-skeleton {
+.cora-dark-theme .cora-skeleton {
     background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%) !important;
     background-size: 200% 100% !important;
 }
@@ -1814,7 +1814,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     flex-shrink: 1 !important;
 }
 
-.dark .cora-stat-card {
+.cora-dark-theme .cora-stat-card {
     background-color: rgba(24, 24, 27, 0.5) !important; /* dark:bg-zinc-900/50 */
     border-color: rgb(39, 39, 42) !important; /* dark:border-zinc-800 */
 }
@@ -1824,7 +1824,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     border-color: rgb(212, 212, 216) !important; /* hover:border-zinc-300 */
 }
 
-.dark .cora-stat-card:hover {
+.cora-dark-theme .cora-stat-card:hover {
     border-color: rgb(63, 63, 70) !important; /* dark:hover:border-zinc-700 */
 }
 
@@ -6320,7 +6320,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             #cora-copilot-chat-window, #cora-copilot-dashboard {
                 background-color: #FBFaf7 !important;
             }
-            .dark #cora-copilot-chat-window, .dark #cora-copilot-dashboard {
+            .cora-dark-theme #cora-copilot-chat-window, .cora-dark-theme #cora-copilot-dashboard {
                 background-color: #09090b !important;
             }
             .cora-copilot-bubble {
@@ -6350,7 +6350,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 border-radius: 9999px;
                 animation: coraShimmer 1.4s infinite linear;
             }
-            .dark .cora-skeleton-bar {
+            .cora-dark-theme .cora-skeleton-bar {
                 background: linear-gradient(90deg, 
                     #1c1c1f 25%, 
                     #27272a 37%, 

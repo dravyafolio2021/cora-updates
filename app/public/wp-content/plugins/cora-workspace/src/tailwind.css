@@ -3,3 +3,7 @@
 @source "../views/**/*.php";
 @source "../admin-dashboard.php";
 @source "../cora-real-estate.php";
+
+@custom-variant dark (&:where(.cora-dark-theme, .cora-dark-theme *));
+
+
