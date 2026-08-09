@@ -259,3 +259,17 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     background-color: rgba(244, 244, 245, 0.5) !important;
     border-radius: 12px;
 }
+
+/* --- CORA THEME & AUTO-DARK CONTROL SYSTEM --- */
+/* Lock elements to Light scheme by default to prevent naive mobile browser force-dark color inversions */
+#cora-workspace:not(.cora-dark-theme),
+#cora-workspace:not(.cora-dark-theme) * {
+    color-scheme: only light !important;
+}
+
+/* Allow Dark scheme transitions and rendering when the platform's dark theme class is explicitly active */
+#cora-workspace.cora-dark-theme,
+#cora-workspace.cora-dark-theme * {
+    color-scheme: dark !important;
+}
+
