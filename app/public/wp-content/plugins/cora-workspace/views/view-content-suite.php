@@ -6249,6 +6249,15 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             @media (max-width: 1023px) {
                 #cora-copilot-container {
                     padding-left: 0;
+                    bottom: 84px !important;
+                }
+                #cora-copilot-chat-window {
+                    height: 58vh !important;
+                    max-height: 420px !important;
+                    min-height: 320px !important;
+                }
+                #cora-copilot-dashboard {
+                    overflow-y: auto !important;
                 }
             }
             #cora-copilot-bar, #cora-copilot-chat-window {
