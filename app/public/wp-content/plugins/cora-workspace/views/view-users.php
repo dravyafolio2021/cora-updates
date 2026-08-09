@@ -4420,59 +4420,8 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         }
     });
 
-    // Platform Redirection and Clipboard Sync Helpers
-    window.coraGetReferQuery = function() {
-        // Find which tab is currently active (not hidden)
-        var activeTab = $('.cora-tab-content:not(.hidden)').attr('id') || 'tab-active-members';
-        
-        if (activeTab === 'tab-permissions-matrix') {
-            return "How do I configure the granular Permissions Matrix (View, Edit, No Access levels) in the Cora Workspace Platform?";
-        } else if (activeTab === 'tab-custom-roles') {
-            return "How to create custom team roles and manage capabilities inside Cora Workspace?";
-        } else if (activeTab === 'tab-attendance-logs') {
-            return "How to configure geofenced office location attendance logs and GPS check-ins in Cora Workspace?";
-        } else if (activeTab === 'tab-owner-automations') {
-            return "How to setup automated owner digests, security alerts, and SMTP templates in Cora Workspace?";
-        } else if (activeTab === 'tab-pending-invites') {
-            return "How to invite new users, manage pending invitations, and resend links in Cora Workspace?";
-        } else {
-            return "How to manage team members, active accounts, and edit profile details in Cora Workspace?";
-        }
-    };
+    // Platform Redirection and Clipboard Sync Helpers (using global definitions in admin-script.js)
 
-    window.coraAskExternalPlatform = function(platform) {
-        var query = window.coraGetReferQuery();
-        
-        // Copy to clipboard dynamically
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(query).then(function() {
-                // Clipboard copy successful
-            }).catch(function() {
-                // Ignore fallback
-            });
-        }
-        
-        var url = '';
-        var platformName = '';
-        if (platform === 'openai') {
-            platformName = 'ChatGPT';
-            url = 'https://chatgpt.com/?q=' + encodeURIComponent(query);
-        } else if (platform === 'gemini') {
-            platformName = 'Gemini';
-            url = 'https://gemini.google.com/app?q=' + encodeURIComponent(query);
-        } else if (platform === 'claude') {
-            platformName = 'Claude';
-            url = 'https://claude.ai/';
-        } else if (platform === 'perplexity') {
-            platformName = 'Perplexity';
-            url = 'https://www.perplexity.ai/?q=' + encodeURIComponent(query);
-        }
-        
-        if (url) {
-            window.coraShowToast('Opening ' + platformName + '... Query copied to clipboard!');
-            window.open(url, '_blank');
-        }
-    };
 
     // Drawer Open/Close & Tab Switching helpers
     window.openAiTrainerDrawer = function(platform) {
