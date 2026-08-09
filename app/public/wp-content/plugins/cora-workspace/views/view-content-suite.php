@@ -553,30 +553,28 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 </div>
 
                 <!-- Filter control row -->
-                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 pb-4">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <!-- Dropdowns -->
-                        <select id="opp-filter-topic" onchange="coraFilterOpportunitiesTable()" class="border border-zinc-200 hover:border-zinc-300 rounded-xl px-3 py-1.5 text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
-                            <option value="all">All Topics</option>
-                            <option value="seo">SEO Strategy</option>
-                            <option value="ai">AI & Search</option>
-                            <option value="content">Content Marketing</option>
-                        </select>
-                        <select id="opp-filter-intent" onchange="coraFilterOpportunitiesTable()" class="border border-zinc-200 hover:border-zinc-300 rounded-xl px-3 py-1.5 text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
-                            <option value="all">All Intent</option>
-                            <option value="commercial">Commercial</option>
-                            <option value="local">Local</option>
-                            <option value="informational">Informational</option>
-                            <option value="transactional">Transactional</option>
-                        </select>
-                        <select id="opp-filter-impact" onchange="coraFilterOpportunitiesTable()" class="border border-zinc-200 hover:border-zinc-300 rounded-xl px-3 py-1.5 text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
-                            <option value="all">All Impact</option>
-                            <option value="high">High Impact</option>
-                            <option value="medium">Medium Impact</option>
-                            <option value="low">Low Impact</option>
-                        </select>
-                    </div>
-                    <button class="flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 hover:border-zinc-900 bg-white rounded-xl text-xs text-zinc-700 font-bold transition-all shadow-3xs active:scale-97 cursor-pointer">
+                <div class="grid grid-cols-2 gap-2.5 pb-4 border-b border-zinc-100 w-full sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
+                    <!-- Dropdowns -->
+                    <select id="opp-filter-topic" onchange="coraFilterOpportunitiesTable()" class="w-full sm:w-auto border border-zinc-200 hover:border-zinc-300 rounded-xl px-3 py-1.5 text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
+                        <option value="all">All Topics</option>
+                        <option value="seo">SEO Strategy</option>
+                        <option value="ai">AI & Search</option>
+                        <option value="content">Content Marketing</option>
+                    </select>
+                    <select id="opp-filter-intent" onchange="coraFilterOpportunitiesTable()" class="w-full sm:w-auto border border-zinc-200 hover:border-zinc-300 rounded-xl px-3 py-1.5 text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
+                        <option value="all">All Intent</option>
+                        <option value="commercial">Commercial</option>
+                        <option value="local">Local</option>
+                        <option value="informational">Informational</option>
+                        <option value="transactional">Transactional</option>
+                    </select>
+                    <select id="opp-filter-impact" onchange="coraFilterOpportunitiesTable()" class="w-full sm:w-auto border border-zinc-200 hover:border-zinc-300 rounded-xl px-3 py-1.5 text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
+                        <option value="all">All Impact</option>
+                        <option value="high">High Impact</option>
+                        <option value="medium">Medium Impact</option>
+                        <option value="low">Low Impact</option>
+                    </select>
+                    <button class="flex items-center justify-center gap-1.5 w-full sm:w-auto sm:ml-auto px-3 py-1.5 border border-zinc-200 hover:border-zinc-900 bg-white rounded-xl text-xs text-zinc-700 font-bold transition-all shadow-3xs active:scale-97 cursor-pointer">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                         Filters
                     </button>
