@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.65
+ * Version: 3.2.66
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,32 +15,60 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.65' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.66' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
 if ( ! defined( 'CORA_PLUGIN_FILE' ) ) {
     define( 'CORA_PLUGIN_FILE', __FILE__ );
 }
-define( 'CORA_PLATFORM_GEMINI_API_KEY', 'AQ.Ab8RN6LQyWhTU1-DnmLErK_xsadod4eOu1ixRCN-5K1LwVOmfg' );
-define( 'CORA_PLATFORM_OPENAI_API_KEY', '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' );
-define( 'CORA_PLATFORM_GROQ_API_KEY', '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' );
-define( 'CORA_PLATFORM_OPENROUTER_API_KEY', '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' );
-define( 'CORA_PLATFORM_ELEVENLABS_API_KEY', 'sk_45e1f8470453f6b63681f12e2e359c7f1d019b0fb2e8a0d5' );
-define( 'CORA_PLATFORM_NVIDIA_GLM_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_MINIMAX_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_MOONSHOT_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_GEMMA_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_GPT_20B_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_GPT_120B_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_33_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY', '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY', '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' );
+if ( ! function_exists( 'cora_workspace_load_env_keys' ) ) {
+function cora_workspace_load_env_keys() {
+    $env_paths = array(
+        dirname( __FILE__ ) . '/.env',
+        dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) . '/.env'
+    );
+    $keys = array();
+    foreach ( $env_paths as $path ) {
+        if ( file_exists( $path ) ) {
+            $lines = file( $path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
+            foreach ( $lines as $line ) {
+                $line = trim( $line );
+                if ( empty( $line ) || strpos( $line, '#' ) === 0 ) {
+                    continue;
+                }
+                if ( strpos( $line, '=' ) !== false ) {
+                    list( $name, $value ) = explode( '=', $line, 2 );
+                    $keys[ trim( $name ) ] = trim( $value, " '\"" );
+                }
+            }
+        }
+    }
+    return $keys;
+}
+}
+$cora_env_keys = cora_workspace_load_env_keys();
+
+define( 'CORA_PLATFORM_GEMINI_API_KEY', $cora_env_keys['GEMINI'] ?? $cora_env_keys['CORA_PLATFORM_GEMINI_API_KEY'] ?? 'AQ.Ab8RN6LQyWhTU1-DnmLErK_xsadod4eOu1ixRCN-5K1LwVOmfg' );
+define( 'CORA_PLATFORM_OPENAI_API_KEY', $cora_env_keys['OPENAI'] ?? $cora_env_keys['CORA_PLATFORM_OPENAI_API_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_GROQ_API_KEY', $cora_env_keys['GROQ_API'] ?? $cora_env_keys['CORA_PLATFORM_GROQ_API_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_OPENROUTER_API_KEY', $cora_env_keys['OPENROUTER'] ?? $cora_env_keys['CORA_PLATFORM_OPENROUTER_API_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_ELEVENLABS_API_KEY', $cora_env_keys['ELEVENLABS_API_KEY'] ?? $cora_env_keys['CORA_PLATFORM_ELEVENLABS_API_KEY'] ?? 'sk_45e1f8470453f6b63681f12e2e359c7f1d019b0fb2e8a0d5' );
+
+define( 'CORA_PLATFORM_NVIDIA_GLM_KEY', $cora_env_keys['ZAI_GLM_52'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GLM_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_MINIMAX_KEY', $cora_env_keys['MINIMAXAI_MINIMAX_M3'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_MINIMAX_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_MOONSHOT_KEY', $cora_env_keys['NVIDIA_NEMOTRON_3_MOONSHOT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_MOONSHOT_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY', $cora_env_keys['NVIDIA_NEMOTRON_3_DEEPSEEK_FLASH'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY', $cora_env_keys['NVIDIA_NEMOTRON_3_DEEPSEEK_PRO'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_GEMMA_KEY', $cora_env_keys['GOOGLE_GEMMA_4_31B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GEMMA_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_GPT_20B_KEY', $cora_env_keys['OPENAI_GPT_OSS_20B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GPT_20B_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_GPT_120B_KEY', $cora_env_keys['OPENAI_GPT_OSS_120B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GPT_120B_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY', $cora_env_keys['NVIDIA_LLAMA_GUARD_4_12B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_33_KEY', $cora_env_keys['META_LLAMA_33_70B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_33_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY', $cora_env_keys['META_LLAMA_32_1B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY', $cora_env_keys['META_LLAMA_32_3B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY', $cora_env_keys['META_LLAMA_31_70B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY', $cora_env_keys['META_LLAMA_31_8B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY'] ?? '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' );
 
 // ── Foundation Migration: cora_re_* → cora_workspace_* ───────────────────────
 // Runs once on activation to migrate all legacy option keys from the old
@@ -14408,10 +14436,20 @@ function cora_ajax_chat_query() {
     $data = json_decode( $response_body, true );
 
     $reply = '';
+    $prompt_tokens = 0;
+    $completion_tokens = 0;
+    $total_tokens = 0;
+
     if ( $provider === 'gemini' ) {
         $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        $prompt_tokens = $data['usageMetadata']['promptTokenCount'] ?? 0;
+        $completion_tokens = $data['usageMetadata']['candidatesTokenCount'] ?? 0;
+        $total_tokens = $data['usageMetadata']['totalTokenCount'] ?? 0;
     } else {
         $reply = $data['choices'][0]['message']['content'] ?? '';
+        $prompt_tokens = $data['usage']['prompt_tokens'] ?? 0;
+        $completion_tokens = $data['usage']['completion_tokens'] ?? 0;
+        $total_tokens = $data['usage']['total_tokens'] ?? 0;
     }
 
     $fallback_notice = '';
@@ -14421,10 +14459,13 @@ function cora_ajax_chat_query() {
     }
 
     wp_send_json_success( array(
-        'reply'           => $reply,
-        'model'           => $model,
-        'provider'        => $provider,
-        'fallback_notice' => $fallback_notice
+        'reply'             => $reply,
+        'model'             => $model,
+        'provider'          => $provider,
+        'fallback_notice'   => $fallback_notice,
+        'prompt_tokens'     => $prompt_tokens,
+        'completion_tokens' => $completion_tokens,
+        'total_tokens'      => $total_tokens
     ) );
 }
 }

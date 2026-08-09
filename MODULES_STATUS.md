@@ -16,7 +16,7 @@
 | **Forms & Reviews** | `feature/forms-module` | 🟢 Merged to Main | `views/view-forms.php`, `public-form-view.php`, `views/view-emails.php` | Dedicated Forms Agent |
 | **Media Module** | `feature/media-module` | 🟢 Merged to Main | `views/view-media.php`, `views/view-media-editor.php`, `cora-workspace.php` | Media Module Agent |
 | **Studio Module** | `feature/studio-module` | 🟡 Active Work | `cora-workspace.php`, Studio Views & Features | Studio Module Agent (Arjun) |
-| **Content Module** | `feature/content-module` | 🟢 Merged to Main | `views/view-content-suite.php`, `cora-workspace.php` | Content Module Agent |
+| **Content Module** | `feature/content-ai-copilot` | 🟡 Active Work | `views/view-content-suite.php` | Content Module Agent (AI Copilot) |
 | **Lead Management** | `feature/lead-management` | 🟡 Active Work | `views/view-leads.php`, `cora-workspace.php`, `admin-dashboard.php` | Lead Suite Agent |
 | **Frontend Module** | `feature/frontend-module` | 🟡 Active Work | `cora-frontend/*`, `cora-workspace.php` | Frontend Module Agent |
 <!-- MODULE_ROWS_END -->
@@ -50,9 +50,9 @@
 - **Status**: 🟡 Active — Enterprise Lead Management Suite: Drag & drop Kanban funnel, searchable directory table, funnel & revenue analytics, sliding side drawers (deal details, create/edit lead, schedule follow-up), lead activity timeline, direct email outreach, and lead conversion to client.
 - **Main Touchpoint**: `views/view-leads.php`, `cora-workspace.php`, `admin-dashboard.php`.
 
-### `feature/content-module` (Merged to Main)
-- **Status**: 🟢 Merged to Main — AI Content Suite: 2-column inline editor layout fix, real-time debounced auto-save engine with instant localStorage caching & draft recovery, balanced SEO & GEO inspector tab, and email page outer wrapper padding optimization.
-- **Main Touchpoint**: `views/view-content-suite.php`, `cora-workspace.php`, `admin-dashboard.php`.
+### `feature/content-ai-copilot` (Active Branch)
+- **Status**: 🟡 Active — Integrating floating WhatsApp-style Indian Manager AI Copilot ("Alok") at the bottom center of the Content Suite dashboard with real-time state-awareness and direct inline actions execution.
+- **Main Touchpoint**: `views/view-content-suite.php`.
 
 ### `feature/studio-module` (Active Branch)
 - **Status**: 🟡 Active — Studio Features, Studio Booking & Management, Equipment & Crew Integration, and Studio Suite workflows.
