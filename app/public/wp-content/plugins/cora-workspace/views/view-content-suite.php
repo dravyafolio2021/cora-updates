@@ -340,7 +340,10 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     </div>
                     <div class="min-w-0 pt-0.5">
                         <div class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider mb-1 select-none">Top Opportunity</div>
-                        <div class="text-[11px] text-zinc-650 dark:text-zinc-400 leading-relaxed font-medium" id="ai-top-opportunity">Loading AI recommendation...</div>
+                        <div class="text-[11px] text-zinc-650 dark:text-zinc-400 leading-relaxed font-medium space-y-1.5 py-0.5" id="ai-top-opportunity">
+                            <div class="cora-skeleton h-3 w-5/6"></div>
+                            <div class="cora-skeleton h-3 w-2/3"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="flex gap-3.5 relative">
@@ -350,7 +353,10 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     </div>
                     <div class="min-w-0 pt-0.5">
                         <div class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider mb-1 select-none">Content Grounding</div>
-                        <div class="text-[11px] text-zinc-650 dark:text-zinc-400 leading-relaxed font-medium" id="ai-content-health">Analyzing published content...</div>
+                        <div class="text-[11px] text-zinc-650 dark:text-zinc-400 leading-relaxed font-medium space-y-1.5 py-0.5" id="ai-content-health">
+                            <div class="cora-skeleton h-3 w-4/5"></div>
+                            <div class="cora-skeleton h-3 w-1/2"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1739,6 +1745,30 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </aside>
 <!-- BOTTOM SHEET STYLING -->
 <style>
+/* Shimmering Skeleton Loader Styling */
+.cora-skeleton {
+    background: linear-gradient(90deg, #f4f4f5 25%, #e4e4e7 50%, #f4f4f5 75%) !important;
+    background-size: 200% 100% !important;
+    animation: cora-shimmer 1.6s infinite linear !important;
+    border-radius: 0.375rem !important; /* rounded-md */
+    display: block !important;
+    width: 100%;
+}
+
+.dark .cora-skeleton {
+    background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%) !important;
+    background-size: 200% 100% !important;
+}
+
+@keyframes cora-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
 /* Overview Metrics Grid & Stats Cards Styling */
 .cora-metrics-grid {
     display: flex !important;
@@ -2238,6 +2268,95 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
     };
 
+    window.coraGetSkeletonHtml = function(type, count = 3) {
+        let html = '';
+        if (type === 'table-rows') {
+            for (let i = 0; i < count; i++) {
+                html += `
+                <tr class="border-b border-zinc-100 dark:border-zinc-800/50">
+                    <td class="px-5 py-4"><div class="cora-skeleton h-4 w-2/3"></div></td>
+                    <td class="px-5 py-4"><div class="cora-skeleton h-4 w-1/2"></div></td>
+                    <td class="px-5 py-4"><div class="cora-skeleton h-4 w-1/3"></div></td>
+                    <td class="px-5 py-4"><div class="cora-skeleton h-4 w-1/4"></div></td>
+                    <td class="px-5 py-4"><div class="cora-skeleton h-4 w-12 rounded-full"></div></td>
+                    <td class="px-5 py-4"><div class="cora-skeleton h-4 w-16"></div></td>
+                    <td class="px-5 py-4"><div class="cora-skeleton h-4 w-16"></div></td>
+                    <td class="px-5 py-4"><div class="cora-skeleton h-7 w-20 rounded-lg"></div></td>
+                </tr>`;
+            }
+        } else if (type === 'cards') {
+            for (let i = 0; i < count; i++) {
+                html += `
+                <div class="border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl bg-white dark:bg-zinc-950 p-4 space-y-3.5 shadow-2xs">
+                    <div class="flex items-center justify-between">
+                        <div class="cora-skeleton h-4 w-1/3"></div>
+                        <div class="cora-skeleton h-4.5 w-12 rounded-full"></div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="cora-skeleton h-3.5 w-5/6"></div>
+                        <div class="cora-skeleton h-3.5 w-2/3"></div>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/50">
+                        <div class="cora-skeleton h-3.5 w-1/4"></div>
+                        <div class="cora-skeleton h-7 w-20 rounded-lg"></div>
+                    </div>
+                </div>`;
+            }
+        } else if (type === 'calendar-list') {
+            for (let i = 0; i < count; i++) {
+                html += `
+                <div class="border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl bg-white dark:bg-zinc-950 p-4 flex items-center justify-between gap-4 shadow-2xs">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="cora-skeleton h-9 w-9 rounded-xl shrink-0"></div>
+                        <div class="space-y-1.5 min-w-0">
+                            <div class="cora-skeleton h-3.5 w-32"></div>
+                            <div class="cora-skeleton h-3 w-48"></div>
+                        </div>
+                    </div>
+                    <div class="cora-skeleton h-6 w-16 rounded-full shrink-0"></div>
+                </div>`;
+            }
+        } else if (type === 'performance-rows') {
+            for (let i = 0; i < count; i++) {
+                html += `
+                <tr class="border-b border-zinc-100 dark:border-zinc-800/50">
+                    <td class="px-4 py-3"><div class="cora-skeleton h-4 w-32"></div></td>
+                    <td class="px-4 py-3"><div class="cora-skeleton h-4 w-12"></div></td>
+                    <td class="px-4 py-3"><div class="cora-skeleton h-4 w-16"></div></td>
+                    <td class="px-4 py-3"><div class="cora-skeleton h-4 w-16"></div></td>
+                    <td class="px-4 py-3"><div class="cora-skeleton h-4 w-16"></div></td>
+                    <td class="px-4 py-3"><div class="cora-skeleton h-4 w-20"></div></td>
+                    <td class="px-4 py-3 text-right"><div class="cora-skeleton h-7 w-20 rounded-lg inline-block"></div></td>
+                </tr>`;
+            }
+        } else if (type === 'performance-cards') {
+            for (let i = 0; i < count; i++) {
+                html += `
+                <div class="border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl bg-white dark:bg-zinc-950 p-4 space-y-3 shadow-2xs">
+                    <div class="flex items-center justify-between">
+                        <div class="cora-skeleton h-4 w-1/2"></div>
+                        <div class="cora-skeleton h-4 w-16"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-zinc-100 dark:border-zinc-800/50">
+                        <div class="space-y-1">
+                            <div class="cora-skeleton h-3 w-16"></div>
+                            <div class="cora-skeleton h-4 w-12"></div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="cora-skeleton h-3 w-16"></div>
+                            <div class="cora-skeleton h-4 w-12"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/50">
+                        <div class="cora-skeleton h-3 w-20"></div>
+                        <div class="cora-skeleton h-7 w-20 rounded-lg"></div>
+                    </div>
+                </div>`;
+            }
+        }
+        return html;
+    };
+
     function switchContentTab(tabId) {
         if (tabId === 'ct-brain') {
             if (window.coraShowToast) {
@@ -2579,6 +2698,52 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             reportArea.classList.add('opacity-70', 'transition-opacity');
         }
 
+        // Reset metrics to shimmering skeleton loading blocks
+        const scoreLarge = document.getElementById('inline-seo-score-large');
+        const geoEl = document.getElementById('inline-geo-score');
+        const densEl = document.getElementById('inline-kw-density');
+        const readScoreEl = document.getElementById('inline-readability-score');
+        const checklistGrid = document.getElementById('inline-seo-checklist-grid');
+        const ring = document.getElementById('inline-seo-ring');
+        const checkRing = document.getElementById('inline-checklist-ring');
+        const checkScore = document.getElementById('inline-checklist-score-num');
+        const checkSubtext = document.getElementById('inline-checklist-subtext');
+
+        if (scoreLarge) scoreLarge.innerHTML = '<div class="cora-skeleton h-5.5 w-12 my-1"></div>';
+        if (geoEl) geoEl.innerHTML = '<div class="cora-skeleton h-6 w-14 my-1"></div>';
+        if (densEl) densEl.innerHTML = '<div class="cora-skeleton h-6 w-10 my-1"></div>';
+        if (readScoreEl) readScoreEl.innerHTML = '<div class="cora-skeleton h-6 w-14 my-1"></div>';
+        if (ring) ring.setAttribute('stroke-dashoffset', '163.3');
+        if (checkRing) checkRing.setAttribute('stroke-dashoffset', '163.3');
+        if (checkScore) checkScore.innerHTML = '<div class="cora-skeleton h-4 w-28 mx-auto mt-1"></div>';
+        if (checkSubtext) checkSubtext.innerHTML = '<div class="cora-skeleton h-3 w-40 mx-auto mt-1.5"></div>';
+
+        const badges = document.querySelectorAll('#inline-seo-checklist-categories span');
+        badges.forEach(b => {
+            b.innerHTML = '<div class="cora-skeleton h-2 w-4 inline-block"></div>';
+            b.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border border-zinc-200/60 dark:border-zinc-800';
+        });
+
+        if (checklistGrid) {
+            checklistGrid.innerHTML = `
+                <div class="space-y-3 py-1">
+                    <div class="p-3 border border-zinc-150/70 dark:border-zinc-800 rounded-xl space-y-2.5 bg-zinc-55/10 dark:bg-zinc-900/10">
+                        <div class="flex items-center justify-between">
+                            <div class="cora-skeleton h-3.5 w-1/3"></div>
+                            <div class="cora-skeleton h-4.5 w-20 rounded-full"></div>
+                        </div>
+                        <div class="cora-skeleton h-3 w-5/6 mt-1"></div>
+                    </div>
+                    <div class="p-3 border border-zinc-150/70 dark:border-zinc-800 rounded-xl space-y-2.5 bg-zinc-55/10 dark:bg-zinc-900/10">
+                        <div class="flex items-center justify-between">
+                            <div class="cora-skeleton h-3.5 w-1/4"></div>
+                            <div class="cora-skeleton h-4.5 w-20 rounded-full"></div>
+                        </div>
+                        <div class="cora-skeleton h-3 w-4/5 mt-1"></div>
+                    </div>
+                </div>`;
+        }
+
         if (window.coraShowToast) window.coraShowToast('Scanning article & running 11-point audit...', 'info');
 
         // Multi-step scanning feedback
@@ -2745,69 +2910,69 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 <!-- 4-Metric Top Bar -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                     <!-- Metric 1: Overall SEO Score -->
-                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs relative overflow-hidden">
+                    <div class="bg-white dark:bg-zinc-950 border border-zinc-200/80 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs relative overflow-hidden">
                         <div class="flex items-center justify-between mb-2 gap-1.5">
-                            <span class="text-xs font-bold text-zinc-900 truncate">Overall SEO Score</span>
-                            <span id="inline-seo-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
+                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">Overall SEO Score</span>
+                            <span id="inline-seo-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
                         </div>
                         <div class="flex items-center gap-3 my-1">
                             <div class="relative w-12 h-12 shrink-0 flex items-center justify-center">
                                 <svg width="48" height="48" viewBox="0 0 64 64" class="-rotate-90">
                                     <circle cx="32" cy="32" r="26" stroke="#f4f4f5" stroke-width="5" fill="none"/>
                                     <circle cx="32" cy="32" r="26" stroke="#10b981" stroke-width="5" fill="none"
-                                        stroke-dasharray="163.3" stroke-dashoffset="30"
+                                        stroke-dasharray="163.3" stroke-dashoffset="163.3"
                                         id="inline-seo-ring" stroke-linecap="round" style="transition: stroke-dashoffset 0.6s ease"/>
                                 </svg>
                             </div>
-                            <div>
-                                <div class="text-xl font-bold text-zinc-900 leading-none" id="inline-seo-score-large">82<span class="text-xs text-zinc-400 font-normal"> /100</span></div>
-                                <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-seo-status">Well optimized / Keep improving</div>
+                            <div class="flex-1">
+                                <div class="text-xl font-bold text-zinc-900 dark:text-zinc-50 leading-none" id="inline-seo-score-large"><div class="cora-skeleton h-5.5 w-12 my-1"></div></div>
+                                <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-seo-status"><div class="cora-skeleton h-3 w-32 mt-1"></div></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Metric 2: GEO AI Visibility -->
-                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
+                    <div class="bg-white dark:bg-zinc-950 border border-zinc-200/80 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
                         <div class="flex items-center justify-between mb-2 gap-1.5">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 truncate min-w-0">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                                 GEO / AI Visibility
                             </div>
-                            <span id="inline-geo-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200/60">Average</span>
+                            <span id="inline-geo-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-zinc-900" id="inline-geo-score">72%</div>
-                            <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-geo-label">Your content is visible in AI search results</div>
+                            <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-50" id="inline-geo-score"><div class="cora-skeleton h-6 w-14 my-1"></div></div>
+                            <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-geo-label"><div class="cora-skeleton h-3 w-40 mt-1"></div></div>
                         </div>
                     </div>
 
                     <!-- Metric 3: Focus Keyword Density -->
-                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
+                    <div class="bg-white dark:bg-zinc-950 border border-zinc-200/80 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
                         <div class="flex items-center justify-between mb-2 gap-1.5">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 truncate min-w-0">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                                 Focus Keyword Density
                             </div>
-                            <span id="inline-kw-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
+                            <span id="inline-kw-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-zinc-900" id="inline-kw-density">1.4%</div>
-                            <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-kw-label">Target: 0.8% - 2.5%</div>
+                            <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-50" id="inline-kw-density"><div class="cora-skeleton h-6 w-10 my-1"></div></div>
+                            <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-kw-label"><div class="cora-skeleton h-3 w-28 mt-1"></div></div>
                         </div>
                     </div>
 
                     <!-- Metric 4: Readability & Depth -->
-                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
+                    <div class="bg-white dark:bg-zinc-950 border border-zinc-200/80 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
                         <div class="flex items-center justify-between mb-2 gap-1.5">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 truncate min-w-0">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                                 Readability & Depth
                             </div>
-                            <span id="inline-read-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Good</span>
+                            <span id="inline-read-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-zinc-900" id="inline-readability-score">78<span class="text-xs text-zinc-400 font-normal"> /100</span></div>
-                            <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-readability-label">Easy to read and well structured</div>
+                            <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-50" id="inline-readability-score"><div class="cora-skeleton h-6 w-14 my-1"></div></div>
+                            <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-readability-label"><div class="cora-skeleton h-3 w-36 mt-1"></div></div>
                         </div>
                     </div>
                 </div>
@@ -2826,17 +2991,17 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         <svg width="96" height="96" viewBox="0 0 64 64" class="-rotate-90">
                                             <circle cx="32" cy="32" r="26" stroke="#e4e4e7" stroke-width="5" fill="none"/>
                                             <circle cx="32" cy="32" r="26" stroke="#10b981" stroke-width="5" fill="none"
-                                                stroke-dasharray="163.3" stroke-dashoffset="44.5"
+                                                stroke-dasharray="163.3" stroke-dashoffset="163.3"
                                                 id="inline-checklist-ring" stroke-linecap="round" style="transition: stroke-dashoffset 0.6s ease"/>
                                         </svg>
                                         <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                            <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-0.5">
-                                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                            <div class="w-7 h-7 rounded-full bg-zinc-100 text-zinc-400 flex items-center justify-center mb-0.5">
+                                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="text-sm sm:text-base font-bold text-zinc-900 mt-1" id="inline-checklist-score-num">8 / 11 Checks Passed</div>
-                                    <p class="text-xs text-zinc-500 mt-1 max-w-[200px] break-words" id="inline-checklist-subtext">Great job! Most of your on-page SEO looks good.</p>
+                                    <div class="text-sm sm:text-base font-bold text-zinc-900 mt-1" id="inline-checklist-score-num"><div class="cora-skeleton h-4 w-28 mx-auto mt-1"></div></div>
+                                    <p class="text-xs text-zinc-500 mt-1 max-w-[200px] break-words" id="inline-checklist-subtext"><div class="cora-skeleton h-3 w-40 mx-auto mt-1.5"></div></p>
                                 </div>
 
                                 <!-- Right side grid: 2-column grid of checklist summary categories -->
@@ -2853,7 +3018,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">2/2</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -2869,7 +3034,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">1/2</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -2885,7 +3050,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">2/2</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -2901,7 +3066,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -2917,7 +3082,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">1/2</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -2933,7 +3098,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -2949,7 +3114,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">0/1</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -2965,7 +3130,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -2981,7 +3146,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -2997,7 +3162,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">1/1</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
                                 </div>
@@ -3005,7 +3170,29 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
                             <!-- Detailed Checklist Item List -->
                             <div class="pt-3 border-t border-zinc-100" id="inline-seo-checklist-grid">
-                                <div class="text-zinc-400 text-center py-3 text-xs font-medium">Evaluating checklist details...</div>
+                                <div class="space-y-3 py-1">
+                                    <div class="p-3 border border-zinc-150/70 dark:border-zinc-800 rounded-xl space-y-2.5 bg-zinc-55/10 dark:bg-zinc-900/10">
+                                        <div class="flex items-center justify-between">
+                                            <div class="cora-skeleton h-3.5 w-1/3"></div>
+                                            <div class="cora-skeleton h-4.5 w-20 rounded-full"></div>
+                                        </div>
+                                        <div class="cora-skeleton h-3 w-5/6 mt-1"></div>
+                                    </div>
+                                    <div class="p-3 border border-zinc-150/70 dark:border-zinc-800 rounded-xl space-y-2.5 bg-zinc-55/10 dark:bg-zinc-900/10">
+                                        <div class="flex items-center justify-between">
+                                            <div class="cora-skeleton h-3.5 w-1/4"></div>
+                                            <div class="cora-skeleton h-4.5 w-20 rounded-full"></div>
+                                        </div>
+                                        <div class="cora-skeleton h-3 w-4/5 mt-1"></div>
+                                    </div>
+                                    <div class="p-3 border border-zinc-150/70 dark:border-zinc-800 rounded-xl space-y-2.5 bg-zinc-55/10 dark:bg-zinc-900/10">
+                                        <div class="flex items-center justify-between">
+                                            <div class="cora-skeleton h-3.5 w-1/2"></div>
+                                            <div class="cora-skeleton h-4.5 w-20 rounded-full"></div>
+                                        </div>
+                                        <div class="cora-skeleton h-3 w-2/3 mt-1"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -4509,7 +4696,11 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const tbody = document.getElementById('cora-opportunities-table-body');
         if (!tbody || !$) return;
 
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-zinc-400 py-8 font-medium">Loading opportunity backlog...</td></tr>';
+        tbody.innerHTML = window.coraGetSkeletonHtml('table-rows', 5);
+        const mobileContainer = document.getElementById('cora-opportunities-mobile-cards');
+        if (mobileContainer) {
+            mobileContainer.innerHTML = window.coraGetSkeletonHtml('cards', 3);
+        }
 
         $.post(window.coraREWPData.ajaxUrl, {
             action: 'cora_fetch_opportunities',
@@ -4932,7 +5123,20 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const ajaxUrl = window.coraREWPData.ajaxUrl;
         const nonce = window.coraREWPData.ajaxNonce;
 
-        grid.innerHTML = '<div class="col-span-7 py-10 text-center text-xs text-zinc-450">Loading calendar...</div>';
+        let gridSkeletons = '';
+        for (let i = 0; i < 28; i++) {
+            gridSkeletons += `
+            <div class="p-2 border border-zinc-100 dark:border-zinc-800/40 min-h-[75px] space-y-2">
+                <div class="cora-skeleton h-3 w-5"></div>
+                <div class="cora-skeleton h-2.5 w-4/5 rounded-xs mt-1"></div>
+            </div>`;
+        }
+        grid.innerHTML = gridSkeletons;
+
+        const mobileAgenda = document.getElementById('cora-calendar-mobile-agenda');
+        if (mobileAgenda) {
+            mobileAgenda.innerHTML = window.coraGetSkeletonHtml('calendar-list', 3);
+        }
 
         $.post(ajaxUrl, {
             action: 'cora_fetch_content_workspace',
@@ -5314,10 +5518,10 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const tbody = document.getElementById('cora-performance-table-body');
         const mobileContainer = document.getElementById('cora-performance-mobile-cards');
         if (tbody) {
-            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-zinc-400">Loading performance metrics...</td></tr>';
+            tbody.innerHTML = window.coraGetSkeletonHtml('performance-rows', 4);
         }
         if (mobileContainer) {
-            mobileContainer.innerHTML = '<div class="py-8 text-center text-zinc-400 text-xs">Loading performance metrics...</div>';
+            mobileContainer.innerHTML = window.coraGetSkeletonHtml('performance-cards', 3);
         }
 
         $.post(window.coraREWPData.ajaxUrl, {

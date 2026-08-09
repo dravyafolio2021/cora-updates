@@ -410,6 +410,45 @@ window.moveToStage = function(itemId, targetStage) {
 window.loadContentWorkspace = function(stageFilter) {
   const kanban = document.getElementById('cora-workflow-kanban');
   if(kanban) kanban.style.opacity = '1';
+
+  // Render shimmering skeleton cards in all columns during load
+  if (window.STAGE_ORDER) {
+    window.STAGE_ORDER.forEach(colKey => {
+      const col = document.querySelector(`.ct-stage-column[data-stage="${colKey}"]`);
+      if (col) {
+        col.innerHTML = `
+          <div class="cora-wb-card rounded-xl p-3.5 space-y-3" style="background-color: #ffffff; border: 1px solid #e4e4e7;">
+            <div class="flex items-center justify-between">
+              <div class="cora-skeleton h-3.5 w-1/3"></div>
+              <div class="cora-skeleton h-3.5 w-12 rounded-full"></div>
+            </div>
+            <div class="space-y-1.5">
+              <div class="cora-skeleton h-3 w-5/6"></div>
+              <div class="cora-skeleton h-3 w-2/3"></div>
+            </div>
+            <div class="flex items-center justify-between pt-1.5 border-t border-zinc-100">
+              <div class="cora-skeleton h-3 w-12"></div>
+              <div class="cora-skeleton h-3 w-12"></div>
+            </div>
+          </div>
+          <div class="cora-wb-card rounded-xl p-3.5 space-y-3 mt-3" style="background-color: #ffffff; border: 1px solid #e4e4e7;">
+            <div class="flex items-center justify-between">
+              <div class="cora-skeleton h-3.5 w-1/4"></div>
+              <div class="cora-skeleton h-3.5 w-12 rounded-full"></div>
+            </div>
+            <div class="space-y-1.5">
+              <div class="cora-skeleton h-3 w-4/5"></div>
+              <div class="cora-skeleton h-3 w-1/2"></div>
+            </div>
+            <div class="flex items-center justify-between pt-1.5 border-t border-zinc-100">
+              <div class="cora-skeleton h-3 w-12"></div>
+              <div class="cora-skeleton h-3 w-12"></div>
+            </div>
+          </div>`;
+      }
+    });
+  }
+
   const $ = window.jQuery || window.$;
   const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : ''));
   const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '');
