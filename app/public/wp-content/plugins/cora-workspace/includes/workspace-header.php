@@ -49,6 +49,138 @@ function cora_render_workspace_header( $args = array() ) {
     } ) );
     
     ?>
+    <script>
+    (function() {
+        if (window.coraAskExternalPlatform) return; // Prevent duplicate declarations
+
+        window.coraGetReferQuery = function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var subPage = urlParams.get('sub_page') || 'dashboard';
+
+            // 1. Content Suite
+            if (subPage === 'blogs' || document.getElementById('cora-view-content-suite')) {
+                var activePanelEl = document.querySelector('.cora-ct-panel:not(.hidden)');
+                var activeContentTab = activePanelEl ? activePanelEl.id : '';
+                if (activeContentTab.indexOf('ct-opportunities') !== -1) {
+                    return "How do I generate SEO content opportunities, filter by intent/impact, and create brief drafts in Cora Workspace?";
+                } else if (activeContentTab.indexOf('ct-calendar') !== -1) {
+                    return "How do I schedule articles on the Content Editorial Calendar and edit call-time slots in Cora?";
+                } else if (activeContentTab.indexOf('ct-library') !== -1) {
+                    return "How do I organize the article document library, filter by status, and edit posts in Cora?";
+                } else if (activeContentTab.indexOf('ct-seo') !== -1) {
+                    return "How do I run the 11-point SEO audit check, score keywords, and inject FAQ schemas in Cora?";
+                } else if (activeContentTab.indexOf('ct-performance') !== -1) {
+                    return "How do I trace lead attributions and revenue back to articles in the Content Performance Ledger in Cora?";
+                } else if (activeContentTab.indexOf('ct-automations') !== -1) {
+                    return "How do I configure content auto-posting policies, syndication, and autonomy level limits in Cora?";
+                } else if (activeContentTab.indexOf('ct-brain') !== -1) {
+                    return "How do I build the Business Brain RAG knowledge base repository in Cora Workspace?";
+                } else {
+                    return "How do I use the Content Suite overview dashboard and KPI metrics in Cora Workspace?";
+                }
+            }
+
+            // 2. Users (Team Management)
+            if (subPage === 'users' || document.getElementById('cora-page-users')) {
+                var activeTabEl = document.querySelector('.cora-tab-content:not(.hidden)');
+                var activeTab = activeTabEl ? activeTabEl.id : 'tab-active-members';
+                if (activeTab === 'tab-permissions-matrix') {
+                    return "How do I configure the granular Permissions Matrix (View, Edit, No Access levels) in the Cora Workspace Platform?";
+                } else if (activeTab === 'tab-custom-roles') {
+                    return "How to create custom team roles and manage capabilities inside Cora Workspace?";
+                } else if (activeTab === 'tab-attendance-logs') {
+                    return "How to configure geofenced office location attendance logs and GPS check-ins in Cora Workspace?";
+                } else if (activeTab === 'tab-owner-automations') {
+                    return "How to setup automated owner digests, security alerts, and SMTP templates in Cora Workspace?";
+                } else if (activeTab === 'tab-pending-invites') {
+                    return "How to invite new users, manage pending invitations, and resend links in Cora Workspace?";
+                } else {
+                    return "How to manage team members, active accounts, and edit profile details in Cora Workspace?";
+                }
+            }
+
+            // 3. Page Builder / Canvas
+            if (subPage === 'canvas' || document.getElementById('cora-page-canvas')) {
+                return "How do I use the GrapesJS visual page builder and prompt-to-layout AI engine in Cora?";
+            }
+
+            // 4. Financials
+            if (subPage === 'financials') {
+                return "How do I generate sales invoices, track expense statements, and review GST tax breakdowns in Cora Workspace?";
+            }
+
+            // 5. Media
+            if (subPage === 'media') {
+                return "How do I upload images, organize folders, crop assets, and edit SEO metadata in the Cora Media Library?";
+            }
+
+            // 6. Document Vault
+            if (subPage === 'vault') {
+                return "How do I use the Document Vault, send e-sign contracts, and run the 5-step guided document studio in Cora?";
+            }
+
+            // 7. Leads CRM
+            if (subPage === 'leads') {
+                return "How do I configure the CRM lead funnel pipeline, drag-and-drop Kanban cards, and automate deal statuses in Cora?";
+            }
+
+            // 8. Forms & Reviews
+            if (subPage === 'forms') {
+                return "How do I create client feedback forms, acquire WhatsApp-first reviews, and map custom Hinglish automation rules in Cora?";
+            }
+
+            // 9. Email Center
+            if (subPage === 'emails') {
+                return "How do I set up Hostinger SMTP, construct drip templates, and check outbox delivery logs in the Cora Email Center?";
+            }
+
+            // 10. Settings Suite
+            if (subPage === 'settings-suite') {
+                return "How do I modify my workspace details, update custom domains, and configure security backup policies in Cora Workspace?";
+            }
+
+            return "How do I configure and manage my workspaces in the Cora Workspace Platform?";
+        };
+
+        window.coraAskExternalPlatform = function(platform) {
+            var query = window.coraGetReferQuery();
+
+            // Copy to clipboard dynamically
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(query).then(function() {
+                    // Clipboard copy successful
+                }).catch(function() {
+                    // Ignore fallback
+                });
+            }
+
+            var url = '';
+            var platformName = '';
+            if (platform === 'openai') {
+                platformName = 'ChatGPT';
+                url = 'https://chatgpt.com/?q=' + encodeURIComponent(query);
+            } else if (platform === 'gemini') {
+                platformName = 'Gemini';
+                url = 'https://gemini.google.com/app?q=' + encodeURIComponent(query);
+            } else if (platform === 'claude') {
+                platformName = 'Claude';
+                url = 'https://claude.ai/';
+            } else if (platform === 'perplexity') {
+                platformName = 'Perplexity';
+                url = 'https://www.perplexity.ai/?q=' + encodeURIComponent(query);
+            }
+
+            if (url) {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Opening ' + platformName + '... Query copied to clipboard!', 'info');
+                } else {
+                    console.log('Opening ' + platformName + '... Query copied to clipboard!');
+                }
+                window.open(url, '_blank');
+            }
+        };
+    })();
+    </script>
     <div class="cora-workspace-header select-none w-full max-w-full min-w-0 overflow-visible <?php echo esc_attr( $args['container_class'] ); ?>">
         <!-- Desktop Header -->
 
