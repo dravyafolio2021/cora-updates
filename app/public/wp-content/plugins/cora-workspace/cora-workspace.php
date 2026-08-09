@@ -36547,117 +36547,127 @@ if ( ! function_exists( 'cora_ajax_fetch_content_performance' ) ) {
 function cora_ajax_fetch_content_performance() {
     check_ajax_referer('cora_ajax_nonce', 'nonce');
     global $wpdb;
+    
+    $agency_id = cora_db_get_agency_id();
+    $cache_key = 'cora_content_performance_' . $agency_id;
+    $response = get_transient($cache_key);
 
-    // Retrieve all content suite items connected to posts
-    $items_table = $wpdb->prefix . 'cora_content_items';
-    $leads_table = $wpdb->prefix . 'cora_leads';
-    $ledger_table = $wpdb->prefix . 'cora_ledger';
+    if (false === $response) {
+        // Retrieve all content suite items connected to posts
+        $items_table = $wpdb->prefix . 'cora_content_items';
+        $leads_table = $wpdb->prefix . 'cora_leads';
+        $ledger_table = $wpdb->prefix . 'cora_ledger';
 
-    $posts = $wpdb->get_results("SELECT id, title, post_id, stage, primary_keyword FROM {$items_table} WHERE stage = 'published' OR post_id IS NOT NULL ORDER BY id DESC") ?: [];
+        $posts = $wpdb->get_results("SELECT id, title, post_id, stage, primary_keyword FROM {$items_table} WHERE stage = 'published' OR post_id IS NOT NULL ORDER BY id DESC") ?: [];
 
-    $report_items = [];
-    $total_leads = 0;
-    $total_revenue = 0;
+        $report_items = [];
+        $total_leads = 0;
+        $total_revenue = 0;
 
-    $post_ids = [];
-    foreach ($posts as $p) {
-        $post_ids[] = intval($p->post_id ? $p->post_id : $p->id);
-    }
+        $post_ids = [];
+        foreach ($posts as $p) {
+            $post_ids[] = intval($p->post_id ? $p->post_id : $p->id);
+        }
 
-    $leads_by_post = [];
-    $all_lead_ids = [];
+        $leads_by_post = [];
+        $all_lead_ids = [];
 
-    if (!empty($post_ids)) {
-        // Construct Blog Post ID string sources for querying leads table in one batch
-        $sources = array_map(function($pid) {
-            return 'Blog Post ID: ' . $pid;
-        }, $post_ids);
+        if (!empty($post_ids)) {
+            // Construct Blog Post ID string sources for querying leads table in one batch
+            $sources = array_map(function($pid) {
+                return 'Blog Post ID: ' . $pid;
+            }, $post_ids);
 
-        $source_placeholders = implode(',', array_fill(0, count($sources), '%s'));
-        $lead_results = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT id, source FROM {$leads_table} WHERE source IN ($source_placeholders)",
-                $sources
-            ),
-            ARRAY_A
-        ) ?: [];
+            $source_placeholders = implode(',', array_fill(0, count($sources), '%s'));
+            $lead_results = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT id, source FROM {$leads_table} WHERE source IN ($source_placeholders)",
+                    $sources
+                ),
+                ARRAY_A
+            ) ?: [];
 
-        foreach ($lead_results as $l) {
-            $lead_id = intval($l['id']);
-            $all_lead_ids[] = $lead_id;
-            $source = $l['source'];
-            $parts = explode('Blog Post ID: ', $source);
-            if (isset($parts[1])) {
-                $pid = intval($parts[1]);
-                if (!isset($leads_by_post[$pid])) {
-                    $leads_by_post[$pid] = [];
+            foreach ($lead_results as $l) {
+                $lead_id = intval($l['id']);
+                $all_lead_ids[] = $lead_id;
+                $source = $l['source'];
+                $parts = explode('Blog Post ID: ', $source);
+                if (isset($parts[1])) {
+                    $pid = intval($parts[1]);
+                    if (!isset($leads_by_post[$pid])) {
+                        $leads_by_post[$pid] = [];
+                    }
+                    $leads_by_post[$pid][] = $lead_id;
                 }
-                $leads_by_post[$pid][] = $lead_id;
             }
         }
-    }
 
-    $ledger_by_lead = [];
-    if (!empty($all_lead_ids)) {
-        $lead_placeholders = implode(',', array_fill(0, count($all_lead_ids), '%d'));
-        $ledger_results = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT lead_id, SUM(amount) as revenue FROM {$ledger_table} WHERE lead_id IN ($lead_placeholders) GROUP BY lead_id",
-                $all_lead_ids
-            ),
-            ARRAY_A
-        ) ?: [];
+        $ledger_by_lead = [];
+        if (!empty($all_lead_ids)) {
+            $lead_placeholders = implode(',', array_fill(0, count($all_lead_ids), '%d'));
+            $ledger_results = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT lead_id, SUM(amount) as revenue FROM {$ledger_table} WHERE lead_id IN ($lead_placeholders) GROUP BY lead_id",
+                    $all_lead_ids
+                ),
+                ARRAY_A
+            ) ?: [];
 
-        foreach ($ledger_results as $lr) {
-            $ledger_by_lead[intval($lr['lead_id'])] = floatval($lr['revenue']);
+            foreach ($ledger_results as $lr) {
+                $ledger_by_lead[intval($lr['lead_id'])] = floatval($lr['revenue']);
+            }
         }
-    }
 
-    foreach ($posts as $p) {
-        $post_id = intval($p->post_id ? $p->post_id : $p->id);
+        foreach ($posts as $p) {
+            $post_id = intval($p->post_id ? $p->post_id : $p->id);
 
-        $lead_ids = isset($leads_by_post[$post_id]) ? $leads_by_post[$post_id] : [];
-        $leads_count = count($lead_ids);
-        $total_leads += $leads_count;
+            $lead_ids = isset($leads_by_post[$post_id]) ? $leads_by_post[$post_id] : [];
+            $leads_count = count($lead_ids);
+            $total_leads += $leads_count;
 
-        $revenue = 0;
-        foreach ($lead_ids as $lid) {
-            $revenue += isset($ledger_by_lead[$lid]) ? $ledger_by_lead[$lid] : 0;
+            $revenue = 0;
+            foreach ($lead_ids as $lid) {
+                $revenue += isset($ledger_by_lead[$lid]) ? $ledger_by_lead[$lid] : 0;
+            }
+            $total_revenue += $revenue;
+
+            // Generate static impressions, CTR, engagement metrics based on post age/word count for demo realism
+            $seed = intval($post_id);
+            $impressions = 2500 + ($seed * 70);
+            $clicks = 120 + ($seed * 3);
+            $ctr = $impressions > 0 ? round(($clicks / $impressions) * 100, 2) : 0;
+            $scroll_depth = 50 + ($seed % 35);
+            $wa_clicks = 8 + ($seed % 20);
+
+            $report_items[] = [
+                'post_id' => $post_id,
+                'title' => $p->title,
+                'keyword' => $p->primary_keyword ?: 'General branding',
+                'impressions' => $impressions,
+                'clicks' => $clicks,
+                'ctr' => $ctr,
+                'scroll_depth' => $scroll_depth,
+                'wa_clicks' => $wa_clicks,
+                'leads' => $leads_count,
+                'revenue' => $revenue
+            ];
         }
-        $total_revenue += $revenue;
 
-        // Generate static impressions, CTR, engagement metrics based on post age/word count for demo realism
-        $seed = intval($post_id);
-        $impressions = 2500 + ($seed * 70);
-        $clicks = 120 + ($seed * 3);
-        $ctr = $impressions > 0 ? round(($clicks / $impressions) * 100, 2) : 0;
-        $scroll_depth = 50 + ($seed % 35);
-        $wa_clicks = 8 + ($seed % 20);
-
-        $report_items[] = [
-            'post_id' => $post_id,
-            'title' => $p->title,
-            'keyword' => $p->primary_keyword ?: 'General branding',
-            'impressions' => $impressions,
-            'clicks' => $clicks,
-            'ctr' => $ctr,
-            'scroll_depth' => $scroll_depth,
-            'wa_clicks' => $wa_clicks,
-            'leads' => $leads_count,
-            'revenue' => $revenue
+        $response = [
+            'items' => $report_items,
+            'totals' => [
+                'leads' => $total_leads,
+                'revenue' => $total_revenue,
+                'impressions' => 15800 + (count($posts) * 2000),
+                'clicks' => 840 + (count($posts) * 150),
+                'whatsapp' => 95 + (count($posts) * 12)
+            ]
         ];
+
+        set_transient($cache_key, $response, 6 * HOUR_IN_SECONDS);
     }
 
-    wp_send_json_success([
-        'items' => $report_items,
-        'totals' => [
-            'leads' => $total_leads,
-            'revenue' => $total_revenue,
-            'impressions' => 15800 + (count($posts) * 2000),
-            'clicks' => 840 + (count($posts) * 150),
-            'whatsapp' => 95 + (count($posts) * 12)
-        ]
-    ]);
+    wp_send_json_success($response);
 }
 }
 
@@ -36844,6 +36854,7 @@ function cora_invalidate_workspace_cache_all($agency_id) {
     delete_transient('cora_content_workspace_' . $agency_id . '_published');
     delete_transient('cora_content_workspace_' . $agency_id . '_performance');
     delete_transient('cora_content_workspace_' . $agency_id . '_review');
+    delete_transient('cora_content_performance_' . $agency_id);
 }
 }
 
