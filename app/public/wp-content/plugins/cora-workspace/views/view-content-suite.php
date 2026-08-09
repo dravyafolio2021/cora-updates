@@ -6251,6 +6251,9 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     padding-left: 0;
                     bottom: 84px !important;
                 }
+                #cora-copilot-bar {
+                    display: none !important;
+                }
                 #cora-copilot-chat-window {
                     height: 58vh !important;
                     max-height: 420px !important;
@@ -6802,6 +6805,23 @@ Always keep it crisp and quick, like typing on WhatsApp.`;
                     }
                 }
             });
+
+            // Dynamically integrate circular bottom-right AI trigger with copilot modal on mobile
+            const bindMobileTrigger = function() {
+                const mobileAiTrigger = document.getElementById('cora-mobile-ai-trigger');
+                if (mobileAiTrigger) {
+                    mobileAiTrigger.removeAttribute('onclick');
+                    // Add listener to open the modular copilot overlay instead of native sidebar
+                    mobileAiTrigger.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.coraToggleCopilot();
+                    });
+                }
+            };
+            bindMobileTrigger();
+            setTimeout(bindMobileTrigger, 100);
+            setTimeout(bindMobileTrigger, 500);
         }
     }
 
