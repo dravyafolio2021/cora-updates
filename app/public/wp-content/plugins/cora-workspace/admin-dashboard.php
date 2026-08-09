@@ -7818,7 +7818,15 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
         margin: 0 !important;
         padding: 0 !important;
     }
-    #cora-full-page-editor main { background-color: #FBFaf7 !important; padding: 40px 24px !important; }
+    #cora-full-page-editor main { background-color: #ffffff !important; padding: 0 !important; }
+
+    @keyframes coraHeadingHighlight {
+        0% { background-color: rgba(228, 228, 231, 0.5); border-left: 4px solid #000000; padding-left: 8px; }
+        100% { background-color: transparent; border-left: 0px solid transparent; padding-left: 0px; }
+    }
+    .cora-heading-highlight-flash {
+        animation: coraHeadingHighlight 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
     /* Inspector sidebar collapse behavior & transitions */
     #cora-article-inspector {
@@ -7859,15 +7867,17 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
 
     .cora-writing-sheet {
         background-color: #ffffff !important;
-        border: 1px solid #e4e4e7 !important;
-        border-radius: 20px !important;
-        box-shadow: 0 10px 30px -10px rgba(9, 9, 11, 0.04), 0 1px 3px rgba(9, 9, 11, 0.02) !important;
-        padding: 32px 40px !important;
-        min-height: calc(100vh - 160px) !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 40px 60px !important;
+        min-height: 100% !important;
         display: flex;
         flex-direction: column;
         gap: 16px;
         position: relative;
+        width: 100% !important;
+        max-width: none !important;
     }
     .cora-serif-editor .ql-editor { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: 1.125rem; line-height: 1.8; color: #18181b; }
     .cora-sans-editor .ql-editor { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1.05rem; line-height: 1.75; color: #18181b; }
@@ -8137,7 +8147,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
         <div class="flex-1 flex overflow-hidden relative">
 
             <!-- ST-1: Left Outline Sidebar -->
-            <aside id="cora-editor-left-sidebar" class="w-64 bg-zinc-50/50 border-r border-zinc-200 shrink-0 overflow-y-auto hidden lg:flex flex-col select-none">
+            <aside id="cora-editor-left-sidebar" class="w-64 bg-zinc-50/50 border-r border-zinc-200 shrink-0 overflow-y-auto hidden md:flex flex-col select-none">
                 <!-- Navigation Tabs: Outline / Media -->
                 <div class="flex border-b border-zinc-200 bg-zinc-100/50 text-[10px] font-bold uppercase tracking-wider select-none shrink-0 font-sans">
                     <button type="button" onclick="coraSwitchLeftSidebarTab('outline', this)" class="cora-left-tab-btn flex-1 py-3 text-center border-b-2 border-zinc-950 text-zinc-900 font-bold bg-white/40 cursor-pointer">
@@ -8225,7 +8235,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             
             <!-- Notion/Medium-Style Writing Canvas -->
             <main class="flex-1 overflow-y-auto px-6 py-10 md:px-16 xl:px-32 relative">
-                <div class="max-w-[760px] mx-auto w-full cora-writing-sheet">
+                <div class="w-full cora-writing-sheet">
                     
                     <!-- Beehiiv Horizontal Settings Bar -->
                     <div class="w-full border-b border-zinc-200/80 pb-3.5 flex items-center justify-between gap-4 text-xs font-semibold relative select-none">
@@ -8241,7 +8251,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Subtitle & Excerpt</span>
                                     <!-- Excerpt Content inside this dropdown -->
                                     <div class="space-y-1">
-                                        <textarea id="cora-article-excerpt-bh" rows="3" placeholder="Summary snippet for search results and social previews..." class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 placeholder:text-zinc-300 resize-none"></textarea>
+                                        <textarea id="cora-article-excerpt-bh" rows="3" placeholder="Summary snippet for search results and social previews..." oninput="coraUpdateWordCount()" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 placeholder:text-zinc-300 resize-none"></textarea>
                                         <p class="text-[9px] text-zinc-400 leading-tight">Summarize the article or write a subtitle snippet.</p>
                                     </div>
                                     <div class="flex justify-end gap-2 pt-1">
@@ -8951,7 +8961,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                     <span>Generate</span>
                                 </button>
                             </div>
-                            <textarea id="cora-article-excerpt" rows="3" placeholder="Summary snippet for search results and social previews..." class="w-full text-xs border border-zinc-200 rounded-lg p-2.5 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 shadow-3xs resize-none"></textarea>
+                            <textarea id="cora-article-excerpt" rows="3" placeholder="Summary snippet for search results and social previews..." oninput="coraUpdateWordCount()" class="w-full text-xs border border-zinc-200 rounded-lg p-2.5 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 shadow-3xs resize-none"></textarea>
                         </div>
 
                         <!-- Move to Trash -->
@@ -9110,12 +9120,6 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                             </div>
                         </div>
                     </div>
-                </div>" class="text-[9px] text-violet-650 hover:text-violet-850 font-bold flex items-center gap-0.5 shrink-0 hover:underline">
-                                Learn More
-                                <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="3" fill="none"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                            </a>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- TAB 4: Grounded Claims & Trust Audit Tab -->
@@ -9159,7 +9163,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                         
                         <div class="space-y-2 text-xs">
                             <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
                                 <span class="text-zinc-750 dark:text-zinc-350">Grounded claims match Brain facts</span>
                             </div>
                             <div class="flex items-center gap-2">
@@ -9170,18 +9174,15 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
                                 <span class="text-zinc-750 dark:text-zinc-350">Physical business address verified</span>
                             </div>
-                            <div class="flex items-center gap-2" id="audit-lead-cta-status">
-                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" id="audit-lead-cta-indicator"></span>
-                                <span class="text-zinc-750 dark:text-zinc-350" id="audit-lead-cta-text">WhatsApp contact CTA active</span>
-                            </div>
                         </div>
                     </div>
                 </div>
             </aside>
         </div>
+    </div>
 
         <script>
-        // Custom Workspace Editor Overrides
+        // Custom Workspace Editor Overrides & AI Assistant Implementation
         (function() {
             // Redefine window.coraToggleBeehiivDropdown to support 'more'
             window.coraToggleBeehiivDropdown = function(type) {
@@ -9316,6 +9317,12 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 if (!jQuery(e.target).closest('#beehiiv-dropdown-title-subtitle-wrap, #beehiiv-dropdown-visibility-wrap, #beehiiv-dropdown-authors-wrap, #beehiiv-dropdown-thumbnail-wrap, #beehiiv-dropdown-tags-wrap, #beehiiv-dropdown-more-wrap').length) {
                     window.coraToggleBeehiivDropdown('');
                 }
+                // Close inline selection AI popup if click is outside it and outside the editor
+                if (!jQuery(e.target).closest('#cora-inline-ai-popup').length && !jQuery(e.target).closest('#cora-quill-editor').length) {
+                    if (typeof window.coraHideInlineAIPopup === 'function') {
+                        window.coraHideInlineAIPopup();
+                    }
+                }
             });
         })();
 
@@ -9329,7 +9336,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     $backdrop.removeClass('hidden');
                 } else {
                     $panel.addClass('collapsed-inspector translate-y-full');
-                    $backdrop.addClass('hidden');
+                    $backdrop.removeClass('hidden');
                 }
                 return;
             }
@@ -9357,16 +9364,16 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             jQuery('#panel-inspector-copilot, #panel-inspector-meta, #panel-inspector-seo, #panel-inspector-claims').addClass('hidden');
             
             if (tab === 'copilot') {
-                jQuery('#tab-inspector-copilot').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
+                jQuery('#tab-inspector-copilot').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-955 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
                 jQuery('#panel-inspector-copilot').removeClass('hidden');
             } else if (tab === 'meta') {
-                jQuery('#tab-inspector-meta').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
+                jQuery('#tab-inspector-meta').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-955 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
                 jQuery('#panel-inspector-meta').removeClass('hidden');
             } else if (tab === 'seo') {
-                jQuery('#tab-inspector-seo').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
+                jQuery('#tab-inspector-seo').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-955 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
                 jQuery('#panel-inspector-seo').removeClass('hidden');
             } else if (tab === 'claims') {
-                jQuery('#tab-inspector-claims').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
+                jQuery('#tab-inspector-claims').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-955 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
                 jQuery('#panel-inspector-claims').removeClass('hidden');
             }
         };
@@ -9401,14 +9408,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             }, 750);
         };
 
-        // Restore inspector collapsed state on load
-        (function() {
-            try {
-                if (localStorage.getItem('cora_article_inspector_collapsed') === 'true') {
-                    jQuery('#cora-article-inspector').addClass('collapsed-inspector');
-                }
-            } catch(e) {}
-        })();
+
 
 
         window.coraSetEditorFont = function(font) {
@@ -9424,11 +9424,8 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             }
         };
 
-        // Editor helper functions are loaded from assets/js/admin-script.js
-
         // --- REAL-TIME AUTO-SAVE & DRAFT RECOVERY ENGINE ---
         window.coraEditorAutoSaveTimer = null;
-
         window.coraTriggerEditorAutoSave = function() {
             const postId = jQuery('#cora-article-id').val() || 'draft';
             const draftKey = 'cora_article_draft_' + postId;
@@ -9548,18 +9545,125 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             });
         };
 
-        // Smooth scrolling to headings inside editor sheet
+        // Smooth scrolling to headings inside editor sheet with cursor focus & premium highlighting
         window.coraScrollToHeading = function(id) {
             if (!window.coraQuillListingCoordinator) return;
             const editor = window.coraQuillListingCoordinator.root;
             const heading = editor.querySelector('#' + id);
             if (heading) {
                 heading.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                heading.focus();
+                
+                // Add visual highlight flash class
+                heading.classList.remove('cora-heading-highlight-flash');
+                void heading.offsetWidth; // Trigger reflow to restart animation
+                heading.classList.add('cora-heading-highlight-flash');
+                setTimeout(() => {
+                    heading.classList.remove('cora-heading-highlight-flash');
+                }, 1500);
+
+                // Find blot and select text in Quill
+                try {
+                    const Q = window.Quill || (typeof Quill !== 'undefined' ? Quill : null);
+                    if (Q) {
+                        const blot = Q.find(heading);
+                        if (blot) {
+                            const index = window.coraQuillListingCoordinator.getIndex(blot);
+                            const length = heading.textContent.length;
+                            window.coraQuillListingCoordinator.setSelection(index, length);
+                        }
+                    }
+                } catch(e) {}
             }
         };
 
-        // Override and extend word count update to synchronize outline and left stats
+        // Populate Left Sidebar media grid from Quill images in real-time
+        window.coraUpdateLeftSidebarMediaGrid = function() {
+            if (!window.coraQuillListingCoordinator) return;
+            const editor = window.coraQuillListingCoordinator.root;
+            const images = editor.querySelectorAll('img');
+            const grid = jQuery('#left-sidebar-media-grid');
+            
+            if (images.length === 0) {
+                grid.html('<div class="text-[10px] text-zinc-400 italic col-span-2 text-center py-6">No images embedded yet</div>');
+                return;
+            }
+            
+            grid.empty();
+            
+            images.forEach((img, idx) => {
+                const src = img.getAttribute('src');
+                if (!src) return;
+                
+                const card = jQuery(`
+                    <div class="group relative aspect-square bg-zinc-150 rounded-lg border border-zinc-200 overflow-hidden cursor-pointer hover:border-zinc-450 transition-all select-none">
+                        <img src="${src}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-[9px] font-bold">
+                            View in Editor
+                        </div>
+                    </div>
+                `);
+                
+                card.on('click', function() {
+                    img.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Flash highlight outline on image element
+                    img.style.outline = '4px solid #000000';
+                    img.style.outlineOffset = '2px';
+                    setTimeout(() => {
+                        img.style.outline = 'none';
+                    }, 1500);
+
+                    // Place selection cursor on the image blot
+                    try {
+                        const Q = window.Quill || (typeof Quill !== 'undefined' ? Quill : null);
+                        if (Q) {
+                            const blot = Q.find(img);
+                            if (blot) {
+                                const index = window.coraQuillListingCoordinator.getIndex(blot);
+                                window.coraQuillListingCoordinator.setSelection(index, 1);
+                            }
+                        }
+                    } catch(e) {}
+                });
+                
+                grid.append(card);
+            });
+        };
+
+        // Override and extend media library selection to support inline article canvas insertion
+        const originalSelectMedia = window.coraSelectMedia;
+        window.coraSelectMedia = function(id, url) {
+            const target = window.coraMediaSelectTarget || 'thumbnail';
+            if (target === 'inline') {
+                if (window.coraQuillListingCoordinator) {
+                    const range = window.coraQuillListingCoordinator.getSelection();
+                    const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
+                    // Insert the image
+                    window.coraQuillListingCoordinator.insertEmbed(index, 'image', url);
+                    // Add newline after image for seamless typing flow
+                    window.coraQuillListingCoordinator.insertText(index + 1, '\n');
+                    window.coraQuillListingCoordinator.setSelection(index + 2, 0);
+                    
+                    window.coraShowToast('Image inserted inline at cursor.', 'success');
+                }
+                
+                if (typeof window.coraToggleMediaDrawer === 'function') {
+                    window.coraToggleMediaDrawer(false);
+                }
+                if (typeof window.coraUpdateWordCount === 'function') {
+                    window.coraUpdateWordCount();
+                }
+                if (typeof window.coraTriggerEditorAutoSave === 'function') {
+                    window.coraTriggerEditorAutoSave();
+                }
+            } else {
+                if (typeof originalSelectMedia === 'function') {
+                    originalSelectMedia(id, url);
+                }
+            }
+        };
+
+        // Override and extend word count update to synchronize outline, left stats, and dynamic SEO audits
         const originalUpdateWordCount = window.coraUpdateWordCount;
         window.coraUpdateWordCount = function() {
             if (typeof originalUpdateWordCount === 'function') {
@@ -9570,17 +9674,56 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             let headings = 0;
             let images = 0;
             let links = 0;
+            let h1s = 0;
+            let internalLinks = 0;
+            let externalLinks = 0;
+            let altTextOk = true;
+            let imageList = [];
             
             if (window.coraQuillListingCoordinator && window.coraQuillListingCoordinator.root) {
+                const root = window.coraQuillListingCoordinator.root;
                 text = window.coraQuillListingCoordinator.getText() || '';
-                headings = window.coraQuillListingCoordinator.root.querySelectorAll('h1, h2, h3, h4').length;
-                images = window.coraQuillListingCoordinator.root.querySelectorAll('img').length;
-                links = window.coraQuillListingCoordinator.root.querySelectorAll('a').length;
+                headings = root.querySelectorAll('h1, h2, h3, h4').length;
+                h1s = root.querySelectorAll('h1').length;
+                imageList = root.querySelectorAll('img');
+                images = imageList.length;
+                
+                const linkList = root.querySelectorAll('a');
+                links = linkList.length;
+                
+                const homeUrl = window.location.origin;
+                linkList.forEach(link => {
+                    const href = link.getAttribute('href') || '';
+                    if (href.startsWith('/') || href.startsWith('#') || href.includes(homeUrl)) {
+                        internalLinks++;
+                    } else if (href.startsWith('http')) {
+                        externalLinks++;
+                    } else {
+                        internalLinks++;
+                    }
+                });
+                
+                // Alt text verification
+                if (images > 0) {
+                    let missingAlt = 0;
+                    imageList.forEach(img => {
+                        if (!img.getAttribute('alt')) {
+                            missingAlt++;
+                        }
+                    });
+                    if (missingAlt === images) {
+                        altTextOk = false;
+                    }
+                } else {
+                    altTextOk = false;
+                }
             } else {
                 text = jQuery('#cora-quill-editor').text() || '';
                 headings = jQuery('#cora-quill-editor').find('h1, h2, h3, h4').length;
+                h1s = jQuery('#cora-quill-editor').find('h1').length;
                 images = jQuery('#cora-quill-editor').find('img').length;
                 links = jQuery('#cora-quill-editor').find('a').length;
+                internalLinks = links; // Fallback
             }
             
             const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
@@ -9589,7 +9732,8 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             jQuery('#left-stat-headings').text(headings);
             jQuery('#left-stat-images').text(images);
             jQuery('#left-stat-links').text(links);
-            jQuery('#seo-stat-internal-links').text(links);
+            jQuery('#seo-stat-internal-links').text(internalLinks);
+            jQuery('#seo-stat-external-links').text(externalLinks);
             
             if (typeof window.coraRebuildOutline === 'function') {
                 window.coraRebuildOutline();
@@ -9599,12 +9743,12 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 window.coraUpdateLeftSidebarMediaGrid();
             }
             
-            // Calculate SEO / Content Score dynamically
+            // Recalculate SEO / Content Score dynamically
             let score = 0;
-            score += Math.min(40, Math.round((words / 1000) * 40));
+            score += Math.min(40, Math.round((words / 600) * 40));
             score += Math.min(20, headings * 5);
             score += Math.min(20, images * 10);
-            score += Math.min(20, links * 7);
+            score += Math.min(20, links * 10);
             
             if (words === 0) score = 0;
             
@@ -9616,6 +9760,56 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             
             jQuery('#left-score-value').text(`${score}/100`);
             jQuery('#left-score-bar').css('width', `${score}%`);
+            
+            // Dynamic checklist sync
+            const hasTitle = jQuery('#cora-article-title').val() || '';
+            const hasH1 = (h1s > 0 || hasTitle.trim().length > 0);
+            const hasMeta = (jQuery('#cora-article-excerpt-bh').val() || jQuery('#cora-article-excerpt').val() || '').trim().length > 0;
+            
+            // H1 Tag Checklist
+            if (hasH1) {
+                jQuery('#chk-chk-h1').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
+                jQuery('#chk-indicator-h1').text('Active').removeClass('text-red-500 bg-red-50').addClass('text-zinc-400');
+            } else {
+                jQuery('#chk-chk-h1').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+                jQuery('#chk-indicator-h1').text('Missing').removeClass('text-zinc-400').addClass('text-red-500');
+            }
+            
+            // Meta Description Checklist
+            if (hasMeta) {
+                jQuery('#chk-chk-meta').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
+                jQuery('#chk-indicator-meta').text('Active').removeClass('text-red-500').addClass('text-zinc-400');
+            } else {
+                jQuery('#chk-chk-meta').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+                jQuery('#chk-indicator-meta').text('Missing').removeClass('text-zinc-400').addClass('text-red-500');
+            }
+            
+            // Image Alt Text Checklist
+            if (images > 0) {
+                if (altTextOk) {
+                    jQuery('#chk-chk-alt').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
+                    jQuery('#chk-indicator-alt').text('Active').removeClass('text-red-500').addClass('text-zinc-400');
+                } else {
+                    jQuery('#chk-chk-alt').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+                    jQuery('#chk-indicator-alt').text('No Alt').removeClass('text-zinc-400').addClass('text-red-500');
+                }
+            } else {
+                jQuery('#chk-chk-alt').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+                jQuery('#chk-indicator-alt').text('No Images').removeClass('text-zinc-400').addClass('text-red-500');
+            }
+            
+            // Overall Checklist Badge
+            let criticalIssues = 0;
+            if (!hasH1) criticalIssues++;
+            if (!hasMeta) criticalIssues++;
+            
+            if (criticalIssues === 0 && altTextOk && internalLinks > 0) {
+                jQuery('#checklist-issues-badge').text('Optimal').removeClass('bg-red-50 text-red-700 border-red-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-emerald-50 text-emerald-700 border-emerald-150');
+            } else if (criticalIssues > 0) {
+                jQuery('#checklist-issues-badge').text('Critical').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-red-50 text-red-700 border-red-150');
+            } else {
+                jQuery('#checklist-issues-badge').text('Needs Tweaks').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-red-50 text-red-700 border-red-150').addClass('bg-amber-50 text-amber-700 border-amber-150');
+            }
             
             if (score >= 80) {
                 jQuery('#left-score-grade').text('A').removeClass('bg-red-50 text-red-700 border-red-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-emerald-50 text-emerald-700 border-emerald-150');
@@ -9635,45 +9829,63 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             }
         };
 
-        // Media grid updates in left sidebar
-        window.coraUpdateLeftSidebarMediaGrid = function() {
-            if (!window.coraQuillListingCoordinator) return;
-            const editor = window.coraQuillListingCoordinator.root;
-            const imgs = editor.querySelectorAll('img');
-            const grid = jQuery('#left-sidebar-media-grid');
-            
-            if (imgs.length === 0) {
-                grid.html('<div class="text-[10px] text-zinc-400 italic col-span-2 text-center py-6">No images embedded yet</div>');
-                return;
-            }
-            
-            grid.empty();
-            imgs.forEach((img, idx) => {
-                const src = img.getAttribute('src') || '';
-                const item = jQuery(`
-                    <div class="relative group aspect-square bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200">
-                        <img src="${src}" class="w-full h-full object-cover" loading="lazy">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 select-none">
-                            <button type="button" onclick="window.coraFocusSidebarImage(${idx})" class="p-1 bg-white hover:bg-zinc-100 rounded text-zinc-900 shadow-3xs cursor-pointer border-none" title="Locate Image">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            </button>
-                        </div>
-                    </div>
-                `);
-                grid.append(item);
+        // --- RAG BRAIN FACT RETRIEVAL & AI WORKFLOW IMPLEMENTATION ---
+
+        // Fetch Business Brain items for RAG grounding
+        window.coraGetRagBrainFacts = function(callback) {
+            const nonce = typeof coraREData !== 'undefined' ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+            const ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+
+            jQuery.post(ajaxUrl, {
+                action: 'cora_fetch_brain_items',
+                nonce: nonce
+            }, function(response) {
+                let factsText = '';
+                if (response.success && response.data && response.data.length > 0) {
+                    factsText = "\n\nVerified business facts (RAG grounding):\n";
+                    response.data.forEach(item => {
+                        factsText += `- [${item.source_type || 'Fact'}] ${item.title}: ${item.content}\n`;
+                    });
+                }
+                callback(factsText);
+            }).fail(function() {
+                callback('');
             });
         };
 
-        window.coraFocusSidebarImage = function(idx) {
-            if (!window.coraQuillListingCoordinator) return;
-            const imgs = window.coraQuillListingCoordinator.root.querySelectorAll('img');
-            if (imgs[idx]) {
-                imgs[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                imgs[idx].classList.add('outline', 'outline-2', 'outline-offset-2', 'outline-zinc-950');
-                setTimeout(() => {
-                    imgs[idx].classList.remove('outline', 'outline-2', 'outline-offset-2', 'outline-zinc-950');
-                }, 1500);
+        // Call workspace AI query proxy
+        window.coraCallWorkspaceAI = function(message, systemPrompt, callback) {
+            const nonce = typeof coraREData !== 'undefined' ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+            const ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+            
+            // Get active model provider
+            const modelVal = jQuery('#cora-ai-model-selector').val() || 'cora-core-v2';
+            let provider = 'gemini';
+            let model = 'gemini-3.5-flash-lite';
+            
+            if (modelVal === 'gpt-4o' || modelVal === 'openai') {
+                provider = 'openai';
+                model = 'gpt-4o-mini';
             }
+
+            jQuery.post(ajaxUrl, {
+                action: 'cora_ai_chat_query',
+                security: nonce,
+                message: message,
+                system_prompt: systemPrompt,
+                provider: provider,
+                model: model,
+                temperature: 0.7
+            }, function(response) {
+                if (response.success && response.data && response.data.reply) {
+                    callback(null, response.data.reply);
+                } else {
+                    const failMsg = response.data && response.data.message ? response.data.message : (response.data ? response.data : 'AI model response error.');
+                    callback(new Error(failMsg));
+                }
+            }).fail(function(xhr) {
+                callback(new Error('Network connection failed.'));
+            });
         };
 
         // Excerpt AI generator
@@ -9686,18 +9898,27 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             }
             
             window.coraShowToast('Generating AI excerpt...', 'info');
-            
-            // Call API or mock it instantly
-            setTimeout(() => {
-                const words = text.split(/\s+/).slice(0, 25).join(' ');
-                const excerpt = words + '...';
-                jQuery('#cora-article-excerpt').val(excerpt);
-                window.coraShowToast('AI Excerpt generated successfully!', 'success');
-                if (typeof window.coraUpdateExcerptCount === 'function') {
-                    window.coraUpdateExcerptCount();
-                }
-                window.coraTriggerEditorAutoSave();
-            }, 1000);
+
+            window.coraGetRagBrainFacts(function(facts) {
+                const systemPrompt = `You are a professional metadata specialist for Cora Studio.
+Output ONLY a concise, highly-engaging SEO meta description summary excerpt (max 150 characters, no quotes) for the article. Do NOT include markdown code blocks, conversational introductions, or commentary.`;
+
+                const prompt = `Generate a 120-150 character meta description based on this content: "${text}". Ground it in these facts if applicable: ${facts}`;
+
+                window.coraCallWorkspaceAI(prompt, systemPrompt, function(err, reply) {
+                    if (err) {
+                        window.coraShowToast('AI Excerpt generation failed: ' + err.message, 'error');
+                        return;
+                    }
+                    const cleanExcerpt = reply.replace(/"/g, '').trim();
+                    jQuery('#cora-article-excerpt, #cora-article-excerpt-bh').val(cleanExcerpt);
+                    window.coraShowToast('AI Excerpt generated successfully!', 'success');
+                    if (typeof window.coraUpdateExcerptCount === 'function') {
+                        window.coraUpdateExcerptCount();
+                    }
+                    window.coraTriggerEditorAutoSave();
+                });
+            });
         };
 
         // Insert new heading placeholder via left sidebar action
@@ -9721,21 +9942,47 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 return;
             }
 
+            inputEl.prop('disabled', true);
             window.coraShowToast('AI is processing prompt: "' + prompt + '"...', 'info');
-            
-            setTimeout(() => {
-                const range = window.coraQuillListingCoordinator.getSelection();
-                const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
-                const generatedText = "\nRegarding your prompt '" + prompt + "': To achieve optimal growth, teams should implement continuous validation cycles, align search intent mapping, and audit claims grounding periodically.\n";
+
+            window.coraGetRagBrainFacts(function(facts) {
+                const title = jQuery('#cora-article-title').val() || 'Untitled';
+                const keyword = jQuery('#cora-seo-keyword').val() || 'None';
+                const currentText = window.coraQuillListingCoordinator.getText().trim();
                 
-                window.coraQuillListingCoordinator.insertText(index, generatedText, 'user');
-                window.coraQuillListingCoordinator.setSelection(index + generatedText.length);
-                
-                inputEl.val('');
-                window.coraShowToast('AI content inserted successfully!', 'success');
-                window.coraUpdateWordCount();
-                window.coraTriggerEditorAutoSave();
-            }, 1200);
+                const systemPrompt = `You are Myra, a sharp, action-oriented Indian AI Writing Assistant and editor at Cora Studio.
+Ground your writing and claims strictly in the provided business facts (RAG facts). Do not invent facts, pricing, packages, or office locations that contradict the RAG database.
+Output ONLY the requested content to be inserted. Do NOT include markdown code blocks (like \`\`\`html or \`\`\`text), HTML wrappers around the whole thing, or conversational intros/outros (like "Sure, here is...", "Okay boss"). Standard inline HTML formatting tags (like <p>, <h2>, <strong>, <ul>) are allowed.`;
+
+                const message = `Article Title: "${title}"
+Focus Keyword: "${keyword}"
+Current Document Body:
+"${currentText}"
+
+User Instruction: "${prompt}"
+
+Generate the requested paragraph or section.`;
+
+                window.coraCallWorkspaceAI(message, systemPrompt, function(err, reply) {
+                    inputEl.prop('disabled', false);
+                    if (err) {
+                        window.coraShowToast('AI Generation failed: ' + err.message, 'error');
+                        return;
+                    }
+                    
+                    const range = window.coraQuillListingCoordinator.getSelection();
+                    const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
+                    
+                    const insertedHtml = reply.trim();
+                    window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, insertedHtml, 'user');
+                    window.coraQuillListingCoordinator.setSelection(index + insertedHtml.length);
+                    
+                    inputEl.val('');
+                    window.coraShowToast('AI content inserted successfully!', 'success');
+                    window.coraUpdateWordCount();
+                    window.coraTriggerEditorAutoSave();
+                });
+            });
         };
 
         // Run predefined actions (chips) from inline assistant card
@@ -9748,53 +9995,249 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 selectedText = window.coraQuillListingCoordinator.getText(range.index, range.length).trim();
             }
 
+            if (action === 'clarity' && !hasSelection) {
+                window.coraShowToast('Please highlight/select the text you want to clarify first.', 'warning');
+                return;
+            }
+            if (action === 'expand' && !hasSelection) {
+                window.coraShowToast('Please highlight/select the section you want to expand first.', 'warning');
+                return;
+            }
+            if (action === 'examples' && !hasSelection) {
+                window.coraShowToast('Please highlight/select the statement you want to generate examples for.', 'warning');
+                return;
+            }
+
             window.coraShowToast('Running AI ' + action + ' optimization...', 'info');
 
-            setTimeout(() => {
-                let newText = '';
-                const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
-                const length = range ? range.length : 0;
+            window.coraGetRagBrainFacts(function(facts) {
+                const title = jQuery('#cora-article-title').val() || 'Untitled';
+                const keyword = jQuery('#cora-seo-keyword').val() || 'None';
+                const currentText = window.coraQuillListingCoordinator.getText().trim();
+                
+                const systemPrompt = `You are a professional AI Writing Assistant for Cora Studio.
+Ground your writing in these verified business facts if applicable: ${facts}
+Output ONLY the generated rich-text content to replace or insert. Do NOT include markdown code blocks, conversational comments, or notes. Use inline HTML tags for formatting.`;
 
+                let prompt = '';
                 if (action === 'intro') {
-                    const title = jQuery('#cora-article-title').val() || 'Unlocking Strategic Growth';
-                    newText = "In today's competitive space, mastering '" + title + "' is essential. This article breaks down core methods, industry benchmarks, and actionable workflows to optimize your content strategy and drive direct leads.";
-                    // Insert at beginning of document
-                    window.coraQuillListingCoordinator.insertText(0, newText + "\n\n", 'user');
-                    window.coraQuillListingCoordinator.setSelection(0, newText.length);
+                    prompt = `Generate a compelling, SEO-optimized introduction paragraph (about 80-120 words) for an article titled "${title}". Focus Keyword: "${keyword}".`;
                 } else if (action === 'expand') {
-                    const baseText = selectedText || 'this objective';
-                    newText = "Expanding on '" + baseText + "': This requires a granular understanding of user persona workflows, continuous data alignment, and proactive feature enhancements to maintain optimal performance levels.";
-                    if (hasSelection) {
-                        window.coraQuillListingCoordinator.insertText(index, newText, 'user');
-                        window.coraQuillListingCoordinator.deleteText(index + newText.length, length);
-                    } else {
-                        window.coraQuillListingCoordinator.insertText(index, "\n" + newText + "\n", 'user');
-                    }
-                    window.coraQuillListingCoordinator.setSelection(index, newText.length);
+                    prompt = `Expand on the following section to add more detail, depth, and structural insights: "${selectedText}".`;
                 } else if (action === 'clarity') {
-                    const baseText = selectedText || 'refine our core plans';
-                    newText = "To put it simply, we must focus our core resources, align stakeholders, and prioritize high-impact deliverables to ensure sustained progress.";
-                    if (hasSelection) {
-                        window.coraQuillListingCoordinator.insertText(index, newText, 'user');
-                        window.coraQuillListingCoordinator.deleteText(index + newText.length, length);
-                    } else {
-                        window.coraQuillListingCoordinator.insertText(index, "\n" + newText + "\n", 'user');
-                    }
-                    window.coraQuillListingCoordinator.setSelection(index, newText.length);
+                    prompt = `Rewrite the following text to make it extremely clear, readable, and professional: "${selectedText}".`;
                 } else if (action === 'examples') {
-                    const baseText = selectedText || 'this strategy';
-                    newText = "\n\nFor example:\n1. TechCorp scaled search visibility by 140% using automated geo-targeting briefs.\n2. StudioFlow reduced editing overhead by 3 hours per article using inline copilot templates.";
-                    window.coraQuillListingCoordinator.insertText(index + length, newText, 'user');
-                    window.coraQuillListingCoordinator.setSelection(index + length, newText.length);
+                    prompt = `Generate 2-3 realistic examples or brief case studies to illustrate this point: "${selectedText}".`;
                 }
 
-                window.coraShowToast('AI optimization complete!', 'success');
-                window.coraUpdateWordCount();
-                window.coraTriggerEditorAutoSave();
-            }, 1000);
+                window.coraCallWorkspaceAI(prompt, systemPrompt, function(err, reply) {
+                    if (err) {
+                        window.coraShowToast('AI optimization failed: ' + err.message, 'error');
+                        return;
+                    }
+
+                    const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
+                    const length = range ? range.length : 0;
+                    const insertedHtml = reply.trim();
+
+                    if (action === 'intro') {
+                        window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(0, insertedHtml + '<br><br>', 'user');
+                        window.coraQuillListingCoordinator.setSelection(0, insertedHtml.length);
+                    } else {
+                        if (hasSelection) {
+                            window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, insertedHtml, 'user');
+                            window.coraQuillListingCoordinator.deleteText(index + insertedHtml.length, length);
+                        } else {
+                            window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, '<br>' + insertedHtml + '<br>', 'user');
+                        }
+                        window.coraQuillListingCoordinator.setSelection(index, insertedHtml.length);
+                    }
+
+                    window.coraShowToast('AI optimization complete!', 'success');
+                    window.coraUpdateWordCount();
+                    window.coraTriggerEditorAutoSave();
+                });
+            });
         };
 
+        // --- FLOATING INLINE SELECTION AI PORTAL ---
+
+        window.coraActiveSelectionRange = null;
+
+        window.coraPositionInlineAIPopup = function(range) {
+            if (!window.coraQuillListingCoordinator || !range) return;
+            const bounds = window.coraQuillListingCoordinator.getBounds(range.index, range.length);
+            const popup = document.getElementById('cora-inline-ai-popup');
+            if (!popup) return;
+
+            popup.style.display = 'flex';
+            const popupWidth = popup.offsetWidth;
+            const popupHeight = popup.offsetHeight;
+
+            // Align centered horizontally above the selection bounds
+            const left = bounds.left + (bounds.width / 2) - (popupWidth / 2);
+            const top = bounds.top - popupHeight - 12;
+
+            popup.style.left = Math.max(0, left) + 'px';
+            popup.style.top = top + 'px';
+            
+            setTimeout(() => {
+                popup.classList.remove('hidden', 'opacity-0', 'scale-95');
+                popup.classList.add('opacity-100', 'scale-100');
+            }, 10);
+        };
+
+        window.coraHideInlineAIPopup = function() {
+            const popup = document.getElementById('cora-inline-ai-popup');
+            if (popup && !popup.classList.contains('hidden')) {
+                popup.classList.remove('opacity-100', 'scale-100');
+                popup.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    popup.style.display = 'none';
+                    popup.classList.add('hidden');
+                }, 200);
+            }
+        };
+
+        // Initialize inline popup DOM & logic
+        function coraInitInlineAIPopup() {
+            let inlinePopup = document.getElementById('cora-inline-ai-popup');
+            if (inlinePopup) return;
+
+            inlinePopup = document.createElement('div');
+            inlinePopup.id = 'cora-inline-ai-popup';
+            inlinePopup.className = 'hidden absolute bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl p-3.5 z-[9999] select-none font-sans flex flex-col gap-2 max-w-[340px] w-full transition-all duration-200 opacity-0 scale-95 origin-bottom';
+            
+            inlinePopup.innerHTML = `
+                <div class="flex items-center gap-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5 select-none">
+                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-violet-650 animate-pulse"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <span>Cora Selection AI</span>
+                </div>
+                <div class="flex items-center bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 focus-within:border-zinc-400">
+                    <input type="text" id="cora-inline-ai-prompt" placeholder="Ask AI to edit selection..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-855 dark:text-zinc-100 placeholder:text-zinc-400 pr-4">
+                    <button type="button" id="cora-inline-ai-submit" class="text-zinc-450 hover:text-zinc-955 dark:hover:text-white transition-colors border-none bg-transparent cursor-pointer p-0.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+                </div>
+                <div class="flex flex-wrap gap-1.5 text-[9px] font-bold text-zinc-700 dark:text-zinc-350 select-none">
+                    <button type="button" id="cora-inline-btn-rephrase" class="px-2.5 py-1 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 rounded-md transition-all cursor-pointer shadow-3xs">Rephrase</button>
+                    <button type="button" id="cora-inline-btn-longer" class="px-2.5 py-1 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 rounded-md transition-all cursor-pointer shadow-3xs">Make Longer</button>
+                    <button type="button" id="cora-inline-btn-shorter" class="px-2.5 py-1 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 rounded-md transition-all cursor-pointer shadow-3xs">Make Shorter</button>
+                    <button type="button" id="cora-inline-btn-simplify" class="px-2.5 py-1 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-855 border border-zinc-200 dark:border-zinc-800 rounded-md transition-all cursor-pointer shadow-3xs">Simplify</button>
+                </div>
+            `;
+            
+            const writingSheet = document.querySelector('.cora-writing-sheet');
+            if (writingSheet) {
+                writingSheet.style.position = 'relative';
+                writingSheet.appendChild(inlinePopup);
+            } else {
+                document.body.appendChild(inlinePopup);
+            }
+
+            const promptInput = inlinePopup.querySelector('#cora-inline-ai-prompt');
+            const submitBtn = inlinePopup.querySelector('#cora-inline-ai-submit');
+
+            function runInlineAction(actionType, customInstruction) {
+                const range = window.coraActiveSelectionRange;
+                if (!range || !window.coraQuillListingCoordinator) {
+                    window.coraShowToast('Please select some text first.', 'warning');
+                    return;
+                }
+                
+                const selectedText = window.coraQuillListingCoordinator.getText(range.index, range.length).trim();
+                if (!selectedText) {
+                    window.coraShowToast('Selected text is empty.', 'warning');
+                    return;
+                }
+                
+                promptInput.disabled = true;
+                window.coraShowToast('AI is editing your selection...', 'info');
+                
+                window.coraGetRagBrainFacts(function(facts) {
+                    const systemPrompt = `You are a professional editor for Cora Studio.
+Ground your edits in these verified business facts if applicable: ${facts}
+Output ONLY the rewritten text to replace the selection. Do NOT include markdown code blocks, conversational comments, or wrappers. Maintain original HTML formatting if present.`;
+
+                    let instruction = '';
+                    if (actionType === 'rephrase') {
+                        instruction = `Rephrase and polish this text for better readability: "${selectedText}"`;
+                    } else if (actionType === 'longer') {
+                        instruction = `Make the following text significantly longer and more detailed: "${selectedText}".`;
+                    } else if (actionType === 'shorter') {
+                        instruction = `Summarize and shorten the following text: "${selectedText}"`;
+                    } else if (actionType === 'simplify') {
+                        instruction = `Simplify this text to make it easy to understand: "${selectedText}"`;
+                    } else if (actionType === 'custom') {
+                        instruction = `Edit this text: "${selectedText}" based on this user command: "${customInstruction}"`;
+                    }
+
+                    window.coraCallWorkspaceAI(instruction, systemPrompt, function(err, reply) {
+                        promptInput.disabled = false;
+                        if (err) {
+                            window.coraShowToast('AI edit failed: ' + err.message, 'error');
+                            return;
+                        }
+                        
+                        const index = range.index;
+                        const length = range.length;
+                        const newHtml = reply.trim();
+                        
+                        window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, newHtml, 'user');
+                        window.coraQuillListingCoordinator.deleteText(index + newHtml.length, length);
+                        window.coraQuillListingCoordinator.setSelection(index, newHtml.length);
+                        
+                        promptInput.value = '';
+                        window.coraHideInlineAIPopup();
+                        window.coraShowToast('Selection updated successfully!', 'success');
+                        window.coraUpdateWordCount();
+                        window.coraTriggerEditorAutoSave();
+                    });
+                });
+            }
+
+            submitBtn.addEventListener('click', function() {
+                const customText = promptInput.value.trim();
+                if (customText) {
+                    runInlineAction('custom', customText);
+                }
+            });
+
+            promptInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    const customText = promptInput.value.trim();
+                    if (customText) {
+                        runInlineAction('custom', customText);
+                    }
+                }
+            });
+
+            inlinePopup.querySelector('#cora-inline-btn-rephrase').addEventListener('click', () => runInlineAction('rephrase'));
+            inlinePopup.querySelector('#cora-inline-btn-longer').addEventListener('click', () => runInlineAction('longer'));
+            inlinePopup.querySelector('#cora-inline-btn-shorter').addEventListener('click', () => runInlineAction('shorter'));
+            inlinePopup.querySelector('#cora-inline-btn-simplify').addEventListener('click', () => runInlineAction('simplify'));
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Force expand sidebars and default to active tabs
+            try {
+                const inspector = document.getElementById('cora-article-inspector');
+                if (inspector) {
+                    inspector.classList.remove('collapsed-inspector');
+                }
+                localStorage.setItem('cora_article_inspector_collapsed', 'false');
+                
+                const leftSidebar = document.getElementById('cora-editor-left-sidebar');
+                if (leftSidebar) {
+                    leftSidebar.classList.remove('hidden');
+                    leftSidebar.classList.add('flex');
+                }
+                
+                if (typeof window.coraSwitchInspectorTab === 'function') {
+                    window.coraSwitchInspectorTab('seo');
+                }
+            } catch(e) {}
+
             // Set default font
             if (typeof window.coraSetEditorFont === 'function') {
                 window.coraSetEditorFont('sans');
@@ -9814,8 +10257,28 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                         window.coraUpdateWordCount();
                         window.coraTriggerEditorAutoSave();
                     });
+
+                    // Inline AI selection listener
+                    window.coraQuillListingCoordinator.on('selection-change', function(range, oldRange, source) {
+                        if (range && range.length > 0) {
+                            window.coraActiveSelectionRange = range;
+                            window.coraPositionInlineAIPopup(range);
+                        } else {
+                            setTimeout(function() {
+                                const activeEl = document.activeElement;
+                                const isInsidePopup = activeEl && activeEl.closest('#cora-inline-ai-popup');
+                                if (!isInsidePopup) {
+                                    window.coraHideInlineAIPopup();
+                                    window.coraActiveSelectionRange = null;
+                                }
+                            }, 250);
+                        }
+                    });
                 }
                 
+                // Initialize floating popup DOM elements
+                coraInitInlineAIPopup();
+
                 // Restore unsaved draft from localStorage if page refreshed
                 const activeId = jQuery('#cora-article-id').val();
                 window.coraRestoreEditorDraft(activeId);
@@ -9892,7 +10355,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
     </div>
 
     <!-- Custom Media Library Drawer -->
-    <aside id="cora-media-library-drawer" class="collapsed translate-x-full fixed top-0 right-0 z-[150] h-full w-[450px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out pointer-events-none">
+    <aside id="cora-media-library-drawer" class="collapsed translate-x-full fixed top-0 right-0 z-[1000005] h-full w-[450px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out pointer-events-none">
         <header class="flex items-center justify-between px-5 py-3 border-b border-zinc-200 bg-white shrink-0">
             <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
