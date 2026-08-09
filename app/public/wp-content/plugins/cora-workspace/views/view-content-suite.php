@@ -17,6 +17,21 @@ if (typeof window.coraREData !== 'undefined') {
     window.coraREData = window.coraREWPData;
 }
 
+// Global stubs to prevent ReferenceErrors during initial page load / execution race conditions
+window.switchContentTab = window.switchContentTab || function(tabId) { console.warn("switchContentTab not loaded yet."); };
+window.switchSuiteTab = window.switchSuiteTab || function(tabId) { if (typeof window.switchContentTab === 'function') window.switchContentTab(tabId); };
+window.switchCalendarSubView = window.switchCalendarSubView || function(view) { console.warn("switchCalendarSubView not loaded yet."); };
+window.coraChangeCalendarMonth = window.coraChangeCalendarMonth || function(offset) { console.warn("coraChangeCalendarMonth not loaded yet."); };
+window.coraGoToToday = window.coraGoToToday || function() { console.warn("coraGoToToday not loaded yet."); };
+window.openCreateArticleDrawer = window.openCreateArticleDrawer || function(prefillDate, prefillStage) { console.warn("openCreateArticleDrawer not loaded yet."); };
+window.filterContentByStatus = window.filterContentByStatus || function(status, btnEl) { console.warn("filterContentByStatus not loaded yet."); };
+window.updateBulkActions = window.updateBulkActions || function() { console.warn("updateBulkActions not loaded yet."); };
+window.openContentBriefDrawer = window.openContentBriefDrawer || function(itemId) { console.warn("openContentBriefDrawer not loaded yet."); };
+window.coraSwitchBrainCategory = window.coraSwitchBrainCategory || function(category, btn) { console.warn("coraSwitchBrainCategory not loaded yet."); };
+window.coraCreateBriefFromOpportunity = window.coraCreateBriefFromOpportunity || function(oppId) { console.warn("coraCreateBriefFromOpportunity not loaded yet."); };
+window.coraEditArticle = window.coraEditArticle || function(postId, title) { console.warn("coraEditArticle not loaded yet."); };
+window.openSEOAnalysis = window.openSEOAnalysis || function(articleId, title) { console.warn("openSEOAnalysis not loaded yet."); };
+
 window.addEventListener('error', function(event) {
     const errorMsg = event.error ? (event.error.stack || event.error.message) : event.message;
     console.error("STICKY ERROR:", errorMsg);
@@ -94,155 +109,155 @@ foreach($cora_posts as $post) {
 $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 ?>
 <!-- Metrics Grid -->
-<div class="flex overflow-x-auto gap-4 pb-3 scrollbar-width-none -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-5 snap-x snap-mandatory mb-6">
+<div class="cora-metrics-grid mb-6">
     <!-- Card 1: Total Articles -->
-    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px] w-[220px] shrink-0 snap-start sm:w-auto">
+    <div class="cora-stat-card">
         <div class="flex items-center">
-            <div class="p-2 bg-indigo-50/80 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center shrink-0">
+            <div class="p-2 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-800/80 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
             </div>
-            <span class="text-xs sm:text-sm font-semibold text-zinc-500 dark:text-zinc-400 ml-2.5">Total Articles</span>
+            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest ml-2">Total Articles</span>
         </div>
         <div class="flex items-center justify-between mt-3 mb-1">
             <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 font-mono tracking-tight"><?php echo esc_html($total_articles); ?></div>
             <div class="flex items-end gap-1 h-7 select-none">
-                <div class="w-[3px] bg-indigo-500/20 rounded-full h-[25%]"></div>
-                <div class="w-[3px] bg-indigo-500/30 rounded-full h-[40%]"></div>
-                <div class="w-[3px] bg-indigo-500/25 rounded-full h-[35%]"></div>
-                <div class="w-[3px] bg-indigo-500/50 rounded-full h-[55%]"></div>
-                <div class="w-[3px] bg-indigo-500/40 rounded-full h-[45%]"></div>
-                <div class="w-[3px] bg-indigo-500/70 rounded-full h-[75%]"></div>
-                <div class="w-[3px] bg-indigo-500/55 rounded-full h-[60%]"></div>
-                <div class="w-[3px] bg-indigo-500/80 rounded-full h-[85%]"></div>
-                <div class="w-[3px] bg-indigo-500/65 rounded-full h-[70%]"></div>
-                <div class="w-[3px] bg-indigo-500/90 rounded-full h-[95%]"></div>
-                <div class="w-[3px] bg-indigo-50 rounded-full h-[100%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[25%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[40%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[35%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[55%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[75%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[60%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[85%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[70%]"></div>
+                <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[95%]"></div>
+                <div class="w-[3px] bg-zinc-950 dark:bg-zinc-100 rounded-full h-[100%]"></div>
             </div>
         </div>
-        <div class="text-[10px] text-zinc-400 font-medium mt-1">Active library</div>
+        <div class="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1">Active library</div>
     </div>
 
     <!-- Card 2: Published -->
-    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px] w-[220px] shrink-0 snap-start sm:w-auto">
+    <div class="cora-stat-card">
         <div class="flex items-center">
-            <div class="p-2 bg-emerald-50/80 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center shrink-0">
+            <div class="p-2 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-800/80 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             </div>
-            <span class="text-xs sm:text-sm font-semibold text-zinc-500 dark:text-zinc-400 ml-2.5">Published</span>
+            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest ml-2">Published</span>
         </div>
         <div class="flex items-center justify-between mt-3 mb-1">
             <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 font-mono tracking-tight"><?php echo esc_html($published_count); ?></div>
             <div class="flex items-end gap-1 h-7 select-none">
-                <div class="w-[3px] bg-emerald-500/20 rounded-full h-[15%]"></div>
-                <div class="w-[3px] bg-emerald-500/35 rounded-full h-[30%]"></div>
-                <div class="w-[3px] bg-emerald-500/25 rounded-full h-[20%]"></div>
-                <div class="w-[3px] bg-emerald-500/50 rounded-full h-[45%]"></div>
-                <div class="w-[3px] bg-emerald-500/35 rounded-full h-[30%]"></div>
-                <div class="w-[3px] bg-emerald-500/70 rounded-full h-[65%]"></div>
-                <div class="w-[3px] bg-emerald-500/50 rounded-full h-[45%]"></div>
-                <div class="w-[3px] bg-emerald-500/80 rounded-full h-[75%]"></div>
-                <div class="w-[3px] bg-emerald-500/60 rounded-full h-[55%]"></div>
-                <div class="w-[3px] bg-emerald-500/90 rounded-full h-[90%]"></div>
-                <div class="w-[3px] bg-emerald-500 rounded-full h-[100%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[15%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[30%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[20%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[30%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[65%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[75%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[55%]"></div>
+                <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[90%]"></div>
+                <div class="w-[3px] bg-zinc-950 dark:bg-zinc-100 rounded-full h-[100%]"></div>
             </div>
         </div>
-        <div class="text-[10px] text-zinc-400 font-medium mt-1">Live on site</div>
+        <div class="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1">Live on site</div>
     </div>
 
     <!-- Card 3: Drafts -->
-    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px] w-[220px] shrink-0 snap-start sm:w-auto">
+    <div class="cora-stat-card">
         <div class="flex items-center">
-            <div class="p-2 bg-amber-50/80 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center shrink-0">
+            <div class="p-2 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-800/80 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
             </div>
-            <span class="text-xs sm:text-sm font-semibold text-zinc-500 dark:text-zinc-400 ml-2.5">Drafts</span>
+            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest ml-2">Drafts</span>
         </div>
         <div class="flex items-center justify-between mt-3 mb-1">
             <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 font-mono tracking-tight"><?php echo esc_html($draft_count); ?></div>
             <div class="flex items-end gap-1 h-7 select-none">
-                <div class="w-[3px] bg-amber-500/20 rounded-full h-[25%]"></div>
-                <div class="w-[3px] bg-amber-500/40 rounded-full h-[40%]"></div>
-                <div class="w-[3px] bg-amber-500/30 rounded-full h-[35%]"></div>
-                <div class="w-[3px] bg-amber-500/60 rounded-full h-[55%]"></div>
-                <div class="w-[3px] bg-amber-500/45 rounded-full h-[45%]"></div>
-                <div class="w-[3px] bg-amber-500/75 rounded-full h-[70%]"></div>
-                <div class="w-[3px] bg-amber-500/60 rounded-full h-[55%]"></div>
-                <div class="w-[3px] bg-amber-500/90 rounded-full h-[85%]"></div>
-                <div class="w-[3px] bg-amber-500/75 rounded-full h-[70%]"></div>
-                <div class="w-[3px] bg-amber-500/95 rounded-full h-[95%]"></div>
-                <div class="w-[3px] bg-amber-500 rounded-full h-[100%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[25%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[40%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[35%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[60%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[70%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[55%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[85%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[75%]"></div>
+                <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[95%]"></div>
+                <div class="w-[3px] bg-zinc-950 dark:bg-zinc-100 rounded-full h-[100%]"></div>
             </div>
         </div>
-        <div class="text-[10px] text-zinc-400 font-medium mt-1">In progress</div>
+        <div class="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1">In progress</div>
     </div>
 
     <!-- Card 4: Avg SEO Score -->
-    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px] w-[220px] shrink-0 snap-start sm:w-auto">
+    <div class="cora-stat-card">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
-                <div class="p-2 bg-blue-50/80 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center shrink-0">
+                <div class="p-2 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-800/80 rounded-xl flex items-center justify-center shrink-0">
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><polyline points="17 6 23 6 23 12"></polyline></svg>
                 </div>
-                <span class="text-xs sm:text-sm font-semibold text-zinc-500 dark:text-zinc-400 ml-2.5">Avg SEO Score</span>
+                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest ml-2">Avg SEO Score</span>
             </div>
         </div>
         <div class="flex items-center justify-between mt-3 mb-1">
             <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 font-mono tracking-tight"><?php echo esc_html($avg_seo); ?></div>
             <div class="flex flex-col items-end">
-                <div class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-450 text-[10px] font-bold">
+                <div class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[10px] font-bold border border-zinc-200/50 dark:border-zinc-700/50">
                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg>
                     <span>3%</span>
                 </div>
-                <span class="text-[9px] text-zinc-400 mt-0.5 font-medium">this week</span>
+                <span class="text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5 font-bold uppercase tracking-wide">this week</span>
             </div>
         </div>
         <!-- Full-width Sparkline at bottom -->
         <div class="flex items-end justify-between gap-0.5 h-3.5 w-full select-none mt-2">
-            <div class="w-[3px] bg-blue-500/15 rounded-full h-[20%]"></div>
-            <div class="w-[3px] bg-blue-500/25 rounded-full h-[30%]"></div>
-            <div class="w-[3px] bg-blue-500/20 rounded-full h-[25%]"></div>
-            <div class="w-[3px] bg-blue-500/40 rounded-full h-[45%]"></div>
-            <div class="w-[3px] bg-blue-500/30 rounded-full h-[35%]"></div>
-            <div class="w-[3px] bg-blue-500/50 rounded-full h-[55%]"></div>
-            <div class="w-[3px] bg-blue-500/40 rounded-full h-[45%]"></div>
-            <div class="w-[3px] bg-blue-500/60 rounded-full h-[65%]"></div>
-            <div class="w-[3px] bg-blue-500/50 rounded-full h-[55%]"></div>
-            <div class="w-[3px] bg-blue-500/75 rounded-full h-[80%]"></div>
-            <div class="w-[3px] bg-blue-500/60 rounded-full h-[65%]"></div>
-            <div class="w-[3px] bg-blue-500/85 rounded-full h-[90%]"></div>
-            <div class="w-[3px] bg-blue-500/70 rounded-full h-[75%]"></div>
-            <div class="w-[3px] bg-blue-500/95 rounded-full h-[95%]"></div>
-            <div class="w-[3px] bg-blue-500/80 rounded-full h-[80%]"></div>
-            <div class="w-[3px] bg-blue-500/90 rounded-full h-[90%]"></div>
-            <div class="w-[3px] bg-blue-500 rounded-full h-[100%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[20%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[30%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[25%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[35%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[55%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[65%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[55%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[80%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[65%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[90%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[75%]"></div>
+            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[95%]"></div>
+            <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[80%]"></div>
+            <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[90%]"></div>
+            <div class="w-[3px] bg-zinc-950 dark:bg-zinc-100 rounded-full h-[100%]"></div>
         </div>
     </div>
 
     <!-- Card 5: Total Leads -->
-    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px] w-[220px] shrink-0 snap-start sm:w-auto">
+    <div class="cora-stat-card">
         <div class="flex items-center">
-            <div class="p-2 bg-rose-50/80 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 rounded-xl flex items-center justify-center shrink-0">
+            <div class="p-2 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-800/80 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
-            <span class="text-xs sm:text-sm font-semibold text-zinc-500 dark:text-zinc-400 ml-2.5">Total Leads</span>
+            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest ml-2">Total Leads</span>
         </div>
         <div class="flex items-center justify-between mt-3 mb-1">
             <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 font-mono tracking-tight"><?php echo esc_html($total_leads); ?></div>
             <div class="flex items-end gap-1 h-7 select-none">
-                <div class="w-[3px] bg-rose-500/10 rounded-full h-[15%]"></div>
-                <div class="w-[3px] bg-rose-500/25 rounded-full h-[30%]"></div>
-                <div class="w-[3px] bg-rose-500/20 rounded-full h-[20%]"></div>
-                <div class="w-[3px] bg-rose-500/40 rounded-full h-[45%]"></div>
-                <div class="w-[3px] bg-rose-500/30 rounded-full h-[35%]"></div>
-                <div class="w-[3px] bg-rose-500/60 rounded-full h-[65%]"></div>
-                <div class="w-[3px] bg-rose-500/45 rounded-full h-[50%]"></div>
-                <div class="w-[3px] bg-rose-500/80 rounded-full h-[85%]"></div>
-                <div class="w-[3px] bg-rose-500/65 rounded-full h-[70%]"></div>
-                <div class="w-[3px] bg-rose-500/90 rounded-full h-[95%]"></div>
-                <div class="w-[3px] bg-rose-500 rounded-full h-[100%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[15%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[30%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[20%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[35%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[65%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[50%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[85%]"></div>
+                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[70%]"></div>
+                <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[95%]"></div>
+                <div class="w-[3px] bg-zinc-950 dark:bg-zinc-100 rounded-full h-[100%]"></div>
             </div>
         </div>
-        <div class="text-[10px] text-zinc-400 font-medium mt-1">From content</div>
+        <div class="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1">From content</div>
     </div>
 </div>
 
@@ -277,9 +292,10 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
         Automations
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-brain" onclick="switchContentTab('ct-brain')">
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-brain" onclick="switchContentTab('ct-brain')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z"></path></svg>
         Business Brain
+        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-850 text-zinc-400 dark:text-zinc-500 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
     </button>
 </div>
 
@@ -895,7 +911,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                                         </div>
                                     <?php endif; ?>
                                     <div class="min-w-0 flex-1">
-                                        <div class="font-bold text-zinc-900 text-xs line-clamp-1 hover:text-zinc-700 cursor-pointer leading-snug" title="<?php echo esc_attr($post->post_title); ?>" onclick="switchSuiteTab('ct-seo'); openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>');"><?php echo esc_html($post->post_title); ?></div>
+                                        <div class="font-bold text-zinc-900 text-xs line-clamp-1 hover:text-zinc-700 cursor-pointer leading-snug" title="<?php echo esc_attr($post->post_title); ?>" onclick="switchContentTab('ct-seo'); openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>');"><?php echo esc_html($post->post_title); ?></div>
                                         <div class="text-[11px] text-zinc-400 font-normal mt-0.5"><?php echo number_format($word_count); ?> words &bull; ID #<?php echo $post->ID; ?></div>
                                     </div>
                                 </div>
@@ -1723,6 +1739,88 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </aside>
 <!-- BOTTOM SHEET STYLING -->
 <style>
+/* Overview Metrics Grid & Stats Cards Styling */
+.cora-metrics-grid {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 1rem !important;
+    padding-bottom: 0.75rem !important;
+    margin-left: -1rem !important;
+    margin-right: -1rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    scroll-snap-type: x mandatory !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+.cora-metrics-grid::-webkit-scrollbar {
+    display: none !important;
+}
+
+@media (min-width: 640px) {
+    .cora-metrics-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        gap: 1.25rem !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .cora-metrics-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    }
+}
+
+.cora-stat-card {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(228, 228, 231, 0.9) !important; /* zinc-200 */
+    border-radius: 1rem !important; /* rounded-2xl */
+    padding: 1.25rem !important; /* p-5 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important; /* shadow-2xs */
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    min-height: 148px !important;
+    width: 220px !important;
+    flex-shrink: 0 !important;
+    scroll-snap-align: start !important;
+}
+
+.dark .cora-stat-card {
+    background-color: rgba(24, 24, 27, 0.5) !important; /* dark:bg-zinc-900/50 */
+    border-color: rgb(39, 39, 42) !important; /* dark:border-zinc-800 */
+}
+
+.cora-stat-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important; /* shadow-xs */
+    border-color: rgb(212, 212, 216) !important; /* hover:border-zinc-300 */
+}
+
+.dark .cora-stat-card:hover {
+    border-color: rgb(63, 63, 70) !important; /* dark:hover:border-zinc-700 */
+}
+
+@media (min-width: 640px) {
+    .cora-stat-card {
+        width: auto !important;
+        flex-shrink: 1 !important;
+    }
+}
+
+/* Locked Business Brain Tab Button */
+.cora-tab-btn[data-tab="ct-brain"] {
+    opacity: 0.65 !important;
+}
+.cora-tab-btn[data-tab="ct-brain"]:hover {
+    color: rgb(113, 113, 122) !important; /* text-zinc-500 */
+    border-color: transparent !important;
+}
+
 .checklist-item, .checklist-item * {
     outline: none !important;
 }
@@ -2141,6 +2239,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     };
 
     function switchContentTab(tabId) {
+        if (tabId === 'ct-brain') {
+            if (window.coraShowToast) {
+                window.coraShowToast('Business Brain is coming soon! This knowledge base module is currently in development.', 'info');
+            }
+            return;
+        }
         document.querySelectorAll('.cora-ct-panel').forEach(p => p.classList.add('hidden'));
         document.querySelectorAll('.cora-tab-btn').forEach(b => {
             b.classList.remove('border-zinc-950', 'text-zinc-900');
@@ -2270,7 +2374,10 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     // Immediate & DOMReady Init
     function initActiveTab() {
         const urlParams = new URLSearchParams(window.location.search);
-        const ct = urlParams.get('ct') || 'ct-overview';
+        let ct = urlParams.get('ct') || 'ct-overview';
+        if (ct === 'ct-brain') {
+            ct = 'ct-overview';
+        }
         switchContentTab(ct);
 
         const postId = urlParams.get('post_id') || urlParams.get('article_id') || urlParams.get('edit_post');
