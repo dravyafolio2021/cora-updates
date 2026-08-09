@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.67
+ * Version: 3.2.68
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.67' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.68' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -36356,6 +36356,9 @@ function cora_ajax_save_brain_item() {
         $id = $wpdb->insert_id;
     }
 
+    // Invalidate isolated transient cache
+    delete_transient('cora_brain_items_' . $agency_id);
+
     wp_send_json_success(['id' => $id, 'title' => $title, 'source_type' => $source_type, 'token_count' => $token_count]);
 }
 }
@@ -36372,6 +36375,10 @@ function cora_ajax_delete_brain_item() {
 
     if ($id > 0) {
         $wpdb->delete($table, ['id' => $id, 'agency_id' => $agency_id]);
+        
+        // Invalidate isolated transient cache
+        delete_transient('cora_brain_items_' . $agency_id);
+        
         wp_send_json_success();
     }
     wp_send_json_error('Invalid item');
@@ -36384,12 +36391,19 @@ function cora_ajax_fetch_brain_items() {
     check_ajax_referer('cora_ajax_nonce', 'nonce');
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
-    $table = $wpdb->prefix . 'cora_rag_knowledge';
 
-    $results = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM {$table} WHERE agency_id = %d AND source_type LIKE 'cora_brain_%%' ORDER BY id DESC",
-        $agency_id
-    ), ARRAY_A) ?: [];
+    $cache_key = 'cora_brain_items_' . $agency_id;
+    $results = get_transient($cache_key);
+
+    if (false === $results) {
+        $table = $wpdb->prefix . 'cora_rag_knowledge';
+        $results = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$table} WHERE agency_id = %d AND source_type LIKE 'cora_brain_%%' ORDER BY id DESC",
+            $agency_id
+        ), ARRAY_A) ?: [];
+        
+        set_transient($cache_key, $results, 6 * HOUR_IN_SECONDS);
+    }
 
     wp_send_json_success($results);
 }
@@ -36401,8 +36415,16 @@ if ( ! function_exists( 'cora_ajax_fetch_opportunities' ) ) {
 function cora_ajax_fetch_opportunities() {
     check_ajax_referer('cora_ajax_nonce', 'nonce');
     global $wpdb;
-    $table = $wpdb->prefix . 'cora_content_opportunities';
-    $results = $wpdb->get_results("SELECT * FROM {$table} WHERE status = 'backlog' ORDER BY priority_score DESC", ARRAY_A) ?: [];
+    $agency_id = cora_db_get_agency_id();
+    
+    $cache_key = 'cora_opps_backlog_' . $agency_id;
+    $results = get_transient($cache_key);
+
+    if (false === $results) {
+        $table = $wpdb->prefix . 'cora_content_opportunities';
+        $results = $wpdb->get_results("SELECT * FROM {$table} WHERE status = 'backlog' ORDER BY priority_score DESC", ARRAY_A) ?: [];
+        set_transient($cache_key, $results, 6 * HOUR_IN_SECONDS);
+    }
     wp_send_json_success($results);
 }
 }
@@ -36468,6 +36490,9 @@ function cora_ajax_generate_opportunities() {
         }
     }
 
+    // Invalidate isolated opportunities backlog cache
+    delete_transient('cora_opps_backlog_' . $agency_id);
+
     wp_send_json_success(['generated' => $generated]);
 }
 }
@@ -36504,6 +36529,14 @@ function cora_ajax_create_brief_from_opportunity() {
     // Mark opportunity as created
     $wpdb->update($opp_table, ['status' => 'created'], ['id' => $opp_id]);
 
+    $agency_id = cora_db_get_agency_id();
+    
+    // Invalidate isolated opportunities backlog cache
+    delete_transient('cora_opps_backlog_' . $agency_id);
+    
+    // Invalidate workspace cache since we added a new content item
+    cora_invalidate_workspace_cache_all($agency_id);
+
     wp_send_json_success(['item_id' => $new_post_id, 'title' => $opp->title]);
 }
 }
@@ -36526,22 +36559,70 @@ function cora_ajax_fetch_content_performance() {
     $total_leads = 0;
     $total_revenue = 0;
 
+    $post_ids = [];
     foreach ($posts as $p) {
-        $post_id = $p->post_id ? $p->post_id : $p->id;
+        $post_ids[] = intval($p->post_id ? $p->post_id : $p->id);
+    }
 
-        // Count Leads attributed to this blog post
-        // Leads source formats: "Blog Post ID: X"
-        $lead_query = $wpdb->prepare("SELECT id FROM {$leads_table} WHERE source = %s", 'Blog Post ID: ' . $post_id);
-        $lead_ids = $wpdb->get_col($lead_query);
+    $leads_by_post = [];
+    $all_lead_ids = [];
+
+    if (!empty($post_ids)) {
+        // Construct Blog Post ID string sources for querying leads table in one batch
+        $sources = array_map(function($pid) {
+            return 'Blog Post ID: ' . $pid;
+        }, $post_ids);
+
+        $source_placeholders = implode(',', array_fill(0, count($sources), '%s'));
+        $lead_results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT id, source FROM {$leads_table} WHERE source IN ($source_placeholders)",
+                $sources
+            ),
+            ARRAY_A
+        ) ?: [];
+
+        foreach ($lead_results as $l) {
+            $lead_id = intval($l['id']);
+            $all_lead_ids[] = $lead_id;
+            $source = $l['source'];
+            $parts = explode('Blog Post ID: ', $source);
+            if (isset($parts[1])) {
+                $pid = intval($parts[1]);
+                if (!isset($leads_by_post[$pid])) {
+                    $leads_by_post[$pid] = [];
+                }
+                $leads_by_post[$pid][] = $lead_id;
+            }
+        }
+    }
+
+    $ledger_by_lead = [];
+    if (!empty($all_lead_ids)) {
+        $lead_placeholders = implode(',', array_fill(0, count($all_lead_ids), '%d'));
+        $ledger_results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT lead_id, SUM(amount) as revenue FROM {$ledger_table} WHERE lead_id IN ($lead_placeholders) GROUP BY lead_id",
+                $all_lead_ids
+            ),
+            ARRAY_A
+        ) ?: [];
+
+        foreach ($ledger_results as $lr) {
+            $ledger_by_lead[intval($lr['lead_id'])] = floatval($lr['revenue']);
+        }
+    }
+
+    foreach ($posts as $p) {
+        $post_id = intval($p->post_id ? $p->post_id : $p->id);
+
+        $lead_ids = isset($leads_by_post[$post_id]) ? $leads_by_post[$post_id] : [];
         $leads_count = count($lead_ids);
         $total_leads += $leads_count;
 
-        // Calculate Revenue attributed via sales ledger entries matching these lead IDs
         $revenue = 0;
-        if (!empty($lead_ids)) {
-            $placeholders = implode(',', array_fill(0, count($lead_ids), '%d'));
-            $rev_query = "SELECT SUM(amount) FROM {$ledger_table} WHERE lead_id IN ($placeholders)";
-            $revenue = intval($wpdb->get_var($wpdb->prepare($rev_query, $lead_ids)));
+        foreach ($lead_ids as $lid) {
+            $revenue += isset($ledger_by_lead[$lid]) ? $ledger_by_lead[$lid] : 0;
         }
         $total_revenue += $revenue;
 
@@ -36648,6 +36729,10 @@ function cora_ajax_create_content_item() {
     ];
     $wpdb->insert($wpdb->prefix.'cora_content_items', $data);
     $id = $wpdb->insert_id;
+    
+    $agency_id = cora_db_get_agency_id();
+    cora_invalidate_workspace_cache_all($agency_id);
+
     wp_send_json_success(['id' => $id, 'title' => $title, 'stage' => 'idea', 'created_at' => $data['created_at']]);
 }
 }
@@ -36689,6 +36774,10 @@ function cora_ajax_save_content_brief() {
     }
 
     $wpdb->update($wpdb->prefix.'cora_content_items', $data, ['id' => $item_id]);
+    
+    $agency_id = cora_db_get_agency_id();
+    cora_invalidate_workspace_cache_all($agency_id);
+
     wp_send_json_success();
 }
 }
@@ -36730,7 +36819,31 @@ function cora_ajax_update_content_stage() {
         'changed_at' => current_time('mysql')
     ]);
     
+    $agency_id = cora_db_get_agency_id();
+    cora_invalidate_workspace_cache_all($agency_id);
+
     wp_send_json_success(['item_id' => $item->id, 'new_stage' => $target_stage, 'logged_at' => current_time('mysql')]);
+}
+}
+
+/**
+ * Invalidate all transients for the workspace board stages.
+ */
+if ( ! function_exists( 'cora_invalidate_workspace_cache_all' ) ) {
+function cora_invalidate_workspace_cache_all($agency_id) {
+    delete_transient('cora_content_workspace_' . $agency_id . '_');
+    delete_transient('cora_content_workspace_' . $agency_id . '_idea');
+    delete_transient('cora_content_workspace_' . $agency_id . '_briefing');
+    delete_transient('cora_content_workspace_' . $agency_id . '_research');
+    delete_transient('cora_content_workspace_' . $agency_id . '_drafting');
+    delete_transient('cora_content_workspace_' . $agency_id . '_editorial_review');
+    delete_transient('cora_content_workspace_' . $agency_id . '_revisions');
+    delete_transient('cora_content_workspace_' . $agency_id . '_seo_gate');
+    delete_transient('cora_content_workspace_' . $agency_id . '_approval');
+    delete_transient('cora_content_workspace_' . $agency_id . '_scheduled');
+    delete_transient('cora_content_workspace_' . $agency_id . '_published');
+    delete_transient('cora_content_workspace_' . $agency_id . '_performance');
+    delete_transient('cora_content_workspace_' . $agency_id . '_review');
 }
 }
 
@@ -36745,157 +36858,171 @@ function cora_ajax_fetch_content_workspace() {
         wp_send_json_error('Permission denied');
     }
     global $wpdb;
+    $agency_id = cora_db_get_agency_id();
     
     $table = $wpdb->prefix . 'cora_content_items';
 
-    // Auto-seed sample mockup items if target item is missing
-    $mockup_item_exists = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$table} WHERE title = %s", 'AI Search Visibility Best Practices'));
-    if ($mockup_item_exists === 0) {
-        $wpdb->query("TRUNCATE TABLE {$table}");
-        $user_id = get_current_user_id();
-        $sample_items = [
-            [
-                'title' => 'AI Search Visibility Best Practices',
-                'stage' => 'idea',
-                'priority' => 'medium',
-                'primary_keyword' => 'AI Search Visibility',
-                'target_word_count' => 1200,
-                'seo_score' => 0,
-                'geo_score' => 0,
-                'draft_due_date' => null,
-                'publish_date' => '2026-05-01'
-            ],
-            [
-                'title' => 'Content Optimization Checklist 2026',
-                'stage' => 'idea',
-                'priority' => 'medium',
-                'primary_keyword' => 'Content Optimization',
-                'target_word_count' => 880,
-                'seo_score' => 10,
-                'geo_score' => 20,
-                'draft_due_date' => null,
-                'publish_date' => '2026-05-03'
-            ],
-            [
-                'title' => 'AI Content Brief Template',
-                'stage' => 'idea',
-                'priority' => 'high',
-                'primary_keyword' => 'AI Content Brief',
-                'target_word_count' => 15,
-                'seo_score' => 75,
-                'geo_score' => 81,
-                'draft_due_date' => null,
-                'publish_date' => '2026-05-28'
-            ],
-            [
-                'title' => 'Top 10 SEO Tools for 2026',
-                'stage' => 'drafting',
-                'priority' => 'medium',
-                'primary_keyword' => 'SEO Tools',
-                'target_word_count' => 950,
-                'seo_score' => 40,
-                'geo_score' => 45,
-                'draft_due_date' => '2026-05-08',
-                'publish_date' => '2026-05-08'
-            ],
-            [
-                'title' => 'On-Page SEO Checklist',
-                'stage' => 'drafting',
-                'priority' => 'low',
-                'primary_keyword' => 'On-Page SEO',
-                'target_word_count' => 600,
-                'seo_score' => 35,
-                'geo_score' => 40,
-                'draft_due_date' => '2026-05-20',
-                'publish_date' => '2026-05-20'
-            ],
-            [
-                'title' => 'How AI Overviews Impact SEO',
-                'stage' => 'review',
-                'priority' => 'high',
-                'primary_keyword' => 'AI Overviews Impact',
-                'target_word_count' => 720,
-                'seo_score' => 65,
-                'geo_score' => 70,
-                'draft_due_date' => '2026-05-06',
-                'publish_date' => '2026-05-06'
-            ],
-            [
-                'title' => 'Content Gap Analysis Template',
-                'stage' => 'scheduled',
-                'priority' => 'low',
-                'primary_keyword' => 'Content Gap Analysis',
-                'target_word_count' => 480,
-                'seo_score' => 55,
-                'geo_score' => 60,
-                'draft_due_date' => '2026-05-11',
-                'publish_date' => '2026-05-11'
-            ],
-            [
-                'title' => 'SEO Strategy for Service Businesses',
-                'stage' => 'scheduled',
-                'priority' => 'medium',
-                'primary_keyword' => 'SEO Strategy',
-                'target_word_count' => 1100,
-                'seo_score' => 60,
-                'geo_score' => 65,
-                'draft_due_date' => '2026-05-13',
-                'publish_date' => '2026-05-13'
-            ],
-            [
-                'title' => 'Topic Cluster Strategy That Works',
-                'stage' => 'scheduled',
-                'priority' => 'medium',
-                'primary_keyword' => 'Topic Cluster',
-                'target_word_count' => 980,
-                'seo_score' => 70,
-                'geo_score' => 75,
-                'draft_due_date' => '2026-05-15',
-                'publish_date' => '2026-05-15'
-            ],
-            [
-                'title' => 'Local SEO Guide for 2026',
-                'stage' => 'scheduled',
-                'priority' => 'low',
-                'primary_keyword' => 'Local SEO',
-                'target_word_count' => 780,
-                'seo_score' => 50,
-                'geo_score' => 55,
-                'draft_due_date' => '2026-05-23',
-                'publish_date' => '2026-05-23'
-            ]
-        ];
-        foreach($sample_items as $si) {
-            $wpdb->insert($table, array_merge($si, [
-                'industry' => 'real_estate',
-                'writer_id' => $user_id,
-                'created_by' => $user_id,
-                'created_at' => $si['publish_date'] . ' 10:00:00',
-                'updated_at' => current_time('mysql')
-            ]));
+    // Auto-seed sample mockup items if target item is missing (using cached transient check)
+    $seeded_key = 'cora_workspace_seeded_' . $agency_id;
+    if (false === get_transient($seeded_key)) {
+        $mockup_item_exists = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$table} WHERE title = %s", 'AI Search Visibility Best Practices'));
+        if ($mockup_item_exists === 0) {
+            $wpdb->query("TRUNCATE TABLE {$table}");
+            $user_id = get_current_user_id();
+            $sample_items = [
+                [
+                    'title' => 'AI Search Visibility Best Practices',
+                    'stage' => 'idea',
+                    'priority' => 'medium',
+                    'primary_keyword' => 'AI Search Visibility',
+                    'target_word_count' => 1200,
+                    'seo_score' => 0,
+                    'geo_score' => 0,
+                    'draft_due_date' => null,
+                    'publish_date' => '2026-05-01'
+                ],
+                [
+                    'title' => 'Content Optimization Checklist 2026',
+                    'stage' => 'idea',
+                    'priority' => 'medium',
+                    'primary_keyword' => 'Content Optimization',
+                    'target_word_count' => 880,
+                    'seo_score' => 10,
+                    'geo_score' => 20,
+                    'draft_due_date' => null,
+                    'publish_date' => '2026-05-03'
+                ],
+                [
+                    'title' => 'AI Content Brief Template',
+                    'stage' => 'idea',
+                    'priority' => 'high',
+                    'primary_keyword' => 'AI Content Brief',
+                    'target_word_count' => 15,
+                    'seo_score' => 75,
+                    'geo_score' => 81,
+                    'draft_due_date' => null,
+                    'publish_date' => '2026-05-28'
+                ],
+                [
+                    'title' => 'Top 10 SEO Tools for 2026',
+                    'stage' => 'drafting',
+                    'priority' => 'medium',
+                    'primary_keyword' => 'SEO Tools',
+                    'target_word_count' => 950,
+                    'seo_score' => 40,
+                    'geo_score' => 45,
+                    'draft_due_date' => '2026-05-08',
+                    'publish_date' => '2026-05-08'
+                ],
+                [
+                    'title' => 'On-Page SEO Checklist',
+                    'stage' => 'drafting',
+                    'priority' => 'low',
+                    'primary_keyword' => 'On-Page SEO',
+                    'target_word_count' => 600,
+                    'seo_score' => 35,
+                    'geo_score' => 40,
+                    'draft_due_date' => '2026-05-20',
+                    'publish_date' => '2026-05-20'
+                ],
+                [
+                    'title' => 'How AI Overviews Impact SEO',
+                    'stage' => 'review',
+                    'priority' => 'high',
+                    'primary_keyword' => 'AI Overviews Impact',
+                    'target_word_count' => 720,
+                    'seo_score' => 65,
+                    'geo_score' => 70,
+                    'draft_due_date' => '2026-05-06',
+                    'publish_date' => '2026-05-06'
+                ],
+                [
+                    'title' => 'Content Gap Analysis Template',
+                    'stage' => 'scheduled',
+                    'priority' => 'low',
+                    'primary_keyword' => 'Content Gap Analysis',
+                    'target_word_count' => 480,
+                    'seo_score' => 55,
+                    'geo_score' => 60,
+                    'draft_due_date' => '2026-05-11',
+                    'publish_date' => '2026-05-11'
+                ],
+                [
+                    'title' => 'SEO Strategy for Service Businesses',
+                    'stage' => 'scheduled',
+                    'priority' => 'medium',
+                    'primary_keyword' => 'SEO Strategy',
+                    'target_word_count' => 1100,
+                    'seo_score' => 60,
+                    'geo_score' => 65,
+                    'draft_due_date' => '2026-05-13',
+                    'publish_date' => '2026-05-13'
+                ],
+                [
+                    'title' => 'Topic Cluster Strategy That Works',
+                    'stage' => 'scheduled',
+                    'priority' => 'medium',
+                    'primary_keyword' => 'Topic Cluster',
+                    'target_word_count' => 980,
+                    'seo_score' => 70,
+                    'geo_score' => 75,
+                    'draft_due_date' => '2026-05-15',
+                    'publish_date' => '2026-05-15'
+                ],
+                [
+                    'title' => 'Local SEO Guide for 2026',
+                    'stage' => 'scheduled',
+                    'priority' => 'low',
+                    'primary_keyword' => 'Local SEO',
+                    'target_word_count' => 780,
+                    'seo_score' => 50,
+                    'geo_score' => 55,
+                    'draft_due_date' => '2026-05-23',
+                    'publish_date' => '2026-05-23'
+                ]
+            ];
+            foreach($sample_items as $si) {
+                $wpdb->insert($table, array_merge($si, [
+                    'industry' => 'real_estate',
+                    'writer_id' => $user_id,
+                    'created_by' => $user_id,
+                    'created_at' => $si['publish_date'] . ' 10:00:00',
+                    'updated_at' => current_time('mysql')
+                ]));
+            }
         }
+        set_transient($seeded_key, 'yes', 24 * HOUR_IN_SECONDS);
     }
 
     $stage_filter = !empty($_POST['stage_filter']) ? sanitize_text_field($_POST['stage_filter']) : '';
-    $where = "1=1";
-    if($stage_filter) {
-        $where .= $wpdb->prepare(" AND c.stage = %s", $stage_filter);
+
+    $cache_key = 'cora_content_workspace_' . $agency_id . '_' . $stage_filter;
+    $response = get_transient($cache_key);
+
+    if (false === $response) {
+        $where = "1=1";
+        if($stage_filter) {
+            $where .= $wpdb->prepare(" AND c.stage = %s", $stage_filter);
+        }
+        
+        $query = "SELECT c.*, u.display_name as writer_name FROM {$table} c LEFT JOIN {$wpdb->users} u ON c.writer_id = u.ID WHERE $where ORDER BY c.created_at DESC";
+        $items = $wpdb->get_results($query, ARRAY_A) ?: [];
+        
+        $grouped = [];
+        $counts = [];
+        $total = 0;
+        foreach($items as $item) {
+            $st = $item['stage'];
+            if(!isset($grouped[$st])) $grouped[$st] = [];
+            $grouped[$st][] = $item;
+            $counts[$st] = ($counts[$st] ?? 0) + 1;
+            $total++;
+        }
+        $response = ['stages' => $grouped, 'counts' => $counts, 'total' => $total];
+        set_transient($cache_key, $response, 2 * HOUR_IN_SECONDS);
     }
-    
-    $query = "SELECT c.*, u.display_name as writer_name FROM {$table} c LEFT JOIN {$wpdb->users} u ON c.writer_id = u.ID WHERE $where ORDER BY c.created_at DESC";
-    $items = $wpdb->get_results($query, ARRAY_A);
-    
-    $grouped = [];
-    $counts = [];
-    $total = 0;
-    foreach($items as $item) {
-        $st = $item['stage'];
-        if(!isset($grouped[$st])) $grouped[$st] = [];
-        $grouped[$st][] = $item;
-        $counts[$st] = ($counts[$st] ?? 0) + 1;
-        $total++;
-    }
-    wp_send_json_success(['stages' => $grouped, 'counts' => $counts, 'total' => $total]);
+
+    wp_send_json_success($response);
 }
 }
 
@@ -36946,7 +37073,7 @@ function cora_ajax_add_content_comment() {
 // 2g. cora_delete_content_post
 add_action('wp_ajax_cora_delete_content_post', 'cora_ajax_delete_content_post');
 if ( ! function_exists( 'cora_ajax_delete_content_post' ) ) {
-function cora_delete_content_post() {
+function cora_ajax_delete_content_post() {
     if (isset($_POST['nonce']) && !empty($_POST['nonce'])) {
         @wp_verify_nonce($_POST['nonce'], 'cora_ajax_nonce');
     }
@@ -36968,6 +37095,9 @@ function cora_delete_content_post() {
             $deleted_count++;
         }
     }
+
+    $agency_id = cora_db_get_agency_id();
+    cora_invalidate_workspace_cache_all($agency_id);
 
     wp_send_json_success(['deleted' => $deleted_count]);
 }
