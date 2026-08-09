@@ -11806,4 +11806,77 @@ jQuery(document).ready(function($) {
         }
     };
 
+    // 14. Version Update Checker System
+    function checkWorkspaceVersion() {
+        if (typeof coraREWPData === 'undefined' || !coraREWPData.ajaxUrl || !coraREWPData.version) {
+            return;
+        }
+
+        // Delay the version check slightly to let the page load smoothly
+        setTimeout(function() {
+            $.ajax({
+                url: coraREWPData.ajaxUrl,
+                method: 'GET',
+                data: {
+                    action: 'cora_get_server_version'
+                },
+                success: function(response) {
+                    if (response && response.success && response.data && response.data.version) {
+                        var serverVer = response.data.version;
+                        var clientVer = coraREWPData.version;
+                        
+                        // If client version doesn't match the server version, show reload prompt
+                        if (serverVer !== clientVer) {
+                            showMobileVersionUpgradeBanner(serverVer);
+                        }
+                    }
+                }
+            });
+        }, 3000);
+    }
+
+    function showMobileVersionUpgradeBanner(newVersion) {
+        if (document.getElementById('cora-upgrade-banner')) return;
+
+        var banner = document.createElement('div');
+        banner.id = 'cora-upgrade-banner';
+        banner.className = 'fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-zinc-950 text-white dark:bg-zinc-50 dark:text-zinc-950 text-xs px-4 py-3.5 rounded-xl shadow-xl border border-zinc-800 dark:border-zinc-200 z-[999999] flex items-center justify-between gap-3 select-none cursor-pointer';
+        
+        // Add dynamic CSS styling for transition animation on load
+        var style = document.createElement('style');
+        style.innerHTML = `
+            #cora-upgrade-banner {
+                animation: coraSlideInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+            @keyframes coraSlideInUp {
+                from { opacity: 0; transform: translateY(24px) scale(0.95); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        banner.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0" style="display: flex; align-items: center; gap: 10px;">
+                <div class="shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 dark:bg-zinc-200" style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #27272a; flex-shrink: 0;">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" style="color: #ffffff;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                </div>
+                <div class="truncate" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <p class="font-bold leading-none" style="font-weight: 700; margin: 0; line-height: 1.2;">Workspace Updated</p>
+                    <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1" style="font-size: 10px; color: #a1a1aa; margin: 2px 0 0 0;">Tap to reload & apply v${newVersion}</p>
+                </div>
+            </div>
+            <div class="shrink-0 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 dark:bg-zinc-200 px-2 py-1 rounded" style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #27272a; color: #ffffff; padding: 4px 8px; border-radius: 4px; flex-shrink: 0;">Reload</div>
+        `;
+        
+        banner.addEventListener('click', function() {
+            // Force reload ignoring cache
+            window.location.reload(true);
+        });
+
+        document.body.appendChild(banner);
+    }
+
+    // Call the checker on load
+    checkWorkspaceVersion();
+
 

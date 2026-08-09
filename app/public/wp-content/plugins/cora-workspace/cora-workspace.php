@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.72
+ * Version: 3.2.73
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.72' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.73' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -1573,6 +1573,7 @@ function cora_workspace_admin_assets( $hook ) {
         'favicon_url'      => get_option( 'cora_brand_favicon_url', '' ),
         'logo_url'         => get_option( 'cora_brand_logo_url', '' ),
         'sidebar_title'    => get_option( 'cora_sidebar_title', 'cora' ),
+        'version'          => CORA_WORKSPACE_VERSION,
     ) );
 }
 }
@@ -1605,6 +1606,16 @@ function cora_save_module_draft_ajax_handler() {
 }
 }
 add_action( 'wp_ajax_cora_save_module_draft', 'cora_save_module_draft_ajax_handler' );
+
+if ( ! function_exists( 'cora_ajax_get_server_version' ) ) {
+function cora_ajax_get_server_version() {
+    wp_send_json_success( array(
+        'version' => CORA_WORKSPACE_VERSION
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_get_server_version', 'cora_ajax_get_server_version' );
+add_action( 'wp_ajax_nopriv_cora_get_server_version', 'cora_ajax_get_server_version' );
 
 /**
  * Redirect custom studio roles and administrators to our custom dashboard after login
