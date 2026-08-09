@@ -1771,30 +1771,23 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
 /* Overview Metrics Grid & Stats Cards Styling */
 .cora-metrics-grid {
-    display: flex !important;
-    overflow-x: auto !important;
-    gap: 1rem !important;
-    padding-bottom: 0.75rem !important;
-    margin-left: -1rem !important;
-    margin-right: -1rem !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-    scroll-snap-type: x mandatory !important;
-    scrollbar-width: none !important;
-    -webkit-overflow-scrolling: touch !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    overflow-x: visible !important;
 }
-.cora-metrics-grid::-webkit-scrollbar {
-    display: none !important;
+
+.cora-metrics-grid > .cora-stat-card:last-child {
+    grid-column: span 2 / span 2 !important;
 }
 
 @media (min-width: 640px) {
     .cora-metrics-grid {
-        display: grid !important;
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
         gap: 1.25rem !important;
     }
 }
@@ -1803,22 +1796,24 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     .cora-metrics-grid {
         grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
     }
+    .cora-metrics-grid > .cora-stat-card:last-child {
+        grid-column: span 1 / span 1 !important;
+    }
 }
 
 .cora-stat-card {
     background-color: #ffffff !important;
     border: 1px solid rgba(228, 228, 231, 0.9) !important; /* zinc-200 */
     border-radius: 1rem !important; /* rounded-2xl */
-    padding: 1.25rem !important; /* p-5 */
+    padding: 0.85rem !important; /* compact padding on mobile */
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important; /* shadow-2xs */
     transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1) !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    min-height: 148px !important;
-    width: 220px !important;
-    flex-shrink: 0 !important;
-    scroll-snap-align: start !important;
+    min-height: 110px !important; /* compact min-height on mobile */
+    width: auto !important;
+    flex-shrink: 1 !important;
 }
 
 .dark .cora-stat-card {
@@ -1837,8 +1832,9 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
 @media (min-width: 640px) {
     .cora-stat-card {
+        padding: 1.25rem !important;
+        min-height: 148px !important;
         width: auto !important;
-        flex-shrink: 1 !important;
     }
 }
 
