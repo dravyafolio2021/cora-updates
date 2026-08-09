@@ -94,9 +94,9 @@ foreach($cora_posts as $post) {
 $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 ?>
 <!-- Metrics Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+<div class="flex overflow-x-auto gap-4 pb-3 scrollbar-width-none -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-5 snap-x snap-mandatory mb-6">
     <!-- Card 1: Total Articles -->
-    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px]">
+    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px] w-[220px] shrink-0 snap-start sm:w-auto">
         <div class="flex items-center">
             <div class="p-2 bg-indigo-50/80 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -116,14 +116,14 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <div class="w-[3px] bg-indigo-500/80 rounded-full h-[85%]"></div>
                 <div class="w-[3px] bg-indigo-500/65 rounded-full h-[70%]"></div>
                 <div class="w-[3px] bg-indigo-500/90 rounded-full h-[95%]"></div>
-                <div class="w-[3px] bg-indigo-500 rounded-full h-[100%]"></div>
+                <div class="w-[3px] bg-indigo-50 rounded-full h-[100%]"></div>
             </div>
         </div>
         <div class="text-[10px] text-zinc-400 font-medium mt-1">Active library</div>
     </div>
 
     <!-- Card 2: Published -->
-    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px]">
+    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px] w-[220px] shrink-0 snap-start sm:w-auto">
         <div class="flex items-center">
             <div class="p-2 bg-emerald-50/80 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -150,7 +150,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 
     <!-- Card 3: Drafts -->
-    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px]">
+    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px] w-[220px] shrink-0 snap-start sm:w-auto">
         <div class="flex items-center">
             <div class="p-2 bg-amber-50/80 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
@@ -177,7 +177,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 
     <!-- Card 4: Avg SEO Score -->
-    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px]">
+    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px] w-[220px] shrink-0 snap-start sm:w-auto">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
                 <div class="p-2 bg-blue-50/80 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center shrink-0">
@@ -219,7 +219,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 
     <!-- Card 5: Total Leads -->
-    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px]">
+    <div class="cora-stat-card bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[148px] w-[220px] shrink-0 snap-start sm:w-auto">
         <div class="flex items-center">
             <div class="p-2 bg-rose-50/80 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -560,8 +560,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     </button>
                 </div>
 
-                <!-- Table Container -->
-                <div class="overflow-x-auto -mx-6 sm:mx-0">
+                <!-- Desktop Table View -->
+                <div class="hidden md:block overflow-x-auto -mx-6 sm:mx-0">
                     <table class="w-full text-left border-collapse min-w-[650px] text-xs">
                         <thead>
                             <tr class="border-b border-zinc-150 text-[10px] font-bold text-zinc-400 uppercase tracking-wider bg-zinc-50/40">
@@ -579,6 +579,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                             <!-- Rendered Dynamically in JS -->
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Mobile Cards View -->
+                <div id="cora-opportunities-mobile-cards" class="block md:hidden flex flex-col gap-3">
+                    <!-- Rendered Dynamically in JS -->
                 </div>
 
                 <!-- Table Footer / Pagination -->
@@ -1096,7 +1101,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <!-- Top Control Bar -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-zinc-800/80 mb-5 select-none w-full">
         <div class="flex items-center gap-3 flex-1 w-full max-w-2xl relative" id="seo-dropdown-wrapper">
-            <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest shrink-0">Active Article:</span>
+            <span class="hidden sm:inline-block text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest shrink-0">Active Article:</span>
             <div class="relative flex-1 w-full">
                 <button onclick="coraToggleSEODropdown(event)" class="w-full text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors flex items-center justify-between bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer shadow-3xs select-none">
                     <span id="seo-active-article-title-display">Select an article...</span>
@@ -1210,7 +1215,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             <span class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Content attribution model ledger</span>
             <span class="text-[10px] text-zinc-500 font-mono">Last updated: Just now</span>
         </div>
-        <div class="overflow-x-auto">
+        <!-- Desktop Table View -->
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse min-w-[900px]">
                 <thead>
                     <tr class="bg-zinc-50/30 border-b border-zinc-200 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
@@ -1228,6 +1234,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     <!-- Loaded via AJAX -->
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile Cards View -->
+        <div id="cora-performance-mobile-cards" class="block md:hidden flex flex-col gap-3 p-3 bg-zinc-50/60">
+            <!-- Loaded via AJAX -->
         </div>
     </div>
 </div>
@@ -1447,7 +1458,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <!-- SUB-VIEW: Monthly Calendar View -->
     <div id="cal-view-monthly" class="cora-cal-subview grid grid-cols-1 lg:grid-cols-4 gap-6">
         <!-- Monthly Grid (3/4 width) -->
-        <div class="lg:col-span-3 space-y-4">
+        <div class="hidden md:block lg:col-span-3 space-y-4">
             <!-- Calendar Grid Assembly -->
             <div class="border border-zinc-200 rounded-2xl bg-white shadow-2xs overflow-hidden">
                 <!-- Weekday Headers -->
@@ -1474,9 +1485,19 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Draft</span>
             </div>
         </div>
+
+        <!-- Mobile Calendar Agenda List -->
+        <div class="block md:hidden space-y-4">
+            <div class="border border-zinc-200 rounded-2xl bg-white shadow-2xs p-4">
+                <h3 class="text-xs font-bold text-zinc-900 mb-3 uppercase tracking-wider">Month Agenda</h3>
+                <div id="cora-calendar-mobile-agenda" class="divide-y divide-zinc-100 text-xs">
+                    <!-- Populated via Javascript -->
+                </div>
+            </div>
+        </div>
         
         <!-- Right Sidebar: Upcoming (1/4 width) -->
-        <div class="lg:col-span-1">
+        <div class="hidden md:block lg:col-span-1">
             <div class="border border-zinc-200 rounded-2xl bg-white shadow-2xs p-5 space-y-4 flex flex-col justify-between h-full">
                 <div class="space-y-4">
                     <h4 class="text-xs font-extrabold text-zinc-950">Upcoming (Next 7 Days)</h4>
@@ -1504,10 +1525,18 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
     <!-- SUB-VIEW: Kanban Planner View -->
     <div id="cal-view-kanban" class="cora-cal-subview hidden space-y-4">
+        <!-- Mobile Kanban Column Switcher -->
+        <div class="flex md:hidden bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl mb-4 select-none" id="kbc-mobile-switcher">
+            <button onclick="switchMobileKanbanColumn('idea')" id="kbc-tab-idea" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs cursor-pointer">Idea</button>
+            <button onclick="switchMobileKanbanColumn('drafting')" id="kbc-tab-drafting" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-450 cursor-pointer">Drafting</button>
+            <button onclick="switchMobileKanbanColumn('review')" id="kbc-tab-review" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-450 cursor-pointer">Review</button>
+            <button onclick="switchMobileKanbanColumn('scheduled')" id="kbc-tab-scheduled" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-450 cursor-pointer">Scheduled</button>
+        </div>
+
         <!-- Kanban Columns Container -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="cora-kanban-board-container">
             <!-- Idea Column -->
-            <div class="flex flex-col rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 space-y-3.5" data-column="idea">
+            <div class="flex kanban-col flex-col rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 space-y-3.5" data-column="idea">
                 <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
                     <span class="text-xs font-extrabold text-zinc-900 flex items-center gap-1.5 uppercase tracking-wide">
                         <span class="w-2 h-2 rounded-full bg-zinc-400"></span>Idea
@@ -1522,7 +1551,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             </div>
 
             <!-- Drafting Column -->
-            <div class="flex flex-col rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 space-y-3.5" data-column="drafting">
+            <div class="hidden md:flex kanban-col flex-col rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 space-y-3.5" data-column="drafting">
                 <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
                     <span class="text-xs font-extrabold text-zinc-900 flex items-center gap-1.5 uppercase tracking-wide">
                         <span class="w-2 h-2 rounded-full bg-blue-400"></span>Drafting
@@ -1537,7 +1566,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             </div>
 
             <!-- Review Column -->
-            <div class="flex flex-col rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 space-y-3.5" data-column="review">
+            <div class="hidden md:flex kanban-col flex-col rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 space-y-3.5" data-column="review">
                 <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
                     <span class="text-xs font-extrabold text-zinc-900 flex items-center gap-1.5 uppercase tracking-wide">
                         <span class="w-2 h-2 rounded-full bg-violet-400"></span>Review
@@ -1552,7 +1581,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             </div>
 
             <!-- Scheduled Column -->
-            <div class="flex flex-col rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 space-y-3.5" data-column="scheduled">
+            <div class="hidden md:flex kanban-col flex-col rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 space-y-3.5" data-column="scheduled">
                 <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
                     <span class="text-xs font-extrabold text-zinc-900 flex items-center gap-1.5 uppercase tracking-wide">
                         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>Scheduled
@@ -1591,24 +1620,24 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 <div id="panel-ct-brain" class="cora-ct-brain cora-ct-panel hidden space-y-6">
     <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-start min-w-0 overflow-hidden w-full max-w-full">
         <!-- Left: Brain Categories Sidebar -->
-        <div class="w-full md:w-60 shrink-0 bg-white border border-zinc-200 rounded-xl shadow-2xs p-3 space-y-1.5 flex flex-col">
-            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-2 py-1">Brain Categories</span>
-            <button onclick="coraSwitchBrainCategory('cora_brain_service', this)" class="brain-cat-btn w-full text-left px-3 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer bg-zinc-900 text-white shadow-2xs">
+        <div class="w-full md:w-60 shrink-0 bg-white border border-zinc-200 rounded-xl shadow-2xs p-3 flex flex-row md:flex-col gap-1.5 overflow-x-auto scrollbar-width-none">
+            <span class="hidden md:block text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-2 py-1">Brain Categories</span>
+            <button onclick="coraSwitchBrainCategory('cora_brain_service', this)" class="brain-cat-btn whitespace-nowrap shrink-0 w-auto md:w-full text-left px-3 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer bg-zinc-900 text-white shadow-2xs">
                 Services & service areas
             </button>
-            <button onclick="coraSwitchBrainCategory('cora_brain_location', this)" class="brain-cat-btn w-full text-left px-3 py-2 text-xs font-semibold rounded-lg border border-transparent transition-all cursor-pointer text-zinc-600 hover:bg-zinc-50">
+            <button onclick="coraSwitchBrainCategory('cora_brain_location', this)" class="brain-cat-btn whitespace-nowrap shrink-0 w-auto md:w-full text-left px-3 py-2 text-xs font-semibold rounded-lg border border-transparent transition-all cursor-pointer text-zinc-650 hover:bg-zinc-55 hover:text-zinc-900">
                 Locations & hours
             </button>
-            <button onclick="coraSwitchBrainCategory('cora_brain_proof', this)" class="brain-cat-btn w-full text-left px-3 py-2 text-xs font-semibold rounded-lg border border-transparent transition-all cursor-pointer text-zinc-600 hover:bg-zinc-50">
+            <button onclick="coraSwitchBrainCategory('cora_brain_proof', this)" class="brain-cat-btn whitespace-nowrap shrink-0 w-auto md:w-full text-left px-3 py-2 text-xs font-semibold rounded-lg border border-transparent transition-all cursor-pointer text-zinc-650 hover:bg-zinc-55 hover:text-zinc-900">
                 Approved case studies & proof
             </button>
-            <button onclick="coraSwitchBrainCategory('cora_brain_voice', this)" class="brain-cat-btn w-full text-left px-3 py-2 text-xs font-semibold rounded-lg border border-transparent transition-all cursor-pointer text-zinc-600 hover:bg-zinc-50">
+            <button onclick="coraSwitchBrainCategory('cora_brain_voice', this)" class="brain-cat-btn whitespace-nowrap shrink-0 w-auto md:w-full text-left px-3 py-2 text-xs font-semibold rounded-lg border border-transparent transition-all cursor-pointer text-zinc-650 hover:bg-zinc-55 hover:text-zinc-900">
                 Brand voice & style
             </button>
-            <button onclick="coraSwitchBrainCategory('cora_brain_restriction', this)" class="brain-cat-btn w-full text-left px-3 py-2 text-xs font-semibold rounded-lg border border-transparent transition-all cursor-pointer text-zinc-600 hover:bg-zinc-50">
+            <button onclick="coraSwitchBrainCategory('cora_brain_restriction', this)" class="brain-cat-btn whitespace-nowrap shrink-0 w-auto md:w-full text-left px-3 py-2 text-xs font-semibold rounded-lg border border-transparent transition-all cursor-pointer text-zinc-650 hover:bg-zinc-55 hover:text-zinc-900">
                 Rules & restricted claims
             </button>
-            <button onclick="coraSwitchBrainCategory('cora_brain_faq', this)" class="brain-cat-btn w-full text-left px-3 py-2 text-xs font-semibold rounded-lg border border-transparent transition-all cursor-pointer text-zinc-600 hover:bg-zinc-50">
+            <button onclick="coraSwitchBrainCategory('cora_brain_faq', this)" class="brain-cat-btn whitespace-nowrap shrink-0 w-auto md:w-full text-left px-3 py-2 text-xs font-semibold rounded-lg border border-transparent transition-all cursor-pointer text-zinc-650 hover:bg-zinc-55 hover:text-zinc-900">
                 Sales & support FAQs
             </button>
         </div>
@@ -1625,8 +1654,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 </button>
             </div>
 
-            <!-- Notion Style Data Table -->
-            <div class="overflow-x-auto">
+            <!-- Notion Style Data Table (Desktop View) -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left border-collapse" id="cora-brain-items-table">
                     <thead>
                         <tr class="border-b border-zinc-200 bg-zinc-50/50 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
@@ -1639,6 +1668,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         <!-- Loaded dynamically via AJAX -->
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Cards View -->
+            <div id="cora-brain-items-mobile-cards" class="block md:hidden flex flex-col divide-y divide-zinc-100 p-3 bg-zinc-50/25 gap-3">
+                <!-- Loaded dynamically via AJAX -->
             </div>
         </div>
     </div>
@@ -1735,6 +1769,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 /* Backdrop always on top */
 #cora-drawer-backdrop {
     z-index: 99998 !important;
+}
+@media (min-width: 768px) {
+    .kanban-col {
+        display: flex !important;
+    }
 }
 </style>
 
@@ -4225,9 +4264,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     window.coraFetchBrainItems = function() {
         const $ = window.jQuery;
         const tbody = document.getElementById('cora-brain-items-table-body');
+        const mobileContainer = document.getElementById('cora-brain-items-mobile-cards');
         if (!tbody || !$) return;
 
         tbody.innerHTML = '<tr><td colspan="3" class="px-5 py-8 text-center text-zinc-400">Loading resources...</td></tr>';
+        if (mobileContainer) {
+            mobileContainer.innerHTML = '<div class="py-8 text-center text-zinc-400 text-xs">Loading resources...</div>';
+        }
 
         $.post(window.coraREWPData.ajaxUrl, {
             action: 'cora_fetch_brain_items',
@@ -4238,8 +4281,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 const items = response.data.filter(item => item.source_type === window.coraActiveBrainCategory);
                 if (items.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="3" class="px-5 py-12 text-center text-zinc-400 font-medium">No resources found in this category. Add your first resource by clicking "+ Add Resource" above.</td></tr>';
+                    if (mobileContainer) {
+                        mobileContainer.innerHTML = '<div class="py-12 text-center text-zinc-400 font-medium text-xs">No resources found in this category. Add your first resource by clicking "+ Add Resource" above.</div>';
+                    }
                     return;
                 }
+                
                 tbody.innerHTML = items.map(item => `
                     <tr class="hover:bg-zinc-50/50 transition-colors">
                         <td class="px-5 py-3.5 font-bold text-zinc-900 min-w-[200px]">${item.title}</td>
@@ -4252,8 +4299,26 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         </td>
                     </tr>
                 `).join('');
+
+                if (mobileContainer) {
+                    mobileContainer.innerHTML = items.map(item => `
+                        <div class="p-4 bg-white border border-zinc-200 rounded-xl shadow-2xs flex flex-col gap-3">
+                            <div class="flex items-center justify-between gap-3">
+                                <h4 class="font-bold text-zinc-900 text-xs leading-snug">${item.title}</h4>
+                            </div>
+                            <p class="text-[11px] text-zinc-650 leading-relaxed whitespace-pre-wrap break-words border-t border-b border-zinc-100 py-2.5 my-1.5">${item.content}</p>
+                            <div class="flex items-center justify-end gap-2.5">
+                                <button onclick="coraOpenBrainResourceDrawer(${item.id}, '${item.title.replace(/'/g, "\\'")}', '${item.source_type}', '${item.content.replace(/\r?\n/g, '\\n').replace(/'/g, "\\'")}')" class="px-3.5 py-1.5 border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-semibold rounded-lg shadow-3xs cursor-pointer">Edit</button>
+                                <button onclick="coraDeleteBrainResource(${item.id})" class="px-3.5 py-1.5 border border-transparent hover:border-red-200 text-zinc-455 hover:text-red-650 hover:bg-red-50/20 text-xs font-semibold rounded-lg cursor-pointer">Delete</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
             } else {
                 tbody.innerHTML = '<tr><td colspan="3" class="px-5 py-8 text-center text-zinc-400 font-medium">Failed to load resources.</td></tr>';
+                if (mobileContainer) {
+                    mobileContainer.innerHTML = '<div class="py-8 text-center text-zinc-400 font-medium text-xs">Failed to load resources.</div>';
+                }
             }
         });
     };
@@ -4399,89 +4464,171 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             pagText.textContent = totalOpps > 0 ? `Showing ${startIdx + 1} to ${endIdx} of ${totalOpps} opportunities` : 'Showing 0 to 0 of 0 opportunities';
         }
 
+        const mobileContainer = document.getElementById('cora-opportunities-mobile-cards');
+
         if (totalOpps === 0) {
-            body.innerHTML = `
-                <tr>
-                    <td colspan="8" class="py-16 text-center text-zinc-400 font-medium">
+            if (body) {
+                body.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="py-16 text-center text-zinc-400 font-medium">
+                            No opportunities match the active filters. Click "Find New Opportunities" below to scan.
+                        </td>
+                    </tr>
+                `;
+            }
+            if (mobileContainer) {
+                mobileContainer.innerHTML = `
+                    <div class="py-12 text-center text-zinc-400 font-medium text-xs">
                         No opportunities match the active filters. Click "Find New Opportunities" below to scan.
-                    </td>
-                </tr>
-            `;
+                    </div>
+                `;
+            }
             if (pagControls) pagControls.innerHTML = '';
             coraUpdateFunnelStats([]);
             return;
         }
 
-        body.innerHTML = pageItems.map(item => {
-            // Deterministic volume & traffic
-            const vol = Math.round((item.priority_score * 12.5) / 10) * 10;
-            const traffic = Math.round((vol * (item.business_value === 'high' ? 2.0 : (item.business_value === 'medium' ? 1.5 : 1.2))) / 10) * 10;
-            
-            const volStr = vol >= 1000 ? (vol / 1000).toFixed(1) + 'K' : vol;
-            const trafficStr = traffic >= 1000 ? (traffic / 1000).toFixed(1) + 'K' : traffic;
+        if (body) {
+            body.innerHTML = pageItems.map(item => {
+                // Deterministic volume & traffic
+                const vol = Math.round((item.priority_score * 12.5) / 10) * 10;
+                const traffic = Math.round((vol * (item.business_value === 'high' ? 2.0 : (item.business_value === 'medium' ? 1.5 : 1.2))) / 10) * 10;
+                
+                const volStr = vol >= 1000 ? (vol / 1000).toFixed(1) + 'K' : vol;
+                const trafficStr = traffic >= 1000 ? (traffic / 1000).toFixed(1) + 'K' : traffic;
 
-            // Impact pill classes
-            const impact = (item.priority_score >= 80) ? 'High' : ((item.priority_score >= 65) ? 'Medium' : 'Low');
-            const impactClass = impact === 'High' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50' : (impact === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200/50' : 'bg-zinc-50 text-zinc-600 border-zinc-200/50');
+                // Impact pill classes
+                const impact = (item.priority_score >= 80) ? 'High' : ((item.priority_score >= 65) ? 'Medium' : 'Low');
+                const impactClass = impact === 'High' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50' : (impact === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200/50' : 'bg-zinc-50 text-zinc-600 border-zinc-200/50');
 
-            // Status & Action mapping
-            let statusLabel = 'Ready to Create';
-            let statusDot = 'bg-emerald-500';
-            let btnText = 'Create';
-            let btnOnClick = `coraCreateBriefFromOpportunity(${item.id})`;
+                // Status & Action mapping
+                let statusLabel = 'Ready to Create';
+                let statusDot = 'bg-emerald-500';
+                let btnText = 'Create';
+                let btnOnClick = `coraCreateBriefFromOpportunity(${item.id})`;
 
-            if (item.status === 'created') {
-                statusLabel = 'In Progress';
-                statusDot = 'bg-blue-500';
-                btnText = 'Continue';
-                btnOnClick = `switchContentTab('ct-library')`;
-            } else if (item.status === 'draft') {
-                statusLabel = 'Draft';
-                statusDot = 'bg-amber-500';
-                btnText = 'Continue';
-                btnOnClick = `switchContentTab('ct-library')`;
-            } else if (item.status === 'published') {
-                statusLabel = 'Published';
-                statusDot = 'bg-zinc-500';
-                btnText = 'View';
-                btnOnClick = `switchContentTab('ct-library')`;
-            }
+                if (item.status === 'created') {
+                    statusLabel = 'In Progress';
+                    statusDot = 'bg-blue-500';
+                    btnText = 'Continue';
+                    btnOnClick = `switchContentTab('ct-library')`;
+                } else if (item.status === 'draft') {
+                    statusLabel = 'Draft';
+                    statusDot = 'bg-amber-500';
+                    btnText = 'Continue';
+                    btnOnClick = `switchContentTab('ct-library')`;
+                } else if (item.status === 'published') {
+                    statusLabel = 'Published';
+                    statusDot = 'bg-zinc-500';
+                    btnText = 'View';
+                    btnOnClick = `switchContentTab('ct-library')`;
+                }
 
-            const intentFormatted = item.intent.charAt(0).toUpperCase() + item.intent.slice(1);
+                const intentFormatted = item.intent.charAt(0).toUpperCase() + item.intent.slice(1);
 
-            return `
-                <tr class="hover:bg-zinc-50/40 transition-colors border-b border-zinc-100">
-                    <td class="py-3 px-4 text-center"><input type="checkbox" class="rounded border-zinc-300 accent-zinc-900 cursor-pointer"></td>
-                    <td class="py-3 px-4">
-                        <div class="font-bold text-zinc-900 leading-snug">${item.title}</div>
-                        <div class="mt-1 flex items-center gap-1.5">
-                           <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-650 rounded-md text-[9px] font-bold uppercase tracking-wider">${intentFormatted}</span>
+                return `
+                    <tr class="hover:bg-zinc-50/40 transition-colors border-b border-zinc-100">
+                        <td class="py-3 px-4 text-center"><input type="checkbox" class="rounded border-zinc-300 accent-zinc-900 cursor-pointer"></td>
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-zinc-900 leading-snug">${item.title}</div>
+                            <div class="mt-1 flex items-center gap-1.5">
+                               <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-650 rounded-md text-[9px] font-bold uppercase tracking-wider">${intentFormatted}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-center font-bold text-zinc-800">${volStr}</td>
+                        <td class="py-3 px-4 text-center font-bold text-zinc-800">${trafficStr}</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${impactClass}">${impact}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-1.5 font-bold text-zinc-800">
+                                <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                                ${statusLabel}
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="${btnOnClick}" class="px-3 py-1 bg-white hover:bg-zinc-50 border border-zinc-250 hover:border-zinc-900 text-zinc-800 font-bold rounded-lg transition-colors cursor-pointer active:scale-95 shadow-3xs">
+                                ${btnText}
+                            </button>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <button class="text-zinc-450 hover:text-zinc-800">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        if (mobileContainer) {
+            mobileContainer.innerHTML = pageItems.map(item => {
+                const vol = Math.round((item.priority_score * 12.5) / 10) * 10;
+                const traffic = Math.round((vol * (item.business_value === 'high' ? 2.0 : (item.business_value === 'medium' ? 1.5 : 1.2))) / 10) * 10;
+                
+                const volStr = vol >= 1000 ? (vol / 1000).toFixed(1) + 'K' : vol;
+                const trafficStr = traffic >= 1000 ? (traffic / 1000).toFixed(1) + 'K' : traffic;
+
+                const impact = (item.priority_score >= 80) ? 'High' : ((item.priority_score >= 65) ? 'Medium' : 'Low');
+                const impactClass = impact === 'High' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50' : (impact === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200/50' : 'bg-zinc-50 text-zinc-600 border-zinc-200/50');
+
+                let statusLabel = 'Ready to Create';
+                let statusDot = 'bg-emerald-500';
+                let btnText = 'Create';
+                let btnOnClick = `coraCreateBriefFromOpportunity(${item.id})`;
+
+                if (item.status === 'created' || item.status === 'draft') {
+                    statusLabel = 'In Progress';
+                    statusDot = 'bg-blue-500';
+                    btnText = 'Continue';
+                    btnOnClick = `switchContentTab('ct-library')`;
+                } else if (item.status === 'published') {
+                    statusLabel = 'Published';
+                    statusDot = 'bg-zinc-500';
+                    btnText = 'View';
+                    btnOnClick = `switchContentTab('ct-library')`;
+                }
+
+                const intentFormatted = item.intent.charAt(0).toUpperCase() + item.intent.slice(1);
+
+                return `
+                    <div class="p-4 bg-white border border-zinc-200/90 rounded-xl shadow-2xs flex flex-col gap-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-zinc-900 text-xs leading-snug">${item.title}</h4>
+                                <span class="inline-block mt-1 px-1.5 py-0.5 bg-zinc-100 text-zinc-655 rounded-md text-[9px] font-bold uppercase tracking-wider">${intentFormatted}</span>
+                            </div>
+                            <div class="shrink-0 flex items-center gap-1.5 font-bold text-zinc-800 text-[10px]">
+                                <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                                <span>${statusLabel}</span>
+                            </div>
                         </div>
-                    </td>
-                    <td class="py-3 px-4 text-center font-bold text-zinc-800">${volStr}</td>
-                    <td class="py-3 px-4 text-center font-bold text-zinc-800">${trafficStr}</td>
-                    <td class="py-3 px-4 text-center">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${impactClass}">${impact}</span>
-                    </td>
-                    <td class="py-3 px-4">
-                        <div class="flex items-center gap-1.5 font-bold text-zinc-800">
-                            <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
-                            ${statusLabel}
+                        
+                        <div class="grid grid-cols-3 gap-2.5 py-2 border-t border-b border-zinc-100/80 text-[11px]">
+                            <div>
+                                <span class="text-zinc-400 block text-[9px] font-bold uppercase tracking-wider mb-0.5">Vol</span>
+                                <span class="font-extrabold text-zinc-800">${volStr}</span>
+                            </div>
+                            <div>
+                                <span class="text-zinc-400 block text-[9px] font-bold uppercase tracking-wider mb-0.5">Traffic</span>
+                                <span class="font-extrabold text-zinc-800">${trafficStr}</span>
+                            </div>
+                            <div>
+                                <span class="text-zinc-400 block text-[9px] font-bold uppercase tracking-wider mb-0.5">Impact</span>
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold border ${impactClass} inline-block mt-0.5">${impact}</span>
+                            </div>
                         </div>
-                    </td>
-                    <td class="py-3 px-4 text-center">
-                        <button onclick="${btnOnClick}" class="px-3 py-1 bg-white hover:bg-zinc-50 border border-zinc-250 hover:border-zinc-900 text-zinc-800 font-bold rounded-lg transition-colors cursor-pointer active:scale-95 shadow-3xs">
-                            ${btnText}
-                        </button>
-                    </td>
-                    <td class="py-3 px-4 text-center">
-                        <button class="text-zinc-450 hover:text-zinc-800">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] text-zinc-400 font-semibold">Priority #${item.priority_score}</span>
+                            <button onclick="${btnOnClick}" class="px-3.5 py-1.5 bg-white hover:bg-zinc-50 border border-zinc-250 hover:border-zinc-900 text-zinc-800 font-bold rounded-lg transition-colors cursor-pointer active:scale-95 shadow-3xs text-xs">
+                                ${btnText}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
 
         // Render Pagination controls
         if (pagControls) {
@@ -4736,6 +4883,56 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
             grid.innerHTML = gridCells;
 
+            // Render Mobile Calendar Agenda List
+            const activeMonthItems = contentItems.filter(item => {
+                const idate = item.publish_date || item.draft_due_date || item.created_at;
+                if (!idate) return false;
+                const itemDate = new Date(idate);
+                return itemDate.getFullYear() === year && itemDate.getMonth() === month;
+            });
+
+            activeMonthItems.sort((a, b) => {
+                const dateA = new Date(a.publish_date || a.draft_due_date || a.created_at);
+                const dateB = new Date(b.publish_date || b.draft_due_date || b.created_at);
+                return dateA - dateB;
+            });
+
+            let mobileAgendaHtml = '';
+            if (activeMonthItems.length === 0) {
+                mobileAgendaHtml = '<div class="py-8 text-center text-zinc-400">No scheduled content for this month</div>';
+            } else {
+                activeMonthItems.forEach(item => {
+                    let dotColor = 'bg-zinc-400';
+                    let stageLabel = item.stage || 'Draft';
+                    if (item.stage === 'published') { dotColor = 'bg-emerald-500'; stageLabel = 'Published'; }
+                    else if (item.stage === 'drafting') { dotColor = 'bg-blue-500'; stageLabel = 'Drafting'; }
+                    else if (item.stage === 'review') { dotColor = 'bg-amber-500'; stageLabel = 'Review'; }
+                    else if (item.stage === 'scheduled') { dotColor = 'bg-zinc-500'; stageLabel = 'Scheduled'; }
+
+                    const idate = item.publish_date || item.draft_due_date || item.created_at;
+                    const formattedDate = new Date(idate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                    mobileAgendaHtml += `
+                        <div onclick="coraEditArticle(${item.post_id || item.id}, '${item.title.replace(/'/g, "\\'")}')" class="py-3 flex items-center justify-between gap-3 cursor-pointer hover:bg-zinc-50/50 transition-colors">
+                            <div class="min-w-0 flex-1">
+                                <div class="font-bold text-zinc-900 truncate leading-snug">${item.title}</div>
+                                <div class="flex items-center gap-1.5 text-[10px] text-zinc-450 mt-1">
+                                    <span class="w-1.5 h-1.5 rounded-full ${dotColor}"></span>
+                                    <span class="capitalize">${stageLabel}</span>
+                                    <span>&bull;</span>
+                                    <span>${formattedDate}</span>
+                                </div>
+                            </div>
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                    `;
+                });
+            }
+            const mobileAgendaContainer = document.getElementById('cora-calendar-mobile-agenda');
+            if (mobileAgendaContainer) {
+                mobileAgendaContainer.innerHTML = mobileAgendaHtml;
+            }
+
             // 2. Render Upcoming Next 7 Days Sidebar
             coraRenderUpcomingList(contentItems);
 
@@ -4923,6 +5120,31 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         initKanbanDragAndDrop();
     };
 
+    window.switchMobileKanbanColumn = function(col) {
+        document.querySelectorAll('.kanban-col').forEach(el => {
+            if (el.dataset.column === col) {
+                el.classList.remove('hidden');
+                el.classList.add('flex');
+            } else {
+                el.classList.remove('flex');
+                el.classList.add('hidden');
+            }
+        });
+        const cols = ['idea', 'drafting', 'review', 'scheduled'];
+        cols.forEach(c => {
+            const btn = document.getElementById('kbc-tab-' + c);
+            if (btn) {
+                if (c === col) {
+                    btn.classList.add('bg-white', 'text-zinc-900', 'shadow-2xs', 'dark:bg-zinc-800', 'dark:text-zinc-100');
+                    btn.classList.remove('text-zinc-650', 'text-zinc-600', 'dark:text-zinc-450');
+                } else {
+                    btn.classList.remove('bg-white', 'text-zinc-900', 'shadow-2xs', 'dark:bg-zinc-800', 'dark:text-zinc-100');
+                    btn.classList.add('text-zinc-600', 'dark:text-zinc-450');
+                }
+            }
+        });
+    };
+
     window.initKanbanDragAndDrop = function() {
         const cards = document.querySelectorAll('.kanban-card-draggable');
         const zones = document.querySelectorAll('.kanban-cards-dropzone');
@@ -4983,8 +5205,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const $ = window.jQuery;
         if (!$) return;
         const tbody = document.getElementById('cora-performance-table-body');
+        const mobileContainer = document.getElementById('cora-performance-mobile-cards');
         if (tbody) {
             tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-zinc-400">Loading performance metrics...</td></tr>';
+        }
+        if (mobileContainer) {
+            mobileContainer.innerHTML = '<div class="py-8 text-center text-zinc-400 text-xs">Loading performance metrics...</div>';
         }
 
         $.post(window.coraREWPData.ajaxUrl, {
@@ -5024,16 +5250,21 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     window.renderContentPerformanceSparkline(data.totals.clicks, data.totals.impressions);
                 }
 
-                if (tbody) {
-                    if (data.items.length === 0) {
+                if (data.items.length === 0) {
+                    if (tbody) {
                         tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-zinc-450">No published articles yet. Publish draft items to start tracking conversion attribution.</td></tr>';
-                        return;
                     }
+                    if (mobileContainer) {
+                        mobileContainer.innerHTML = '<div class="p-6 text-center text-zinc-450 text-xs">No published articles yet. Publish draft items to start tracking conversion attribution.</div>';
+                    }
+                    return;
+                }
 
+                if (tbody) {
                     tbody.innerHTML = data.items.map(item => `
                         <tr class="hover:bg-zinc-50/50 transition-colors">
                             <td class="py-3 px-4 font-bold text-zinc-900 max-w-[280px] truncate cursor-pointer hover:text-zinc-700" onclick="coraEditArticle(${item.post_id})">${item.title}</td>
-                            <td class="py-3 px-4 font-semibold text-zinc-650">${item.keyword}</td>
+                            <td class="py-3 px-4 font-semibold text-zinc-655">${item.keyword}</td>
                             <td class="py-3 px-4 text-center font-mono">${item.impressions.toLocaleString()}</td>
                             <td class="py-3 px-4 text-center font-mono">${item.clicks.toLocaleString()}</td>
                             <td class="py-3 px-4 text-center font-mono">${item.ctr}%</td>
@@ -5043,9 +5274,45 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         </tr>
                     `).join('');
                 }
+
+                if (mobileContainer) {
+                    mobileContainer.innerHTML = data.items.map(item => `
+                        <div class="p-4 bg-white border border-zinc-200/90 rounded-xl shadow-2xs flex flex-col gap-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <h4 class="font-bold text-zinc-900 text-xs leading-snug cursor-pointer hover:text-zinc-700" onclick="coraEditArticle(${item.post_id})">${item.title}</h4>
+                            </div>
+                            <div class="text-[10px] text-zinc-400 font-medium">Keyword: <span class="text-zinc-700 font-semibold">${item.keyword}</span></div>
+                            
+                            <div class="grid grid-cols-3 gap-2 py-2 border-t border-b border-zinc-100/80 text-[10px] font-medium text-zinc-500">
+                                <div>
+                                    <span class="block text-[8px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Imp.</span>
+                                    <span class="font-bold text-zinc-800 font-mono">${item.impressions.toLocaleString()}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[8px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Clicks</span>
+                                    <span class="font-bold text-zinc-800 font-mono">${item.clicks.toLocaleString()} (${item.ctr}%)</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[8px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">WA Clicks</span>
+                                    <span class="font-bold text-zinc-800 font-mono">${item.wa_clicks}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between text-[11px] pt-1 font-semibold">
+                                <span class="text-zinc-550 flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-900"></span>Leads: <strong class="text-zinc-900">${item.leads}</strong>
+                                </span>
+                                <span class="text-zinc-900 font-extrabold font-mono">₹${item.revenue.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
             } else {
                 if (tbody) {
                     tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-zinc-400">Failed to load performance report.</td></tr>';
+                }
+                if (mobileContainer) {
+                    mobileContainer.innerHTML = '<div class="py-8 text-center text-zinc-400 text-xs">Failed to load performance report.</div>';
                 }
             }
         });
