@@ -18,7 +18,7 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
     await login(page);
 
     // 1. Navigate to Content & Blogs
-    await page.goto('/workspace/blogs');
+    await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
     await expect(page.locator('.cora-page-title')).toContainText('AI Content Suite');
 
@@ -100,7 +100,7 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
 
   test('Should simulate submitting a blog lead form and verify lead attribution drawer displays it', async ({ page }) => {
     await login(page);
-    await page.goto('/workspace/blogs');
+    await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
 
     // Dynamically retrieve the first published post's ID from its onclick attribute
@@ -132,7 +132,7 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
     expect((ajaxResult as any).success).toBe(true);
 
     // Reload blogs page to fetch fresh lead counts
-    await page.goto('/workspace/blogs');
+    await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
 
     // Verify leads count button is visible on that same published row
@@ -156,7 +156,7 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
 
   test('Should execute collaborative review cycle: assign, submit review, reject with feedback, approve, publish, and verify leaderboard attribution', async ({ page }) => {
     await login(page);
-    await page.goto('/workspace/blogs');
+    await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
 
     // 1. Trigger One-Click Write from Keyword Explorer
