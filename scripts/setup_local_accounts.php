@@ -83,8 +83,12 @@ foreach ($accounts as $acc) {
         echo "Created WP User: {$acc['username']} (ID: {$user_id})\n";
     } else {
         $user_id = $user->ID;
-        wp_set_password($acc['password'], $user_id);
-        echo "Reset password for WP User: {$acc['username']} (ID: {$user_id})\n";
+        if ( ! wp_check_password( $acc['password'], $user->data->user_pass, $user_id ) ) {
+            wp_set_password($acc['password'], $user_id);
+            echo "Reset password for WP User: {$acc['username']} (ID: {$user_id})\n";
+        } else {
+            echo "Password already correct for WP User: {$acc['username']} (ID: {$user_id})\n";
+        }
     }
     
     // Set display name and WP role

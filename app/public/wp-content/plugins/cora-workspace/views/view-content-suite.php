@@ -1901,6 +1901,29 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 </aside>
 
+<?php
+// ─── Floating AI Agent (Reusable Partial) ───────────────────────────
+$cora_agent_config = array(
+    'page_context'  => 'content_suite',
+    'ajax_action'   => 'cora_ajax_content_suite_agent',
+    'placeholder'   => 'Ask anything or search articles, keywords, opportunities...',
+    'pill_text'     => 'Search articles, keywords, opportunities...',
+    'quick_actions' => array(
+        array( 'id' => 'new-article',      'label' => 'New Article',       'icon' => 'edit' ),
+        array( 'id' => 'content-brief',    'label' => 'AI Content Brief',  'icon' => 'file' ),
+        array( 'id' => 'keyword-research', 'label' => 'Keyword Research',  'icon' => 'search' ),
+        array( 'id' => 'optimizer',        'label' => 'Optimizer',         'icon' => 'sliders' ),
+    ),
+    'suggestions' => array(
+        array( 'text' => 'Run index check',           'icon' => 'activity' ),
+        array( 'text' => 'Optimize meta descriptors', 'icon' => 'folder' ),
+        array( 'text' => 'Suggest question headings', 'icon' => 'file-plus' ),
+        array( 'text' => 'Audit organic search rank', 'icon' => 'search' ),
+    ),
+);
+include CORA_WORKSPACE_PATH . 'views/partials/floating-agent.php';
+?>
+
 <?php include CORA_WORKSPACE_PATH . 'views/partials/content-brief-drawer.php'; ?>
 
 <?php
@@ -5552,6 +5575,8 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         URL.revokeObjectURL(url);
         if(window.coraShowToast) window.coraShowToast('CSV exported successfully', 'success');
     };
+
+    // (Floating AI Agent JS engine has been extracted to views/partials/floating-agent.php)
 
     // Open Content Tutorial Walkthrough
     window.coraOpenContentTutorial = function() {
