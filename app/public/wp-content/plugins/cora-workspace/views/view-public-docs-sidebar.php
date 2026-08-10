@@ -449,7 +449,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div class="text-[11px] leading-relaxed text-zinc-500 ">
                 Need help building with Cora? Ask Cora AI for instant answers from our documentation.
             </div>
-            <button onclick="coraPublicShowSection('cora-ai')" class="w-full text-center py-1.5 px-2 bg-zinc-950 hover:bg-zinc-900 text-white font-bold rounded-lg transition-colors text-[11px] cursor-pointer select-none border border-zinc-900 ">
+            <button onclick="window.coraToggleAiSidebar(true)" class="w-full text-center py-1.5 px-2 bg-zinc-950 hover:bg-zinc-900 text-white font-bold rounded-lg transition-colors text-[11px] cursor-pointer select-none border border-zinc-900 ">
                 Ask Cora AI
             </button>
         </div>

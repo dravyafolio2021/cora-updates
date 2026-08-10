@@ -58,10 +58,10 @@ $ajax_url     = admin_url( 'admin-ajax.php' );
     </div>
 
     <!-- 2. Ask Cora AI Chatbot Card -->
-    <div class="border border-zinc-200/80 bg-white rounded-xl p-4 shadow-sm flex flex-col space-y-3.5">
+    <div onclick="window.coraToggleAiSidebar(true)" class="border border-zinc-200/80 bg-white hover:border-zinc-300 rounded-xl p-4 shadow-sm flex flex-col space-y-3.5 cursor-pointer hover:shadow-md transition-all group">
         <div class="flex items-center justify-between pb-2 border-b border-zinc-100 ">
             <div class="flex items-center gap-2">
-                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-850 ">
+                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-850 group-hover:bg-zinc-950 group-hover:text-white transition-colors">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
                 </span>
                 <span class="text-xs font-bold text-zinc-850 ">Ask Cora AI</span>
@@ -74,7 +74,7 @@ $ajax_url     = admin_url( 'admin-ajax.php' );
         </div>
 
         <!-- Chat messages body container -->
-        <div id="cora-chat-messages" class="max-h-48 overflow-y-auto space-y-3 pr-1 text-xs flex flex-col scrollbar-thin scrollbar-thumb-zinc-200">
+        <div id="cora-widget-chat-messages" class="max-h-48 overflow-y-auto space-y-3 pr-1 text-xs flex flex-col scrollbar-thin scrollbar-thumb-zinc-200 pointer-events-none">
             <div class="p-2.5 rounded-lg text-xs bg-zinc-100 text-zinc-800 self-start max-w-[88%] leading-relaxed">
                 Hi! Ask me anything about the Cora Platform features, CRM, CGST/SGST ledger, e-signing, or documentation configuration.
             </div>
@@ -82,8 +82,8 @@ $ajax_url     = admin_url( 'admin-ajax.php' );
 
         <!-- Inline input block -->
         <div class="relative flex items-center shrink-0">
-            <input type="text" id="cora-chat-input" onkeydown="handleCoraChatKeyDown(event)" class="w-full border border-zinc-200 rounded-lg pl-3 pr-8 py-2 text-xs bg-zinc-50 focus:border-zinc-400 outline-none text-zinc-900 transition-all font-sans" placeholder="Ask anything about Cora...">
-            <button onclick="submitCoraChatQuery()" id="cora-chat-send-btn" class="absolute right-2.5 text-zinc-400 hover:text-zinc-900 transition-colors p-1 cursor-pointer" title="Send Question">
+            <input type="text" id="cora-widget-chat-input" readonly class="w-full border border-zinc-200 rounded-lg pl-3 pr-8 py-2 text-xs bg-zinc-50 outline-none text-zinc-900 transition-all font-sans cursor-pointer" placeholder="Ask anything about Cora...">
+            <button type="button" class="absolute right-2.5 text-zinc-400 group-hover:text-zinc-900 transition-colors p-1 cursor-pointer bg-transparent border-none" title="Send Question">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </button>
         </div>

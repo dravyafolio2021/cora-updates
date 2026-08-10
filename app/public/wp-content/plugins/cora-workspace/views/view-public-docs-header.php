@@ -40,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <!-- Right Section: Actions & User Avatar -->
         <div class="flex items-center gap-4">
             <!-- Ask Cora AI Button -->
-            <button onclick="coraPublicShowSection('cora-ai')" class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer select-none border border-zinc-900 ">
+            <button onclick="window.coraToggleAiSidebar(true)" class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer select-none border border-zinc-900 ">
                 <!-- Sparkles SVG icon -->
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-white ">
                     <path d="M9.81 2.863a.5.5 0 0 0-.955 0L7.335 6.757 3.441 8.277a.5.5 0 0 0 0 .955l3.894 1.52 1.52 3.894a.5.5 0 0 0 .955 0l1.52-3.894 3.894-1.52a.5.5 0 0 0 0-.955l-3.894-1.52-1.52-3.894zM19 14.5a.5.5 0 0 0-.955 0l-.608 1.558-1.558.608a.5.5 0 0 0 0 .955l1.558.608.608 1.558a.5.5 0 0 0 .955 0l.608-1.558 1.558-.608a.5.5 0 0 0 0-.955l-1.558-.608-.608-1.558zM19 3.5a.5.5 0 0 0-.955 0l-.608 1.558-1.558.608a.5.5 0 0 0 0 .955l1.558.608.608 1.558a.5.5 0 0 0 .955 0l.608-1.558 1.558-.608a.5.5 0 0 0 0-.955l-1.558-.608-.608-1.558z"/>

@@ -1227,3 +1227,256 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+
+<!-- Ask Cora AI sliding right sidebar container -->
+<div id="cora-public-ai-sidebar" class="fixed top-16 right-0 bottom-0 w-[420px] bg-white border-l border-zinc-200 z-50 shadow-2xl transition-transform duration-300 transform translate-x-full flex flex-col font-sans">
+    <!-- Header -->
+    <div class="px-5 py-4 border-b border-zinc-100 flex items-center justify-between select-none shrink-0 bg-white">
+        <div class="flex items-center gap-2.5">
+            <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-950 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+            </span>
+            <span class="font-bold text-sm text-zinc-950 font-display">Ask Cora AI</span>
+            <span class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 text-green-700 text-[9px] font-bold border border-green-200/30">
+                <span class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
+                RAG Online
+            </span>
+        </div>
+        <button onclick="window.coraToggleAiSidebar(false)" class="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-all cursor-pointer border-none bg-transparent" title="Close Sidebar">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Scrollable Chat Area -->
+    <div id="cora-sidebar-messages-container" class="flex-1 overflow-y-auto p-5 space-y-5 bg-zinc-50/10 scrollbar-thin">
+        
+        <!-- Welcome bubble -->
+        <div class="flex gap-3 max-w-[90%]">
+            <div class="w-6 h-6 rounded-full bg-zinc-950 flex items-center justify-center text-[10px] font-bold text-white select-none flex-shrink-0">AI</div>
+            <div class="space-y-3 flex-1">
+                <div class="bg-zinc-100 text-zinc-800 p-3 rounded-lg text-xs leading-relaxed border border-zinc-200/50 shadow-xs">
+                    Hi Dravya! 👋 I'm Cora AI, your documentation assistant. How can I help you today?
+                </div>
+                
+                <!-- Quick Questions list -->
+                <div class="space-y-1.5">
+                    <button onclick="window.coraSubmitSidebarQuickQuery('Explain the authentication flow')" class="w-full text-left p-2.5 bg-white border border-zinc-200 hover:border-zinc-400 rounded-lg text-xs text-zinc-700 hover:text-zinc-950 hover:bg-zinc-50 transition-all cursor-pointer shadow-3xs font-semibold flex items-center justify-between group">
+                        <span>Explain the authentication flow</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-800 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                    <button onclick="window.coraSubmitSidebarQuickQuery('How do I create a new invoice?')" class="w-full text-left p-2.5 bg-white border border-zinc-200 hover:border-zinc-400 rounded-lg text-xs text-zinc-700 hover:text-zinc-950 hover:bg-zinc-50 transition-all cursor-pointer shadow-3xs font-semibold flex items-center justify-between group">
+                        <span>How do I create a new invoice?</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-800 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                    <button onclick="window.coraSubmitSidebarQuickQuery('Show me API rate limits')" class="w-full text-left p-2.5 bg-white border border-zinc-200 hover:border-zinc-400 rounded-lg text-xs text-zinc-700 hover:text-zinc-950 hover:bg-zinc-50 transition-all cursor-pointer shadow-3xs font-semibold flex items-center justify-between group">
+                        <span>Show me API rate limits</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-800 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                    <button onclick="window.coraSubmitSidebarQuickQuery('What permissions does a crew member have?')" class="w-full text-left p-2.5 bg-white border border-zinc-200 hover:border-zinc-400 rounded-lg text-xs text-zinc-700 hover:text-zinc-950 hover:bg-zinc-50 transition-all cursor-pointer shadow-3xs font-semibold flex items-center justify-between group">
+                        <span>What permissions does a crew member have?</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-800 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Input Area -->
+    <div class="p-4 border-t border-zinc-100 bg-white shrink-0">
+        <form id="cora-sidebar-chat-form" onsubmit="window.coraSubmitSidebarChat(event)" class="relative flex items-center">
+            <input type="text" id="cora-sidebar-chat-input" class="w-full border border-zinc-200 rounded-lg pl-3 pr-9 py-2 text-xs bg-zinc-50 focus:bg-white focus:border-zinc-950 outline-none text-zinc-900 transition-all placeholder-zinc-400 font-sans" placeholder="Ask anything about Cora..." required autocomplete="off">
+            <button type="submit" id="cora-sidebar-chat-send-btn" class="absolute right-2 text-zinc-400 hover:text-zinc-900 transition-colors p-1.5 cursor-pointer bg-transparent border-none" title="Send Doubt">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+        </form>
+        <div class="mt-2 text-center text-[10px] text-zinc-400">
+            Powered by Cora AI &bull; Using docs v2.2.1
+        </div>
+    </div>
+
+    <!-- Reference Hub Grid Column -->
+    <div class="px-5 py-4 border-t border-zinc-100 bg-zinc-50/50 shrink-0 select-none">
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Popular Topics -->
+            <div class="space-y-1.5">
+                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Popular Topics</span>
+                <div class="space-y-1">
+                    <a href="#" onclick="window.coraSidebarTopicLink(event, 'platform-overview')" class="flex items-center gap-1.5 text-xs text-zinc-650 hover:text-zinc-955 font-semibold">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
+                        <span>Getting Started</span>
+                    </a>
+                    <a href="#" onclick="window.coraSidebarTopicLink(event, 'workspace-roles')" class="flex items-center gap-1.5 text-xs text-zinc-650 hover:text-zinc-955 font-semibold">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                        <span>Authentication</span>
+                    </a>
+                    <a href="#" onclick="window.coraSidebarTopicLink(event, 'api')" class="flex items-center gap-1.5 text-xs text-zinc-650 hover:text-zinc-955 font-semibold">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                        <span>API Reference</span>
+                    </a>
+                    <a href="#" onclick="window.coraSidebarTopicLink(event, 'pwa-push-notifications')" class="flex items-center gap-1.5 text-xs text-zinc-650 hover:text-zinc-955 font-semibold">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <span>Webhook Events</span>
+                    </a>
+                </div>
+            </div>
+            <!-- Recently Viewed -->
+            <div class="space-y-1.5">
+                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Recently Viewed</span>
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs font-semibold text-zinc-650">
+                        <span class="truncate pr-1">/api/v1/auth/login</span>
+                        <span class="text-[9px] text-zinc-400 font-normal shrink-0">Just now</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs font-semibold text-zinc-650">
+                        <span class="truncate pr-1">Invoices Engine</span>
+                        <span class="text-[9px] text-zinc-400 font-normal shrink-0">10m ago</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs font-semibold text-zinc-650">
+                        <span class="truncate pr-1">Crew Scheduler</span>
+                        <span class="text-[9px] text-zinc-400 font-normal shrink-0">1h ago</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs font-semibold text-zinc-650">
+                        <span class="truncate pr-1">Webhook Events</span>
+                        <span class="text-[9px] text-zinc-400 font-normal shrink-0">2h ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tip Banner -->
+        <div class="mt-4 p-2 bg-white rounded-lg border border-zinc-200 text-[10px] text-zinc-500 leading-normal flex items-start gap-1.5">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span>Tip: You can ask me questions about any feature, API, or configuration in Cora.</span>
+        </div>
+    </div>
+</div>
+
+<script>
+window.coraToggleAiSidebar = function(show) {
+    const sidebar = document.getElementById('cora-public-ai-sidebar');
+    if (!sidebar) return;
+    if (show) {
+        sidebar.classList.remove('translate-x-full');
+        sidebar.classList.add('translate-x-0');
+        // Auto-focus chat input
+        setTimeout(() => {
+            const input = document.getElementById('cora-sidebar-chat-input');
+            if (input) input.focus();
+        }, 300);
+    } else {
+        sidebar.classList.remove('translate-x-0');
+        sidebar.classList.add('translate-x-full');
+    }
+};
+
+window.coraSubmitSidebarQuickQuery = function(query) {
+    const input = document.getElementById('cora-sidebar-chat-input');
+    if (input) {
+        input.value = query;
+        window.coraSubmitSidebarChat();
+    }
+};
+
+window.coraSidebarTopicLink = function(e, slug) {
+    if (e) e.preventDefault();
+    window.coraToggleAiSidebar(false);
+    if (slug === 'api' || slug === 'changelog') {
+        coraPublicShowSection(slug);
+    } else {
+        coraPublicLoadPage(null, slug, null);
+    }
+};
+
+window.coraSubmitSidebarChat = function(event) {
+    if (event) event.preventDefault();
+    
+    const input = document.getElementById('cora-sidebar-chat-input');
+    const sendBtn = document.getElementById('cora-sidebar-chat-send-btn');
+    const doubt = input.value.trim();
+    if (!doubt) return;
+    
+    input.value = '';
+    input.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
+    
+    // Append user query to chat history
+    const msgList = document.getElementById('cora-sidebar-messages-container');
+    msgList.insertAdjacentHTML('beforeend', `
+        <div class="flex gap-3 max-w-[90%] ml-auto justify-end">
+            <div class="bg-zinc-950 text-white p-3 rounded-lg text-xs leading-relaxed border border-zinc-950 shadow-xs">
+                ${escapeHtml(doubt)}
+            </div>
+            <div class="w-6 h-6 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center text-[10px] font-bold text-zinc-650 select-none flex-shrink-0">Me</div>
+        </div>
+    `);
+    
+    msgList.scrollTop = msgList.scrollHeight;
+    
+    // Add dynamic dot loading animation
+    const typingId = 'cora-sidebar-typing-' + Date.now();
+    msgList.insertAdjacentHTML('beforeend', `
+        <div id="${typingId}" class="flex gap-3 max-w-[90%] select-none">
+            <div class="w-6 h-6 rounded-full bg-zinc-950 flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">AI</div>
+            <div class="bg-zinc-100 text-zinc-400 p-3 rounded-lg text-xs border border-zinc-200/55 flex items-center gap-1 shadow-3xs">
+                <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+            </div>
+        </div>
+    `);
+    msgList.scrollTop = msgList.scrollHeight;
+    
+    // Build query body
+    const formData = new FormData();
+    formData.append('action', 'cora_ajax_ask_llm_doubt');
+    formData.append('doubt', doubt);
+    formData.append('security', '<?php echo wp_create_nonce( "cora_ajax_nonce" ); ?>');
+    
+    fetch(ajaxUrl, {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(res => {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+        
+        input.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        input.focus();
+        
+        if (res.success && res.data && res.data.reply) {
+            addSidebarAiMessage(msgList, res.data.reply);
+        } else {
+            const reply = coraSimulateRagReply(doubt);
+            addSidebarAiMessage(msgList, reply);
+        }
+    })
+    .catch(err => {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+        
+        input.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        input.focus();
+        
+        const reply = coraSimulateRagReply(doubt);
+        addSidebarAiMessage(msgList, reply);
+    });
+};
+
+function addSidebarAiMessage(msgList, text) {
+    const formatted = formatMessageMarkdown(text);
+    
+    msgList.insertAdjacentHTML('beforeend', `
+        <div class="flex gap-3 max-w-[90%]">
+            <div class="w-6 h-6 rounded-full bg-zinc-950 flex items-center justify-center text-[10px] font-bold text-white select-none flex-shrink-0">AI</div>
+            <div class="bg-zinc-100 text-zinc-800 p-3 rounded-lg text-xs leading-relaxed border border-zinc-200/50 shadow-xs">
+                ${formatted}
+            </div>
+        </div>
+    `);
+    msgList.scrollTop = msgList.scrollHeight;
+}
+</script>
+
