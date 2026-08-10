@@ -49,10 +49,12 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
     <title>Cora — Get Started</title>
     <meta name="description" content="Create your Cora workspace. Set up your business in minutes with our guided onboarding.">
     <style>
         :root {
+            color-scheme: only light !important;
             --bg-color: #fcfcfc;
             --card-bg: #ffffff;
             --text-primary: #18181b;

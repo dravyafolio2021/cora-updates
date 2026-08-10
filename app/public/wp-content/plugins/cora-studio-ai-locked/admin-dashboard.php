@@ -8709,7 +8709,7 @@ $s2_assignments = isset($cora_shoot_assignments['shoot2']) ? $cora_shoot_assignm
                         <!-- Assignee / Author -->
                         <div class="space-y-1.5 pt-2 border-t border-zinc-200">
                             <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Assignee / Author</label>
-                            <select id="cora-article-assignee" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
+                            <select id="cora-article-assignee-locked" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
                                 <option value="0">Unassigned</option>
                                 <?php foreach($cora_users as $usr): ?>
                                     <option value="<?php echo $usr->ID; ?>"><?php echo esc_html($usr->display_name); ?></option>

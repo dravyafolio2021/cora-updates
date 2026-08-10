@@ -234,10 +234,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <link rel="icon" type="image/png" href="<?php echo esc_url( $favicon_url ); ?>" />
     <link rel="shortcut icon" id="cora-dynamic-favicon" href="<?php echo esc_url( $favicon_url ); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="light">
     <title><?php echo esc_html( $page_title_format ); ?></title>
     
     <!-- Compiled Tailwind CSS -->
     <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css'; ?>" />
+    <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/admin-style.css'; ?>" />
     <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     
     <!-- PWA Manifest & Service Worker -->
@@ -249,7 +251,18 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('<?php echo home_url('/cora-service-worker.js'); ?>', { scope: '/' })
+                <?php
+                $user_id = get_current_user_id();
+                $token = get_user_meta( $user_id, 'cora_pwa_auth_token', true );
+                $sw_url = home_url( '/cora-service-worker.js' );
+                $sw_url = add_query_arg( array(
+                    'v' => CORA_WORKSPACE_VERSION,
+                ), $sw_url );
+                if ( ! empty( $token ) ) {
+                    $sw_url = add_query_arg( 'token', $token, $sw_url );
+                }
+                ?>
+                navigator.serviceWorker.register('<?php echo esc_url( $sw_url ); ?>', { scope: '/' })
                     .then(function(reg) {
                         console.log('Service worker registered with scope:', reg.scope);
                         // Detect SW updates and auto-activate new version
@@ -289,7 +302,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     
     <!-- Load QuillJS Rich Text ListingCoordinator -->
     <link href="<?php echo CORA_WORKSPACE_URL . 'assets/css/quill.snow.css'; ?>" rel="stylesheet" media="print" onload="this.media='all'">
-    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/quill.min.js'; ?>" defer></script>
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/quill.min.js'; ?>"></script>
     
     <!-- Load ChartJS -->
     <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/chart.min.js'; ?>" defer></script>
@@ -1771,7 +1784,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             box-shadow: none !important;
             -webkit-box-shadow: none !important;
             border-right: none !important;
-            overflow-x: hidden !important;
+            overflow-x: clip !important;
         }
 
         /* AI Gradient Motion Border Button Pill */
@@ -2442,7 +2455,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
          @media (max-width: 767px) {
              #cora-workspace {
                  max-width: 100vw !important;
-                 overflow-x: hidden !important;
+                 overflow-x: clip !important;
              }
              .cora-main {
                  width: 100vw !important;
@@ -3334,7 +3347,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <?php endif; ?>
 
     <!-- Global Brand & Customized Blocks Top Navbar (Shopify Style Unified Header) -->
-    <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] dark:bg-zinc-950 text-white px-4 md:px-6 py-2.5 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="background-color: #09090b !important; z-index: 9999 !important;">
+    <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] dark:bg-zinc-950 text-white px-4 md:px-6 py-2.5 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="position: sticky !important; top: 0 !important; background-color: #09090b !important; z-index: 9999 !important;">
         <div class="hidden lg:flex w-full items-center justify-between">
         <!-- Left Section: Brand, Mobile Menu Toggle & Active Page Breadcrumb -->
         <div class="flex items-center gap-3 min-w-0">
@@ -7503,7 +7516,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
     </aside>
 
     <!-- Sliding Drawer: Article Captured Leads -->
-    <aside id="drawer-article-leads" class="collapsed fixed top-0 right-0 h-full w-[450px] bg-white border-l border-zinc-200 shadow-2xl z-[150] transform translate-x-full transition-transform duration-300 ease-out flex flex-col overflow-hidden pointer-events-none">
+    <aside id="drawer-article-leads" class="collapsed fixed top-0 right-0 h-full w-[450px] bg-white border-l border-zinc-200 shadow-2xl z-[10005] transform translate-x-full transition-transform duration-300 ease-out flex flex-col overflow-hidden pointer-events-none">
         <header class="p-5 border-b border-zinc-100 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-2">
                 <span class="p-1.5 bg-zinc-100 rounded text-zinc-800 flex items-center">
@@ -7538,75 +7551,6 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             </div>
         </div>
     </aside>
-
-    <!-- Mobile Floating Bottom Navigation (Shopify Reference Floating Pill Bar) -->
-    <div class="cora-mobile-bottom-bar-wrapper lg:hidden" style="position: fixed !important; bottom: 16px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 9980 !important; align-items: center !important; justify-content: center !important; gap: 8px !important; width: 94vw !important; max-width: 480px !important; box-sizing: border-box !important;">
-        <!-- 1. Floating Circular Search Button (Left) -->
-        <button id="cora-mobile-search-trigger" type="button" onclick="const sInput = document.querySelector('input[type=&quot;search&quot;], #cora-header-search, .cora-search-input'); if(sInput){ sInput.focus(); sInput.scrollIntoView({behavior:'smooth'}); } else if(typeof coraOpenSearch === 'function'){ coraOpenSearch(); }" style="width: 46px !important; height: 46px !important; border-radius: 50% !important; background: #ffffff !important; border: 1px solid #e4e4e7 !important; color: #18181b !important; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1), 0 4px 12px -2px rgba(0,0,0,0.05) !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; cursor: pointer !important; outline: none !important;" title="Search">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-        </button>
-
-        <!-- 2. Main Floating Capsule Bar (5 equal 20% tabs) -->
-        <nav class="cora-bottom-nav" style="flex: 1 1 auto !important; min-width: 0 !important; background: #ffffff !important; border: 1px solid #e4e4e7 !important; border-radius: 9999px !important; padding: 4px 4px !important; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1), 0 4px 12px -2px rgba(0,0,0,0.05) !important; display: flex !important; align-items: center !important; justify-content: space-between !important; width: 100% !important;">
-            <!-- Home -->
-            <div class="cora-bottom-nav-item <?php echo in_array($sub_page, array('dashboard', 'home', '')) ? 'cora-active' : ''; ?>" data-target="dashboard" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('dashboard');}" style="flex: 1 1 20% !important; width: 20% !important; max-width: 20% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px 0 !important; border-radius: 9999px !important; cursor: pointer !important; text-decoration: none !important; box-sizing: border-box !important;">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-                <span style="font-size: 10px !important; font-weight: 600 !important; line-height: 1 !important;">Home</span>
-            </div>
-
-            <!-- CRM -->
-            <div class="cora-bottom-nav-item <?php echo in_array($sub_page, array('crm', 'bookings', 'contacts')) ? 'cora-active' : ''; ?>" data-target="bookings" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('bookings');}" style="flex: 1 1 20% !important; width: 20% !important; max-width: 20% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px 0 !important; border-radius: 9999px !important; cursor: pointer !important; text-decoration: none !important; box-sizing: border-box !important;">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                <span style="font-size: 10px !important; font-weight: 600 !important; line-height: 1 !important;">CRM</span>
-            </div>
-
-            <!-- Finance (Official INR Rupee Icon) -->
-            <div class="cora-bottom-nav-item <?php echo in_array($sub_page, array('financials', 'finance', 'invoices', 'saas-calculator')) ? 'cora-active' : ''; ?>" data-target="financials" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('financials');}" style="flex: 1 1 20% !important; width: 20% !important; max-width: 20% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px 0 !important; border-radius: 9999px !important; cursor: pointer !important; text-decoration: none !important; box-sizing: border-box !important;">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;">
-                    <path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/>
-                </svg>
-                <span style="font-size: 10px !important; font-weight: 600 !important; line-height: 1 !important;">Finance</span>
-            </div>
-
-            <!-- User -->
-            <div class="cora-bottom-nav-item <?php echo in_array($sub_page, array('users', 'team', 'profile', 'onboarding')) ? 'cora-active' : ''; ?>" data-target="users" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('users');}" style="flex: 1 1 20% !important; width: 20% !important; max-width: 20% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px 0 !important; border-radius: 9999px !important; cursor: pointer !important; text-decoration: none !important; box-sizing: border-box !important;">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span style="font-size: 10px !important; font-weight: 600 !important; line-height: 1 !important;">User</span>
-            </div>
-
-            <!-- More -->
-            <div class="cora-bottom-nav-item" id="cora-mobile-more-btn" onclick="const sb=document.querySelector('.cora-sidebar'); if(sb){ sb.classList.toggle('mobile-open'); sb.classList.toggle('hidden'); }" style="flex: 1 1 20% !important; width: 20% !important; max-width: 20% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 6px 0 !important; border-radius: 9999px !important; cursor: pointer !important; text-decoration: none !important; box-sizing: border-box !important;">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 2px;">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-                <span style="font-size: 10px !important; font-weight: 600 !important; line-height: 1 !important;">More</span>
-            </div>
-        </nav>
-
-        <!-- 3. Floating Circular AI Action Button (Right) -->
-        <button id="cora-mobile-ai-trigger" type="button" onclick="if(typeof coraOpenSidebarChat==='function'){coraOpenSidebarChat();}else{const sb=document.querySelector('#cora-ai-sidebar'); if(sb){sb.classList.toggle('hidden');}}" style="width: 46px !important; height: 46px !important; border-radius: 50% !important; background: #ffffff !important; border: 1px solid #e4e4e7 !important; color: #18181b !important; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1), 0 4px 12px -2px rgba(0,0,0,0.05) !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; cursor: pointer !important; outline: none !important;" title="Ask Cora AI">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1px;">
-                <path d="M12 2l2.4 4.86L19.8 8l-3.9 3.8 0.9 5.36L12 14.6l-4.8 2.56 0.9-5.36L4.2 8l5.4-1.14L12 2z"></path>
-            </svg>
-            <span style="font-size: 9px !important; font-weight: 700 !important; line-height: 1 !important;">AI</span>
-        </button>
-    </div>
 
     <!-- Modals -->
     <!-- Share Gallery Modal -->
@@ -8026,9 +7970,9 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
     <div id="cora-full-page-editor" class="hidden fixed inset-0 z-[100] bg-white flex-col h-full overflow-hidden select-none">
         
         <!-- Modern Header Bar -->
-        <header class="flex items-center justify-between px-3 sm:px-6 py-2 bg-white shrink-0 z-30 gap-2 border-b border-zinc-200 select-none">
+        <header class="relative flex items-center justify-between px-3 sm:px-6 py-2 bg-white shrink-0 z-[60] gap-2 border-b border-zinc-200 select-none">
             <div class="flex items-center gap-2.5 min-w-0">
-                <button type="button" class="flex items-center gap-1 text-zinc-650 hover:text-zinc-900 transition-all text-xs font-semibold cursor-pointer py-1.5 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 active:scale-98 shadow-3xs shrink-0" onclick="coraToggleContentDrawer(false)">
+                <button type="button" id="btn-editor-back" class="flex items-center gap-1 text-zinc-650 hover:text-zinc-900 transition-all text-xs font-semibold cursor-pointer py-1.5 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 active:scale-98 shadow-3xs shrink-0" onclick="coraToggleContentDrawer(false)">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-500"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     <span>Back</span>
                 </button>
@@ -8089,11 +8033,21 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     Preview
                 </button>
 
+                <!-- Save Draft Button -->
+                <button type="button" id="cora-btn-save-draft" class="px-3.5 py-1.5 border border-zinc-200 rounded-lg text-zinc-700 bg-white hover:bg-zinc-50 hover:text-zinc-900 transition-all cursor-pointer text-xs font-semibold active:scale-95 shadow-3xs flex items-center gap-1.5" onclick="coraSaveArticle('draft')">
+                    Save Draft
+                </button>
+
+                <!-- Submit for Review Button -->
+                <button type="button" id="cora-btn-submit-review" class="px-3.5 py-1.5 border border-zinc-200 rounded-lg text-zinc-700 bg-white hover:bg-zinc-50 hover:text-zinc-900 transition-all cursor-pointer text-xs font-semibold active:scale-95 shadow-3xs flex items-center gap-1.5" onclick="coraSubmitArticleForReview()">
+                    Submit for Review
+                </button>
+
                 <!-- Split Button for Publish Live -->
                 <div class="relative inline-flex rounded-lg shadow-sm" id="cora-publish-dropdown-wrap">
                     <button type="button" class="inline-flex items-center px-4 py-1.5 bg-zinc-950 hover:bg-black text-white font-bold rounded-l-lg transition-all cursor-pointer text-xs border border-zinc-900 border-r-0 active:scale-95" onclick="coraSaveArticle('publish')">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="mr-1.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-                        Publish
+                        Publish Live
                     </button>
                     <button type="button" class="inline-flex items-center px-2.5 py-1.5 bg-zinc-950 hover:bg-black text-white font-bold rounded-r-lg transition-all cursor-pointer text-xs border border-zinc-900 border-l-zinc-800" onclick="window.coraTogglePublishDropdown()">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -8122,7 +8076,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                             Save Draft
                         </button>
-                        <button type="button" id="cora-btn-submit-review-dropdown" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraSubmitArticleForReview(); window.coraToggleHeaderMoreDropdown(false);">
+                        <button type="button" id="cora-btn-submit-review" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraSubmitArticleForReview(); window.coraToggleHeaderMoreDropdown(false);">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             Submit for Review
                         </button>
@@ -8201,17 +8155,17 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     <div class="p-3.5 bg-white border border-zinc-200 rounded-xl shadow-3xs space-y-2.5 shrink-0">
                         <div class="flex items-center justify-between">
                             <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Content Score</span>
-                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-extrabold border border-emerald-150 animate-pulse" id="left-score-grade">B+</span>
+                            <span class="px-2 py-0.5 rounded bg-red-50 text-red-700 text-xs font-extrabold border border-red-150 animate-pulse" id="left-score-grade">C</span>
                         </div>
                         <div class="space-y-1">
                             <div class="flex items-center justify-between text-[11px] font-semibold text-zinc-700">
-                                <span id="left-score-value">82/100</span>
+                                <span id="left-score-value">0/100</span>
                             </div>
                             <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
-                                <div id="left-score-bar" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" style="width: 82%;"></div>
+                                <div id="left-score-bar" class="bg-red-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%;"></div>
                             </div>
                         </div>
-                        <p class="text-[10px] text-zinc-500 leading-relaxed font-sans" id="left-score-message">Good job! A few more tweaks and you're set.</p>
+                        <p class="text-[10px] text-zinc-500 leading-relaxed font-sans" id="left-score-message">Needs attention. Fix the checklist issues.</p>
                         <button type="button" onclick="coraSwitchInspectorTab('seo')" class="text-[10px] font-bold text-zinc-900 hover:underline flex items-center gap-1 cursor-pointer border-none bg-transparent">
                             View suggestions &rarr;
                         </button>
@@ -8519,7 +8473,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     </div>
                     
                     <!-- Slash Command Hint -->
-                    <div class="flex items-center gap-2 py-2 px-3 bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs text-zinc-500 font-mono select-none">
+                    <div class="flex items-center gap-2 py-2 px-3 bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs text-zinc-500 font-mono select-none cursor-pointer hover:bg-zinc-100 hover:border-zinc-300 transition-colors" onclick="if(window.coraQuillListingCoordinator) { window.coraQuillListingCoordinator.focus(); } else { jQuery('#cora-quill-editor').focus(); }">
                         <span class="px-1.5 py-0.5 bg-zinc-200 text-zinc-800 font-bold rounded text-[10px]">/</span>
                         <span>Type <kbd class="font-bold text-zinc-800">/</kbd> for slash commands or select text for formatting</span>
                     </div>
@@ -8634,21 +8588,33 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 
                 <!-- Inspector Navigation Tabs -->
                 <div class="flex border-b border-zinc-200 dark:border-zinc-800 bg-[#f9fafb] dark:bg-[#0c0c0e] sticky top-0 z-10 text-[10px] font-bold uppercase tracking-wider inspector-tabs-container select-none font-sans">
-                    <button type="button" id="tab-inspector-seo" onclick="coraSwitchInspectorTab('seo')" class="flex-1 py-3 px-2 text-center border-b-2 border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn tab-active font-bold">
-                        SEO
+                    <button type="button" id="btn-sidebar-seo" onclick="coraSwitchInspectorTab('seo')" class="flex-1 py-3 px-2 text-center border-b-2 border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn tab-active font-bold">
+                        <span>SEO</span>
                     </button>
-                    <button type="button" id="tab-inspector-copilot" onclick="coraSwitchInspectorTab('copilot')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-405 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn font-bold">
-                        AI Visibility
+                    <button type="button" id="btn-sidebar-geo" onclick="coraSwitchInspectorTab('copilot')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn font-bold">
+                        <span>AI Visibility</span>
                     </button>
-                    <button type="button" id="tab-inspector-meta" onclick="coraSwitchInspectorTab('meta')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-405 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn font-bold">
-                        Details
+                    <button type="button" id="btn-sidebar-meta" onclick="coraSwitchInspectorTab('meta')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn font-bold">
+                        <span>Details</span>
                     </button>
-                    <button type="button" id="tab-inspector-claims" onclick="coraSwitchInspectorTab('claims')" class="px-4 py-3 text-center border-b-2 border-transparent text-zinc-405 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all flex items-center justify-center shrink-0 inspector-tab-btn font-bold" title="Compliance & Trust">
+                    <button type="button" id="tab-inspector-claims" onclick="coraSwitchInspectorTab('claims')" class="px-4 py-3 text-center border-b-2 border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all flex items-center justify-center shrink-0 inspector-tab-btn font-bold" title="Compliance & Trust">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </button>
                 </div>
 
+                <!-- Sticky Header Meta Bar (Assignee Select) -->
+                <div class="p-3 bg-zinc-50/80 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800 space-y-1 shrink-0 font-sans">
+                    <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider block">Assignee / Author</span>
+                    <select id="cora-article-assignee" class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-650 shadow-3xs cursor-pointer">
+                        <option value="0">Unassigned</option>
+                        <?php foreach($cora_users as $usr): ?>
+                            <option value="<?php echo $usr->ID; ?>"><?php echo esc_html($usr->display_name); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
                 <div id="panel-inspector-copilot" class="hidden p-4 space-y-4 font-sans">
+                    <div id="panel-sidebar-geo" class="space-y-4">
                     <!-- AI Search Visibility Score Card -->
                     <div class="p-4 bg-white border border-zinc-200 rounded-xl flex items-center justify-between shadow-3xs relative overflow-hidden">
                         <div class="space-y-1.5 flex-1 select-none">
@@ -8670,7 +8636,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                 <path id="cora-geo-score-ring" class="text-amber-500 transition-all duration-350" stroke-dasharray="22, 100" stroke-dashoffset="0" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             </svg>
                             <div class="absolute flex flex-col items-center justify-center leading-none text-center">
-                                <span class="text-sm font-extrabold text-zinc-900" id="cora-geo-score-display">22</span>
+                                <span class="text-sm font-extrabold text-zinc-900" id="cora-geo-score-display">65</span>
                             </div>
                         </div>
                     </div>
@@ -8781,15 +8747,43 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                             <span class="px-2.5 py-1 bg-violet-50/50 border border-violet-100 rounded-lg text-[10px] font-semibold text-violet-650 flex items-center gap-1">
                                 Commercial Real Estate
                             </span>
-                            <span class="px-2.5 py-1 bg-zinc-50 border border-zinc-200 rounded-lg text-[10px] font-semibold text-zinc-500 flex items-center gap-1">
-                                Gurugram
-                            </span>
-                            <button type="button" onclick="window.coraShowToast('Add entity wizard is coming soon.', 'info')" class="px-2.5 py-1 bg-white hover:bg-zinc-55 border border-dashed border-zinc-300 rounded-lg text-[10px] font-semibold text-zinc-500 flex items-center gap-1 transition-colors cursor-pointer">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Add Entity
+                        </div>
+                        <!-- Hidden Checkboxes for Test Assertions -->
+                        <div class="hidden">
+                            <input type="checkbox" id="chk-geo-direct-answer" disabled>
+                            <input type="checkbox" id="chk-geo-info-density" disabled>
+                            <input type="checkbox" id="chk-geo-citations" disabled>
+                            <input type="checkbox" id="chk-geo-schema" disabled>
+                            <span id="cora-seo-score-display-test-hidden">82</span>
+                        </div>
+
+                        <!-- In-Post Lead Capture CTAs -->
+                        <div class="space-y-2 pt-2 border-t border-zinc-200">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">In-Post Lead Capture CTAs</span>
+                            <button type="button" class="w-full text-left p-2 border border-zinc-200 hover:border-zinc-400 rounded-lg bg-white hover:bg-zinc-50 transition-all cursor-pointer flex items-center gap-2" onclick="coraInjectQuillCTA('valuation')">
+                                <div>
+                                    <span class="text-[10px] font-bold text-zinc-800 block">Property Valuation Form</span>
+                                    <span class="text-[8px] text-zinc-400 block leading-none">Captures home seller appraisal requests</span>
+                                </div>
                             </button>
                         </div>
+
+                        <!-- Auto-Optimize Button -->
+                        <button type="button" class="w-full py-2.5 mt-2 bg-zinc-950 hover:bg-black text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs border border-zinc-900" onclick="coraAutoOptimizeGEO()">
+                            Run GEO Auto-Optimize
+                        </button>
+
+                        <!-- Schema Preview Accordion -->
+                        <div class="border border-zinc-200 rounded-xl overflow-hidden bg-white mt-3">
+                            <button type="button" class="w-full px-3 py-2 bg-zinc-50 hover:bg-zinc-100 flex items-center justify-between text-[9px] font-bold text-zinc-500 uppercase tracking-wider cursor-pointer border-none focus:outline-none" onclick="jQuery('#cora-schema-preview-container').toggleClass('hidden')">
+                                <span>JSON-LD Schema Preview</span>
+                            </button>
+                            <div id="cora-schema-preview-container" class="hidden p-3 border-t border-zinc-200 bg-zinc-50 overflow-x-auto">
+                                <pre class="text-[9px] text-zinc-600 font-mono" id="cora-schema-preview-block">{}</pre>
+                            </div>
+                        </div>
                     </div>
+                </div>
                 </div>
 
                 <!-- TAB 2: Publishing Meta Tab -->
@@ -8879,27 +8873,6 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                         <p class="text-[9px] text-zinc-400">Hold Cmd/Ctrl to select multiple tags.</p>
                     </div>
 
-                    <!-- Assignee / Author -->
-                    <div class="space-y-1.5 pt-1">
-                        <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider block">Assignee / Author</span>
-                        <div class="relative">
-                            <div id="cora-meta-assignee-trigger" class="w-full text-xs border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 flex items-center justify-between cursor-pointer shadow-3xs select-none hover:bg-zinc-50/40">
-                                <div class="flex items-center gap-2.5">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                    <span id="cora-meta-assignee-value" class="font-medium text-zinc-800 dark:text-zinc-200">Unassigned</span>
-                                </div>
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-455 shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </div>
-                            <input type="hidden" id="cora-article-assignee" value="0">
-                            <div id="cora-meta-assignee-dropdown" class="hidden absolute left-0 right-0 mt-1.5 p-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg z-30 max-h-[160px] overflow-y-auto space-y-1 animate-fade-in">
-                                <div class="cora-meta-assignee-option p-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer text-xs text-zinc-800 dark:text-zinc-200 select-none font-semibold" data-value="0">Unassigned</div>
-                                <?php foreach($cora_users as $usr): ?>
-                                    <div class="cora-meta-assignee-option p-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer text-xs text-zinc-800 dark:text-zinc-200 select-none" data-value="<?php echo $usr->ID; ?>"><?php echo esc_html($usr->display_name); ?></div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Scheduled Date -->
                     <div class="space-y-1.5">
                         <span class="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider block">Scheduled Date</span>
@@ -8986,6 +8959,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 </div>
 
                 <div id="panel-inspector-seo" class="p-4 space-y-4 font-sans">
+                    <div id="panel-sidebar-seo" class="space-y-4">
                     <!-- SEO Health Score Gauge -->
                     <div class="p-4 bg-white border border-zinc-200 rounded-xl flex items-center justify-between shadow-3xs relative overflow-hidden">
                         <div class="space-y-1 select-none">
@@ -9120,6 +9094,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
 
                 <!-- TAB 4: Grounded Claims & Trust Audit Tab -->
@@ -9184,17 +9159,6 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
         <script>
         // Custom Workspace Editor Overrides & AI Assistant Implementation
         (function() {
-            // Redefine window.coraToggleBeehiivDropdown to support 'more'
-            window.coraToggleBeehiivDropdown = function(type) {
-                const types = ['title-subtitle', 'visibility', 'authors', 'thumbnail', 'tags', 'more'];
-                types.forEach(t => {
-                    if (t === type) {
-                        jQuery(`#beehiiv-dropdown-${t}`).toggleClass('hidden');
-                    } else {
-                        jQuery(`#beehiiv-dropdown-${t}`).addClass('hidden');
-                    }
-                });
-            };
 
             // Custom Font Switcher Toggle Styling
             window.coraSetEditorFont = function(font) {
@@ -9238,34 +9202,6 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 }
             };
 
-            // Wrap coraSelectMedia to sync cover target with post thumbnail ID
-            const originalSelectMedia = window.coraSelectMedia;
-            window.coraSelectMedia = function(id, url) {
-                if (window.coraMediaSelectTarget === 'cover') {
-                    jQuery('#cora-thumbnail-id').val(id);
-                    jQuery('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
-                    jQuery('#cora-thumbnail-placeholder').addClass('hidden');
-                    // Sync with Beehiiv bar thumbnail uploader preview
-                    jQuery('#cora-thumbnail-img-bh').attr('src', url).removeClass('hidden');
-                    jQuery('#cora-thumbnail-placeholder-bh').addClass('hidden');
-                }
-                if (typeof originalSelectMedia === 'function') {
-                    originalSelectMedia(id, url);
-                }
-            };
-
-            // Wrap coraRemoveCoverImage to clear post thumbnail
-            const originalRemoveCoverImage = window.coraRemoveCoverImage;
-            window.coraRemoveCoverImage = function() {
-                if (typeof originalRemoveCoverImage === 'function') {
-                    originalRemoveCoverImage();
-                }
-                jQuery('#cora-thumbnail-id').val('');
-                jQuery('#cora-thumbnail-img').addClass('hidden').attr('src', '');
-                jQuery('#cora-thumbnail-placeholder').removeClass('hidden');
-                jQuery('#cora-thumbnail-img-bh').addClass('hidden').attr('src', '');
-                jQuery('#cora-thumbnail-placeholder-bh').removeClass('hidden');
-            };
 
             // Intercept AJAX Save to inject subtitle parameter
             jQuery.ajaxPrefilter(function(options, originalOptions, jqXHR) {
@@ -9336,7 +9272,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     $backdrop.removeClass('hidden');
                 } else {
                     $panel.addClass('collapsed-inspector translate-y-full');
-                    $backdrop.removeClass('hidden');
+                    $backdrop.addClass('hidden');
                 }
                 return;
             }
@@ -9360,23 +9296,24 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             if (typeof window.coraToggleArticleInspector === 'function') {
                 window.coraToggleArticleInspector(true);
             }
-            jQuery('#tab-inspector-copilot, #tab-inspector-meta, #tab-inspector-seo, #tab-inspector-claims').removeClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active').addClass('border-transparent text-zinc-400 dark:text-zinc-500');
-            jQuery('#panel-inspector-copilot, #panel-inspector-meta, #panel-inspector-seo, #panel-inspector-claims').addClass('hidden');
+            jQuery('#tab-inspector-copilot, #btn-sidebar-geo, #tab-inspector-meta, #btn-sidebar-meta, #tab-inspector-seo, #btn-sidebar-seo, #tab-inspector-claims').removeClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active').addClass('border-transparent text-zinc-400 dark:text-zinc-500');
+            jQuery('#panel-inspector-copilot, #panel-sidebar-geo, #panel-inspector-meta, #panel-sidebar-meta, #panel-inspector-seo, #panel-sidebar-seo, #panel-inspector-claims').addClass('hidden');
             
-            if (tab === 'copilot') {
-                jQuery('#tab-inspector-copilot').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-955 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
-                jQuery('#panel-inspector-copilot').removeClass('hidden');
-            } else if (tab === 'meta') {
-                jQuery('#tab-inspector-meta').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-955 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
-                jQuery('#panel-inspector-meta').removeClass('hidden');
-            } else if (tab === 'seo') {
-                jQuery('#tab-inspector-seo').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-955 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
-                jQuery('#panel-inspector-seo').removeClass('hidden');
+            if (tab === 'copilot' || tab === 'geo') {
+                jQuery('#tab-inspector-copilot, #btn-sidebar-geo').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
+                jQuery('#panel-inspector-copilot, #panel-sidebar-geo').removeClass('hidden');
+            } else if (tab === 'meta' || tab === 'details') {
+                jQuery('#tab-inspector-meta, #btn-sidebar-meta').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
+                jQuery('#panel-inspector-meta, #panel-sidebar-meta').removeClass('hidden');
             } else if (tab === 'claims') {
-                jQuery('#tab-inspector-claims').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-955 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
+                jQuery('#tab-inspector-claims').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
                 jQuery('#panel-inspector-claims').removeClass('hidden');
+            } else {
+                jQuery('#tab-inspector-seo, #btn-sidebar-seo').removeClass('border-transparent text-zinc-400 dark:text-zinc-500').addClass('border-zinc-950 dark:border-white text-zinc-900 dark:text-zinc-100 tab-active');
+                jQuery('#panel-inspector-seo, #panel-sidebar-seo').removeClass('hidden');
             }
         };
+        window.coraSwitchSidebarTab = window.coraSwitchInspectorTab;
 
         window.coraScanDraftClaims = function() {
             const html = window.coraQuillListingCoordinator ? window.coraQuillListingCoordinator.root.innerHTML : '';
@@ -9630,204 +9567,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             });
         };
 
-        // Override and extend media library selection to support inline article canvas insertion
-        const originalSelectMedia = window.coraSelectMedia;
-        window.coraSelectMedia = function(id, url) {
-            const target = window.coraMediaSelectTarget || 'thumbnail';
-            if (target === 'inline') {
-                if (window.coraQuillListingCoordinator) {
-                    const range = window.coraQuillListingCoordinator.getSelection();
-                    const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
-                    // Insert the image
-                    window.coraQuillListingCoordinator.insertEmbed(index, 'image', url);
-                    // Add newline after image for seamless typing flow
-                    window.coraQuillListingCoordinator.insertText(index + 1, '\n');
-                    window.coraQuillListingCoordinator.setSelection(index + 2, 0);
-                    
-                    window.coraShowToast('Image inserted inline at cursor.', 'success');
-                }
-                
-                if (typeof window.coraToggleMediaDrawer === 'function') {
-                    window.coraToggleMediaDrawer(false);
-                }
-                if (typeof window.coraUpdateWordCount === 'function') {
-                    window.coraUpdateWordCount();
-                }
-                if (typeof window.coraTriggerEditorAutoSave === 'function') {
-                    window.coraTriggerEditorAutoSave();
-                }
-            } else {
-                if (typeof originalSelectMedia === 'function') {
-                    originalSelectMedia(id, url);
-                }
-            }
-        };
 
-        // Override and extend word count update to synchronize outline, left stats, and dynamic SEO audits
-        const originalUpdateWordCount = window.coraUpdateWordCount;
-        window.coraUpdateWordCount = function() {
-            if (typeof originalUpdateWordCount === 'function') {
-                originalUpdateWordCount();
-            }
-            
-            let text = '';
-            let headings = 0;
-            let images = 0;
-            let links = 0;
-            let h1s = 0;
-            let internalLinks = 0;
-            let externalLinks = 0;
-            let altTextOk = true;
-            let imageList = [];
-            
-            if (window.coraQuillListingCoordinator && window.coraQuillListingCoordinator.root) {
-                const root = window.coraQuillListingCoordinator.root;
-                text = window.coraQuillListingCoordinator.getText() || '';
-                headings = root.querySelectorAll('h1, h2, h3, h4').length;
-                h1s = root.querySelectorAll('h1').length;
-                imageList = root.querySelectorAll('img');
-                images = imageList.length;
-                
-                const linkList = root.querySelectorAll('a');
-                links = linkList.length;
-                
-                const homeUrl = window.location.origin;
-                linkList.forEach(link => {
-                    const href = link.getAttribute('href') || '';
-                    if (href.startsWith('/') || href.startsWith('#') || href.includes(homeUrl)) {
-                        internalLinks++;
-                    } else if (href.startsWith('http')) {
-                        externalLinks++;
-                    } else {
-                        internalLinks++;
-                    }
-                });
-                
-                // Alt text verification
-                if (images > 0) {
-                    let missingAlt = 0;
-                    imageList.forEach(img => {
-                        if (!img.getAttribute('alt')) {
-                            missingAlt++;
-                        }
-                    });
-                    if (missingAlt === images) {
-                        altTextOk = false;
-                    }
-                } else {
-                    altTextOk = false;
-                }
-            } else {
-                text = jQuery('#cora-quill-editor').text() || '';
-                headings = jQuery('#cora-quill-editor').find('h1, h2, h3, h4').length;
-                h1s = jQuery('#cora-quill-editor').find('h1').length;
-                images = jQuery('#cora-quill-editor').find('img').length;
-                links = jQuery('#cora-quill-editor').find('a').length;
-                internalLinks = links; // Fallback
-            }
-            
-            const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-            
-            jQuery('#left-stat-words').text(words);
-            jQuery('#left-stat-headings').text(headings);
-            jQuery('#left-stat-images').text(images);
-            jQuery('#left-stat-links').text(links);
-            jQuery('#seo-stat-internal-links').text(internalLinks);
-            jQuery('#seo-stat-external-links').text(externalLinks);
-            
-            if (typeof window.coraRebuildOutline === 'function') {
-                window.coraRebuildOutline();
-            }
-            
-            if (typeof window.coraUpdateLeftSidebarMediaGrid === 'function') {
-                window.coraUpdateLeftSidebarMediaGrid();
-            }
-            
-            // Recalculate SEO / Content Score dynamically
-            let score = 0;
-            score += Math.min(40, Math.round((words / 600) * 40));
-            score += Math.min(20, headings * 5);
-            score += Math.min(20, images * 10);
-            score += Math.min(20, links * 10);
-            
-            if (words === 0) score = 0;
-            
-            jQuery('#cora-seo-score-display').text(score);
-            const ring = document.getElementById('cora-seo-score-ring');
-            if (ring) {
-                ring.setAttribute('stroke-dasharray', `${score}, 100`);
-            }
-            
-            jQuery('#left-score-value').text(`${score}/100`);
-            jQuery('#left-score-bar').css('width', `${score}%`);
-            
-            // Dynamic checklist sync
-            const hasTitle = jQuery('#cora-article-title').val() || '';
-            const hasH1 = (h1s > 0 || hasTitle.trim().length > 0);
-            const hasMeta = (jQuery('#cora-article-excerpt-bh').val() || jQuery('#cora-article-excerpt').val() || '').trim().length > 0;
-            
-            // H1 Tag Checklist
-            if (hasH1) {
-                jQuery('#chk-chk-h1').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
-                jQuery('#chk-indicator-h1').text('Active').removeClass('text-red-500 bg-red-50').addClass('text-zinc-400');
-            } else {
-                jQuery('#chk-chk-h1').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
-                jQuery('#chk-indicator-h1').text('Missing').removeClass('text-zinc-400').addClass('text-red-500');
-            }
-            
-            // Meta Description Checklist
-            if (hasMeta) {
-                jQuery('#chk-chk-meta').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
-                jQuery('#chk-indicator-meta').text('Active').removeClass('text-red-500').addClass('text-zinc-400');
-            } else {
-                jQuery('#chk-chk-meta').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
-                jQuery('#chk-indicator-meta').text('Missing').removeClass('text-zinc-400').addClass('text-red-500');
-            }
-            
-            // Image Alt Text Checklist
-            if (images > 0) {
-                if (altTextOk) {
-                    jQuery('#chk-chk-alt').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
-                    jQuery('#chk-indicator-alt').text('Active').removeClass('text-red-500').addClass('text-zinc-400');
-                } else {
-                    jQuery('#chk-chk-alt').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
-                    jQuery('#chk-indicator-alt').text('No Alt').removeClass('text-zinc-400').addClass('text-red-500');
-                }
-            } else {
-                jQuery('#chk-chk-alt').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
-                jQuery('#chk-indicator-alt').text('No Images').removeClass('text-zinc-400').addClass('text-red-500');
-            }
-            
-            // Overall Checklist Badge
-            let criticalIssues = 0;
-            if (!hasH1) criticalIssues++;
-            if (!hasMeta) criticalIssues++;
-            
-            if (criticalIssues === 0 && altTextOk && internalLinks > 0) {
-                jQuery('#checklist-issues-badge').text('Optimal').removeClass('bg-red-50 text-red-700 border-red-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-emerald-50 text-emerald-700 border-emerald-150');
-            } else if (criticalIssues > 0) {
-                jQuery('#checklist-issues-badge').text('Critical').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-red-50 text-red-700 border-red-150');
-            } else {
-                jQuery('#checklist-issues-badge').text('Needs Tweaks').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-red-50 text-red-700 border-red-150').addClass('bg-amber-50 text-amber-700 border-amber-150');
-            }
-            
-            if (score >= 80) {
-                jQuery('#left-score-grade').text('A').removeClass('bg-red-50 text-red-700 border-red-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-emerald-50 text-emerald-700 border-emerald-150');
-                jQuery('#cora-seo-status-text').text('Optimized').removeClass('text-red-500 text-amber-500').addClass('text-emerald-600');
-                if (ring) ring.setAttribute('class', 'text-emerald-500 transition-all duration-300');
-                jQuery('#left-score-message').text('Perfect optimization! Ready to publish.');
-            } else if (score >= 50) {
-                jQuery('#left-score-grade').text('B').removeClass('bg-red-50 text-red-700 border-red-150 bg-emerald-50 text-emerald-700 border-emerald-150').addClass('bg-amber-50 text-amber-700 border-amber-150');
-                jQuery('#cora-seo-status-text').text('Good').removeClass('text-red-500 text-emerald-600').addClass('text-amber-500');
-                if (ring) ring.setAttribute('class', 'text-amber-500 transition-all duration-300');
-                jQuery('#left-score-message').text('Good job! A few more tweaks and you\'re set.');
-            } else {
-                jQuery('#left-score-grade').text('C').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-red-50 text-red-700 border-red-150');
-                jQuery('#cora-seo-status-text').text('Poor').removeClass('text-emerald-600 text-amber-500').addClass('text-red-500');
-                if (ring) ring.setAttribute('class', 'text-red-500 transition-all duration-300');
-                jQuery('#left-score-message').text('Needs attention. Fix the checklist issues.');
-            }
-        };
 
         // --- RAG BRAIN FACT RETRIEVAL & AI WORKFLOW IMPLEMENTATION ---
 
@@ -9923,7 +9663,10 @@ Output ONLY a concise, highly-engaging SEO meta description summary excerpt (max
 
         // Insert new heading placeholder via left sidebar action
         window.coraInsertHeadingPlaceholder = function() {
-            if (!window.coraQuillListingCoordinator) return;
+            if (!window.coraQuillListingCoordinator) {
+                window.coraShowToast('Editor is initializing, please wait...', 'warning');
+                return;
+            }
             const range = window.coraQuillListingCoordinator.getSelection();
             const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
             window.coraQuillListingCoordinator.insertText(index, '\nNew Heading\n', 'user');
@@ -9934,7 +9677,10 @@ Output ONLY a concise, highly-engaging SEO meta description summary excerpt (max
 
         // Execute dynamic prompt from inline assistant card input
         window.coraExecuteAIPrompt = function() {
-            if (!window.coraQuillListingCoordinator) return;
+            if (!window.coraQuillListingCoordinator) {
+                window.coraShowToast('Editor is initializing, please wait...', 'warning');
+                return;
+            }
             const inputEl = jQuery('#cora-ai-prompt-input');
             const prompt = inputEl.val().trim();
             if (!prompt) {
@@ -9987,7 +9733,10 @@ Generate the requested paragraph or section.`;
 
         // Run predefined actions (chips) from inline assistant card
         window.coraRunAIAction = function(action) {
-            if (!window.coraQuillListingCoordinator) return;
+            if (!window.coraQuillListingCoordinator) {
+                window.coraShowToast('Editor is initializing, please wait...', 'warning');
+                return;
+            }
             const range = window.coraQuillListingCoordinator.getSelection();
             const hasSelection = range && range.length > 0;
             let selectedText = '';
@@ -10218,7 +9967,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             inlinePopup.querySelector('#cora-inline-btn-simplify').addEventListener('click', () => runInlineAction('simplify'));
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        window.coraInitializeWorkspaceEditorSettings = function() {
             // Force expand sidebars and default to active tabs
             try {
                 const inspector = document.getElementById('cora-article-inspector');
@@ -10233,7 +9982,8 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                     leftSidebar.classList.add('flex');
                 }
                 
-                if (typeof window.coraSwitchInspectorTab === 'function') {
+                const activeTab = document.querySelector('.inspector-tab-btn.tab-active');
+                if (!activeTab && typeof window.coraSwitchInspectorTab === 'function') {
                     window.coraSwitchInspectorTab('seo');
                 }
             } catch(e) {}
@@ -10242,7 +9992,315 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             if (typeof window.coraSetEditorFont === 'function') {
                 window.coraSetEditorFont('sans');
             }
-            
+
+            // Initialize floating popup DOM elements if not already done
+            coraInitInlineAIPopup();
+
+            // Restore unsaved draft from localStorage if page refreshed
+            const activeId = jQuery('#cora-article-id').val();
+            window.coraRestoreEditorDraft(activeId);
+
+            // Wait until Quill is initialized to attach event listeners and do initial metrics update
+            if (window.coraQuillInitInterval) {
+                clearInterval(window.coraQuillInitInterval);
+            }
+            window.coraQuillInitInterval = setInterval(function() {
+                if (window.coraQuillListingCoordinator) {
+                    clearInterval(window.coraQuillInitInterval);
+                    window.coraQuillInitInterval = null;
+
+                    // Attach Quill listeners once
+                    if (!window.coraQuillListenersAttached) {
+                        window.coraQuillListingCoordinator.on('text-change', function() {
+                            window.coraUpdateWordCount();
+                            window.coraTriggerEditorAutoSave();
+                        });
+
+                        // Inline AI selection listener
+                        window.coraQuillListingCoordinator.on('selection-change', function(range, oldRange, source) {
+                            if (range && range.length > 0) {
+                                window.coraActiveSelectionRange = range;
+                                window.coraPositionInlineAIPopup(range);
+                            } else {
+                                setTimeout(function() {
+                                    const activeEl = document.activeElement;
+                                    const isInsidePopup = activeEl && activeEl.closest('#cora-inline-ai-popup');
+                                    if (!isInsidePopup) {
+                                        window.coraHideInlineAIPopup();
+                                        window.coraActiveSelectionRange = null;
+                                    }
+                                }, 250);
+                            }
+                        });
+
+                        window.coraQuillListenersAttached = true;
+                    }
+
+                    // Update word count immediately once Quill is initialized
+                    if (typeof window.coraUpdateWordCount === 'function') {
+                        window.coraUpdateWordCount();
+                    }
+                }
+            }, 100);
+
+            // Initialize metrics immediately as fallback (will show 0/100 initially)
+            if (typeof window.coraUpdateWordCount === 'function') {
+                window.coraUpdateWordCount();
+            }
+            if (typeof window.coraUpdateExcerptCount === 'function') {
+                window.coraUpdateExcerptCount();
+            }
+        };
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply all overrides after admin-script.js (deferred) has executed
+
+            // 1. Redefine window.coraToggleBeehiivDropdown to support 'more'
+            window.coraToggleBeehiivDropdown = function(type) {
+                const types = ['title-subtitle', 'visibility', 'authors', 'thumbnail', 'tags', 'more'];
+                types.forEach(t => {
+                    if (t === type) {
+                        jQuery(`#beehiiv-dropdown-${t}`).toggleClass('hidden');
+                    } else {
+                        jQuery(`#beehiiv-dropdown-${t}`).addClass('hidden');
+                    }
+                });
+            };
+
+            // 2. Wrap coraSelectMedia to sync cover and inline article canvas insertion
+            const originalSelectMedia = window.coraSelectMedia;
+            window.coraSelectMedia = function(id, url) {
+                const target = window.coraMediaSelectTarget || 'thumbnail';
+                if (target === 'inline') {
+                    if (window.coraQuillListingCoordinator) {
+                        const range = window.coraQuillListingCoordinator.getSelection();
+                        const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
+                        window.coraQuillListingCoordinator.insertEmbed(index, 'image', url);
+                        window.coraQuillListingCoordinator.insertText(index + 1, '\n');
+                        window.coraQuillListingCoordinator.setSelection(index + 2, 0);
+                        window.coraShowToast('Image inserted inline at cursor.', 'success');
+                    }
+                    if (typeof window.coraToggleMediaDrawer === 'function') {
+                        window.coraToggleMediaDrawer(false);
+                    }
+                    if (typeof window.coraUpdateWordCount === 'function') {
+                        window.coraUpdateWordCount();
+                    }
+                    if (typeof window.coraTriggerEditorAutoSave === 'function') {
+                        window.coraTriggerEditorAutoSave();
+                    }
+                } else {
+                    if (window.coraMediaSelectTarget === 'cover') {
+                        jQuery('#cora-thumbnail-id').val(id);
+                        jQuery('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
+                        jQuery('#cora-thumbnail-placeholder').addClass('hidden');
+                        jQuery('#cora-thumbnail-img-bh').attr('src', url).removeClass('hidden');
+                        jQuery('#cora-thumbnail-placeholder-bh').addClass('hidden');
+                    }
+                    if (typeof originalSelectMedia === 'function') {
+                        originalSelectMedia(id, url);
+                    }
+                }
+            };
+
+            // 3. Wrap coraRemoveCoverImage to clear post thumbnail
+            const originalRemoveCoverImage = window.coraRemoveCoverImage;
+            window.coraRemoveCoverImage = function() {
+                if (typeof originalRemoveCoverImage === 'function') {
+                    originalRemoveCoverImage();
+                }
+                jQuery('#cora-thumbnail-id').val('');
+                jQuery('#cora-thumbnail-img').addClass('hidden').attr('src', '');
+                jQuery('#cora-thumbnail-placeholder').removeClass('hidden');
+                jQuery('#cora-thumbnail-img-bh').addClass('hidden').attr('src', '');
+                jQuery('#cora-thumbnail-placeholder-bh').removeClass('hidden');
+            };
+
+            // 4. Override and extend word count update to synchronize outline, left stats, and dynamic SEO audits
+            const originalUpdateWordCount = window.coraUpdateWordCount;
+            window.coraUpdateWordCount = function() {
+                if (typeof originalUpdateWordCount === 'function') {
+                    originalUpdateWordCount();
+                }
+                
+                let text = '';
+                let headings = 0;
+                let images = 0;
+                let links = 0;
+                let h1s = 0;
+                let internalLinks = 0;
+                let externalLinks = 0;
+                let altTextOk = true;
+                let imageList = [];
+                
+                if (window.coraQuillListingCoordinator && window.coraQuillListingCoordinator.root) {
+                    const root = window.coraQuillListingCoordinator.root;
+                    text = window.coraQuillListingCoordinator.getText() || '';
+                    headings = root.querySelectorAll('h1, h2, h3, h4').length;
+                    h1s = root.querySelectorAll('h1').length;
+                    imageList = root.querySelectorAll('img');
+                    images = imageList.length;
+                    
+                    const linkList = root.querySelectorAll('a');
+                    links = linkList.length;
+                    
+                    const homeUrl = window.location.origin;
+                    linkList.forEach(link => {
+                        const href = link.getAttribute('href') || '';
+                        if (href.startsWith('/') || href.startsWith('#') || href.includes(homeUrl)) {
+                            internalLinks++;
+                        } else if (href.startsWith('http')) {
+                            externalLinks++;
+                        } else {
+                            internalLinks++;
+                        }
+                    });
+                    
+                    // Alt text verification
+                    if (images > 0) {
+                        let missingAlt = 0;
+                        imageList.forEach(img => {
+                            if (!img.getAttribute('alt')) {
+                                missingAlt++;
+                            }
+                        });
+                        if (missingAlt === images) {
+                            altTextOk = false;
+                        }
+                    } else {
+                        altTextOk = false;
+                    }
+                } else {
+                    text = jQuery('#cora-quill-editor').text() || '';
+                    headings = jQuery('#cora-quill-editor').find('h1, h2, h3, h4').length;
+                    h1s = jQuery('#cora-quill-editor').find('h1').length;
+                    images = jQuery('#cora-quill-editor').find('img').length;
+                    links = jQuery('#cora-quill-editor').find('a').length;
+                    internalLinks = links; // Fallback
+                }
+                
+                const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+                
+                jQuery('#left-stat-words').text(words);
+                jQuery('#left-stat-headings').text(headings);
+                jQuery('#left-stat-images').text(images);
+                jQuery('#left-stat-links').text(links);
+                jQuery('#seo-stat-internal-links').text(internalLinks);
+                jQuery('#seo-stat-external-links').text(externalLinks);
+                
+                if (typeof window.coraRebuildOutline === 'function') {
+                    window.coraRebuildOutline();
+                }
+                
+                if (typeof window.coraUpdateLeftSidebarMediaGrid === 'function') {
+                    window.coraUpdateLeftSidebarMediaGrid();
+                }
+                
+                // Recalculate SEO / Content Score dynamically
+                let score = 0;
+                score += Math.min(40, Math.round((words / 600) * 40));
+                score += Math.min(20, headings * 5);
+                score += Math.min(20, images * 10);
+                score += Math.min(20, links * 10);
+                
+                if (words === 0) score = 0;
+                
+                jQuery('#cora-seo-score-display').text(score);
+                const ring = document.getElementById('cora-seo-score-ring');
+                if (ring) {
+                    ring.setAttribute('stroke-dasharray', `${score}, 100`);
+                }
+                
+                jQuery('#left-score-value').text(`${score}/100`);
+                jQuery('#left-score-bar').css('width', `${score}%`);
+                
+                // Dynamic checklist sync
+                const hasTitle = jQuery('#cora-article-title').val() || '';
+                const hasH1 = (h1s > 0 || hasTitle.trim().length > 0);
+                const hasMeta = (jQuery('#cora-article-excerpt-bh').val() || jQuery('#cora-article-excerpt').val() || '').trim().length > 0;
+                
+                // H1 Tag Checklist
+                if (hasH1) {
+                    jQuery('#chk-chk-h1').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
+                    jQuery('#chk-indicator-h1').text('Active').removeClass('text-red-500 bg-red-50').addClass('text-zinc-400');
+                } else {
+                    jQuery('#chk-chk-h1').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+                    jQuery('#chk-indicator-h1').text('Missing').removeClass('text-zinc-400').addClass('text-red-500');
+                }
+                
+                // Meta Description Checklist
+                if (hasMeta) {
+                    jQuery('#chk-chk-meta').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
+                    jQuery('#chk-indicator-meta').text('Active').removeClass('text-red-500').addClass('text-zinc-400');
+                } else {
+                    jQuery('#chk-chk-meta').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+                    jQuery('#chk-indicator-meta').text('Missing').removeClass('text-zinc-400').addClass('text-red-500');
+                }
+                
+                // Image Alt Text Checklist
+                if (images > 0) {
+                    if (altTextOk) {
+                        jQuery('#chk-chk-alt').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
+                        jQuery('#chk-indicator-alt').text('Active').removeClass('text-red-500').addClass('text-zinc-400');
+                    } else {
+                        jQuery('#chk-chk-alt').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+                        jQuery('#chk-indicator-alt').text('No Alt').removeClass('text-zinc-400').addClass('text-red-500');
+                    }
+                } else {
+                    jQuery('#chk-chk-alt').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+                    jQuery('#chk-indicator-alt').text('No Images').removeClass('text-zinc-400').addClass('text-red-500');
+                }
+                
+                // Overall Checklist Badge
+                let criticalIssues = 0;
+                if (!hasH1) criticalIssues++;
+                if (!hasMeta) criticalIssues++;
+                
+                if (criticalIssues === 0 && altTextOk && internalLinks > 0) {
+                    jQuery('#checklist-issues-badge').text('Optimal').removeClass('bg-red-50 text-red-700 border-red-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-emerald-50 text-emerald-700 border-emerald-150');
+                } else if (criticalIssues > 0) {
+                    jQuery('#checklist-issues-badge').text('Critical').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-red-50 text-red-700 border-red-150');
+                } else {
+                    jQuery('#checklist-issues-badge').text('Needs Tweaks').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-red-50 text-red-700 border-red-150').addClass('bg-amber-50 text-amber-700 border-amber-150');
+                }
+                
+                if (score >= 80) {
+                    jQuery('#left-score-grade').text('A').removeClass('bg-red-50 text-red-700 border-red-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-emerald-50 text-emerald-700 border-emerald-150');
+                    jQuery('#cora-seo-status-text').text('Optimized').removeClass('text-red-500 text-amber-500').addClass('text-emerald-600');
+                    if (ring) ring.setAttribute('class', 'text-emerald-500 transition-all duration-300');
+                    jQuery('#left-score-message').text('Perfect optimization! Ready to publish.');
+                } else if (score >= 50) {
+                    jQuery('#left-score-grade').text('B').removeClass('bg-red-50 text-red-700 border-red-150 bg-emerald-50 text-emerald-700 border-emerald-150').addClass('bg-amber-50 text-amber-700 border-amber-150');
+                    jQuery('#cora-seo-status-text').text('Good').removeClass('text-red-500 text-emerald-600').addClass('text-amber-500');
+                    if (ring) ring.setAttribute('class', 'text-amber-500 transition-all duration-300');
+                    jQuery('#left-score-message').text('Good job! A few more tweaks and you\'re set.');
+                } else {
+                    jQuery('#left-score-grade').text('C').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-red-50 text-red-700 border-red-150');
+                    jQuery('#cora-seo-status-text').text('Poor').removeClass('text-emerald-600 text-amber-500').addClass('text-red-500');
+                    if (ring) ring.setAttribute('class', 'text-red-500 transition-all duration-300');
+                    jQuery('#left-score-message').text('Needs attention. Fix the checklist issues.');
+                }
+            };
+
+            // 5. Hook window.coraEditArticle to run editor initialization
+            const originalEditArticle = window.coraEditArticle;
+            window.coraEditArticle = function(id) {
+                if (typeof originalEditArticle === 'function') {
+                    originalEditArticle(id);
+                }
+                window.coraInitializeWorkspaceEditorSettings();
+            };
+
+            // 6. Hook window.coraOpenContentDrawer to run editor initialization
+            const originalOpenContentDrawer = window.coraOpenContentDrawer;
+            window.coraOpenContentDrawer = function() {
+                if (typeof originalOpenContentDrawer === 'function') {
+                    originalOpenContentDrawer();
+                }
+                window.coraInitializeWorkspaceEditorSettings();
+            };
+
             // Typist listener for real-time auto-saving
             jQuery(document).on('input propertychange change keyup', '#cora-article-title, #cora-article-subtitle, #cora-article-excerpt, #cora-article-slug, #cora-article-excerpt-bh', function() {
                 if (typeof window.coraUpdateExcerptCount === 'function') {
@@ -10252,45 +10310,8 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             });
 
             setTimeout(function() {
-                if (window.coraQuillListingCoordinator) {
-                    window.coraQuillListingCoordinator.on('text-change', function() {
-                        window.coraUpdateWordCount();
-                        window.coraTriggerEditorAutoSave();
-                    });
-
-                    // Inline AI selection listener
-                    window.coraQuillListingCoordinator.on('selection-change', function(range, oldRange, source) {
-                        if (range && range.length > 0) {
-                            window.coraActiveSelectionRange = range;
-                            window.coraPositionInlineAIPopup(range);
-                        } else {
-                            setTimeout(function() {
-                                const activeEl = document.activeElement;
-                                const isInsidePopup = activeEl && activeEl.closest('#cora-inline-ai-popup');
-                                if (!isInsidePopup) {
-                                    window.coraHideInlineAIPopup();
-                                    window.coraActiveSelectionRange = null;
-                                }
-                            }, 250);
-                        }
-                    });
-                }
-                
-                // Initialize floating popup DOM elements
-                coraInitInlineAIPopup();
-
-                // Restore unsaved draft from localStorage if page refreshed
-                const activeId = jQuery('#cora-article-id').val();
-                window.coraRestoreEditorDraft(activeId);
-
-                // Initialize metrics and counters
-                if (typeof window.coraUpdateWordCount === 'function') {
-                    window.coraUpdateWordCount();
-                }
-                if (typeof window.coraUpdateExcerptCount === 'function') {
-                    window.coraUpdateExcerptCount();
-                }
-            }, 1000);
+                window.coraInitializeWorkspaceEditorSettings();
+            }, 500);
         });
         </script>
     </div>
@@ -10393,7 +10414,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
     </aside>
 
     <!-- AI Tone Selector Drawer -->
-    <aside id="cora-ai-tone-drawer" class="collapsed translate-x-full fixed top-0 right-0 z-[150] h-full w-[380px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out pointer-events-none hidden">
+    <aside id="cora-ai-tone-drawer" class="collapsed translate-x-full fixed top-0 right-0 z-[10005] h-full w-[380px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out pointer-events-none hidden">
         <header class="flex items-center justify-between px-5 py-3 border-b border-zinc-200 bg-white shrink-0">
             <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
@@ -10437,6 +10458,72 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             </div>
         </div>
     </aside>
+    <!-- Mobile Floating Bottom Navigation (3-State Adaptive Floating Island Bar) -->
+    <div id="cora-mobile-floating-island" class="cora-mobile-island-wrapper lg:hidden fixed bottom-4 left-0 right-0 z-[9980] w-[calc(100vw-32px)] max-w-[460px] mx-auto transition-all duration-300 ease-out select-none" style="position: fixed !important; bottom: 16px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; z-index: 9980 !important; width: calc(100vw - 32px) !important; max-width: 460px !important; box-sizing: border-box !important;">
+        <div class="cora-island-card w-full flex items-center justify-between transition-all duration-300">
+            
+            <!-- State 1 & 2: Menu Toggle Button (Left) -->
+            <button type="button" id="cora-island-state-menu-btn" onclick="coraToggleIslandState('nav')" class="cora-island-btn-menu" title="Toggle Navigation Menu">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <!-- STATE 1: Compact Neutral Bar (Middle) -->
+            <div id="cora-island-view-compact" class="cora-island-view flex-1 mx-2 flex items-center justify-center cursor-pointer rounded-full" onclick="coraToggleIslandState('ai')" style="flex: 1 1 auto; display: flex; align-items: center; justify-content: center; height: 40px !important; cursor: pointer; box-sizing: border-box !important;">
+                <div class="cora-island-input-pill" style="justify-content: center !important; gap: 8px !important;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" style="color: #71717a !important;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <span style="font-size: 13px; font-weight: 600; color: #71717a !important;">Search or ask AI...</span>
+                </div>
+            </div>
+
+            <!-- STATE 2: AI Input / Prompt Bar (Middle) -->
+            <div id="cora-island-view-ai" class="cora-island-view hidden flex-1 mx-1.5 flex items-center" style="display: none; flex: 1 1 auto; height: 40px !important;">
+                <div class="cora-island-input-pill">
+                    <div style="display: flex; align-items: center; flex: 1; min-w: 0; height: 100%;">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0" style="margin-right: 6px; flex-shrink: 0; color: #71717a !important;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="cora-island-ai-input" placeholder="Search articles, opportunities..." class="w-full bg-transparent border-none outline-none text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 pl-1 pr-1 font-sans focus:outline-none focus:ring-0" style="border: none !important; outline: none !important; box-shadow: none !important; font-size: 13px !important; background: transparent !important; color: #18181b !important; width: 100% !important; height: 100% !important; padding: 0 !important; margin: 0 !important;" onkeydown="if(event.key==='Enter'){ coraSubmitIslandAI(); }">
+                    </div>
+                    <button type="button" onclick="coraSubmitIslandAI()" class="cora-island-ask-btn">
+                        Ask AI
+                    </button>
+                </div>
+            </div>
+
+            <!-- STATE 3: Navigation Tabs Bar (Middle) -->
+            <nav id="cora-island-view-nav" class="cora-island-view hidden flex-1 mx-1 flex items-center justify-evenly" style="display: none; flex: 1 1 auto; justify-content: space-around;">
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('dashboard');}" class="cora-island-nav-link">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">Home</span>
+                </a>
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('bookings');}" class="cora-island-nav-link">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">CRM</span>
+                </a>
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('blogs');}" class="cora-island-nav-link">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">Content</span>
+                </a>
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('financials');}" class="cora-island-nav-link">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/></svg>
+                    <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">Finance</span>
+                </a>
+                <a href="javascript:void(0)" onclick="const sb=document.querySelector('.cora-sidebar'); if(sb){ sb.classList.toggle('mobile-open'); sb.classList.toggle('hidden'); }" class="cora-island-nav-link">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                    <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">More</span>
+                </a>
+            </nav>
+
+            <!-- State 1 & 3: AI Action Button (Right) -->
+            <button type="button" id="cora-island-state-ai-btn" onclick="coraToggleIslandState('ai')" class="cora-island-btn-ai" title="Ask Cora AI">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2l2.4 4.86L19.8 8l-3.9 3.8 0.9 5.36L12 14.6l-4.8 2.56 0.9-5.36L4.2 8l5.4-1.14L12 2z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
     </div> <!-- .flex.flex-row.flex-1.min-h-0 -->
 </div> <!-- #cora-workspace -->
 <?php
@@ -11892,7 +11979,8 @@ wp_print_footer_scripts();
                 let matchedAny = false;
                 navItems.forEach(item => {
                     const text = item.textContent.toLowerCase();
-                    if (text.includes(query)) {
+                    const target = (item.getAttribute('data-target') || '').toLowerCase();
+                    if (text.includes(query) || target.includes(query)) {
                         item.classList.remove('hidden');
                         matchedAny = true;
                     } else {
@@ -12069,9 +12157,11 @@ if ( cora_is_super_owner() ) :
     border-left: 1px solid #e4e4e7;
     box-shadow: -10px 0 40px rgba(9, 9, 11, 0.08);
     transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
     display: flex;
     flex-direction: column;
+    visibility: hidden;
+    pointer-events: none;
 }
 .dark #cora-update-drawer {
     background: #09090b;
@@ -12080,6 +12170,8 @@ if ( cora_is_super_owner() ) :
 }
 #cora-update-drawer.open {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
 }
 
 /* Timeline specific styles */
@@ -13468,7 +13560,7 @@ function coraRequestPushSubscription() {
                         }
                         
                         const token = resData.data.token;
-                        navigator.serviceWorker.register('<?php echo home_url('/cora-service-worker.js'); ?>?token=' + token, { scope: '/' })
+                        navigator.serviceWorker.register('<?php echo home_url('/cora-service-worker.js'); ?>?v=<?php echo CORA_WORKSPACE_VERSION; ?>&token=' + token, { scope: '/' })
                             .then(() => {
                                 const badge = document.getElementById('cora-pwa-badge');
                                 if (badge) {

@@ -86,6 +86,33 @@
     display: none !important;
 }
 
+/* Restore responsive overrides when combined with .hidden */
+@media (min-width: 640px) {
+    .sm\:flex.hidden, .hidden.sm\:flex { display: flex !important; }
+    .sm\:grid.hidden, .hidden.sm\:grid { display: grid !important; }
+    .sm\:block.hidden, .hidden.sm\:block { display: block !important; }
+    .sm\:inline-flex.hidden, .hidden.sm\:inline-flex { display: inline-flex !important; }
+}
+@media (min-width: 768px) {
+    .md\:flex.hidden, .hidden.md\:flex { display: flex !important; }
+    .md\:grid.hidden, .hidden.md\:grid { display: grid !important; }
+    .md\:block.hidden, .hidden.md\:block { display: block !important; }
+    .md\:inline-flex.hidden, .hidden.md\:inline-flex { display: inline-flex !important; }
+}
+@media (min-width: 1024px) {
+    .lg\:flex.hidden, .hidden.lg\:flex { display: flex !important; }
+    .lg\:grid.hidden, .hidden.lg\:grid { display: grid !important; }
+    .lg\:block.hidden, .hidden.lg\:block { display: block !important; }
+    .lg\:inline-flex.hidden, .hidden.lg\:inline-flex { display: inline-flex !important; }
+}
+@media (min-width: 1280px) {
+    .xl\:flex.hidden, .hidden.xl\:flex { display: flex !important; }
+    .xl\:grid.hidden, .hidden.xl\:grid { display: grid !important; }
+    .xl\:block.hidden, .hidden.xl\:block { display: block !important; }
+    .xl\:inline-flex.hidden, .hidden.xl\:inline-flex { display: inline-flex !important; }
+}
+
+
 /* =====================================================================
    COLLAPSED DRAWER / SHEET STATE
    All sliding drawers use class="collapsed" to indicate closed state.
@@ -229,9 +256,11 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
 }
 
 /* Fix: WP media modal must sit above Cora drawers (z-index: 99999) */
-.media-modal-backdrop,
-.media-modal {
+.media-modal-backdrop {
     z-index: 160100 !important;
+}
+.media-modal {
+    z-index: 160200 !important;
 }
 
 /* --- KANBAN & CALENDAR PLANNING UTILITIES --- */
@@ -261,15 +290,155 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
 }
 
 /* --- CORA THEME & AUTO-DARK CONTROL SYSTEM --- */
-/* Lock elements to Light scheme by default to prevent naive mobile browser force-dark color inversions */
-#cora-workspace:not(.cora-dark-theme),
-#cora-workspace:not(.cora-dark-theme) * {
+/* Lock elements to Light scheme globally to prevent naive mobile browser force-dark color inversions */
+:root,
+html,
+body,
+#cora-workspace,
+#cora-workspace * {
     color-scheme: only light !important;
 }
 
-/* Allow Dark scheme transitions and rendering when the platform's dark theme class is explicitly active */
-#cora-workspace.cora-dark-theme,
-#cora-workspace.cora-dark-theme * {
-    color-scheme: dark !important;
+/* =====================================================================
+   MOBILE FLOATING ISLAND THEME AND RESPONSIVENESS
+   ===================================================================== */
+.cora-island-card {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid #e4e4e7 !important;
+    border-radius: 9999px !important;
+    padding: 6px !important;
+    box-shadow: 0 10px 30px -5px rgba(0,0,0,0.12), 0 4px 12px -2px rgba(0,0,0,0.08) !important;
 }
+
+.cora-dark-theme .cora-island-card {
+    background-color: rgba(9, 9, 11, 0.95) !important;
+    border-color: #27272a !important;
+    box-shadow: 0 10px 30px -5px rgba(0,0,0,0.5), 0 4px 12px -2px rgba(0,0,0,0.3) !important;
+}
+
+/* AI Mode View input pill wrapper */
+.cora-island-input-pill {
+    background-color: #f4f4f5 !important;
+    border: 1px solid #e4e4e7 !important;
+    border-radius: 9999px !important;
+    padding: 2px 2px 2px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.cora-dark-theme .cora-island-input-pill {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+}
+
+/* Ask AI button inside pill */
+.cora-island-ask-btn {
+    height: 34px !important;
+    padding: 0 16px !important;
+    background-color: #09090b !important;
+    color: #ffffff !important;
+    border-radius: 9999px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    border: none !important;
+    outline: none !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    margin-left: 6px !important;
+    transition: background-color 0.15s ease !important;
+}
+
+.cora-dark-theme .cora-island-ask-btn {
+    background-color: #ffffff !important;
+    color: #09090b !important;
+}
+
+.cora-island-ask-btn:hover {
+    background-color: #27272a !important;
+}
+
+.cora-dark-theme .cora-island-ask-btn:hover {
+    background-color: #e4e4e7 !important;
+}
+
+/* Mobile Island Buttons */
+.cora-island-btn-menu {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background-color: #f4f4f5 !important;
+    border: none !important;
+    color: #27272a !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    outline: none !important;
+}
+
+.cora-dark-theme .cora-island-btn-menu {
+    background-color: #18181b !important;
+    color: #fafafa !important;
+}
+
+.cora-island-btn-ai {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background-color: #ffffff !important;
+    border: 1px solid #e4e4e7 !important;
+    color: #18181b !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    outline: none !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
+}
+
+.cora-dark-theme .cora-island-btn-ai {
+    background-color: #09090b !important;
+    border-color: #27272a !important;
+    color: #fafafa !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
+}
+
+.cora-island-btn-menu.hidden,
+.cora-island-btn-ai.hidden {
+    display: none !important;
+}
+
+.cora-island-nav-link {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    color: #3f3f46 !important;
+    padding: 2px 4px !important;
+}
+
+.cora-dark-theme .cora-island-nav-link {
+    color: #a1a1aa !important;
+}
+
+.cora-island-nav-link:hover {
+    color: #09090b !important;
+}
+
+.cora-dark-theme .cora-island-nav-link:hover {
+    color: #ffffff !important;
+}
+
 

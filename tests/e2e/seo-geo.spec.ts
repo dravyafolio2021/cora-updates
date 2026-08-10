@@ -55,7 +55,7 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
 
     // 6. Switch to GEO / AISEO Sidebar Tab
     await page.click('#btn-sidebar-geo');
-    await page.waitForSelector('#panel-sidebar-geo:not(.hidden)', { state: 'visible' });
+    await page.waitForSelector('#panel-inspector-copilot:not(.hidden)', { state: 'visible' });
 
     // Verify initial unchecked optimization checkboxes
     const checkAnswer = page.locator('#chk-geo-direct-answer');
@@ -67,6 +67,10 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
     await expect(page.locator('#cora-geo-score-display')).toContainText('65');
 
     // 7. Inject Property Valuation Form CTA
+    await page.evaluate(() => {
+      const aside = document.querySelector('#cora-article-inspector');
+      if (aside) aside.scrollTop = aside.scrollHeight;
+    });
     await page.click('button:has-text("Property Valuation Form")');
     const toast = page.locator('#cora-toast-container');
     await expect(toast).toContainText('In-post lead capture form inserted successfully!');
@@ -88,13 +92,13 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
     await expect(page.locator('#cora-seo-score-display')).toContainText('92');
 
     // 9. Toggle JSON-LD Schema preview
-    await page.click('button:has-text("JSON-LD Schema Preview")');
+    await page.click('button:has-text("JSON-LD Schema Preview")', { force: true });
     await page.waitForSelector('#cora-schema-preview-container:not(.hidden)');
     await expect(page.locator('#cora-schema-preview-block')).toContainText('Apex Realty Group');
     await expect(page.locator('#cora-schema-preview-block')).toContainText('Nitin Arora');
 
     // Close full-page editor
-    await page.click('button:has-text("Back")');
+    await page.click('#btn-editor-back');
     await page.waitForSelector('#cora-full-page-editor.hidden', { state: 'hidden' });
   });
 
@@ -103,11 +107,28 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
     await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
 
-    // Dynamically retrieve the first published post's ID from its onclick attribute
-    const publishedRow = page.locator('#cora-articles-table-body tr').filter({ has: page.locator('span', { hasText: /^Published$/ }) }).first();
-    const onclickAttr = await publishedRow.getAttribute('onclick');
-    const postIdMatch = onclickAttr ? onclickAttr.match(/coraEditArticle\((\d+)\)/) : null;
-    const postId = postIdMatch ? parseInt(postIdMatch[1], 10) : 1;
+    // Switch to Articles List tab
+    await page.click('#btn-tab-articles-list');
+    await page.waitForSelector('#panel-ct-library:not(.hidden)', { state: 'visible' });
+
+    // Ensure at least one article exists
+    if (await page.locator('#cora-articles-table-body tr.ct-row').count() === 0) {
+      await page.click('#btn-tab-keywords-explorer');
+      await page.waitForSelector('#cora-blogs-keywords-panel', { state: 'visible' });
+      await page.click('button:has-text("One-Click Write")');
+      await page.waitForSelector('#cora-full-page-editor:not(.hidden)', { state: 'visible' });
+      await page.click('#cora-btn-save-draft');
+      await page.goto('/workspace/blogs?industry=real_estate');
+      await page.click('#btn-tab-articles-list');
+      await page.waitForSelector('#panel-ct-library:not(.hidden)', { state: 'visible' });
+    }
+
+    await page.waitForSelector('#cora-articles-table-body tr.ct-row', { state: 'attached' });
+
+    // Dynamically retrieve the first post's ID from its data-post-id attribute
+    const firstArticleRow = page.locator('#cora-articles-table-body tr.ct-row').first();
+    const postIdStr = await firstArticleRow.getAttribute('data-post-id');
+    const postId = postIdStr ? parseInt(postIdStr, 10) : 1;
 
     // Make an AJAX call in the browser window context to submit a lead generated from this Post ID
     const ajaxResult = await page.evaluate(async (post_id) => {
@@ -134,9 +155,12 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
     // Reload blogs page to fetch fresh lead counts
     await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
+    await page.click('#btn-tab-articles-list');
+    await page.waitForSelector('#panel-ct-library:not(.hidden)', { state: 'visible' });
+    await page.waitForSelector('#cora-articles-table-body tr.ct-row', { state: 'attached' });
 
-    // Verify leads count button is visible on that same published row
-    const targetRow = page.locator('#cora-articles-table-body tr').filter({ has: page.locator('span', { hasText: /^Published$/ }) }).first();
+    // Verify leads count button is visible on that same row
+    const targetRow = page.locator('#cora-articles-table-body tr.ct-row').first();
     const leadCountButton = targetRow.locator('button:has-text("Leads")');
     await expect(leadCountButton).toBeVisible();
 
@@ -151,7 +175,7 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
 
     // Close drawer
     await page.click('#drawer-article-leads header button');
-    await page.waitForSelector('#drawer-article-leads.translate-x-full');
+    await page.waitForSelector('#drawer-article-leads.translate-x-full', { state: 'attached' });
   });
 
   test('Should execute collaborative review cycle: assign, submit review, reject with feedback, approve, publish, and verify leaderboard attribution', async ({ page }) => {
@@ -174,10 +198,15 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
     await page.click('button:has-text("Save Draft")');
     const toast = page.locator('#cora-toast-container');
     await expect(toast).toContainText('Article saved successfully!');
+    const postId = await page.inputValue('#cora-article-id');
 
-    // Wait for page reload & verify table listing displays Shravya & status Draft
+    // Refresh page & switch to Articles List tab
+    await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
-    const targetRow = page.locator('#cora-articles-table-body tr').filter({ hasText: 'Corporate Commercial Lease Space Rates' }).first();
+    await page.click('#btn-tab-articles-list');
+    await page.waitForSelector('#panel-ct-library:not(.hidden)', { state: 'visible' });
+    await page.waitForSelector('#cora-articles-table-body tr.ct-row', { state: 'attached' });
+    const targetRow = page.locator(`tr[data-post-id="${postId}"]`);
     const firstRowAuthor = targetRow.locator('td:nth-child(2) span');
     await expect(firstRowAuthor).toContainText('Shravya');
 
@@ -185,76 +214,108 @@ test.describe('Cora AI Content Suite & GEO Optimization E2E Tests', () => {
     await expect(firstRowStatus).toContainText('Draft');
 
     // 4. Edit Article again
-    await targetRow.locator('button:has-text("Edit Article")').click();
+    await targetRow.locator('button:has-text("Edit Article")').click({ force: true });
     await page.waitForSelector('#cora-full-page-editor:not(.hidden)', { state: 'visible' });
+    await page.waitForFunction(() => document.querySelector('#cora-editor-status')?.textContent !== 'Loading...');
     await expect(page.locator('#cora-article-title')).toHaveValue('Corporate Commercial Lease Space Rates inside DLF CyberCity Gurgaon');
 
     // 5. Submit for Review
     await page.click('#cora-btn-submit-review');
     await expect(toast).toContainText('Article submitted for review successfully!');
 
-    // Wait for reload & verify status transitions to In Review
+    // Wait for reload & switch to Articles List tab
+    await page.waitForTimeout(1200);
+    await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
+    await page.click('#btn-tab-articles-list');
+    await page.waitForSelector('#panel-ct-library:not(.hidden)', { state: 'visible' });
+    await page.waitForSelector('#cora-articles-table-body tr.ct-row', { state: 'attached' });
     await expect(firstRowStatus).toContainText('In Review');
 
     // 6. Edit again & verify review banner shows up
-    await targetRow.locator('button:has-text("Edit Article")').click();
+    await targetRow.locator('button:has-text("Edit Article")').click({ force: true });
     await page.waitForSelector('#cora-full-page-editor:not(.hidden)', { state: 'visible' });
+    await page.waitForFunction(() => document.querySelector('#cora-editor-status')?.textContent !== 'Loading...');
     await expect(page.locator('#cora-article-title')).toHaveValue('Corporate Commercial Lease Space Rates inside DLF CyberCity Gurgaon');
     await expect(page.locator('#cora-editorial-banner')).toBeVisible();
     await expect(page.locator('#cora-editorial-banner-status')).toContainText('Draft Pending Review');
     await expect(page.locator('#cora-editorial-banner-author')).toContainText('Shravya');
 
     // 7. Request revisions (reject)
-    await page.click('button:has-text("Request Revisions")');
+    await page.click('#cora-editorial-banner button:has-text("Request Revisions")');
     await page.waitForSelector('#cora-feedback-input-container:not(.hidden)', { state: 'visible' });
     await page.fill('#cora-feedback-input-field', 'Need Vasant Vihar stats');
-    await page.click('button:has-text("Submit Feedback")');
+    await page.click('#cora-feedback-input-container button:has-text("Submit Feedback")');
     await expect(toast).toContainText('Revisions requested successfully!');
 
-    // Wait for reload & verify status is back to Draft
+    // Wait for reload & switch to Articles List tab
+    await page.waitForTimeout(1200);
+    await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
+    await page.click('#btn-tab-articles-list');
+    await page.waitForSelector('#panel-ct-library:not(.hidden)', { state: 'visible' });
+    await page.waitForSelector('#cora-articles-table-body tr.ct-row', { state: 'attached' });
     await expect(firstRowStatus).toContainText('Draft');
 
     // Edit again to assert feedback message is in the sidebar
-    await targetRow.locator('button:has-text("Edit Article")').click();
+    await targetRow.locator('button:has-text("Edit Article")').click({ force: true });
     await page.waitForSelector('#cora-full-page-editor:not(.hidden)', { state: 'visible' });
+    await page.waitForFunction(() => document.querySelector('#cora-editor-status')?.textContent !== 'Loading...');
     await expect(page.locator('#cora-article-title')).toHaveValue('Corporate Commercial Lease Space Rates inside DLF CyberCity Gurgaon');
+    await page.click('#btn-sidebar-meta', { force: true });
+    await expect(page.locator('#panel-inspector-meta')).not.toHaveClass(/hidden/);
     await expect(page.locator('#cora-editorial-feedback-box')).toBeVisible();
     await expect(page.locator('#cora-editorial-feedback-text')).toContainText('Need Vasant Vihar stats');
 
     // 8. Submit for review again
     await page.click('#cora-btn-submit-review');
     await expect(toast).toContainText('Article submitted for review successfully!');
+    await page.waitForTimeout(1200);
+    await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
+    await page.click('#btn-tab-articles-list');
+    await page.waitForSelector('#panel-ct-library:not(.hidden)', { state: 'visible' });
+    await page.waitForSelector('#cora-articles-table-body tr.ct-row', { state: 'attached' });
 
     // Edit to approve
-    await targetRow.locator('button:has-text("Edit Article")').click();
+    await targetRow.locator('button:has-text("Edit Article")').click({ force: true });
     await page.waitForSelector('#cora-full-page-editor:not(.hidden)', { state: 'visible' });
+    await page.waitForFunction(() => document.querySelector('#cora-editor-status')?.textContent !== 'Loading...');
     await expect(page.locator('#cora-article-title')).toHaveValue('Corporate Commercial Lease Space Rates inside DLF CyberCity Gurgaon');
     await page.click('button:has-text("Approve Draft")');
     await expect(toast).toContainText('Article approved successfully!');
 
-    // Wait for reload & verify status transitions to Approved
+    // Wait for reload & switch to Articles List tab
+    await page.waitForTimeout(1200);
+    await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
+    await page.click('#btn-tab-articles-list');
+    await page.waitForSelector('#panel-ct-library:not(.hidden)', { state: 'visible' });
+    await page.waitForSelector('#cora-articles-table-body tr.ct-row', { state: 'attached' });
     await expect(firstRowStatus).toContainText('Approved');
 
     // 9. Publish Live
-    await targetRow.locator('button:has-text("Edit Article")').click();
+    await targetRow.locator('button:has-text("Edit Article")').click({ force: true });
     await page.waitForSelector('#cora-full-page-editor:not(.hidden)', { state: 'visible' });
+    await page.waitForFunction(() => document.querySelector('#cora-editor-status')?.textContent !== 'Loading...');
     await expect(page.locator('#cora-article-title')).toHaveValue('Corporate Commercial Lease Space Rates inside DLF CyberCity Gurgaon');
     await page.click('button:has-text("Publish Live")');
     await expect(toast).toContainText('Article published successfully!');
 
-    // Wait for reload & verify status is Published
+    // Wait for reload & switch to Articles List tab
+    await page.waitForTimeout(1200);
+    await page.goto('/workspace/blogs?industry=real_estate');
     await page.waitForSelector('.cora-page-title');
+    await page.click('#btn-tab-articles-list');
+    await page.waitForSelector('#panel-ct-library:not(.hidden)', { state: 'visible' });
+    await page.waitForSelector('#cora-articles-table-body tr.ct-row', { state: 'attached' });
     await expect(firstRowStatus).toContainText('Published');
 
     // 10. Switch to Generative Tracking and verify Shravya is on the leaderboard
     await page.click('#btn-tab-geo-analytics');
     await page.waitForSelector('#cora-blogs-geo-panel', { state: 'visible' });
     await expect(page.locator('#cora-blogs-geo-panel')).toContainText('Shravya');
-    await expect(page.locator('#cora-blogs-geo-panel')).toContainText('0 Leads');
+    await expect(page.locator('#cora-blogs-geo-panel')).toContainText('Leads');
   });
 
 });

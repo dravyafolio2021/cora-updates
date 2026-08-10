@@ -9,9 +9,11 @@ if ( get_option( 'cora_onboarding_enabled', 1 ) ) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
     <title>Cora — Create Your Workspace</title>
     <style>
         :root {
+            color-scheme: only light !important;
             --bg-color: #fcfcfc;
             --card-bg: #ffffff;
             --text-primary: #18181b;

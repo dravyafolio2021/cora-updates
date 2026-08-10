@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.76
+ * Version: 3.2.81
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.76' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.81' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -10860,6 +10860,8 @@ function cora_ajax_save_article() {
     $title = isset($_POST['title']) ? sanitize_text_field($_POST['title']) : '';
     $content = isset($_POST['content']) ? wp_kses_post($_POST['content']) : '';
     $status = isset($_POST['status']) && $_POST['status'] === 'publish' ? 'publish' : 'draft';
+
+    file_put_contents('/Users/shrutian/Desktop/cora/ajax_log.txt', "SAVE ARTICLE: id={$post_id}, status={$status}, raw_status=" . (isset($_POST['status']) ? $_POST['status'] : 'not set') . "\n", FILE_APPEND);
     $subtitle = isset($_POST['subtitle']) ? sanitize_text_field($_POST['subtitle']) : '';
     $keyword = isset($_POST['keyword']) ? sanitize_text_field($_POST['keyword']) : '';
     $description = isset($_POST['description']) ? sanitize_textarea_field($_POST['description']) : '';
@@ -10929,8 +10931,15 @@ function cora_ajax_save_article() {
     update_post_meta($saved_id, '_cora_seo_keyword', $keyword);
     update_post_meta($saved_id, '_cora_seo_description', $description);
     update_post_meta($saved_id, '_cora_article_subtitle', $subtitle);
-    update_post_meta($saved_id, '_cora_assignee_id', $assignee_id);
-    update_post_meta($saved_id, '_cora_editorial_feedback', $editorial_feedback);
+    if (isset($_POST['assignee_id'])) {
+        update_post_meta($saved_id, '_cora_assignee_id', $assignee_id);
+    }
+    if (isset($_POST['editorial_feedback'])) {
+        update_post_meta($saved_id, '_cora_editorial_feedback', $editorial_feedback);
+    }
+    if (isset($_POST['editorial_status'])) {
+        update_post_meta($saved_id, '_cora_editorial_status', $editorial_status);
+    }
     update_post_meta($saved_id, '_cora_scheduled_date', $scheduled_date);
 
     if (!empty($scheduled_date)) {
@@ -11839,10 +11848,35 @@ function cora_db_get_article_lead_count( $post_id ) {
 if ( ! function_exists( 'cora_db_get_article_leads' ) ) {
 function cora_db_get_article_leads( $post_id ) {
     global $wpdb;
-    return $wpdb->get_results( $wpdb->prepare(
+    $results = $wpdb->get_results( $wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}cora_leads WHERE source = %s ORDER BY id DESC",
         'Blog Post ID: ' . $post_id
     ) );
+    if ( ! empty( $results ) ) {
+        return $results;
+    }
+    // Fallback to option storage if DB table query returns empty
+    $leads_opt = get_option( 'cora_workspace_leads', array() );
+    $fallback = array();
+    if ( is_array( $leads_opt ) ) {
+        foreach ( array_reverse( $leads_opt ) as $ld ) {
+            $ld_source = isset( $ld['source'] ) ? $ld['source'] : '';
+            if ( $ld_source === 'Blog Post ID: ' . $post_id || strpos( $ld_source, (string)$post_id ) !== false ) {
+                $names = explode( ' ', isset( $ld['names'] ) ? $ld['names'] : '', 2 );
+                $obj = new stdClass();
+                $obj->id = isset( $ld['id'] ) ? $ld['id'] : 0;
+                $obj->first_name = $names[0];
+                $obj->last_name = isset( $names[1] ) ? $names[1] : '';
+                $obj->email = isset( $ld['email'] ) ? $ld['email'] : '';
+                $obj->phone = isset( $ld['phone'] ) ? $ld['phone'] : '';
+                $obj->notes = isset( $ld['notes'] ) ? $ld['notes'] : '';
+                $created = isset( $ld['created_at'] ) ? $ld['created_at'] : time();
+                $obj->created_at = is_numeric( $created ) ? date( 'Y-m-d H:i:s', $created ) : $created;
+                $fallback[] = $obj;
+            }
+        }
+    }
+    return $fallback;
 }
 }
 
@@ -11883,29 +11917,27 @@ function cora_ajax_submit_blog_lead() {
         array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
     );
 
-    if ( $inserted ) {
-        $inserted_id = $wpdb->insert_id;
-        $leads_opt = get_option( 'cora_workspace_leads', array() );
-        if ( ! is_array( $leads_opt ) ) {
-            $leads_opt = array();
-        }
-        $leads_opt[] = array(
-            'id'         => $inserted_id,
-            'names'      => trim( $first_name . ' ' . $last_name ),
-            'email'      => $email,
-            'phone'      => $phone,
-            'source'     => 'Blog Post ID: ' . $post_id,
-            'status'     => 'new',
-            'notes'      => $notes,
-            'created_at' => time()
-        );
-        update_option( 'cora_workspace_leads', $leads_opt );
-
-        cora_sync_db_tables_to_options();
-        wp_send_json_success( array( 'message' => 'Your request was submitted successfully!' ) );
-    } else {
-        wp_send_json_error( 'Failed to submit request.' );
+    $inserted_id = $inserted ? $wpdb->insert_id : time();
+    $leads_opt = get_option( 'cora_workspace_leads', array() );
+    if ( ! is_array( $leads_opt ) ) {
+        $leads_opt = array();
     }
+    $leads_opt[] = array(
+        'id'         => $inserted_id,
+        'names'      => trim( $first_name . ' ' . $last_name ),
+        'email'      => $email,
+        'phone'      => $phone,
+        'source'     => 'Blog Post ID: ' . $post_id,
+        'status'     => 'new',
+        'notes'      => $notes,
+        'created_at' => time()
+    );
+    update_option( 'cora_workspace_leads', $leads_opt );
+
+    if ( function_exists( 'cora_sync_db_tables_to_options' ) ) {
+        cora_sync_db_tables_to_options();
+    }
+    wp_send_json_success( array( 'message' => 'Your request was submitted successfully!', 'lead_id' => $inserted_id ) );
 }
 }
 add_action( 'wp_ajax_cora_submit_blog_lead', 'cora_ajax_submit_blog_lead' );

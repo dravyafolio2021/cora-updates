@@ -53,8 +53,8 @@ if ( ! defined( 'ABSPATH' ) ) {
                 Changelog
             </button>
 
-            <!-- Theme Toggle -->
-            <button onclick="coraTogglePublicDarkMode()" class="text-zinc-500 hover:text-zinc-900 dark:text-zinc-450 dark:hover:text-zinc-100 transition-colors p-1.5 rounded-lg border-none bg-transparent cursor-pointer select-none flex items-center justify-center" aria-label="Toggle dark mode">
+            <!-- Theme Toggle (Locked to Light Mode for this release) -->
+            <button onclick="coraTogglePublicDarkMode()" class="hidden text-zinc-500 hover:text-zinc-900 dark:text-zinc-450 dark:hover:text-zinc-100 transition-colors p-1.5 rounded-lg border-none bg-transparent cursor-pointer select-none flex items-center justify-center" aria-label="Toggle dark mode">
                 <!-- SVG sun icon (shown in light mode to switch to dark) -->
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="block dark:hidden">
                     <circle cx="12" cy="12" r="5"></circle>
@@ -83,22 +83,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <script>
 function coraTogglePublicDarkMode() {
-    if (document.documentElement.classList.contains('dark')) {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('cora-theme', 'light');
-    } else {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('cora-theme', 'dark');
-    }
+    // Locked for this release
 }
-// Initialize Theme dynamically from stored preferences
+// Initialize Theme dynamically from stored preferences (Force Light Mode)
 (function() {
-    const savedTheme = localStorage.getItem('cora-theme');
-    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.remove('dark');
+    try {
+        localStorage.setItem('cora-theme', 'light');
+    } catch(e) {}
 })();
 </script>
 

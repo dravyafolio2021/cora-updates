@@ -72,7 +72,7 @@ test.describe('Cora Content Suite Floating AI Agent E2E Tests', () => {
     await page.waitForTimeout(3500);
 
     // Verify AI response printed
-    await expect(chatLog).toContainText("Cora AI Content Agent");
+    await expect(chatLog).toContainText("Cora Assistant");
     
     // Verify dynamic credits increments in display
     await expect(sessionCredits).toContainText('10');

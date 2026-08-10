@@ -4,6 +4,6 @@
 @source "../admin-dashboard.php";
 @source "../cora-real-estate.php";
 
-@custom-variant dark (&:where(.cora-dark-theme, .cora-dark-theme *));
+@custom-variant dark (&:where(.never-match-dark-mode));
 
 

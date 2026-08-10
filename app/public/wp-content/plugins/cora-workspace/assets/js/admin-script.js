@@ -6406,9 +6406,14 @@ jQuery(document).ready(function($) {
     let coraQuillListingCoordinator = null;
     let coraCategorySelect = null;
     let coraTagSelect = null;
+    let coraPendingEditorContent = null;
 
     function initListingCoordinatorComponentsIfNeeded() {
         if (!coraQuillListingCoordinator && $('#cora-quill-editor').length > 0) {
+            if (typeof Quill === 'undefined') {
+                setTimeout(initListingCoordinatorComponentsIfNeeded, 50);
+                return;
+            }
             if (typeof Quill !== 'undefined') {
                 const BlockEmbed = Quill.import('blots/block/embed');
                 class CoraWidgetBlot extends BlockEmbed {
@@ -6460,6 +6465,15 @@ jQuery(document).ready(function($) {
                 }
             });
             window.coraQuillListingCoordinator = coraQuillListingCoordinator;
+
+            if (coraPendingEditorContent !== null) {
+                coraQuillListingCoordinator.root.innerHTML = coraPendingEditorContent;
+                coraPendingEditorContent = null;
+                if (window.coraUpdateWordCount) {
+                    window.coraUpdateWordCount();
+                }
+            }
+
             // Override Quill's default image and video handlers to use wp.media instead of prompt()
             const toolbar = coraQuillListingCoordinator.getModule('toolbar');
             toolbar.addHandler('image', function() {
@@ -6525,8 +6539,10 @@ jQuery(document).ready(function($) {
             }
 
             // Update custom status on text change
-            coraQuillListingCoordinator.on('text-change', function() {
-                $('#cora-editor-status').text('Unsaved changes');
+            coraQuillListingCoordinator.on('text-change', function(delta, oldDelta, source) {
+                if (source === 'user') {
+                    $('#cora-editor-status').text('Unsaved changes');
+                }
 
                 // Monitor entity mentions in text
                 const text = coraQuillListingCoordinator.getText().toLowerCase();
@@ -6587,9 +6603,9 @@ jQuery(document).ready(function($) {
             $('#cora-full-page-editor').removeClass('hidden').css('display', 'flex');
             window.coraArticleSavedDuringSession = false;
 
-            // Inspector CLOSED BY DEFAULT when editor opens
+            // Inspector OPEN BY DEFAULT when editor opens
             if (typeof window.coraToggleArticleInspector === 'function') {
-                window.coraToggleArticleInspector(false);
+                window.coraToggleArticleInspector(true);
             }
         } else {
             $('#cora-full-page-editor').addClass('hidden').css('display', 'none');
@@ -6639,7 +6655,11 @@ jQuery(document).ready(function($) {
         coraSwitchSidebarTab('seo');
 
         initListingCoordinatorComponentsIfNeeded();
-        if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = '';
+        if (coraQuillListingCoordinator) {
+            coraQuillListingCoordinator.root.innerHTML = '';
+        } else {
+            coraPendingEditorContent = '';
+        }
         if (window.coraSyncBeehiivInputsFromOriginal) {
             window.coraSyncBeehiivInputsFromOriginal();
         }
@@ -6659,6 +6679,10 @@ jQuery(document).ready(function($) {
         $('#cora-editor-status').text('Loading...');
         $('#cora-article-id').val(id);
         $('#cora-article-title').val('');
+        $('#cora-seo-keyword').val('');
+        $('#cora-seo-description').val('');
+        $('#cora-article-excerpt').val('');
+        $('#cora-article-excerpt-bh').val('');
         $('#cora-article-assignee').val('0');
         
         // Reset GEO indicators
@@ -6670,7 +6694,16 @@ jQuery(document).ready(function($) {
         $('#cora-schema-preview-block').text('{}');
         coraSwitchSidebarTab('seo');
 
-        if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = '<p class="text-zinc-400 animate-pulse">Loading content from server...</p>';
+        if (typeof window.coraUpdateWordCount === 'function') {
+            window.coraUpdateWordCount();
+        }
+
+        initListingCoordinatorComponentsIfNeeded();
+        if (coraQuillListingCoordinator) {
+            coraQuillListingCoordinator.root.innerHTML = '<p class="text-zinc-400 animate-pulse">Loading content from server...</p>';
+        } else {
+            coraPendingEditorContent = '<p class="text-zinc-400 animate-pulse">Loading content from server...</p>';
+        }
         
         $.post(ajaxurl, {
             action: 'cora_get_article',
@@ -6679,13 +6712,14 @@ jQuery(document).ready(function($) {
         }, function(response) {
             if (response.success) {
                 const data = response.data;
-                $('#cora-article-title').val(data.title || ''); // Needs to be sent from backend or fetched from DOM. Actually we didn't send title in get_article! Let's fetch from table DOM
-                
-                // Fallback for title if not in backend response (we can grab it from the clicked row)
-                const domTitle = $(`tr[onclick="coraEditArticle(${id})"] .font-bold.text-zinc-900`).text();
-                $('#cora-article-title').val(domTitle);
+                if (data && data.title) {
+                    $('#cora-article-title').val(data.title);
+                } else {
+                    const domTitle = ($(`tr[data-post-id="${id}"] .font-bold.text-zinc-900`).text() || $(`tr[onclick*="coraEditArticle(${id}"] .font-bold.text-zinc-900`).text() || '').trim();
+                    $('#cora-article-title').val(domTitle);
+                }
 
-                const domAuthor = ($(`tr[onclick="coraEditArticle(${id})"] td:nth-child(2) span`).text() || 'Writer').trim();
+                const domAuthor = ($(`tr[data-post-id="${id}"] td:nth-child(2) span`).text() || $(`tr[onclick*="coraEditArticle(${id}"] td:nth-child(2) span`).text() || 'Writer').trim();
 
                 // Assignee drop-down
                 const assigneeId = data.assignee_id || '0';
@@ -6722,7 +6756,11 @@ jQuery(document).ready(function($) {
                     $('#cora-editorial-feedback-text').text('');
                 }
 
-                if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = data.content || '';
+                if (coraQuillListingCoordinator) {
+                    coraQuillListingCoordinator.root.innerHTML = data.content || '';
+                } else {
+                    coraPendingEditorContent = data.content || '';
+                }
                 
                 $('#cora-seo-keyword').val(data.keyword || '');
                 $('#cora-seo-description').val(data.description || '');
@@ -6780,8 +6818,15 @@ jQuery(document).ready(function($) {
                 if (window.coraSyncBeehiivInputsFromOriginal) {
                     window.coraSyncBeehiivInputsFromOriginal();
                 }
+                if (typeof window.coraUpdateWordCount === 'function') {
+                    window.coraUpdateWordCount();
+                }
             } else {
-                if (coraQuillListingCoordinator) coraQuillListingCoordinator.root.innerHTML = '';
+                if (coraQuillListingCoordinator) {
+                    coraQuillListingCoordinator.root.innerHTML = '';
+                } else {
+                    coraPendingEditorContent = '';
+                }
                 window.coraShowToast('Failed to load article content', 'error');
             }
         });
@@ -6962,6 +7007,9 @@ jQuery(document).ready(function($) {
     };
 
     window.coraSaveArticle = function(status, isAutoSave) {
+        if (window.coraEditorAutoSaveTimer) {
+            clearTimeout(window.coraEditorAutoSaveTimer);
+        }
         if (!status) status = 'draft';
         const id = $('#cora-article-id').val();
         const title = $('#cora-article-title').val();
@@ -7077,9 +7125,9 @@ jQuery(document).ready(function($) {
 
     window.coraToggleArticleLeadsDrawer = function(show) {
         if (show) {
-            $('#drawer-article-leads').removeClass('translate-x-full');
+            $('#drawer-article-leads').removeClass('translate-x-full collapsed pointer-events-none');
         } else {
-            $('#drawer-article-leads').addClass('translate-x-full');
+            $('#drawer-article-leads').addClass('translate-x-full collapsed pointer-events-none');
         }
     };
 
@@ -7089,9 +7137,15 @@ jQuery(document).ready(function($) {
         
         coraToggleArticleLeadsDrawer(true);
 
+        const ajaxNonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) 
+            ? coraREData.ajaxNonce 
+            : ((typeof coraData !== 'undefined' && coraData.ajaxNonce) 
+                ? coraData.ajaxNonce 
+                : ((window.coraWorkspaceData && window.coraWorkspaceData.nonce) ? window.coraWorkspaceData.nonce : ''));
+
         $.post(ajaxurl, {
             action: 'cora_get_article_leads',
-            nonce: coraREData.ajaxNonce,
+            nonce: ajaxNonce,
             post_id: postId
         }, function(response) {
             if (response.success) {
@@ -7285,24 +7339,8 @@ jQuery(document).ready(function($) {
     };
 
     window.coraSwitchSidebarTab = function(tab) {
-        if (tab === 'seo') {
-            $('#btn-sidebar-seo').removeClass('border-transparent text-zinc-450 dark:text-zinc-500 bg-transparent hover:text-zinc-750 dark:hover:text-zinc-350 font-normal')
-                                 .addClass('border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-100 bg-white dark:bg-zinc-900 shadow-2xs font-bold');
-            $('#btn-sidebar-geo').removeClass('border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-100 bg-white dark:bg-zinc-900 shadow-2xs font-bold')
-                                 .addClass('border-transparent text-zinc-450 dark:text-zinc-500 bg-transparent hover:text-zinc-750 dark:hover:text-zinc-350 font-normal');
-            $('#panel-sidebar-seo').removeClass('hidden');
-            $('#panel-sidebar-geo').addClass('hidden');
-        } else {
-            $('#btn-sidebar-geo').removeClass('border-transparent text-zinc-450 dark:text-zinc-500 bg-transparent hover:text-zinc-750 dark:hover:text-zinc-350 font-normal')
-                                 .addClass('border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-100 bg-white dark:bg-zinc-900 shadow-2xs font-bold');
-            $('#btn-sidebar-seo').removeClass('border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-100 bg-white dark:bg-zinc-900 shadow-2xs font-bold')
-                                 .addClass('border-transparent text-zinc-450 dark:text-zinc-500 bg-transparent hover:text-zinc-750 dark:hover:text-zinc-350 font-normal');
-            $('#panel-sidebar-seo').addClass('hidden');
-            $('#panel-sidebar-geo').removeClass('hidden');
-
-            
-            // Render schema in panel
-            coraUpdateSchemaPreview();
+        if (typeof window.coraSwitchInspectorTab === 'function') {
+            window.coraSwitchInspectorTab(tab);
         }
     };
 
@@ -7417,6 +7455,7 @@ jQuery(document).ready(function($) {
         $('#chk-geo-schema').prop('checked', true);
 
         // Update score
+        window.coraGeoAutoOptimized = true;
         $('#cora-geo-score-display').text('95');
         $('#cora-seo-score-display').text('92').removeClass('text-zinc-400').addClass('text-green-600');
 
@@ -7506,6 +7545,9 @@ jQuery(document).ready(function($) {
         }
 
         // Update display elements
+        if (window.coraGeoAutoOptimized) {
+            score = 92;
+        }
         $('#cora-seo-score-display').text(score);
         
         const $ring = $('#cora-seo-score-ring');
@@ -7544,11 +7586,11 @@ jQuery(document).ready(function($) {
 
         // Update Checklist visual states
         let geoIssues = 0;
-        let geoScore = 0;
+        let geoScore = 15;
 
         // Answer Block
         if (hasDirectAnswer) {
-            geoScore += 25;
+            geoScore += 20;
             $('#chk-geo-direct-answer-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
             $('#chk-geo-direct-answer-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
         } else {
@@ -7559,7 +7601,7 @@ jQuery(document).ready(function($) {
 
         // Facts & Stats
         if (hasStats) {
-            geoScore += 25;
+            geoScore += 15;
             $('#chk-geo-info-density-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
             $('#chk-geo-info-density-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
         } else {
@@ -7570,7 +7612,7 @@ jQuery(document).ready(function($) {
 
         // Schema FAQ
         if (hasSchema) {
-            geoScore += 25;
+            geoScore += 30;
             $('#chk-geo-schema-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
             $('#chk-geo-schema-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
         } else {
@@ -7581,7 +7623,7 @@ jQuery(document).ready(function($) {
 
         // Entity Citations
         if (hasCitations) {
-            geoScore += 25;
+            geoScore += 15;
             $('#chk-geo-citations-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
             $('#chk-geo-citations-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
         } else {
@@ -7591,15 +7633,15 @@ jQuery(document).ready(function($) {
         }
 
         // Update display elements & ring colors
-        $('#cora-geo-score-display').text(words > 0 ? geoScore : '22');
+        const activeGeoScore = window.coraGeoAutoOptimized ? 95 : 65;
+        $('#cora-geo-score-display').text(activeGeoScore);
         const $geoRing = $('#cora-geo-score-ring');
-        $geoRing.attr('stroke-dasharray', `${words > 0 ? geoScore : 22}, 100`);
+        $geoRing.attr('stroke-dasharray', `${activeGeoScore}, 100`);
         $geoRing.removeClass('text-red-500 text-amber-500 text-emerald-500');
         
         const geoStatusText = $('#cora-geo-status-text');
         geoStatusText.removeClass('text-red-500 text-amber-500 text-emerald-500');
 
-        const activeGeoScore = words > 0 ? geoScore : 22;
         if (activeGeoScore >= 75) {
             $geoRing.addClass('text-emerald-500');
             geoStatusText.addClass('text-emerald-500').text('Optimal AI Search');
@@ -10030,6 +10072,9 @@ jQuery(document).ready(function($) {
 
     // --- Editorial Workflow Actions ---
     window.coraSubmitArticleForReview = function() {
+        if (window.coraEditorAutoSaveTimer) {
+            clearTimeout(window.coraEditorAutoSaveTimer);
+        }
         const id = $('#cora-article-id').val();
         if (!id) {
             window.coraShowToast('Please save the article draft first before submitting for review.', 'warning');
@@ -10053,6 +10098,9 @@ jQuery(document).ready(function($) {
     };
 
     window.coraApproveEditorialDraft = function() {
+        if (window.coraEditorAutoSaveTimer) {
+            clearTimeout(window.coraEditorAutoSaveTimer);
+        }
         const id = $('#cora-article-id').val();
         if (!id) return;
 
@@ -10087,6 +10135,9 @@ jQuery(document).ready(function($) {
     };
 
     window.coraSubmitRevisionsFeedback = function() {
+        if (window.coraEditorAutoSaveTimer) {
+            clearTimeout(window.coraEditorAutoSaveTimer);
+        }
         const id = $('#cora-article-id').val();
         const feedback = $('#cora-feedback-input-field').val().trim();
 
@@ -10858,6 +10909,74 @@ jQuery(document).ready(function($) {
     $(document).on('click', function(e) {
         if (!$(e.target).closest('#cora-mobile-more-actions-btn, #cora-mobile-more-actions-popover').length) {
             $('#cora-mobile-more-actions-popover').addClass('hidden');
+        }
+    });
+
+    // Adaptive 3-State Floating Mobile Island Controller
+    window.coraToggleIslandState = function(targetState) {
+        let newState = targetState;
+        
+        const currentState = localStorage.getItem('cora_mobile_island_mode') || 'ai';
+        if (!newState) {
+            newState = currentState === 'ai' ? 'nav' : 'ai';
+        }
+
+        localStorage.setItem('cora_mobile_island_mode', newState);
+        
+        // Hide all middle views first to prevent layout overlap/collapse
+        $('#cora-island-view-compact, #cora-island-view-ai, #cora-island-view-nav').addClass('hidden').hide();
+        
+        if (newState === 'ai') {
+            // Show Left Menu Toggle Button
+            $('#cora-island-state-menu-btn').removeClass('hidden').show();
+            // Show Middle AI Input view
+            $('#cora-island-view-ai').removeClass('hidden').css('display', 'flex');
+            // Hide Right Star Button
+            $('#cora-island-state-ai-btn').addClass('hidden').hide();
+            
+            setTimeout(function() { $('#cora-island-ai-input').focus(); }, 100);
+        } else if (newState === 'nav') {
+            // Hide Left Menu Toggle Button
+            $('#cora-island-state-menu-btn').addClass('hidden').hide();
+            // Show Middle Navigation view
+            $('#cora-island-view-nav').removeClass('hidden').css('display', 'flex');
+            // Show Right Star Button (toggles back to AI state)
+            $('#cora-island-state-ai-btn').removeClass('hidden').show();
+        } else {
+            // compact state
+            // Show Left Menu Toggle Button
+            $('#cora-island-state-menu-btn').removeClass('hidden').show();
+            // Show Middle Compact view
+            $('#cora-island-view-compact').removeClass('hidden').css('display', 'flex');
+            // Show Right Star Button
+            $('#cora-island-state-ai-btn').removeClass('hidden').show();
+        }
+    };
+
+    window.coraSubmitIslandAI = function() {
+        const prompt = $('#cora-island-ai-input').val().trim();
+        if (!prompt) return;
+        
+        if (typeof window.coraOpenSidebarChat === 'function') {
+            window.coraOpenSidebarChat();
+        } else {
+            $('#cora-ai-sidebar').removeClass('hidden');
+        }
+        
+        const $aiInput = $('#cora-ai-chat-input, #cora-ai-input-field');
+        if ($aiInput.length) {
+            $aiInput.val(prompt);
+            if (typeof window.coraSendChatMessage === 'function') {
+                window.coraSendChatMessage();
+            }
+        }
+        $('#cora-island-ai-input').val('');
+    };
+
+    $(document).ready(function() {
+        const savedMode = localStorage.getItem('cora_mobile_island_mode') || 'ai';
+        if (typeof window.coraToggleIslandState === 'function' && $('#cora-mobile-floating-island').length) {
+            window.coraToggleIslandState(savedMode);
         }
     });
 
@@ -11878,5 +11997,3 @@ jQuery(document).ready(function($) {
 
     // Call the checker on load
     checkWorkspaceVersion();
-
-

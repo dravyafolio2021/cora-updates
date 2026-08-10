@@ -285,6 +285,11 @@ function _cora_fmt_k( $n ) {
     width: 800px;
     max-width: calc(100vw - 48px);
 }
+@media (max-width: 1023px) {
+    .cora-floating-agent-wrapper {
+        display: none !important;
+    }
+}
 .cora-floating-agent-wrapper .hidden {
     display: none !important;
 }
