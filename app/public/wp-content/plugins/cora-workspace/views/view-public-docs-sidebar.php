@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
-<aside id="cora-docs-sidebar" class="w-64 flex-shrink-0 flex flex-col gap-5 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 pb-12 scrollbar-thin select-none">
+<aside id="cora-docs-sidebar" class="w-64 flex-shrink-0 flex flex-col gap-5 sticky top-24 pr-2 pb-12 select-none">
     
     <!-- PAGE CATEGORIES COLLAPSIBLE GROUPS -->
     <div class="space-y-2">

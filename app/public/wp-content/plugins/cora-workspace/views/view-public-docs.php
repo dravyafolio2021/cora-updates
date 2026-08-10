@@ -76,25 +76,6 @@ if ( ! defined( 'ABSPATH' ) ) {
             color: #ffffff !important;
         }
 
-        /* Clean, thin monochromatic scrollbar for the docs sidebar */
-        #cora-docs-sidebar {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(161, 161, 170, 0.25) transparent;
-        }
-        #cora-docs-sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-        #cora-docs-sidebar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #cora-docs-sidebar::-webkit-scrollbar-thumb {
-            background-color: rgba(161, 161, 170, 0.3);
-            border-radius: 9999px;
-        }
-        #cora-docs-sidebar::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(161, 161, 170, 0.5);
-        }
-
         /* Clean, thin monochromatic scrollbar for the RAG chatbot sidebar chat history */
         #cora-sidebar-messages-container {
             scrollbar-width: thin;
