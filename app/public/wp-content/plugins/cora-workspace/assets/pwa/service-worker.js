@@ -1,6 +1,6 @@
 // Service worker for Cora Admin PWA
-const CACHE_NAME = 'cora-workspace-v3.2.95';
-const DYNAMIC_CACHE = 'cora-dynamic-v3.2.95';
+const CACHE_NAME = 'cora-workspace-v3.2.96';
+const DYNAMIC_CACHE = 'cora-dynamic-v3.2.96';
 const MAX_DYNAMIC_CACHE_ITEMS = 150;
 
 const URLs_TO_CACHE = [
