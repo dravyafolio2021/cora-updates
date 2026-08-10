@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.90
+ * Version: 3.2.91
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.90' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.91' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -26,7 +26,8 @@ if ( ! function_exists( 'cora_workspace_load_env_keys' ) ) {
 function cora_workspace_load_env_keys() {
     $env_paths = array(
         dirname( __FILE__ ) . '/.env',
-        dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) . '/.env'
+        dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) . '/.env',
+        dirname( dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) ) ) . '/.env'
     );
     $keys = array();
     foreach ( $env_paths as $path ) {
@@ -11404,7 +11405,7 @@ function cora_rag_call_ai_api( $message, $system_prompt ) {
     $openai_key_b64 = get_option( 'cora_workspace_ai_openai_key', '' );
 
     // Route 1: Gemini
-    if ( ! empty( $gemini_key_b64 ) && ( $active_model === 'gemini' || $active_model === 'cora-core-v2' || empty( $openai_key_b64 ) ) ) {
+    if ( ! empty( $gemini_key_b64 ) && strpos( $gemini_key_b64, 'AQ.' ) === false && ( $active_model === 'gemini' || $active_model === 'cora-core-v2' || empty( $openai_key_b64 ) ) ) {
         $api_key  = $gemini_key_b64;
         $model_id = 'gemini-3.5-flash-lite';
         $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
@@ -11466,6 +11467,80 @@ function cora_rag_call_ai_api( $message, $system_prompt ) {
                 'Content-Type'  => 'application/json',
             ),
             'body' => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                    cora_workspace_log_ai_request();
+                }
+                return $data['choices'][0]['message']['content'];
+            }
+        }
+    }
+
+    // Route 3: OpenRouter (Fallback to real loaded key from root .env)
+    $openrouter_key = defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ? CORA_PLATFORM_OPENROUTER_API_KEY : '';
+    if ( ! empty( $openrouter_key ) && strpos( $openrouter_key, 'sk-or-v1-cbb69' ) === false ) {
+        $url = 'https://openrouter.ai/api/v1/chat/completions';
+        $headers = array(
+            'Authorization' => 'Bearer ' . $openrouter_key,
+            'Content-Type'  => 'application/json',
+            'HTTP-Referer'  => 'https://heycora.in',
+            'X-Title'       => 'Cora Workspace Platform'
+        );
+        $body = json_encode( array(
+            'model'    => 'google/gemini-2.5-flash',
+            'messages' => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 1500,
+            'temperature' => 0.3,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => $headers,
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                    cora_workspace_log_ai_request();
+                }
+                return $data['choices'][0]['message']['content'];
+            }
+        }
+    }
+
+    // Route 4: Groq (Fallback to real loaded key from root .env)
+    $groq_key = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : '';
+    if ( ! empty( $groq_key ) && strpos( $groq_key, 'gsk_ofVNE4c' ) === false ) {
+        $url = 'https://api.groq.com/openai/v1/chat/completions';
+        $headers = array(
+            'Authorization' => 'Bearer ' . $groq_key,
+            'Content-Type'  => 'application/json'
+        );
+        $body = json_encode( array(
+            'model'    => 'llama-3.3-70b-versatile',
+            'messages' => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 1500,
+            'temperature' => 0.3,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => $headers,
+            'body'    => $body,
         ) );
 
         if ( ! is_wp_error( $response ) ) {

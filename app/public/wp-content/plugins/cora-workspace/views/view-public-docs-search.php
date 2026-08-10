@@ -608,14 +608,14 @@ function resolveContentContainer() {
  */
 function deactivateLink(link) {
     link.classList.remove('bg-zinc-950', 'text-white', 'font-semibold', 'font-medium');
-    link.classList.add('text-zinc-655', 'hover:text-zinc-950', 'hover:bg-zinc-100/70');
+    link.classList.add('text-zinc-650', 'hover:text-zinc-950', 'hover:bg-zinc-100/70');
 }
 
 /**
  * Adds active monochromatic highlight tokens to link element
  */
 function activateLink(link) {
-    link.classList.remove('text-zinc-655', 'hover:text-zinc-955', 'hover:bg-zinc-100/70');
+    link.classList.remove('text-zinc-650', 'text-zinc-655', 'hover:text-zinc-950', 'hover:text-zinc-955', 'hover:bg-zinc-100/70');
     link.classList.add('bg-zinc-950', 'text-white', 'font-semibold');
 }
 
