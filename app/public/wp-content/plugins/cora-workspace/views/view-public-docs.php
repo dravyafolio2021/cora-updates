@@ -64,6 +64,17 @@ if ( ! defined( 'ABSPATH' ) ) {
         .prose p { margin-bottom: 1rem; line-height: 1.6; }
         .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 1.25rem; list-style-type: disc; }
         .prose li { margin-bottom: 0.25rem; }
+        
+        /* Monochromatic navigation link styling overrides */
+        .cora-nav-link:hover {
+            background-color: rgba(244, 244, 245, 0.7) !important; /* zinc-100/70 */
+            color: #09090b !important; /* zinc-950 */
+        }
+        .cora-nav-link.bg-zinc-950,
+        .cora-nav-link.bg-zinc-950:hover {
+            background-color: #09090b !important;
+            color: #ffffff !important;
+        }
     </style>
 </head>
 <body class="text-zinc-850 font-sans min-h-screen flex flex-col justify-between selection:bg-zinc-950 selection:text-white">
