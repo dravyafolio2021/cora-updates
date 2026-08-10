@@ -308,6 +308,12 @@ body,
     border-radius: 9999px !important;
     padding: 6px !important;
     box-shadow: 0 10px 30px -5px rgba(0,0,0,0.12), 0 4px 12px -2px rgba(0,0,0,0.08) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    box-sizing: border-box !important;
 }
 
 .cora-dark-theme .cora-island-card {
@@ -325,6 +331,8 @@ body,
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
     box-sizing: border-box !important;
     width: 100% !important;
     height: 100% !important;
