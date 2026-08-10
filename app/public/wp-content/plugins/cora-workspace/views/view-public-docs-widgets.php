@@ -1,12 +1,37 @@
 <?php
 /**
- * Cora Platform Documentation Right Widgets Component (v3.2.98)
+ * Cora Platform Documentation Right Widgets Component (v2.4.0)
  * Monochromatic Notion / Shopify Visual System Standard
- * Dedicated Full-Height AI Playground
+ * Core User: Shruti (Studio Administrator)
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
+}
+
+global $wpdb;
+$agency_id = cora_db_get_agency_id();
+$t_pages = $wpdb->prefix . 'cora_docs_pages';
+
+// Dynamically retrieve related pages if they exist in DB
+$related_docs = array();
+if ( cora_table_exists( $t_pages ) ) {
+    $related_docs = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT title, slug FROM {$t_pages} WHERE status = 'published' AND slug != %s ORDER BY id DESC LIMIT 3",
+            get_query_var( 'sub_slug', '' )
+        ),
+        ARRAY_A
+    ) ?: array();
+}
+
+// Fallback to defaults if DB query is empty or table doesn't exist yet
+if ( empty( $related_docs ) ) {
+    $related_docs = array(
+        array( 'title' => 'Workspace Configuration Guide', 'slug' => 'workspace-configuration' ),
+        array( 'title' => 'User Management & Roles', 'slug' => 'user-management' ),
+        array( 'title' => 'API Authentication', 'slug' => 'api-authentication' )
+    );
 }
 
 // Generate public nonce for public search & RAG chatbot
@@ -14,185 +39,314 @@ $public_nonce = wp_create_nonce( 'cora_public_docs_nonce' );
 $ajax_url     = admin_url( 'admin-ajax.php' );
 ?>
 
-<aside class="w-80 shrink-0 sticky top-24 max-h-[calc(100vh-8rem)] hidden lg:flex flex-col bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-sm font-sans" id="cora-docs-widgets-column">
-    <!-- Header -->
-    <div class="px-4 py-3 border-b border-zinc-100 flex items-center justify-between select-none shrink-0 bg-white">
-        <div class="flex items-center gap-2">
-            <span class="p-1 bg-zinc-100 rounded text-zinc-950 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
-            </span>
-            <span class="font-bold text-xs text-zinc-950 font-display">Ask Cora AI</span>
-            <span class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 text-green-700 text-[8px] font-bold border border-green-200/30">
+<aside class="w-72 shrink-0 sticky top-24 space-y-6 hidden lg:block" id="cora-docs-widgets-column">
+
+    <!-- 1. On This Page (Dynamic Scroll-Spy TOC) -->
+    <div class="space-y-3">
+        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+            On This Page
+        </h4>
+        <div class="relative pl-4 border-l border-zinc-200 ">
+            <!-- Active indicator vertical guide dot container -->
+            <ul id="toc-list" class="space-y-2.5 py-0.5">
+                <!-- Dynamically populated via JS -->
+                <li class="text-xs text-zinc-400 italic">
+                    Loading page headings...
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 2. Ask Cora AI Chatbot Card -->
+    <div onclick="window.coraToggleAiSidebar(true)" class="border border-zinc-200/80 bg-white hover:border-zinc-300 rounded-xl p-4 shadow-sm flex flex-col space-y-3.5 cursor-pointer hover:shadow-md transition-all group">
+        <div class="flex items-center justify-between pb-2 border-b border-zinc-100 ">
+            <div class="flex items-center gap-2">
+                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-850 group-hover:bg-zinc-950 group-hover:text-white transition-colors">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+                </span>
+                <span class="text-xs font-bold text-zinc-850 ">Ask Cora AI</span>
+            </div>
+            <!-- Online Indicator -->
+            <span class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-medium bg-green-50 text-green-700 border border-green-200/30">
                 <span class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
                 RAG Online
             </span>
         </div>
-    </div>
 
-    <!-- Scrollable Chat Area -->
-    <div id="cora-inline-messages-container" class="flex-1 overflow-y-auto p-4 space-y-5 bg-zinc-50/10 scrollbar-thin">
-        
-        <!-- Welcome Greeting & Suggested Questions Container -->
-        <div id="cora-inline-welcome-view" class="space-y-5">
-            <!-- Welcome Greeting -->
-            <div class="space-y-1 select-none pt-1">
-                <h3 class="text-lg font-bold text-zinc-900 tracking-tight">Hi Dravya! 👋</h3>
-                <p class="text-[11px] text-zinc-500 leading-relaxed font-semibold">
-                    I'm Cora AI, your documentation assistant.<br>
-                    How can I help you today?
-                </p>
-            </div>
-
-            <!-- Quick Questions list -->
-            <div class="space-y-1.5">
-                <button onclick="window.coraSubmitInlineQuickQuery('Explain the authentication flow')" class="w-full text-left p-3 bg-white border border-zinc-150 hover:border-zinc-300 rounded-xl text-[11px] text-zinc-700 hover:text-zinc-955 hover:bg-zinc-50 transition-all cursor-pointer shadow-3xs font-semibold flex items-center justify-between group">
-                    <span class="flex items-center gap-2">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-800 transition-colors"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                        <span>Explain the authentication flow</span>
-                    </span>
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-300 group-hover:text-zinc-800 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-                <button onclick="window.coraSubmitInlineQuickQuery('How do I create a new invoice?')" class="w-full text-left p-3 bg-white border border-zinc-150 hover:border-zinc-300 rounded-xl text-[11px] text-zinc-700 hover:text-zinc-955 hover:bg-zinc-50 transition-all cursor-pointer shadow-3xs font-semibold flex items-center justify-between group">
-                    <span class="flex items-center gap-2">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-800 transition-colors"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        <span>How do I create a new invoice?</span>
-                    </span>
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-300 group-hover:text-zinc-800 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-                <button onclick="window.coraSubmitInlineQuickQuery('Show me API rate limits')" class="w-full text-left p-3 bg-white border border-zinc-150 hover:border-zinc-300 rounded-xl text-[11px] text-zinc-700 hover:text-zinc-955 hover:bg-zinc-50 transition-all cursor-pointer shadow-3xs font-semibold flex items-center justify-between group">
-                    <span class="flex items-center gap-2">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-800 transition-colors"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        <span>Show me API rate limits</span>
-                    </span>
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-300 group-hover:text-zinc-800 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-                <button onclick="window.coraSubmitInlineQuickQuery('What permissions does a crew member have?')" class="w-full text-left p-3 bg-white border border-zinc-150 hover:border-zinc-300 rounded-xl text-[11px] text-zinc-700 hover:text-zinc-955 hover:bg-zinc-50 transition-all cursor-pointer shadow-3xs font-semibold flex items-center justify-between group">
-                    <span class="flex items-center gap-2">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-800 transition-colors"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <span>What permissions does a crew member have?</span>
-                    </span>
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-300 group-hover:text-zinc-800 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-            </div>
-
-            <!-- Reference Hub Grid inside welcome container -->
-            <div class="grid grid-cols-2 gap-3 pt-1">
-                <!-- Popular Topics -->
-                <div class="space-y-1.5">
-                    <span class="text-[8px] font-bold text-zinc-400 uppercase tracking-wider block">Popular Topics</span>
-                    <div class="space-y-1.5">
-                        <a href="#" onclick="window.coraInlineTopicLink(event, 'platform-overview')" class="flex items-center gap-2 p-1.5 bg-white border border-zinc-150 hover:border-zinc-300 rounded-lg transition-all group">
-                            <span class="p-1 bg-zinc-100 text-zinc-650 rounded group-hover:bg-zinc-950 group-hover:text-white transition-colors shrink-0">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
-                            </span>
-                            <div class="flex flex-col min-w-0">
-                                <span class="font-bold text-zinc-800 text-[10px] truncate group-hover:text-zinc-955 transition-colors">Getting Started</span>
-                            </div>
-                        </a>
-                        <a href="#" onclick="window.coraInlineTopicLink(event, 'workspace-roles')" class="flex items-center gap-2 p-1.5 bg-white border border-zinc-150 hover:border-zinc-300 rounded-lg transition-all group">
-                            <span class="p-1 bg-zinc-100 text-zinc-650 rounded group-hover:bg-zinc-955 group-hover:text-white transition-colors shrink-0">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                            </span>
-                            <div class="flex flex-col min-w-0">
-                                <span class="font-bold text-zinc-800 text-[10px] truncate group-hover:text-zinc-955 transition-colors">Authentication</span>
-                            </div>
-                        </a>
-                        <a href="#" onclick="window.coraInlineTopicLink(event, 'api')" class="flex items-center gap-2 p-1.5 bg-white border border-zinc-150 hover:border-zinc-300 rounded-lg transition-all group">
-                            <span class="p-1 bg-zinc-100 text-zinc-650 rounded group-hover:bg-zinc-955 group-hover:text-white transition-colors shrink-0">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                            </span>
-                            <div class="flex flex-col min-w-0">
-                                <span class="font-bold text-zinc-800 text-[10px] truncate group-hover:text-zinc-955 transition-colors">API Reference</span>
-                            </div>
-                        </a>
-                        <a href="#" onclick="window.coraInlineTopicLink(event, 'pwa-push-notifications')" class="flex items-center gap-2 p-1.5 bg-white border border-zinc-150 hover:border-zinc-300 rounded-lg transition-all group">
-                            <span class="p-1 bg-zinc-100 text-zinc-650 rounded group-hover:bg-zinc-955 group-hover:text-white transition-colors shrink-0">
-                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                            </span>
-                            <div class="flex flex-col min-w-0">
-                                <span class="font-bold text-zinc-800 text-[10px] truncate group-hover:text-zinc-955 transition-colors">Webhook Events</span>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <!-- Recently Viewed -->
-                <div class="space-y-1.5">
-                    <span class="text-[8px] font-bold text-zinc-400 uppercase tracking-wider block">Recently Viewed</span>
-                    <div class="border border-zinc-150 bg-white rounded-lg divide-y divide-zinc-100 overflow-hidden shadow-3xs">
-                        <div class="flex items-center justify-between p-2 text-[10px] hover:bg-zinc-50/50 transition-colors">
-                            <span class="font-bold text-zinc-800 truncate pr-1">/api/v1/auth/login</span>
-                        </div>
-                        <div class="flex items-center justify-between p-2 text-[10px] hover:bg-zinc-50/50 transition-colors">
-                            <span class="font-bold text-zinc-800 truncate pr-1">Invoices Engine</span>
-                        </div>
-                        <div class="flex items-center justify-between p-2 text-[10px] hover:bg-zinc-50/50 transition-colors">
-                            <span class="font-bold text-zinc-800 truncate pr-1">Crew Scheduler</span>
-                        </div>
-                        <div class="flex items-center justify-between p-2 text-[10px] hover:bg-zinc-50/50 transition-colors">
-                            <span class="font-bold text-zinc-800 truncate pr-1">Webhook Events</span>
-                        </div>
-                    </div>
-                </div>
+        <!-- Chat messages body container -->
+        <div id="cora-widget-chat-messages" class="max-h-48 overflow-y-auto space-y-3 pr-1 text-xs flex flex-col scrollbar-thin scrollbar-thumb-zinc-200 pointer-events-none">
+            <div class="p-2.5 rounded-lg text-xs bg-zinc-100 text-zinc-800 self-start max-w-[88%] leading-relaxed">
+                Hi! Ask me anything about the Cora Platform features, CRM, CGST/SGST ledger, e-signing, or documentation configuration.
             </div>
         </div>
 
-    </div>
-
-    <!-- Input Area -->
-    <div class="p-3 border-t border-zinc-100 bg-white shrink-0">
-        <form id="cora-inline-chat-form" onsubmit="window.coraSubmitInlineChat(event)" class="relative flex items-center">
-            <input type="text" id="cora-inline-chat-input" class="w-full border border-zinc-200 rounded-lg pl-3 pr-8 py-2 text-xs bg-zinc-50 focus:bg-white focus:border-zinc-950 outline-none text-zinc-900 transition-all placeholder-zinc-400 font-sans" placeholder="Ask anything about Cora..." required autocomplete="off">
-            <button type="submit" id="cora-inline-chat-send-btn" class="absolute right-2 text-zinc-450 hover:text-zinc-900 transition-colors p-1 cursor-pointer bg-transparent border-none flex items-center justify-center" title="Send Doubt">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        <!-- Inline input block -->
+        <div class="relative flex items-center shrink-0">
+            <input type="text" id="cora-widget-chat-input" readonly class="w-full border border-zinc-200 rounded-lg pl-3 pr-8 py-2 text-xs bg-zinc-50 outline-none text-zinc-900 transition-all font-sans cursor-pointer" placeholder="Ask anything about Cora...">
+            <button type="button" class="absolute right-2.5 text-zinc-400 group-hover:text-zinc-900 transition-colors p-1 cursor-pointer bg-transparent border-none" title="Send Question">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </button>
-        </form>
-        <div class="mt-2 text-center text-[9px] text-zinc-400 select-none">
-            Powered by Cora AI &bull; Using docs v2.2.1
         </div>
     </div>
+
+    <!-- 3. Related Docs Panel -->
+    <div class="space-y-3">
+        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+            Related Docs
+        </h4>
+        <div class="space-y-2">
+            <?php foreach ( $related_docs as $doc ) : ?>
+                <a href="<?php echo esc_url( home_url( '/docs/' . $doc['slug'] ) ); ?>" class="flex items-center gap-2.5 p-2.5 border border-zinc-200/50 hover:border-zinc-400 bg-white hover:bg-zinc-50 rounded-lg transition-all group shadow-xs">
+                    <span class="text-zinc-400 group-hover:text-zinc-850 transition-colors shrink-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    </span>
+                    <span class="text-xs text-zinc-600 font-medium truncate group-hover:text-zinc-900 transition-colors">
+                        <?php echo esc_html( $doc['title'] ); ?>
+                    </span>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <!-- 4. Was This Helpful Voting Module -->
+    <div class="border-t border-zinc-200/60 pt-5 space-y-3">
+        <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                Was this helpful?
+            </span>
+            <div class="flex items-center gap-1.5">
+                <button onclick="handleCoraVote(true, this)" class="p-1.5 border border-zinc-200 text-zinc-550 hover:text-zinc-900 hover:bg-zinc-50 rounded-lg transition-all cursor-pointer shadow-xs" title="Yes, helpful">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                </button>
+                <button onclick="handleCoraVote(false, this)" class="p-1.5 border border-zinc-200 text-zinc-550 hover:text-zinc-900 hover:bg-zinc-50 rounded-lg transition-all cursor-pointer shadow-xs" title="No, not helpful">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm12-3h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
 </aside>
 
+<!-- Configuration Bridge -->
+<script>
+window.coraDocsConfig = window.coraDocsConfig || {
+    ajaxUrl: <?php echo json_encode( esc_url( $ajax_url ) ); ?>,
+    nonce: <?php echo json_encode( esc_attr( $public_nonce ) ); ?>
+};
+</script>
+
+<!-- Monochromatic Layout-Safe Styling -->
 <style>
-/* Clean, thin monochromatic scrollbar for the RAG chatbot inline panel */
-#cora-inline-messages-container {
+/* Custom mini scrollbar for Notion side panel */
+#cora-chat-messages {
     scrollbar-width: thin;
-    scrollbar-color: rgba(161, 161, 170, 0.25) transparent;
+    scrollbar-color: rgba(161, 161, 170, 0.2) transparent;
 }
-#cora-inline-messages-container::-webkit-scrollbar {
+#cora-chat-messages::-webkit-scrollbar {
     width: 4px;
 }
-#cora-inline-messages-container::-webkit-scrollbar-track {
+#cora-chat-messages::-webkit-scrollbar-track {
     background: transparent;
 }
-#cora-inline-messages-container::-webkit-scrollbar-thumb {
-    background-color: rgba(161, 161, 170, 0.3);
+#cora-chat-messages::-webkit-scrollbar-thumb {
+    background-color: rgba(161, 161, 170, 0.25);
     border-radius: 9999px;
 }
-#cora-inline-messages-container::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(161, 161, 170, 0.5);
+.dark #cora-chat-messages::-webkit-scrollbar-thumb {
+    background-color: rgba(161, 161, 170, 0.1);
 }
 </style>
 
+<!-- Sidebar JS Mechanics -->
 <script>
 (function() {
-    const ajaxUrl = '<?php echo esc_url( $ajax_url ); ?>';
-    const publicNonce = '<?php echo esc_attr( $public_nonce ); ?>';
+    // 1. Dynamic Table of Contents Generator (Scroll-Spy)
+    window.coraDocsRefreshTOC = function() {
+        const tocList = document.getElementById('toc-list');
+        if (!tocList) return;
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+        // Target .prose elements inside main panel
+        const proseContent = document.querySelector('.prose') || document.querySelector('main article') || document.querySelector('main');
+        if (!proseContent) {
+            tocList.innerHTML = '<li class="text-xs text-zinc-400 italic">No structure detected.</li>';
+            return;
+        }
+
+        const headings = proseContent.querySelectorAll('h2, h3');
+        if (headings.length === 0) {
+            tocList.innerHTML = '<li class="text-xs text-zinc-400 italic">No subheadings on this page.</li>';
+            return;
+        }
+
+        tocList.innerHTML = '';
+        const tocItems = [];
+
+        headings.forEach((heading, idx) => {
+            const titleText = heading.textContent.trim();
+            if (!titleText) return;
+
+            // Generate clean anchor ID if missing
+            if (!heading.id) {
+                heading.id = 'heading-' + idx + '-' + titleText.toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/(^-|-$)/g, '');
+            }
+
+            const isH3 = heading.tagName.toLowerCase() === 'h3';
+            const li = document.createElement('li');
+            li.className = 'relative flex items-center';
+            if (isH3) {
+                li.classList.add('pl-4.5');
+            }
+
+            // Dot alignment matches typography line-height precisely
+            const dot = document.createElement('span');
+            dot.className = `toc-dot absolute ${isH3 ? '-left-[4px]' : '-left-[17px]'} w-1.5 h-1.5 rounded-full bg-zinc-900 scale-0 transition-all duration-200 ease-out`;
+
+            const link = document.createElement('a');
+            link.href = '#' + heading.id;
+            link.className = `toc-link text-xs text-zinc-400 hover:text-zinc-950 transition-colors duration-150 block py-0.5 truncate max-w-[240px] ${isH3 ? 'text-[11px]' : ''}`;
+            link.textContent = titleText;
+            
+            // Safe jump click behavior
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetEl = document.getElementById(heading.id);
+                if (targetEl) {
+                    window.scrollTo({
+                        top: targetEl.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    history.pushState(null, '', '#' + heading.id);
+                }
+            });
+
+            li.appendChild(dot);
+            li.appendChild(link);
+            tocList.appendChild(li);
+
+            tocItems.push({
+                element: heading,
+                linkEl: link,
+                dotEl: dot
+            });
+        });
+
+        // Scroll Spy Handler
+        function handleScrollSpy() {
+            let activeIdx = -1;
+            const scrollPos = window.scrollY + 120;
+
+            for (let i = 0; i < tocItems.length; i++) {
+                if (tocItems[i].element.offsetTop <= scrollPos) {
+                    activeIdx = i;
+                } else {
+                    break;
+                }
+            }
+
+            if (activeIdx === -1 && tocItems.length > 0) {
+                activeIdx = 0;
+            }
+
+            tocItems.forEach((item, index) => {
+                if (index === activeIdx) {
+                    item.linkEl.classList.remove('text-zinc-400');
+                    item.linkEl.classList.add('text-zinc-950', 'font-semibold');
+                    item.dotEl.classList.remove('scale-0');
+                    item.dotEl.classList.add('scale-100');
+                } else {
+                    item.linkEl.classList.remove('text-zinc-950', 'font-semibold');
+                    item.linkEl.classList.add('text-zinc-400');
+                    item.dotEl.classList.remove('scale-100');
+                    item.dotEl.classList.add('scale-0');
+                }
+            });
+        }
+
+        window.removeEventListener('scroll', handleScrollSpy);
+        window.addEventListener('scroll', handleScrollSpy);
+        handleScrollSpy();
+    };
+
+    // 2. Chatbot Input Mechanics
+    window.handleCoraChatKeyDown = function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitCoraChatQuery();
+        }
+    };
+
+    window.submitCoraChatQuery = function() {
+        const input = document.getElementById('cora-chat-input');
+        const sendBtn = document.getElementById('cora-chat-send-btn');
+        const query = input.value.trim();
+        if (!query) return;
+
+        // Reset inputs and disable
+        input.value = '';
+        input.disabled = true;
+        sendBtn.disabled = true;
+
+        // Append user doubt bubble
+        appendCoraChatBubble('user', query);
+
+        // Typing indicator card
+        const thinkingBubble = appendCoraChatBubble('ai', `
+            <div class="flex items-center gap-1.5 py-0.5" id="cora-chat-thinking">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style="animation-delay:0.2s"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style="animation-delay:0.4s"></span>
+            </div>
+        `);
+
+        // Prepare query request payload
+        const formData = new FormData();
+        formData.append('action', 'cora_public_query_rag');
+        formData.append('question', query);
+        formData.append('nonce', window.coraDocsConfig.nonce);
+
+        fetch(window.coraDocsConfig.ajaxUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(res => {
+            thinkingBubble.remove();
+            input.disabled = false;
+            sendBtn.disabled = false;
+            input.focus();
+
+            if (res.success && res.data && res.data.reply) {
+                streamCoraChatReply(res.data.reply);
+            } else {
+                const errMsg = (res.data && res.data.message) ? res.data.message : 'Doubt lookup error.';
+                appendCoraChatBubble('ai', `<span class="text-red-500 font-semibold">${errMsg}</span>`);
+            }
+        })
+        .catch(err => {
+            thinkingBubble.remove();
+            input.disabled = false;
+            sendBtn.disabled = false;
+            appendCoraChatBubble('ai', '<span class="text-red-500 font-semibold">Network failure. Please try again.</span>');
+        });
+    };
+
+    function appendCoraChatBubble(sender, content) {
+        const messages = document.getElementById('cora-chat-messages');
+        const bubble = document.createElement('div');
+        bubble.className = `p-2.5 rounded-lg text-xs max-w-[88%] leading-relaxed ${
+            sender === 'user'
+                ? 'bg-zinc-950 text-white self-end ml-auto shadow-sm'
+                : 'bg-zinc-100 text-zinc-800 self-start shadow-2xs'
+        }`;
+        bubble.innerHTML = content;
+        messages.appendChild(bubble);
+        messages.scrollTop = messages.scrollHeight;
+        return bubble;
     }
 
-    function formatMarkdown(text) {
-        if (typeof formatMessageMarkdown === 'function') {
-            return formatMessageMarkdown(text);
-        }
-        // Fallback simple parser
+    function parseSimpleMarkdown(text) {
         return text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -204,127 +358,86 @@ $ajax_url     = admin_url( 'admin-ajax.php' );
             .replace(/\n/g, '<br>');
     }
 
-    window.coraSubmitInlineQuickQuery = function(query) {
-        const input = document.getElementById('cora-inline-chat-input');
-        if (input) {
-            input.value = query;
-            window.coraSubmitInlineChat();
-        }
-    };
+    function streamCoraChatReply(fullText) {
+        const messages = document.getElementById('cora-chat-messages');
+        const bubble = document.createElement('div');
+        bubble.className = 'p-2.5 rounded-lg text-xs max-w-[88%] leading-relaxed bg-zinc-100 text-zinc-800 self-start shadow-2xs';
+        messages.appendChild(bubble);
 
-    window.coraInlineTopicLink = function(e, slug) {
-        if (e) e.preventDefault();
-        if (slug === 'api' || slug === 'changelog') {
-            coraPublicShowSection(slug);
-        } else {
-            coraPublicLoadPage(null, slug, null);
-        }
-    };
+        const words = fullText.split(' ');
+        let currentIdx = 0;
+        let runningText = '';
 
-    window.coraSubmitInlineChat = function(event) {
-        if (event) event.preventDefault();
-        
-        const input = document.getElementById('cora-inline-chat-input');
-        const sendBtn = document.getElementById('cora-inline-chat-send-btn');
-        const doubt = input.value.trim();
-        if (!doubt) return;
-        
-        input.value = '';
-        input.disabled = true;
-        if (sendBtn) sendBtn.disabled = true;
-        
-        // Append user query to chat history
-        const msgList = document.getElementById('cora-inline-messages-container');
-        msgList.insertAdjacentHTML('beforeend', `
-            <div class="flex gap-2 max-w-[90%] ml-auto justify-end">
-                <div class="bg-zinc-950 text-white p-2.5 rounded-lg text-xs leading-relaxed border border-zinc-950 shadow-xs">
-                    ${escapeHtml(doubt)}
-                </div>
-                <div class="w-6 h-6 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center text-[10px] font-bold text-zinc-650 select-none flex-shrink-0">Me</div>
-            </div>
-        `);
-        
-        msgList.scrollTop = msgList.scrollHeight;
-        
-        // Add dynamic dot loading animation
-        const typingId = 'cora-inline-typing-' + Date.now();
-        msgList.insertAdjacentHTML('beforeend', `
-            <div id="${typingId}" class="flex gap-2 max-w-[90%] select-none">
-                <div class="w-6 h-6 rounded-full bg-zinc-950 flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">AI</div>
-                <div class="bg-zinc-100 text-zinc-400 p-2.5 rounded-lg text-xs border border-zinc-200/55 flex items-center gap-1 shadow-3xs">
-                    <span class="w-1 h-1 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-                    <span class="w-1 h-1 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-                    <span class="w-1 h-1 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
-                </div>
-            </div>
-        `);
-        msgList.scrollTop = msgList.scrollHeight;
-        
-        // Build query body
-        const formData = new FormData();
-        formData.append('action', 'cora_public_query_rag');
-        formData.append('question', doubt);
-        formData.append('nonce', publicNonce);
-        
-        fetch(ajaxUrl, {
-            method: 'POST',
-            body: formData
-        })
-        .then(r => r.json())
-        .then(res => {
-            const typingEl = document.getElementById(typingId);
-            if (typingEl) typingEl.remove();
-            
-            input.disabled = false;
-            if (sendBtn) sendBtn.disabled = false;
-            input.focus();
-            
-            if (res.success && res.data && res.data.reply) {
-                addInlineAiMessage(msgList, res.data.reply);
-            } else {
-                const reply = coraSimulateRagReplyFallback(doubt);
-                addInlineAiMessage(msgList, reply);
+        const timer = setInterval(() => {
+            if (currentIdx >= words.length) {
+                clearInterval(timer);
+                bubble.innerHTML = parseSimpleMarkdown(fullText);
+                messages.scrollTop = messages.scrollHeight;
+                return;
             }
-        })
-        .catch(err => {
-            const typingEl = document.getElementById(typingId);
-            if (typingEl) typingEl.remove();
-            
-            input.disabled = false;
-            if (sendBtn) sendBtn.disabled = false;
-            input.focus();
-            
-            const reply = coraSimulateRagReplyFallback(doubt);
-            addInlineAiMessage(msgList, reply);
-        });
-    };
 
-    function addInlineAiMessage(msgList, text) {
-        const formatted = formatMarkdown(text);
-        
-        msgList.insertAdjacentHTML('beforeend', `
-            <div class="flex gap-2 max-w-[90%]">
-                <div class="w-6 h-6 rounded-full bg-zinc-950 flex items-center justify-center text-[10px] font-bold text-white select-none flex-shrink-0">AI</div>
-                <div class="bg-zinc-100 text-zinc-800 p-2.5 rounded-lg text-xs leading-relaxed border border-zinc-200/55 shadow-xs">
-                    ${formatted}
-                </div>
-            </div>
-        `);
-        msgList.scrollTop = msgList.scrollHeight;
+            runningText += (currentIdx === 0 ? '' : ' ') + words[currentIdx];
+            bubble.innerHTML = parseSimpleMarkdown(runningText);
+            messages.scrollTop = messages.scrollHeight;
+            currentIdx++;
+        }, 30); // Dynamic word progressive rendering
     }
 
-    function coraSimulateRagReplyFallback(question) {
-        const q = question.toLowerCase();
-        if (q.includes('auth') || q.includes('token') || q.includes('key')) {
-            return "To authenticate requests:\n- Generate an API Key under CRM settings.\n- Set header `Authorization: Bearer <key>`.\n- Rates are limited to 60 requests/min.";
+    // 3. Was This Helpful Feedback Widget
+    window.handleCoraVote = function(wasUpvote, buttonEl) {
+        // Toggle selected styling
+        const parent = buttonEl.parentElement;
+        const buttons = parent.querySelectorAll('button');
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-zinc-900', 'text-white');
+            btn.classList.add('text-zinc-550', 'bg-transparent');
+        });
+
+        buttonEl.classList.remove('text-zinc-550', 'bg-transparent');
+        buttonEl.classList.add('bg-zinc-900', 'text-white');
+
+        // Show layout feedback toast
+        window.coraShowToast("Thank you for your feedback!");
+    };
+
+    // 4. Fallback Toast System (Layout Isolation Policy)
+    window.coraShowToast = window.coraShowToast || function(msg, type = 'success') {
+        let container = document.getElementById('cora-public-toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'cora-public-toast-container';
+            container.className = 'fixed bottom-6 right-6 z-[9999] flex flex-col gap-2.5 pointer-events-none';
+            document.body.appendChild(container);
         }
-        if (q.includes('invoice') || q.includes('gst') || q.includes('ledger')) {
-            return "The Financials engine handles CGST/SGST splitting:\n- Default GST calculation is set at 18%.\n- Splits split transaction inputs equally (9% CGST / 9% SGST).\n- Triggers real-time e-invoice stamps.";
-        }
-        if (q.includes('role') || q.includes('permission') || q.includes('access')) {
-            return "Cora roles include Super Admin (`cora_super_admin`), Owner (`owner`), Administrator (`administrator`), and Scoped Member (`cora_member`). Custom capability maps are configurable inside the User permissions matrix drawer.";
-        }
-        return "I received your question: \"" + question + "\". As the Cora Documentation Assistant, I can help you with CRM Leads, GST Ledger math, e-signing workflows, or PWA setup. What specific module can I explain?";
+
+        const toast = document.createElement('div');
+        toast.className = 'flex items-center gap-2.5 px-4 py-3 bg-zinc-900 text-white text-xs font-bold rounded-xl shadow-lg pointer-events-auto transition-all duration-300 transform translate-y-3 opacity-0 border border-zinc-800 ';
+        
+        const successIcon = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        toast.innerHTML = `${successIcon} <span>${msg}</span>`;
+        container.appendChild(toast);
+
+        // Animate entrance
+        setTimeout(() => {
+            toast.classList.remove('translate-y-3', 'opacity-0');
+        }, 20);
+
+        // Dismiss sequence
+        setTimeout(() => {
+            toast.classList.add('translate-y-3', 'opacity-0');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3500);
+    };
+
+    // Run initialization hooks
+    document.addEventListener('DOMContentLoaded', window.coraDocsRefreshTOC);
+    window.addEventListener('load', window.coraDocsRefreshTOC);
+    
+    // Fallback if readyState is already loaded or complete
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        window.coraDocsRefreshTOC();
     }
 })();
 </script>
