@@ -1229,7 +1229,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <!-- Ask Cora AI sliding right sidebar container -->
-<div id="cora-public-ai-sidebar" class="fixed top-0 right-0 bottom-0 w-[420px] bg-white border-l border-zinc-200 z-50 shadow-2xl transition-transform duration-300 transform translate-x-0 flex flex-col font-sans">
+<div id="cora-public-ai-sidebar" class="fixed top-0 right-0 bottom-0 w-[420px] bg-white border-l border-zinc-200 z-50 shadow-2xl transition-transform duration-300 transform translate-x-full flex flex-col font-sans">
     <!-- Header -->
     <div class="px-5 py-4 border-b border-zinc-100 flex items-center justify-between select-none shrink-0 bg-white">
         <div class="flex items-center gap-2.5">
@@ -1380,12 +1380,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script>
 window.coraToggleAiSidebar = function(show) {
+    if (window.innerWidth >= 1024) {
+        // Desktop: Toggle inline sidebar column visibility
+        const inlineSidebar = document.getElementById('cora-docs-widgets-column');
+        if (inlineSidebar) {
+            if (show) {
+                inlineSidebar.classList.remove('hidden');
+                inlineSidebar.classList.add('lg:flex');
+                setTimeout(() => {
+                    const input = document.getElementById('cora-inline-chat-input');
+                    if (input) {
+                        input.focus();
+                        input.classList.add('border-zinc-950', 'ring-2', 'ring-zinc-950/10');
+                        setTimeout(() => {
+                            input.classList.remove('border-zinc-950', 'ring-2', 'ring-zinc-950/10');
+                        }, 800);
+                    }
+                }, 100);
+            } else {
+                inlineSidebar.classList.remove('lg:flex');
+                inlineSidebar.classList.add('hidden');
+            }
+        }
+        return;
+    }
+
+    // Mobile: Toggle sliding sidebar drawer
     const sidebar = document.getElementById('cora-public-ai-sidebar');
     if (!sidebar) return;
     if (show) {
         sidebar.classList.remove('translate-x-full');
         sidebar.classList.add('translate-x-0');
-        // Auto-focus chat input
         setTimeout(() => {
             const input = document.getElementById('cora-sidebar-chat-input');
             if (input) input.focus();
