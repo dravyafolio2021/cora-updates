@@ -238,15 +238,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <title><?php echo esc_html( $page_title_format ); ?></title>
     
     <!-- Compiled Tailwind CSS -->
-    <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css'; ?>" />
-    <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/admin-style.css'; ?>" />
+    <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css?v=' . CORA_WORKSPACE_VERSION; ?>" />
+    <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/admin-style.css?v=' . CORA_WORKSPACE_VERSION; ?>" />
     <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     
     <!-- PWA Manifest & Service Worker -->
     <link rel="manifest" href="<?php echo home_url('/cora-manifest.json'); ?>">
-    <meta name="theme-color" content="#18181b">
+    <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="apple-touch-icon" href="<?php echo CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png'; ?>">
     <script>
         if ('serviceWorker' in navigator) {
@@ -265,6 +265,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 navigator.serviceWorker.register('<?php echo esc_url( $sw_url ); ?>', { scope: '/' })
                     .then(function(reg) {
                         console.log('Service worker registered with scope:', reg.scope);
+                        reg.update();
                         // Detect SW updates and auto-activate new version
                         reg.addEventListener('updatefound', function() {
                             var newWorker = reg.installing;
