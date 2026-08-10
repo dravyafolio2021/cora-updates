@@ -1229,7 +1229,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <!-- Ask Cora AI sliding right sidebar container -->
-<div id="cora-public-ai-sidebar" class="fixed top-16 right-0 bottom-0 w-[420px] bg-white border-l border-zinc-200 z-50 shadow-2xl transition-transform duration-300 transform translate-x-full flex flex-col font-sans">
+<div id="cora-public-ai-sidebar" class="fixed top-0 right-0 bottom-0 w-[420px] bg-white border-l border-zinc-200 z-50 shadow-2xl transition-transform duration-300 transform translate-x-full flex flex-col font-sans">
     <!-- Header -->
     <div class="px-5 py-4 border-b border-zinc-100 flex items-center justify-between select-none shrink-0 bg-white">
         <div class="flex items-center gap-2.5">

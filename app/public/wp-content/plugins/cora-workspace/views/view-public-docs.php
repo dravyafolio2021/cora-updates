@@ -76,6 +76,15 @@ if ( ! defined( 'ABSPATH' ) ) {
             color: #ffffff !important;
         }
 
+        /* Hide scrollbars for the docs sidebar to allow independent scrolling without clipping */
+        #cora-docs-sidebar {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+        }
+        #cora-docs-sidebar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
+        }
+
         /* Clean, thin monochromatic scrollbar for the RAG chatbot sidebar chat history */
         #cora-sidebar-messages-container {
             scrollbar-width: thin;
