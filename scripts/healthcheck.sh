@@ -11,6 +11,7 @@ SSH_PORT="65002"
 
 MAIN_URL="https://heycora.in"
 DEMO_URL="https://app.heycora.in"
+STAGING_URL="https://stagging.heycora.in"
 
 # Terminal formatting
 RED='\033[0;31m'
@@ -56,6 +57,7 @@ check_http_endpoint() {
 # 1. HTTP Endpoint checks
 check_http_endpoint "Main Login Page" "$MAIN_URL/workspace/login" "<title>Cora — Login</title>"
 check_http_endpoint "Demo Login Page" "$DEMO_URL/workspace/login" "<title>Cora — Login</title>"
+check_http_endpoint "Stagging Login Page" "$STAGING_URL/workspace/login" "<title>Cora — Login</title>"
 
 # 2. Remote check of plugin active status via SSH/WP-CLI
 echo -n "Checking Active plugins via SSH (Main)... "
@@ -74,6 +76,17 @@ DEMO_ACTIVE=$(ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$SSH_USER@$SSH_IP"
   "cd ~/domains/heycora.in/public_html/demo && wp plugin is-active cora-workspace --allow-root && echo 'yes' || echo 'no'")
 
 if [ "$DEMO_ACTIVE" = "yes" ]; then
+    echo -e "${GREEN}ACTIVE${NC}"
+else
+    echo -e "${RED}INACTIVE/MISSING${NC}"
+    FAILED=1
+fi
+
+echo -n "Checking Active plugins via SSH (Stagging)... "
+STAGING_ACTIVE=$(ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$SSH_USER@$SSH_IP" \
+  "cd ~/domains/heycora.in/public_html/stagging && wp plugin is-active cora-workspace --allow-root && echo 'yes' || echo 'no'")
+
+if [ "$STAGING_ACTIVE" = "yes" ]; then
     echo -e "${GREEN}ACTIVE${NC}"
 else
     echo -e "${RED}INACTIVE/MISSING${NC}"
