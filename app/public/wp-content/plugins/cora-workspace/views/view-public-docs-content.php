@@ -80,7 +80,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) ) . ' min read';
             </button>
 
             <!-- Ask Cora AI -->
-            <button onclick="coraPublicShowSection('cora-ai')" class="px-2.5 py-1.5 bg-zinc-950 border border-zinc-900 rounded-lg text-[11px] font-bold text-white hover:bg-zinc-900 transition-all shadow-3xs cursor-pointer flex items-center gap-1.5 select-none focus:outline-none active:scale-[0.98]">
+            <button onclick="window.coraToggleAiSidebar(true)" class="px-2.5 py-1.5 bg-zinc-950 border border-zinc-900 rounded-lg text-[11px] font-bold text-white hover:bg-zinc-900 transition-all shadow-3xs cursor-pointer flex items-center gap-1.5 select-none focus:outline-none active:scale-[0.98]">
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9.81 2.863a.5.5 0 0 0-.955 0L7.335 6.757 3.441 8.277a.5.5 0 0 0 0 .955l3.894 1.52 1.52 3.894a.5.5 0 0 0 .955 0l1.52-3.894 3.894-1.52a.5.5 0 0 0 0-.955l-3.894-1.52-1.52-3.894zM19 14.5a.5.5 0 0 0-.955 0l-.608 1.558-1.558.608a.5.5 0 0 0 0 .955l1.558.608.608 1.558a.5.5 0 0 0 .955 0l.608-1.558 1.558-.608a.5.5 0 0 0 0-.955l-1.558-.608-.608-1.558z"/>
                 </svg>
