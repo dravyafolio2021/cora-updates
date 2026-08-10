@@ -78,14 +78,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) ) . ' min read';
                 </svg>
                 <span>Copy link</span>
             </button>
-            <!-- Edit this page -->
-            <a href="<?php echo esc_url( home_url( '/workspace/super-docs' ) ); ?>" class="px-2.5 py-1.5 bg-white border border-zinc-200 rounded-lg text-[11px] font-semibold text-zinc-650 hover:bg-zinc-50 hover:text-zinc-900 transition-all shadow-3xs flex items-center gap-1.5 select-none focus:outline-none active:scale-[0.98]">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path>
-                </svg>
-                <span>Edit this page</span>
-            </a>
+
             <!-- Ask Cora AI -->
             <button onclick="coraPublicShowSection('cora-ai')" class="px-2.5 py-1.5 bg-zinc-950 border border-zinc-900 rounded-lg text-[11px] font-bold text-white hover:bg-zinc-900 transition-all shadow-3xs cursor-pointer flex items-center gap-1.5 select-none focus:outline-none active:scale-[0.98]">
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
