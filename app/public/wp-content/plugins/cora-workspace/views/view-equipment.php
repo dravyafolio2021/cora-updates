@@ -1276,8 +1276,8 @@ window.coraSwitchEquipmentTab = function(tabId) {
     // Reset sub-tab button states
     var buttons = document.querySelectorAll('.cora-eq-tab-btn');
     buttons.forEach(function(btn) {
-        btn.classList.remove('active', 'border-zinc-950', '', 'text-zinc-950', '');
-        btn.classList.add('border-transparent', 'text-zinc-450', '');
+        btn.classList.remove('active', 'border-zinc-950', 'text-zinc-950');
+        btn.classList.add('border-transparent', 'text-zinc-450');
     });
 
     // Show target panel & activate button
@@ -1286,8 +1286,8 @@ window.coraSwitchEquipmentTab = function(tabId) {
 
     if (target) target.classList.remove('hidden');
     if (targetBtn) {
-        targetBtn.classList.remove('border-transparent', 'text-zinc-450', '');
-        targetBtn.classList.add('active', 'border-zinc-950', '', 'text-zinc-950', '');
+        targetBtn.classList.remove('border-transparent', 'text-zinc-450');
+        targetBtn.classList.add('active', 'border-zinc-950', 'text-zinc-950');
     }
 
     // Dynamic URL Update

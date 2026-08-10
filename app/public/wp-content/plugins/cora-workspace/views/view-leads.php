@@ -33,7 +33,7 @@ window.coraSwitchLeadSubtab = function(tabName) {
     } else {
         document.querySelectorAll('.cora-lead-subtab-btn').forEach(b => {
             const isTarget = b.getAttribute('data-tab') === tabName;
-            b.classList.remove('active', 'bg-white', 'text-zinc-950', '', '', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', '');
+            b.classList.remove('active', 'bg-white', 'text-zinc-950', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80');
             if (isTarget) {
                 b.className += ' ' + activeClasses;
             } else {
@@ -148,14 +148,14 @@ window.coraSwitchLeadDetailTab = function(tabName) {
     // 1. Manage active tab button styling
     const tabs = document.querySelectorAll('.cora-lead-detail-tab-btn');
     tabs.forEach(tab => {
-        tab.classList.remove('bg-white', '', 'text-zinc-950', '', 'font-bold', 'shadow-xs');
-        tab.classList.add('text-zinc-500', 'hover:text-zinc-900', '');
+        tab.classList.remove('bg-white', 'text-zinc-950', 'font-bold', 'shadow-xs');
+        tab.classList.add('text-zinc-500', 'hover:text-zinc-900');
     });
     
     const activeTab = document.getElementById(`cora-lead-detail-tab-btn-${tabName}`);
     if (activeTab) {
-        activeTab.classList.add('bg-white', '', 'text-zinc-950', '', 'font-bold', 'shadow-xs');
-        activeTab.classList.remove('text-zinc-500', 'hover:text-zinc-900', '');
+        activeTab.classList.add('bg-white', 'text-zinc-950', 'font-bold', 'shadow-xs');
+        activeTab.classList.remove('text-zinc-500', 'hover:text-zinc-900');
     }
 
     // 2. Toggle content panes
@@ -2465,11 +2465,7 @@ window.coraSetGridColumns = function(cols, silent) {
     cols = Math.min(3, Math.max(1, parseInt(cols) || 3));
 
     // Remove all column classes then apply the chosen one
-    grid.classList.remove(
-        'grid-cols-1', 'grid-cols-2', 'grid-cols-3',
-        'md:grid-cols-1', 'md:grid-cols-2', 'md:grid-cols-3',
-        'lg:grid-cols-1', 'lg:grid-cols-2', 'lg:grid-cols-3'
-    );
+    grid.classList.remove('grid-cols-1', 'grid-cols-2', 'grid-cols-3', 'md:grid-cols-1', 'md:grid-cols-2', 'md:grid-cols-3', 'lg:grid-cols-1', 'lg:grid-cols-2', 'lg:grid-cols-3');
 
     var colMap = {
         1: ['grid-cols-1'],

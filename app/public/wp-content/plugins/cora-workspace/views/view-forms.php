@@ -1657,8 +1657,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (titleInput) titleInput.value = '';
         if (textInput) textInput.value = '';
         document.querySelectorAll('.clause-chip').forEach(c => {
-            c.classList.remove('bg-zinc-900', '', 'text-white', '', 'border-zinc-900', '');
-            c.classList.add('bg-zinc-50', '', 'text-zinc-600', '', 'border-zinc-200', '');
+            c.classList.remove('bg-zinc-900', 'text-white', 'border-zinc-900');
+            c.classList.add('bg-zinc-50', 'text-zinc-600', 'border-zinc-200');
         });
     }
 
@@ -1668,12 +1668,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const chip = this;
         // Deselect all chips
         document.querySelectorAll('.clause-chip').forEach(c => {
-            c.classList.remove('bg-zinc-900', '', 'text-white', '', 'border-zinc-900', '');
-            c.classList.add('bg-zinc-50', '', 'text-zinc-600', '', 'border-zinc-200', '');
+            c.classList.remove('bg-zinc-900', 'text-white', 'border-zinc-900');
+            c.classList.add('bg-zinc-50', 'text-zinc-600', 'border-zinc-200');
         });
         // Activate this chip
-        chip.classList.remove('bg-zinc-50', '', 'text-zinc-600', '', 'border-zinc-200', '');
-        chip.classList.add('bg-zinc-900', '', 'text-white', '', 'border-zinc-900', '');
+        chip.classList.remove('bg-zinc-50', 'text-zinc-600', 'border-zinc-200');
+        chip.classList.add('bg-zinc-900', 'text-white', 'border-zinc-900');
         // Fill form
         const keyInput = document.getElementById('drawer-clause-key');
         const titleInput = document.getElementById('drawer-clause-title');
@@ -2631,14 +2631,14 @@ function renderFormsList() {
         const tabs = [tabFormsList, tabFunnel, tabClauses, tabAuditLogs];
         tabs.forEach(t => {
             if (t) {
-                t.classList.remove('font-semibold', 'border-zinc-950', '', 'text-zinc-950', '');
+                t.classList.remove('font-semibold', 'border-zinc-950', 'text-zinc-950');
                 t.classList.add('font-medium', 'border-transparent', 'text-zinc-500');
             }
         });
 
         if (hash === '#list') {
             if (tabFormsList) {
-                tabFormsList.classList.add('font-semibold', 'border-zinc-950', '', 'text-zinc-950', '');
+                tabFormsList.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
                 tabFormsList.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (listTabContent) { listTabContent.classList.remove('hidden'); listTabContent.classList.add('flex'); }
@@ -2646,7 +2646,7 @@ function renderFormsList() {
             fetchForms();
         } else if (hash === '#funnel') {
             if (tabFunnel) {
-                tabFunnel.classList.add('font-semibold', 'border-zinc-950', '', 'text-zinc-950', '');
+                tabFunnel.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
                 tabFunnel.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (funnelTabContent) { funnelTabContent.classList.remove('hidden'); funnelTabContent.classList.add('flex'); }
@@ -2655,7 +2655,7 @@ function renderFormsList() {
             updateAdvancedFunnelData();
         } else if (hash === '#clauses') {
             if (tabClauses) {
-                tabClauses.classList.add('font-semibold', 'border-zinc-950', '', 'text-zinc-950', '');
+                tabClauses.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
                 tabClauses.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (clausesTabContent) { clausesTabContent.classList.remove('hidden'); clausesTabContent.classList.add('flex'); }
@@ -2663,7 +2663,7 @@ function renderFormsList() {
             fetchClauses();
         } else if (hash === '#audit-log') {
             if (tabAuditLogs) {
-                tabAuditLogs.classList.add('font-semibold', 'border-zinc-950', '', 'text-zinc-950', '');
+                tabAuditLogs.classList.add('font-semibold', 'border-zinc-950', 'text-zinc-950');
                 tabAuditLogs.classList.remove('font-medium', 'border-transparent', 'text-zinc-500');
             }
             if (auditTabContent) { auditTabContent.classList.remove('hidden'); auditTabContent.classList.add('flex'); }
@@ -3128,16 +3128,16 @@ function renderFormsList() {
         statusEl.className = "px-2.5 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1.5 shrink-0 transition-all duration-300";
         
         if (status === 'saving') {
-            statusEl.classList.add('bg-zinc-100', 'text-zinc-500', '', '');
+            statusEl.classList.add('bg-zinc-100', 'text-zinc-500');
             statusEl.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-zinc-400 mr-0.5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
         } else if (status === 'saved') {
-            statusEl.classList.add('bg-emerald-50', 'text-emerald-700', '', '');
+            statusEl.classList.add('bg-emerald-50', 'text-emerald-700');
             statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-0.5 animate-pulse"></span> Autosaved`;
         } else if (status === 'unsaved') {
-            statusEl.classList.add('bg-zinc-100', 'text-zinc-600', '', '');
+            statusEl.classList.add('bg-zinc-100', 'text-zinc-600');
             statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-zinc-400 mr-0.5"></span> Unsaved Draft`;
         } else if (status === 'error') {
-            statusEl.classList.add('bg-red-50', 'text-red-700', '', '');
+            statusEl.classList.add('bg-red-50', 'text-red-700');
             statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-0.5"></span> Error`;
         }
     }

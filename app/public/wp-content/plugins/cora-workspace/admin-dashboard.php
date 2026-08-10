@@ -11436,12 +11436,12 @@ wp_print_footer_scripts();
                 const parentPalette = isInlinePill ? document.getElementById('cora-inline-command-palette') : document.getElementById('cora-command-palette');
                 if (parentPalette) {
                     parentPalette.querySelectorAll('.cora-search-pill').forEach(p => {
-                        p.classList.remove('active', 'bg-zinc-900', 'text-white', '', '');
-                        p.classList.add('bg-white', 'text-zinc-650', '', '');
+                        p.classList.remove('active', 'bg-zinc-900', 'text-white');
+                        p.classList.add('bg-white', 'text-zinc-650');
                     });
                 }
-                this.classList.add('active', 'bg-zinc-900', 'text-white', '', '');
-                this.classList.remove('bg-white', 'text-zinc-650', '', '');
+                this.classList.add('active', 'bg-zinc-900', 'text-white');
+                this.classList.remove('bg-white', 'text-zinc-650');
                 currentFilter = this.getAttribute('data-filter');
                 if (isInlinePill) {
                     const query = document.getElementById('cora-inline-command-input') ? document.getElementById('cora-inline-command-input').value.trim() : '';

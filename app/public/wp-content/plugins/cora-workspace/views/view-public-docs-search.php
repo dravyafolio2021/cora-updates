@@ -552,14 +552,14 @@ function coraHighlightResultItem(index) {
     const items = document.querySelectorAll('.cora-search-result-item');
     items.forEach((item, idx) => {
         if (idx === index) {
-            item.classList.add('bg-zinc-50', '', 'text-zinc-955', '');
-            item.classList.remove('text-zinc-650', '');
+            item.classList.add('bg-zinc-50', 'text-zinc-955');
+            item.classList.remove('text-zinc-650');
             const chevron = item.querySelector('svg:last-child');
             if (chevron) chevron.classList.remove('opacity-0');
             item.scrollIntoView({ block: 'nearest' });
         } else {
-            item.classList.remove('bg-zinc-50', '', 'text-zinc-955', '');
-            item.classList.add('text-zinc-650', '');
+            item.classList.remove('bg-zinc-50', 'text-zinc-955');
+            item.classList.add('text-zinc-650');
             const chevron = item.querySelector('svg:last-child');
             if (chevron) chevron.classList.add('opacity-0');
         }
@@ -607,16 +607,16 @@ function resolveContentContainer() {
  * Removes active styling layout tokens from link elements
  */
 function deactivateLink(link) {
-    link.classList.remove('bg-zinc-950', 'text-white', '', '', 'font-semibold', 'font-medium');
-    link.classList.add('text-zinc-655', 'hover:text-zinc-950', 'hover:bg-zinc-100/70', '', '', '');
+    link.classList.remove('bg-zinc-950', 'text-white', 'font-semibold', 'font-medium');
+    link.classList.add('text-zinc-655', 'hover:text-zinc-950', 'hover:bg-zinc-100/70');
 }
 
 /**
  * Adds active monochromatic highlight tokens to link element
  */
 function activateLink(link) {
-    link.classList.remove('text-zinc-655', 'hover:text-zinc-955', 'hover:bg-zinc-100/70', '', '', '');
-    link.classList.add('bg-zinc-950', 'text-white', '', '', 'font-semibold');
+    link.classList.remove('text-zinc-655', 'hover:text-zinc-955', 'hover:bg-zinc-100/70');
+    link.classList.add('bg-zinc-950', 'text-white', 'font-semibold');
 }
 
 /**

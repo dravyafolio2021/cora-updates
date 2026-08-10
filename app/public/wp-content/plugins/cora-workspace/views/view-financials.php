@@ -2576,14 +2576,14 @@ aside[id$="-drawer"].collapsed {
 
         var tabs = document.querySelectorAll('.cora-financial-tab');
         for (var i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove('bg-zinc-900', 'text-white', '', '', 'shadow-xs');
-            tabs[i].classList.add('text-zinc-600', '', 'hover:bg-zinc-100', '');
+            tabs[i].classList.remove('bg-zinc-900', 'text-white', 'shadow-xs');
+            tabs[i].classList.add('text-zinc-600', 'hover:bg-zinc-100');
         }
         
         var activeBtn = document.getElementById('btn-tab-' + tabId);
         if (activeBtn) {
-            activeBtn.classList.add('bg-zinc-900', 'text-white', '', '', 'shadow-xs');
-            activeBtn.classList.remove('text-zinc-600', '', 'hover:bg-zinc-100', '');
+            activeBtn.classList.add('bg-zinc-900', 'text-white', 'shadow-xs');
+            activeBtn.classList.remove('text-zinc-600', 'hover:bg-zinc-100');
         }
     };
 
@@ -2593,14 +2593,14 @@ aside[id$="-drawer"].collapsed {
         window.currentLedgerPill = catKey || 'all';
         var pills = document.querySelectorAll('.fin-pill-filter');
         for (var i = 0; i < pills.length; i++) {
-            pills[i].classList.remove('bg-zinc-900', 'text-white', '', '');
-            pills[i].classList.add('bg-zinc-50', '', 'text-zinc-600', '', 'hover:bg-zinc-100', '');
+            pills[i].classList.remove('bg-zinc-900', 'text-white');
+            pills[i].classList.add('bg-zinc-50', 'text-zinc-600', 'hover:bg-zinc-100');
             
             // Highlight matching pill
             var onclickAttr = pills[i].getAttribute('onclick') || '';
             if (onclickAttr.indexOf("'" + catKey + "'") !== -1 || (catKey === 'all' && onclickAttr.indexOf("'all'") !== -1)) {
-                pills[i].classList.add('bg-zinc-900', 'text-white', '', '');
-                pills[i].classList.remove('bg-zinc-50', '', 'text-zinc-600', '', 'hover:bg-zinc-100', '');
+                pills[i].classList.add('bg-zinc-900', 'text-white');
+                pills[i].classList.remove('bg-zinc-50', 'text-zinc-600', 'hover:bg-zinc-100');
             }
         }
         

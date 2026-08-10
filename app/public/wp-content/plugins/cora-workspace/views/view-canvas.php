@@ -4877,7 +4877,7 @@ function cora_get_sparkline_points( $history, $type ) {
         // Highlight active tab pill
         document.querySelectorAll('.cpb-filter-btn').forEach(function(btn) {
             btn.classList.toggle('bg-zinc-100', btn.dataset.filter === status);
-            btn.classList.toggle('font-bold',    btn.dataset.filter === status);
+            btn.classList.toggle('font-bold', btn.dataset.filter === status);
         });
         var tabAll = document.getElementById('pages-tab-all');
         if (tabAll) {
@@ -4893,7 +4893,7 @@ function cora_get_sparkline_points( $history, $type ) {
         document.querySelectorAll('.cpb-sort-btn').forEach(function(btn) {
             var isActive = btn.dataset.sort === val.replace('-desc','');
             btn.classList.toggle('bg-zinc-100', isActive);
-            btn.classList.toggle('font-bold',    isActive);
+            btn.classList.toggle('font-bold', isActive);
         });
         var el = document.getElementById('cpb-panel-sort'); if (el) el.classList.add('hidden');
         filterPages();

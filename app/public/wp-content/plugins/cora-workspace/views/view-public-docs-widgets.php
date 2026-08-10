@@ -251,13 +251,13 @@ window.coraDocsConfig = window.coraDocsConfig || {
 
             tocItems.forEach((item, index) => {
                 if (index === activeIdx) {
-                    item.linkEl.classList.remove('text-zinc-400', '');
-                    item.linkEl.classList.add('text-zinc-950', '', 'font-semibold');
+                    item.linkEl.classList.remove('text-zinc-400');
+                    item.linkEl.classList.add('text-zinc-950', 'font-semibold');
                     item.dotEl.classList.remove('scale-0');
                     item.dotEl.classList.add('scale-100');
                 } else {
-                    item.linkEl.classList.remove('text-zinc-950', '', 'font-semibold');
-                    item.linkEl.classList.add('text-zinc-400', '');
+                    item.linkEl.classList.remove('text-zinc-950', 'font-semibold');
+                    item.linkEl.classList.add('text-zinc-400');
                     item.dotEl.classList.remove('scale-100');
                     item.dotEl.classList.add('scale-0');
                 }
@@ -389,12 +389,12 @@ window.coraDocsConfig = window.coraDocsConfig || {
         const parent = buttonEl.parentElement;
         const buttons = parent.querySelectorAll('button');
         buttons.forEach(btn => {
-            btn.classList.remove('bg-zinc-900', 'text-white', '', '');
+            btn.classList.remove('bg-zinc-900', 'text-white');
             btn.classList.add('text-zinc-550', 'bg-transparent');
         });
 
         buttonEl.classList.remove('text-zinc-550', 'bg-transparent');
-        buttonEl.classList.add('bg-zinc-900', 'text-white', '', '');
+        buttonEl.classList.add('bg-zinc-900', 'text-white');
 
         // Show layout feedback toast
         window.coraShowToast("Thank you for your feedback!");

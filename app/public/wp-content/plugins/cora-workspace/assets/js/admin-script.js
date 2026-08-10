@@ -10926,8 +10926,14 @@ jQuery(document).ready(function($) {
 
     window.coraSubmitIslandAI = function() {
         const prompt = $('#cora-island-ai-input').val().trim();
-        if (!prompt) return;
-        
+        if (typeof window.coraToggleCopilot === 'function') {
+            window.coraToggleCopilot(true);
+            if (prompt && typeof window.coraSendCopilotMessage === 'function') {
+                window.coraSendCopilotMessage(prompt);
+                $('#cora-island-ai-input').val('');
+            }
+            return;
+        }
         if (typeof window.coraOpenSidebarChat === 'function') {
             window.coraOpenSidebarChat();
         } else {

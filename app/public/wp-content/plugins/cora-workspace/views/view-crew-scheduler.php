@@ -1565,8 +1565,8 @@ window.coraSwitchSchedulerTab = function(tabName) {
         if (headerActions) headerActions.classList.add('hidden');
         if (toolbarControls) toolbarControls.classList.add('hidden');
         if (btn) {
-            btn.classList.remove('active', 'bg-white', '', 'text-zinc-950', '', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', '');
-            btn.classList.add('text-zinc-500', 'hover:text-zinc-900', '', '', 'font-medium', 'hover:bg-zinc-200/50', '');
+            btn.classList.remove('active', 'bg-white', 'text-zinc-950', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80');
+            btn.classList.add('text-zinc-500', 'hover:text-zinc-900', 'font-medium', 'hover:bg-zinc-200/50');
         }
     });
 
@@ -1579,8 +1579,8 @@ window.coraSwitchSchedulerTab = function(tabName) {
     if (ha) ha.classList.remove('hidden');
     if (tc) tc.classList.remove('hidden');
     if (b) {
-        b.classList.remove('text-zinc-500', 'hover:text-zinc-900', '', '', 'font-medium', 'hover:bg-zinc-200/50', '');
-        b.classList.add('active', 'bg-white', '', 'text-zinc-950', '', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', '');
+        b.classList.remove('text-zinc-500', 'hover:text-zinc-900', 'font-medium', 'hover:bg-zinc-200/50');
+        b.classList.add('active', 'bg-white', 'text-zinc-950', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80');
     }
 
     var clientBadge = document.getElementById('header-client-badge');
@@ -2130,7 +2130,7 @@ window.coraUpdateCardSelectionVisuals = function(row, isChecked) {
     var textSpan = row.querySelector('.sh-card-select-text');
 
     if (isChecked) {
-        row.classList.add('ring-2', 'ring-zinc-950', '', 'border-zinc-950', '');
+        row.classList.add('ring-2', 'ring-zinc-950', 'border-zinc-950');
         if (btn) {
             btn.className = 'sh-card-select-btn px-2.5 py-1 rounded-lg text-[9.5px] font-extrabold uppercase tracking-wider border transition-all cursor-pointer flex items-center gap-1.5 bg-zinc-950 text-white border-zinc-950 shadow-xs';
         }
@@ -2141,7 +2141,7 @@ window.coraUpdateCardSelectionVisuals = function(row, isChecked) {
         }
         if (textSpan) textSpan.textContent = 'Selected';
     } else {
-        row.classList.remove('ring-2', 'ring-zinc-950', '', 'border-zinc-950', '');
+        row.classList.remove('ring-2', 'ring-zinc-950', 'border-zinc-950');
         if (btn) {
             btn.className = 'sh-card-select-btn px-2.5 py-1 rounded-lg text-[9.5px] font-extrabold uppercase tracking-wider border transition-all cursor-pointer flex items-center gap-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-500 border-zinc-200/80 ';
         }
@@ -2238,15 +2238,15 @@ window.coraExportShiftPayouts = function() {
 
 window.coraFilterTimelineDay = function(dayNum, btnEl) {
     document.querySelectorAll('.tl-day-pill').forEach(function(b){
-        b.classList.remove('active', 'bg-white', '', 'text-zinc-950', '', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', '');
-        b.classList.add('text-zinc-500', 'hover:text-zinc-900', '', '', 'font-medium', 'hover:bg-zinc-200/50', '');
+        b.classList.remove('active', 'bg-white', 'text-zinc-950', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80');
+        b.classList.add('text-zinc-500', 'hover:text-zinc-900', 'font-medium', 'hover:bg-zinc-200/50');
         b.style.backgroundColor = '';
         b.style.color = '';
     });
 
     if (btnEl) {
-        btnEl.classList.remove('text-zinc-500', 'hover:text-zinc-900', '', '', 'font-medium', 'hover:bg-zinc-200/50', '');
-        btnEl.classList.add('active', 'bg-white', '', 'text-zinc-950', '', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', '');
+        btnEl.classList.remove('text-zinc-500', 'hover:text-zinc-900', 'font-medium', 'hover:bg-zinc-200/50');
+        btnEl.classList.add('active', 'bg-white', 'text-zinc-950', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80');
         btnEl.style.backgroundColor = '';
         btnEl.style.color = '';
     }
