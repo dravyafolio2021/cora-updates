@@ -408,8 +408,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <div onclick="<?php echo esc_attr($btn_onclick); ?>" class="flex items-center justify-between p-2.5 hover:bg-zinc-50/70 rounded-xl cursor-pointer transition-colors gap-3 group">
                     <div class="flex items-center min-w-0 gap-1">
                         <div class="flex flex-col gap-1 min-w-0">
-                            <span class="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 transition-colors truncate max-w-[200px]"><?php echo esc_html($p->post_title ?: 'Untitled Draft'); ?></span>
-                            <div class="flex items-center gap-1.5 text-[10px] text-zinc-450 ">
+                            <span class="text-xs font-semibold text-zinc-900 group-hover:text-black transition-colors truncate max-w-[240px]"><?php echo esc_html($p->post_title ?: 'Untitled Draft'); ?></span>
+                            <div class="flex items-center gap-1.5 text-[10px] text-zinc-500">
                                 <span class="w-1.5 h-1.5 rounded-full <?php echo $dot_color; ?> shrink-0"></span>
                                 <span><?php echo $status_label; ?></span>
                                 <span>·</span>
@@ -417,7 +417,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                             </div>
                         </div>
                     </div>
-                    <button class="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100/50 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="<?php echo esc_attr($btn_title); ?>">
+                    <button type="button" onclick="event.stopPropagation(); <?php echo esc_attr($btn_onclick); ?>" class="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100/50 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="<?php echo esc_attr($btn_title); ?>">
                         <?php echo $action_icon; ?>
                     </button>
                 </div>
@@ -428,13 +428,13 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <!-- Column 3: Content Performance -->
         <div class="lg:col-span-1 border border-zinc-200/80 rounded-2xl bg-white shadow-2xs flex flex-col p-5 min-h-[350px]">
             <div class="flex items-center justify-between mb-4 select-none">
-                <div class="flex items-center gap-2 text-zinc-900 ">
+                <div class="flex items-center gap-2 text-zinc-900">
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                     <span class="text-sm font-bold tracking-tight">Content Performance</span>
                 </div>
-                <select class="text-[10px] font-bold text-zinc-650 border border-zinc-200/80 rounded-lg px-2 py-1 bg-white cursor-pointer focus:outline-none select-none">
-                    <option>This Week</option>
-                    <option>This Month</option>
+                <select id="ct-performance-timeframe" onchange="if(typeof coraFetchOverviewPerformance==='function') coraFetchOverviewPerformance(this.value)" class="text-[10px] font-bold text-zinc-600 border border-zinc-200/80 rounded-lg px-2 py-1 bg-white cursor-pointer focus:outline-none select-none">
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
                 </select>
             </div>
             
@@ -475,7 +475,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     </div>
                 </div>
 
-                <button onclick="switchContentTab('ct-performance')" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 border border-zinc-200/80 hover:border-zinc-900 bg-white hover:bg-zinc-50 text-zinc-855 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-3xs active:scale-97 select-none ">
+                <button onclick="switchContentTab('ct-performance')" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 border border-zinc-200/80 hover:border-zinc-900 bg-white hover:bg-zinc-50 text-zinc-900 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-3xs active:scale-97 select-none">
                     <span>Go to Performance Analytics</span>
                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </button>
@@ -503,7 +503,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
                 <div class="text-left"><div class="font-bold text-xs">Optimize Content</div><div class="text-zinc-400 text-[9px]">Improve SEO score</div></div>
             </button>
-            <button onclick="openCreateArticleDrawer('ai-draft')" class="flex items-center gap-2.5 px-4 py-2.5 border border-zinc-200 hover:border-zinc-900 rounded-xl text-xs text-zinc-800 bg-white hover:bg-zinc-50 transition-all cursor-pointer shadow-3xs active:scale-97">
+            <button onclick="openCreateArticleDrawer(null, 'ai-draft')" class="flex items-center gap-2.5 px-4 py-2.5 border border-zinc-200 hover:border-zinc-900 rounded-xl text-xs text-zinc-800 bg-white hover:bg-zinc-50 transition-all cursor-pointer shadow-3xs active:scale-97">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2c0 5.523 4.477 10 10 10-5.523 0-10 4.477-10 10-5.523 0-10-4.477-10-10 5.523 0 10-4.477 10-10z" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <div class="text-left"><div class="font-bold text-xs">AI Draft</div><div class="text-zinc-400 text-[9px]">Generate draft</div></div>
             </button>
@@ -560,6 +560,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         <option value="seo">SEO Strategy</option>
                         <option value="ai">AI & Search</option>
                         <option value="content">Content Marketing</option>
+                        <option value="analytics">Analytics & GSC</option>
                     </select>
                     <select id="opp-filter-intent" onchange="coraFilterOpportunitiesTable()" class="w-full sm:w-auto border border-zinc-200 hover:border-zinc-300 rounded-xl px-3 py-1.5 text-xs bg-white text-zinc-700 font-bold focus:outline-none transition-all cursor-pointer">
                         <option value="all">All Intent</option>
@@ -574,7 +575,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         <option value="medium">Medium Impact</option>
                         <option value="low">Low Impact</option>
                     </select>
-                    <button class="flex items-center justify-center gap-1.5 w-full sm:w-auto sm:ml-auto px-3 py-1.5 border border-zinc-200 hover:border-zinc-900 bg-white rounded-xl text-xs text-zinc-700 font-bold transition-all shadow-3xs active:scale-97 cursor-pointer">
+                    <button id="btn-opp-filters" type="button" onclick="if(typeof coraFilterOpportunitiesTable==='function') coraFilterOpportunitiesTable();" class="flex items-center justify-center gap-1.5 w-full sm:w-auto sm:ml-auto px-3 py-1.5 border border-zinc-200 hover:border-zinc-900 bg-white rounded-xl text-xs text-zinc-700 font-bold transition-all shadow-3xs active:scale-97 cursor-pointer">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                         Filters
                     </button>
@@ -1175,9 +1176,9 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     <!-- Pagination JS buttons rendered dynamically -->
                 </div>
                 <select id="ct-per-page" class="border border-zinc-200 rounded-lg px-2.5 py-1 text-xs bg-white text-zinc-700 font-medium focus:outline-none cursor-pointer" onchange="changeCTPageSize(this.value)">
-                    <option value="6" selected>6 per page</option>
                     <option value="10">10 per page</option>
                     <option value="25">25 per page</option>
+                    <option value="50" selected>50 per page</option>
                     <option value="all">All per page</option>
                 </select>
             </div>
@@ -1579,7 +1580,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <h3 class="text-sm font-bold text-zinc-900 uppercase tracking-wider mb-1">Google Cloud Platform API Connectors</h3>
                 <p class="text-xs text-zinc-500">Enable real-time search impressions, clicks, average position, and indexing submission.</p>
             </div>
-            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold <?php echo get_option('cora_google_service_account_json') ? 'bg-green-50 text-green-755 border border-green-200/60' : 'bg-zinc-100 text-zinc-650 border border-zinc-200'; ?> uppercase" id="gsc-connector-status">
+            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold <?php echo get_option('cora_google_service_account_json') ? 'bg-green-50 text-emerald-600 border border-green-200/60' : 'bg-zinc-100 text-zinc-600 border border-zinc-200'; ?> uppercase" id="gsc-connector-status">
                 <?php echo get_option('cora_google_service_account_json') ? 'Connected' : 'Disconnected'; ?>
             </span>
         </div>
@@ -1607,7 +1608,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             </form>
 
             <!-- Sidebar instructions -->
-            <div class="lg:col-span-1 border border-zinc-150 rounded-xl bg-zinc-50/30 p-4 space-y-4 text-xs text-zinc-650 leading-relaxed">
+            <div class="lg:col-span-1 border border-zinc-150 rounded-xl bg-zinc-50/30 p-4 space-y-4 text-xs text-zinc-600 leading-relaxed">
                 <span class="font-bold text-zinc-900 uppercase tracking-wider block text-[10px]">Setup Instructions</span>
                 <ol class="list-decimal pl-4 space-y-2.5">
                     <li>Create a project in the <a href="https://console.cloud.google.com/" target="_blank" class="text-zinc-900 font-bold hover:underline">Google Cloud Console</a>.</li>
@@ -1633,7 +1634,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 </button>
             </div>
             <!-- Results display area -->
-            <div id="cora-inspector-result" class="hidden mt-4 p-4 border border-zinc-150 rounded-xl bg-zinc-50/20 text-xs text-zinc-750 space-y-3.5 max-w-2xl select-text">
+            <div id="cora-inspector-result" class="hidden mt-4 p-4 border border-zinc-150 rounded-xl bg-zinc-50/20 text-xs text-zinc-600 space-y-3.5 max-w-2xl select-text">
                 <!-- Response rendered dynamically -->
             </div>
         </div>
@@ -1705,7 +1706,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         
         <div class="flex items-center gap-2 shrink-0 select-none">
             <button onclick="coraGoToToday()" id="cal-today-btn" class="px-3 py-1.5 bg-white border border-zinc-200 hover:border-zinc-900 text-zinc-800 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-3xs active:scale-97">Today</button>
-            <button class="flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 hover:border-zinc-900 bg-white rounded-xl text-xs text-zinc-700 font-bold transition-all shadow-3xs active:scale-97 cursor-pointer">
+            <button id="btn-cal-toggle-filters" type="button" onclick="if(typeof coraToggleCalendarFilterBar==='function') coraToggleCalendarFilterBar();" class="flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 hover:border-zinc-900 bg-white rounded-xl text-xs text-zinc-700 font-bold transition-all shadow-3xs active:scale-97 cursor-pointer">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 Filters
             </button>
@@ -1793,18 +1794,18 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <!-- Kanban Columns Container -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="cora-kanban-board-container">
             <!-- Idea Column -->
-            <div class="flex kanban-col flex-col rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 space-y-3.5" data-column="idea">
+            <div class="hidden md:flex kanban-col flex-col rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 space-y-3.5" data-column="idea">
                 <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
                     <span class="text-xs font-extrabold text-zinc-900 flex items-center gap-1.5 uppercase tracking-wide">
                         <span class="w-2 h-2 rounded-full bg-zinc-400"></span>Idea
                     </span>
                     <div class="flex items-center gap-2">
-                        <span class="px-2 py-0.5 bg-zinc-250/60 text-zinc-700 rounded-full text-[10px] font-bold" id="kanban-count-idea">0</span>
-                        <button onclick="openCreateArticleDrawer('idea')" class="text-zinc-500 hover:text-zinc-900 font-bold cursor-pointer">+</button>
+                        <span class="px-2 py-0.5 bg-zinc-200/80 text-zinc-700 rounded-full text-[10px] font-bold" id="kanban-count-idea">0</span>
+                        <button onclick="openCreateArticleDrawer(null, 'idea')" class="text-zinc-500 hover:text-zinc-900 font-bold cursor-pointer">+</button>
                     </div>
                 </div>
                 <div class="space-y-3 kanban-cards-dropzone min-h-[350px] p-1 overflow-y-auto" id="kanban-cards-idea"></div>
-                <button onclick="openCreateArticleDrawer('idea')" class="w-full py-2 border border-dashed border-zinc-200 hover:border-zinc-500 rounded-xl text-center text-xs font-bold text-zinc-550 transition-all hover:bg-zinc-100/50 cursor-pointer">+ Add Idea</button>
+                <button onclick="openCreateArticleDrawer(null, 'idea')" class="w-full py-2 border border-dashed border-zinc-200 hover:border-zinc-500 rounded-xl text-center text-xs font-bold text-zinc-500 transition-all hover:bg-zinc-100/50 cursor-pointer">+ Add Idea</button>
             </div>
 
             <!-- Drafting Column -->
@@ -1814,12 +1815,12 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         <span class="w-2 h-2 rounded-full bg-blue-400"></span>Drafting
                     </span>
                     <div class="flex items-center gap-2">
-                        <span class="px-2 py-0.5 bg-zinc-250/60 text-zinc-700 rounded-full text-[10px] font-bold" id="kanban-count-drafting">0</span>
-                        <button onclick="openCreateArticleDrawer('drafting')" class="text-zinc-500 hover:text-zinc-900 font-bold cursor-pointer">+</button>
+                        <span class="px-2 py-0.5 bg-zinc-200/80 text-zinc-700 rounded-full text-[10px] font-bold" id="kanban-count-drafting">0</span>
+                        <button onclick="openCreateArticleDrawer(null, 'drafting')" class="text-zinc-500 hover:text-zinc-900 font-bold cursor-pointer">+</button>
                     </div>
                 </div>
                 <div class="space-y-3 kanban-cards-dropzone min-h-[350px] p-1 overflow-y-auto" id="kanban-cards-drafting"></div>
-                <button onclick="openCreateArticleDrawer('drafting')" class="w-full py-2 border border-dashed border-zinc-200 hover:border-zinc-500 rounded-xl text-center text-xs font-bold text-zinc-550 transition-all hover:bg-zinc-100/50 cursor-pointer">+ Add Draft</button>
+                <button onclick="openCreateArticleDrawer(null, 'drafting')" class="w-full py-2 border border-dashed border-zinc-200 hover:border-zinc-500 rounded-xl text-center text-xs font-bold text-zinc-500 transition-all hover:bg-zinc-100/50 cursor-pointer">+ Add Draft</button>
             </div>
 
             <!-- Review Column -->
@@ -1829,12 +1830,12 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         <span class="w-2 h-2 rounded-full bg-violet-400"></span>Review
                     </span>
                     <div class="flex items-center gap-2">
-                        <span class="px-2 py-0.5 bg-zinc-250/60 text-zinc-700 rounded-full text-[10px] font-bold" id="kanban-count-review">0</span>
-                        <button onclick="openCreateArticleDrawer('review')" class="text-zinc-500 hover:text-zinc-900 font-bold cursor-pointer">+</button>
+                        <span class="px-2 py-0.5 bg-zinc-200/80 text-zinc-700 rounded-full text-[10px] font-bold" id="kanban-count-review">0</span>
+                        <button onclick="openCreateArticleDrawer(null, 'review')" class="text-zinc-500 hover:text-zinc-900 font-bold cursor-pointer">+</button>
                     </div>
                 </div>
                 <div class="space-y-3 kanban-cards-dropzone min-h-[350px] p-1 overflow-y-auto" id="kanban-cards-review"></div>
-                <button onclick="openCreateArticleDrawer('review')" class="w-full py-2 border border-dashed border-zinc-200 hover:border-zinc-500 rounded-xl text-center text-xs font-bold text-zinc-550 transition-all hover:bg-zinc-100/50 cursor-pointer">+ Add Review</button>
+                <button onclick="openCreateArticleDrawer(null, 'review')" class="w-full py-2 border border-dashed border-zinc-200 hover:border-zinc-500 rounded-xl text-center text-xs font-bold text-zinc-500 transition-all hover:bg-zinc-100/50 cursor-pointer">+ Add Review</button>
             </div>
 
             <!-- Scheduled Column -->
@@ -1844,12 +1845,12 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>Scheduled
                     </span>
                     <div class="flex items-center gap-2">
-                        <span class="px-2 py-0.5 bg-zinc-250/60 text-zinc-700 rounded-full text-[10px] font-bold" id="kanban-count-scheduled">0</span>
-                        <button onclick="openCreateArticleDrawer('scheduled')" class="text-zinc-500 hover:text-zinc-900 font-bold cursor-pointer">+</button>
+                        <span class="px-2 py-0.5 bg-zinc-200/80 text-zinc-700 rounded-full text-[10px] font-bold" id="kanban-count-scheduled">0</span>
+                        <button onclick="openCreateArticleDrawer(null, 'scheduled')" class="text-zinc-500 hover:text-zinc-900 font-bold cursor-pointer">+</button>
                     </div>
                 </div>
                 <div class="space-y-3 kanban-cards-dropzone min-h-[350px] p-1 overflow-y-auto" id="kanban-cards-scheduled"></div>
-                <button onclick="openCreateArticleDrawer('scheduled')" class="w-full py-2 border border-dashed border-zinc-200 hover:border-zinc-500 rounded-xl text-center text-xs font-bold text-zinc-550 transition-all hover:bg-zinc-100/50 cursor-pointer">+ Add Scheduled</button>
+                <button onclick="openCreateArticleDrawer(null, 'scheduled')" class="w-full py-2 border border-dashed border-zinc-200 hover:border-zinc-500 rounded-xl text-center text-xs font-bold text-zinc-500 transition-all hover:bg-zinc-100/50 cursor-pointer">+ Add Scheduled</button>
             </div>
         </div>
         
@@ -2565,8 +2566,9 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         } else if (type === 'performance-rows') {
             for (let i = 0; i < count; i++) {
                 html += `
-                <tr class="border-b border-zinc-100 ">
+                <tr class="border-b border-zinc-100">
                     <td class="px-4 py-3"><div class="cora-skeleton h-4 w-32"></div></td>
+                    <td class="px-4 py-3"><div class="cora-skeleton h-4 w-24"></div></td>
                     <td class="px-4 py-3"><div class="cora-skeleton h-4 w-12"></div></td>
                     <td class="px-4 py-3"><div class="cora-skeleton h-4 w-16"></div></td>
                     <td class="px-4 py-3"><div class="cora-skeleton h-4 w-16"></div></td>
