@@ -299,6 +299,24 @@ body,
     color-scheme: only light !important;
 }
 
+/* Content Suite Horizontal Padding */
+.cora-ct-panel {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+@media (min-width: 640px) {
+    .cora-ct-panel {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+@media (min-width: 1024px) {
+    .cora-ct-panel {
+        padding-left: 2rem !important; /* 32px horizontal padding */
+        padding-right: 2rem !important; /* 32px horizontal padding */
+    }
+}
+
 /* =====================================================================
    MOBILE FLOATING ISLAND THEME AND RESPONSIVENESS
    ===================================================================== */
