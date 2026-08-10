@@ -297,35 +297,35 @@ function cora_get_sparkline_points( $history, $type ) {
     <!-- LEVEL 1 — CANVAS HUB -->
     <div id="canvas-level-1" class="space-y-6<?php echo ! empty($_editor_resume_url) ? ' hidden' : ''; ?>">
         <!-- Page Header -->
-        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-4 flex flex-col md:flex-row justify-between md:items-center gap-4">
+        <div class="border-b border-zinc-100 pb-4 flex flex-col md:flex-row justify-between md:items-center gap-4">
             <!-- Left Area: Title + Desc + Mobile Stack -->
             <div class="min-w-0 w-full md:w-auto">
                 <div class="flex items-center justify-between gap-4">
-                    <h1 class="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Canvas Themes</h1>
+                    <h1 class="text-xl font-bold text-zinc-900 tracking-tight">Canvas Themes</h1>
                     <!-- Mobile Platforms Stacked Overlapping Shortcuts (visible only on mobile) -->
                     <div class="flex md:hidden items-center -space-x-1.5 select-none">
                         <!-- ChatGPT Button -->
-                        <button onclick="coraAskExternalPlatform('openai')" class="group relative w-8 h-8 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 5 !important; margin-left: 0px !important;">
+                        <button onclick="coraAskExternalPlatform('openai')" class="group relative w-8 h-8 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 flex items-center justify-center text-emerald-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 5 !important; margin-left: 0px !important;">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
                         </button>
                         
                         <!-- Claude Button -->
-                        <button onclick="coraAskExternalPlatform('claude')" class="group relative w-8 h-8 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 dark:bg-amber-950/20 dark:hover:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-500 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 4 !important; margin-left: -6px !important;">
+                        <button onclick="coraAskExternalPlatform('claude')" class="group relative w-8 h-8 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 flex items-center justify-center text-amber-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 4 !important; margin-left: -6px !important;">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
                         </button>
                         
                         <!-- Gemini Button -->
-                        <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-8 h-8 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
+                        <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-8 h-8 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 flex items-center justify-center text-blue-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
                         </button>
                         
                         <!-- Perplexity Button -->
-                        <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 dark:bg-zinc-800/20 dark:hover:bg-zinc-800/40 flex items-center justify-center text-zinc-650 dark:text-zinc-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
+                        <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 flex items-center justify-center text-zinc-650 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
                         </button>
                         
                         <!-- YouTube Button -->
-                        <button onclick="coraOpenCanvasTutorial()" class="group relative w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 1 !important; margin-left: -6px !important;">
+                        <button onclick="coraOpenCanvasTutorial()" class="group relative w-8 h-8 rounded-full border border-zinc-200 bg-white hover:bg-zinc-50 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 1 !important; margin-left: -6px !important;">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" class="w-4 h-4"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
                         </button>
                     </div>
@@ -346,17 +346,17 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- Desktop Platforms Stacked Overlapping Shortcuts (hidden on mobile, visible on desktop) -->
                 <div class="cora-platform-stack hidden md:flex items-center -space-x-1.5 select-none mr-2">
                     <!-- ChatGPT Button -->
-                    <button onclick="coraAskExternalPlatform('openai')" class="group relative w-8 h-8 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 5 !important; margin-left: 0px !important;">
+                    <button onclick="coraAskExternalPlatform('openai')" class="group relative w-8 h-8 rounded-full border-0 bg-emerald-50/70 hover:bg-emerald-100/50 flex items-center justify-center text-emerald-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 5 !important; margin-left: 0px !important;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>
                     </button>
                     
                     <!-- Claude Button -->
-                    <button onclick="coraAskExternalPlatform('claude')" class="group relative w-8 h-8 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 dark:bg-amber-950/20 dark:hover:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-500 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 4 !important; margin-left: -6px !important;">
+                    <button onclick="coraAskExternalPlatform('claude')" class="group relative w-8 h-8 rounded-full border-0 bg-amber-50/70 hover:bg-amber-100/50 flex items-center justify-center text-amber-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 4 !important; margin-left: -6px !important;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
                     </button>
                     
                     <!-- Gemini Button -->
-                    <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-8 h-8 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
+                    <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-8 h-8 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 flex items-center justify-center text-blue-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask Gemini
@@ -365,7 +365,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     </button>
                     
                     <!-- Perplexity Button -->
-                    <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 dark:bg-zinc-800/20 dark:hover:bg-zinc-800/40 flex items-center justify-center text-zinc-650 dark:text-zinc-400 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
+                    <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 flex items-center justify-center text-zinc-650 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask Perplexity
@@ -374,7 +374,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     </button>
                     
                     <!-- YouTube Button -->
-                    <button onclick="coraOpenCanvasTutorial()" class="group relative w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 1 !important; margin-left: -6px !important;">
+                    <button onclick="coraOpenCanvasTutorial()" class="group relative w-8 h-8 rounded-full border border-zinc-200 bg-white hover:bg-zinc-50 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 1 !important; margin-left: -6px !important;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" class="w-4 h-4"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Tutorial Walkthrough
@@ -389,7 +389,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>Add Theme</span>
                     </button>
-                    <button onclick="window.coraShowToast('Exporting performance report ZIP...', 'success')" class="flex-1 md:flex-none justify-center px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-xs cursor-pointer transition-all flex items-center gap-1.5 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 whitespace-nowrap shrink-0">
+                    <button onclick="window.coraShowToast('Exporting performance report ZIP...', 'success')" class="flex-1 md:flex-none justify-center px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-xs cursor-pointer transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         <span>Export Report</span>
                     </button>
@@ -466,15 +466,15 @@ function cora_get_sparkline_points( $history, $type ) {
         $score_last_y = 28 - round( ( intval($score_last_pt) / 100 ) * 20 ) - 4;
         $score_last_y = max( 2, min( 26, $score_last_y ) );
         ?>
-        <div class="rounded-xl shadow-2xs border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden mb-3">
+        <div class="rounded-xl shadow-2xs border border-zinc-200 bg-white overflow-hidden mb-3">
             <div class="grid grid-cols-2 md:flex md:flex-row">
 
                 <!-- LCP -->
-                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-b border-r border-zinc-100 dark:border-zinc-800 md:border-b-0 md:border-r-0">
+                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-b border-r border-zinc-100 md:border-b-0 md:border-r-0">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">LCP</div>
                         <div class="flex items-center gap-1.5">
-                            <span id="pagespeed-val-lcp" class="text-sm font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_lcp); ?></span>
+                            <span id="pagespeed-val-lcp" class="text-sm font-black text-zinc-900 leading-none"><?php echo esc_html($ps_lcp); ?></span>
                             <span id="pagespeed-badge-lcp"><?php echo $lcp_badge; ?></span>
                         </div>
                         <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 2.5s</div>
@@ -482,11 +482,11 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
 
                 <!-- INP -->
-                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-b border-zinc-100 dark:border-zinc-800 md:border-b-0 md:border-l md:border-zinc-100 dark:md:border-zinc-800">
+                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-b border-zinc-100 md:border-b-0 md:border-l md:border-zinc-100 ">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">INP</div>
                         <div class="flex items-center gap-1.5">
-                            <span id="pagespeed-val-inp" class="text-sm font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_inp); ?></span>
+                            <span id="pagespeed-val-inp" class="text-sm font-black text-zinc-900 leading-none"><?php echo esc_html($ps_inp); ?></span>
                             <span id="pagespeed-badge-inp"><?php echo $inp_badge; ?></span>
                         </div>
                         <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 200ms</div>
@@ -494,11 +494,11 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
 
                 <!-- CLS -->
-                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-r border-zinc-100 dark:border-zinc-800 md:border-r-0 md:border-l md:border-zinc-100 dark:md:border-zinc-800 md:border-b-0">
+                <div class="flex-1 flex items-center px-4 py-3 min-w-0 border-r border-zinc-100 md:border-r-0 md:border-l md:border-zinc-100 md:border-b-0">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">CLS</div>
                         <div class="flex items-center gap-1.5">
-                            <span id="pagespeed-val-cls" class="text-sm font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_cls); ?></span>
+                            <span id="pagespeed-val-cls" class="text-sm font-black text-zinc-900 leading-none"><?php echo esc_html($ps_cls); ?></span>
                             <span id="pagespeed-badge-cls"><?php echo $cls_badge; ?></span>
                         </div>
                         <div class="text-[9px] text-zinc-400 mt-0.5">Target &lt; 0.1</div>
@@ -506,11 +506,11 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
 
                 <!-- Score -->
-                <div class="flex-1 flex items-center px-4 py-3 min-w-0 md:border-l md:border-zinc-100 dark:md:border-zinc-800">
+                <div class="flex-1 flex items-center px-4 py-3 min-w-0 md:border-l md:border-zinc-100 ">
                     <div class="min-w-0">
                         <div class="text-[9px] text-zinc-400 uppercase font-bold tracking-widest leading-none mb-1">Score</div>
                         <div class="flex items-center gap-1.5">
-                            <span id="pagespeed-val-score" class="text-sm font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_score); ?></span>
+                            <span id="pagespeed-val-score" class="text-sm font-black text-zinc-900 leading-none"><?php echo esc_html($ps_score); ?></span>
                             <span id="pagespeed-badge-score"><?php echo $score_badge; ?></span>
                         </div>
                         <div class="text-[9px] text-zinc-400 mt-0.5">Target &gt; 89</div>
@@ -520,31 +520,31 @@ function cora_get_sparkline_points( $history, $type ) {
         </div>
 
         <!-- PageSpeed Sync Status Bar — ultra-compact on mobile, full layout on sm+ (wrapped in separate container) -->
-        <div class="rounded-xl shadow-2xs border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 overflow-hidden mb-3">
+        <div class="rounded-xl shadow-2xs border border-zinc-200 bg-zinc-50 overflow-hidden mb-3">
             <div class="flex items-center justify-between py-1.5 px-3 gap-2">
                 <!-- Left: connection dot + label (minimal on mobile, full on sm+) -->
                 <div class="flex items-center gap-1.5 min-w-0 overflow-hidden">
                     <span id="pagespeed-conn-indicator" class="w-1.5 h-1.5 rounded-full shrink-0 <?php echo $ps_is_mocked ? 'bg-amber-400' : 'bg-green-500'; ?>"></span>
                     <svg viewBox="0 0 24 24" width="11" height="11" class="shrink-0 hidden sm:block"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.77c-.98.66-2.23 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-                    <span id="pagespeed-conn-text" class="text-[9.5px] font-bold text-zinc-700 dark:text-zinc-300 truncate"><?php echo $ps_is_mocked ? 'Simulated' : 'Connected'; ?></span>
+                    <span id="pagespeed-conn-text" class="text-[9.5px] font-bold text-zinc-700 truncate"><?php echo $ps_is_mocked ? 'Simulated' : 'Connected'; ?></span>
                     <span class="hidden sm:inline text-[9px] text-zinc-400">·</span>
-                    <span class="hidden sm:inline text-[9px] text-zinc-500 truncate">Audit Target: <code id="pagespeed-target-url" class="bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono text-[8.5px]"><?php echo esc_html( $ps_target ); ?></code></span>
+                    <span class="hidden sm:inline text-[9px] text-zinc-500 truncate">Audit Target: <code id="pagespeed-target-url" class="bg-zinc-100 px-1 py-0.5 rounded font-mono text-[8.5px]"><?php echo esc_html( $ps_target ); ?></code></span>
                     <span class="hidden sm:inline text-[9px] text-zinc-400">·</span>
-                    <span class="hidden sm:inline text-[9px] text-zinc-500">Last audited: <span id="pagespeed-last-updated" class="font-medium text-zinc-600 dark:text-zinc-400"><?php echo !empty($ps_last) ? esc_html( $ps_last ) : 'Never'; ?></span></span>
+                    <span class="hidden sm:inline text-[9px] text-zinc-500">Last audited: <span id="pagespeed-last-updated" class="font-medium text-zinc-600 "><?php echo !empty($ps_last) ? esc_html( $ps_last ) : 'Never'; ?></span></span>
                 </div>
                 <!-- Right: icon-only on mobile, labeled on sm+ -->
                 <div class="flex items-center gap-1.5 shrink-0">
                     <!-- Device toggles — hidden on mobile -->
-                    <div class="hidden sm:flex items-center gap-1 border border-zinc-200 dark:border-zinc-800 rounded-md p-0.5 bg-white dark:bg-zinc-950 mr-0.5">
-                        <button id="pagespeed-device-mobile" onclick="switchPageSpeedDevice('mobile')" class="w-6 h-6 rounded border-0 bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 flex items-center justify-center cursor-pointer transition-all focus:outline-none" title="Mobile View">
+                    <div class="hidden sm:flex items-center gap-1 border border-zinc-200 rounded-md p-0.5 bg-white mr-0.5">
+                        <button id="pagespeed-device-mobile" onclick="switchPageSpeedDevice('mobile')" class="w-6 h-6 rounded border-0 bg-zinc-100 text-zinc-800 flex items-center justify-center cursor-pointer transition-all focus:outline-none" title="Mobile View">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                         </button>
-                        <button id="pagespeed-device-desktop" onclick="switchPageSpeedDevice('desktop')" class="w-6 h-6 rounded border-0 bg-transparent text-zinc-450 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 flex items-center justify-center cursor-pointer transition-all focus:outline-none" title="Desktop View">
+                        <button id="pagespeed-device-desktop" onclick="switchPageSpeedDevice('desktop')" class="w-6 h-6 rounded border-0 bg-transparent text-zinc-450 hover:text-zinc-700 flex items-center justify-center cursor-pointer transition-all focus:outline-none" title="Desktop View">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
                         </button>
                     </div>
                     <!-- API Settings: icon-only on mobile -->
-                    <button onclick="openPageSpeedSettingsDrawer()" class="h-7 px-2 flex items-center gap-1 text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 cursor-pointer transition-all dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300" title="API Settings">
+                    <button onclick="openPageSpeedSettingsDrawer()" class="h-7 px-2 flex items-center gap-1 text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 cursor-pointer transition-all " title="API Settings">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M12 2v2M12 20v2"></path></svg>
                         <span class="hidden sm:inline text-[9px] font-bold">API Settings</span>
                     </button>
@@ -568,18 +568,18 @@ function cora_get_sparkline_points( $history, $type ) {
                 if ( empty( $ls['seo_title'] ) || empty( $ls['seo_description'] ) ) $seo_issues++;
             }
         ?>
-        <div class="bg-white border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 rounded-xl shadow-sm relative overflow-visible" id="active-theme-card">
+        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm relative overflow-visible" id="active-theme-card">
             <!-- Theme preview: Dual device frames + theme info row -->
             <div class="p-5 flex flex-col lg:flex-row items-stretch lg:items-center gap-6">
                 <!-- Left device frames block -->
                 <div class="flex gap-4 shrink-0 justify-center lg:justify-start items-center">
                     <!-- Desktop Frame: 280×200px | scale = 280/1280 = 0.21875 -->
-                    <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 relative shadow-sm overflow-hidden flex flex-col bg-white dark:bg-zinc-950 select-none pointer-events-none shrink-0" style="width: 280px; height: 200px;">
-                        <div class="flex items-center gap-1 px-2.5 py-2 border-b border-zinc-100 dark:border-zinc-800 shrink-0 bg-zinc-50/50 dark:bg-zinc-900/20">
+                    <div class="rounded-xl border border-zinc-200 relative shadow-sm overflow-hidden flex flex-col bg-white select-none pointer-events-none shrink-0" style="width: 280px; height: 200px;">
+                        <div class="flex items-center gap-1 px-2.5 py-2 border-b border-zinc-100 shrink-0 bg-zinc-50/50 ">
                             <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                             <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                            <div class="flex-1 mx-2 bg-zinc-100 dark:bg-zinc-800 rounded text-[6px] font-mono text-zinc-400 px-2 py-0.5 text-center truncate"><?php echo esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) . '/' . $cora_canvas_slug ); ?></div>
+                            <div class="flex-1 mx-2 bg-zinc-100 rounded text-[6px] font-mono text-zinc-400 px-2 py-0.5 text-center truncate"><?php echo esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) . '/' . $cora_canvas_slug ); ?></div>
                         </div>
                         <!-- viewport: 1280px wide × 850px tall → scale 0.21875 → renders 280px × 185px (fills 172px container height perfectly, cropping the bottom) -->
                         <div class="flex-1 relative overflow-hidden bg-white">
@@ -587,9 +587,9 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                     </div>
                     <!-- Mobile Frame: 90×200px | scale = 90/390 = 0.230769 (hidden on small mobile screens to prevent layout overflow) -->
-                    <div class="hidden sm:flex rounded-xl border-2 border-zinc-200 dark:border-zinc-700 shadow-sm overflow-hidden flex-col bg-white dark:bg-zinc-950 select-none pointer-events-none shrink-0" style="width: 90px; height: 200px;">
-                        <div class="shrink-0 flex items-center justify-center py-1 bg-zinc-50/50 dark:bg-zinc-900/20 border-b border-zinc-100 dark:border-zinc-800">
-                            <span class="w-6 h-0.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+                    <div class="hidden sm:flex rounded-xl border-2 border-zinc-200 shadow-sm overflow-hidden flex-col bg-white select-none pointer-events-none shrink-0" style="width: 90px; height: 200px;">
+                        <div class="shrink-0 flex items-center justify-center py-1 bg-zinc-50/50 border-b border-zinc-100 ">
+                            <span class="w-6 h-0.5 rounded-full bg-zinc-300 "></span>
                         </div>
                         <!-- viewport: 390px wide × 850px tall → scale 0.230769 → renders 90px × 196px (fills container height perfectly, cropping the bottom) -->
                         <div class="flex-1 relative overflow-hidden bg-white">
@@ -599,47 +599,47 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
 
                 <!-- Vertical Divider -->
-                <div class="hidden lg:block w-px bg-zinc-100 dark:bg-zinc-800 self-stretch my-1 shrink-0"></div>
+                <div class="hidden lg:block w-px bg-zinc-100 self-stretch my-1 shrink-0"></div>
 
                 <!-- Right: Theme Info and Action buttons (No inner card nesting) -->
                 <div class="flex-1 flex flex-col justify-between min-w-[280px] py-1">
                     <!-- Top Info Row -->
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-green-50/70 dark:bg-green-950/20 border border-green-200/60 dark:border-green-900/50 text-[9px] font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">Active Theme</span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-green-50/70 border border-green-200/60 text-[9px] font-bold text-green-700 uppercase tracking-wider">Active Theme</span>
                             <?php if ( isset($live_settings['source']) && $live_settings['source'] === 'lovable' ) : ?>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900 text-[9px] font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wide">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-purple-50 border border-purple-200 text-[9px] font-bold text-purple-700 uppercase tracking-wide">
                                 <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                                 Lovable Connected
                             </span>
                             <?php endif; ?>
                             <span class="text-[10px] text-zinc-400">· Last edited 2 days ago</span>
                         </div>
-                        <h2 class="text-xl font-bold text-zinc-900 dark:text-white leading-tight"><?php echo esc_html( $live_theme['name'] ); ?></h2>
+                        <h2 class="text-xl font-bold text-zinc-900 leading-tight"><?php echo esc_html( $live_theme['name'] ); ?></h2>
 
                         <!-- Optimization Feature Badges Wrap Row (Sleek, pill-shaped monochromatic tags with no borders/outlines) -->
                         <div class="flex flex-wrap gap-1.5 mt-1">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 Optimized
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                                 Core Web Vitals
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                 SEO Ready
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect></svg>
                                 Responsive
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
                                 Accessibility AA
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 dark:bg-zinc-800/60 dark:text-zinc-300">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                                 Elementor
                             </span>
@@ -657,24 +657,24 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
 
 <!-- Action Buttons Row (Clean border-t and mt-auto so it aligns vertically) -->
-                    <div class="flex items-center gap-2 w-full border-t border-zinc-100 dark:border-zinc-800 pt-3 mt-auto">
+                    <div class="flex items-center gap-2 w-full border-t border-zinc-100 pt-3 mt-auto">
                         <!-- Edit Theme is hidden on mobile, visible on desktop -->
                         <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true)" class="hidden lg:flex px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold cursor-pointer transition-all items-center gap-1.5 border-none shadow-xs shrink-0">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                             Edit Theme
                         </button>
-                        <a href="<?php echo home_url( '/' . esc_attr( $cora_canvas_slug ) . '/' ); ?>" target="_blank" class="flex-1 lg:flex-none justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5 no-underline">
+                        <a href="<?php echo home_url( '/' . esc_attr( $cora_canvas_slug ) . '/' ); ?>" target="_blank" class="flex-1 lg:flex-none justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5 no-underline">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                             Preview
                         </a>
-                        <button onclick="triggerDuplicateTheme(<?php echo $live_theme['id']; ?>)" class="flex-1 lg:flex-none justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
+                        <button onclick="triggerDuplicateTheme(<?php echo $live_theme['id']; ?>)" class="flex-1 lg:flex-none justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             Duplicate
                         </button>
                         <div class="flex-1 lg:flex-none lg:ml-auto flex items-center gap-2">
                             <!-- Three-dot more actions options dropdown -->
                             <div class="relative inline-block w-full">
-                                <button onclick="toggleActiveThemeDropdown(event)" class="w-full justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-[11px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5">
+                                <button onclick="toggleActiveThemeDropdown(event)" class="w-full justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5">
                                     <!-- Leading Ellipsis Icon so it is an Icon Button -->
                                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle><circle cx="5" cy="12" r="1.2"></circle></svg>
                                     <span class="lg:hidden">More</span>
@@ -726,7 +726,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- Performance Insights Card -->
                 <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between" id="performance-insights-card">
                     <div>
-                        <h3 class="text-sm font-black text-zinc-900 dark:text-white mb-4">Performance insights</h3>
+                        <h3 class="text-sm font-black text-zinc-900 mb-4">Performance insights</h3>
                         <div class="flex items-center gap-4 mb-4">
                             <!-- Circular Score Radial -->
                             <div class="relative w-16 h-16 shrink-0">
@@ -735,11 +735,11 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <circle id="pagespeed-radial-score" cx="18" cy="18" r="15.9" fill="none" stroke="<?php echo $score_radial_color; ?>" stroke-width="3" stroke-dasharray="<?php echo intval($ps_score); ?> <?php echo 100 - intval($ps_score); ?>" stroke-linecap="round"></circle>
                                 </svg>
                                 <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span id="pagespeed-radial-val" class="text-base font-black text-zinc-900 dark:text-white leading-none"><?php echo esc_html($ps_score); ?></span>
+                                    <span id="pagespeed-radial-val" class="text-base font-black text-zinc-900 leading-none"><?php echo esc_html($ps_score); ?></span>
                                 </div>
                             </div>
                             <div>
-                                <div class="text-xs font-bold text-zinc-700 dark:text-zinc-350">Performance score</div>
+                                <div class="text-xs font-bold text-zinc-700 ">Performance score</div>
                                 <div id="pagespeed-score-status" class="text-sm font-black <?php echo $score_status_color; ?> mt-0.5"><?php echo esc_html($score_status_text); ?></div>
                                 <div class="text-[10px] text-zinc-400 mt-1 flex items-center gap-1">
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-green-500"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
@@ -749,18 +749,18 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
 
                         <!-- Core Web Vitals Metrics Grid -->
-                        <div class="grid grid-cols-3 gap-2 py-2 px-3 bg-zinc-50/50 dark:bg-zinc-900/10 rounded-lg border border-zinc-100 dark:border-zinc-800/80 mb-5">
+                        <div class="grid grid-cols-3 gap-2 py-2 px-3 bg-zinc-50/50 rounded-lg border border-zinc-100 mb-5">
                             <div class="text-center">
                                 <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">LCP</div>
-                                <div class="text-xs font-black text-zinc-800 dark:text-zinc-200 mt-0.5"><?php echo esc_html($ps_lcp); ?></div>
+                                <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_lcp); ?></div>
                             </div>
-                            <div class="text-center border-l border-zinc-100 dark:border-zinc-800">
+                            <div class="text-center border-l border-zinc-100 ">
                                 <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">INP</div>
-                                <div class="text-xs font-black text-zinc-800 dark:text-zinc-200 mt-0.5"><?php echo esc_html($ps_inp); ?></div>
+                                <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_inp); ?></div>
                             </div>
-                            <div class="text-center border-l border-zinc-100 dark:border-zinc-800">
+                            <div class="text-center border-l border-zinc-100 ">
                                 <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">CLS</div>
-                                <div class="text-xs font-black text-zinc-800 dark:text-zinc-200 mt-0.5"><?php echo esc_html($ps_cls); ?></div>
+                                <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_cls); ?></div>
                             </div>
                         </div>
 
@@ -774,22 +774,22 @@ function cora_get_sparkline_points( $history, $type ) {
                                 } elseif ($opp_severity === 'Medium') {
                                     $opp_badge_class = 'bg-amber-50 text-amber-700 border border-amber-200/50';
                                 }
-                                $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+                                $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
                                 if (stripos($opp['label'], 'javascript') !== false || stripos($opp['label'], 'js') !== false) {
-                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
+                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
                                 } elseif (stripos($opp['label'], 'image') !== false) {
-                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
+                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
                                 } elseif (stripos($opp['label'], 'inp') !== false || stripos($opp['label'], 'paint') !== false || stripos($opp['label'], 'blocking') !== false) {
-                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
                                 }
                             ?>
-                            <div class="flex items-center justify-between p-2.5 bg-zinc-50/50 dark:bg-zinc-900/10 hover:bg-zinc-50 border border-zinc-100 dark:border-zinc-800 rounded-lg cursor-pointer transition-all group" onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...');">
+                            <div class="flex items-center justify-between p-2.5 bg-zinc-50/50 hover:bg-zinc-50 border border-zinc-100 rounded-lg cursor-pointer transition-all group" onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...');">
                                 <div class="flex items-center gap-2.5 min-w-0">
-                                    <div class="w-6 h-6 rounded bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 flex items-center justify-center shrink-0">
+                                    <div class="w-6 h-6 rounded bg-white border border-zinc-200/60 flex items-center justify-center shrink-0">
                                         <?php echo $opp_icon; ?>
                                     </div>
                                     <div class="min-w-0">
-                                        <div class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 truncate"><?php echo esc_html($opp['label']); ?></div>
+                                        <div class="text-[10px] font-bold text-zinc-800 truncate"><?php echo esc_html($opp['label']); ?></div>
                                         <div class="text-[9px] text-zinc-400 mt-0.5"><?php echo esc_html($opp['savings']); ?></div>
                                     </div>
                                 </div>
@@ -807,7 +807,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- Website Statistics Card -->
                 <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between" id="website-statistics-card">
                     <div>
-                        <h3 class="text-sm font-black text-zinc-900 dark:text-white mb-4 font-sans">Website statistics</h3>
+                        <h3 class="text-sm font-black text-zinc-900 mb-4 font-sans">Website statistics</h3>
                         <div class="space-y-1">
                             <?php
                             $stats_rows = [
@@ -821,15 +821,15 @@ function cora_get_sparkline_points( $history, $type ) {
                             $total_rows = count($stats_rows);
                             foreach ($stats_rows as $index => $row) :
                             ?>
-                            <div onclick="<?php echo $row['action']; ?>" class="flex items-center justify-between py-2 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 px-2 -mx-2 rounded-lg cursor-pointer transition-colors group">
-                                <div class="flex items-center gap-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-350 font-sans">
-                                    <div class="w-6 h-6 rounded bg-zinc-100/60 dark:bg-zinc-800/40 flex items-center justify-center text-zinc-450 dark:text-zinc-500 transition-colors group-hover:bg-zinc-200/50 dark:group-hover:bg-zinc-700/50 shrink-0">
+                            <div onclick="<?php echo $row['action']; ?>" class="flex items-center justify-between py-2 hover:bg-zinc-50/50 px-2 -mx-2 rounded-lg cursor-pointer transition-colors group">
+                                <div class="flex items-center gap-2.5 text-xs font-semibold text-zinc-700 font-sans">
+                                    <div class="w-6 h-6 rounded bg-zinc-100/60 flex items-center justify-center text-zinc-450 transition-colors group-hover:bg-zinc-200/50 shrink-0">
                                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><?php echo $row['icon']; ?></svg>
                                     </div>
                                     <?php echo esc_html($row['label']); ?>
                                 </div>
                                 <div class="flex items-center gap-3 font-sans">
-                                    <span class="text-xs font-black text-zinc-900 dark:text-white"><?php echo $row['value']; ?></span>
+                                    <span class="text-xs font-black text-zinc-900 "><?php echo $row['value']; ?></span>
                                     <?php if (!empty($row['neutral'])) : ?>
                                         <span class="text-[10px] text-zinc-400 font-semibold"><?php echo esc_html($row['delta']); ?></span>
                                     <?php elseif ($row['positive']) : ?>
@@ -840,7 +840,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                 </div>
                             </div>
                             <?php if ($index < $total_rows - 1) : ?>
-                            <div class="h-px bg-zinc-100/60 dark:bg-zinc-850/60 my-0.5"></div>
+                            <div class="h-px bg-zinc-100/60 my-0.5"></div>
                             <?php endif; ?>
                             <?php endforeach; ?>
                         </div>
@@ -867,17 +867,17 @@ function cora_get_sparkline_points( $history, $type ) {
         ?>
         <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4" id="recommended-banner">
             <div class="flex items-start gap-3">
-                <div class="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center shrink-0 mt-0.5">
+                <div class="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-blue-600"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                 </div>
                 <div>
                     <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Recommended for you</div>
-                    <div id="pagespeed-rec-title" class="text-sm font-black text-zinc-900 dark:text-white mt-0.5"><?php echo esc_html($rec_opp['label']); ?></div>
+                    <div id="pagespeed-rec-title" class="text-sm font-black text-zinc-900 mt-0.5"><?php echo esc_html($rec_opp['label']); ?></div>
                     <div id="pagespeed-rec-desc" class="text-xs text-zinc-500 mt-0.5 max-w-md"><?php echo esc_html($rec_desc); ?></div>
                     <div class="mt-2 flex items-center gap-2">
                         <span class="text-[10px] text-zinc-400 font-semibold">Estimated improvement</span>
-                        <span id="pagespeed-rec-metric-lbl" class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400"><?php echo esc_html($rec_metric); ?></span>
-                        <span class="text-[10px] font-black text-zinc-900 dark:text-white"><span id="pagespeed-rec-metric-from"><?php echo esc_html($rec_metric_val); ?></span> <span class="text-zinc-400 font-normal">→</span> <span id="pagespeed-rec-metric-to" class="text-green-600"><?php echo esc_html($rec_target); ?></span></span>
+                        <span id="pagespeed-rec-metric-lbl" class="text-[10px] font-bold text-zinc-600 "><?php echo esc_html($rec_metric); ?></span>
+                        <span class="text-[10px] font-black text-zinc-900 "><span id="pagespeed-rec-metric-from"><?php echo esc_html($rec_metric_val); ?></span> <span class="text-zinc-400 font-normal">→</span> <span id="pagespeed-rec-metric-to" class="text-green-600"><?php echo esc_html($rec_target); ?></span></span>
                     </div>
                 </div>
             </div>
@@ -888,20 +888,20 @@ function cora_get_sparkline_points( $history, $type ) {
         <?php endif; ?>
 
         <!-- Theme Library Card (Shopify Style) -->
-        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm dark:bg-zinc-950 dark:border-zinc-800" id="draft-themes-library-card">
-            <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-white dark:bg-zinc-950 shrink-0 rounded-t-xl">
+        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm " id="draft-themes-library-card">
+            <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-white shrink-0 rounded-t-xl">
                 <div class="flex items-center gap-3">
                     <!-- Dashed Rectangle Grid Icon Box -->
-                    <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 flex items-center justify-center shrink-0">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" stroke-dasharray="3 3" fill="none" class="text-zinc-650"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-zinc-900 dark:text-white leading-tight">Draft themes</h3>
+                        <h3 class="text-sm font-bold text-zinc-900 leading-tight">Draft themes</h3>
                         <p class="text-[10px] text-zinc-400 font-medium mt-0.5">These themes are only visible to you. You can work on them before publishing.</p>
                     </div>
                 </div>
                 <div class="relative inline-block text-left">
-                    <button onclick="toggleImportDropdown(event)" class="px-4 py-2 border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 rounded-lg text-xs font-bold text-zinc-800 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center gap-1.5 select-none shadow-xs">
+                    <button onclick="toggleImportDropdown(event)" class="px-4 py-2 border border-zinc-200 hover:border-zinc-300 rounded-lg text-xs font-bold text-zinc-800 bg-white cursor-pointer transition-all flex items-center gap-1.5 select-none shadow-xs">
                         Import
                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-550"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
@@ -921,7 +921,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
             </div>
             
-            <div class="divide-y divide-zinc-200 dark:divide-zinc-800 rounded-b-xl">
+            <div class="divide-y divide-zinc-200 rounded-b-xl">
                 <?php 
                 $draft_themes = [];
                 foreach ( $themes as $th ) {
@@ -959,27 +959,27 @@ function cora_get_sparkline_points( $history, $type ) {
                         <div class="flex items-center gap-3.5 min-w-0">
                             <!-- Live iframe thumbnail preview -->
                             <?php $preview_url = home_url('/?cv_preview_theme=' . $th['id']); ?>
-                            <div style="width:80px;height:50px;flex-shrink:0;overflow:hidden;position:relative;" class="rounded-lg border border-zinc-200 bg-zinc-100 dark:bg-zinc-900 select-none">
+                            <div style="width:80px;height:50px;flex-shrink:0;overflow:hidden;position:relative;" class="rounded-lg border border-zinc-200 bg-zinc-100 select-none">
                                 <iframe src="<?php echo esc_url($preview_url); ?>" loading="lazy" sandbox="allow-scripts allow-same-origin" style="width:800px;height:500px;border:none;transform:scale(0.1);transform-origin:0 0;pointer-events:none;position:absolute;top:0;left:0;" tabindex="-1" aria-hidden="true"></iframe>
                             </div>
                             
                             <!-- Theme Details & Upgrade Information -->
                             <div class="min-w-0">
                                 <div class="flex items-center gap-1.5 flex-wrap">
-                                    <h4 class="text-xs font-bold text-zinc-900 dark:text-white leading-none truncate"><?php echo esc_html($th['name']); ?></h4>
+                                    <h4 class="text-xs font-bold text-zinc-900 leading-none truncate"><?php echo esc_html($th['name']); ?></h4>
                                     <?php
                                     $th_settings = json_decode( $th['settings'], true ) ?: array();
                                     $th_source = isset( $th_settings['source'] ) ? $th_settings['source'] : 'elementor';
                                     if ( strtolower($th_source) === 'lovable' ) :
                                     ?>
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-extrabold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-250">Lovable</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-extrabold bg-zinc-100 text-zinc-800 ">Lovable</span>
                                     <?php else: ?>
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-extrabold bg-zinc-50 text-zinc-600 border border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800">Elementor</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-extrabold bg-zinc-50 text-zinc-600 border border-zinc-200 ">Elementor</span>
                                     <?php endif; ?>
                                 </div>
-                                <div class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1.5"><?php echo esc_html($modified_time); ?></div>
+                                <div class="text-[10px] text-zinc-400 mt-1.5"><?php echo esc_html($modified_time); ?></div>
                                 <!-- Version tracking is not available for custom themes -->
-                                <div class="mt-1.5 inline-flex items-center gap-1 text-[9.5px] text-zinc-400 dark:text-zinc-600 font-medium">
+                                <div class="mt-1.5 inline-flex items-center gap-1 text-[9.5px] text-zinc-400 font-medium">
                                     <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                                     Version tracking not available
                                 </div>
@@ -990,7 +990,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         <div class="flex items-center gap-2 shrink-0 w-full md:w-auto justify-end">
                             <!-- Actions Dropdown button on the far left of the row -->
                             <div class="relative">
-                                <button onclick="toggleDraftActionsMenu(<?php echo $th['id']; ?>, event)" class="p-2 border border-zinc-200 hover:bg-zinc-50 dark:border-zinc-850 rounded-lg text-zinc-650 bg-white dark:bg-zinc-900 cursor-pointer transition-all flex items-center justify-center shadow-xs">
+                                <button onclick="toggleDraftActionsMenu(<?php echo $th['id']; ?>, event)" class="p-2 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-zinc-650 bg-white cursor-pointer transition-all flex items-center justify-center shadow-xs">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                                 </button>
                                 
@@ -1007,8 +1007,8 @@ function cora_get_sparkline_points( $history, $type ) {
                                 </div>
                             </div>
 
-                            <button onclick="triggerActivateTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="px-3.5 py-1.5 border border-zinc-200 hover:bg-zinc-50 dark:border-zinc-850 rounded-lg text-xs font-bold text-zinc-800 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all shadow-xs">Publish</button>
-                            <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false)" class="px-3.5 py-1.5 border border-zinc-200 hover:bg-zinc-50 dark:border-zinc-850 rounded-lg text-xs font-bold text-zinc-800 dark:text-zinc-300 bg-white dark:bg-zinc-900 cursor-pointer transition-all shadow-xs">Edit theme</button>
+                            <button onclick="triggerActivateTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="px-3.5 py-1.5 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-xs font-bold text-zinc-800 bg-white cursor-pointer transition-all shadow-xs">Publish</button>
+                            <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false)" class="px-3.5 py-1.5 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-xs font-bold text-zinc-800 bg-white cursor-pointer transition-all shadow-xs">Edit theme</button>
                         </div>
                     </div>
                 <?php } 
@@ -2373,15 +2373,15 @@ function cora_get_sparkline_points( $history, $type ) {
     <!-- LEVEL 3 — ELEMENTOR PAGE EDITOR iframe wrapper -->
     <div id="canvas-level-3" class="fixed inset-0 z-[9999] bg-white<?php echo ! empty($_editor_resume_url) ? '' : ' hidden'; ?> flex flex-col">
         <!-- Editor Topbar Wrapper -->
-        <div id="cora-parent-editor-topbar" class="h-24 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex flex-col hidden select-none">
+        <div id="cora-parent-editor-topbar" class="h-24 bg-zinc-50 border-b border-zinc-200 flex flex-col hidden select-none">
             <!-- Row 1 -->
-            <div class="h-12 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-4 w-full bg-zinc-50 dark:bg-zinc-950">
+            <div class="h-12 border-b border-zinc-200 flex items-center justify-between px-4 w-full bg-zinc-50 ">
                 <!-- Left: Logo & Theme Selector -->
                 <div class="flex items-center gap-3">
                     <div class="flex items-center gap-1.5 select-none shrink-0 mr-1">
-                        <span class="text-xs font-black tracking-tight text-zinc-900 dark:text-zinc-100 uppercase">CORA</span>
+                        <span class="text-xs font-black tracking-tight text-zinc-900 uppercase">CORA</span>
                     </div>
-                    <button onclick="closeElementorEditor()" class="h-8 px-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-150 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 bg-white dark:bg-zinc-900">
+                    <button onclick="closeElementorEditor()" class="h-8 px-3 border border-zinc-200 hover:bg-zinc-150 text-zinc-700 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 bg-white ">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         Theme Dashboard
                     </button>
@@ -2391,16 +2391,16 @@ function cora_get_sparkline_points( $history, $type ) {
                 
                 <!-- Center: Breadcrumbs & Save Status -->
                 <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[11px] font-medium">
+                    <div class="flex items-center gap-1.5 text-zinc-400 text-[11px] font-medium">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                         <span>/</span>
                         <span>Pages</span>
                         <span>/</span>
-                        <span class="text-zinc-800 dark:text-zinc-200 font-bold" id="cora-topbar-page-name">Home Page</span>
-                        <span id="cora-topbar-theme-status-badge" class="ml-1.5 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider select-none bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">Draft</span>
+                        <span class="text-zinc-800 font-bold" id="cora-topbar-page-name">Home Page</span>
+                        <span id="cora-topbar-theme-status-badge" class="ml-1.5 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider select-none bg-zinc-200 text-zinc-700 ">Draft</span>
                     </div>
-                    <div class="h-3 w-[1px] bg-zinc-250 dark:bg-zinc-800"></div>
-                    <div class="flex items-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400">
+                    <div class="h-3 w-[1px] bg-zinc-250 "></div>
+                    <div class="flex items-center gap-1.5 text-[10px] text-zinc-500 ">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="cora-save-status-text">All changes saved</span>
                     </div>
@@ -2408,7 +2408,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 
                 <!-- Right: Preview -->
                 <div class="flex items-center gap-1.5">
-                    <button onclick="previewPage()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                    <button onclick="previewPage()" class="h-8 px-3 rounded-lg hover:bg-zinc-200/60 text-zinc-600 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         Preview
                     </button>
@@ -2416,33 +2416,33 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
 
             <!-- Row 2 -->
-            <div class="h-12 border-b border-zinc-200 dark:border-zinc-850 flex items-center justify-between px-4 w-full bg-white dark:bg-zinc-900">
+            <div class="h-12 border-b border-zinc-200 flex items-center justify-between px-4 w-full bg-white ">
                 <!-- Left: Add, Templates, Undo/Redo -->
                 <div class="flex items-center gap-2">
-                    <button onclick="toggleWidgetsPanel()" class="h-8 w-8 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg cursor-pointer transition-colors flex items-center justify-center" title="Add Element">
+                    <button onclick="toggleWidgetsPanel()" class="h-8 w-8 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg cursor-pointer transition-colors flex items-center justify-center" title="Add Element">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     </button>
-                    <button onclick="openTemplatesLibrary()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                    <button onclick="openTemplatesLibrary()" class="h-8 px-3 hover:bg-zinc-50 text-zinc-700 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                         Templates
                     </button>
-                    <button id="cora-git-btn" onclick="openGitDrawer()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 relative" title="Git Version Control">
+                    <button id="cora-git-btn" onclick="openGitDrawer()" class="h-8 px-3 hover:bg-zinc-50 text-zinc-700 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5 relative" title="Git Version Control">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                         Git
                         <span id="cora-git-status-dot" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500 absolute top-1.5 right-1.5"></span>
                     </button>
-                    <button onclick="openPageSettings()" class="h-8 px-2.5 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5" title="Page Settings">
+                    <button onclick="openPageSettings()" class="h-8 px-2.5 hover:bg-zinc-50 text-zinc-700 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5" title="Page Settings">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="3"></circle>
                             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                         </svg>
                         Settings
                     </button>
-                    <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1"></div>
-                    <button onclick="runElementorCommand('document/history/undo')" class="h-8 w-8 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg cursor-pointer transition-colors flex items-center justify-center" title="Undo">
+                    <div class="h-4 w-[1px] bg-zinc-200 mx-1"></div>
+                    <button onclick="runElementorCommand('document/history/undo')" class="h-8 w-8 hover:bg-zinc-50 text-zinc-700 rounded-lg cursor-pointer transition-colors flex items-center justify-center" title="Undo">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
                     </button>
-                    <button onclick="runElementorCommand('document/history/redo')" class="h-8 w-8 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg cursor-pointer transition-colors flex items-center justify-center" title="Redo">
+                    <button onclick="runElementorCommand('document/history/redo')" class="h-8 w-8 hover:bg-zinc-50 text-zinc-700 rounded-lg cursor-pointer transition-colors flex items-center justify-center" title="Redo">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
                     </button>
                 </div>
@@ -2451,40 +2451,40 @@ function cora_get_sparkline_points( $history, $type ) {
                 <div class="flex items-center gap-3">
                     <!-- Page switcher -->
                     <div class="relative" id="cora-page-switcher-wrap">
-                        <button onclick="togglePageSwitcher(event)" class="flex items-center gap-1 cursor-pointer select-none h-8 px-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-                            <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-topbar-page-selector">Home Page</span>
+                        <button onclick="togglePageSwitcher(event)" class="flex items-center gap-1 cursor-pointer select-none h-8 px-2 rounded-lg hover:bg-zinc-100 transition-colors">
+                            <span class="text-xs font-bold text-zinc-800 " id="cora-topbar-page-selector">Home Page</span>
                             <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         <!-- Page dropdown -->
-                        <div id="cora-page-switcher-dropdown" class="hidden absolute top-full left-0 mt-1 w-80 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl z-[99999] flex flex-col max-h-[420px] overflow-hidden">
-                            <div class="p-3 border-b border-zinc-100 dark:border-zinc-800 shrink-0">
+                        <div id="cora-page-switcher-dropdown" class="hidden absolute top-full left-0 mt-1 w-80 bg-white border border-zinc-200 rounded-xl shadow-2xl z-[99999] flex flex-col max-h-[420px] overflow-hidden">
+                            <div class="p-3 border-b border-zinc-100 shrink-0">
                                 <div class="relative w-full">
-                                    <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                     </svg>
-                                    <input id="cora-page-switcher-search" type="text" placeholder="Search pages..." oninput="filterPageSwitcher(this.value)" class="w-full pl-8 pr-3 py-1.5 text-[11px] border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400 transition-colors" />
+                                    <input id="cora-page-switcher-search" type="text" placeholder="Search pages..." oninput="filterPageSwitcher(this.value)" class="w-full pl-8 pr-3 py-1.5 text-[11px] border border-zinc-200 rounded-lg bg-white text-zinc-800 focus:outline-none focus:border-zinc-400 transition-colors" />
                                 </div>
                             </div>
                             <div id="cora-page-switcher-list" class="flex-1 overflow-y-auto max-h-[300px] py-1"></div>
-                            <div class="border-t border-zinc-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-950">
-                                <button onclick="ddOpenNewPageDrawer(event)" class="w-full text-left px-4 py-2.5 text-[11px] font-bold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-250 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors flex items-center gap-2">
+                            <div class="border-t border-zinc-100 shrink-0 bg-white ">
+                                <button onclick="ddOpenNewPageDrawer(event)" class="w-full text-left px-4 py-2.5 text-[11px] font-bold text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50 cursor-pointer transition-colors flex items-center gap-2">
                                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                     Add new page
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800"></div>
+                    <div class="h-4 w-[1px] bg-zinc-200 "></div>
                     <!-- Viewport devices -->
                     <div class="flex items-center gap-1">
-                        <div class="flex items-center bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg" id="cora-device-pill">
-                            <button id="cora-device-desktop" onclick="switchDevice('desktop')" title="Desktop" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all">
+                        <div class="flex items-center bg-zinc-100 p-0.5 rounded-lg" id="cora-device-pill">
+                            <button id="cora-device-desktop" onclick="switchDevice('desktop')" title="Desktop" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 bg-white shadow-sm cursor-pointer transition-all">
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
                             </button>
-                            <button id="cora-device-tablet" onclick="switchDevice('tablet')" title="Tablet (768px)" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all">
+                            <button id="cora-device-tablet" onclick="switchDevice('tablet')" title="Tablet (768px)" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 cursor-pointer transition-all">
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                             </button>
-                            <button id="cora-device-mobile" onclick="switchDevice('mobile')" title="Mobile (375px)" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all">
+                            <button id="cora-device-mobile" onclick="switchDevice('mobile')" title="Mobile (375px)" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 cursor-pointer transition-all">
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                             </button>
                         </div>
@@ -2493,24 +2493,24 @@ function cora_get_sparkline_points( $history, $type ) {
                 
                 <!-- Right: Navigator, Publish -->
                 <div class="flex items-center gap-2">
-                    <button onclick="toggleNavigatorPanel()" class="h-8 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
+                    <button onclick="toggleNavigatorPanel()" class="h-8 px-3 hover:bg-zinc-50 text-zinc-700 rounded-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
                         Navigator
                     </button>
                     
                     <!-- Split Publish Button -->
                     <div class="inline-flex rounded-lg shadow-sm relative">
-                        <button onclick="publishPage()" class="h-8 px-4 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-50 text-white dark:text-zinc-900 rounded-l-lg text-[11px] font-extrabold cursor-pointer transition-colors flex items-center justify-center">
+                        <button onclick="publishPage()" class="h-8 px-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-l-lg text-[11px] font-extrabold cursor-pointer transition-colors flex items-center justify-center">
                             Publish
                         </button>
-                        <div class="w-[1px] h-8 bg-zinc-800 dark:bg-zinc-100"></div>
-                        <button onclick="togglePublishDropdown(event)" class="h-8 px-2 bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-50 text-white dark:text-zinc-900 rounded-r-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center justify-center">
+                        <div class="w-[1px] h-8 bg-zinc-800 "></div>
+                        <button onclick="togglePublishDropdown(event)" class="h-8 px-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-r-lg text-[11px] font-bold cursor-pointer transition-colors flex items-center justify-center">
                             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         <!-- Publish Dropdown Menu -->
-                        <div id="cora-publish-dropdown" class="absolute right-0 top-10 w-40 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl py-1 hidden z-50">
-                            <button onclick="saveDraftPage(); togglePublishDropdown(event);" class="w-full text-left px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-xs font-bold text-zinc-700 dark:text-zinc-200 cursor-pointer">Save Draft</button>
-                            <button onclick="saveTemplatePage(); togglePublishDropdown(event);" class="w-full text-left px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-xs font-bold text-zinc-700 dark:text-zinc-200 cursor-pointer">Save as Template</button>
+                        <div id="cora-publish-dropdown" class="absolute right-0 top-10 w-40 bg-white border border-zinc-200 rounded-lg shadow-xl py-1 hidden z-50">
+                            <button onclick="saveDraftPage(); togglePublishDropdown(event);" class="w-full text-left px-4 py-2 hover:bg-zinc-50 text-xs font-bold text-zinc-700 cursor-pointer">Save Draft</button>
+                            <button onclick="saveTemplatePage(); togglePublishDropdown(event);" class="w-full text-left px-4 py-2 hover:bg-zinc-50 text-xs font-bold text-zinc-700 cursor-pointer">Save as Template</button>
                         </div>
                     </div>
                 </div>
@@ -3049,18 +3049,18 @@ function cora_get_sparkline_points( $history, $type ) {
 
 <!-- 7. Git Connection Drawer (Right-Sliding Sheet) -->
 <div id="drawer-git-connect" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
-    <div class="bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-git-connect-card">
-        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 flex-shrink-0">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-git-connect-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700 dark:text-zinc-300"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M6 9v6"></path><path d="M9 18h9"></path></svg>
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700 "><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M6 9v6"></path><path d="M9 18h9"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-50 font-sans">Git Integration</h3>
+                    <h3 class="text-sm font-bold text-zinc-950 font-sans">Git Integration</h3>
                     <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Sync your website design with GitHub</p>
                 </div>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closeGitDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closeGitDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
@@ -3071,38 +3071,38 @@ function cora_get_sparkline_points( $history, $type ) {
             <div id="git-step-connect-pat" class="space-y-5 hidden" style="display:none" data-alias="git-unconnected-form"></div><!-- alias bridge -->
             <div id="git-unconnected-form" class="space-y-5">
 
-                <div class="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-2">
+                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 space-y-2">
                     <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Easy Setup</p>
-                    <p class="text-[11px] text-zinc-650 dark:text-zinc-400 leading-relaxed font-sans">
+                    <p class="text-[11px] text-zinc-650 leading-relaxed font-sans">
                         Let's connect your website to GitHub so your designs are safely saved and versioned automatically.
                     </p>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="p-4 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-white dark:bg-zinc-900 space-y-3">
-                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-50 text-[10px] font-bold text-white dark:text-zinc-950">1</span>
-                        <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-sans inline-block ml-1">Get your GitHub Access Token</p>
+                    <div class="p-4 border border-zinc-150 rounded-xl bg-white space-y-3">
+                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 text-[10px] font-bold text-white ">1</span>
+                        <p class="text-xs font-bold text-zinc-800 font-sans inline-block ml-1">Get your GitHub Access Token</p>
                         <p class="text-[11px] text-zinc-500 leading-relaxed font-sans">
                             Click the button below to open GitHub (create a free account if you don't have one). Scroll down and click the green <strong>"Generate token"</strong> button at the bottom.
                         </p>
-                        <a href="https://github.com/settings/tokens/new?scopes=repo&description=Cora%2520Studio%2520Integration" target="_blank" class="w-full h-9 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border border-zinc-200 dark:border-zinc-750 no-underline font-sans">
+                        <a href="https://github.com/settings/tokens/new?scopes=repo&description=Cora%2520Studio%2520Integration" target="_blank" class="w-full h-9 bg-zinc-100 hover:bg-zinc-200 text-zinc-850 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border border-zinc-200 no-underline font-sans">
                             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                             Get GitHub Access Token
                         </a>
                     </div>
 
-                    <div class="p-4 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-white dark:bg-zinc-900 space-y-3">
-                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-50 text-[10px] font-bold text-white dark:text-zinc-950">2</span>
-                        <label for="git-pat-input" class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-sans inline-block ml-1">Paste your Access Token</label>
+                    <div class="p-4 border border-zinc-150 rounded-xl bg-white space-y-3">
+                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 text-[10px] font-bold text-white ">2</span>
+                        <label for="git-pat-input" class="text-xs font-bold text-zinc-800 font-sans inline-block ml-1">Paste your Access Token</label>
                         <p class="text-[11px] text-zinc-500 leading-relaxed font-sans">
                             Copy the generated token from GitHub (starts with <code>ghp_</code>) and paste it below.
                         </p>
-                        <input type="password" id="git-pat-input" placeholder="ghp_..." class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-850 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-sans">
+                        <input type="password" id="git-pat-input" placeholder="ghp_..." class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-850 font-medium bg-white text-zinc-900 font-sans">
                     </div>
                 </div>
 
                 <div class="pt-2">
-                    <button type="button" id="git-connect-btn" onclick="connectGitRepository()" class="w-full h-10 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-2 border-none">
+                    <button type="button" id="git-connect-btn" onclick="connectGitRepository()" class="w-full h-10 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-2 border-none">
                         Connect Account
                     </button>
                 </div>
@@ -3110,10 +3110,10 @@ function cora_get_sparkline_points( $history, $type ) {
 
             <!-- STEP 2: CHOOSE OR CREATE REPOSITORY -->
             <div id="git-step-select-repo" class="space-y-5 hidden">
-                <div class="p-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center justify-between gap-3">
+                <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between gap-3">
                     <div class="flex items-center gap-2.5">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0 animate-pulse"></span>
-                        <p class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 font-sans" id="git-connected-user-temp">Connected as @user</p>
+                        <p class="text-[11px] font-bold text-zinc-800 font-sans" id="git-connected-user-temp">Connected as @user</p>
                     </div>
                     <button onclick="disconnectGit()" class="text-[10px] font-bold text-zinc-500 hover:text-red-650 transition-colors cursor-pointer border-none bg-transparent font-sans">Disconnect</button>
                 </div>
@@ -3122,11 +3122,11 @@ function cora_get_sparkline_points( $history, $type ) {
                     <p class="text-[10px] font-bold text-zinc-450 uppercase tracking-wider font-sans">Setup Repository</p>
                     
                     <!-- TAB OPTIONS -->
-                    <div class="grid grid-cols-2 gap-2 p-0.5 bg-zinc-100 dark:bg-zinc-900 rounded-lg">
-                        <button onclick="switchRepoTab('create')" id="tab-repo-create" class="py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-white dark:bg-zinc-800 text-zinc-850 dark:text-zinc-100 shadow-sm">
+                    <div class="grid grid-cols-2 gap-2 p-0.5 bg-zinc-100 rounded-lg">
+                        <button onclick="switchRepoTab('create')" id="tab-repo-create" class="py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-white text-zinc-850 shadow-sm">
                             Create New (Recommended)
                         </button>
-                        <button onclick="switchRepoTab('link')" id="tab-repo-link" class="py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200">
+                        <button onclick="switchRepoTab('link')" id="tab-repo-link" class="py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-transparent text-zinc-500 hover:text-zinc-800 ">
                             Link Existing
                         </button>
                     </div>
@@ -3138,9 +3138,9 @@ function cora_get_sparkline_points( $history, $type ) {
                         </p>
                         <div class="space-y-1.5">
                             <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">New Repository Name</label>
-                            <input type="text" id="git-new-repo-name" value="cora-website" placeholder="cora-website" class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-850 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-sans font-medium">
+                            <input type="text" id="git-new-repo-name" value="cora-website" placeholder="cora-website" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-850 bg-white text-zinc-900 font-sans font-medium">
                         </div>
-                        <button type="button" id="git-create-repo-btn" onclick="createGitRepository()" class="w-full h-10 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer border-none font-sans flex items-center justify-center gap-2">
+                        <button type="button" id="git-create-repo-btn" onclick="createGitRepository()" class="w-full h-10 bg-zinc-950 hover:bg-zinc-850 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer border-none font-sans flex items-center justify-center gap-2">
                             Create Private Repository
                         </button>
                     </div>
@@ -3152,10 +3152,10 @@ function cora_get_sparkline_points( $history, $type ) {
                         </p>
                         <div class="space-y-1.5">
                             <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Repository Path</label>
-                            <input type="text" id="git-link-repo-path" placeholder="username/repository-name" class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-850 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-sans font-medium">
+                            <input type="text" id="git-link-repo-path" placeholder="username/repository-name" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-850 bg-white text-zinc-900 font-sans font-medium">
                             <p class="text-[9px] text-zinc-400 pl-1">Format: <code>owner/repository-name</code></p>
                         </div>
-                        <button type="button" id="git-link-repo-btn" onclick="linkGitRepository()" class="w-full h-10 bg-zinc-950 dark:bg-white hover:bg-zinc-850 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer border-none font-sans flex items-center justify-center gap-2">
+                        <button type="button" id="git-link-repo-btn" onclick="linkGitRepository()" class="w-full h-10 bg-zinc-950 hover:bg-zinc-850 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer border-none font-sans flex items-center justify-center gap-2">
                             Link Repository
                         </button>
                     </div>
@@ -3165,12 +3165,12 @@ function cora_get_sparkline_points( $history, $type ) {
             <!-- STEP 3: CONNECTED DASHBOARD -->
             <div id="git-connected-dashboard" class="space-y-6 hidden">
                 <!-- Status Banner -->
-                <div class="p-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center justify-between gap-3">
+                <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between gap-3">
                     <div class="flex items-center gap-2.5">
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0 animate-pulse"></span>
                         <div>
-                            <p class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 font-sans" id="git-connected-user">Connected as @user</p>
-                            <a href="#" id="git-connected-repo-link" target="_blank" class="text-[10px] text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1 font-sans">
+                            <p class="text-[11px] font-bold text-zinc-800 font-sans" id="git-connected-user">Connected as @user</p>
+                            <a href="#" id="git-connected-repo-link" target="_blank" class="text-[10px] text-zinc-500 hover:text-zinc-900 transition-colors flex items-center gap-1 font-sans">
                                 owner/repo
                                 <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                             </a>
@@ -3184,72 +3184,72 @@ function cora_get_sparkline_points( $history, $type ) {
                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Active Branch</label>
                     <div class="flex items-center gap-2">
                         <div class="relative flex-1">
-                            <select id="git-branch-select" onchange="changeActiveBranch()" class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 cursor-pointer font-sans">
+                            <select id="git-branch-select" onchange="changeActiveBranch()" class="w-full px-3 py-2.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-800 font-medium bg-white text-zinc-900 cursor-pointer font-sans">
                                 <option value="main">main</option>
                             </select>
                         </div>
-                        <button onclick="toggleInlineNewBranch(true)" class="h-9 px-3 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-850 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-200 transition-colors cursor-pointer flex items-center gap-1 bg-white dark:bg-zinc-900 font-sans">
+                        <button onclick="toggleInlineNewBranch(true)" class="h-9 px-3 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-[10px] font-bold text-zinc-700 transition-colors cursor-pointer flex items-center gap-1 bg-white font-sans">
                             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             New
                         </button>
                     </div>
 
                     <!-- Inline New Branch Form -->
-                    <div id="git-new-branch-container" class="hidden mt-2 p-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-xl space-y-3">
+                    <div id="git-new-branch-container" class="hidden mt-2 p-3 border border-zinc-200 bg-zinc-50/50 rounded-xl space-y-3">
                         <div class="space-y-1.5">
                             <label class="block text-[9px] font-bold text-zinc-400 uppercase tracking-wider font-sans">New Branch Name</label>
-                            <input type="text" id="new-branch-name-input" placeholder="e.g. feature-homepage-redesign" class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium font-sans">
+                            <input type="text" id="new-branch-name-input" placeholder="e.g. feature-homepage-redesign" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white text-zinc-900 font-medium font-sans">
                         </div>
                         <div class="flex justify-end gap-2">
-                            <button onclick="toggleInlineNewBranch(false)" class="px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[10px] text-zinc-650 dark:text-zinc-300 font-bold rounded-md hover:bg-zinc-50 transition-colors cursor-pointer font-sans">Cancel</button>
-                            <button onclick="submitCreateBranch()" class="px-2.5 py-1.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-900 text-[10px] font-bold rounded-md hover:bg-zinc-850 transition-colors cursor-pointer border-none font-sans">Create</button>
+                            <button onclick="toggleInlineNewBranch(false)" class="px-2.5 py-1.5 border border-zinc-200 bg-white text-[10px] text-zinc-650 font-bold rounded-md hover:bg-zinc-50 transition-colors cursor-pointer font-sans">Cancel</button>
+                            <button onclick="submitCreateBranch()" class="px-2.5 py-1.5 bg-zinc-950 text-white text-[10px] font-bold rounded-md hover:bg-zinc-850 transition-colors cursor-pointer border-none font-sans">Create</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Working Tree Status -->
-                <div id="git-working-tree-section" class="space-y-2 border-t border-zinc-150 dark:border-zinc-800 pt-5 hidden">
+                <div id="git-working-tree-section" class="space-y-2 border-t border-zinc-150 pt-5 hidden">
                     <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Working Tree Changes</p>
-                    <div class="p-3 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/50 rounded-xl flex items-center justify-between gap-2">
+                    <div class="p-3 bg-amber-50/50 border border-amber-200 rounded-xl flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2">
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0 animate-pulse"></span>
-                            <span id="git-working-tree-file" class="text-[10.5px] font-mono text-zinc-700 dark:text-zinc-300">pages/about/design.json</span>
+                            <span id="git-working-tree-file" class="text-[10.5px] font-mono text-zinc-700 ">pages/about/design.json</span>
                         </div>
-                        <span class="text-[9px] bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider font-sans">Modified</span>
+                        <span class="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider font-sans">Modified</span>
                     </div>
                     <!-- Suggestion Box -->
-                    <div id="git-suggestion-box" class="p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 rounded-xl space-y-2">
+                    <div id="git-suggestion-box" class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
                         <div class="flex items-center gap-1.5">
                             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-500"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
                             <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-tight font-sans">AI Commit Suggestion</span>
                         </div>
                         <div class="flex items-center justify-between gap-3">
-                            <span id="git-suggestion-text" class="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 italic font-sans">"update page layout"</span>
-                            <button onclick="applyCommitSuggestion()" class="text-[10px] font-bold text-zinc-900 dark:text-white bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 px-2 py-1 rounded-md transition-colors cursor-pointer border-none font-sans">Apply</button>
+                            <span id="git-suggestion-text" class="text-[11px] font-semibold text-zinc-800 italic font-sans">"update page layout"</span>
+                            <button onclick="applyCommitSuggestion()" class="text-[10px] font-bold text-zinc-900 bg-zinc-200 hover:bg-zinc-300 px-2 py-1 rounded-md transition-colors cursor-pointer border-none font-sans">Apply</button>
                         </div>
                     </div>
                 </div>
                 
-                <div id="git-clean-tree-section" class="p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center gap-2 hidden">
+                <div id="git-clean-tree-section" class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center gap-2 hidden">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
-                    <span class="text-[10.5px] font-bold text-zinc-700 dark:text-zinc-300 font-sans">Working tree clean. All changes committed.</span>
+                    <span class="text-[10.5px] font-bold text-zinc-700 font-sans">Working tree clean. All changes committed.</span>
                 </div>
 
                 <!-- Manual Commit Actions -->
-                <div class="space-y-3 border-t border-zinc-150 dark:border-zinc-800 pt-5">
+                <div class="space-y-3 border-t border-zinc-150 pt-5">
                     <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Commit & Sync Changes</p>
                     
                     <div class="space-y-2">
                         <label class="block text-[10px] font-bold text-zinc-400 font-sans">Commit Message</label>
-                        <textarea id="git-commit-msg" rows="3" placeholder="Describe the layout edits or components updated..." class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium font-sans resize-none"></textarea>
+                        <textarea id="git-commit-msg" rows="3" placeholder="Describe the layout edits or components updated..." class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white text-zinc-900 font-medium font-sans resize-none"></textarea>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 pt-1">
-                        <button type="button" id="git-push-btn" onclick="pushPageLayout()" class="h-9 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border-none font-sans">
+                        <button type="button" id="git-push-btn" onclick="pushPageLayout()" class="h-9 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border-none font-sans">
                             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path><polyline points="16 16 12 12 8 16"></polyline></svg>
                             Commit & Push
                         </button>
-                        <button type="button" id="git-pull-btn" onclick="pullDesignTemplates()" class="h-9 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-850 rounded-lg text-xs font-bold text-zinc-700 dark:text-zinc-200 transition-colors cursor-pointer flex items-center justify-center gap-1.5 bg-white dark:bg-zinc-900 font-sans">
+                        <button type="button" id="git-pull-btn" onclick="pullDesignTemplates()" class="h-9 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-xs font-bold text-zinc-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5 bg-white font-sans">
                             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path><polyline points="8 17 12 21 16 17"></polyline></svg>
                             Pull Design
                         </button>
@@ -3257,7 +3257,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
 
                 <!-- Recent Commit History -->
-                <div class="space-y-3 border-t border-zinc-150 dark:border-zinc-800 pt-5">
+                <div class="space-y-3 border-t border-zinc-150 pt-5">
                     <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Recent Commit Log</p>
                     <div id="git-commit-log" class="space-y-2">
                         <!-- Will be populated dynamically -->
@@ -3267,66 +3267,66 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
         </div>
         <!-- Drawer Footer -->
-        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-end gap-2.5 bg-zinc-50/30 dark:bg-zinc-900/30 flex-shrink-0">
-            <button type="button" class="px-3.5 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeGitDrawer()">Cancel</button>
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/30 flex-shrink-0">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeGitDrawer()">Cancel</button>
         </div>
     </div>
 </div>
 
 <!-- 7.5. PageSpeed Settings Drawer (Right-Sliding Sheet) -->
 <div id="drawer-pagespeed-settings" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
-    <div class="bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-pagespeed-settings-card">
-        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 flex-shrink-0">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-pagespeed-settings-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700 dark:text-zinc-300"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700 "><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-950 dark:text-zinc-50 font-sans">PageSpeed Credentials</h3>
+                    <h3 class="text-sm font-bold text-zinc-950 font-sans">PageSpeed Credentials</h3>
                     <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Setup your Google PageSpeed API Key</p>
                 </div>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closePageSpeedSettingsDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closePageSpeedSettingsDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         
         <!-- Drawer Body -->
         <div class="flex-1 overflow-y-auto p-5 space-y-6">
-            <div class="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 space-y-2">
+            <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 space-y-2">
                 <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Google Cloud API Key</p>
-                <p class="text-[11px] text-zinc-650 dark:text-zinc-400 leading-relaxed font-sans">
+                <p class="text-[11px] text-zinc-650 leading-relaxed font-sans">
                     Google PageSpeed Insights API is 100% free and does not require complex configuration. To execute higher volume tests without rate limit limits, add your Google API key.
                 </p>
             </div>
 
             <div class="space-y-4">
-                <div class="p-4 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-white dark:bg-zinc-900 space-y-3">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-50 text-[10px] font-bold text-white dark:text-zinc-950">1</span>
-                    <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-sans inline-block ml-1">Get your PageSpeed API Key</p>
+                <div class="p-4 border border-zinc-150 rounded-xl bg-white space-y-3">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 text-[10px] font-bold text-white ">1</span>
+                    <p class="text-xs font-bold text-zinc-800 font-sans inline-block ml-1">Get your PageSpeed API Key</p>
                     <p class="text-[11px] text-zinc-500 leading-relaxed font-sans">
                         Click the button below to open Google Cloud API console (free account). Search or ensure the <strong>PageSpeed Insights API</strong> is enabled, and click <strong>"Create Credentials" / "API Key"</strong>.
                     </p>
-                    <a href="https://console.cloud.google.com/apis/library/pagespeedonline.googleapis.com" target="_blank" class="w-full h-9 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border border-zinc-200 dark:border-zinc-750 no-underline font-sans">
+                    <a href="https://console.cloud.google.com/apis/library/pagespeedonline.googleapis.com" target="_blank" class="w-full h-9 bg-zinc-100 hover:bg-zinc-200 text-zinc-850 font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border border-zinc-200 no-underline font-sans">
                         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                         Get Free PageSpeed API Key
                     </a>
                 </div>
 
-                <div class="p-4 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-white dark:bg-zinc-900 space-y-3">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 dark:bg-zinc-50 text-[10px] font-bold text-white dark:text-zinc-950">2</span>
-                    <label for="pagespeed-api-key-input" class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-sans inline-block ml-1">Paste your Google API Key</label>
+                <div class="p-4 border border-zinc-150 rounded-xl bg-white space-y-3">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-zinc-950 text-[10px] font-bold text-white ">2</span>
+                    <label for="pagespeed-api-key-input" class="text-xs font-bold text-zinc-800 font-sans inline-block ml-1">Paste your Google API Key</label>
                     <p class="text-[11px] text-zinc-500 leading-relaxed font-sans">
                         Paste your API key here. If left blank, Cora will try to fall back to your Google Maps API key or query keyless with standard limitations.
                     </p>
-                    <input type="password" id="pagespeed-api-key-input" placeholder="AIzaSy..." value="<?php echo esc_attr( get_option( 'cora_pagespeed_api_key', '' ) ); ?>" class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs focus:outline-none focus:border-zinc-850 dark:focus:border-zinc-400 font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-sans">
+                    <input type="password" id="pagespeed-api-key-input" placeholder="AIzaSy..." value="<?php echo esc_attr( get_option( 'cora_pagespeed_api_key', '' ) ); ?>" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-850 font-medium bg-white text-zinc-900 font-sans">
                 </div>
             </div>
         </div>
         <!-- Drawer Footer -->
-        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-end gap-2.5 bg-zinc-50/30 dark:bg-zinc-900/30 flex-shrink-0">
-            <button type="button" class="px-3.5 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closePageSpeedSettingsDrawer()">Cancel</button>
-            <button type="button" class="px-3.5 py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-lg text-xs transition-colors cursor-pointer border-none font-sans" onclick="savePageSpeedSettings()">Save API Settings</button>
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/30 flex-shrink-0">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closePageSpeedSettingsDrawer()">Cancel</button>
+            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer border-none font-sans" onclick="savePageSpeedSettings()">Save API Settings</button>
         </div>
     </div>
 </div>
@@ -3846,21 +3846,21 @@ function cora_get_sparkline_points( $history, $type ) {
 
 
 
-<div id="theme-version-drawer" class="fixed inset-y-0 right-0 z-50 w-[350px] bg-white border-l border-zinc-200 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out dark:bg-zinc-950 dark:border-zinc-800 flex flex-col">
+<div id="theme-version-drawer" class="fixed inset-y-0 right-0 z-50 w-[350px] bg-white border-l border-zinc-200 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
     <!-- Header -->
-    <div class="p-5 border-b border-zinc-150 flex items-center justify-between bg-white dark:bg-zinc-950 shrink-0">
+    <div class="p-5 border-b border-zinc-150 flex items-center justify-between bg-white shrink-0">
         <div class="flex items-center gap-3">
             <!-- Icon box -->
-            <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-150 dark:bg-zinc-900 dark:border-zinc-800 flex items-center justify-center shrink-0">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-350"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <div class="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-150 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 "><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             </div>
             <div>
-                <h3 class="text-sm font-bold text-zinc-900 dark:text-white leading-tight">Version history</h3>
+                <h3 class="text-sm font-bold text-zinc-900 leading-tight">Version history</h3>
                 <span class="text-[10px] text-zinc-400 font-medium">View and restore previous versions</span>
             </div>
         </div>
         <!-- Close button -->
-        <button onclick="toggleThemeVersionDrawer(event)" class="p-2 border border-zinc-150 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900 rounded-full text-zinc-500 hover:text-zinc-800 cursor-pointer bg-transparent flex items-center justify-center transition-colors">
+        <button onclick="toggleThemeVersionDrawer(event)" class="p-2 border border-zinc-150 hover:bg-zinc-50 rounded-full text-zinc-500 hover:text-zinc-800 cursor-pointer bg-transparent flex items-center justify-center transition-colors">
             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
@@ -3868,15 +3868,15 @@ function cora_get_sparkline_points( $history, $type ) {
     <!-- Body Content (Simple versions listing for non-technical users) -->
     <div class="flex-1 overflow-y-auto p-5 space-y-4">
         <!-- Current Version Card -->
-        <div class="p-3 bg-white dark:bg-zinc-900/10 rounded-xl border border-green-200 border-l-4 border-l-green-500 dark:border-green-950 flex items-center justify-between gap-3 shadow-xs">
+        <div class="p-3 bg-white rounded-xl border border-green-200 border-l-4 border-l-green-500 flex items-center justify-between gap-3 shadow-xs">
             <div class="flex items-center gap-3 min-w-0">
                 <!-- Small square dot indicator -->
-                <div class="w-8 h-8 rounded-lg bg-green-50 border border-green-100 dark:bg-green-950/20 dark:border-green-900/50 flex items-center justify-center shrink-0">
+                <div class="w-8 h-8 rounded-lg bg-green-50 border border-green-100 flex items-center justify-center shrink-0">
                     <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
                 </div>
                 <div class="min-w-0">
-                    <div class="text-xs font-bold text-zinc-900 dark:text-white leading-tight">v15.5.0</div>
-                    <div class="text-[10px] text-zinc-450 dark:text-zinc-500 mt-1 truncate">Updated by Dravya • 2 hours ago</div>
+                    <div class="text-xs font-bold text-zinc-900 leading-tight">v15.5.0</div>
+                    <div class="text-[10px] text-zinc-450 mt-1 truncate">Updated by Dravya • 2 hours ago</div>
                 </div>
             </div>
             <!-- Live Pill Badge -->
@@ -3887,20 +3887,20 @@ function cora_get_sparkline_points( $history, $type ) {
         </div>
 
         <!-- Previous Version Card -->
-        <div class="p-3 bg-white dark:bg-zinc-950 rounded-xl border border-zinc-200 dark:border-zinc-850 flex items-center justify-between gap-3 shadow-xs">
+        <div class="p-3 bg-white rounded-xl border border-zinc-200 flex items-center justify-between gap-3 shadow-xs">
             <div class="flex items-center gap-3 min-w-0">
                 <!-- Small square dot indicator -->
-                <div class="w-8 h-8 rounded-lg bg-zinc-50 border border-zinc-150 dark:bg-zinc-900 dark:border-zinc-800 flex items-center justify-center shrink-0">
-                    <span class="w-2.5 h-2.5 rounded-full bg-zinc-400 dark:bg-zinc-650"></span>
+                <div class="w-8 h-8 rounded-lg bg-zinc-50 border border-zinc-150 flex items-center justify-center shrink-0">
+                    <span class="w-2.5 h-2.5 rounded-full bg-zinc-400 "></span>
                 </div>
                 <div class="min-w-0">
-                    <div class="text-xs font-semibold text-zinc-850 dark:text-zinc-250 leading-tight">v15.4.0</div>
-                    <div class="text-[10px] text-zinc-450 dark:text-zinc-500 mt-1 truncate">Updated by Dravya • 5 days ago</div>
+                    <div class="text-xs font-semibold text-zinc-850 leading-tight">v15.4.0</div>
+                    <div class="text-[10px] text-zinc-450 mt-1 truncate">Updated by Dravya • 5 days ago</div>
                 </div>
             </div>
             <!-- Restore Button -->
             <?php if ( $live_theme ) : ?>
-            <button onclick="triggerThemeUpdate(<?php echo $live_theme['id']; ?>)" class="px-2.5 py-1.5 border border-zinc-200 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900 rounded-lg text-[9.5px] font-bold flex items-center gap-1.5 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 cursor-pointer shadow-xs transition-colors shrink-0">
+            <button onclick="triggerThemeUpdate(<?php echo $live_theme['id']; ?>)" class="px-2.5 py-1.5 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-[9.5px] font-bold flex items-center gap-1.5 bg-white text-zinc-800 cursor-pointer shadow-xs transition-colors shrink-0">
                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 Restore
             </button>
@@ -3909,7 +3909,7 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 <!-- Backdrop for Drawer -->
-<div id="theme-version-drawer-backdrop" class="hidden fixed inset-0 z-40 bg-black/15 dark:bg-black/35 backdrop-blur-xs transition-opacity duration-300 ease-in-out" onclick="toggleThemeVersionDrawer(event)"></div>
+<div id="theme-version-drawer-backdrop" class="hidden fixed inset-0 z-40 bg-black/15 backdrop-blur-xs transition-opacity duration-300 ease-in-out" onclick="toggleThemeVersionDrawer(event)"></div>
 
 <script src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/js/lovable-prompts.js' ); ?>"></script>
 <script>
@@ -4132,11 +4132,11 @@ function cora_get_sparkline_points( $history, $type ) {
             }
 
             html += `
-                <div class="flex items-center justify-between p-2.5 bg-zinc-50 dark:bg-zinc-900/30 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors group" onclick="window.coraShowToast('Opening optimization guide...')">
+                <div class="flex items-center justify-between p-2.5 bg-zinc-50 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors group" onclick="window.coraShowToast('Opening optimization guide...')">
                     <div class="flex items-center gap-2.5 min-w-0">
                         ${icon}
                         <div class="min-w-0">
-                            <div class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 truncate">${opp.label}</div>
+                            <div class="text-[10px] font-bold text-zinc-800 truncate">${opp.label}</div>
                             <div class="text-[9px] text-zinc-400 mt-0.5">${opp.savings}</div>
                         </div>
                     </div>
@@ -6925,9 +6925,9 @@ function cora_get_sparkline_points( $history, $type ) {
         const isThemeLive = canvasState.activeThemeIsLive === true || canvasState.activeThemeIsLive == 1 || canvasState.activeThemeIsLive == '1';
         const badge = jQuery('#cora-topbar-theme-status-badge');
         if (isThemeLive) {
-            badge.text('Live').removeClass().addClass('ml-1.5 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider select-none bg-zinc-900 text-white dark:bg-white dark:text-zinc-900');
+            badge.text('Live').removeClass().addClass('ml-1.5 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider select-none bg-zinc-900 text-white ');
         } else {
-            badge.text('Draft').removeClass().addClass('ml-1.5 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider select-none bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300');
+            badge.text('Draft').removeClass().addClass('ml-1.5 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider select-none bg-zinc-200 text-zinc-700 ');
         }
 
         // Collapse sidebar and hide header
@@ -8661,8 +8661,8 @@ function cora_get_sparkline_points( $history, $type ) {
             const btn = document.getElementById('cora-device-' + d);
             if (btn) {
                 btn.className = (d === device)
-                    ? 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700 shadow-sm cursor-pointer transition-all'
-                    : 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-pointer transition-all';
+                    ? 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-800 bg-white shadow-sm cursor-pointer transition-all'
+                    : 'w-7 h-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 cursor-pointer transition-all';
             }
         });
 
@@ -8879,7 +8879,7 @@ function cora_get_sparkline_points( $history, $type ) {
         else if (title.includes('footer') || slug.includes('footer')) typeText = 'Footer';
         else if (title.includes('archive') || slug.includes('archive')) typeText = 'Archive';
         
-        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 bg-transparent">${typeText}</span>`;
+        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border border-zinc-200 text-zinc-500 bg-transparent">${typeText}</span>`;
     }
 
     function renderPageSwitcherList(query) {
@@ -8893,7 +8893,7 @@ function cora_get_sparkline_points( $history, $type ) {
         let html = '';
         
         // "Recent" section title heading
-        html += `<div class="px-4.5 py-2 text-[9px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest select-none">Recent</div>`;
+        html += `<div class="px-4.5 py-2 text-[9px] font-extrabold text-zinc-400 uppercase tracking-widest select-none">Recent</div>`;
         
         if (!filtered.length) {
             html += '<div class="px-4.5 py-4 text-center text-[11px] text-zinc-450">No pages found</div>';
@@ -8904,20 +8904,20 @@ function cora_get_sparkline_points( $history, $type ) {
                 const badge = getPageTypeBadge(p);
                 const escTitle = (p.title||'').replace(/'/g,"\\'");
                 
-                return `<div class="group flex items-center justify-between px-4.5 py-2.5 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 cursor-pointer transition-colors border-b border-zinc-100 dark:border-zinc-800/80">
+                return `<div class="group flex items-center justify-between px-4.5 py-2.5 hover:bg-zinc-50 cursor-pointer transition-colors border-b border-zinc-100 ">
                     <div class="flex-1 min-w-0" onclick="switchToPage(${p.id}, '${escTitle}', ${p.wp_post_id||0})">
                         <div class="flex items-center gap-2 mb-0.5">
-                            <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${active?'bg-emerald-500':'bg-zinc-350 dark:bg-zinc-650'}"></span>
-                            <span class="text-xs font-semibold ${active?'text-zinc-950 dark:text-white':'text-zinc-850 dark:text-zinc-300'} truncate">${p.title||'Untitled'}</span>
+                            <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${active?'bg-emerald-500':'bg-zinc-350 '}"></span>
+                            <span class="text-xs font-semibold ${active?'text-zinc-950 ':'text-zinc-850 '} truncate">${p.title||'Untitled'}</span>
                             <span class="flex-shrink-0 ml-1.5">${badge}</span>
                         </div>
-                        <div class="text-[10px] text-zinc-450 dark:text-zinc-550 pl-3.5 font-normal truncate">/${p.slug||''}</div>
+                        <div class="text-[10px] text-zinc-450 pl-3.5 font-normal truncate">/${p.slug||''}</div>
                     </div>
                     <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity pl-2 shrink-0">
-                        <button onclick="event.stopPropagation(); window.open('${window.location.origin}/?p=${p.wp_post_id||0}&preview=true', '_blank')" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-450 hover:text-zinc-800 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Preview Page">
+                        <button onclick="event.stopPropagation(); window.open('${window.location.origin}/?p=${p.wp_post_id||0}&preview=true', '_blank')" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-450 hover:text-zinc-800 hover:bg-zinc-100 transition-colors" title="Preview Page">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
-                        <button onclick="switchToPage(${p.id}, '${escTitle}', ${p.wp_post_id||0})" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-450 hover:text-zinc-800 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Edit Page">
+                        <button onclick="switchToPage(${p.id}, '${escTitle}', ${p.wp_post_id||0})" class="w-7 h-7 rounded-md flex items-center justify-center text-zinc-450 hover:text-zinc-800 hover:bg-zinc-100 transition-colors" title="Edit Page">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                         </button>
                     </div>
@@ -9021,12 +9021,12 @@ function cora_get_sparkline_points( $history, $type ) {
         
         if (isMobile) {
             window.coraShowToast('Switching to mobile view...');
-            mobBtn.className = 'w-6 h-6 rounded border-0 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 cursor-pointer transition-all focus:outline-none';
-            deskBtn.className = 'w-6 h-6 rounded border-0 bg-transparent flex items-center justify-center text-zinc-450 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all focus:outline-none';
+            mobBtn.className = 'w-6 h-6 rounded border-0 bg-zinc-100 flex items-center justify-center text-zinc-800 cursor-pointer transition-all focus:outline-none';
+            deskBtn.className = 'w-6 h-6 rounded border-0 bg-transparent flex items-center justify-center text-zinc-450 hover:text-zinc-700 cursor-pointer transition-all focus:outline-none';
         } else {
             window.coraShowToast('Switching to desktop view...');
-            deskBtn.className = 'w-6 h-6 rounded border-0 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 cursor-pointer transition-all focus:outline-none';
-            mobBtn.className = 'w-6 h-6 rounded border-0 bg-transparent flex items-center justify-center text-zinc-450 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer transition-all focus:outline-none';
+            deskBtn.className = 'w-6 h-6 rounded border-0 bg-zinc-100 flex items-center justify-center text-zinc-800 cursor-pointer transition-all focus:outline-none';
+            mobBtn.className = 'w-6 h-6 rounded border-0 bg-transparent flex items-center justify-center text-zinc-450 hover:text-zinc-700 cursor-pointer transition-all focus:outline-none';
         }
     }
     window.switchPageSpeedDevice = switchPageSpeedDevice;
@@ -9155,16 +9155,16 @@ function cora_get_sparkline_points( $history, $type ) {
                         if (data.recent_commits && data.recent_commits.length) {
                             data.recent_commits.forEach(commit => {
                                 const commitEl = document.createElement('div');
-                                commitEl.className = 'p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-150 dark:border-zinc-800 rounded-xl space-y-1';
+                                commitEl.className = 'p-3 bg-zinc-50 border border-zinc-150 rounded-xl space-y-1';
                                 const commitDate = new Date(commit.date).toLocaleString();
                                 commitEl.innerHTML = `
                                     <div class="flex items-center justify-between gap-2">
-                                        <a href="${commit.url}" target="_blank" class="text-[10px] font-bold text-zinc-850 dark:text-zinc-200 hover:underline flex items-center gap-1">
+                                        <a href="${commit.url}" target="_blank" class="text-[10px] font-bold text-zinc-850 hover:underline flex items-center gap-1">
                                             <code>${commit.sha}</code>
                                         </a>
                                         <span class="text-[9px] text-zinc-400 font-sans">${commitDate}</span>
                                     </div>
-                                    <p class="text-[10px] text-zinc-600 dark:text-zinc-400 font-sans leading-snug">${commit.message}</p>
+                                    <p class="text-[10px] text-zinc-600 font-sans leading-snug">${commit.message}</p>
                                 `;
                                 commitLog.appendChild(commitEl);
                             });
@@ -9217,13 +9217,13 @@ function cora_get_sparkline_points( $history, $type ) {
         const panelLink = document.getElementById('panel-repo-link');
 
         if (tab === 'create') {
-            if (tabCreate) tabCreate.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-white dark:bg-zinc-800 text-zinc-850 dark:text-zinc-100 shadow-sm';
-            if (tabLink) tabLink.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200';
+            if (tabCreate) tabCreate.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-white text-zinc-850 shadow-sm';
+            if (tabLink) tabLink.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-transparent text-zinc-500 hover:text-zinc-800 ';
             if (panelCreate) panelCreate.classList.remove('hidden');
             if (panelLink) panelLink.classList.add('hidden');
         } else {
-            if (tabLink) tabLink.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-white dark:bg-zinc-800 text-zinc-850 dark:text-zinc-100 shadow-sm';
-            if (tabCreate) tabCreate.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200';
+            if (tabLink) tabLink.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-white text-zinc-850 shadow-sm';
+            if (tabCreate) tabCreate.className = 'py-1.5 text-[10px] font-bold rounded-md transition-all cursor-pointer border-none bg-transparent text-zinc-500 hover:text-zinc-800 ';
             if (panelLink) panelLink.classList.remove('hidden');
             if (panelCreate) panelCreate.classList.add('hidden');
         }

@@ -378,7 +378,7 @@ if ( $is_empty_donut ) {
     $profit_val = 0.0;
     
     $donut_segments = array(
-        array( 'label' => 'No Transactions', 'pct' => 100, 'val' => 0, 'color' => '#e4e4e7', 'class' => 'bg-zinc-200 dark:bg-zinc-800' )
+        array( 'label' => 'No Transactions', 'pct' => 100, 'val' => 0, 'color' => '#e4e4e7', 'class' => 'bg-zinc-200 ' )
     );
 } else {
     if ( $donut_inflow <= 0 ) {
@@ -401,7 +401,7 @@ if ( $is_empty_donut ) {
     $pct_payouts = round( ( $cat_payouts / $donut_inflow ) * 100, 1 );
 
     $donut_segments = array(
-        array( 'label' => 'Net Profit', 'pct' => $pct_profit, 'val' => $profit_val, 'color' => '#18181b', 'class' => 'bg-zinc-900 dark:bg-zinc-100' ),
+        array( 'label' => 'Net Profit', 'pct' => $pct_profit, 'val' => $profit_val, 'color' => '#18181b', 'class' => 'bg-zinc-900 ' ),
         array( 'label' => 'Operating Rent', 'pct' => $pct_rent, 'val' => $cat_rent, 'color' => '#52525b', 'class' => 'bg-zinc-600' ),
         array( 'label' => 'Gear & Equipment', 'pct' => $pct_gear, 'val' => $cat_gear, 'color' => '#a1a1aa', 'class' => 'bg-zinc-400' ),
         array( 'label' => 'Food & Travel', 'pct' => $pct_food, 'val' => $cat_food, 'color' => '#d4d4d8', 'class' => 'bg-zinc-300' ),
@@ -426,7 +426,7 @@ foreach ( $donut_segments as $seg ) {
 }
 ?>
 
-<div id="cora-financial-overview-root" class="space-y-6 text-zinc-900 dark:text-zinc-100 font-sans">
+<div id="cora-financial-overview-root" class="space-y-6 text-zinc-900 font-sans">
 
 <style>
 /* Micro-animations and Premium Motion Design System */
@@ -1096,37 +1096,37 @@ aside[id$="-drawer"].collapsed {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div class="w-full sm:w-auto">
             <div class="flex items-center justify-between gap-2 w-full">
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight flex items-center gap-2">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight flex items-center gap-2">
                     <span>Financial Overview</span>
                     <span class="text-zinc-400 text-lg font-normal">✦</span>
                 </h1>
                 
                 <!-- Mobile-only Action Menu Button -->
                 <div class="relative block sm:hidden">
-                    <button type="button" onclick="window.toggleFinancialActionMenu(event)" class="px-3.5 py-2 bg-zinc-900 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm cora-micro-interact">
+                    <button type="button" onclick="window.toggleFinancialActionMenu(event)" class="px-3.5 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm cora-micro-interact">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>Action</span>
                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
                     
                     <!-- Mobile Action Menu Popover -->
-                    <div id="cora-fin-action-popover-mobile" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
-                        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openAddLedgerDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
+                    <div id="cora-fin-action-popover-mobile" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
+                        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openAddLedgerDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             <span>Add Ledger Entry</span>
                         </button>
-                        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openCreateInvoiceDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
+                        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openCreateInvoiceDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                             <span>Create Client Invoice</span>
                         </button>
-                        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openProcessPayoutDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
+                        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openProcessPayoutDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                             <span>Process Payout</span>
                         </button>
                     </div>
                 </div>
             </div>
-            <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
+            <p class="text-xs sm:text-sm text-zinc-500 mt-1 font-medium">
                 Real-time insights into your studio's financial performance.
             </p>
         </div>
@@ -1138,7 +1138,7 @@ aside[id$="-drawer"].collapsed {
             <div class="flex items-center gap-2 w-full sm:w-auto flex-1">
                 <!-- Date Range Selector Dropdown -->
                 <div class="relative flex-1 sm:flex-none">
-                    <div onclick="window.toggleFinancialDatePopover(event)" class="w-full sm:w-auto justify-between flex items-center gap-2 bg-white dark:bg-zinc-900 px-3.5 py-2 rounded-xl shadow-sm cursor-pointer text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-855 transition-all cora-micro-interact">
+                    <div onclick="window.toggleFinancialDatePopover(event)" class="w-full sm:w-auto justify-between flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl shadow-sm cursor-pointer text-xs font-bold text-zinc-800 hover:bg-zinc-50 transition-all cora-micro-interact">
                         <div class="flex items-center gap-2">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                             <span id="cora-selected-date-range">All Time</span>
@@ -1147,52 +1147,52 @@ aside[id$="-drawer"].collapsed {
                     </div>
                     
                     <!-- Popover Date Dropdown -->
-                    <div id="cora-fin-date-popover" class="hidden absolute left-0 mt-2 w-full sm:w-48 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
-                        <button type="button" onclick="window.selectFinancialDateRange('This Month', '01 Jul – 31 Jul 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between">
+                    <div id="cora-fin-date-popover" class="hidden absolute left-0 mt-2 w-full sm:w-48 bg-white rounded-xl shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
+                        <button type="button" onclick="window.selectFinancialDateRange('This Month', '01 Jul – 31 Jul 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
                             <span>This Month</span>
                         </button>
-                        <button type="button" onclick="window.selectFinancialDateRange('Last Month', '01 Jun – 30 Jun 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between">
+                        <button type="button" onclick="window.selectFinancialDateRange('Last Month', '01 Jun – 30 Jun 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
                             <span>Last Month</span>
                         </button>
-                        <button type="button" onclick="window.selectFinancialDateRange('Last 3 Months', '01 Apr – 30 Jun 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between">
+                        <button type="button" onclick="window.selectFinancialDateRange('Last 3 Months', '01 Apr – 30 Jun 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
                             <span>Last 3 Months</span>
                         </button>
-                        <button type="button" onclick="window.selectFinancialDateRange('Last 6 Months', '01 Jan – 30 Jun 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between">
+                        <button type="button" onclick="window.selectFinancialDateRange('Last 6 Months', '01 Jan – 30 Jun 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
                             <span>Last 6 Months</span>
                         </button>
-                        <button type="button" onclick="window.selectFinancialDateRange('Year to Date', '01 Jan – 31 Dec 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between">
+                        <button type="button" onclick="window.selectFinancialDateRange('Year to Date', '01 Jan – 31 Dec 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
                             <span>Year to Date</span>
                         </button>
-                        <button type="button" onclick="window.selectFinancialDateRange('All Time', 'All Time')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between">
+                        <button type="button" onclick="window.selectFinancialDateRange('All Time', 'All Time')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
                             <span>All Time</span>
                         </button>
                     </div>
                 </div>
 
-                <button type="button" onclick="window.openFinancialReportsDrawer()" class="p-2.5 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl transition-colors cursor-pointer shadow-sm cora-micro-interact flex items-center justify-center shrink-0 h-[36px] w-[36px]" title="Automated Reports & Schedule">
+                <button type="button" onclick="window.openFinancialReportsDrawer()" class="p-2.5 bg-white text-zinc-700 hover:bg-zinc-50 rounded-xl transition-colors cursor-pointer shadow-sm cora-micro-interact flex items-center justify-center shrink-0 h-[36px] w-[36px]" title="Automated Reports & Schedule">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 </button>
             </div>
 
             <!-- Primary Action Menu Button (Hidden on mobile) -->
             <div class="relative hidden sm:block">
-                <button type="button" onclick="window.toggleFinancialActionMenu(event)" class="px-4 py-2 bg-zinc-900 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-sm cora-micro-interact">
+                <button type="button" onclick="window.toggleFinancialActionMenu(event)" class="px-4 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-sm cora-micro-interact">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     <span>New Action</span>
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
 
                 <!-- Popover Action Menu Dropdown -->
-                <div id="cora-fin-action-popover" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
-                    <button type="button" onclick="window.toggleFinancialActionMenu(); window.openAddLedgerDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
+                <div id="cora-fin-action-popover" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
+                    <button type="button" onclick="window.toggleFinancialActionMenu(); window.openAddLedgerDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>Add Ledger Entry</span>
                     </button>
-                    <button type="button" onclick="window.toggleFinancialActionMenu(); window.openCreateInvoiceDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
+                    <button type="button" onclick="window.toggleFinancialActionMenu(); window.openCreateInvoiceDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                         <span>Create Client Invoice</span>
                     </button>
-                    <button type="button" onclick="window.toggleFinancialActionMenu(); window.openProcessPayoutDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
+                    <button type="button" onclick="window.toggleFinancialActionMenu(); window.openProcessPayoutDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                         <span>Process Payout</span>
                     </button>
@@ -1311,64 +1311,64 @@ aside[id$="-drawer"].collapsed {
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
 
         <!-- Card 1: Gross Revenue -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-3 cora-animate-fade-in-up" style="animation-delay: 50ms;">
+        <div class="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-3 cora-animate-fade-in-up" style="animation-delay: 50ms;">
             <div class="flex items-center gap-2">
-                <span class="w-8 h-8 shrink-0 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 font-extrabold text-sm flex items-center justify-center select-none">₹</span>
+                <span class="w-8 h-8 shrink-0 rounded-xl bg-emerald-50 text-emerald-600 font-extrabold text-sm flex items-center justify-center select-none">₹</span>
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wide leading-tight">Gross Revenue</span>
             </div>
             <div>
-                <div class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">₹<?php echo number_format( $kpi_inflow ); ?></div>
+                <div class="text-xl font-extrabold text-zinc-900 tracking-tight">₹<?php echo number_format( $kpi_inflow ); ?></div>
                 <div id="cora-revenue-growth-trend" class="text-[10px] font-semibold mt-0.5">
                     <?php if ( $kpi_inflow > 0 ) : ?>
-                        <span class="text-emerald-600 dark:text-emerald-400">↑ 12.4% vs last period</span>
+                        <span class="text-emerald-600 ">↑ 12.4% vs last period</span>
                     <?php else : ?>
-                        <span class="text-zinc-400 dark:text-zinc-500">No change vs last period</span>
+                        <span class="text-zinc-400 ">No change vs last period</span>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
 
         <!-- Card 2: Total Expenses -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-3 cora-animate-fade-in-up" style="animation-delay: 100ms;">
+        <div class="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-3 cora-animate-fade-in-up" style="animation-delay: 100ms;">
             <div class="flex items-center gap-2">
-                <span class="w-8 h-8 shrink-0 rounded-xl bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <span class="w-8 h-8 shrink-0 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                 </span>
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wide leading-tight">Total Expenses</span>
             </div>
             <div>
-                <div class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">₹<?php echo number_format( $kpi_outflow ); ?></div>
-                <div class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 mt-0.5">Ops, Production &amp; Gear</div>
+                <div class="text-xl font-extrabold text-zinc-900 tracking-tight">₹<?php echo number_format( $kpi_outflow ); ?></div>
+                <div class="text-[10px] font-semibold text-zinc-400 mt-0.5">Ops, Production &amp; Gear</div>
             </div>
         </div>
 
         <!-- Card 3: Net Profit -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-3 cora-animate-fade-in-up" style="animation-delay: 150ms;">
+        <div class="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-3 cora-animate-fade-in-up" style="animation-delay: 150ms;">
             <div class="flex items-center gap-2">
-                <span class="w-8 h-8 shrink-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 flex items-center justify-center">
+                <span class="w-8 h-8 shrink-0 rounded-xl bg-zinc-100 text-zinc-600 flex items-center justify-center">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
                 </span>
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wide leading-tight">Net Profit</span>
             </div>
             <div>
-                <div class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">₹<?php echo number_format( $kpi_profit ); ?></div>
+                <div class="text-xl font-extrabold text-zinc-900 tracking-tight">₹<?php echo number_format( $kpi_profit ); ?></div>
                 <div class="mt-0.5">
-                    <span id="cora-kpi-profit-margin" class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"><?php echo $kpi_margin; ?>% Margin</span>
+                    <span id="cora-kpi-profit-margin" class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-600 "><?php echo $kpi_margin; ?>% Margin</span>
                 </div>
             </div>
         </div>
 
         <!-- Card 4: Pending Receivables -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-3 cora-animate-fade-in-up" style="animation-delay: 200ms;">
+        <div class="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-3 cora-animate-fade-in-up" style="animation-delay: 200ms;">
             <div class="flex items-center gap-2">
-                <span class="w-8 h-8 shrink-0 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                <span class="w-8 h-8 shrink-0 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 </span>
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wide leading-tight">Receivables</span>
             </div>
             <div>
-                <div class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">₹<?php echo number_format( $kpi_receivables ); ?></div>
-                <div class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 mt-0.5"><?php echo $kpi_receivables_count; ?> Outstanding</div>
+                <div class="text-xl font-extrabold text-zinc-900 tracking-tight">₹<?php echo number_format( $kpi_receivables ); ?></div>
+                <div class="text-[10px] font-semibold text-zinc-400 mt-0.5"><?php echo $kpi_receivables_count; ?> Outstanding</div>
             </div>
         </div>
 
@@ -1378,16 +1378,16 @@ aside[id$="-drawer"].collapsed {
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-6">
         
         <!-- Left 7 Columns: Revenue Analytics & Cashflow Chart -->
-        <div class="lg:col-span-7 bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm flex flex-col space-y-4 cora-animate-fade-in-up" style="animation-delay: 250ms;">
+        <div class="lg:col-span-7 bg-white rounded-2xl p-5 shadow-sm flex flex-col space-y-4 cora-animate-fade-in-up" style="animation-delay: 250ms;">
             
             <div class="flex items-center justify-between gap-3">
-                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">Revenue &amp; Cashflow</h3>
+                <h3 class="text-sm font-bold text-zinc-900 whitespace-nowrap">Revenue &amp; Cashflow</h3>
                 <div class="flex items-center gap-2 shrink-0">
-                    <select id="cora-chart-view-selector" onchange="window.switchChartPeriod(this.value)" class="bg-zinc-50 dark:bg-zinc-800 rounded-lg px-2.5 py-1 text-xs font-semibold text-zinc-700 dark:text-zinc-300 focus:outline-none border-0 cursor-pointer">
+                    <select id="cora-chart-view-selector" onchange="window.switchChartPeriod(this.value)" class="bg-zinc-50 rounded-lg px-2.5 py-1 text-xs font-semibold text-zinc-700 focus:outline-none border-0 cursor-pointer">
                         <option value="monthly">Monthly</option>
                         <option value="quarterly">Quarterly</option>
                     </select>
-                    <button type="button" class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200">
+                    <button type="button" class="text-zinc-400 hover:text-zinc-700 ">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                     </button>
                 </div>
@@ -1507,33 +1507,33 @@ aside[id$="-drawer"].collapsed {
             </div>
 
             <!-- Chart Footer Metrics Row -->
-            <div class="grid grid-cols-3 gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800/80">
+            <div class="grid grid-cols-3 gap-2 pt-3 border-t border-zinc-100 ">
                 <!-- Inflows -->
-                <div class="flex flex-col gap-0.5 bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-xl">
+                <div class="flex flex-col gap-0.5 bg-zinc-50 p-2.5 rounded-xl">
                     <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wide whitespace-nowrap">Inflows</span>
-                    <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100">₹<?php echo number_format( $kpi_inflow ); ?></span>
+                    <span class="text-xs font-extrabold text-zinc-900 ">₹<?php echo number_format( $kpi_inflow ); ?></span>
                 </div>
                 <!-- Outflows -->
-                <div class="flex flex-col gap-0.5 bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-xl">
+                <div class="flex flex-col gap-0.5 bg-zinc-50 p-2.5 rounded-xl">
                     <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wide whitespace-nowrap">Outflows</span>
-                    <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100">₹<?php echo number_format( $kpi_outflow ); ?></span>
+                    <span class="text-xs font-extrabold text-zinc-900 ">₹<?php echo number_format( $kpi_outflow ); ?></span>
                 </div>
                 <!-- Net Profit -->
-                <div class="flex flex-col gap-0.5 bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-xl">
+                <div class="flex flex-col gap-0.5 bg-zinc-50 p-2.5 rounded-xl">
                     <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wide whitespace-nowrap">Net Profit</span>
-                    <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100">₹<?php echo number_format( $kpi_profit ); ?></span>
+                    <span class="text-xs font-extrabold text-zinc-900 ">₹<?php echo number_format( $kpi_profit ); ?></span>
                 </div>
             </div>
 
         </div>
 
         <!-- Right 5 Columns: Cash Allocation & Profit Margin Donut Chart -->
-        <div class="lg:col-span-5 bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm flex flex-col justify-between space-y-5 cora-animate-fade-in-up" style="animation-delay: 300ms;">
+        <div class="lg:col-span-5 bg-white rounded-2xl p-6 shadow-sm flex flex-col justify-between space-y-5 cora-animate-fade-in-up" style="animation-delay: 300ms;">
             
             <div class="flex items-start justify-between">
                 <div>
-                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Cash Allocation & Profit Margin</h3>
-                    <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"><?php echo $has_actual_data ? $kpi_margin : 35.0; ?>% Net Margin</span>
+                    <h3 class="text-base font-bold text-zinc-900 ">Cash Allocation & Profit Margin</h3>
+                    <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800 "><?php echo $has_actual_data ? $kpi_margin : 35.0; ?>% Net Margin</span>
                 </div>
                 <span class="text-xs font-semibold text-zinc-400">Gross Revenue: ₹<?php echo number_format( $kpi_inflow ); ?></span>
             </div>
@@ -1552,8 +1552,8 @@ aside[id$="-drawer"].collapsed {
                     <!-- Inner Donut Text -->
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-center cora-animate-scale-in" style="animation-delay: 500ms;">
                         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Net Profit</span>
-                        <span class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100 leading-none my-0.5"><?php echo $pct_profit; ?>%</span>
-                        <span class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400">₹<?php echo number_format( $profit_val ); ?></span>
+                        <span class="text-xl font-extrabold text-zinc-900 leading-none my-0.5"><?php echo $pct_profit; ?>%</span>
+                        <span class="text-[10px] font-bold text-zinc-500 ">₹<?php echo number_format( $profit_val ); ?></span>
                     </div>
                 </div>
 
@@ -1564,11 +1564,11 @@ aside[id$="-drawer"].collapsed {
                             <div class="flex items-center justify-between font-semibold">
                                 <div class="flex items-center gap-2">
                                     <span class="w-3 h-3 rounded-sm" style="background-color: <?php echo esc_attr( $seg['color'] ); ?>;"></span>
-                                    <span class="text-zinc-700 dark:text-zinc-300"><?php echo esc_html( $seg['label'] ); ?></span>
+                                    <span class="text-zinc-700 "><?php echo esc_html( $seg['label'] ); ?></span>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <span class="text-zinc-400"><?php echo number_format( $seg['pct'], 1 ); ?>%</span>
-                                    <span class="font-bold text-zinc-900 dark:text-zinc-100">₹<?php echo number_format( $seg['val'] ); ?></span>
+                                    <span class="font-bold text-zinc-900 ">₹<?php echo number_format( $seg['val'] ); ?></span>
                                 </div>
                             </div>
                         <?php endif; 
@@ -1578,7 +1578,7 @@ aside[id$="-drawer"].collapsed {
             </div>
 
             <!-- Bottom Segmented Progress Bar -->
-            <div class="w-full h-3 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex">
+            <div class="w-full h-3 rounded-full bg-zinc-100 overflow-hidden flex">
                 <?php foreach ( $donut_segments as $seg ) : 
                     if ( $seg['pct'] > 0 ) : ?>
                         <div class="h-full" style="width: <?php echo $seg['pct']; ?>%; background-color: <?php echo esc_attr( $seg['color'] ); ?>;"></div>
@@ -1587,11 +1587,11 @@ aside[id$="-drawer"].collapsed {
             </div>
 
             <!-- On Track Blue Info Card -->
-            <div class="bg-blue-50/50 dark:bg-blue-955/20 border border-blue-100/50 dark:border-blue-900/30 rounded-xl p-3 flex items-center gap-2.5">
-                <div class="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div class="bg-blue-50/50 border border-blue-100/50 rounded-xl p-3 flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
                 </div>
-                <span class="text-xs font-semibold text-blue-800 dark:text-blue-300">You're on track! Keep up the good work.</span>
+                <span class="text-xs font-semibold text-blue-800 ">You're on track! Keep up the good work.</span>
             </div>
 
             </div>
@@ -1600,30 +1600,30 @@ aside[id$="-drawer"].collapsed {
     </div>
 
     <!-- 4. MASTER LEDGER SECTION (BORDERLESS CLEAN CARD WITH SOFT SHADOW) -->
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm space-y-5">
+    <div class="bg-white rounded-2xl p-6 shadow-sm space-y-5">
         
         <!-- Header & Tabs -->
-        <div class="space-y-3 border-b border-zinc-100 dark:border-zinc-800/60 pb-4">
+        <div class="space-y-3 border-b border-zinc-100 pb-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">Master Ledger</h2>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium">Consolidated view of all financial entries.</p>
+                    <h2 class="text-lg font-bold text-zinc-900 ">Master Ledger</h2>
+                    <p class="text-xs text-zinc-500 mt-0.5 font-medium">Consolidated view of all financial entries.</p>
                 </div>
             </div>
             <div class="hidden sm:flex flex-wrap items-center gap-1.5 pb-0.5">
-                <button type="button" onclick="window.switchFinancialTab('fin-ledger')" id="btn-tab-fin-ledger" class="cora-financial-tab shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs cursor-pointer">
+                <button type="button" onclick="window.switchFinancialTab('fin-ledger')" id="btn-tab-fin-ledger" class="cora-financial-tab shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-white shadow-xs cursor-pointer">
                     Master Ledger
                 </button>
-                <button type="button" onclick="window.switchFinancialTab('fin-invoices')" id="btn-tab-fin-invoices" class="cora-financial-tab shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer">
+                <button type="button" onclick="window.switchFinancialTab('fin-invoices')" id="btn-tab-fin-invoices" class="cora-financial-tab shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 hover:bg-zinc-100 cursor-pointer">
                     Invoices & Billing
                 </button>
-                <button type="button" onclick="window.switchFinancialTab('fin-payouts')" id="btn-tab-fin-payouts" class="cora-financial-tab shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer">
+                <button type="button" onclick="window.switchFinancialTab('fin-payouts')" id="btn-tab-fin-payouts" class="cora-financial-tab shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 hover:bg-zinc-100 cursor-pointer">
                     Agent / Crew Payouts
                 </button>
             </div>
             <!-- Mobile Tab Dropdown -->
             <div class="sm:hidden block w-full">
-                <select id="cora-mobile-financial-tab-selector" onchange="window.switchFinancialTab(this.value)" class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50 rounded-xl py-2 px-3 text-xs font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                <select id="cora-mobile-financial-tab-selector" onchange="window.switchFinancialTab(this.value)" class="w-full bg-zinc-50 border border-zinc-200/50 rounded-xl py-2 px-3 text-xs font-bold text-zinc-800 focus:outline-none cursor-pointer">
                     <option value="fin-ledger">Master Ledger</option>
                     <option value="fin-invoices">Invoices & Billing</option>
                     <option value="fin-payouts">Agent / Crew Payouts</option>
@@ -1639,17 +1639,17 @@ aside[id$="-drawer"].collapsed {
                 
                 <!-- Category Pills (Desktop) -->
                 <div class="hidden lg:flex flex-wrap items-center gap-2 pb-1">
-                    <button type="button" onclick="window.filterLedgerByPill('all', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer shrink-0">All Entries</button>
-                    <button type="button" onclick="window.filterLedgerByPill('Food & Travel', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer shrink-0">Food & Travel</button>
-                    <button type="button" onclick="window.filterLedgerByPill('Gear & Tech', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer shrink-0">Gear & Tech</button>
-                    <button type="button" onclick="window.filterLedgerByPill('Studio Ops & Rent', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer shrink-0">Studio Ops & Rent</button>
-                    <button type="button" onclick="window.filterLedgerByPill('Marketing & Listings', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer shrink-0">Marketing & Listings</button>
-                    <button type="button" onclick="window.filterLedgerByPill('Agent / Crew Payouts', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer shrink-0">Agent / Crew Payouts</button>
-                    <button type="button" onclick="window.filterLedgerByPill('Inflows & Retainers', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer shrink-0">Inflows & Retainers</button>
+                    <button type="button" onclick="window.filterLedgerByPill('all', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-900 text-white cursor-pointer shrink-0">All Entries</button>
+                    <button type="button" onclick="window.filterLedgerByPill('Food & Travel', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 text-zinc-600 hover:bg-zinc-100 cursor-pointer shrink-0">Food & Travel</button>
+                    <button type="button" onclick="window.filterLedgerByPill('Gear & Tech', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 text-zinc-600 hover:bg-zinc-100 cursor-pointer shrink-0">Gear & Tech</button>
+                    <button type="button" onclick="window.filterLedgerByPill('Studio Ops & Rent', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 text-zinc-600 hover:bg-zinc-100 cursor-pointer shrink-0">Studio Ops & Rent</button>
+                    <button type="button" onclick="window.filterLedgerByPill('Marketing & Listings', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 text-zinc-600 hover:bg-zinc-100 cursor-pointer shrink-0">Marketing & Listings</button>
+                    <button type="button" onclick="window.filterLedgerByPill('Agent / Crew Payouts', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 text-zinc-600 hover:bg-zinc-100 cursor-pointer shrink-0">Agent / Crew Payouts</button>
+                    <button type="button" onclick="window.filterLedgerByPill('Inflows & Retainers', this)" class="fin-pill-filter px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-50 text-zinc-600 hover:bg-zinc-100 cursor-pointer shrink-0">Inflows & Retainers</button>
                 </div>
                 <!-- Category Selector Dropdown (Mobile) -->
                 <div class="lg:hidden block w-full">
-                    <select id="cora-mobile-ledger-category-selector" onchange="window.filterLedgerByPill(this.value, this)" class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-700/50 rounded-xl py-2 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300 focus:outline-none cursor-pointer">
+                    <select id="cora-mobile-ledger-category-selector" onchange="window.filterLedgerByPill(this.value, this)" class="w-full bg-zinc-50 border border-zinc-200/50 rounded-xl py-2 px-3 text-xs font-semibold text-zinc-700 focus:outline-none cursor-pointer">
                         <option value="all">All Categories</option>
                         <option value="Food & Travel">Food & Travel</option>
                         <option value="Gear & Tech">Gear & Tech</option>
@@ -1663,10 +1663,10 @@ aside[id$="-drawer"].collapsed {
                 <!-- Search Input + Filter Icon Button -->
                 <div class="flex items-center gap-2 shrink-0">
                     <div class="relative w-full sm:w-64">
-                        <input type="text" id="fin-ledger-search" oninput="window.filterLedgerTable()" placeholder="Search transactions..." class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl py-2 pl-9 pr-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none">
+                        <input type="text" id="fin-ledger-search" oninput="window.filterLedgerTable()" placeholder="Search transactions..." class="w-full bg-zinc-50 border-0 rounded-xl py-2 pl-9 pr-3 text-xs text-zinc-800 focus:outline-none">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-2.5 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </div>
-                    <button type="button" class="p-2 bg-zinc-50 dark:bg-zinc-800 border-0 text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer" title="Advanced Filter">
+                    <button type="button" class="p-2 bg-zinc-50 border-0 text-zinc-600 rounded-xl hover:bg-zinc-100 cursor-pointer" title="Advanced Filter">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                     </button>
                 </div>
@@ -1675,8 +1675,8 @@ aside[id$="-drawer"].collapsed {
 
             <!-- Master Ledger Table (No Outer Border) -->
             <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left divide-y divide-zinc-100 dark:divide-zinc-800" id="cora-financial-table">
-                    <thead class="bg-zinc-50/50 dark:bg-zinc-800/30">
+                <table class="w-full text-xs text-left divide-y divide-zinc-100 " id="cora-financial-table">
+                    <thead class="bg-zinc-50/50 ">
                         <tr>
                             <th class="px-5 py-3.5 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">DATE</th>
                             <th class="px-5 py-3.5 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">DESCRIPTION</th>
@@ -1687,7 +1687,7 @@ aside[id$="-drawer"].collapsed {
                             <th class="px-5 py-3.5 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">ACTIONS</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800 font-medium" id="cora-financial-table-body">
+                    <tbody class="divide-y divide-zinc-100 font-medium" id="cora-financial-table-body">
                         <?php 
                         if ( ! empty( $financial_entries ) ) :
                             foreach ( $financial_entries as $entry ) :
@@ -1726,19 +1726,19 @@ aside[id$="-drawer"].collapsed {
                                     $status = $is_inflow ? 'Received' : 'Paid';
                                 }
                                 ?>
-                                <tr class="cora-table-row-interact hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors">
-                                    <td data-label="Date" class="px-5 py-4 text-zinc-800 dark:text-zinc-200 font-semibold"><?php echo esc_html( $formatted_date ); ?></td>
-                                    <td data-label="Description" class="px-5 py-4 font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $entry['description'] ?? '' ); ?></td>
-                                    <td data-label="Category" class="px-5 py-4"><span class="px-3 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold text-[11px]"><?php echo esc_html( $category ); ?></span></td>
+                                <tr class="cora-table-row-interact hover:bg-zinc-50/70 transition-colors">
+                                    <td data-label="Date" class="px-5 py-4 text-zinc-800 font-semibold"><?php echo esc_html( $formatted_date ); ?></td>
+                                    <td data-label="Description" class="px-5 py-4 font-bold text-zinc-900 "><?php echo esc_html( $entry['description'] ?? '' ); ?></td>
+                                    <td data-label="Category" class="px-5 py-4"><span class="px-3 py-1 rounded-lg bg-zinc-100 text-zinc-700 font-semibold text-[11px]"><?php echo esc_html( $category ); ?></span></td>
                                     <td data-label="Type" class="px-5 py-4">
-                                        <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 dark:bg-zinc-800 <?php echo $is_inflow ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-600 dark:text-zinc-400'; ?> flex items-center gap-1 w-fit">
-                                            <span class="<?php echo $is_inflow ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-500'; ?>"><?php echo esc_html( $type_arrow ); ?></span> <?php echo esc_html( $type_label ); ?>
+                                        <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 <?php echo $is_inflow ? 'text-zinc-900 ' : 'text-zinc-600 '; ?> flex items-center gap-1 w-fit">
+                                            <span class="<?php echo $is_inflow ? 'text-zinc-900 ' : 'text-zinc-500'; ?>"><?php echo esc_html( $type_arrow ); ?></span> <?php echo esc_html( $type_label ); ?>
                                         </span>
                                     </td>
-                                    <td data-label="Amount" class="px-5 py-4 font-extrabold text-zinc-900 dark:text-zinc-100 text-sm"><?php echo esc_html( $formatted_amount ); ?></td>
-                                    <td data-label="Status" class="px-5 py-4"><span class="px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"><?php echo esc_html( $status ); ?></span></td>
+                                    <td data-label="Amount" class="px-5 py-4 font-extrabold text-zinc-900 text-sm"><?php echo esc_html( $formatted_amount ); ?></td>
+                                    <td data-label="Status" class="px-5 py-4"><span class="px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 text-zinc-700 "><?php echo esc_html( $status ); ?></span></td>
                                     <td data-label="Actions" class="px-5 py-4 text-right">
-                                        <button type="button" onclick="window.coraShowToast('Viewing details for transaction #<?php echo esc_attr( $entry['id'] ); ?>', 'info')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-bold text-base">···</button>
+                                        <button type="button" onclick="window.coraShowToast('Viewing details for transaction #<?php echo esc_attr( $entry['id'] ); ?>', 'info')" class="text-zinc-400 hover:text-zinc-900 font-bold text-base">···</button>
                                     </td>
                                 </tr>
                                 <?php
@@ -1767,8 +1767,8 @@ aside[id$="-drawer"].collapsed {
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left divide-y divide-zinc-100 dark:divide-zinc-800" id="cora-invoices-table">
-                    <thead class="bg-zinc-50/50 dark:bg-zinc-800/30">
+                <table class="w-full text-xs text-left divide-y divide-zinc-100 " id="cora-invoices-table">
+                    <thead class="bg-zinc-50/50 ">
                         <tr>
                             <th class="px-5 py-3.5 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">INVOICE #</th>
                             <th class="px-5 py-3.5 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">CLIENT</th>
@@ -1779,7 +1779,7 @@ aside[id$="-drawer"].collapsed {
                             <th class="px-5 py-3.5 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">ACTIONS</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800 font-medium" id="cora-invoices-table-body">
+                    <tbody class="divide-y divide-zinc-100 font-medium" id="cora-invoices-table-body">
                         <?php 
                         if ( ! empty( $invoices ) ) :
                             foreach ( $invoices as $inv ) :
@@ -1789,28 +1789,28 @@ aside[id$="-drawer"].collapsed {
                                 $formatted_amount = '₹' . number_format( $inv_amount );
                                 $inv_status = ucfirst( strtolower( $inv['status'] ?? 'pending' ) );
                                 ?>
-                                <tr class="cora-table-row-interact hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors">
-                                    <td data-label="Invoice #" class="px-5 py-4 font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $inv['invoice_number'] ?? '' ); ?></td>
-                                    <td data-label="Client" class="px-5 py-4 text-zinc-800 dark:text-zinc-200 font-semibold"><?php echo esc_html( $inv['client_name'] ?? '' ); ?></td>
-                                    <td data-label="Description" class="px-5 py-4 text-zinc-600 dark:text-zinc-400"><?php echo esc_html( $inv['package_name'] ?? '' ); ?></td>
-                                    <td data-label="Amount" class="px-5 py-4 font-extrabold text-zinc-900 dark:text-zinc-100 text-sm"><?php echo esc_html( $formatted_amount ); ?></td>
-                                    <td data-label="Due Date" class="px-5 py-4 text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $formatted_due_date ); ?></td>
+                                <tr class="cora-table-row-interact hover:bg-zinc-50/70 transition-colors">
+                                    <td data-label="Invoice #" class="px-5 py-4 font-bold text-zinc-900 "><?php echo esc_html( $inv['invoice_number'] ?? '' ); ?></td>
+                                    <td data-label="Client" class="px-5 py-4 text-zinc-800 font-semibold"><?php echo esc_html( $inv['client_name'] ?? '' ); ?></td>
+                                    <td data-label="Description" class="px-5 py-4 text-zinc-600 "><?php echo esc_html( $inv['package_name'] ?? '' ); ?></td>
+                                    <td data-label="Amount" class="px-5 py-4 font-extrabold text-zinc-900 text-sm"><?php echo esc_html( $formatted_amount ); ?></td>
+                                    <td data-label="Due Date" class="px-5 py-4 text-zinc-800 "><?php echo esc_html( $formatted_due_date ); ?></td>
                                     <td data-label="Status" class="px-5 py-4">
-                                        <span class="px-3 py-1 rounded-lg text-[11px] font-bold <?php echo (strtolower($inv_status) === 'paid') ? 'bg-zinc-100 dark:bg-zinc-850 text-zinc-800 dark:text-zinc-200' : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-500'; ?>">
+                                        <span class="px-3 py-1 rounded-lg text-[11px] font-bold <?php echo (strtolower($inv_status) === 'paid') ? 'bg-zinc-100 text-zinc-800 ' : 'bg-zinc-50 text-zinc-500'; ?>">
                                             <?php echo esc_html( $inv_status ); ?>
                                         </span>
                                     </td>
                                     <td data-label="Actions" class="px-5 py-4 text-right">
                                          <div class="flex items-center justify-end gap-2">
                                              <?php if (strtolower($inv_status) !== 'paid') : ?>
-                                                 <button type="button" onclick="window.coraMarkInvoicePaid('<?php echo esc_attr( $inv['id'] ); ?>', this)" class="px-2 py-1 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-[10px] font-bold rounded-lg shadow-sm hover:bg-black dark:hover:bg-white transition-all cora-micro-interact">
+                                                 <button type="button" onclick="window.coraMarkInvoicePaid('<?php echo esc_attr( $inv['id'] ); ?>', this)" class="px-2 py-1 bg-zinc-900 text-white text-[10px] font-bold rounded-lg shadow-sm hover:bg-black transition-all cora-micro-interact">
                                                      Mark Paid
                                                  </button>
-                                                 <button type="button" onclick="window.coraSendInvoiceReminder('<?php echo esc_attr( $inv['id'] ); ?>', this)" class="px-2 py-1 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cora-micro-interact" title="Send email reminder">
+                                                 <button type="button" onclick="window.coraSendInvoiceReminder('<?php echo esc_attr( $inv['id'] ); ?>', this)" class="px-2 py-1 border border-zinc-200 text-zinc-700 text-[10px] font-bold rounded-lg hover:bg-zinc-50 transition-all cora-micro-interact" title="Send email reminder">
                                                      Remind
                                                  </button>
                                              <?php endif; ?>
-                                             <button type="button" onclick="window.coraShowToast('Invoice share token: <?php echo esc_attr( $inv['share_token'] ?? '' ); ?>', 'info')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-bold text-base px-1">···</button>
+                                             <button type="button" onclick="window.coraShowToast('Invoice share token: <?php echo esc_attr( $inv['share_token'] ?? '' ); ?>', 'info')" class="text-zinc-400 hover:text-zinc-900 font-bold text-base px-1">···</button>
                                          </div>
                                     </td>
                                 </tr>
@@ -1839,8 +1839,8 @@ aside[id$="-drawer"].collapsed {
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left divide-y divide-zinc-100 dark:divide-zinc-800" id="cora-payouts-table">
-                    <thead class="bg-zinc-50/50 dark:bg-zinc-800/30">
+                <table class="w-full text-xs text-left divide-y divide-zinc-100 " id="cora-payouts-table">
+                    <thead class="bg-zinc-50/50 ">
                         <tr>
                             <th class="px-5 py-3.5 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">PAYOUT #</th>
                             <th class="px-5 py-3.5 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">RECIPIENT</th>
@@ -1851,7 +1851,7 @@ aside[id$="-drawer"].collapsed {
                             <th class="px-5 py-3.5 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">ACTIONS</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800 font-medium" id="cora-payouts-table-body">
+                    <tbody class="divide-y divide-zinc-100 font-medium" id="cora-payouts-table-body">
                         <?php 
                         if ( ! empty( $payouts ) ) :
                             foreach ( $payouts as $pay ) :
@@ -1861,15 +1861,15 @@ aside[id$="-drawer"].collapsed {
                                 $formatted_net = '₹' . number_format( $pay_net );
                                 $pay_status = ucfirst( strtolower( $pay['status'] ?? 'processed' ) );
                                 ?>
-                                <tr class="cora-table-row-interact hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors">
-                                    <td data-label="Payout #" class="px-5 py-4 font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $pay['payout_number'] ?? '' ); ?></td>
-                                    <td data-label="Recipient" class="px-5 py-4 text-zinc-800 dark:text-zinc-200 font-semibold"><?php echo esc_html( $pay['recipient_name'] ?? '' ); ?></td>
-                                    <td data-label="Role" class="px-5 py-4"><span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 dark:bg-zinc-850 text-zinc-700 dark:text-zinc-300"><?php echo esc_html( ucfirst( $pay['recipient_role'] ?? '' ) ); ?></span></td>
-                                    <td data-label="Net Amount" class="px-5 py-4 font-extrabold text-zinc-900 dark:text-zinc-100 text-sm"><?php echo esc_html( $formatted_net ); ?></td>
-                                    <td data-label="Date" class="px-5 py-4 text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $formatted_pay_date ); ?></td>
-                                    <td data-label="Status" class="px-5 py-4"><span class="px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 dark:bg-zinc-850 text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $pay_status ); ?></span></td>
+                                <tr class="cora-table-row-interact hover:bg-zinc-50/70 transition-colors">
+                                    <td data-label="Payout #" class="px-5 py-4 font-bold text-zinc-900 "><?php echo esc_html( $pay['payout_number'] ?? '' ); ?></td>
+                                    <td data-label="Recipient" class="px-5 py-4 text-zinc-800 font-semibold"><?php echo esc_html( $pay['recipient_name'] ?? '' ); ?></td>
+                                    <td data-label="Role" class="px-5 py-4"><span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 text-zinc-700 "><?php echo esc_html( ucfirst( $pay['recipient_role'] ?? '' ) ); ?></span></td>
+                                    <td data-label="Net Amount" class="px-5 py-4 font-extrabold text-zinc-900 text-sm"><?php echo esc_html( $formatted_net ); ?></td>
+                                    <td data-label="Date" class="px-5 py-4 text-zinc-800 "><?php echo esc_html( $formatted_pay_date ); ?></td>
+                                    <td data-label="Status" class="px-5 py-4"><span class="px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 text-zinc-800 "><?php echo esc_html( $pay_status ); ?></span></td>
                                     <td data-label="Actions" class="px-5 py-4 text-right">
-                                        <button type="button" onclick="window.coraShowToast('Notes: <?php echo esc_attr( $pay['notes'] ?? '' ); ?>', 'info')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-bold text-base">···</button>
+                                        <button type="button" onclick="window.coraShowToast('Notes: <?php echo esc_attr( $pay['notes'] ?? '' ); ?>', 'info')" class="text-zinc-400 hover:text-zinc-900 font-bold text-base">···</button>
                                     </td>
                                 </tr>
                                 <?php
@@ -1896,13 +1896,13 @@ aside[id$="-drawer"].collapsed {
 <!-- SIDE DRAWERS FOR ACTIONS -->
 
 <!-- 1. ADD LEDGER ENTRY DRAWER -->
-<aside id="cora-add-ledger-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
-    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+<aside id="cora-add-ledger-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between">
         <div>
-            <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Add Ledger Entry</h3>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400">Log cash inflow or operational outflow.</p>
+            <h3 class="text-base font-bold text-zinc-900 ">Add Ledger Entry</h3>
+            <p class="text-xs text-zinc-500 ">Log cash inflow or operational outflow.</p>
         </div>
-        <button type="button" onclick="window.closeAddLedgerDrawer()" class="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100">
+        <button type="button" onclick="window.closeAddLedgerDrawer()" class="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 ">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
@@ -1910,12 +1910,12 @@ aside[id$="-drawer"].collapsed {
         <!-- Coworker Receipt Dropzone -->
         <div class="space-y-1">
             <div class="flex items-center justify-between">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Smart Receipt Scan (AI Coworker)</label>
-                <span class="px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 leading-none">Upcoming Soon</span>
+                <label class="font-bold text-zinc-700 ">Smart Receipt Scan (AI Coworker)</label>
+                <span class="px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-zinc-100 text-zinc-500 border border-zinc-200 leading-none">Upcoming Soon</span>
             </div>
-            <div id="cora-receipt-dropzone" class="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 text-center cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-650 transition-colors relative overflow-hidden">
+            <div id="cora-receipt-dropzone" class="border-2 border-dashed border-zinc-200 rounded-2xl p-4 text-center cursor-pointer hover:border-zinc-400 transition-colors relative overflow-hidden">
                 <!-- Laser Scanning Animation overlay -->
-                <div id="cora-scanner-laser" class="hidden absolute top-0 left-0 w-full h-[3px] bg-zinc-900 dark:bg-zinc-100 opacity-60 shadow-[0_0_10px_#18181b]"></div>
+                <div id="cora-scanner-laser" class="hidden absolute top-0 left-0 w-full h-[3px] bg-zinc-900 opacity-60 shadow-[0_0_10px_#18181b]"></div>
                 
                 <div id="cora-dropzone-content" class="space-y-1 text-zinc-500">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" class="mx-auto text-zinc-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -1927,25 +1927,25 @@ aside[id$="-drawer"].collapsed {
         </div>
 
         <div class="space-y-1">
-            <label class="font-bold text-zinc-700 dark:text-zinc-300">Entry Description</label>
-            <input type="text" name="entry_desc" required placeholder="e.g. Camera Rental – Sony FX6" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="font-bold text-zinc-700 ">Entry Description</label>
+            <input type="text" name="entry_desc" required placeholder="e.g. Camera Rental – Sony FX6" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
             <div class="space-y-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Amount (₹)</label>
-                <input type="number" name="entry_amount" required placeholder="12500" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">Amount (₹)</label>
+                <input type="number" name="entry_amount" required placeholder="12500" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
             </div>
             <div class="space-y-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Type</label>
-                <select name="entry_type" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">Type</label>
+                <select name="entry_type" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
                     <option value="inflow">Cash Inflow</option>
                     <option value="outflow">Cash Outflow</option>
                 </select>
             </div>
         </div>
         <div class="space-y-1">
-            <label class="font-bold text-zinc-700 dark:text-zinc-300">Category</label>
-            <select name="entry_category" onchange="window.coraToggleCustomCategoryField(this)" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="font-bold text-zinc-700 ">Category</label>
+            <select name="entry_category" onchange="window.coraToggleCustomCategoryField(this)" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
                 <option value="Inflows & Retainers">Inflows & Retainers</option>
                 <option value="Food & Travel">Food & Travel</option>
                 <option value="Gear & Tech">Gear & Tech</option>
@@ -1957,31 +1957,31 @@ aside[id$="-drawer"].collapsed {
         </div>
 
         <div id="cora-custom-category-input-wrap" class="space-y-1 hidden">
-            <label class="font-bold text-zinc-700 dark:text-zinc-300">Custom Category Name</label>
-            <input type="text" name="entry_category_custom" placeholder="e.g. Software Subscriptions" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="font-bold text-zinc-700 ">Custom Category Name</label>
+            <input type="text" name="entry_category_custom" placeholder="e.g. Software Subscriptions" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
         </div>
-        <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-end gap-2">
-            <button type="button" onclick="window.closeAddLedgerDrawer()" class="px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold">Cancel</button>
+        <div class="pt-4 border-t border-zinc-200 flex justify-end gap-2">
+            <button type="button" onclick="window.closeAddLedgerDrawer()" class="px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-700 font-bold">Cancel</button>
             <button type="submit" class="px-5 py-2.5 rounded-xl bg-zinc-900 text-white font-bold">Save Entry</button>
         </div>
     </form>
 </aside>
 
 <!-- 2. CREATE CLIENT INVOICE DRAWER -->
-<aside id="cora-create-invoice-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
-    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+<aside id="cora-create-invoice-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between">
         <div>
-            <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Create Client Invoice</h3>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400">Send a structured billing statement to a client.</p>
+            <h3 class="text-base font-bold text-zinc-900 ">Create Client Invoice</h3>
+            <p class="text-xs text-zinc-500 ">Send a structured billing statement to a client.</p>
         </div>
-        <button type="button" onclick="window.closeCreateInvoiceDrawer()" class="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100">
+        <button type="button" onclick="window.closeCreateInvoiceDrawer()" class="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 ">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
     <form id="cora-create-invoice-form" onsubmit="handleCreateInvoiceSubmit(event)" class="p-5 space-y-4 flex-1 overflow-y-auto text-xs">
         <div class="space-y-1">
-            <label class="font-bold text-zinc-700 dark:text-zinc-300">Client / Customer</label>
-            <select name="invoice_client" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="font-bold text-zinc-700 ">Client / Customer</label>
+            <select name="invoice_client" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
                 <option value="Ananya Sharma">Ananya Sharma (Residential Buy)</option>
                 <option value="Rajesh Kumar">Rajesh Kumar (Commercial Lease)</option>
                 <option value="Rohit Verma">Rohit Verma (Premium Listing)</option>
@@ -1989,21 +1989,21 @@ aside[id$="-drawer"].collapsed {
             </select>
         </div>
         <div class="space-y-1">
-            <label class="font-bold text-zinc-700 dark:text-zinc-300">Invoice Number</label>
-            <input type="text" name="invoice_number" required value="INV-<?php echo date('Ymd'); ?>-<?php echo rand(100, 999); ?>" readonly class="w-full bg-zinc-100 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-500 dark:text-zinc-400 focus:outline-none cursor-not-allowed">
+            <label class="font-bold text-zinc-700 ">Invoice Number</label>
+            <input type="text" name="invoice_number" required value="INV-<?php echo date('Ymd'); ?>-<?php echo rand(100, 999); ?>" readonly class="w-full bg-zinc-100 border-0 rounded-xl p-2.5 text-xs text-zinc-500 focus:outline-none cursor-not-allowed">
         </div>
         <div class="space-y-1">
-            <label class="font-bold text-zinc-700 dark:text-zinc-300">Service Description / Line Item</label>
-            <input type="text" name="invoice_desc" required placeholder="e.g. Sunset Villa Professional Photography Shoot" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="font-bold text-zinc-700 ">Service Description / Line Item</label>
+            <input type="text" name="invoice_desc" required placeholder="e.g. Sunset Villa Professional Photography Shoot" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
             <div class="space-y-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Subtotal Amount (₹)</label>
-                <input type="number" name="invoice_amount" required placeholder="25000" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">Subtotal Amount (₹)</label>
+                <input type="number" name="invoice_amount" required placeholder="25000" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
             </div>
             <div class="space-y-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Tax Class</label>
-                <select name="invoice_tax" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">Tax Class</label>
+                <select name="invoice_tax" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
                     <option value="18">18% GST (Standard)</option>
                     <option value="12">12% GST (Services)</option>
                     <option value="0">No Tax / Exempt</option>
@@ -2012,53 +2012,53 @@ aside[id$="-drawer"].collapsed {
         </div>
         <div class="grid grid-cols-2 gap-3">
             <div class="space-y-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Deposit Percentage (%)</label>
-                <select name="invoice_deposit" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">Deposit Percentage (%)</label>
+                <select name="invoice_deposit" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
                     <option value="0">None (Full Payment on Due Date)</option>
                     <option value="25">25% Retainer / Advance</option>
                     <option value="50">50% Retainer / Advance</option>
                 </select>
             </div>
             <div class="space-y-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Due Date</label>
-                <input type="date" name="invoice_due_date" required value="<?php echo date('Y-m-d', strtotime('+30 days')); ?>" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">Due Date</label>
+                <input type="date" name="invoice_due_date" required value="<?php echo date('Y-m-d', strtotime('+30 days')); ?>" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
             </div>
         </div>
-        <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-end gap-2">
-            <button type="button" onclick="window.closeCreateInvoiceDrawer()" class="px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold">Cancel</button>
+        <div class="pt-4 border-t border-zinc-200 flex justify-end gap-2">
+            <button type="button" onclick="window.closeCreateInvoiceDrawer()" class="px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-700 font-bold">Cancel</button>
             <button type="submit" class="px-5 py-2.5 rounded-xl bg-zinc-900 text-white font-bold">Generate & Send</button>
         </div>
     </form>
 </aside>
 
 <!-- 3. PROCESS PAYOUT DRAWER -->
-<aside id="cora-process-payout-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
-    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+<aside id="cora-process-payout-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between">
         <div>
-            <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Process Payout</h3>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400">Pay commissions, contractor day rates, or split payouts.</p>
+            <h3 class="text-base font-bold text-zinc-900 ">Process Payout</h3>
+            <p class="text-xs text-zinc-500 ">Pay commissions, contractor day rates, or split payouts.</p>
         </div>
-        <button type="button" onclick="window.closeProcessPayoutDrawer()" class="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100">
+        <button type="button" onclick="window.closeProcessPayoutDrawer()" class="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 ">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
     <form id="cora-process-payout-form" onsubmit="handleProcessPayoutSubmit(event)" class="p-5 space-y-4 flex-1 overflow-y-auto text-xs">
         <!-- Sync Shift Dropdown -->
         <div class="space-y-1">
-            <label class="font-bold text-zinc-700 dark:text-zinc-300">Sync Completed Booking / Shift</label>
-            <select id="payout-shift-sync" onchange="window.coraSyncShiftPayout(this)" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="font-bold text-zinc-700 ">Sync Completed Booking / Shift</label>
+            <select id="payout-shift-sync" onchange="window.coraSyncShiftPayout(this)" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
                 <option value="">-- Manual Entry --</option>
             </select>
         </div>
 
         <div class="space-y-1">
-            <label class="font-bold text-zinc-700 dark:text-zinc-300">Recipient Name</label>
-            <input type="text" name="payout_recipient" required placeholder="e.g. Rohit Sharma" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="font-bold text-zinc-700 ">Recipient Name</label>
+            <input type="text" name="payout_recipient" required placeholder="e.g. Rohit Sharma" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
             <div class="space-y-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Recipient Role</label>
-                <select name="payout_role" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">Recipient Role</label>
+                <select name="payout_role" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
                     <option value="agent">Co-Agent / Broker</option>
                     <option value="photographer">Second Photographer</option>
                     <option value="editor">Editor</option>
@@ -2067,8 +2067,8 @@ aside[id$="-drawer"].collapsed {
                 </select>
             </div>
             <div class="space-y-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Industry Sector</label>
-                <select name="payout_industry" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">Industry Sector</label>
+                <select name="payout_industry" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
                     <option value="real_estate">Real Estate Ops</option>
                     <option value="studio">Studio Production</option>
                 </select>
@@ -2076,23 +2076,23 @@ aside[id$="-drawer"].collapsed {
         </div>
         <div class="grid grid-cols-3 gap-3">
             <div class="space-y-1 col-span-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Base Share (₹)</label>
-                <input type="number" name="payout_amount" required placeholder="15000" oninput="calculatePayoutTDS()" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">Base Share (₹)</label>
+                <input type="number" name="payout_amount" required placeholder="15000" oninput="calculatePayoutTDS()" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
             </div>
             <div class="space-y-1 col-span-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">Split %</label>
-                <input type="number" name="payout_split" value="100" min="1" max="100" required oninput="calculatePayoutTDS()" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">Split %</label>
+                <input type="number" name="payout_split" value="100" min="1" max="100" required oninput="calculatePayoutTDS()" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
             </div>
             <div class="space-y-1 col-span-1">
-                <label class="font-bold text-zinc-700 dark:text-zinc-300">TDS / WHT (%)</label>
-                <select name="payout_tds" onchange="calculatePayoutTDS()" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="font-bold text-zinc-700 ">TDS / WHT (%)</label>
+                <select name="payout_tds" onchange="calculatePayoutTDS()" class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none">
                     <option value="10">10% TDS (Sec 194J)</option>
                     <option value="2">2% TDS (Sec 194C)</option>
                     <option value="0">No TDS</option>
                 </select>
             </div>
         </div>
-        <div class="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl space-y-2 border border-zinc-100 dark:border-zinc-800/80">
+        <div class="bg-zinc-50 p-4 rounded-2xl space-y-2 border border-zinc-100 ">
             <div class="flex justify-between font-semibold text-zinc-500">
                 <span>Gross Share:</span>
                 <span id="payout-calc-gross">₹0</span>
@@ -2103,38 +2103,38 @@ aside[id$="-drawer"].collapsed {
             </div>
             <div class="flex justify-between font-semibold text-zinc-500">
                 <span>Withholding Tax (TDS):</span>
-                <span id="payout-calc-tds" class="text-zinc-900 dark:text-zinc-100 font-extrabold">- ₹0</span>
+                <span id="payout-calc-tds" class="text-zinc-900 font-extrabold">- ₹0</span>
             </div>
-            <div class="pt-2 border-t border-zinc-200 dark:border-zinc-800 flex justify-between font-extrabold text-sm text-zinc-900 dark:text-zinc-100">
+            <div class="pt-2 border-t border-zinc-200 flex justify-between font-extrabold text-sm text-zinc-900 ">
                 <span>Net Disbursed:</span>
                 <span id="payout-calc-net">₹0</span>
             </div>
         </div>
         <div class="space-y-1">
-            <label class="font-bold text-zinc-700 dark:text-zinc-300">Notes / Transaction Reference</label>
-            <textarea name="payout_notes" rows="2" placeholder="e.g. Split commission for Sunset Villa listing." class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none resize-none"></textarea>
+            <label class="font-bold text-zinc-700 ">Notes / Transaction Reference</label>
+            <textarea name="payout_notes" rows="2" placeholder="e.g. Split commission for Sunset Villa listing." class="w-full bg-zinc-50 border-0 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none resize-none"></textarea>
         </div>
-        <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-end gap-2">
-            <button type="button" onclick="window.closeProcessPayoutDrawer()" class="px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold">Cancel</button>
+        <div class="pt-4 border-t border-zinc-200 flex justify-end gap-2">
+            <button type="button" onclick="window.closeProcessPayoutDrawer()" class="px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-700 font-bold">Cancel</button>
             <button type="submit" class="px-5 py-2.5 rounded-xl bg-zinc-900 text-white font-bold">Process & Payout</button>
         </div>
     </form>
 </aside>
 
 <!-- 4. FINANCIAL REPORTS & EMAIL AUTOMATION DRAWER -->
-<aside id="cora-financial-reports-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[480px] max-w-[96vw] bg-white dark:bg-zinc-900 shadow-2xl flex flex-col select-none" style="border-left:1px solid #f4f4f5;">
+<aside id="cora-financial-reports-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[480px] max-w-[96vw] bg-white shadow-2xl flex flex-col select-none" style="border-left:1px solid #f4f4f5;">
     <!-- Header -->
     <div class="px-5 py-4 flex items-center justify-between" style="border-bottom:1px solid #f4f4f5;">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 shrink-0">
+            <div class="w-8 h-8 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-600 shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
             </div>
             <div>
-                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Report Automation</h3>
-                <p class="text-[10px] text-zinc-500 dark:text-zinc-400">Schedule &amp; deliver financial reports</p>
+                <h3 class="text-sm font-bold text-zinc-900 ">Report Automation</h3>
+                <p class="text-[10px] text-zinc-500 ">Schedule &amp; deliver financial reports</p>
             </div>
         </div>
-        <button type="button" onclick="window.closeFinancialReportsDrawer()" class="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+        <button type="button" onclick="window.closeFinancialReportsDrawer()" class="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 transition-colors">
             <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
@@ -2145,13 +2145,13 @@ aside[id$="-drawer"].collapsed {
         <!-- Section 1: Delivery Frequency -->
         <div class="space-y-2">
             <div class="flex items-center gap-2 mb-3">
-                <span class="w-1 h-4 rounded-full bg-zinc-900 dark:bg-zinc-100 shrink-0"></span>
-                <h4 class="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Delivery Schedule</h4>
+                <span class="w-1 h-4 rounded-full bg-zinc-900 shrink-0"></span>
+                <h4 class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest">Delivery Schedule</h4>
             </div>
             <!-- Daily -->
             <div class="cora-freq-toggle" id="freq-daily" onclick="window.coraToggleFreq('daily')">
                 <div class="flex items-center gap-3">
-                    <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </div>
                     <div>
@@ -2164,7 +2164,7 @@ aside[id$="-drawer"].collapsed {
             <!-- Weekly -->
             <div class="cora-freq-toggle" id="freq-weekly" onclick="window.coraToggleFreq('weekly')">
                 <div class="flex items-center gap-3">
-                    <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
                     <div>
@@ -2177,7 +2177,7 @@ aside[id$="-drawer"].collapsed {
             <!-- Monthly -->
             <div class="cora-freq-toggle" id="freq-monthly" onclick="window.coraToggleFreq('monthly')">
                 <div class="flex items-center gap-3">
-                    <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                     </div>
                     <div>
@@ -2190,7 +2190,7 @@ aside[id$="-drawer"].collapsed {
             <!-- Quarterly -->
             <div class="cora-freq-toggle" id="freq-quarterly" onclick="window.coraToggleFreq('quarterly')">
                 <div class="flex items-center gap-3">
-                    <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                     </div>
                     <div>
@@ -2203,7 +2203,7 @@ aside[id$="-drawer"].collapsed {
             <!-- Custom -->
             <div class="cora-freq-toggle" id="freq-custom" onclick="window.coraToggleFreq('custom')">
                 <div class="flex items-center gap-3">
-                    <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"></path></svg>
                     </div>
                     <div>
@@ -2214,7 +2214,7 @@ aside[id$="-drawer"].collapsed {
                 <div class="cora-switch" id="switch-custom"></div>
             </div>
             <div id="cora-custom-cron-wrap" class="hidden">
-                <input type="text" id="custom-cron-expr" placeholder="e.g. 0 8 * * 1  (Mon 8am)" class="w-full bg-zinc-50 dark:bg-zinc-800 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none font-mono">
+                <input type="text" id="custom-cron-expr" placeholder="e.g. 0 8 * * 1  (Mon 8am)" class="w-full bg-zinc-50 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none font-mono">
                 <p class="text-[10px] text-zinc-400 mt-1.5">5-field cron: minute hour day month weekday</p>
             </div>
         </div>
@@ -2224,13 +2224,13 @@ aside[id$="-drawer"].collapsed {
         <!-- Section 2: Recipients -->
         <div class="space-y-2">
             <div class="flex items-center gap-2 mb-3">
-                <span class="w-1 h-4 rounded-full bg-zinc-900 dark:bg-zinc-100 shrink-0"></span>
-                <h4 class="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Recipients</h4>
+                <span class="w-1 h-4 rounded-full bg-zinc-900 shrink-0"></span>
+                <h4 class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest">Recipients</h4>
             </div>
             <div class="cora-chip-container" id="cora-email-chips" onclick="document.getElementById('cora-email-chip-input').focus()">
                 <input type="text" id="cora-email-chip-input" class="cora-chip-input" placeholder="Add email &amp; press Enter...">
             </div>
-            <p class="text-[10px] text-zinc-400">Press <kbd class="px-1 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded text-[9px] font-mono">Enter</kbd> or <kbd class="px-1 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded text-[9px] font-mono">,</kbd> after each email</p>
+            <p class="text-[10px] text-zinc-400">Press <kbd class="px-1 py-0.5 bg-zinc-100 rounded text-[9px] font-mono">Enter</kbd> or <kbd class="px-1 py-0.5 bg-zinc-100 rounded text-[9px] font-mono">,</kbd> after each email</p>
         </div>
 
         <div style="height:1px;background:#f4f4f5;"></div>
@@ -2238,26 +2238,26 @@ aside[id$="-drawer"].collapsed {
         <!-- Section 3: Report Contents -->
         <div class="space-y-2">
             <div class="flex items-center gap-2 mb-3">
-                <span class="w-1 h-4 rounded-full bg-zinc-900 dark:bg-zinc-100 shrink-0"></span>
-                <h4 class="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Report Contents</h4>
+                <span class="w-1 h-4 rounded-full bg-zinc-900 shrink-0"></span>
+                <h4 class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest">Report Contents</h4>
             </div>
-            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 cursor-pointer" onclick="var sw=this.querySelector('.cora-switch'); var hidden=this.querySelector('input[type=checkbox]'); hidden.checked=!hidden.checked; sw.classList.toggle('on', hidden.checked);">
-                <div><div class="font-semibold text-zinc-800 dark:text-zinc-200 text-[11px]">Inline HTML KPI Summary</div><div class="text-[10px] text-zinc-400 mt-0.5">Key numbers right inside the email body</div></div>
+            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-zinc-50 cursor-pointer" onclick="var sw=this.querySelector('.cora-switch'); var hidden=this.querySelector('input[type=checkbox]'); hidden.checked=!hidden.checked; sw.classList.toggle('on', hidden.checked);">
+                <div><div class="font-semibold text-zinc-800 text-[11px]">Inline HTML KPI Summary</div><div class="text-[10px] text-zinc-400 mt-0.5">Key numbers right inside the email body</div></div>
                 <input type="checkbox" name="opt_inline_summary" id="opt_inline_summary" checked class="sr-only">
                 <div class="cora-switch on"></div>
             </label>
-            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 cursor-pointer" onclick="var sw=this.querySelector('.cora-switch'); var hidden=this.querySelector('input[type=checkbox]'); hidden.checked=!hidden.checked; sw.classList.toggle('on', hidden.checked);">
-                <div><div class="font-semibold text-zinc-800 dark:text-zinc-200 text-[11px]">Attach PDF Statement</div><div class="text-[10px] text-zinc-400 mt-0.5">Full financial statement PDF</div></div>
+            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-zinc-50 cursor-pointer" onclick="var sw=this.querySelector('.cora-switch'); var hidden=this.querySelector('input[type=checkbox]'); hidden.checked=!hidden.checked; sw.classList.toggle('on', hidden.checked);">
+                <div><div class="font-semibold text-zinc-800 text-[11px]">Attach PDF Statement</div><div class="text-[10px] text-zinc-400 mt-0.5">Full financial statement PDF</div></div>
                 <input type="checkbox" name="opt_attach_pdf" id="opt_attach_pdf" checked class="sr-only">
                 <div class="cora-switch on"></div>
             </label>
-            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 cursor-pointer" onclick="var sw=this.querySelector('.cora-switch'); var hidden=this.querySelector('input[type=checkbox]'); hidden.checked=!hidden.checked; sw.classList.toggle('on', hidden.checked);">
-                <div><div class="font-semibold text-zinc-800 dark:text-zinc-200 text-[11px]">Attach CSV Ledger Export</div><div class="text-[10px] text-zinc-400 mt-0.5">Raw data for accountant tools</div></div>
+            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-zinc-50 cursor-pointer" onclick="var sw=this.querySelector('.cora-switch'); var hidden=this.querySelector('input[type=checkbox]'); hidden.checked=!hidden.checked; sw.classList.toggle('on', hidden.checked);">
+                <div><div class="font-semibold text-zinc-800 text-[11px]">Attach CSV Ledger Export</div><div class="text-[10px] text-zinc-400 mt-0.5">Raw data for accountant tools</div></div>
                 <input type="checkbox" name="opt_attach_csv" id="opt_attach_csv" class="sr-only">
                 <div class="cora-switch"></div>
             </label>
-            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 cursor-pointer" onclick="var sw=this.querySelector('.cora-switch'); var hidden=this.querySelector('input[type=checkbox]'); hidden.checked=!hidden.checked; sw.classList.toggle('on', hidden.checked);">
-                <div><div class="font-semibold text-zinc-800 dark:text-zinc-200 text-[11px]">Include Revenue Chart Image</div><div class="text-[10px] text-zinc-400 mt-0.5">Bar chart visual snapshot</div></div>
+            <label class="flex items-center justify-between gap-3 p-3 rounded-xl bg-zinc-50 cursor-pointer" onclick="var sw=this.querySelector('.cora-switch'); var hidden=this.querySelector('input[type=checkbox]'); hidden.checked=!hidden.checked; sw.classList.toggle('on', hidden.checked);">
+                <div><div class="font-semibold text-zinc-800 text-[11px]">Include Revenue Chart Image</div><div class="text-[10px] text-zinc-400 mt-0.5">Bar chart visual snapshot</div></div>
                 <input type="checkbox" name="opt_include_chart" id="opt_include_chart" checked class="sr-only">
                 <div class="cora-switch on"></div>
             </label>
@@ -2268,13 +2268,13 @@ aside[id$="-drawer"].collapsed {
         <!-- Section 4: Manual Export -->
         <div class="space-y-3">
             <div class="flex items-center gap-2 mb-3">
-                <span class="w-1 h-4 rounded-full bg-zinc-900 dark:bg-zinc-100 shrink-0"></span>
-                <h4 class="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Manual Export</h4>
+                <span class="w-1 h-4 rounded-full bg-zinc-900 shrink-0"></span>
+                <h4 class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest">Manual Export</h4>
             </div>
             <div class="grid grid-cols-2 gap-2">
                 <div class="space-y-1">
                     <label class="font-semibold text-zinc-500 text-[10px] uppercase tracking-wide">Period</label>
-                    <select id="report_period" name="report_period" class="w-full bg-zinc-50 dark:bg-zinc-800 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none font-medium">
+                    <select id="report_period" name="report_period" class="w-full bg-zinc-50 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none font-medium">
                         <option value="this_month">This Month</option>
                         <option value="last_month">Last Month</option>
                         <option value="this_quarter">This Quarter</option>
@@ -2286,13 +2286,13 @@ aside[id$="-drawer"].collapsed {
                 </div>
                 <div class="space-y-1">
                     <label class="font-semibold text-zinc-500 text-[10px] uppercase tracking-wide">Format</label>
-                    <select id="report_format" name="report_format" class="w-full bg-zinc-50 dark:bg-zinc-800 rounded-xl p-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none font-medium">
+                    <select id="report_format" name="report_format" class="w-full bg-zinc-50 rounded-xl p-2.5 text-xs text-zinc-900 focus:outline-none font-medium">
                         <option value="pdf">PDF Statement</option>
                         <option value="csv">CSV Export</option>
                     </select>
                 </div>
             </div>
-            <button type="button" onclick="window.triggerReportGeneration()" class="w-full py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold text-xs transition-colors flex items-center justify-center gap-2">
+            <button type="button" onclick="window.triggerReportGeneration()" class="w-full py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-bold text-xs transition-colors flex items-center justify-center gap-2">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 Generate &amp; Download
             </button>
@@ -2302,11 +2302,11 @@ aside[id$="-drawer"].collapsed {
 
     <!-- Footer -->
     <div class="px-5 py-4 flex items-center gap-2" style="border-top:1px solid #f4f4f5;">
-        <button type="button" onclick="window.coraTestSendReport()" class="flex-1 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold text-xs transition-colors flex items-center justify-center gap-2">
+        <button type="button" onclick="window.coraTestSendReport()" class="flex-1 py-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 text-zinc-700 font-bold text-xs transition-colors flex items-center justify-center gap-2">
             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="22 2 11 13"></polyline><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             Test Send
         </button>
-        <button type="button" onclick="window.coraSaveReportSchedule()" class="flex-1 py-2.5 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold text-xs transition-colors hover:bg-black dark:hover:bg-white flex items-center justify-center gap-2">
+        <button type="button" onclick="window.coraSaveReportSchedule()" class="flex-1 py-2.5 rounded-xl bg-zinc-900 text-white font-bold text-xs transition-colors hover:bg-black flex items-center justify-center gap-2">
             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
             Save Schedule
         </button>
@@ -2576,14 +2576,14 @@ aside[id$="-drawer"].collapsed {
 
         var tabs = document.querySelectorAll('.cora-financial-tab');
         for (var i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove('bg-zinc-900', 'text-white', 'dark:bg-zinc-100', 'dark:text-zinc-900', 'shadow-xs');
-            tabs[i].classList.add('text-zinc-600', 'dark:text-zinc-400', 'hover:bg-zinc-100', 'dark:hover:bg-zinc-800');
+            tabs[i].classList.remove('bg-zinc-900', 'text-white', '', '', 'shadow-xs');
+            tabs[i].classList.add('text-zinc-600', '', 'hover:bg-zinc-100', '');
         }
         
         var activeBtn = document.getElementById('btn-tab-' + tabId);
         if (activeBtn) {
-            activeBtn.classList.add('bg-zinc-900', 'text-white', 'dark:bg-zinc-100', 'dark:text-zinc-900', 'shadow-xs');
-            activeBtn.classList.remove('text-zinc-600', 'dark:text-zinc-400', 'hover:bg-zinc-100', 'dark:hover:bg-zinc-800');
+            activeBtn.classList.add('bg-zinc-900', 'text-white', '', '', 'shadow-xs');
+            activeBtn.classList.remove('text-zinc-600', '', 'hover:bg-zinc-100', '');
         }
     };
 
@@ -2593,14 +2593,14 @@ aside[id$="-drawer"].collapsed {
         window.currentLedgerPill = catKey || 'all';
         var pills = document.querySelectorAll('.fin-pill-filter');
         for (var i = 0; i < pills.length; i++) {
-            pills[i].classList.remove('bg-zinc-900', 'text-white', 'dark:bg-zinc-100', 'dark:text-zinc-900');
-            pills[i].classList.add('bg-zinc-50', 'dark:bg-zinc-800', 'text-zinc-600', 'dark:text-zinc-400', 'hover:bg-zinc-100', 'dark:hover:bg-zinc-700');
+            pills[i].classList.remove('bg-zinc-900', 'text-white', '', '');
+            pills[i].classList.add('bg-zinc-50', '', 'text-zinc-600', '', 'hover:bg-zinc-100', '');
             
             // Highlight matching pill
             var onclickAttr = pills[i].getAttribute('onclick') || '';
             if (onclickAttr.indexOf("'" + catKey + "'") !== -1 || (catKey === 'all' && onclickAttr.indexOf("'all'") !== -1)) {
-                pills[i].classList.add('bg-zinc-900', 'text-white', 'dark:bg-zinc-100', 'dark:text-zinc-900');
-                pills[i].classList.remove('bg-zinc-50', 'dark:bg-zinc-800', 'text-zinc-600', 'dark:text-zinc-400', 'hover:bg-zinc-100', 'dark:hover:bg-zinc-700');
+                pills[i].classList.add('bg-zinc-900', 'text-white', '', '');
+                pills[i].classList.remove('bg-zinc-50', '', 'text-zinc-600', '', 'hover:bg-zinc-100', '');
             }
         }
         
@@ -2670,22 +2670,22 @@ aside[id$="-drawer"].collapsed {
                         if (window.coraShowToast) window.coraShowToast('Ledger entry saved to database.', 'success');
                         
                         var tr = document.createElement('tr');
-                        tr.className = 'cora-table-row-interact hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors';
+                        tr.className = 'cora-table-row-interact hover:bg-zinc-50/70 transition-colors';
                         var isInflow = (type === 'inflow');
                         var dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
                         tr.innerHTML = `
-                            <td class="px-5 py-4 text-zinc-800 dark:text-zinc-200 font-semibold">${dateStr}</td>
-                            <td class="px-5 py-4 font-bold text-zinc-900 dark:text-zinc-100">${desc}</td>
-                            <td class="px-5 py-4"><span class="px-3 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold text-[11px]">${cat}</span></td>
+                            <td class="px-5 py-4 text-zinc-800 font-semibold">${dateStr}</td>
+                            <td class="px-5 py-4 font-bold text-zinc-900 ">${desc}</td>
+                            <td class="px-5 py-4"><span class="px-3 py-1 rounded-lg bg-zinc-100 text-zinc-700 font-semibold text-[11px]">${cat}</span></td>
                             <td class="px-5 py-4">
-                                <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 dark:bg-zinc-800 ${isInflow ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-600 dark:text-zinc-400'} flex items-center gap-1 w-fit">
-                                    <span class="${isInflow ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-500'}">${isInflow ? '↑' : '↓'}</span> ${isInflow ? 'Cash Inflow' : 'Cash Outflow'}
+                                <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 ${isInflow ? 'text-zinc-900 ' : 'text-zinc-600 '} flex items-center gap-1 w-fit">
+                                    <span class="${isInflow ? 'text-zinc-900 ' : 'text-zinc-500'}">${isInflow ? '↑' : '↓'}</span> ${isInflow ? 'Cash Inflow' : 'Cash Outflow'}
                                 </span>
                             </td>
-                            <td class="px-5 py-4 font-extrabold text-zinc-900 dark:text-zinc-100 text-sm">₹${Number(amount).toLocaleString('en-IN')}</td>
-                            <td class="px-5 py-4"><span class="px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">${isInflow ? 'Received' : 'Paid'}</span></td>
-                            <td class="px-5 py-4 text-right"><button type="button" onclick="window.coraShowToast('Viewing details', 'info')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-bold text-base">···</button></td>
+                            <td class="px-5 py-4 font-extrabold text-zinc-900 text-sm">₹${Number(amount).toLocaleString('en-IN')}</td>
+                            <td class="px-5 py-4"><span class="px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 text-zinc-700 ">${isInflow ? 'Received' : 'Paid'}</span></td>
+                            <td class="px-5 py-4 text-right"><button type="button" onclick="window.coraShowToast('Viewing details', 'info')" class="text-zinc-400 hover:text-zinc-900 font-bold text-base">···</button></td>
                         `;
 
                         var tbody = document.getElementById('cora-financial-table-body');
@@ -2780,21 +2780,21 @@ aside[id$="-drawer"].collapsed {
                         
                         var net = (amount * (split / 100)) * (1 - (tds / 100));
                         var tr = document.createElement('tr');
-                        tr.className = 'cora-table-row-interact hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors';
+                        tr.className = 'cora-table-row-interact hover:bg-zinc-50/70 transition-colors';
                         var dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
                         tr.innerHTML = `
-                            <td class="px-5 py-4 text-zinc-800 dark:text-zinc-200 font-semibold">${dateStr}</td>
-                            <td class="px-5 py-4 font-bold text-zinc-900 dark:text-zinc-100">Payout to ${recipient} (${role.toUpperCase()})</td>
-                            <td class="px-5 py-4"><span class="px-3 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold text-[11px]">Agent / Crew Payouts</span></td>
+                            <td class="px-5 py-4 text-zinc-800 font-semibold">${dateStr}</td>
+                            <td class="px-5 py-4 font-bold text-zinc-900 ">Payout to ${recipient} (${role.toUpperCase()})</td>
+                            <td class="px-5 py-4"><span class="px-3 py-1 rounded-lg bg-zinc-100 text-zinc-700 font-semibold text-[11px]">Agent / Crew Payouts</span></td>
                             <td class="px-5 py-4">
-                                <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 flex items-center gap-1 w-fit">
+                                <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 text-zinc-600 flex items-center gap-1 w-fit">
                                     <span class="text-zinc-500">↓</span> Cash Outflow
                                 </span>
                             </td>
-                            <td class="px-5 py-4 font-extrabold text-zinc-900 dark:text-zinc-100 text-sm">₹${Number(net).toLocaleString('en-IN')}</td>
-                            <td class="px-5 py-4"><span class="px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Paid</span></td>
-                            <td class="px-5 py-4 text-right"><button type="button" onclick="window.coraShowToast('Viewing details', 'info')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-bold text-base">···</button></td>
+                            <td class="px-5 py-4 font-extrabold text-zinc-900 text-sm">₹${Number(net).toLocaleString('en-IN')}</td>
+                            <td class="px-5 py-4"><span class="px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 text-zinc-700 ">Paid</span></td>
+                            <td class="px-5 py-4 text-right"><button type="button" onclick="window.coraShowToast('Viewing details', 'info')" class="text-zinc-400 hover:text-zinc-900 font-bold text-base">···</button></td>
                         `;
 
                         var tbody = document.getElementById('cora-financial-table-body');
@@ -3239,14 +3239,14 @@ aside[id$="-drawer"].collapsed {
                         if (row) {
                             var statusCol = row.cells[5];
                             if (statusCol) {
-                                statusCol.innerHTML = '<span class="px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 dark:bg-zinc-850 text-zinc-800 dark:text-zinc-200">Paid</span>';
+                                statusCol.innerHTML = '<span class="px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-100 text-zinc-800 ">Paid</span>';
                             }
                             var actionCol = row.cells[6];
                             if (actionCol) {
                                 var shareToken = res.data.invoice ? (res.data.invoice.share_token || '') : '';
                                 actionCol.innerHTML = `
                                     <div class="flex items-center justify-end gap-2">
-                                        <button type="button" onclick="window.coraShowToast('Invoice share token: ${shareToken}', 'info')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-bold text-base px-1">···</button>
+                                        <button type="button" onclick="window.coraShowToast('Invoice share token: ${shareToken}', 'info')" class="text-zinc-400 hover:text-zinc-900 font-bold text-base px-1">···</button>
                                     </div>
                                 `;
                             }
@@ -3292,9 +3292,9 @@ aside[id$="-drawer"].collapsed {
                     var trendEl = document.getElementById('cora-revenue-growth-trend');
                     if (trendEl) {
                         if (kpi.inflow > 0) {
-                            trendEl.innerHTML = '<span class="text-emerald-600 dark:text-emerald-400">↑ 12.4% vs last period</span>';
+                            trendEl.innerHTML = '<span class="text-emerald-600 ">↑ 12.4% vs last period</span>';
                         } else {
-                            trendEl.innerHTML = '<span class="text-zinc-400 dark:text-zinc-500">No change vs last period</span>';
+                            trendEl.innerHTML = '<span class="text-zinc-400 ">No change vs last period</span>';
                         }
                     }
                     
@@ -3469,7 +3469,7 @@ aside[id$="-drawer"].collapsed {
                 }
                 if (content) {
                     content.innerHTML = `
-                        <div class="font-bold text-[11px] text-zinc-900 dark:text-zinc-100">Scanning ${file.name}...</div>
+                        <div class="font-bold text-[11px] text-zinc-900 ">Scanning ${file.name}...</div>
                         <div class="text-[9px] text-zinc-500 font-semibold">AI Coworker parsing metadata</div>
                     `;
                 }

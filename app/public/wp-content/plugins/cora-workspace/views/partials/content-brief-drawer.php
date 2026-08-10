@@ -1,5 +1,5 @@
-<aside id="cora-content-brief-sheet" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
-    <div class="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto my-2.5 shrink-0"></div>
+<aside id="cora-content-brief-sheet" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 bg-white shadow-2xl flex flex-col">
+    <div class="w-12 h-1.5 bg-zinc-300 rounded-full mx-auto my-2.5 shrink-0"></div>
     <div class="px-6 py-3 border-b border-zinc-200 flex justify-between items-center bg-zinc-50 shrink-0">
         <div>
             <h2 class="text-lg font-bold text-zinc-900">Content Brief</h2>

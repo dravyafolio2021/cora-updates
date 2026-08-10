@@ -205,7 +205,7 @@ jQuery(document).ready(function($) {
         }
 
         const toastHtml = `
-            <div id="${toastId}" class="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 text-xs font-semibold px-4 py-3 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 flex items-center gap-3 pointer-events-auto transition-all duration-300 transform translate-y-3 opacity-0 select-none max-w-sm">
+            <div id="${toastId}" class="bg-white text-zinc-800 text-xs font-semibold px-4 py-3 rounded-xl shadow-lg border border-zinc-200 flex items-center gap-3 pointer-events-auto transition-all duration-300 transform translate-y-3 opacity-0 select-none max-w-sm">
                 ${iconHtml}
                 <span class="flex-1">${message}</span>
             </div>
@@ -546,9 +546,9 @@ jQuery(document).ready(function($) {
                 if (!$overlay.length) {
                     $overlay = $(`
                         <div id="cora-report-preview-overlay" class="fixed inset-0 z-[10000] bg-zinc-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-                            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
-                                <div class="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/40">
-                                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                            <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+                                <div class="p-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+                                    <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
                                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                             <polyline points="14 2 14 8 20 8"></polyline>
@@ -557,14 +557,14 @@ jQuery(document).ready(function($) {
                                         </svg>
                                         Financial Report Summary
                                     </h3>
-                                    <button type="button" onclick="$('#cora-report-preview-overlay').addClass('hidden')" class="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">
+                                    <button type="button" onclick="$('#cora-report-preview-overlay').addClass('hidden')" class="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200 transition-colors">
                                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                     </button>
                                 </div>
                                 <div id="cora-report-preview-content" class="p-5 overflow-y-auto flex-1 text-xs"></div>
-                                <div class="p-3.5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 flex items-center justify-end gap-2">
-                                    <button type="button" onclick="window.print()" class="px-3 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold text-xs rounded-lg hover:bg-zinc-800 transition-colors">Print Report</button>
-                                    <button type="button" onclick="$('#cora-report-preview-overlay').addClass('hidden')" class="px-3 py-1.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold text-xs rounded-lg hover:bg-zinc-50 transition-colors">Close</button>
+                                <div class="p-3.5 border-t border-zinc-200 bg-zinc-50/50 flex items-center justify-end gap-2">
+                                    <button type="button" onclick="window.print()" class="px-3 py-1.5 bg-zinc-900 text-white font-semibold text-xs rounded-lg hover:bg-zinc-800 transition-colors">Print Report</button>
+                                    <button type="button" onclick="$('#cora-report-preview-overlay').addClass('hidden')" class="px-3 py-1.5 bg-white border border-zinc-200 text-zinc-700 font-semibold text-xs rounded-lg hover:bg-zinc-50 transition-colors">Close</button>
                                 </div>
                             </div>
                         </div>
@@ -1033,11 +1033,11 @@ jQuery(document).ready(function($) {
         const quickBtn = $('#cora-quick-ai-btn');
         if (show) {
             sidebar.removeClass('collapsed');
-            quickBtn.addClass('bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700');
+            quickBtn.addClass('bg-zinc-100 border-zinc-300');
             $('#cora-sidebar-chat-input').focus();
         } else {
             sidebar.addClass('collapsed');
-            quickBtn.removeClass('bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700');
+            quickBtn.removeClass('bg-zinc-100 border-zinc-300');
         }
     };
 
@@ -1109,17 +1109,17 @@ jQuery(document).ready(function($) {
         // Appending typing loader
         const typingId = 'typing-' + Date.now();
         chat.append(`
-            <div class="chat-bubble ai animate-pulse p-3.5 space-y-2 rounded-xl bg-zinc-50 border border-zinc-100 dark:bg-zinc-900/60 dark:border-zinc-800" id="${typingId}">
+            <div class="chat-bubble ai animate-pulse p-3.5 space-y-2 rounded-xl bg-zinc-50 border border-zinc-100" id="${typingId}">
                 <div class="flex items-center gap-1.5 mb-1 select-none">
-                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 animate-bounce" style="animation-delay: 0ms;"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 animate-bounce" style="animation-delay: 150ms;"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 animate-bounce" style="animation-delay: 300ms;"></span>
-                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider ml-1">Cora is thinking</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider ml-1">Cora is thinking</span>
                 </div>
                 <div class="space-y-1.5 w-44">
-                    <div class="h-2 bg-zinc-200 dark:bg-zinc-800 rounded w-5/6"></div>
-                    <div class="h-2 bg-zinc-200 dark:bg-zinc-800 rounded w-full"></div>
-                    <div class="h-2 bg-zinc-200 dark:bg-zinc-800 rounded w-2/3"></div>
+                    <div class="h-2 bg-zinc-200 rounded w-5/6"></div>
+                    <div class="h-2 bg-zinc-200 rounded w-full"></div>
+                    <div class="h-2 bg-zinc-200 rounded w-2/3"></div>
                 </div>
             </div>
         `);
@@ -1197,35 +1197,6 @@ jQuery(document).ready(function($) {
         }
     });
 
-    // 12. Theme Toggle & Persistence
-    function toggleTheme(isDark) {
-        if (isDark) {
-            $('#cora-workspace').addClass('cora-dark-theme');
-            $('#cora-theme-toggle-text').text('Light Theme');
-            // Sun icon for switching back to light mode
-            $('#cora-theme-icon').html('<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>');
-            try {
-                localStorage.setItem('cora-theme', 'dark');
-            } catch(e) {}
-        } else {
-            $('#cora-workspace').removeClass('cora-dark-theme');
-            $('#cora-theme-toggle-text').text('Dark Theme');
-            // Moon icon for switching to dark mode
-            $('#cora-theme-icon').html('<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>');
-            try {
-                localStorage.setItem('cora-theme', 'light');
-            } catch(e) {}
-        }
-    }
-
-    // Initialize theme state - Force light theme since it's locked for now
-    toggleTheme(false);
-
-    // Click handler for theme toggle button (now locked/coming soon)
-    $('#cora-theme-toggle-btn').on('click', function(e) {
-        window.coraShowToast('Dark Theme is coming soon. Stay tuned!');
-        e.stopPropagation();
-    });
 
     // 13. AI Model Selector — silently save user's model preference on change
     $('#cora-ai-model-selector').on('change', function() {
@@ -6783,7 +6754,7 @@ jQuery(document).ready(function($) {
                         let chk = $(`.cora-meta-tag-checkbox[value="${tagId}"], .cora-meta-tag-checkbox[data-name="${tagId}"]`);
                         if (chk.length === 0) {
                             const newTagOpt = $(`
-                                <label class="flex items-center gap-2.5 p-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer text-xs text-zinc-850 dark:text-zinc-250 select-none">
+                                <label class="flex items-center gap-2.5 p-1.5 hover:bg-zinc-50 rounded-lg cursor-pointer text-xs text-zinc-850 select-none">
                                     <input type="checkbox" class="cora-meta-tag-checkbox rounded border-zinc-300 focus:ring-0 text-zinc-950" value="${tagId}" data-name="${tagId}" checked>
                                     <span>${tagId}</span>
                                 </label>
@@ -7520,7 +7491,7 @@ jQuery(document).ready(function($) {
         // Show/update badge
         let densityBadge = $('#cora-seo-density-badge');
         if (densityBadge.length === 0) {
-            $('#chk-indicator-density').parent().append('<span id="cora-seo-density-badge" class="ml-auto text-[10px] text-zinc-550 dark:text-zinc-400 font-mono font-bold">0.00%</span>');
+            $('#chk-indicator-density').parent().append('<span id="cora-seo-density-badge" class="ml-auto text-[10px] text-zinc-550 font-mono font-bold">0.00%</span>');
             densityBadge = $('#cora-seo-density-badge');
         }
         if (kw && words > 0) {
@@ -7535,12 +7506,12 @@ jQuery(document).ready(function($) {
         // Update Issues Badge
         const badge = $('#checklist-issues-badge');
         if (issues > 0) {
-            badge.removeClass('bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30')
-                 .addClass('bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border border-red-100/50 dark:border-red-900/30')
+            badge.removeClass('bg-emerald-50 text-emerald-600 border-emerald-100')
+                 .addClass('bg-red-50 text-red-650 border border-red-100/50')
                  .text(`${issues} ${issues === 1 ? 'Issue' : 'Issues'}`);
         } else {
-            badge.removeClass('bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border-red-100/50 dark:border-red-900/30')
-                 .addClass('bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30')
+            badge.removeClass('bg-red-50 text-red-650 border-red-100/50')
+                 .addClass('bg-emerald-50 text-emerald-600 border border-emerald-100')
                  .text('Optimal');
         }
 
@@ -7657,17 +7628,17 @@ jQuery(document).ready(function($) {
         const geoBadge = $('#geo-checklist-issues-badge');
         if (words > 0) {
             if (geoIssues > 0) {
-                geoBadge.removeClass('bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30')
-                        .addClass('bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border border-red-100/50 dark:border-red-900/30')
+                geoBadge.removeClass('bg-emerald-50 text-emerald-600 border-emerald-100')
+                        .addClass('bg-red-50 text-red-650 border border-red-100/50')
                         .text(`${geoIssues} ${geoIssues === 1 ? 'Issue' : 'Issues'}`);
             } else {
-                geoBadge.removeClass('bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border-red-100/50 dark:border-red-900/30')
-                        .addClass('bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30')
+                geoBadge.removeClass('bg-red-50 text-red-650 border-red-100/50')
+                        .addClass('bg-emerald-50 text-emerald-600 border border-emerald-100')
                         .text('Optimal');
             }
         } else {
-            geoBadge.removeClass('bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30')
-                    .addClass('bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border border-red-100/50 dark:border-red-900/30')
+            geoBadge.removeClass('bg-emerald-50 text-emerald-600 border-emerald-100')
+                    .addClass('bg-red-50 text-red-650 border border-red-100/50')
                     .text('4 Issues');
         }
 
@@ -9826,8 +9797,8 @@ jQuery(document).ready(function($) {
         $('.cora-settings-nav-item[data-settings-tab="' + tabKey + '"]').addClass('active');
         
         // Update mobile tab navigation active classes
-        $('.cora-settings-nav-mobile').removeClass('border-zinc-950 text-zinc-950 dark:border-white dark:text-white font-bold active-tab').addClass('border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-850 dark:hover:text-zinc-250');
-        $('.cora-settings-nav-mobile[data-settings-tab-mobile="' + tabKey + '"]').removeClass('border-transparent text-zinc-550 dark:text-zinc-400 hover:text-zinc-850 dark:hover:text-zinc-250').addClass('border-zinc-950 text-zinc-950 dark:border-white dark:text-white font-bold active-tab');
+        $('.cora-settings-nav-mobile').removeClass('border-zinc-950 text-zinc-950 font-bold active-tab').addClass('border-transparent text-zinc-550 hover:text-zinc-850');
+        $('.cora-settings-nav-mobile[data-settings-tab-mobile="' + tabKey + '"]').removeClass('border-transparent text-zinc-550 hover:text-zinc-850').addClass('border-zinc-950 text-zinc-950 font-bold active-tab');
 
         // Update active tab hidden input
         $('input[name="active_tab"]').val(tabKey);
@@ -10227,7 +10198,7 @@ jQuery(document).ready(function($) {
             preview.html('<img src="' + url + '" class="max-h-full max-w-full object-contain transition-transform group-hover:scale-102" alt="Logo Preview">');
             clearBtn.removeClass('hidden');
         } else {
-            preview.html('<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-650 dark:group-hover:text-zinc-300 transition-colors mb-1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span class="text-xs font-bold text-zinc-850 dark:text-zinc-200">Upload Agency Logo</span><span class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">Recommended size: 250x80px (PNG/JPG)</span>');
+            preview.html('<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-650 transition-colors mb-1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span class="text-xs font-bold text-zinc-850">Upload Agency Logo</span><span class="text-[10px] text-zinc-500 mt-1">Recommended size: 250x80px (PNG/JPG)</span>');
             clearBtn.addClass('hidden');
         }
     });
@@ -10368,34 +10339,34 @@ jQuery(document).ready(function($) {
         function openDropdown() {
             $dropdown.show();
             $arrow.css('transform', 'rotate(180deg)');
-            $trigger.addClass('border-zinc-400 dark:border-zinc-650');
+            $trigger.addClass('border-zinc-400');
             $searchInput.val('').trigger('input').focus();
             isOpen = true;
         }
         function closeDropdown() {
             $dropdown.hide();
             $arrow.css('transform', 'rotate(0deg)');
-            $trigger.removeClass('border-zinc-400 dark:border-zinc-650');
+            $trigger.removeClass('border-zinc-400');
             isOpen = false;
         }
 
         function setTriggerLabel(text, isPlaceholder) {
             $displayText.text(text);
             if (isPlaceholder) {
-                $displayText.addClass('text-zinc-400 dark:text-zinc-500').removeClass('text-zinc-800 dark:text-zinc-200');
+                $displayText.addClass('text-zinc-400').removeClass('text-zinc-800');
             } else {
-                $displayText.removeClass('text-zinc-400 dark:text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                $displayText.removeClass('text-zinc-400').addClass('text-zinc-800');
             }
         }
 
         function renderRepoItem(url, owner, repo, isCurrent) {
             var checkSvg = isCurrent
-                ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" class="text-zinc-900 dark:text-zinc-100 shrink-0 ml-auto"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" class="text-zinc-900 shrink-0 ml-auto"><polyline points="20 6 9 17 4 12"></polyline></svg>'
                 : '';
-            return '<div class="cora-repo-option-item hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-colors" data-url="' + url + '" data-name="' + owner + '/' + repo + '" data-current="' + isCurrent + '" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:11px;font-family:inherit;border:none !important;border-bottom:none !important;background:transparent;">' +
+            return '<div class="cora-repo-option-item hover:bg-zinc-50 transition-colors" data-url="' + url + '" data-name="' + owner + '/' + repo + '" data-current="' + isCurrent + '" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:11px;font-family:inherit;border:none !important;border-bottom:none !important;background:transparent;">' +
                 '<div style="flex:1;min-width:0;text-align:left;border:none !important;">' +
-                    '<span class="text-zinc-500 dark:text-zinc-450" style="font-size:10px;border:none !important;background:transparent;">' + owner + '/</span>' +
-                    '<span class="text-zinc-800 dark:text-zinc-200" style="font-weight:500;border:none !important;background:transparent;">' + repo + '</span>' +
+                    '<span class="text-zinc-500" style="font-size:10px;border:none !important;background:transparent;">' + owner + '/</span>' +
+                    '<span class="text-zinc-800" style="font-weight:500;border:none !important;background:transparent;">' + repo + '</span>' +
                 '</div>' + checkSvg +
             '</div>';
         }
@@ -10458,7 +10429,7 @@ jQuery(document).ready(function($) {
                 });
 
                 // "Enter manually" footer option
-                html += '<div class="cora-repo-option-item hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-colors" data-url="manual" data-name="manual" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:11px;font-family:inherit;border:none !important;border-top:1px solid #f4f4f5 !important;color:#71717a;background:transparent;">' +
+                html += '<div class="cora-repo-option-item hover:bg-zinc-50 transition-colors" data-url="manual" data-name="manual" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:11px;font-family:inherit;border:none !important;border-top:1px solid #f4f4f5 !important;color:#71717a;background:transparent;">' +
                     '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
                     'Enter URL manually...' +
                 '</div>';
@@ -10543,22 +10514,22 @@ jQuery(document).ready(function($) {
         function openBranchDropdown() {
             $dropdown.show();
             $arrow.css('transform', 'rotate(180deg)');
-            $trigger.addClass('border-zinc-400 dark:border-zinc-650');
+            $trigger.addClass('border-zinc-400');
             $searchInput.val('').trigger('input').focus();
             isOpen = true;
         }
         function closeBranchDropdown() {
             $dropdown.hide();
             $arrow.css('transform', 'rotate(0deg)');
-            $trigger.removeClass('border-zinc-400 dark:border-zinc-650');
+            $trigger.removeClass('border-zinc-400');
             isOpen = false;
         }
         function setBranchLabel(text, isPlaceholder) {
             $displayText.text(text);
             if (isPlaceholder) {
-                $displayText.addClass('text-zinc-400 dark:text-zinc-500').removeClass('text-zinc-800 dark:text-zinc-200');
+                $displayText.addClass('text-zinc-400').removeClass('text-zinc-800');
             } else {
-                $displayText.removeClass('text-zinc-400 dark:text-zinc-500').addClass('text-zinc-800 dark:text-zinc-200');
+                $displayText.removeClass('text-zinc-400').addClass('text-zinc-800');
             }
         }
 
@@ -10609,11 +10580,11 @@ jQuery(document).ready(function($) {
                         $hiddenInput.val(branch);
                     }
                     var checkSvg = isCur
-                        ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" class="text-zinc-900 dark:text-zinc-100 shrink-0 ml-auto"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                        ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" class="text-zinc-900 shrink-0 ml-auto"><polyline points="20 6 9 17 4 12"></polyline></svg>'
                         : '';
-                    html += '<div class="cora-branch-option-item hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-colors" data-branch="' + branch + '" data-current="' + isCur + '" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:11px;font-family:inherit;border:none !important;border-bottom:none !important;background:transparent;">' +
-                        '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-400 dark:text-zinc-550 shrink-0"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>' +
-                        '<span class="text-zinc-700 dark:text-zinc-300" style="font-weight:' + (isCur ? '600' : '400') + ';border:none !important;">' + branch + '</span>' +
+                    html += '<div class="cora-branch-option-item hover:bg-zinc-50 transition-colors" data-branch="' + branch + '" data-current="' + isCur + '" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:11px;font-family:inherit;border:none !important;border-bottom:none !important;background:transparent;">' +
+                        '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-400 shrink-0"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>' +
+                        '<span class="text-zinc-700" style="font-weight:' + (isCur ? '600' : '400') + ';border:none !important;">' + branch + '</span>' +
                         checkSvg +
                     '</div>';
                 });
@@ -10781,7 +10752,7 @@ jQuery(document).ready(function($) {
             } else {
                 // Add to dropdown list dynamically
                 const newTagOpt = $(`
-                    <label class="flex items-center gap-2.5 p-1.5 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg cursor-pointer text-xs text-zinc-850 dark:text-zinc-250 select-none">
+                    <label class="flex items-center gap-2.5 p-1.5 hover:bg-zinc-50 rounded-lg cursor-pointer text-xs text-zinc-850 select-none">
                         <input type="checkbox" class="cora-meta-tag-checkbox rounded border-zinc-300 focus:ring-0 text-zinc-950" value="${tagVal}" data-name="${tagVal}" checked>
                         <span>${tagVal}</span>
                     </label>
@@ -10833,7 +10804,7 @@ jQuery(document).ready(function($) {
             selected.push(val);
             
             const badge = $(`
-                <span class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded flex items-center gap-1.5 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">
+                <span class="px-2 py-0.5 bg-zinc-100 border border-zinc-200 rounded flex items-center gap-1.5 text-[10px] font-semibold text-zinc-700">
                     ${name}
                     <span class="cora-meta-remove-cat cursor-pointer text-zinc-400 hover:text-zinc-700" data-value="${val}">✕</span>
                 </span>
@@ -10843,7 +10814,7 @@ jQuery(document).ready(function($) {
         
         $('#cora-article-categories').val(selected);
         if (selected.length === 0) {
-            badgeContainer.html('<span class="text-zinc-350 dark:text-zinc-700">Select categories...</span>');
+            badgeContainer.html('<span class="text-zinc-350">Select categories...</span>');
         }
     };
 
@@ -10858,7 +10829,7 @@ jQuery(document).ready(function($) {
             selected.push(val);
             
             const badge = $(`
-                <span class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded flex items-center gap-1.5 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">
+                <span class="px-2 py-0.5 bg-zinc-100 border border-zinc-200 rounded flex items-center gap-1.5 text-[10px] font-semibold text-zinc-700">
                     ${name}
                     <span class="cora-meta-remove-tag cursor-pointer text-zinc-400 hover:text-zinc-700" data-value="${val}">✕</span>
                 </span>
@@ -10868,7 +10839,7 @@ jQuery(document).ready(function($) {
         
         $('#cora-article-tags').val(selected);
         if (selected.length === 0) {
-            badgeContainer.html('<span class="text-zinc-350 dark:text-zinc-700">Select or add tags...</span>');
+            badgeContainer.html('<span class="text-zinc-350">Select or add tags...</span>');
         }
     };
 
@@ -10878,9 +10849,9 @@ jQuery(document).ready(function($) {
 
     // Sub-Tab Switcher with URL Parameter State Persistence
     window.coraSwitchLeadSubtab = function(tabName) {
-        const activeClasses = 'active bg-white text-zinc-950 dark:bg-zinc-800 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700/80';
-        const inactiveClasses = 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50';
-        const classesToRemove = 'active bg-white text-zinc-950 dark:bg-zinc-800 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 shadow-sm font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800';
+        const activeClasses = 'active bg-white text-zinc-950 shadow-2xs font-bold border border-zinc-200/80';
+        const inactiveClasses = 'text-zinc-500 hover:text-zinc-900 font-medium hover:bg-zinc-200/50';
+        const classesToRemove = 'active bg-white text-zinc-950 shadow-2xs font-bold border border-zinc-200/80 bg-zinc-950 text-white shadow-sm font-semibold text-zinc-500 hover:text-zinc-900 font-medium hover:bg-zinc-200/50 text-zinc-600 hover:bg-zinc-100';
 
         $('.cora-lead-subtab-btn').removeClass(classesToRemove).addClass(inactiveClasses);
         $(`.cora-lead-subtab-btn[data-tab="${tabName}"]`).removeClass(classesToRemove).addClass(activeClasses);
@@ -11161,18 +11132,18 @@ jQuery(document).ready(function($) {
     window.coraLeadDragOver = function(ev, el) {
         ev.preventDefault();
         ev.dataTransfer.dropEffect = 'move';
-        $(el || ev.currentTarget).closest('.cora-kanban-column').addClass('bg-zinc-100/60 dark:bg-zinc-800/60');
+        $(el || ev.currentTarget).closest('.cora-kanban-column').addClass('bg-zinc-100/60');
     };
 
     window.coraLeadDragEnd = function(ev, el) {
         $('.cora-lead-card').removeClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
-        $('.cora-kanban-column').removeClass('bg-zinc-100/60 dark:bg-zinc-800/60');
+        $('.cora-kanban-column').removeClass('bg-zinc-100/60');
         draggedLeadCardId = null;
     };
 
     window.coraLeadDrop = function(ev, el) {
         ev.preventDefault();
-        $('.cora-kanban-column').removeClass('bg-zinc-100/60 dark:bg-zinc-800/60');
+        $('.cora-kanban-column').removeClass('bg-zinc-100/60');
         $('.cora-lead-card').removeClass('opacity-40 border-dashed border-zinc-500 scale-[0.99]');
 
         const col = $(el || ev.currentTarget).closest('.cora-kanban-column');
@@ -11223,7 +11194,7 @@ jQuery(document).ready(function($) {
             if (cards.length === 0) {
                 if ($(this).find('.cora-cards-container > div').length === 0) {
                     $(this).find('.cora-cards-container').html(`
-                        <div class="p-4 text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl text-[11px] text-zinc-400 my-2 select-none">
+                        <div class="p-4 text-center border border-dashed border-zinc-200 rounded-xl text-[11px] text-zinc-400 my-2 select-none">
                             No deals in this stage
                         </div>
                     `);
@@ -11277,13 +11248,13 @@ jQuery(document).ready(function($) {
             
             const scoreBadge = $('#cora-drawer-lead-score');
             const scoreMap = {
-                hot:  { label: 'Hot',  cls: 'bg-rose-500/10 text-rose-600 border-rose-200 dark:text-rose-400 dark:border-rose-800' },
-                cold: { label: 'Cold', cls: 'bg-sky-500/10 text-sky-600 border-sky-200 dark:text-sky-400 dark:border-sky-800' },
-                warm: { label: 'Warm', cls: 'bg-amber-500/10 text-amber-600 border-amber-200 dark:text-amber-400 dark:border-amber-800' }
+                hot: { label: 'Hot', cls: 'bg-rose-500/10 text-rose-600 border-rose-200' },
+                cold: { label: 'Cold', cls: 'bg-sky-500/10 text-sky-600 border-sky-200' },
+                warm: { label: 'Warm', cls: 'bg-amber-500/10 text-amber-600 border-amber-200' }
             };
             const isWon = (status === 'Converted');
             if (isWon) {
-                scoreBadge.attr('class', 'px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 border border-emerald-200 dark:text-emerald-400 dark:border-emerald-800 shrink-0').text('Won');
+                scoreBadge.attr('class', 'px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 border border-emerald-200 shrink-0').text('Won');
             } else {
                 const sm = scoreMap[score] || scoreMap.warm;
                 scoreBadge.attr('class', 'px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider border shrink-0 ' + sm.cls).text(sm.label);
@@ -11386,11 +11357,11 @@ jQuery(document).ready(function($) {
         for (let i = 1; i <= 3; i++) {
             const ind = $('#cora-lead-step-ind-' + i);
             if (i === step) {
-                ind.removeClass('bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700')
-                   .addClass('bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 border-zinc-950 dark:border-white shadow-xs');
+                ind.removeClass('bg-zinc-100 text-zinc-400 border-zinc-200')
+                   .addClass('bg-zinc-950 text-white border-zinc-950 shadow-xs');
             } else {
-                ind.removeClass('bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 border-zinc-950 dark:border-white shadow-xs')
-                   .addClass('bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700');
+                ind.removeClass('bg-zinc-950 text-white border-zinc-950 shadow-xs')
+                   .addClass('bg-zinc-100 text-zinc-400 border-zinc-200');
             }
         }
     };
@@ -11399,13 +11370,13 @@ jQuery(document).ready(function($) {
     window.coraSelectCreateLeadStage = function(stageKey) {
         $('#cora-new-lead-stage').val(stageKey);
 
-        $('.cora-stage-select-btn').removeClass('border-zinc-900 dark:border-white bg-zinc-50 dark:bg-zinc-800/80 ring-1 ring-zinc-900 dark:ring-white')
-                                   .addClass('border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900');
+        $('.cora-stage-select-btn').removeClass('border-zinc-900 bg-zinc-50 ring-1 ring-zinc-900')
+                                   .addClass('border-zinc-200 bg-white');
         
         const activeBtn = $(`.cora-stage-select-btn[data-stage="${stageKey}"]`);
         if (activeBtn.length) {
-            activeBtn.removeClass('border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900')
-                     .addClass('border-zinc-900 dark:border-white bg-zinc-50 dark:bg-zinc-800/80 ring-1 ring-zinc-900 dark:ring-white');
+            activeBtn.removeClass('border-zinc-200 bg-white')
+                     .addClass('border-zinc-900 bg-zinc-50 ring-1 ring-zinc-900');
         }
 
         const displayLabel = activeBtn.find('.cora-stage-title').text() || stageKey;
@@ -11669,7 +11640,7 @@ jQuery(document).ready(function($) {
     window.coraAddNewStageRow = function() {
         const randId = 'Stage_' + Math.floor(Math.random() * 8999 + 1000);
         const html = `
-        <div class="cora-stage-config-row p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 space-y-2 relative transition-all cursor-grab active:cursor-grabbing"
+        <div class="cora-stage-config-row p-3 rounded-xl border border-zinc-200 bg-zinc-50/70 space-y-2 relative transition-all cursor-grab active:cursor-grabbing"
              draggable="true"
              data-key="${randId}"
              ondragstart="coraStageRowDragStart(event)"
@@ -11679,10 +11650,10 @@ jQuery(document).ready(function($) {
             <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2 flex-1">
                     <span class="text-zinc-400 cursor-grab font-bold text-xs select-none">⋮⋮</span>
-                    <input type="text" class="cora-stage-label-input px-2.5 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg font-bold text-zinc-900 dark:text-zinc-100 text-xs w-full outline-none" value="Custom Stage Column" placeholder="Stage Column Title">
+                    <input type="text" class="cora-stage-label-input px-2.5 py-1.5 bg-white border border-zinc-200 rounded-lg font-bold text-zinc-900 text-xs w-full outline-none" value="Custom Stage Column" placeholder="Stage Column Title">
                 </div>
                 <label class="flex items-center gap-1.5 text-[11px] text-zinc-500 font-semibold cursor-pointer">
-                    <input type="checkbox" class="cora-stage-enable-checkbox accent-zinc-950 dark:accent-white" checked>
+                    <input type="checkbox" class="cora-stage-enable-checkbox accent-zinc-950" checked>
                     <span>Show</span>
                 </label>
                 <button type="button" class="text-zinc-400 hover:text-rose-600 transition-colors p-1 border-none bg-transparent cursor-pointer" onclick="jQuery(this).closest('.cora-stage-config-row').remove();">
@@ -11690,23 +11661,23 @@ jQuery(document).ready(function($) {
                 </button>
             </div>
             <div class="flex items-center justify-between pt-1">
-                <span class="text-[10px] text-zinc-400 font-medium">Stage Key: <code class="font-mono text-zinc-600 dark:text-zinc-300">${randId}</code></span>
+                <span class="text-[10px] text-zinc-400 font-medium">Stage Key: <code class="font-mono text-zinc-600">${randId}</code></span>
                 <div class="flex items-center gap-1.5">
-                    <select class="cora-stage-bg-select px-2 py-1 text-[10.5px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded text-zinc-800 dark:text-zinc-200 outline-none">
+                    <select class="cora-stage-bg-select px-2 py-1 text-[10.5px] bg-white border border-zinc-200 rounded text-zinc-800 outline-none">
                         <option value="default">Default Gray</option>
                         <option value="white">Pure White</option>
                         <option value="zinc">Zinc Gray</option>
                         <option value="slate">Cool Slate</option>
                         <option value="cream">Warm Cream</option>
                     </select>
-                    <select class="cora-stage-badge-select px-2 py-1 text-[10.5px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded text-zinc-800 dark:text-zinc-200 outline-none">
-                        <option value="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800">Blue Badge</option>
-                        <option value="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">Amber Badge</option>
-                        <option value="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800" selected>Purple Badge</option>
-                        <option value="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800">Indigo Badge</option>
-                        <option value="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">Emerald Badge</option>
-                        <option value="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800">Rose Badge</option>
-                        <option value="bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800">Zinc Badge</option>
+                    <select class="cora-stage-badge-select px-2 py-1 text-[10.5px] bg-white border border-zinc-200 rounded text-zinc-800 outline-none">
+                        <option value="bg-blue-500/10 text-blue-600 border-blue-200">Blue Badge</option>
+                        <option value="bg-amber-500/10 text-amber-600 border-amber-200">Amber Badge</option>
+                        <option value="bg-purple-500/10 text-purple-600 border-purple-200" selected>Purple Badge</option>
+                        <option value="bg-indigo-500/10 text-indigo-600 border-indigo-200">Indigo Badge</option>
+                        <option value="bg-emerald-500/10 text-emerald-600 border-emerald-200">Emerald Badge</option>
+                        <option value="bg-rose-500/10 text-rose-600 border-rose-200">Rose Badge</option>
+                        <option value="bg-zinc-500/10 text-zinc-600 border-zinc-200">Zinc Badge</option>
                     </select>
                 </div>
             </div>
@@ -11959,7 +11930,7 @@ jQuery(document).ready(function($) {
 
         var banner = document.createElement('div');
         banner.id = 'cora-upgrade-banner';
-        banner.className = 'fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-zinc-950 text-white dark:bg-zinc-50 dark:text-zinc-950 text-xs px-4 py-3.5 rounded-xl shadow-xl border border-zinc-800 dark:border-zinc-200 z-[999999] flex items-center justify-between gap-3 select-none cursor-pointer';
+        banner.className = 'fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-zinc-950 text-white text-xs px-4 py-3.5 rounded-xl shadow-xl border border-zinc-800 z-[999999] flex items-center justify-between gap-3 select-none cursor-pointer';
         
         // Add dynamic CSS styling for transition animation on load
         var style = document.createElement('style');
@@ -11976,15 +11947,15 @@ jQuery(document).ready(function($) {
 
         banner.innerHTML = `
             <div class="flex items-center gap-2.5 min-w-0" style="display: flex; align-items: center; gap: 10px;">
-                <div class="shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 dark:bg-zinc-200" style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #27272a; flex-shrink: 0;">
+                <div class="shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800" style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #27272a; flex-shrink: 0;">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" style="color: #ffffff;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                 </div>
                 <div class="truncate" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     <p class="font-bold leading-none" style="font-weight: 700; margin: 0; line-height: 1.2;">Workspace Updated</p>
-                    <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1" style="font-size: 10px; color: #a1a1aa; margin: 2px 0 0 0;">Tap to reload & apply v${newVersion}</p>
+                    <p class="text-[10px] text-zinc-400 mt-1" style="font-size: 10px; color: #a1a1aa; margin: 2px 0 0 0;">Tap to reload & apply v${newVersion}</p>
                 </div>
             </div>
-            <div class="shrink-0 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 dark:bg-zinc-200 px-2 py-1 rounded" style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #27272a; color: #ffffff; padding: 4px 8px; border-radius: 4px; flex-shrink: 0;">Reload</div>
+            <div class="shrink-0 text-[10px] font-bold uppercase tracking-wider bg-zinc-800 px-2 py-1 rounded" style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #27272a; color: #ffffff; padding: 4px 8px; border-radius: 4px; flex-shrink: 0;">Reload</div>
         `;
         
         banner.addEventListener('click', function() {

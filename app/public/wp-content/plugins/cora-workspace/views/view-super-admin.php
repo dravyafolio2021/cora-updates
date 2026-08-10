@@ -23,37 +23,37 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div class="cora-page-header flex items-center gap-3">
-            <span class="cora-page-emoji text-zinc-900 dark:text-zinc-150 flex shrink-0">
+            <span class="cora-page-emoji text-zinc-900 flex shrink-0">
                 <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
             </span>
             <div>
-                <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Platform Control Panel</h1>
+                <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900 ">Platform Control Panel</h1>
                 <p class="cora-section-desc text-xs text-zinc-500 mt-1">Manage tenant workspaces, configure plan assignments, update user accounts, and trigger secure impersonation sessions.</p>
             </div>
         </div>
     </div>
 
     <!-- Sub Navigation Tabs -->
-    <div class="cora-sub-tabs border-b border-zinc-200 dark:border-zinc-800 flex gap-4 text-xs font-bold text-zinc-500 select-none pb-0.5">
-        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-admin' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-workspaces">
+    <div class="cora-sub-tabs border-b border-zinc-200 flex gap-4 text-xs font-bold text-zinc-500 select-none pb-0.5">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-admin' ? 'active border-zinc-950 text-zinc-950 ' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-workspaces">
             Workspaces
         </button>
-        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-users' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-users">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-users' ? 'active border-zinc-950 text-zinc-950 ' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-users">
             Users
         </button>
-        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-appeals' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none flex items-center gap-1.5" data-target="tab-super-appeals">
-            Reactivation Appeals <span id="super-appeals-badge" class="px-1.5 py-0.5 rounded-full text-[9.5px] font-bold bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 hidden">0</span>
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-appeals' ? 'active border-zinc-950 text-zinc-950 ' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none flex items-center gap-1.5" data-target="tab-super-appeals">
+            Reactivation Appeals <span id="super-appeals-badge" class="px-1.5 py-0.5 rounded-full text-[9.5px] font-bold bg-amber-100 text-amber-800 hidden">0</span>
         </button>
-        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-governance' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-governance">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-governance' ? 'active border-zinc-950 text-zinc-950 ' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-governance">
             Attendance & Governance
         </button>
-        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-announcements' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-announcements">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-announcements' ? 'active border-zinc-950 text-zinc-950 ' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-announcements">
             Broadcast Console
         </button>
-        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-health' ? 'active border-zinc-950 dark:border-zinc-50 text-zinc-950 dark:text-zinc-50' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-health">
+        <button class="cora-sub-tab <?php echo $active_sub_page === 'super-health' ? 'active border-zinc-950 text-zinc-950 ' : 'border-transparent text-zinc-500'; ?> pb-2 border-b-2 cursor-pointer focus:outline-none" data-target="tab-super-health">
             System Health & Metrics
         </button>
     </div>
@@ -61,17 +61,17 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
     <!-- TAB 1: WORKSPACES -->
     <div id="tab-super-workspaces" class="cora-tab-content space-y-4 <?php echo $active_sub_page === 'super-admin' ? '' : 'hidden'; ?>">
         <!-- Filters Toolbar -->
-        <div class="bg-white dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
             <div class="flex flex-wrap gap-3 items-center flex-1 max-w-2xl">
                 <!-- Search bar -->
                 <div class="relative w-64">
-                    <input type="text" id="workspace-search" oninput="filterWorkspaces()" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg py-1.5 pl-8 pr-3 text-xs bg-white dark:bg-zinc-950 focus:border-zinc-400 dark:focus:border-zinc-600 focus:outline-none text-zinc-900 dark:text-zinc-100" placeholder="Search by name, slug, or owner email...">
-                    <span class="absolute left-2.5 top-2.5 text-zinc-450 dark:text-zinc-550">
+                    <input type="text" id="workspace-search" oninput="filterWorkspaces()" class="w-full border border-zinc-200 rounded-lg py-1.5 pl-8 pr-3 text-xs bg-white focus:border-zinc-400 focus:outline-none text-zinc-900 " placeholder="Search by name, slug, or owner email...">
+                    <span class="absolute left-2.5 top-2.5 text-zinc-450 ">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </span>
                 </div>
                 <!-- Plan Filter -->
-                <select id="workspace-filter-plan" onchange="filterWorkspaces()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <select id="workspace-filter-plan" onchange="filterWorkspaces()" class="border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                     <option value="">All Plans</option>
                     <option value="beta">Beta</option>
                     <option value="starter">Starter</option>
@@ -79,21 +79,21 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
                     <option value="enterprise">Enterprise</option>
                 </select>
                 <!-- Industry Filter -->
-                <select id="workspace-filter-industry" onchange="filterWorkspaces()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <select id="workspace-filter-industry" onchange="filterWorkspaces()" class="border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                     <option value="">All Industries</option>
                     <option value="real_estate">Real Estate</option>
                     <option value="photography_studio">Photography Studio</option>
                 </select>
                 <!-- Status Filter -->
-                <select id="workspace-filter-status" onchange="filterWorkspaces()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <select id="workspace-filter-status" onchange="filterWorkspaces()" class="border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                     <option value="">All Statuses</option>
                     <option value="active">Active</option>
                     <option value="suspended">Suspended</option>
                 </select>
             </div>
             <div class="flex items-center gap-3">
-                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider" id="workspace-count-badge">0 workspaces</span>
-                <button onclick="openCreateWorkspaceDrawer()" class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs cursor-pointer select-none">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider" id="workspace-count-badge">0 workspaces</span>
+                <button onclick="openCreateWorkspaceDrawer()" class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer select-none">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     New Workspace
                 </button>
@@ -101,24 +101,24 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
         </div>
 
         <!-- Workspaces Table -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
+        <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left">
-                    <thead class="bg-zinc-50/50 dark:bg-zinc-900/80">
+                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
+                    <thead class="bg-zinc-50/50 ">
                         <tr>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Workspace Name</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Subdomain/Slug</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Plan</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Industry</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Status</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Owner (email)</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Created Date</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Workspace Name</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Subdomain/Slug</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Plan</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Industry</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Status</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Owner (email)</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Created Date</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="workspaces-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                    <tbody id="workspaces-table-body" class="divide-y divide-zinc-100 ">
                         <tr>
-                            <td colspan="8" class="px-5 py-8 text-center text-zinc-450 dark:text-zinc-500">Loading workspaces...</td>
+                            <td colspan="8" class="px-5 py-8 text-center text-zinc-450 ">Loading workspaces...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -129,49 +129,49 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
     <!-- TAB 2: USERS -->
     <div id="tab-super-users" class="cora-tab-content space-y-4 <?php echo $active_sub_page === 'super-users' ? '' : 'hidden'; ?>">
         <!-- Filters Toolbar -->
-        <div class="bg-white dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
             <div class="flex flex-wrap gap-3 items-center flex-1 max-w-2xl">
                 <!-- Search bar -->
                 <div class="relative w-64">
-                    <input type="text" id="user-search" oninput="filterUsers()" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg py-1.5 pl-8 pr-3 text-xs bg-white dark:bg-zinc-950 focus:border-zinc-400 dark:focus:border-zinc-600 focus:outline-none text-zinc-900 dark:text-zinc-100" placeholder="Search by name, login, or email...">
-                    <span class="absolute left-2.5 top-2.5 text-zinc-450 dark:text-zinc-550">
+                    <input type="text" id="user-search" oninput="filterUsers()" class="w-full border border-zinc-200 rounded-lg py-1.5 pl-8 pr-3 text-xs bg-white focus:border-zinc-400 focus:outline-none text-zinc-900 " placeholder="Search by name, login, or email...">
+                    <span class="absolute left-2.5 top-2.5 text-zinc-450 ">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </span>
                 </div>
                 <!-- Role Filter -->
-                <select id="user-filter-role" onchange="filterUsers()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <select id="user-filter-role" onchange="filterUsers()" class="border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                     <option value="">All Roles</option>
                     <?php foreach ( $roles_list as $role_key => $role_label ) : ?>
                         <option value="<?php echo esc_attr( $role_key ); ?>"><?php echo esc_html( $role_label ); ?></option>
                     <?php endforeach; ?>
                 </select>
                 <!-- Status Filter -->
-                <select id="user-filter-status" onchange="filterUsers()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <select id="user-filter-status" onchange="filterUsers()" class="border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                     <option value="">All Statuses</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider" id="user-count-badge">0 users</span>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider" id="user-count-badge">0 users</span>
         </div>
 
         <!-- Users Table -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
+        <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left">
-                    <thead class="bg-zinc-50/50 dark:bg-zinc-900/80">
+                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
+                    <thead class="bg-zinc-50/50 ">
                         <tr>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">User Name</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Email</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Workspace (Agency name)</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Role</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Status</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">User Name</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Email</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Workspace (Agency name)</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Role</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Status</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="users-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                    <tbody id="users-table-body" class="divide-y divide-zinc-100 ">
                         <tr>
-                            <td colspan="6" class="px-5 py-8 text-center text-zinc-450 dark:text-zinc-500">Loading users...</td>
+                            <td colspan="6" class="px-5 py-8 text-center text-zinc-450 ">Loading users...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -181,31 +181,31 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
 
     <!-- TAB 3: REACTIVATION APPEALS -->
     <div id="tab-super-appeals" class="cora-tab-content space-y-4 <?php echo $active_sub_page === 'super-appeals' ? '' : 'hidden'; ?>">
-        <div class="bg-white dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex items-center justify-between">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm flex items-center justify-between">
             <div>
-                <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Suspension Reactivation Appeals</h2>
+                <h2 class="text-sm font-bold text-zinc-900 ">Suspension Reactivation Appeals</h2>
                 <p class="text-xs text-zinc-500 mt-0.5">Review and manage workspace reactivation requests submitted by suspended users.</p>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider" id="appeals-count-badge">0 appeals</span>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider" id="appeals-count-badge">0 appeals</span>
         </div>
 
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/85 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden">
+        <div class="bg-white border border-zinc-200/85 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs text-left">
-                    <thead class="bg-zinc-50/50 dark:bg-zinc-900/80">
+                <table class="min-w-full divide-y divide-zinc-200 text-xs text-left">
+                    <thead class="bg-zinc-50/50 ">
                         <tr>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Account Email</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Workspace Name</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Contact Phone</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Reason / Message</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Status</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px]">Submitted Date</th>
-                            <th class="px-5 py-3 font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider text-[10px] text-right">Action</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Account Email</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Workspace Name</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Contact Phone</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Reason / Message</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Status</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Submitted Date</th>
+                            <th class="px-5 py-3 font-bold text-zinc-400 uppercase tracking-wider text-[10px] text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="appeals-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                    <tbody id="appeals-table-body" class="divide-y divide-zinc-100 ">
                         <tr>
-                            <td colspan="7" class="px-5 py-8 text-center text-zinc-450 dark:text-zinc-500">Loading appeals...</td>
+                            <td colspan="7" class="px-5 py-8 text-center text-zinc-450 ">Loading appeals...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -215,34 +215,34 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
 
     <!-- TAB 4: ATTENDANCE & GOVERNANCE -->
     <div id="tab-super-governance" class="cora-tab-content space-y-6 <?php echo $active_sub_page === 'super-governance' ? '' : 'hidden'; ?>">
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-6 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Cross-Tenant Daily Reports & Automation Controls</h2>
+                    <h2 class="text-base font-bold text-zinc-900 ">Cross-Tenant Daily Reports & Automation Controls</h2>
                     <p class="text-xs text-zinc-500 mt-0.5">Manually trigger automated end-of-day attendance reports to Workspace Owners or manage global automation triggers.</p>
                 </div>
-                <button onclick="dispatchSuperDailyReports()" class="px-4 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs cursor-pointer flex items-center gap-2">
+                <button onclick="dispatchSuperDailyReports()" class="px-4 py-2 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer flex items-center gap-2">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
                     Dispatch Daily Reports Now
                 </button>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-lg space-y-1">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-zinc-100 ">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-lg space-y-1">
                     <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Scheduled Dispatch</div>
-                    <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Every Day at 8:00 PM</div>
+                    <div class="text-sm font-bold text-zinc-900 ">Every Day at 8:00 PM</div>
                     <div class="text-xs text-zinc-500">Automated WP Cron active</div>
                 </div>
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-lg space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-lg space-y-1">
                     <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">SMTP Relay Status</div>
-                    <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                    <div class="text-sm font-bold text-emerald-600 flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Hostinger Business SMTP Active
                     </div>
                     <div class="text-xs text-zinc-500">heycora@claraverse.in (Port 465 SSL)</div>
                 </div>
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-lg space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-lg space-y-1">
                     <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Geofence Distance Enforcement</div>
-                    <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Strict Haversine Verified</div>
+                    <div class="text-sm font-bold text-zinc-900 ">Strict Haversine Verified</div>
                     <div class="text-xs text-zinc-500">Real-time GPS coordinate validation</div>
                 </div>
             </div>
@@ -251,24 +251,24 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
 
     <!-- TAB 5: BROADCAST ANNOUNCEMENTS -->
     <div id="tab-super-announcements" class="cora-tab-content space-y-6 <?php echo $active_sub_page === 'super-announcements' ? '' : 'hidden'; ?>">
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-6 shadow-sm space-y-4">
             <div>
-                <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Global Platform Broadcast Console</h2>
+                <h2 class="text-base font-bold text-zinc-900 ">Global Platform Broadcast Console</h2>
                 <p class="text-xs text-zinc-500 mt-0.5">Publish top-bar message banners across all tenant workspaces to communicate system updates, maintenance alerts, or notifications.</p>
             </div>
             
-            <div class="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 max-w-2xl">
+            <div class="space-y-4 pt-4 border-t border-zinc-100 max-w-2xl">
                 <!-- Announcement text -->
                 <div class="space-y-1.5">
-                    <label class="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Broadcast Text Message</label>
-                    <textarea id="cora-broadcast-text" rows="3" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs bg-white dark:bg-zinc-950 focus:border-zinc-400 dark:focus:border-zinc-600 focus:outline-none text-zinc-900 dark:text-zinc-100 font-medium" placeholder="Enter broadcast announcement text..."><?php echo esc_textarea( get_option( 'cora_announcement_text', '' ) ); ?></textarea>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Broadcast Text Message</label>
+                    <textarea id="cora-broadcast-text" rows="3" class="w-full border border-zinc-200 rounded-xl p-3 text-xs bg-white focus:border-zinc-400 focus:outline-none text-zinc-900 font-medium" placeholder="Enter broadcast announcement text..."><?php echo esc_textarea( get_option( 'cora_announcement_text', '' ) ); ?></textarea>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Banner style type -->
                     <div class="space-y-1.5">
-                        <label class="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Visual Alert Theme</label>
-                        <select id="cora-broadcast-type" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Visual Alert Theme</label>
+                        <select id="cora-broadcast-type" class="w-full border border-zinc-200 rounded-xl px-3 py-2 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                             <?php $curr_type = get_option( 'cora_announcement_type', 'info' ); ?>
                             <option value="info" <?php echo $curr_type === 'info' ? 'selected' : ''; ?>>Monochromatic Zinc (Information)</option>
                             <option value="warning" <?php echo $curr_type === 'warning' ? 'selected' : ''; ?>>Warm Amber Accent (System Alert)</option>
@@ -280,13 +280,13 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
                     <div class="space-y-1.5 flex flex-col justify-end">
                         <div class="flex items-center gap-2.5 py-2">
                             <input type="checkbox" id="cora-broadcast-active" value="1" <?php checked( get_option( 'cora_announcement_active', '0' ), '1' ); ?> class="w-4 h-4 rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950 cursor-pointer">
-                            <label for="cora-broadcast-active" class="text-xs font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">Enable Public Broadcasting</label>
+                            <label for="cora-broadcast-active" class="text-xs font-bold text-zinc-700 cursor-pointer select-none">Enable Public Broadcasting</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="pt-2">
-                    <button onclick="saveGlobalAnnouncement()" class="px-4 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs cursor-pointer">
+                    <button onclick="saveGlobalAnnouncement()" class="px-4 py-2 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer">
                         Save and Broadcast Banner
                     </button>
                 </div>
@@ -297,10 +297,10 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
     <!-- TAB 6: SYSTEM HEALTH & METRICS -->
     <div id="tab-super-health" class="cora-tab-content space-y-6 <?php echo $active_sub_page === 'super-health' ? '' : 'hidden'; ?>">
         <!-- Live Platform Monitor Card -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-6">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-6 shadow-sm space-y-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <h2 class="text-base font-bold text-zinc-900 flex items-center gap-2">
                         Live Platform Monitor
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
@@ -309,31 +309,31 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
                     </h2>
                     <p class="text-xs text-zinc-500 mt-0.5">Real-time user presence, activity heatmap, and platform usage feed.</p>
                 </div>
-                <button onclick="loadLiveMonitor()" class="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700" title="Refresh Live Data">
+                <button onclick="loadLiveMonitor()" class="p-2 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg transition-colors border border-transparent hover:border-zinc-200 " title="Refresh Live Data">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
             </div>
 
             <!-- Summary Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="p-4 rounded-lg border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-800/20">
-                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Users Online</div>
-                    <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" id="live-stat-online">0</div>
+                <div class="p-4 rounded-lg border border-zinc-100 bg-zinc-50/50 ">
+                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 mb-1">Users Online</div>
+                    <div class="text-2xl font-bold text-zinc-900 " id="live-stat-online">0</div>
                     <div class="text-[10px] text-zinc-500 mt-1">Currently connected</div>
                 </div>
-                <div class="p-4 rounded-lg border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-800/20">
-                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Active Now</div>
-                    <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" id="live-stat-active">0</div>
+                <div class="p-4 rounded-lg border border-zinc-100 bg-zinc-50/50 ">
+                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 mb-1">Active Now</div>
+                    <div class="text-2xl font-bold text-zinc-900 " id="live-stat-active">0</div>
                     <div class="text-[10px] text-zinc-500 mt-1">Interacting &lt; 60s</div>
                 </div>
-                <div class="p-4 rounded-lg border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-800/20">
-                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Actions Today</div>
-                    <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" id="live-stat-actions">0</div>
+                <div class="p-4 rounded-lg border border-zinc-100 bg-zinc-50/50 ">
+                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 mb-1">Actions Today</div>
+                    <div class="text-2xl font-bold text-zinc-900 " id="live-stat-actions">0</div>
                     <div class="text-[10px] text-zinc-500 mt-1">Total logged events</div>
                 </div>
-                <div class="p-4 rounded-lg border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-800/20">
-                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Peak Hour</div>
-                    <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" id="live-stat-peak">--</div>
+                <div class="p-4 rounded-lg border border-zinc-100 bg-zinc-50/50 ">
+                    <div class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 mb-1">Peak Hour</div>
+                    <div class="text-2xl font-bold text-zinc-900 " id="live-stat-peak">--</div>
                     <div class="text-[10px] text-zinc-500 mt-1">Highest activity window</div>
                 </div>
             </div>
@@ -342,20 +342,20 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
                 <!-- Online Users & Heatmap -->
                 <div class="space-y-6">
                     <div>
-                        <h3 class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-3">Online Users</h3>
-                        <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-900">
+                        <h3 class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 mb-3">Online Users</h3>
+                        <div class="border border-zinc-200 rounded-lg overflow-hidden bg-white ">
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left border-collapse text-xs">
                                     <thead>
-                                        <tr class="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
-                                            <th class="px-4 py-2.5 font-medium text-zinc-500 dark:text-zinc-400">User</th>
-                                            <th class="px-4 py-2.5 font-medium text-zinc-500 dark:text-zinc-400">Workspace</th>
-                                            <th class="px-4 py-2.5 font-medium text-zinc-500 dark:text-zinc-400">Current Screen</th>
-                                            <th class="px-4 py-2.5 font-medium text-zinc-500 dark:text-zinc-400">Status</th>
-                                            <th class="px-4 py-2.5 font-medium text-zinc-500 dark:text-zinc-400">Last Seen</th>
+                                        <tr class="bg-zinc-50 border-b border-zinc-200 ">
+                                            <th class="px-4 py-2.5 font-medium text-zinc-500 ">User</th>
+                                            <th class="px-4 py-2.5 font-medium text-zinc-500 ">Workspace</th>
+                                            <th class="px-4 py-2.5 font-medium text-zinc-500 ">Current Screen</th>
+                                            <th class="px-4 py-2.5 font-medium text-zinc-500 ">Status</th>
+                                            <th class="px-4 py-2.5 font-medium text-zinc-500 ">Last Seen</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="live-online-users-body" class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                                    <tbody id="live-online-users-body" class="divide-y divide-zinc-100 ">
                                         <tr>
                                             <td colspan="5" class="px-4 py-6 text-center text-zinc-400">No users currently online</td>
                                         </tr>
@@ -365,7 +365,7 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
                         </div>
                     </div>
                     <div>
-                        <h3 class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-3">24-Hour Activity Heatmap</h3>
+                        <h3 class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 mb-3">24-Hour Activity Heatmap</h3>
                         <div id="live-heatmap-container" class="space-y-1 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
                             <!-- Populated via JS -->
                         </div>
@@ -374,80 +374,80 @@ if ( empty( $active_sub_page ) || $active_sub_page === 'dashboard' ) {
 
                 <!-- Recent Activity Feed -->
                 <div>
-                    <h3 class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-3">Recent Activity Feed</h3>
+                    <h3 class="text-[9.5px] uppercase tracking-wider font-semibold text-zinc-500 mb-3">Recent Activity Feed</h3>
                     <div id="live-activity-feed" class="max-h-[320px] overflow-y-auto pr-2 custom-scrollbar space-y-1">
-                        <div class="text-center text-zinc-400 dark:text-zinc-500 py-6 text-xs">No recent activity recorded.</div>
+                        <div class="text-center text-zinc-400 py-6 text-xs">No recent activity recorded.</div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <hr class="border-zinc-200 dark:border-zinc-800/60 my-8">
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
+        <hr class="border-zinc-200 my-8">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-6 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Platform Specs & Resource Auditing</h2>
+                    <h2 class="text-base font-bold text-zinc-900 ">Platform Specs & Resource Auditing</h2>
                     <p class="text-xs text-zinc-500 mt-0.5">Real-time computation of hosting infrastructure size, dynamic table indexes, and workspace attachments usage.</p>
                 </div>
-                <button onclick="loadHealthMetrics()" class="px-4 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs cursor-pointer flex items-center gap-1.5">
+                <button onclick="loadHealthMetrics()" class="px-4 py-2 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer flex items-center gap-1.5">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                     Refresh Health Metrics
                 </button>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-zinc-100 ">
                 <!-- DB Size widget -->
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-xl space-y-1">
                     <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">MySQL Database Footprint</div>
-                    <div id="metric-db-size" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">-- MB</div>
+                    <div id="metric-db-size" class="text-2xl font-bold text-zinc-900 font-mono">-- MB</div>
                     <div class="text-[10px] text-zinc-500">Total data and index allocation</div>
                 </div>
                 <!-- File Storage widget -->
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-xl space-y-1">
                     <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Media Vault Allocation</div>
-                    <div id="metric-storage-size" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">-- MB</div>
+                    <div id="metric-storage-size" class="text-2xl font-bold text-zinc-900 font-mono">-- MB</div>
                     <div class="text-[10px] text-zinc-500">Tenant media library uploads</div>
                 </div>
                 <!-- Workspaces count -->
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-xl space-y-1">
                     <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Active Workspaces</div>
-                    <div id="metric-workspaces" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">--</div>
+                    <div id="metric-workspaces" class="text-2xl font-bold text-zinc-900 font-mono">--</div>
                     <div class="text-[10px] text-zinc-500">Provisioned multi-tenant directories</div>
                 </div>
                 <!-- Users count -->
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-xl space-y-1">
                     <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Registered Users</div>
-                    <div id="metric-users" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">--</div>
+                    <div id="metric-users" class="text-2xl font-bold text-zinc-900 font-mono">--</div>
                     <div class="text-[10px] text-zinc-500">Across all platform organizations</div>
                 </div>
                 <!-- PHP version info -->
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-xl space-y-1">
                     <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">PHP Runtime</div>
-                    <div id="metric-php-version" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">PHP --</div>
+                    <div id="metric-php-version" class="text-2xl font-bold text-zinc-900 font-mono">PHP --</div>
                     <div class="text-[10px] text-zinc-500">Active server engine specifications</div>
                 </div>
                 <!-- WordPress core info -->
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-xl space-y-1">
                     <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">WordPress Core</div>
-                    <div id="metric-wp-version" class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">WP --</div>
+                    <div id="metric-wp-version" class="text-2xl font-bold text-zinc-900 font-mono">WP --</div>
                     <div class="text-[10px] text-zinc-500">System core framework version</div>
                 </div>
                 <!-- Server Disk space info -->
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-xl space-y-1">
                     <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Server Disk partition</div>
-                    <div id="metric-disk-usage" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono py-1.5 truncate">--</div>
+                    <div id="metric-disk-usage" class="text-xs font-bold text-zinc-900 font-mono py-1.5 truncate">--</div>
                     <div class="text-[10px] text-zinc-500">Partition capacity usage details</div>
                 </div>
                 <!-- PHP memory footprint -->
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-xl space-y-1">
                     <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">PHP Memory Limit</div>
-                    <div id="metric-memory-usage" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono py-1.5 truncate">--</div>
+                    <div id="metric-memory-usage" class="text-xs font-bold text-zinc-900 font-mono py-1.5 truncate">--</div>
                     <div class="text-[10px] text-zinc-500">Peak request vs PHP maximum limit</div>
                 </div>
                 <!-- CPU load and OS -->
-                <div class="p-4 bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/70 dark:border-zinc-800/80 rounded-xl space-y-1">
+                <div class="p-4 bg-zinc-50/70 border border-zinc-200/70 rounded-xl space-y-1">
                     <div class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Server Load & OS</div>
-                    <div id="metric-system-software" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono py-1.5 truncate">--</div>
+                    <div id="metric-system-software" class="text-xs font-bold text-zinc-900 font-mono py-1.5 truncate">--</div>
                     <div id="metric-load-avg" class="text-[10px] text-zinc-500 font-semibold mt-0.5">Load Average: --</div>
                 </div>
             </div>
@@ -514,13 +514,13 @@ jQuery(document).ready(function($) {
                 renderWorkspaces();
             } else {
                 const errorMsg = res.data || 'Failed to load platform workspaces.';
-                $('#workspaces-table-body').html(`<tr><td colspan="7" class="px-5 py-6 text-center text-red-600 font-semibold bg-red-50/20 dark:bg-red-950/10 border-t border-zinc-100 dark:border-zinc-800">${escapeHtml(errorMsg)}</td></tr>`);
+                $('#workspaces-table-body').html(`<tr><td colspan="7" class="px-5 py-6 text-center text-red-600 font-semibold bg-red-50/20 border-t border-zinc-100 ">${escapeHtml(errorMsg)}</td></tr>`);
                 if (window.coraShowToast) {
                     window.coraShowToast(errorMsg, 'error');
                 }
             }
         }).fail(function() {
-            $('#workspaces-table-body').html('<tr><td colspan="7" class="px-5 py-6 text-center text-red-600 font-semibold bg-red-50/20 dark:bg-red-950/10 border-t border-zinc-100 dark:border-zinc-800">Connection error: Could not retrieve workspaces.</td></tr>');
+            $('#workspaces-table-body').html('<tr><td colspan="7" class="px-5 py-6 text-center text-red-600 font-semibold bg-red-50/20 border-t border-zinc-100 ">Connection error: Could not retrieve workspaces.</td></tr>');
         });
 
         // Load Users list
@@ -533,13 +533,13 @@ jQuery(document).ready(function($) {
                 renderUsers();
             } else {
                 const errorMsg = res.data || 'Failed to load platform users.';
-                $('#users-table-body').html(`<tr><td colspan="6" class="px-5 py-6 text-center text-red-600 font-semibold bg-red-50/20 dark:bg-red-950/10 border-t border-zinc-100 dark:border-zinc-800">${escapeHtml(errorMsg)}</td></tr>`);
+                $('#users-table-body').html(`<tr><td colspan="6" class="px-5 py-6 text-center text-red-600 font-semibold bg-red-50/20 border-t border-zinc-100 ">${escapeHtml(errorMsg)}</td></tr>`);
                 if (window.coraShowToast) {
                     window.coraShowToast(errorMsg, 'error');
                 }
             }
         }).fail(function() {
-            $('#users-table-body').html('<tr><td colspan="6" class="px-5 py-6 text-center text-red-600 font-semibold bg-red-50/20 dark:bg-red-950/10 border-t border-zinc-100 dark:border-zinc-800">Connection error: Could not retrieve users.</td></tr>');
+            $('#users-table-body').html('<tr><td colspan="6" class="px-5 py-6 text-center text-red-600 font-semibold bg-red-50/20 border-t border-zinc-100 ">Connection error: Could not retrieve users.</td></tr>');
         });
 
         // Load Appeals list
@@ -567,29 +567,29 @@ jQuery(document).ready(function($) {
         $('#appeals-count-badge').text(`${rawAppeals.length} appeal${rawAppeals.length === 1 ? '' : 's'}`);
 
         if (rawAppeals.length === 0) {
-            $('#appeals-table-body').html('<tr><td colspan="7" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 bg-zinc-50/20 dark:bg-zinc-900/10">No reactivation appeals submitted yet.</td></tr>');
+            $('#appeals-table-body').html('<tr><td colspan="7" class="px-5 py-8 text-center text-zinc-400 bg-zinc-50/20 ">No reactivation appeals submitted yet.</td></tr>');
             return;
         }
 
         let html = '';
         rawAppeals.forEach(a => {
-            let statusBadge = '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">Pending</span>';
+            let statusBadge = '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-amber-50 text-amber-700 ">Pending</span>';
             if (a.status === 'approved') {
-                statusBadge = '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">Approved</span>';
+                statusBadge = '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 text-emerald-700 ">Approved</span>';
             } else if (a.status === 'declined') {
-                statusBadge = '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">Declined</span>';
+                statusBadge = '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-600 ">Declined</span>';
             }
 
             html += `
-                <tr class="hover:bg-zinc-50/20 dark:hover:bg-zinc-800/15 transition-colors">
-                    <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100">${escapeHtml(a.email)}</td>
-                    <td class="px-5 py-3.5 text-zinc-700 dark:text-zinc-300 font-medium">${escapeHtml(a.workspace_name || '—')}</td>
-                    <td class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 font-mono text-[11px]">${escapeHtml(a.phone || '—')}</td>
-                    <td class="px-5 py-3.5 text-zinc-600 dark:text-zinc-400 max-w-xs truncate">${escapeHtml(a.reason)}</td>
+                <tr class="hover:bg-zinc-50/20 transition-colors">
+                    <td class="px-5 py-3.5 font-bold text-zinc-900 ">${escapeHtml(a.email)}</td>
+                    <td class="px-5 py-3.5 text-zinc-700 font-medium">${escapeHtml(a.workspace_name || '—')}</td>
+                    <td class="px-5 py-3.5 text-zinc-500 font-mono text-[11px]">${escapeHtml(a.phone || '—')}</td>
+                    <td class="px-5 py-3.5 text-zinc-600 max-w-xs truncate">${escapeHtml(a.reason)}</td>
                     <td class="px-5 py-3.5">${statusBadge}</td>
-                    <td class="px-5 py-3.5 text-zinc-400 dark:text-zinc-500 font-medium">${formatDate(a.created_at)}</td>
+                    <td class="px-5 py-3.5 text-zinc-400 font-medium">${formatDate(a.created_at)}</td>
                     <td class="px-5 py-3.5 text-right">
-                        <button onclick="openAppealReviewDrawer('${a.id}')" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-xs active:scale-95 transition-all">
+                        <button onclick="openAppealReviewDrawer('${a.id}')" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-xs active:scale-95 transition-all">
                             Review Appeal →
                         </button>
                     </td>
@@ -623,19 +623,19 @@ jQuery(document).ready(function($) {
         $('#workspace-count-badge').text(`${filtered.length} workspace${filtered.length === 1 ? '' : 's'}`);
 
         if (filtered.length === 0) {
-            $('#workspaces-table-body').html('<tr><td colspan="8" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 bg-zinc-50/20 dark:bg-zinc-900/10">No workspaces matching filters found.</td></tr>');
+            $('#workspaces-table-body').html('<tr><td colspan="8" class="px-5 py-8 text-center text-zinc-400 bg-zinc-50/20 ">No workspaces matching filters found.</td></tr>');
             return;
         }
 
         let html = '';
         filtered.forEach(ws => {
             const planBadge = ws.plan 
-                ? `<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">${escapeHtml(ws.plan)}</span>` 
+                ? `<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-700 uppercase tracking-wide">${escapeHtml(ws.plan)}</span>` 
                 : '<span class="text-zinc-400">—</span>';
             
             let statusBadge = ws.status === 'active'
-                ? '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 select-none">Active</span>'
-                : '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 select-none">Suspended</span>';
+                ? '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 text-emerald-700 select-none">Active</span>'
+                : '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-red-50 text-red-700 select-none">Suspended</span>';
 
             const pendingAppeal = rawAppeals.find(a => a.status === 'pending' && (
                 (ws.owner_email && a.email && a.email.toLowerCase() === ws.owner_email.toLowerCase()) ||
@@ -644,13 +644,13 @@ jQuery(document).ready(function($) {
             ));
 
             if (ws.status === 'suspended' && pendingAppeal) {
-                statusBadge += `<button onclick="openAppealReviewDrawer('${pendingAppeal.id}')" class="ml-1.5 px-2 py-0.5 text-[9px] font-bold rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-200 cursor-pointer select-none inline-flex items-center gap-1"><span>📩</span> Appeal Pending</button>`;
+                statusBadge += `<button onclick="openAppealReviewDrawer('${pendingAppeal.id}')" class="ml-1.5 px-2 py-0.5 text-[9px] font-bold rounded-md bg-amber-100 text-amber-800 border border-amber-200 hover:bg-amber-200 cursor-pointer select-none inline-flex items-center gap-1"><span>📩</span> Appeal Pending</button>`;
             }
 
             const toggleLabel = ws.status === 'active' ? 'Suspend' : 'Activate';
             const toggleClass = ws.status === 'active'
-                ? 'text-red-600 hover:text-red-700 border-zinc-200 hover:bg-red-50 dark:border-zinc-800 dark:hover:bg-red-950/20'
-                : 'text-emerald-600 hover:text-emerald-700 border-zinc-200 hover:bg-emerald-50 dark:border-zinc-800 dark:hover:bg-emerald-950/20';
+                ? 'text-red-600 hover:text-red-700 border-zinc-200 hover:bg-red-50 '
+                : 'text-emerald-600 hover:text-emerald-700 border-zinc-200 hover:bg-emerald-50 ';
 
             const currInd = ws.industry === 'photography' ? 'photography_studio' : (ws.industry || 'real_estate');
 
@@ -659,42 +659,42 @@ jQuery(document).ready(function($) {
                 : `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
 
             html += `
-                <tr class="hover:bg-zinc-50/20 dark:hover:bg-zinc-800/15 transition-colors">
-                    <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100">${escapeHtml(ws.name)}</td>
-                    <td class="px-5 py-3.5 text-zinc-550 dark:text-zinc-400 font-mono text-[11px]">${escapeHtml(ws.slug)}</td>
+                <tr class="hover:bg-zinc-50/20 transition-colors">
+                    <td class="px-5 py-3.5 font-bold text-zinc-900 ">${escapeHtml(ws.name)}</td>
+                    <td class="px-5 py-3.5 text-zinc-550 font-mono text-[11px]">${escapeHtml(ws.slug)}</td>
                     <td class="px-5 py-3.5">${planBadge}</td>
                     <td class="px-5 py-3.5">
-                        <div class="inline-flex items-center gap-1.5 px-2 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 shadow-xs">
-                            <span class="text-zinc-500 dark:text-zinc-400 shrink-0">${indIcon}</span>
-                            <select onchange="changeWorkspaceIndustry(${ws.id}, this.value)" class="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-transparent outline-none cursor-pointer">
+                        <div class="inline-flex items-center gap-1.5 px-2 py-1 border border-zinc-200 rounded-lg bg-white shadow-xs">
+                            <span class="text-zinc-500 shrink-0">${indIcon}</span>
+                            <select onchange="changeWorkspaceIndustry(${ws.id}, this.value)" class="text-[10px] font-bold text-zinc-700 bg-transparent outline-none cursor-pointer">
                                 <option value="real_estate" ${currInd === 'real_estate' ? 'selected' : ''}>Real Estate</option>
                                 <option value="photography_studio" ${currInd === 'photography_studio' ? 'selected' : ''}>Studio</option>
                             </select>
                         </div>
                     </td>
                     <td class="px-5 py-3.5">${statusBadge}</td>
-                    <td class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 font-medium">${escapeHtml(ws.owner_email || '—')}</td>
-                    <td class="px-5 py-3.5 text-zinc-400 dark:text-zinc-500 font-medium">${formatDate(ws.created_at)}</td>
+                    <td class="px-5 py-3.5 text-zinc-500 font-medium">${escapeHtml(ws.owner_email || '—')}</td>
+                    <td class="px-5 py-3.5 text-zinc-400 font-medium">${formatDate(ws.created_at)}</td>
                     <td class="px-4 py-3.5 text-right">
                         <div class="flex items-center justify-end flex-wrap gap-1.5">
-                            <button onclick="toggleWorkspaceStatus(${ws.id}, '${ws.status === 'active' ? 'suspended' : 'active'}')" class="px-2.5 py-1 border rounded-lg text-[10px] font-bold bg-white dark:bg-zinc-900 hover:bg-zinc-50 cursor-pointer shadow-sm active:scale-95 transition-all ${toggleClass}">
+                            <button onclick="toggleWorkspaceStatus(${ws.id}, '${ws.status === 'active' ? 'suspended' : 'active'}')" class="px-2.5 py-1 border rounded-lg text-[10px] font-bold bg-white hover:bg-zinc-50 cursor-pointer shadow-sm active:scale-95 transition-all ${toggleClass}">
                                 ${toggleLabel}
                             </button>
                             
-                            <select onchange="changeWorkspacePlan(${ws.id}, this.value)" class="px-2 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 outline-none cursor-pointer shadow-sm">
+                            <select onchange="changeWorkspacePlan(${ws.id}, this.value)" class="px-2 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white outline-none cursor-pointer shadow-sm">
                                 <option value="beta" ${ws.plan === 'beta' ? 'selected' : ''}>Beta</option>
                                 <option value="starter" ${ws.plan === 'starter' ? 'selected' : ''}>Starter</option>
                                 <option value="pro" ${ws.plan === 'pro' ? 'selected' : ''}>Pro</option>
                                 <option value="enterprise" ${ws.plan === 'enterprise' ? 'selected' : ''}>Enterprise</option>
                             </select>
 
-                            <button onclick="openManageWorkspaceDrawer(${ws.id})" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm active:scale-95 transition-all inline-flex items-center gap-1">
+                            <button onclick="openManageWorkspaceDrawer(${ws.id})" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm active:scale-95 transition-all inline-flex items-center gap-1">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                                 Settings
                             </button>
 
                             ${ws.owner_user_id ? `
-                            <button onclick="impersonateUser(${ws.owner_user_id})" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm active:scale-95 transition-all inline-flex items-center gap-1">
+                            <button onclick="impersonateUser(${ws.owner_user_id})" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm active:scale-95 transition-all inline-flex items-center gap-1">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                                 Impersonate
                             </button>
@@ -728,7 +728,7 @@ jQuery(document).ready(function($) {
         $('#user-count-badge').text(`${filtered.length} user${filtered.length === 1 ? '' : 's'}`);
 
         if (filtered.length === 0) {
-            $('#users-table-body').html('<tr><td colspan="6" class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 bg-zinc-50/20 dark:bg-zinc-900/10">No users matching filters found.</td></tr>');
+            $('#users-table-body').html('<tr><td colspan="6" class="px-5 py-8 text-center text-zinc-400 bg-zinc-50/20 ">No users matching filters found.</td></tr>');
             return;
         }
 
@@ -737,13 +737,13 @@ jQuery(document).ready(function($) {
             const roleLabel = coraRoleLabels[u.role] || u.role;
             
             const statusBadge = u.status === 'active'
-                ? '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 select-none">Active</span>'
-                : '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 select-none">Inactive</span>';
+                ? '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-emerald-50 text-emerald-700 select-none">Active</span>'
+                : '<span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-red-50 text-red-700 select-none">Inactive</span>';
 
             const toggleLabel = u.status === 'active' ? 'Deactivate' : 'Activate';
             const toggleClass = u.status === 'active'
-                ? 'text-red-600 hover:text-red-700 border-zinc-200 hover:bg-red-50 dark:border-zinc-800 dark:hover:bg-red-950/20'
-                : 'text-emerald-600 hover:text-emerald-700 border-zinc-200 hover:bg-emerald-50 dark:border-zinc-800 dark:hover:bg-emerald-950/20';
+                ? 'text-red-600 hover:text-red-700 border-zinc-200 hover:bg-red-50 '
+                : 'text-emerald-600 hover:text-emerald-700 border-zinc-200 hover:bg-emerald-50 ';
 
             // Build select options for roles list
             let roleOptions = '';
@@ -752,30 +752,30 @@ jQuery(document).ready(function($) {
             });
 
             html += `
-                <tr class="hover:bg-zinc-50/20 dark:hover:bg-zinc-800/15 transition-colors">
-                    <td class="px-5 py-3.5 font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full ${u.status === 'active' ? 'bg-emerald-500' : 'bg-zinc-300 dark:bg-zinc-600'}"></span>
+                <tr class="hover:bg-zinc-50/20 transition-colors">
+                    <td class="px-5 py-3.5 font-bold text-zinc-900 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full ${u.status === 'active' ? 'bg-emerald-500' : 'bg-zinc-300 '}"></span>
                         ${escapeHtml(u.display_name || u.user_login || '')}
                     </td>
-                    <td class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 font-medium">${escapeHtml(u.user_email || '—')}</td>
-                    <td class="px-5 py-3.5 font-semibold text-zinc-800 dark:text-zinc-250">${escapeHtml(u.agency_name || '—')}</td>
+                    <td class="px-5 py-3.5 text-zinc-500 font-medium">${escapeHtml(u.user_email || '—')}</td>
+                    <td class="px-5 py-3.5 font-semibold text-zinc-800 ">${escapeHtml(u.agency_name || '—')}</td>
                     <td class="px-5 py-3.5">
-                        <span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-350 uppercase tracking-wide">
+                        <span class="px-2 py-0.5 text-[9px] font-bold rounded-md bg-zinc-100 text-zinc-700 uppercase tracking-wide">
                             ${escapeHtml(roleLabel)}
                         </span>
                     </td>
                     <td class="px-5 py-3.5">${statusBadge}</td>
                     <td class="px-5 py-3.5 text-right">
                         <div class="flex items-center justify-end gap-2">
-                            <button onclick="toggleUserStatus(${u.id}, '${u.status === 'active' ? 'inactive' : 'active'}')" class="px-2.5 py-1 border rounded-lg text-[10px] font-bold bg-white dark:bg-zinc-900 hover:bg-zinc-50 cursor-pointer shadow-sm active:scale-95 transition-all ${toggleClass}">
+                            <button onclick="toggleUserStatus(${u.id}, '${u.status === 'active' ? 'inactive' : 'active'}')" class="px-2.5 py-1 border rounded-lg text-[10px] font-bold bg-white hover:bg-zinc-50 cursor-pointer shadow-sm active:scale-95 transition-all ${toggleClass}">
                                 ${toggleLabel}
                             </button>
 
-                            <select onchange="changeUserRole(${u.id}, this.value)" class="px-2 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 outline-none cursor-pointer shadow-sm">
+                            <select onchange="changeUserRole(${u.id}, this.value)" class="px-2 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white outline-none cursor-pointer shadow-sm">
                                 ${roleOptions}
                             </select>
 
-                            <button onclick="impersonateUser(${u.wp_user_id})" class="px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer shadow-sm active:scale-95 transition-all inline-flex items-center gap-1.5">
+                            <button onclick="impersonateUser(${u.wp_user_id})" class="px-2.5 py-1 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-700 bg-white hover:bg-zinc-50 cursor-pointer shadow-sm active:scale-95 transition-all inline-flex items-center gap-1.5">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                                 Impersonate User
                             </button>
@@ -1105,12 +1105,12 @@ jQuery(document).ready(function($) {
                         : '<span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400"></span>';
                     const statusLabel = u.status === 'active' ? 'Active' : 'Idle';
                     const timeSince = u.last_seen ? formatTimeAgo(u.last_seen) : '—';
-                    html += `<tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-colors">
-                        <td class="px-4 py-2.5 font-semibold text-zinc-900 dark:text-zinc-100">${escapeHtml(u.display_name || '—')}</td>
-                        <td class="px-4 py-2.5 text-zinc-500 dark:text-zinc-400 font-mono text-[10px]">${escapeHtml(u.agency_name || '—')}</td>
-                        <td class="px-4 py-2.5 text-zinc-600 dark:text-zinc-300">${escapeHtml(u.current_screen || 'Dashboard')}</td>
-                        <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-zinc-600 dark:text-zinc-300">${statusDot} ${statusLabel}</span></td>
-                        <td class="px-4 py-2.5 text-zinc-400 dark:text-zinc-500">${timeSince}</td>
+                    html += `<tr class="hover:bg-zinc-50/50 transition-colors">
+                        <td class="px-4 py-2.5 font-semibold text-zinc-900 ">${escapeHtml(u.display_name || '—')}</td>
+                        <td class="px-4 py-2.5 text-zinc-500 font-mono text-[10px]">${escapeHtml(u.agency_name || '—')}</td>
+                        <td class="px-4 py-2.5 text-zinc-600 ">${escapeHtml(u.current_screen || 'Dashboard')}</td>
+                        <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-zinc-600 ">${statusDot} ${statusLabel}</span></td>
+                        <td class="px-4 py-2.5 text-zinc-400 ">${timeSince}</td>
                     </tr>`;
                 });
                 $('#live-online-users-body').html(html);
@@ -1144,11 +1144,11 @@ jQuery(document).ready(function($) {
             const pct = Math.round((count / maxCount) * 100);
             const isCurrent = h === currentHour;
             const hourLabel = h === 0 ? '12 AM' : h < 12 ? h + ' AM' : h === 12 ? '12 PM' : (h-12) + ' PM';
-            const highlight = isCurrent ? 'bg-zinc-100/80 dark:bg-zinc-800/40 rounded' : '';
+            const highlight = isCurrent ? 'bg-zinc-100/80 rounded' : '';
             html += `<div class="flex items-center gap-2 py-0.5 px-1 ${highlight}">
-                <span class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 w-12 shrink-0 text-right">${hourLabel}</span>
-                <div class="flex-1 h-3.5 bg-zinc-100 dark:bg-zinc-800/60 rounded-sm overflow-hidden">
-                    <div class="h-full bg-zinc-700 dark:bg-zinc-300 rounded-sm transition-all" style="width:${pct}%"></div>
+                <span class="text-[10px] font-mono text-zinc-400 w-12 shrink-0 text-right">${hourLabel}</span>
+                <div class="flex-1 h-3.5 bg-zinc-100 rounded-sm overflow-hidden">
+                    <div class="h-full bg-zinc-700 rounded-sm transition-all" style="width:${pct}%"></div>
                 </div>
                 <span class="text-[10px] font-mono text-zinc-400 w-6 text-right">${count}</span>
             </div>`;
@@ -1159,19 +1159,19 @@ jQuery(document).ready(function($) {
     function renderActivityFeed(activities) {
         const container = $('#live-activity-feed');
         if (!activities || activities.length === 0) {
-            container.html('<div class="text-center text-zinc-400 dark:text-zinc-500 py-6 text-xs">No recent activity recorded.</div>');
+            container.html('<div class="text-center text-zinc-400 py-6 text-xs">No recent activity recorded.</div>');
             return;
         }
         let html = '';
         activities.forEach(a => {
-            html += `<div class="flex items-start gap-3 py-2 border-b border-zinc-100 dark:border-zinc-800/60 last:border-0">
-                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 shrink-0"></span>
+            html += `<div class="flex items-start gap-3 py-2 border-b border-zinc-100 last:border-0">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-zinc-400 shrink-0"></span>
                 <div class="flex-1 min-w-0">
-                    <span class="font-semibold text-zinc-800 dark:text-zinc-200">${escapeHtml(a.user_display_name || 'System')}</span>
-                    <span class="text-zinc-500 dark:text-zinc-400 ml-1">${escapeHtml(a.description || a.action_type)}</span>
-                    <span class="ml-1.5 text-[10px] font-mono text-zinc-400 dark:text-zinc-500">${escapeHtml(a.agency_name || '')}</span>
+                    <span class="font-semibold text-zinc-800 ">${escapeHtml(a.user_display_name || 'System')}</span>
+                    <span class="text-zinc-500 ml-1">${escapeHtml(a.description || a.action_type)}</span>
+                    <span class="ml-1.5 text-[10px] font-mono text-zinc-400 ">${escapeHtml(a.agency_name || '')}</span>
                 </div>
-                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 shrink-0 whitespace-nowrap">${a.time_ago || '—'}</span>
+                <span class="text-[10px] text-zinc-400 shrink-0 whitespace-nowrap">${a.time_ago || '—'}</span>
             </div>`;
         });
         container.html(html);
@@ -1431,19 +1431,19 @@ window.saveWorkspaceSettings = function() {
 <!-- Create Workspace Right-Sliding Drawer Overlay & Panel -->
 <div id="cora-add-workspace-overlay" onclick="closeCreateWorkspaceDrawer()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-[9990] transition-opacity duration-300"></div>
 
-<div id="cora-add-workspace-drawer" class="fixed top-0 right-0 h-full w-full sm:w-112 bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 flex flex-col">
+<div id="cora-add-workspace-drawer" class="fixed top-0 right-0 h-full w-full sm:w-112 bg-white border-l border-zinc-200 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 flex flex-col">
     <!-- Drawer Header -->
-    <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-850 flex items-center justify-between shrink-0">
+    <div class="px-6 py-4 border-b border-zinc-100 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2.5">
-            <span class="p-2 bg-zinc-100 dark:bg-zinc-900 rounded-lg text-zinc-900 dark:text-zinc-100">
+            <span class="p-2 bg-zinc-100 rounded-lg text-zinc-900 ">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
             </span>
             <div>
-                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-50">Create Independent Workspace</h3>
+                <h3 class="text-base font-bold text-zinc-900 ">Create Independent Workspace</h3>
                 <p class="text-xs text-zinc-500 font-mono">app.heycora.in/{{slug}}</p>
             </div>
         </div>
-        <button onclick="closeCreateWorkspaceDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer">
+        <button onclick="closeCreateWorkspaceDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
@@ -1451,21 +1451,21 @@ window.saveWorkspaceSettings = function() {
     <!-- Drawer Content Form -->
     <div class="flex-1 overflow-y-auto p-6 space-y-5">
         <div>
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Workspace Name *</label>
-            <input type="text" id="new-ws-name" oninput="autoSlugifyWorkspace(this.value)" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 outline-none text-zinc-900 dark:text-zinc-100" placeholder="e.g. Apex Realty Studio">
+            <label class="block text-xs font-bold text-zinc-700 mb-1.5">Workspace Name *</label>
+            <input type="text" id="new-ws-name" oninput="autoSlugifyWorkspace(this.value)" class="w-full border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs bg-white focus:border-zinc-400 outline-none text-zinc-900 " placeholder="e.g. Apex Realty Studio">
         </div>
 
         <div>
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Workspace Slug / URL *</label>
-            <div class="flex items-center border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden bg-white dark:bg-zinc-900 focus-within:border-zinc-400">
-                <span class="px-3 py-2.5 text-xs font-mono text-zinc-400 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 shrink-0">app.heycora.in/</span>
-                <input type="text" id="new-ws-slug" class="w-full px-3 py-2.5 text-xs font-mono bg-transparent outline-none text-zinc-900 dark:text-zinc-100" placeholder="apex-realty">
+            <label class="block text-xs font-bold text-zinc-700 mb-1.5">Workspace Slug / URL *</label>
+            <div class="flex items-center border border-zinc-200 rounded-xl overflow-hidden bg-white focus-within:border-zinc-400">
+                <span class="px-3 py-2.5 text-xs font-mono text-zinc-400 bg-zinc-50 border-r border-zinc-200 shrink-0">app.heycora.in/</span>
+                <input type="text" id="new-ws-slug" class="w-full px-3 py-2.5 text-xs font-mono bg-transparent outline-none text-zinc-900 " placeholder="apex-realty">
             </div>
         </div>
 
         <div>
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Subscription Plan</label>
-            <select id="new-ws-plan" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs bg-white dark:bg-zinc-900 outline-none cursor-pointer text-zinc-900 dark:text-zinc-100">
+            <label class="block text-xs font-bold text-zinc-700 mb-1.5">Subscription Plan</label>
+            <select id="new-ws-plan" class="w-full border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs bg-white outline-none cursor-pointer text-zinc-900 ">
                 <option value="starter">Starter Plan</option>
                 <option value="pro">Pro Plan</option>
                 <option value="enterprise" selected>Enterprise Plan</option>
@@ -1474,26 +1474,26 @@ window.saveWorkspaceSettings = function() {
         </div>
 
         <div>
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Industry Profile *</label>
-            <select id="new-ws-industry" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs bg-white dark:bg-zinc-900 outline-none cursor-pointer text-zinc-900 dark:text-zinc-100">
+            <label class="block text-xs font-bold text-zinc-700 mb-1.5">Industry Profile *</label>
+            <select id="new-ws-industry" class="w-full border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs bg-white outline-none cursor-pointer text-zinc-900 ">
                 <option value="real_estate" selected>Real Estate Agency</option>
                 <option value="photography_studio">Photography Studio</option>
             </select>
         </div>
 
         <div>
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Owner Account Email</label>
-            <input type="email" id="new-ws-owner-email" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 outline-none text-zinc-900 dark:text-zinc-100" placeholder="owner@agency.com">
+            <label class="block text-xs font-bold text-zinc-700 mb-1.5">Owner Account Email</label>
+            <input type="email" id="new-ws-owner-email" class="w-full border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs bg-white focus:border-zinc-400 outline-none text-zinc-900 " placeholder="owner@agency.com">
             <p class="text-[11px] text-zinc-400 mt-1">If the email matches an existing user, they will be assigned as workspace owner.</p>
         </div>
     </div>
 
     <!-- Drawer Footer -->
-    <div class="p-6 border-t border-zinc-100 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-900/40 flex items-center justify-end gap-3 shrink-0">
-        <button onclick="closeCreateWorkspaceDrawer()" class="px-4 py-2 text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">
+    <div class="p-6 border-t border-zinc-100 bg-zinc-50/50 flex items-center justify-end gap-3 shrink-0">
+        <button onclick="closeCreateWorkspaceDrawer()" class="px-4 py-2 text-xs font-bold text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer">
             Cancel
         </button>
-        <button onclick="submitNewWorkspace()" class="px-5 py-2.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 active:scale-[0.98] transition-all cursor-pointer shadow-sm">
+        <button onclick="submitNewWorkspace()" class="px-5 py-2.5 bg-zinc-950 text-white font-bold text-xs rounded-xl hover:bg-zinc-800 active:scale-[0.98] transition-all cursor-pointer shadow-sm">
             Create Workspace
         </button>
     </div>
@@ -1502,58 +1502,58 @@ window.saveWorkspaceSettings = function() {
 <!-- Review Suspension Appeal Right-Sliding Drawer -->
 <div id="cora-appeal-review-overlay" onclick="closeAppealReviewDrawer()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-[9990] transition-opacity duration-300"></div>
 
-<div id="cora-appeal-review-drawer" class="fixed top-0 right-0 h-full w-full sm:w-120 bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 flex flex-col">
+<div id="cora-appeal-review-drawer" class="fixed top-0 right-0 h-full w-full sm:w-120 bg-white border-l border-zinc-200 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 flex flex-col">
     <!-- Header -->
-    <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-850 flex items-center justify-between shrink-0">
+    <div class="px-6 py-4 border-b border-zinc-100 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2.5">
-            <span class="p-2 bg-amber-50 dark:bg-amber-950/40 text-amber-600 rounded-lg">
+            <span class="p-2 bg-amber-50 text-amber-600 rounded-lg">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </span>
             <div>
-                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-50">Review Reactivation Appeal</h3>
+                <h3 class="text-base font-bold text-zinc-900 ">Review Reactivation Appeal</h3>
                 <p class="text-xs text-zinc-500 font-mono" id="review-appeal-id">appeal_...</p>
             </div>
         </div>
-        <button onclick="closeAppealReviewDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer">
+        <button onclick="closeAppealReviewDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
 
     <!-- Body -->
     <div class="flex-1 overflow-y-auto p-6 space-y-4">
-        <div class="p-4 bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-3">
+        <div class="p-4 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-3">
             <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Account Email</span>
-                <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100" id="review-appeal-email">—</p>
+                <p class="text-xs font-bold text-zinc-900 " id="review-appeal-email">—</p>
             </div>
             <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Workspace / Agency</span>
-                <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100" id="review-appeal-workspace">—</p>
+                <p class="text-xs font-bold text-zinc-900 " id="review-appeal-workspace">—</p>
             </div>
             <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Contact Phone</span>
-                <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100" id="review-appeal-phone">—</p>
+                <p class="text-xs font-bold text-zinc-900 " id="review-appeal-phone">—</p>
             </div>
             <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Submitted Date</span>
-                <p class="text-xs text-zinc-600 dark:text-zinc-400 font-mono" id="review-appeal-date">—</p>
+                <p class="text-xs text-zinc-600 font-mono" id="review-appeal-date">—</p>
             </div>
         </div>
 
         <div>
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Applicant Reason / Explanation</label>
-            <div class="p-3.5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap" id="review-appeal-reason">—</div>
+            <label class="block text-xs font-bold text-zinc-700 mb-1.5">Applicant Reason / Explanation</label>
+            <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 leading-relaxed whitespace-pre-wrap" id="review-appeal-reason">—</div>
         </div>
 
         <div>
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Administrator Response Notes (Sent to User)</label>
-            <textarea id="review-appeal-notes" rows="3" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs bg-white dark:bg-zinc-900 outline-none text-zinc-900 dark:text-zinc-100" placeholder="Optional explanation included in the confirmation email..."></textarea>
+            <label class="block text-xs font-bold text-zinc-700 mb-1.5">Administrator Response Notes (Sent to User)</label>
+            <textarea id="review-appeal-notes" rows="3" class="w-full border border-zinc-200 rounded-xl p-3 text-xs bg-white outline-none text-zinc-900 " placeholder="Optional explanation included in the confirmation email..."></textarea>
         </div>
     </div>
 
     <!-- Footer -->
-    <div class="p-6 border-t border-zinc-100 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-900/40 flex items-center justify-between gap-3 shrink-0">
-        <button onclick="processAppealAction('decline')" class="px-4 py-2 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 font-bold text-xs rounded-xl hover:bg-red-100 cursor-pointer transition-all">
+    <div class="p-6 border-t border-zinc-100 bg-zinc-50/50 flex items-center justify-between gap-3 shrink-0">
+        <button onclick="processAppealAction('decline')" class="px-4 py-2 bg-red-50 text-red-700 border border-red-200 font-bold text-xs rounded-xl hover:bg-red-100 cursor-pointer transition-all">
             Decline Appeal
         </button>
         <button onclick="processAppealAction('approve')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl active:scale-[0.98] transition-all cursor-pointer shadow-sm flex items-center gap-1.5">
@@ -1566,19 +1566,19 @@ window.saveWorkspaceSettings = function() {
 <!-- Manage Workspace Settings Right-Sliding Drawer -->
 <div id="cora-manage-workspace-overlay" onclick="closeManageWorkspaceDrawer()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-[9990] transition-opacity duration-300"></div>
 
-<div id="cora-manage-workspace-drawer" class="fixed top-0 right-0 h-full w-full sm:w-120 bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 flex flex-col">
+<div id="cora-manage-workspace-drawer" class="fixed top-0 right-0 h-full w-full sm:w-120 bg-white border-l border-zinc-200 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 flex flex-col">
     <!-- Header -->
-    <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-850 flex items-center justify-between shrink-0">
+    <div class="px-6 py-4 border-b border-zinc-100 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2.5">
-            <span class="p-2 bg-zinc-100 dark:bg-zinc-900 rounded-lg text-zinc-900 dark:text-zinc-100">
+            <span class="p-2 bg-zinc-100 rounded-lg text-zinc-900 ">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             </span>
             <div>
-                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-50" id="manage-ws-title">Manage Workspace</h3>
+                <h3 class="text-base font-bold text-zinc-900 " id="manage-ws-title">Manage Workspace</h3>
                 <p class="text-xs text-zinc-500 font-mono" id="manage-ws-slug-info">app.heycora.in/slug</p>
             </div>
         </div>
-        <button onclick="closeManageWorkspaceDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer">
+        <button onclick="closeManageWorkspaceDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
@@ -1590,20 +1590,20 @@ window.saveWorkspaceSettings = function() {
             <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3.5">Resource Quotas & Limits</h4>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">Max Users</label>
-                    <input type="number" id="manage-ws-max-users" min="1" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 outline-none text-zinc-900 dark:text-zinc-100 font-mono" placeholder="5">
+                    <label class="block text-[10px] font-bold text-zinc-600 mb-1">Max Users</label>
+                    <input type="number" id="manage-ws-max-users" min="1" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:border-zinc-400 outline-none text-zinc-900 font-mono" placeholder="5">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">Storage Limit (MB)</label>
-                    <input type="number" id="manage-ws-storage-mb" min="10" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 outline-none text-zinc-900 dark:text-zinc-100 font-mono" placeholder="1024">
+                    <label class="block text-[10px] font-bold text-zinc-600 mb-1">Storage Limit (MB)</label>
+                    <input type="number" id="manage-ws-storage-mb" min="10" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:border-zinc-400 outline-none text-zinc-900 font-mono" placeholder="1024">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">Max Emails / Month</label>
-                    <input type="number" id="manage-ws-max-emails" min="0" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 outline-none text-zinc-900 dark:text-zinc-100 font-mono" placeholder="200">
+                    <label class="block text-[10px] font-bold text-zinc-600 mb-1">Max Emails / Month</label>
+                    <input type="number" id="manage-ws-max-emails" min="0" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:border-zinc-400 outline-none text-zinc-900 font-mono" placeholder="200">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">RAG Token Limit</label>
-                    <input type="number" id="manage-ws-rag-token-quota" min="1000" step="50000" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 focus:border-zinc-400 outline-none text-zinc-900 dark:text-zinc-100 font-mono" placeholder="100000">
+                    <label class="block text-[10px] font-bold text-zinc-600 mb-1">RAG Token Limit</label>
+                    <input type="number" id="manage-ws-rag-token-quota" min="1000" step="50000" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:border-zinc-400 outline-none text-zinc-900 font-mono" placeholder="100000">
                 </div>
             </div>
         </div>
@@ -1613,74 +1613,74 @@ window.saveWorkspaceSettings = function() {
             <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3.5">Feature Governance Flags</h4>
             <div class="space-y-2.5">
                 <!-- Leads -->
-                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                <div class="flex items-center justify-between p-3 border border-zinc-150 rounded-xl bg-zinc-50/20 ">
                     <div>
-                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Leads Management</h5>
-                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable leads table, details inspection, and client funnels.</p>
+                        <h5 class="text-xs font-bold text-zinc-800 ">Leads Management</h5>
+                        <p class="text-[10px] text-zinc-400 ">Enable leads table, details inspection, and client funnels.</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="manage-ws-enable-leads" class="sr-only peer">
-                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                        <div class="w-8 h-4.5 bg-zinc-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-950 peer-checked:after:border-transparent"></div>
                     </label>
                 </div>
 
                 <!-- Clients -->
-                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                <div class="flex items-center justify-between p-3 border border-zinc-150 rounded-xl bg-zinc-50/20 ">
                     <div>
-                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Clients Directory</h5>
-                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable client records database and workspace accounts.</p>
+                        <h5 class="text-xs font-bold text-zinc-800 ">Clients Directory</h5>
+                        <p class="text-[10px] text-zinc-400 ">Enable client records database and workspace accounts.</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="manage-ws-enable-clients" class="sr-only peer">
-                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                        <div class="w-8 h-4.5 bg-zinc-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-950 peer-checked:after:border-transparent"></div>
                     </label>
                 </div>
 
                 <!-- Portfolios / Properties -->
-                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                <div class="flex items-center justify-between p-3 border border-zinc-150 rounded-xl bg-zinc-50/20 ">
                     <div>
-                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Portfolios & Properties</h5>
-                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable properties portfolio catalog and listing manager.</p>
+                        <h5 class="text-xs font-bold text-zinc-800 ">Portfolios & Properties</h5>
+                        <p class="text-[10px] text-zinc-400 ">Enable properties portfolio catalog and listing manager.</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="manage-ws-enable-properties" class="sr-only peer">
-                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                        <div class="w-8 h-4.5 bg-zinc-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-950 peer-checked:after:border-transparent"></div>
                     </label>
                 </div>
 
                 <!-- Bookings -->
-                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                <div class="flex items-center justify-between p-3 border border-zinc-150 rounded-xl bg-zinc-50/20 ">
                     <div>
-                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Booking Engine</h5>
-                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable shoot schedules and calendar event slots.</p>
+                        <h5 class="text-xs font-bold text-zinc-800 ">Booking Engine</h5>
+                        <p class="text-[10px] text-zinc-400 ">Enable shoot schedules and calendar event slots.</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="manage-ws-enable-bookings" class="sr-only peer">
-                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                        <div class="w-8 h-4.5 bg-zinc-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-950 peer-checked:after:border-transparent"></div>
                     </label>
                 </div>
 
                 <!-- Financials / Ledger -->
-                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                <div class="flex items-center justify-between p-3 border border-zinc-150 rounded-xl bg-zinc-50/20 ">
                     <div>
-                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Financials & Ledger</h5>
-                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable invoice listings, GST math breakdowns, and ledgers.</p>
+                        <h5 class="text-xs font-bold text-zinc-800 ">Financials & Ledger</h5>
+                        <p class="text-[10px] text-zinc-400 ">Enable invoice listings, GST math breakdowns, and ledgers.</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="manage-ws-enable-ledger" class="sr-only peer">
-                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                        <div class="w-8 h-4.5 bg-zinc-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-950 peer-checked:after:border-transparent"></div>
                     </label>
                 </div>
 
                 <!-- Documents Vault -->
-                <div class="flex items-center justify-between p-3 border border-zinc-150 dark:border-zinc-850 rounded-xl bg-zinc-50/20 dark:bg-zinc-900/10">
+                <div class="flex items-center justify-between p-3 border border-zinc-150 rounded-xl bg-zinc-50/20 ">
                     <div>
-                        <h5 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">Document Vault & E-Sign</h5>
-                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500">Enable contract uploads, agreements registry, and e-signatures.</p>
+                        <h5 class="text-xs font-bold text-zinc-800 ">Document Vault & E-Sign</h5>
+                        <p class="text-[10px] text-zinc-400 ">Enable contract uploads, agreements registry, and e-signatures.</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="manage-ws-enable-documents" class="sr-only peer">
-                        <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:after:border-zinc-650 peer-checked:bg-zinc-950 dark:peer-checked:bg-white peer-checked:after:border-transparent"></div>
+                        <div class="w-8 h-4.5 bg-zinc-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-950 peer-checked:after:border-transparent"></div>
                     </label>
                 </div>
             </div>
@@ -1688,11 +1688,11 @@ window.saveWorkspaceSettings = function() {
     </div>
 
     <!-- Footer -->
-    <div class="p-6 border-t border-zinc-100 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-900/40 flex items-center justify-end gap-3 shrink-0">
-        <button onclick="closeManageWorkspaceDrawer()" class="px-4 py-2 text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">
+    <div class="p-6 border-t border-zinc-100 bg-zinc-50/50 flex items-center justify-end gap-3 shrink-0">
+        <button onclick="closeManageWorkspaceDrawer()" class="px-4 py-2 text-xs font-bold text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer">
             Cancel
         </button>
-        <button id="manage-ws-save-btn" onclick="saveWorkspaceSettings()" class="px-5 py-2.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 active:scale-[0.98] transition-all cursor-pointer shadow-sm">
+        <button id="manage-ws-save-btn" onclick="saveWorkspaceSettings()" class="px-5 py-2.5 bg-zinc-950 text-white font-bold text-xs rounded-xl hover:bg-zinc-800 active:scale-[0.98] transition-all cursor-pointer shadow-sm">
             Save Settings
         </button>
     </div>

@@ -113,151 +113,151 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <!-- Card 1: Total Articles -->
     <div class="cora-stat-card">
         <div class="flex items-center">
-            <div class="p-2 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-800/80 rounded-xl flex items-center justify-center shrink-0">
+            <div class="p-2 bg-zinc-50 text-zinc-800 border border-zinc-100 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest ml-2">Total Articles</span>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-2">Total Articles</span>
         </div>
         <div class="flex items-center justify-between mt-3 mb-1">
-            <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 font-mono tracking-tight"><?php echo esc_html($total_articles); ?></div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 font-mono tracking-tight"><?php echo esc_html($total_articles); ?></div>
             <div class="flex items-end gap-1 h-7 select-none">
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[25%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[40%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[35%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[55%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[75%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[60%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[85%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[70%]"></div>
-                <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[95%]"></div>
-                <div class="w-[3px] bg-zinc-950 dark:bg-zinc-100 rounded-full h-[100%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[25%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[40%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[35%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[55%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[45%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[75%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[60%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[85%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[70%]"></div>
+                <div class="w-[3px] bg-zinc-900 rounded-full h-[95%]"></div>
+                <div class="w-[3px] bg-zinc-950 rounded-full h-[100%]"></div>
             </div>
         </div>
-        <div class="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1">Active library</div>
+        <div class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider mt-1">Active library</div>
     </div>
 
     <!-- Card 2: Published -->
     <div class="cora-stat-card">
         <div class="flex items-center">
-            <div class="p-2 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-800/80 rounded-xl flex items-center justify-center shrink-0">
+            <div class="p-2 bg-zinc-50 text-zinc-800 border border-zinc-100 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest ml-2">Published</span>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-2">Published</span>
         </div>
         <div class="flex items-center justify-between mt-3 mb-1">
-            <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 font-mono tracking-tight"><?php echo esc_html($published_count); ?></div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 font-mono tracking-tight"><?php echo esc_html($published_count); ?></div>
             <div class="flex items-end gap-1 h-7 select-none">
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[15%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[30%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[20%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[30%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[65%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[75%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[55%]"></div>
-                <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[90%]"></div>
-                <div class="w-[3px] bg-zinc-950 dark:bg-zinc-100 rounded-full h-[100%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[15%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[30%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[20%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[45%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[30%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[65%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[45%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[75%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[55%]"></div>
+                <div class="w-[3px] bg-zinc-900 rounded-full h-[90%]"></div>
+                <div class="w-[3px] bg-zinc-950 rounded-full h-[100%]"></div>
             </div>
         </div>
-        <div class="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1">Live on site</div>
+        <div class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider mt-1">Live on site</div>
     </div>
 
     <!-- Card 3: Drafts -->
     <div class="cora-stat-card">
         <div class="flex items-center">
-            <div class="p-2 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-800/80 rounded-xl flex items-center justify-center shrink-0">
+            <div class="p-2 bg-zinc-50 text-zinc-800 border border-zinc-100 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest ml-2">Drafts</span>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-2">Drafts</span>
         </div>
         <div class="flex items-center justify-between mt-3 mb-1">
-            <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 font-mono tracking-tight"><?php echo esc_html($draft_count); ?></div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 font-mono tracking-tight"><?php echo esc_html($draft_count); ?></div>
             <div class="flex items-end gap-1 h-7 select-none">
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[25%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[40%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[35%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[60%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[70%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[55%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[85%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[75%]"></div>
-                <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[95%]"></div>
-                <div class="w-[3px] bg-zinc-950 dark:bg-zinc-100 rounded-full h-[100%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[25%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[40%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[35%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[60%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[45%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[70%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[55%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[85%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[75%]"></div>
+                <div class="w-[3px] bg-zinc-900 rounded-full h-[95%]"></div>
+                <div class="w-[3px] bg-zinc-950 rounded-full h-[100%]"></div>
             </div>
         </div>
-        <div class="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1">In progress</div>
+        <div class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider mt-1">In progress</div>
     </div>
 
     <!-- Card 4: Avg SEO Score -->
     <div class="cora-stat-card">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
-                <div class="p-2 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-800/80 rounded-xl flex items-center justify-center shrink-0">
+                <div class="p-2 bg-zinc-50 text-zinc-800 border border-zinc-100 rounded-xl flex items-center justify-center shrink-0">
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><polyline points="17 6 23 6 23 12"></polyline></svg>
                 </div>
-                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest ml-2">Avg SEO Score</span>
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-2">Avg SEO Score</span>
             </div>
         </div>
         <div class="flex items-center justify-between mt-3 mb-1">
-            <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 font-mono tracking-tight"><?php echo esc_html($avg_seo); ?></div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 font-mono tracking-tight"><?php echo esc_html($avg_seo); ?></div>
             <div class="flex flex-col items-end">
-                <div class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[10px] font-bold border border-zinc-200/50 dark:border-zinc-700/50">
+                <div class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-800 text-[10px] font-bold border border-zinc-200/50 ">
                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none" class="shrink-0"><polyline points="18 15 12 9 6 15"></polyline></svg>
                     <span>3%</span>
                 </div>
-                <span class="text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5 font-bold uppercase tracking-wide">this week</span>
+                <span class="text-[9px] text-zinc-400 mt-0.5 font-bold uppercase tracking-wide">this week</span>
             </div>
         </div>
         <!-- Full-width Sparkline at bottom -->
         <div class="flex items-end justify-between gap-0.5 h-3.5 w-full select-none mt-2">
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[20%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[30%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[25%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[35%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[55%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[65%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[55%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[80%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[65%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[90%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[75%]"></div>
-            <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[95%]"></div>
-            <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[80%]"></div>
-            <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[90%]"></div>
-            <div class="w-[3px] bg-zinc-950 dark:bg-zinc-100 rounded-full h-[100%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[20%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[30%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[25%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[45%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[35%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[55%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[45%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[65%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[55%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[80%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[65%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[90%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[75%]"></div>
+            <div class="w-[3px] bg-zinc-200 rounded-full h-[95%]"></div>
+            <div class="w-[3px] bg-zinc-900 rounded-full h-[80%]"></div>
+            <div class="w-[3px] bg-zinc-900 rounded-full h-[90%]"></div>
+            <div class="w-[3px] bg-zinc-950 rounded-full h-[100%]"></div>
         </div>
     </div>
 
     <!-- Card 5: Total Leads -->
     <div class="cora-stat-card">
         <div class="flex items-center">
-            <div class="p-2 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-800/80 rounded-xl flex items-center justify-center shrink-0">
+            <div class="p-2 bg-zinc-50 text-zinc-800 border border-zinc-100 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
-            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest ml-2">Total Leads</span>
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-2">Total Leads</span>
         </div>
         <div class="flex items-center justify-between mt-3 mb-1">
-            <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 font-mono tracking-tight"><?php echo esc_html($total_leads); ?></div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-zinc-900 font-mono tracking-tight"><?php echo esc_html($total_leads); ?></div>
             <div class="flex items-end gap-1 h-7 select-none">
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[15%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[30%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[20%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[45%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[35%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[65%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[50%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[85%]"></div>
-                <div class="w-[3px] bg-zinc-200 dark:bg-zinc-800 rounded-full h-[70%]"></div>
-                <div class="w-[3px] bg-zinc-900 dark:bg-zinc-300 rounded-full h-[95%]"></div>
-                <div class="w-[3px] bg-zinc-950 dark:bg-zinc-100 rounded-full h-[100%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[15%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[30%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[20%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[45%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[35%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[65%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[50%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[85%]"></div>
+                <div class="w-[3px] bg-zinc-200 rounded-full h-[70%]"></div>
+                <div class="w-[3px] bg-zinc-900 rounded-full h-[95%]"></div>
+                <div class="w-[3px] bg-zinc-950 rounded-full h-[100%]"></div>
             </div>
         </div>
-        <div class="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1">From content</div>
+        <div class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider mt-1">From content</div>
     </div>
 </div>
 
@@ -295,7 +295,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-brain" onclick="switchContentTab('ct-brain')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z"></path></svg>
         Business Brain
-        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-850 text-zinc-400 dark:text-zinc-500 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
+        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 text-zinc-400 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
     </button>
 </div>
 
@@ -306,25 +306,25 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
         <!-- Column 1: AI Insights -->
-        <div class="lg:col-span-1 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl bg-white dark:bg-zinc-950 shadow-2xs flex flex-col p-5 gap-5 min-h-[350px]">
+        <div class="lg:col-span-1 border border-zinc-200/80 rounded-2xl bg-white shadow-2xs flex flex-col p-5 gap-5 min-h-[350px]">
             <div class="flex items-center justify-between select-none">
-                <div class="flex items-center gap-2 text-zinc-900 dark:text-zinc-100">
+                <div class="flex items-center gap-2 text-zinc-900 ">
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0">
                         <path d="M12 2c0 5.523 4.477 10 10 10-5.523 0-10 4.477-10 10-5.523 0-10-4.477-10-10 5.523 0 10-4.477 10-10z" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <span class="text-sm font-bold tracking-tight">AI Insights</span>
                 </div>
-                <span class="text-[8px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 text-zinc-550 dark:text-zinc-450">BETA</span>
+                <span class="text-[8px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-50 border border-zinc-200/60 text-zinc-550 ">BETA</span>
             </div>
 
             <!-- Header Highlight Card -->
-            <div class="flex items-center gap-3 bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-zinc-850/80 rounded-xl p-3 select-none">
-                <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div class="flex items-center gap-3 bg-zinc-50/50 border border-zinc-100 rounded-xl p-3 select-none">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
                 </div>
                 <div>
-                    <div class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider">SEO Visibility</div>
-                    <div class="text-[11px] text-zinc-650 dark:text-zinc-400 font-semibold mt-0.5 leading-snug" id="ai-insights-summary-text">
+                    <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">SEO Visibility</div>
+                    <div class="text-[11px] text-zinc-650 font-semibold mt-0.5 leading-snug" id="ai-insights-summary-text">
                         Improved +3% this week. Focus on <?php echo esc_html($opportunities_count ?? 2); ?> opportunities.
                     </div>
                 </div>
@@ -335,12 +335,12 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <div class="flex gap-3.5 relative">
                     <!-- Timeline point -->
                     <div class="flex flex-col items-center shrink-0 relative">
-                        <div class="w-5.5 h-5.5 rounded-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-850 text-zinc-600 dark:text-zinc-450 flex items-center justify-center text-[9px] font-bold shrink-0 select-none z-10">1</div>
-                        <div class="w-0.5 bg-zinc-100 dark:bg-zinc-850/80 absolute top-5.5 bottom-0 left-[10.5px] -mb-5 z-0"></div>
+                        <div class="w-5.5 h-5.5 rounded-full bg-zinc-50 border border-zinc-200/80 text-zinc-600 flex items-center justify-center text-[9px] font-bold shrink-0 select-none z-10">1</div>
+                        <div class="w-0.5 bg-zinc-100 absolute top-5.5 bottom-0 left-[10.5px] -mb-5 z-0"></div>
                     </div>
                     <div class="min-w-0 pt-0.5">
-                        <div class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider mb-1 select-none">Top Opportunity</div>
-                        <div class="text-[11px] text-zinc-650 dark:text-zinc-400 leading-relaxed font-medium space-y-1.5 py-0.5" id="ai-top-opportunity">
+                        <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-1 select-none">Top Opportunity</div>
+                        <div class="text-[11px] text-zinc-650 leading-relaxed font-medium space-y-1.5 py-0.5" id="ai-top-opportunity">
                             <div class="cora-skeleton h-3 w-5/6"></div>
                             <div class="cora-skeleton h-3 w-2/3"></div>
                         </div>
@@ -349,11 +349,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <div class="flex gap-3.5 relative">
                     <!-- Timeline point -->
                     <div class="flex flex-col items-center shrink-0">
-                        <div class="w-5.5 h-5.5 rounded-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-850 text-zinc-600 dark:text-zinc-450 flex items-center justify-center text-[9px] font-bold shrink-0 select-none z-10">2</div>
+                        <div class="w-5.5 h-5.5 rounded-full bg-zinc-50 border border-zinc-200/80 text-zinc-600 flex items-center justify-center text-[9px] font-bold shrink-0 select-none z-10">2</div>
                     </div>
                     <div class="min-w-0 pt-0.5">
-                        <div class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider mb-1 select-none">Content Grounding</div>
-                        <div class="text-[11px] text-zinc-650 dark:text-zinc-400 leading-relaxed font-medium space-y-1.5 py-0.5" id="ai-content-health">
+                        <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-1 select-none">Content Grounding</div>
+                        <div class="text-[11px] text-zinc-650 leading-relaxed font-medium space-y-1.5 py-0.5" id="ai-content-health">
                             <div class="cora-skeleton h-3 w-4/5"></div>
                             <div class="cora-skeleton h-3 w-1/2"></div>
                         </div>
@@ -361,20 +361,20 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 </div>
             </div>
 
-            <button onclick="switchContentTab('ct-opportunities')" class="inline-flex items-center gap-1.5 px-4 py-2 border border-zinc-200/80 hover:border-zinc-900 bg-white hover:bg-zinc-50 text-zinc-850 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-3xs active:scale-97 w-fit select-none dark:bg-zinc-950 dark:hover:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:text-white">
+            <button onclick="switchContentTab('ct-opportunities')" class="inline-flex items-center gap-1.5 px-4 py-2 border border-zinc-200/80 hover:border-zinc-900 bg-white hover:bg-zinc-50 text-zinc-850 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-3xs active:scale-97 w-fit select-none ">
                 <span>View Opportunities</span>
                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
         </div>
 
         <!-- Column 2: Recent Activity -->
-        <div class="lg:col-span-1 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl bg-white dark:bg-zinc-950 shadow-2xs flex flex-col p-5 min-h-[350px]">
+        <div class="lg:col-span-1 border border-zinc-200/80 rounded-2xl bg-white shadow-2xs flex flex-col p-5 min-h-[350px]">
             <div class="flex items-center justify-between mb-4 select-none">
-                <div class="flex items-center gap-2 text-zinc-900 dark:text-zinc-100">
+                <div class="flex items-center gap-2 text-zinc-900 ">
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                     <span class="text-sm font-bold tracking-tight">Recent Activity</span>
                 </div>
-                <button onclick="switchContentTab('ct-library')" class="px-3 py-1.5 border border-zinc-200/80 dark:border-zinc-800 bg-white hover:bg-zinc-50 text-zinc-700 dark:text-zinc-300 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-3xs active:scale-97 dark:bg-zinc-950 dark:hover:bg-zinc-900">
+                <button onclick="switchContentTab('ct-library')" class="px-3 py-1.5 border border-zinc-200/80 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-3xs active:scale-97 ">
                     View all
                 </button>
             </div>
@@ -405,11 +405,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     $diff_text = human_time_diff(get_post_modified_time('U', false, $p), current_time('timestamp'));
                     $diff_text = str_replace(['hours','hour','mins','min','days','day','weeks','week',' '], ['h','h','m','m','d','d','w','w',''], $diff_text) . ' ago';
                 ?>
-                <div onclick="<?php echo esc_attr($btn_onclick); ?>" class="flex items-center justify-between p-2.5 hover:bg-zinc-50/70 dark:hover:bg-zinc-900/50 rounded-xl cursor-pointer transition-colors gap-3 group">
+                <div onclick="<?php echo esc_attr($btn_onclick); ?>" class="flex items-center justify-between p-2.5 hover:bg-zinc-50/70 rounded-xl cursor-pointer transition-colors gap-3 group">
                     <div class="flex items-center min-w-0 gap-1">
                         <div class="flex flex-col gap-1 min-w-0">
-                            <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors truncate max-w-[200px]"><?php echo esc_html($p->post_title ?: 'Untitled Draft'); ?></span>
-                            <div class="flex items-center gap-1.5 text-[10px] text-zinc-450 dark:text-zinc-500">
+                            <span class="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 transition-colors truncate max-w-[200px]"><?php echo esc_html($p->post_title ?: 'Untitled Draft'); ?></span>
+                            <div class="flex items-center gap-1.5 text-[10px] text-zinc-450 ">
                                 <span class="w-1.5 h-1.5 rounded-full <?php echo $dot_color; ?> shrink-0"></span>
                                 <span><?php echo $status_label; ?></span>
                                 <span>·</span>
@@ -417,7 +417,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                             </div>
                         </div>
                     </div>
-                    <button class="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="<?php echo esc_attr($btn_title); ?>">
+                    <button class="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100/50 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="<?php echo esc_attr($btn_title); ?>">
                         <?php echo $action_icon; ?>
                     </button>
                 </div>
@@ -426,13 +426,13 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
 
         <!-- Column 3: Content Performance -->
-        <div class="lg:col-span-1 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl bg-white dark:bg-zinc-950 shadow-2xs flex flex-col p-5 min-h-[350px]">
+        <div class="lg:col-span-1 border border-zinc-200/80 rounded-2xl bg-white shadow-2xs flex flex-col p-5 min-h-[350px]">
             <div class="flex items-center justify-between mb-4 select-none">
-                <div class="flex items-center gap-2 text-zinc-900 dark:text-zinc-100">
+                <div class="flex items-center gap-2 text-zinc-900 ">
                     <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                     <span class="text-sm font-bold tracking-tight">Content Performance</span>
                 </div>
-                <select class="text-[10px] font-bold text-zinc-650 dark:text-zinc-350 border border-zinc-200/80 dark:border-zinc-800 rounded-lg px-2 py-1 bg-white dark:bg-zinc-950 cursor-pointer focus:outline-none select-none">
+                <select class="text-[10px] font-bold text-zinc-650 border border-zinc-200/80 rounded-lg px-2 py-1 bg-white cursor-pointer focus:outline-none select-none">
                     <option>This Week</option>
                     <option>This Month</option>
                 </select>
@@ -442,40 +442,40 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 <!-- Stats Row Grid -->
                 <div class="grid grid-cols-3 gap-2.5">
                     <!-- Views -->
-                    <div class="p-3 bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-zinc-850/80 rounded-xl flex flex-col select-none">
-                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider">Views</span>
-                        <span class="text-base font-extrabold text-zinc-900 dark:text-zinc-100 mt-1 leading-none" id="perf-overview-views">—</span>
-                        <span class="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 mt-2">
+                    <div class="p-3 bg-zinc-50/50 border border-zinc-100 rounded-xl flex flex-col select-none">
+                        <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Views</span>
+                        <span class="text-base font-extrabold text-zinc-900 mt-1 leading-none" id="perf-overview-views">—</span>
+                        <span class="text-[9px] font-bold text-emerald-600 flex items-center gap-0.5 mt-2">
                             <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="3" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>+12%
                         </span>
                     </div>
                     <!-- Clicks -->
-                    <div class="p-3 bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-zinc-850/80 rounded-xl flex flex-col select-none">
-                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider">Clicks</span>
-                        <span class="text-base font-extrabold text-zinc-900 dark:text-zinc-100 mt-1 leading-none" id="perf-overview-clicks">—</span>
-                        <span class="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 mt-2">
+                    <div class="p-3 bg-zinc-50/50 border border-zinc-100 rounded-xl flex flex-col select-none">
+                        <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Clicks</span>
+                        <span class="text-base font-extrabold text-zinc-900 mt-1 leading-none" id="perf-overview-clicks">—</span>
+                        <span class="text-[9px] font-bold text-emerald-600 flex items-center gap-0.5 mt-2">
                             <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="3" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>+8%
                         </span>
                     </div>
                     <!-- Avg Position -->
-                    <div class="p-3 bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-zinc-850/80 rounded-xl flex flex-col select-none">
-                        <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider">Position</span>
-                        <span class="text-base font-extrabold text-zinc-900 dark:text-zinc-100 mt-1 leading-none" id="perf-overview-position">—</span>
-                        <span class="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 mt-2">
+                    <div class="p-3 bg-zinc-50/50 border border-zinc-100 rounded-xl flex flex-col select-none">
+                        <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Position</span>
+                        <span class="text-base font-extrabold text-zinc-900 mt-1 leading-none" id="perf-overview-position">—</span>
+                        <span class="text-[9px] font-bold text-emerald-600 flex items-center gap-0.5 mt-2">
                             <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="3" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>-5
                         </span>
                     </div>
                 </div>
 
                 <!-- Unified Area Sparkline -->
-                <div class="pt-4 border-t border-zinc-100 dark:border-zinc-850 flex flex-col gap-2 select-none">
-                    <div class="text-[9px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider">Weekly Traffic Trend</div>
-                    <div class="relative w-full h-[65px] bg-zinc-50/20 dark:bg-zinc-900/10 rounded-lg p-1">
+                <div class="pt-4 border-t border-zinc-100 flex flex-col gap-2 select-none">
+                    <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Weekly Traffic Trend</div>
+                    <div class="relative w-full h-[65px] bg-zinc-50/20 rounded-lg p-1">
                         <canvas id="cora-performance-sparkline" class="w-full h-full"></canvas>
                     </div>
                 </div>
 
-                <button onclick="switchContentTab('ct-performance')" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 border border-zinc-200/80 hover:border-zinc-900 bg-white hover:bg-zinc-50 text-zinc-855 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-3xs active:scale-97 select-none dark:bg-zinc-950 dark:hover:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:text-white">
+                <button onclick="switchContentTab('ct-performance')" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 border border-zinc-200/80 hover:border-zinc-900 bg-white hover:bg-zinc-50 text-zinc-855 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-3xs active:scale-97 select-none ">
                     <span>Go to Performance Analytics</span>
                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </button>
@@ -645,15 +645,15 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                     <div class="w-20 shrink-0 flex items-center justify-center">
                         <svg viewBox="0 0 100 90" class="w-full text-zinc-200">
                             <!-- Layer 1 -->
-                            <polygon points="5,5 95,5 85,20 15,20" fill="currentColor" class="text-zinc-200 dark:text-zinc-800 transition-all hover:opacity-85 cursor-pointer" id="funnel-l1"/>
+                            <polygon points="5,5 95,5 85,20 15,20" fill="currentColor" class="text-zinc-200 transition-all hover:opacity-85 cursor-pointer" id="funnel-l1"/>
                             <!-- Layer 2 -->
-                            <polygon points="17,23 83,23 75,38 25,38" fill="currentColor" class="text-zinc-300 dark:text-zinc-700 transition-all hover:opacity-85 cursor-pointer" id="funnel-l2"/>
+                            <polygon points="17,23 83,23 75,38 25,38" fill="currentColor" class="text-zinc-300 transition-all hover:opacity-85 cursor-pointer" id="funnel-l2"/>
                             <!-- Layer 3 -->
-                            <polygon points="27,41 73,41 65,56 35,56" fill="currentColor" class="text-zinc-400 dark:text-zinc-600 transition-all hover:opacity-85 cursor-pointer" id="funnel-l3"/>
+                            <polygon points="27,41 73,41 65,56 35,56" fill="currentColor" class="text-zinc-400 transition-all hover:opacity-85 cursor-pointer" id="funnel-l3"/>
                             <!-- Layer 4 -->
-                            <polygon points="37,59 63,59 55,74 45,74" fill="currentColor" class="text-zinc-500 dark:text-zinc-500 transition-all hover:opacity-85 cursor-pointer" id="funnel-l4"/>
+                            <polygon points="37,59 63,59 55,74 45,74" fill="currentColor" class="text-zinc-500 transition-all hover:opacity-85 cursor-pointer" id="funnel-l4"/>
                             <!-- Layer 5 -->
-                            <polygon points="47,77 53,77 50,89 50,89" fill="currentColor" class="text-zinc-600 dark:text-zinc-400 transition-all hover:opacity-85 cursor-pointer" id="funnel-l5"/>
+                            <polygon points="47,77 53,77 50,89 50,89" fill="currentColor" class="text-zinc-600 transition-all hover:opacity-85 cursor-pointer" id="funnel-l5"/>
                         </svg>
                     </div>
 
@@ -1187,22 +1187,22 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 <!-- PANEL: SEO Analyzer -->
 <div id="panel-ct-seo" class="cora-ct-panel hidden w-full max-w-full">
     <!-- Top Control Bar -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-zinc-800/80 mb-5 select-none w-full">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 mb-5 select-none w-full">
         <div class="flex items-center gap-3 flex-1 w-full max-w-2xl relative" id="seo-dropdown-wrapper">
-            <span class="hidden sm:inline-block text-[10px] font-extrabold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest shrink-0">Active Article:</span>
+            <span class="hidden sm:inline-block text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest shrink-0">Active Article:</span>
             <div class="relative flex-1 w-full">
-                <button onclick="coraToggleSEODropdown(event)" class="w-full text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors flex items-center justify-between bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer shadow-3xs select-none">
+                <button onclick="coraToggleSEODropdown(event)" class="w-full text-xs font-bold text-zinc-800 hover:text-zinc-950 transition-colors flex items-center justify-between bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 cursor-pointer shadow-3xs select-none">
                     <span id="seo-active-article-title-display">Select an article...</span>
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 ml-2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
 
                 <!-- Restructured combobox popover card -->
-                <div id="seo-sidebar" class="hidden absolute left-0 top-full mt-2 w-full min-w-full bg-white dark:bg-zinc-950 border border-zinc-250 dark:border-zinc-800 rounded-xl shadow-xl z-[999] flex flex-col overflow-hidden max-h-[350px] transition-all duration-200 select-none">
+                <div id="seo-sidebar" class="hidden absolute left-0 top-full mt-2 w-full min-w-full bg-white border border-zinc-250 rounded-xl shadow-xl z-[999] flex flex-col overflow-hidden max-h-[350px] transition-all duration-200 select-none">
                     <!-- Search Bar -->
-                    <div class="p-3 border-b border-zinc-100 dark:border-zinc-850 flex items-center gap-2">
+                    <div class="p-3 border-b border-zinc-100 flex items-center gap-2">
                         <div class="relative flex-1">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-450"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            <input type="text" id="seo-search" class="w-full pl-8 pr-3 py-2 border border-zinc-200/80 dark:border-zinc-850 rounded-lg text-xs focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-200 dark:focus:ring-zinc-800 bg-zinc-50/50 focus:bg-white transition-all dark:bg-zinc-900 dark:text-zinc-200" placeholder="Search title or ID..." oninput="filterSEOArticleList(this.value)">
+                            <input type="text" id="seo-search" class="w-full pl-8 pr-3 py-2 border border-zinc-200/80 rounded-lg text-xs focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-200 bg-zinc-50/50 focus:bg-white transition-all " placeholder="Search title or ID..." oninput="filterSEOArticleList(this.value)">
                         </div>
                     </div>
 
@@ -1211,11 +1211,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         <?php foreach($cora_posts as $idx => $post): 
                             $score = intval(get_post_meta($post->ID, '_cora_seo_score', true));
                             if (!$score) $score = 75;
-                            $score_cls = ($score >= 80) ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30' : (($score >= 50) ? 'bg-amber-50 text-amber-700 border-amber-200/60 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30' : 'bg-red-50 text-red-700 border-red-200/60 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30');
+                            $score_cls = ($score >= 80) ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60 ' : (($score >= 50) ? 'bg-amber-50 text-amber-700 border-amber-200/60 ' : 'bg-red-50 text-red-700 border-red-200/60 ');
                             $modified_time = human_time_diff(get_the_modified_time('U', $post->ID), current_time('timestamp'));
                         ?>
-                        <button class="seo-article-btn w-full text-left p-2 hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 rounded-lg border border-transparent hover:border-zinc-200/80 dark:hover:border-zinc-800 transition-all cursor-pointer flex items-center justify-between gap-3 group <?php echo $idx === 0 ? 'active bg-zinc-50 dark:bg-zinc-900 border-zinc-200/80 dark:border-zinc-800 shadow-3xs' : ''; ?>" data-id="<?php echo $post->ID; ?>" data-title="<?php echo esc_attr($post->post_title); ?>" data-score="<?php echo $score; ?>" onclick="openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
-                            <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors truncate max-w-[200px] sm:max-w-md leading-tight"><?php echo esc_html($post->post_title); ?></span>
+                        <button class="seo-article-btn w-full text-left p-2 hover:bg-zinc-50/80 rounded-lg border border-transparent hover:border-zinc-200/80 transition-all cursor-pointer flex items-center justify-between gap-3 group <?php echo $idx === 0 ? 'active bg-zinc-50 border-zinc-200/80 shadow-3xs' : ''; ?>" data-id="<?php echo $post->ID; ?>" data-title="<?php echo esc_attr($post->post_title); ?>" data-score="<?php echo $score; ?>" onclick="openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
+                            <span class="text-xs font-semibold text-zinc-700 group-hover:text-zinc-900 transition-colors truncate max-w-[200px] sm:max-w-md leading-tight"><?php echo esc_html($post->post_title); ?></span>
                             <span class="seo-badge-pill px-1.5 py-0.5 rounded text-[9px] font-extrabold border shrink-0 <?php echo $score_cls; ?>"><?php echo $score; ?>/100</span>
                         </button>
                         <?php endforeach; ?>
@@ -1245,13 +1245,13 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </div>
 
     <!-- Main Right Analysis Area - Takes Full Width -->
-    <div class="w-full bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl shadow-2xs p-3 sm:p-5 overflow-x-hidden min-h-[500px]" id="seo-analysis-container">
+    <div class="w-full bg-white border border-zinc-200/80 rounded-xl shadow-2xs p-3 sm:p-5 overflow-x-hidden min-h-[500px]" id="seo-analysis-container">
         <div class="text-center text-zinc-500 py-28 max-w-sm mx-auto select-none">
-            <div class="w-16 h-16 bg-zinc-50 dark:bg-zinc-900 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-zinc-150 dark:border-zinc-850">
+            <div class="w-16 h-16 bg-zinc-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-zinc-150 ">
                 <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </div>
-            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 mb-1">Select an Article to Audit</h3>
-            <p class="text-xs text-zinc-500 dark:text-zinc-450 mb-4">Click "Select an article..." dropdown at the top to view its real-time 11-point SEO audit, AI search visibility signals, and meta optimizations.</p>
+            <h3 class="text-sm font-bold text-zinc-900 mb-1">Select an Article to Audit</h3>
+            <p class="text-xs text-zinc-500 mb-4">Click "Select an article..." dropdown at the top to view its real-time 11-point SEO audit, AI search visibility signals, and meta optimizations.</p>
         </div>
     </div>
 
@@ -1685,21 +1685,21 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-150 pb-4">
         <div class="flex items-center gap-3">
             <!-- Segmented Control for Views -->
-            <div class="inline-flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl shadow-3xs select-none">
-                <button onclick="switchCalendarSubView('monthly')" id="cal-subtab-monthly" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs cursor-pointer">Monthly</button>
-                <button onclick="switchCalendarSubView('weekly')" id="cal-subtab-weekly" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-zinc-650 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white cursor-pointer">Weekly</button>
-                <button onclick="switchCalendarSubView('kanban')" id="cal-subtab-kanban" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-zinc-650 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white cursor-pointer">Kanban</button>
+            <div class="inline-flex bg-zinc-100 p-1 rounded-xl shadow-3xs select-none">
+                <button onclick="switchCalendarSubView('monthly')" id="cal-subtab-monthly" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-zinc-900 shadow-2xs cursor-pointer">Monthly</button>
+                <button onclick="switchCalendarSubView('weekly')" id="cal-subtab-weekly" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-zinc-650 hover:text-zinc-900 cursor-pointer">Weekly</button>
+                <button onclick="switchCalendarSubView('kanban')" id="cal-subtab-kanban" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-zinc-650 hover:text-zinc-900 cursor-pointer">Kanban</button>
             </div>
             
             <!-- Prev/Next Controls (only shown for Monthly/Weekly) -->
             <div id="cal-date-nav-controls" class="flex items-center gap-2 select-none">
-                <button onclick="coraChangeCalendarMonth(-1)" class="p-1.5 border border-zinc-200 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900 rounded-lg text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">
+                <button onclick="coraChangeCalendarMonth(-1)" class="p-1.5 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-zinc-600 transition-all cursor-pointer">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
-                <button onclick="coraChangeCalendarMonth(1)" class="p-1.5 border border-zinc-200 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900 rounded-lg text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">
+                <button onclick="coraChangeCalendarMonth(1)" class="p-1.5 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-zinc-600 transition-all cursor-pointer">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </button>
-                <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-mono tracking-tight text-center ml-1" id="cal-month-year-label">May 2026</span>
+                <span class="text-xs font-bold text-zinc-800 font-mono tracking-tight text-center ml-1" id="cal-month-year-label">May 2026</span>
             </div>
         </div>
         
@@ -1783,11 +1783,11 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     <!-- SUB-VIEW: Kanban Planner View -->
     <div id="cal-view-kanban" class="cora-cal-subview hidden space-y-4">
         <!-- Mobile Kanban Column Switcher -->
-        <div class="flex md:hidden bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl mb-4 select-none" id="kbc-mobile-switcher">
-            <button onclick="switchMobileKanbanColumn('idea')" id="kbc-tab-idea" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs cursor-pointer">Idea</button>
-            <button onclick="switchMobileKanbanColumn('drafting')" id="kbc-tab-drafting" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-450 cursor-pointer">Drafting</button>
-            <button onclick="switchMobileKanbanColumn('review')" id="kbc-tab-review" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-450 cursor-pointer">Review</button>
-            <button onclick="switchMobileKanbanColumn('scheduled')" id="kbc-tab-scheduled" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-450 cursor-pointer">Scheduled</button>
+        <div class="flex md:hidden bg-zinc-100 p-1 rounded-xl mb-4 select-none" id="kbc-mobile-switcher">
+            <button onclick="switchMobileKanbanColumn('idea')" id="kbc-tab-idea" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold bg-white text-zinc-900 shadow-2xs cursor-pointer">Idea</button>
+            <button onclick="switchMobileKanbanColumn('drafting')" id="kbc-tab-drafting" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold text-zinc-600 cursor-pointer">Drafting</button>
+            <button onclick="switchMobileKanbanColumn('review')" id="kbc-tab-review" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold text-zinc-600 cursor-pointer">Review</button>
+            <button onclick="switchMobileKanbanColumn('scheduled')" id="kbc-tab-scheduled" class="flex-1 text-center py-1.5 rounded-lg text-xs font-bold text-zinc-600 cursor-pointer">Scheduled</button>
         </div>
 
         <!-- Kanban Columns Container -->
@@ -1990,10 +1990,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     width: 100%;
 }
 
-.cora-dark-theme .cora-skeleton {
-    background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%) !important;
-    background-size: 200% 100% !important;
-}
+
 
 @keyframes cora-shimmer {
     0% {
@@ -2051,19 +2048,14 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     flex-shrink: 1 !important;
 }
 
-.cora-dark-theme .cora-stat-card {
-    background-color: rgba(24, 24, 27, 0.5) !important; /* dark:bg-zinc-900/50 */
-    border-color: rgb(39, 39, 42) !important; /* dark:border-zinc-800 */
-}
+
 
 .cora-stat-card:hover {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important; /* shadow-xs */
     border-color: rgb(212, 212, 216) !important; /* hover:border-zinc-300 */
 }
 
-.cora-dark-theme .cora-stat-card:hover {
-    border-color: rgb(63, 63, 70) !important; /* dark:hover:border-zinc-700 */
-}
+
 
 @media (min-width: 640px) {
     .cora-stat-card {
@@ -2141,7 +2133,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 <div id="cora-drawer-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] hidden transition-opacity cursor-pointer" onclick="window.coraCloseAllDrawers()"></div>
 
 <!-- Create Article Side Drawer -->
-<aside id="cora-create-article-sheet" class="cora-bottom-sheet collapsed border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
+<aside id="cora-create-article-sheet" class="cora-bottom-sheet collapsed border-l border-zinc-200 bg-white shadow-2xl flex flex-col">
     <div class="px-6 py-4 border-b border-zinc-200/80 flex justify-between items-center shrink-0">
         <div>
             <h2 class="text-lg font-bold text-zinc-900">New Article</h2>
@@ -2197,8 +2189,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </aside>
 
 <!-- SEO Detail Bottom Sheet Drawer -->
-<aside id="cora-seo-detail-sheet" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl flex flex-col">
-    <div class="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto my-2.5 shrink-0"></div>
+<aside id="cora-seo-detail-sheet" class="cora-bottom-sheet collapsed border-t border-x border-zinc-200 bg-white shadow-2xl flex flex-col">
+    <div class="w-12 h-1.5 bg-zinc-300 rounded-full mx-auto my-2.5 shrink-0"></div>
     <div class="px-6 py-3 border-b border-zinc-200 flex justify-between items-center shrink-0">
         <div>
             <h2 class="text-lg font-bold text-zinc-900" id="seo-drawer-title">SEO Deep Analysis</h2>
@@ -2527,7 +2519,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (type === 'table-rows') {
             for (let i = 0; i < count; i++) {
                 html += `
-                <tr class="border-b border-zinc-100 dark:border-zinc-800/50">
+                <tr class="border-b border-zinc-100 ">
                     <td class="px-5 py-4"><div class="cora-skeleton h-4 w-2/3"></div></td>
                     <td class="px-5 py-4"><div class="cora-skeleton h-4 w-1/2"></div></td>
                     <td class="px-5 py-4"><div class="cora-skeleton h-4 w-1/3"></div></td>
@@ -2541,7 +2533,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         } else if (type === 'cards') {
             for (let i = 0; i < count; i++) {
                 html += `
-                <div class="border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl bg-white dark:bg-zinc-950 p-4 space-y-3.5 shadow-2xs">
+                <div class="border border-zinc-200/80 rounded-2xl bg-white p-4 space-y-3.5 shadow-2xs">
                     <div class="flex items-center justify-between">
                         <div class="cora-skeleton h-4 w-1/3"></div>
                         <div class="cora-skeleton h-4.5 w-12 rounded-full"></div>
@@ -2550,7 +2542,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         <div class="cora-skeleton h-3.5 w-5/6"></div>
                         <div class="cora-skeleton h-3.5 w-2/3"></div>
                     </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/50">
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 ">
                         <div class="cora-skeleton h-3.5 w-1/4"></div>
                         <div class="cora-skeleton h-7 w-20 rounded-lg"></div>
                     </div>
@@ -2559,7 +2551,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         } else if (type === 'calendar-list') {
             for (let i = 0; i < count; i++) {
                 html += `
-                <div class="border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl bg-white dark:bg-zinc-950 p-4 flex items-center justify-between gap-4 shadow-2xs">
+                <div class="border border-zinc-200/80 rounded-2xl bg-white p-4 flex items-center justify-between gap-4 shadow-2xs">
                     <div class="flex items-center gap-3 min-w-0">
                         <div class="cora-skeleton h-9 w-9 rounded-xl shrink-0"></div>
                         <div class="space-y-1.5 min-w-0">
@@ -2573,7 +2565,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         } else if (type === 'performance-rows') {
             for (let i = 0; i < count; i++) {
                 html += `
-                <tr class="border-b border-zinc-100 dark:border-zinc-800/50">
+                <tr class="border-b border-zinc-100 ">
                     <td class="px-4 py-3"><div class="cora-skeleton h-4 w-32"></div></td>
                     <td class="px-4 py-3"><div class="cora-skeleton h-4 w-12"></div></td>
                     <td class="px-4 py-3"><div class="cora-skeleton h-4 w-16"></div></td>
@@ -2586,12 +2578,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         } else if (type === 'performance-cards') {
             for (let i = 0; i < count; i++) {
                 html += `
-                <div class="border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl bg-white dark:bg-zinc-950 p-4 space-y-3 shadow-2xs">
+                <div class="border border-zinc-200/80 rounded-2xl bg-white p-4 space-y-3 shadow-2xs">
                     <div class="flex items-center justify-between">
                         <div class="cora-skeleton h-4 w-1/2"></div>
                         <div class="cora-skeleton h-4 w-16"></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-zinc-100 dark:border-zinc-800/50">
+                    <div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-zinc-100 ">
                         <div class="space-y-1">
                             <div class="cora-skeleton h-3 w-16"></div>
                             <div class="cora-skeleton h-4 w-12"></div>
@@ -2601,7 +2593,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                             <div class="cora-skeleton h-4 w-12"></div>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/50">
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 ">
                         <div class="cora-skeleton h-3 w-20"></div>
                         <div class="cora-skeleton h-7 w-20 rounded-lg"></div>
                     </div>
@@ -2985,20 +2977,20 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const badges = document.querySelectorAll('#inline-seo-checklist-categories span');
         badges.forEach(b => {
             b.innerHTML = '<div class="cora-skeleton h-2 w-4 inline-block"></div>';
-            b.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border border-zinc-200/60 dark:border-zinc-800';
+            b.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 text-zinc-400 border border-zinc-200/60 ';
         });
 
         if (checklistGrid) {
             checklistGrid.innerHTML = `
                 <div class="space-y-3 py-1">
-                    <div class="p-3 border border-zinc-150/70 dark:border-zinc-800 rounded-xl space-y-2.5 bg-zinc-55/10 dark:bg-zinc-900/10">
+                    <div class="p-3 border border-zinc-150/70 rounded-xl space-y-2.5 bg-zinc-55/10 ">
                         <div class="flex items-center justify-between">
                             <div class="cora-skeleton h-3.5 w-1/3"></div>
                             <div class="cora-skeleton h-4.5 w-20 rounded-full"></div>
                         </div>
                         <div class="cora-skeleton h-3 w-5/6 mt-1"></div>
                     </div>
-                    <div class="p-3 border border-zinc-150/70 dark:border-zinc-800 rounded-xl space-y-2.5 bg-zinc-55/10 dark:bg-zinc-900/10">
+                    <div class="p-3 border border-zinc-150/70 rounded-xl space-y-2.5 bg-zinc-55/10 ">
                         <div class="flex items-center justify-between">
                             <div class="cora-skeleton h-3.5 w-1/4"></div>
                             <div class="cora-skeleton h-4.5 w-20 rounded-full"></div>
@@ -3072,9 +3064,9 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         // Highlight active item in combobox dropdown list
         document.querySelectorAll('.seo-article-btn').forEach(btn => {
             if(btn.dataset.id == articleId) {
-                btn.classList.add('active', 'bg-zinc-50', 'dark:bg-zinc-900', 'border-zinc-200/80', 'dark:border-zinc-800', 'shadow-3xs');
+                btn.classList.add('active', 'bg-zinc-50', '', 'border-zinc-200/80', '', 'shadow-3xs');
             } else {
-                btn.classList.remove('active', 'bg-zinc-50', 'dark:bg-zinc-900', 'border-zinc-200/80', 'dark:border-zinc-800', 'shadow-3xs');
+                btn.classList.remove('active', 'bg-zinc-50', '', 'border-zinc-200/80', '', 'shadow-3xs');
             }
         });
 
@@ -3107,15 +3099,15 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const actionsWrapper = document.getElementById('seo-workspace-actions-wrapper');
         if (actionsWrapper) {
             actionsWrapper.innerHTML = `
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-200/90 dark:border-zinc-800 text-xs font-bold shadow-2xs">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-50 text-zinc-800 border border-zinc-200/90 text-xs font-bold shadow-2xs">
                     <svg viewBox="0 0 24 24" width="13" height="13" class="shrink-0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
                     Google Verified
                 </span>
-                <button id="btn-reanalyze-seo" class="bg-white hover:bg-zinc-50 text-zinc-700 dark:text-zinc-350 border border-zinc-200 dark:border-zinc-800 font-semibold px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs dark:bg-zinc-950 dark:hover:bg-zinc-900" onclick="triggerSEOAnalysis(${articleId}, this)">
+                <button id="btn-reanalyze-seo" class="bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-200 font-semibold px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs " onclick="triggerSEOAnalysis(${articleId}, this)">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                     <span>Re-analyze</span>
                 </button>
-                <button id="btn-run-audit-seo" class="bg-zinc-900 hover:bg-zinc-800 text-white font-semibold px-3.5 py-1.5 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-xs dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200" onclick="triggerSEOAnalysis(${articleId}, this)">
+                <button id="btn-run-audit-seo" class="bg-zinc-900 hover:bg-zinc-800 text-white font-semibold px-3.5 py-1.5 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-xs " onclick="triggerSEOAnalysis(${articleId}, this)">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     <span class="hidden sm:inline">Run 11-Point Audit</span>
                     <span class="sm:hidden">Run Audit</span>
@@ -3130,15 +3122,15 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         container.innerHTML = `
             <div class="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
                 <!-- Header Bar -->
-                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-2 border-b border-zinc-100 dark:border-zinc-900">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-2 border-b border-zinc-100 ">
                     <div class="min-w-0">
-                        <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest mb-1">SEO & AI AUDIT WORKSPACE</div>
-                        <h2 class="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight line-clamp-2">${escJsHtml(title)}</h2>
-                        <div class="text-xs text-zinc-500 dark:text-zinc-450 mt-1 flex items-center gap-2 flex-wrap font-medium">
+                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">SEO & AI AUDIT WORKSPACE</div>
+                        <h2 class="text-lg sm:text-xl font-bold text-zinc-900 leading-tight line-clamp-2">${escJsHtml(title)}</h2>
+                        <div class="text-xs text-zinc-500 mt-1 flex items-center gap-2 flex-wrap font-medium">
                             <span>Article ID #${articleId}</span>
-                            <span class="text-zinc-300 dark:text-zinc-700">&bull;</span>
+                            <span class="text-zinc-300 ">&bull;</span>
                             <span id="inline-word-count">Word Count: --</span>
-                            <span class="text-zinc-300 dark:text-zinc-700">&bull;</span>
+                            <span class="text-zinc-300 ">&bull;</span>
                             <span id="inline-last-analyzed">Last Analyzed: --</span>
                         </div>
                     </div>
@@ -3174,10 +3166,10 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 <!-- 4-Metric Top Bar -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                     <!-- Metric 1: Overall SEO Score -->
-                    <div class="bg-white dark:bg-zinc-950 border border-zinc-200/80 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs relative overflow-hidden">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs relative overflow-hidden">
                         <div class="flex items-center justify-between mb-2 gap-1.5">
-                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">Overall SEO Score</span>
-                            <span id="inline-seo-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
+                            <span class="text-xs font-bold text-zinc-900 truncate">Overall SEO Score</span>
+                            <span id="inline-seo-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 text-zinc-400 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
                         </div>
                         <div class="flex items-center gap-3 my-1">
                             <div class="relative w-12 h-12 shrink-0 flex items-center justify-center">
@@ -3189,53 +3181,53 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <div class="text-xl font-bold text-zinc-900 dark:text-zinc-50 leading-none" id="inline-seo-score-large"><div class="cora-skeleton h-5.5 w-12 my-1"></div></div>
+                                <div class="text-xl font-bold text-zinc-900 leading-none" id="inline-seo-score-large"><div class="cora-skeleton h-5.5 w-12 my-1"></div></div>
                                 <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-seo-status"><div class="cora-skeleton h-3 w-32 mt-1"></div></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Metric 2: GEO AI Visibility -->
-                    <div class="bg-white dark:bg-zinc-950 border border-zinc-200/80 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
                         <div class="flex items-center justify-between mb-2 gap-1.5">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 truncate min-w-0">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                                 GEO / AI Visibility
                             </div>
-                            <span id="inline-geo-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
+                            <span id="inline-geo-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 text-zinc-400 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-50" id="inline-geo-score"><div class="cora-skeleton h-6 w-14 my-1"></div></div>
+                            <div class="text-2xl font-bold text-zinc-900 " id="inline-geo-score"><div class="cora-skeleton h-6 w-14 my-1"></div></div>
                             <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-geo-label"><div class="cora-skeleton h-3 w-40 mt-1"></div></div>
                         </div>
                     </div>
 
                     <!-- Metric 3: Focus Keyword Density -->
-                    <div class="bg-white dark:bg-zinc-950 border border-zinc-200/80 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
                         <div class="flex items-center justify-between mb-2 gap-1.5">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 truncate min-w-0">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                                 Focus Keyword Density
                             </div>
-                            <span id="inline-kw-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
+                            <span id="inline-kw-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 text-zinc-400 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-50" id="inline-kw-density"><div class="cora-skeleton h-6 w-10 my-1"></div></div>
+                            <div class="text-2xl font-bold text-zinc-900 " id="inline-kw-density"><div class="cora-skeleton h-6 w-10 my-1"></div></div>
                             <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-kw-label"><div class="cora-skeleton h-3 w-28 mt-1"></div></div>
                         </div>
                     </div>
 
                     <!-- Metric 4: Readability & Depth -->
-                    <div class="bg-white dark:bg-zinc-950 border border-zinc-200/80 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
+                    <div class="bg-white border border-zinc-200/80 hover:border-zinc-300 transition-all rounded-xl p-3 sm:p-4 flex flex-col justify-between shadow-2xs overflow-hidden">
                         <div class="flex items-center justify-between mb-2 gap-1.5">
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 truncate min-w-0">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                                 Readability & Depth
                             </div>
-                            <span id="inline-read-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
+                            <span id="inline-read-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 text-zinc-400 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-8 inline-block"></div></span>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-50" id="inline-readability-score"><div class="cora-skeleton h-6 w-14 my-1"></div></div>
+                            <div class="text-2xl font-bold text-zinc-900 " id="inline-readability-score"><div class="cora-skeleton h-6 w-14 my-1"></div></div>
                             <div class="text-[11px] text-zinc-500 mt-1 font-medium leading-tight" id="inline-readability-label"><div class="cora-skeleton h-3 w-36 mt-1"></div></div>
                         </div>
                     </div>
@@ -3282,7 +3274,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -3298,7 +3290,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -3314,7 +3306,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -3330,7 +3322,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -3346,7 +3338,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -3362,7 +3354,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -3378,7 +3370,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -3394,7 +3386,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -3410,7 +3402,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
 
@@ -3426,7 +3418,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800"><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200/60 "><div class="cora-skeleton h-2 w-4 inline-block"></div></span>
                                         </div>
                                     </div>
                                 </div>
@@ -3435,21 +3427,21 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                             <!-- Detailed Checklist Item List -->
                             <div class="pt-3 border-t border-zinc-100" id="inline-seo-checklist-grid">
                                 <div class="space-y-3 py-1">
-                                    <div class="p-3 border border-zinc-150/70 dark:border-zinc-800 rounded-xl space-y-2.5 bg-zinc-55/10 dark:bg-zinc-900/10">
+                                    <div class="p-3 border border-zinc-150/70 rounded-xl space-y-2.5 bg-zinc-55/10 ">
                                         <div class="flex items-center justify-between">
                                             <div class="cora-skeleton h-3.5 w-1/3"></div>
                                             <div class="cora-skeleton h-4.5 w-20 rounded-full"></div>
                                         </div>
                                         <div class="cora-skeleton h-3 w-5/6 mt-1"></div>
                                     </div>
-                                    <div class="p-3 border border-zinc-150/70 dark:border-zinc-800 rounded-xl space-y-2.5 bg-zinc-55/10 dark:bg-zinc-900/10">
+                                    <div class="p-3 border border-zinc-150/70 rounded-xl space-y-2.5 bg-zinc-55/10 ">
                                         <div class="flex items-center justify-between">
                                             <div class="cora-skeleton h-3.5 w-1/4"></div>
                                             <div class="cora-skeleton h-4.5 w-20 rounded-full"></div>
                                         </div>
                                         <div class="cora-skeleton h-3 w-4/5 mt-1"></div>
                                     </div>
-                                    <div class="p-3 border border-zinc-150/70 dark:border-zinc-800 rounded-xl space-y-2.5 bg-zinc-55/10 dark:bg-zinc-900/10">
+                                    <div class="p-3 border border-zinc-150/70 rounded-xl space-y-2.5 bg-zinc-55/10 ">
                                         <div class="flex items-center justify-between">
                                             <div class="cora-skeleton h-3.5 w-1/2"></div>
                                             <div class="cora-skeleton h-4.5 w-20 rounded-full"></div>
@@ -4505,13 +4497,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         overlay.id = 'cora-delete-confirm-overlay';
         overlay.className = 'fixed inset-0 bg-zinc-950/45 flex items-center justify-center z-[999999] opacity-0 transition-opacity duration-200 select-none';
         overlay.innerHTML = `
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl space-y-4 scale-95 transition-transform duration-200">
+            <div class="bg-white border border-zinc-200 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl space-y-4 scale-95 transition-transform duration-200">
                 <div class="space-y-1.5">
-                    <h4 class="text-sm font-extrabold text-zinc-950 dark:text-white">Delete Article?</h4>
-                    <p class="text-xs text-zinc-500">Are you sure you want to delete <span class="font-bold text-zinc-800 dark:text-zinc-250">"${postTitle}"</span>? This action cannot be undone.</p>
+                    <h4 class="text-sm font-extrabold text-zinc-950 ">Delete Article?</h4>
+                    <p class="text-xs text-zinc-500">Are you sure you want to delete <span class="font-bold text-zinc-800 ">"${postTitle}"</span>? This action cannot be undone.</p>
                 </div>
                 <div class="flex items-center justify-end gap-2.5 pt-2">
-                    <button onclick="document.getElementById('cora-delete-confirm-overlay').remove()" class="px-4 py-2 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-950 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300 transition-all cursor-pointer">Cancel</button>
+                    <button onclick="document.getElementById('cora-delete-confirm-overlay').remove()" class="px-4 py-2 border border-zinc-200 hover:bg-zinc-50 rounded-xl text-xs font-bold text-zinc-700 transition-all cursor-pointer">Cancel</button>
                     <button id="cora-delete-confirm-btn" class="px-4 py-2 bg-red-600 hover:bg-red-750 text-white rounded-xl text-xs font-bold transition-all cursor-pointer">Delete</button>
                 </div>
             </div>
@@ -4559,13 +4551,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         overlay.id = 'cora-delete-confirm-overlay';
         overlay.className = 'fixed inset-0 bg-zinc-950/45 flex items-center justify-center z-[999999] opacity-0 transition-opacity duration-200 select-none';
         overlay.innerHTML = `
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl space-y-4 scale-95 transition-transform duration-200">
+            <div class="bg-white border border-zinc-200 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl space-y-4 scale-95 transition-transform duration-200">
                 <div class="space-y-1.5">
-                    <h4 class="text-sm font-extrabold text-zinc-950 dark:text-white">Delete Selected Articles?</h4>
-                    <p class="text-xs text-zinc-500">Are you sure you want to delete the <span class="font-bold text-zinc-800 dark:text-zinc-250">${selectedIds.length}</span> selected articles? This action cannot be undone.</p>
+                    <h4 class="text-sm font-extrabold text-zinc-950 ">Delete Selected Articles?</h4>
+                    <p class="text-xs text-zinc-500">Are you sure you want to delete the <span class="font-bold text-zinc-800 ">${selectedIds.length}</span> selected articles? This action cannot be undone.</p>
                 </div>
                 <div class="flex items-center justify-end gap-2.5 pt-2">
-                    <button onclick="document.getElementById('cora-delete-confirm-overlay').remove(); document.getElementById('ct-bulk-actions').value = ''" class="px-4 py-2 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-950 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300 transition-all cursor-pointer">Cancel</button>
+                    <button onclick="document.getElementById('cora-delete-confirm-overlay').remove(); document.getElementById('ct-bulk-actions').value = ''" class="px-4 py-2 border border-zinc-200 hover:bg-zinc-50 rounded-xl text-xs font-bold text-zinc-700 transition-all cursor-pointer">Cancel</button>
                     <button id="cora-delete-confirm-btn" class="px-4 py-2 bg-red-600 hover:bg-red-755 text-white rounded-xl text-xs font-bold transition-all cursor-pointer">Delete</button>
                 </div>
             </div>
@@ -5344,14 +5336,14 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         document.getElementById(`cal-view-${view}`).classList.remove('hidden');
         
         document.querySelectorAll('#panel-ct-calendar button[id^="cal-subtab-"]').forEach(btn => {
-            btn.classList.remove('bg-white', 'text-zinc-900', 'shadow-2xs', 'dark:bg-zinc-800', 'dark:text-zinc-100');
-            btn.classList.add('text-zinc-650', 'hover:text-zinc-900', 'dark:text-zinc-400', 'dark:hover:text-white');
+            btn.classList.remove('bg-white', 'text-zinc-900', 'shadow-2xs', '', '');
+            btn.classList.add('text-zinc-650', 'hover:text-zinc-900', '', '');
         });
         
         const activeBtn = document.getElementById(`cal-subtab-${view}`);
         if (activeBtn) {
-            activeBtn.classList.remove('text-zinc-650', 'hover:text-zinc-900', 'dark:text-zinc-400', 'dark:hover:text-white');
-            activeBtn.classList.add('bg-white', 'text-zinc-900', 'shadow-2xs', 'dark:bg-zinc-800', 'dark:text-zinc-100');
+            activeBtn.classList.remove('text-zinc-650', 'hover:text-zinc-900', '', '');
+            activeBtn.classList.add('bg-white', 'text-zinc-900', 'shadow-2xs', '', '');
         }
         
         const dateNav = document.getElementById('cal-date-nav-controls');
@@ -5390,7 +5382,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         let gridSkeletons = '';
         for (let i = 0; i < 28; i++) {
             gridSkeletons += `
-            <div class="p-2 border border-zinc-100 dark:border-zinc-800/40 min-h-[75px] space-y-2">
+            <div class="p-2 border border-zinc-100 min-h-[75px] space-y-2">
                 <div class="cora-skeleton h-3 w-5"></div>
                 <div class="cora-skeleton h-2.5 w-4/5 rounded-xs mt-1"></div>
             </div>`;
@@ -5411,7 +5403,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             // 1. Render Monthly View Grid
             let gridCells = '';
             for(let i = firstDayIndex; i > 0; i--) {
-                gridCells += `<div class="p-2 bg-zinc-50/30 dark:bg-zinc-900/10 text-zinc-300 dark:text-zinc-700 text-[10px] select-none">${prevMonthLastDay - i + 1}</div>`;
+                gridCells += `<div class="p-2 bg-zinc-50/30 text-zinc-300 text-[10px] select-none">${prevMonthLastDay - i + 1}</div>`;
             }
 
             for(let day = 1; day <= currentMonthLastDay; day++) {
@@ -5433,17 +5425,17 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     else if (item.stage === 'scheduled') dotColor = 'bg-zinc-500';
 
                     itemsHtml += `
-                        <div onclick="coraEditArticle(${item.post_id || item.id}, '${item.title.replace(/'/g, "\\'")}')" class="px-1.5 py-0.5 rounded border border-zinc-150/70 text-[9px] font-semibold truncate cursor-pointer hover:shadow-xs active:scale-95 transition-all bg-white dark:bg-zinc-900 flex items-center gap-1 select-none" title="${item.title}">
+                        <div onclick="coraEditArticle(${item.post_id || item.id}, '${item.title.replace(/'/g, "\\'")}')" class="px-1.5 py-0.5 rounded border border-zinc-150/70 text-[9px] font-semibold truncate cursor-pointer hover:shadow-xs active:scale-95 transition-all bg-white flex items-center gap-1 select-none" title="${item.title}">
                             <span class="w-1.5 h-1.5 rounded-full ${dotColor} shrink-0"></span>
                             <span class="truncate">${item.title}</span>
                         </div>`;
                 });
 
                 gridCells += `
-                    <div class="p-2 flex flex-col gap-1 overflow-hidden group hover:bg-zinc-50/40 dark:hover:bg-zinc-900/10 transition-colors${isToday ? ' bg-zinc-50 dark:bg-zinc-900 ring-1 ring-inset ring-zinc-300 dark:ring-zinc-800' : ''}">
+                    <div class="p-2 flex flex-col gap-1 overflow-hidden group hover:bg-zinc-50/40 transition-colors${isToday ? ' bg-zinc-50 ring-1 ring-inset ring-zinc-300 ' : ''}">
                         <div class="flex justify-between items-center select-none">
                             <span class="text-[10px] font-bold font-mono${isToday ? ' w-5 h-5 bg-zinc-900 text-white rounded-full flex items-center justify-center' : ' text-zinc-400'}">${day}</span>
-                            <span onclick="openCreateArticleDrawer('${dayDateStr}')" class="opacity-0 group-hover:opacity-100 text-[10px] text-zinc-450 hover:text-zinc-900 dark:hover:text-white cursor-pointer transition-opacity font-bold">+</span>
+                            <span onclick="openCreateArticleDrawer('${dayDateStr}')" class="opacity-0 group-hover:opacity-100 text-[10px] text-zinc-450 hover:text-zinc-900 cursor-pointer transition-opacity font-bold">+</span>
                         </div>
                         <div class="flex flex-col gap-0.5 overflow-y-auto scrollbar-hide">${itemsHtml}</div>
                     </div>
@@ -5453,7 +5445,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             const totalCells = firstDayIndex + currentMonthLastDay;
             const remainingCells = (7 - (totalCells % 7)) % 7;
             for(let i = 1; i <= remainingCells; i++) {
-                gridCells += `<div class="p-2 bg-zinc-50/30 dark:bg-zinc-900/10 text-zinc-300 dark:text-zinc-700 text-[10px] select-none">${i}</div>`;
+                gridCells += `<div class="p-2 bg-zinc-50/30 text-zinc-300 text-[10px] select-none">${i}</div>`;
             }
 
             grid.innerHTML = gridCells;
@@ -5548,7 +5540,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             return `
                 <div class="py-3 flex items-center justify-between font-medium group hover:bg-zinc-50/20 transition-colors">
                     <div class="space-y-0.5">
-                        <div onclick="coraEditArticle(${item.post_id || item.id}, '${item.title.replace(/'/g, "\\'")}')" class="font-bold text-zinc-900 hover:text-zinc-950 dark:text-zinc-200 dark:hover:text-white cursor-pointer">${item.title}</div>
+                        <div onclick="coraEditArticle(${item.post_id || item.id}, '${item.title.replace(/'/g, "\\'")}')" class="font-bold text-zinc-900 hover:text-zinc-950 cursor-pointer">${item.title}</div>
                         <div class="flex items-center gap-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest leading-none">
                             <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
                             ${statusLabel}
@@ -5583,7 +5575,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
             let itemsHtml = '';
             if (dayItems.length === 0) {
-                itemsHtml = `<div class="text-zinc-400 dark:text-zinc-600 text-xs italic">No items scheduled</div>`;
+                itemsHtml = `<div class="text-zinc-400 text-xs italic">No items scheduled</div>`;
             } else {
                 itemsHtml = dayItems.map(item => {
                     let badge = 'bg-zinc-100 text-zinc-700';
@@ -5603,7 +5595,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             agendaHtml += `
                 <div class="space-y-2 border-b border-zinc-100 pb-3 last:border-b-0">
                     <div class="flex items-baseline gap-2 select-none">
-                        <span class="text-xs font-extrabold text-zinc-950 dark:text-zinc-150">${dayName}</span>
+                        <span class="text-xs font-extrabold text-zinc-950 ">${dayName}</span>
                         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">${dayNumStr}</span>
                     </div>
                     <div class="space-y-1.5">${itemsHtml}</div>
@@ -5660,21 +5652,21 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 }
 
                 return `
-                    <div draggable="true" data-item-id="${item.id}" class="kanban-card-draggable p-4 border border-zinc-200/85 rounded-xl bg-white dark:bg-zinc-950 shadow-3xs hover:shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-800 active:cursor-grabbing cursor-grab transition-all space-y-3.5 select-none">
+                    <div draggable="true" data-item-id="${item.id}" class="kanban-card-draggable p-4 border border-zinc-200/85 rounded-xl bg-white shadow-3xs hover:shadow-2xs hover:border-zinc-300 active:cursor-grabbing cursor-grab transition-all space-y-3.5 select-none">
                         <!-- Card Header -->
                         <div class="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider">
-                            <span class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 rounded">${intent}</span>
+                            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-650 rounded">${intent}</span>
                             <span class="px-1.5 py-0.5 rounded ${priorityColor}">${priority}</span>
                         </div>
 
                         <!-- Card Title -->
-                        <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-150 leading-snug cursor-pointer hover:text-zinc-950" onclick="coraEditArticle(${item.post_id || item.id}, '${item.title.replace(/'/g, "\\'")}')">${item.title}</h4>
+                        <h4 class="text-xs font-bold text-zinc-900 leading-snug cursor-pointer hover:text-zinc-950" onclick="coraEditArticle(${item.post_id || item.id}, '${item.title.replace(/'/g, "\\'")}')">${item.title}</h4>
 
                         <!-- Card Metrics -->
                         <div class="flex items-center justify-between text-[10px] font-medium border-b border-zinc-100/50 pb-2">
                             <div class="flex items-center gap-1.5 select-none">
-                                <span class="px-1.5 py-0.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 rounded-md text-zinc-500 font-mono">SEO ${item.seo_score || 0}/100</span>
-                                <span class="px-1.5 py-0.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 rounded-md text-zinc-500 font-mono">GEO ${item.geo_score || 0}%</span>
+                                <span class="px-1.5 py-0.5 bg-zinc-50 border border-zinc-200 rounded-md text-zinc-500 font-mono">SEO ${item.seo_score || 0}/100</span>
+                                <span class="px-1.5 py-0.5 bg-zinc-50 border border-zinc-200 rounded-md text-zinc-500 font-mono">GEO ${item.geo_score || 0}%</span>
                             </div>
                             <span class="text-zinc-450 font-mono font-bold uppercase text-[9px]">${wordCount} w</span>
                         </div>
@@ -5682,7 +5674,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         <!-- Card Footer -->
                         <div class="flex items-center justify-between text-[11px]">
                             <div class="flex items-center gap-1.5">
-                                <div class="w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 text-[9px] font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-center select-none uppercase">${writerInitials}</div>
+                                <div class="w-5 h-5 rounded-full bg-zinc-100 border border-zinc-200/50 text-[9px] font-bold text-zinc-700 flex items-center justify-center select-none uppercase">${writerInitials}</div>
                                 <span class="font-bold text-zinc-750">${writer}</span>
                             </div>
                             ${dateHtml}
@@ -5710,11 +5702,11 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             const btn = document.getElementById('kbc-tab-' + c);
             if (btn) {
                 if (c === col) {
-                    btn.classList.add('bg-white', 'text-zinc-900', 'shadow-2xs', 'dark:bg-zinc-800', 'dark:text-zinc-100');
-                    btn.classList.remove('text-zinc-650', 'text-zinc-600', 'dark:text-zinc-450');
+                    btn.classList.add('bg-white', 'text-zinc-900', 'shadow-2xs', '', '');
+                    btn.classList.remove('text-zinc-650', 'text-zinc-600', '');
                 } else {
-                    btn.classList.remove('bg-white', 'text-zinc-900', 'shadow-2xs', 'dark:bg-zinc-800', 'dark:text-zinc-100');
-                    btn.classList.add('text-zinc-600', 'dark:text-zinc-450');
+                    btn.classList.remove('bg-white', 'text-zinc-900', 'shadow-2xs', '', '');
+                    btn.classList.add('text-zinc-600', '');
                 }
             }
         });
@@ -6359,59 +6351,59 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     <div id="cora-copilot-wrapper" class="font-sans relative">
         <div id="cora-copilot-container">
             <!-- Floating Chat Window (WhatsApp Style + Search Dashboard) -->
-            <div id="cora-copilot-chat-window" class="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-2xl flex flex-col h-[460px] transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom">
+            <div id="cora-copilot-chat-window" class="bg-white border border-zinc-200 shadow-2xl rounded-2xl flex flex-col h-[460px] transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom">
                 <!-- Chat Header -->
-                <div class="flex items-center justify-between p-3.5 border-b border-zinc-150 dark:border-zinc-850 bg-[#FBFaf7] dark:bg-zinc-900 rounded-t-2xl select-none">
+                <div class="flex items-center justify-between p-3.5 border-b border-zinc-150 bg-[#FBFaf7] rounded-t-2xl select-none">
                     <div class="flex items-center gap-3">
                         <div class="relative flex items-center justify-center font-mono">
-                            <div class="w-8 h-8 rounded-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs select-none shadow-xs border border-zinc-200 dark:border-zinc-800">M</div>
-                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-[#FBFaf7] dark:border-zinc-900 rounded-full"></span>
+                            <div class="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs select-none shadow-xs border border-zinc-200 ">M</div>
+                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-[#FBFaf7] rounded-full"></span>
                         </div>
                         <div>
-                            <div class="text-xs font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-1.5">
+                            <div class="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
                                 <span>Myra</span>
-                                <span class="text-[9px] font-semibold text-zinc-500 bg-white/90 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 rounded tracking-wide font-sans">Cora expert</span>
+                                <span class="text-[9px] font-semibold text-zinc-500 bg-white/90 border border-zinc-200 px-1.5 py-0.5 rounded tracking-wide font-sans">Cora expert</span>
                             </div>
-                            <div class="text-[9px] text-green-600 dark:text-green-400 font-bold" id="cora-copilot-status">online</div>
+                            <div class="text-[9px] text-green-600 font-bold" id="cora-copilot-status">online</div>
                         </div>
                     </div>
-                    <button id="cora-copilot-close-btn" class="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-850 dark:hover:text-zinc-200 rounded-lg transition-colors border-none bg-transparent cursor-pointer">
+                    <button id="cora-copilot-close-btn" class="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-zinc-850 rounded-lg transition-colors border-none bg-transparent cursor-pointer">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
 
                 <!-- Chat Dashboard Split Pane (Shown when chatMessages is empty) -->
-                <div id="cora-copilot-dashboard" class="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-zinc-150 dark:divide-zinc-850 flex-1 overflow-y-auto bg-white dark:bg-zinc-950">
+                <div id="cora-copilot-dashboard" class="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-zinc-150 flex-1 overflow-y-auto bg-white ">
                     <!-- Left Pane: Quick Actions & Recent Searches -->
                     <div class="flex-1 p-5 space-y-6">
                         <div>
-                            <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2.5">Quick Actions</div>
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2.5">Quick Actions</div>
                             <div class="flex flex-wrap gap-2">
-                                <button type="button" onclick="window.coraExecuteCopilotAction('create_article', 'New Article', this)" class="px-3 py-2 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-850 dark:text-zinc-200 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
+                                <button type="button" onclick="window.coraExecuteCopilotAction('create_article', 'New Article', this)" class="px-3 py-2 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs font-semibold text-zinc-850 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                     New Article
                                 </button>
-                                <button type="button" onclick="window.coraSendCopilotMessage('Write AI Content Brief')" class="px-3 py-2 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-850 dark:text-zinc-200 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
+                                <button type="button" onclick="window.coraSendCopilotMessage('Write AI Content Brief')" class="px-3 py-2 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs font-semibold text-zinc-850 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
                                     AI Content Brief
                                 </button>
-                                <button type="button" onclick="switchContentTab('ct-opportunities')" class="px-3 py-2 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-850 dark:text-zinc-200 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
+                                <button type="button" onclick="switchContentTab('ct-opportunities')" class="px-3 py-2 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs font-semibold text-zinc-850 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                     Keyword Research
                                 </button>
-                                <button type="button" onclick="switchContentTab('ct-seo')" class="px-3 py-2 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-850 dark:text-zinc-200 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
+                                <button type="button" onclick="switchContentTab('ct-seo')" class="px-3 py-2 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs font-semibold text-zinc-850 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
                                     Optimizer
                                 </button>
                             </div>
                         </div>
                         <div>
-                            <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2.5">Recent Searches</div>
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2.5">Recent Searches</div>
                             <div class="flex flex-wrap gap-2">
-                                <button type="button" onclick="window.coraSendCopilotMessage('skincare content ideas')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 dark:bg-zinc-850 dark:hover:bg-zinc-800 rounded-full text-xs text-zinc-700 dark:text-zinc-300 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">skincare content ideas</button>
-                                <button type="button" onclick="window.coraSendCopilotMessage('wedding photography keywords')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 dark:bg-zinc-850 dark:hover:bg-zinc-800 rounded-full text-xs text-zinc-700 dark:text-zinc-300 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">wedding photography keywords</button>
-                                <button type="button" onclick="window.coraSendCopilotMessage('ai visibility report')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 dark:bg-zinc-850 dark:hover:bg-zinc-800 rounded-full text-xs text-zinc-700 dark:text-zinc-300 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">ai visibility report</button>
-                                <button type="button" onclick="window.coraSendCopilotMessage('low ranking pages')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 dark:bg-zinc-850 dark:hover:bg-zinc-800 rounded-full text-xs text-zinc-700 dark:text-zinc-300 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">low ranking pages</button>
+                                <button type="button" onclick="window.coraSendCopilotMessage('skincare content ideas')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 rounded-full text-xs text-zinc-700 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">skincare content ideas</button>
+                                <button type="button" onclick="window.coraSendCopilotMessage('wedding photography keywords')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 rounded-full text-xs text-zinc-700 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">wedding photography keywords</button>
+                                <button type="button" onclick="window.coraSendCopilotMessage('ai visibility report')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 rounded-full text-xs text-zinc-700 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">ai visibility report</button>
+                                <button type="button" onclick="window.coraSendCopilotMessage('low ranking pages')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 rounded-full text-xs text-zinc-700 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">low ranking pages</button>
                             </div>
                         </div>
                     </div>
@@ -6419,47 +6411,47 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     <!-- Right Pane: Suggestions -->
                     <div class="w-full sm:w-64 p-5 flex flex-col justify-between select-none">
                         <div class="space-y-3">
-                            <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Suggestions</div>
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Suggestions</div>
                             <div class="space-y-1.5">
-                                <div onclick="window.coraSendCopilotMessage('Run index check')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/70 dark:hover:bg-zinc-850/80 cursor-pointer transition-all">
-                                    <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Run index check</span>
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                <div onclick="window.coraSendCopilotMessage('Run index check')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/50 hover:bg-zinc-100/70 cursor-pointer transition-all">
+                                    <span class="text-xs font-semibold text-zinc-700 ">Run index check</span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 "><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </div>
-                                <div onclick="window.coraSendCopilotMessage('Optimize meta descriptors')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/70 dark:hover:bg-zinc-850/80 cursor-pointer transition-all">
-                                    <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Optimize meta descriptors</span>
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                <div onclick="window.coraSendCopilotMessage('Optimize meta descriptors')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/50 hover:bg-zinc-100/70 cursor-pointer transition-all">
+                                    <span class="text-xs font-semibold text-zinc-700 ">Optimize meta descriptors</span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 "><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </div>
-                                <div onclick="window.coraSendCopilotMessage('Suggest question headings')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/70 dark:hover:bg-zinc-850/80 cursor-pointer transition-all">
-                                    <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Suggest question headings</span>
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                <div onclick="window.coraSendCopilotMessage('Suggest question headings')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/50 hover:bg-zinc-100/70 cursor-pointer transition-all">
+                                    <span class="text-xs font-semibold text-zinc-700 ">Suggest question headings</span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 "><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </div>
-                                <div onclick="window.coraSendCopilotMessage('Audit organic search rank')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/70 dark:hover:bg-zinc-850/80 cursor-pointer transition-all">
-                                    <span class="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Audit organic search rank</span>
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 dark:text-zinc-500"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                <div onclick="window.coraSendCopilotMessage('Audit organic search rank')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/50 hover:bg-zinc-100/70 cursor-pointer transition-all">
+                                    <span class="text-xs font-semibold text-zinc-700 ">Audit organic search rank</span>
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 "><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </div>
                             </div>
                         </div>
-                        <div onclick="window.coraSendCopilotMessage('View all suggestions')" class="text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:text-black dark:hover:text-white cursor-pointer flex items-center gap-1 mt-3 transition-colors">
+                        <div onclick="window.coraSendCopilotMessage('View all suggestions')" class="text-xs font-bold text-zinc-800 hover:text-black cursor-pointer flex items-center gap-1 mt-3 transition-colors">
                             <span>View all suggestions</span>
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </div>
 
                         <!-- AI Quota & Token Usage (Minimal) -->
-                        <div class="pt-4 border-t border-zinc-150 dark:border-zinc-850 mt-4 select-none">
-                            <div class="text-[10px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-wider mb-2">Usage Quota</div>
-                            <div class="space-y-2 text-[10px] text-zinc-650 dark:text-zinc-400">
+                        <div class="pt-4 border-t border-zinc-150 mt-4 select-none">
+                            <div class="text-[10px] font-bold text-zinc-450 uppercase tracking-wider mb-2">Usage Quota</div>
+                            <div class="space-y-2 text-[10px] text-zinc-650 ">
                                 <!-- Progress -->
                                 <div>
                                     <div class="flex justify-between font-semibold mb-1">
                                         <span id="cora-copilot-token-numbers">42,500 / 100,000</span>
                                         <span id="cora-copilot-token-percent" class="font-mono font-bold">42.5%</span>
                                     </div>
-                                    <div class="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                                        <div id="cora-copilot-token-progress" class="bg-zinc-950 dark:bg-white h-full rounded-full transition-all duration-500" style="width: 42.5%"></div>
+                                    <div class="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden">
+                                        <div id="cora-copilot-token-progress" class="bg-zinc-950 h-full rounded-full transition-all duration-500" style="width: 42.5%"></div>
                                     </div>
                                 </div>
                                 <!-- Inline stats -->
-                                <div class="flex items-center justify-between text-[9px] text-zinc-400 dark:text-zinc-500 pt-0.5">
+                                <div class="flex items-center justify-between text-[9px] text-zinc-400 pt-0.5">
                                     <div class="flex items-center gap-1.5">
                                         <span class="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span>
                                         <span id="cora-copilot-active-engine">Gemini Flash</span>
@@ -6474,17 +6466,17 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 </div>
 
                 <!-- Chat History Pane (WhatsApp Style, Hidden by default when empty) -->
-                <div id="cora-copilot-chat-history" class="hidden flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50/20 dark:bg-zinc-950/20">
+                <div id="cora-copilot-chat-history" class="hidden flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50/20 ">
                     <!-- Messages will be dynamically rendered here -->
                 </div>
 
                 <!-- Chat Input Footer -->
-                <div class="p-3.5 border-t border-zinc-150 dark:border-zinc-850 flex items-center gap-3 bg-white dark:bg-zinc-950 rounded-b-2xl select-none">
-                    <span class="text-zinc-400 dark:text-zinc-550 flex items-center justify-center shrink-0">
+                <div class="p-3.5 border-t border-zinc-150 flex items-center gap-3 bg-white rounded-b-2xl select-none">
+                    <span class="text-zinc-400 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </span>
-                    <input type="text" id="cora-copilot-chat-input" placeholder="Ask anything or search articles, keywords, opportunities..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-850 dark:text-zinc-100 placeholder:text-zinc-450 focus:placeholder:text-zinc-550 transition-all">
-                    <button id="cora-copilot-send-btn" class="px-4 py-2 rounded-full bg-zinc-950 hover:bg-zinc-850 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 transition-colors border-none cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-bold shadow-xs active:scale-97 select-none">
+                    <input type="text" id="cora-copilot-chat-input" placeholder="Ask anything or search articles, keywords, opportunities..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-850 placeholder:text-zinc-450 focus:placeholder:text-zinc-550 transition-all">
+                    <button id="cora-copilot-send-btn" class="px-4 py-2 rounded-full bg-zinc-950 hover:bg-zinc-850 text-white transition-colors border-none cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-bold shadow-xs active:scale-97 select-none">
                         <span>Ask AI</span>
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </button>
@@ -6492,12 +6484,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             </div>
 
             <!-- Floating Input Bar -->
-            <div id="cora-copilot-bar" class="flex items-center gap-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-lg border border-zinc-200 dark:border-zinc-800 shadow-xl rounded-full px-4 py-2.5 w-full transition-all hover:border-zinc-400 dark:hover:border-zinc-650 cursor-pointer select-none">
-                <span class="text-zinc-450 dark:text-zinc-550 flex items-center justify-center shrink-0">
+            <div id="cora-copilot-bar" class="flex items-center gap-3 bg-white/90 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-4 py-2.5 w-full transition-all hover:border-zinc-400 cursor-pointer select-none">
+                <span class="text-zinc-450 flex items-center justify-center shrink-0">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </span>
-                <input type="text" id="cora-copilot-input-field" placeholder="Ask anything or search articles, keywords, opportunities..." class="flex-1 text-[11px] font-semibold outline-none border-none bg-transparent text-zinc-850 dark:text-zinc-150 placeholder:text-zinc-400 cursor-pointer" readonly>
-                <button id="cora-copilot-bar-ask-btn" class="px-4 py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-850 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 transition-all border-none cursor-pointer text-[10px] font-bold shadow-3xs active:scale-95 shrink-0 flex items-center gap-1 select-none">
+                <input type="text" id="cora-copilot-input-field" placeholder="Ask anything or search articles, keywords, opportunities..." class="flex-1 text-[11px] font-semibold outline-none border-none bg-transparent text-zinc-850 placeholder:text-zinc-400 cursor-pointer" readonly>
+                <button id="cora-copilot-bar-ask-btn" class="px-4 py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-850 text-white transition-all border-none cursor-pointer text-[10px] font-bold shadow-3xs active:scale-95 shrink-0 flex items-center gap-1 select-none">
                     <span>Ask AI</span>
                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                 </button>
@@ -6579,9 +6571,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             #cora-copilot-chat-window, #cora-copilot-dashboard {
                 background-color: #FBFaf7 !important;
             }
-            .cora-dark-theme #cora-copilot-chat-window, .cora-dark-theme #cora-copilot-dashboard {
-                background-color: #09090b !important;
-            }
+            
             .cora-copilot-bubble {
                 max-width: 85%;
                 animation: bubbleFadeIn 0.2s ease-out forwards;
@@ -6609,14 +6599,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 border-radius: 9999px;
                 animation: coraShimmer 1.4s infinite linear;
             }
-            .cora-dark-theme .cora-skeleton-bar {
-                background: linear-gradient(90deg, 
-                    #1c1c1f 25%, 
-                    #27272a 37%, 
-                    #1c1c1f 63%
-                );
-                background-size: 200% 100%;
-            }
+            
         `;
         document.head.appendChild(style);
     }
@@ -6742,8 +6725,8 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             }
 
             if (btnEl) {
-                btnEl.classList.remove('bg-zinc-950', 'dark:bg-white', 'text-white', 'dark:text-zinc-950');
-                btnEl.classList.add('bg-zinc-100', 'dark:bg-zinc-800', 'text-zinc-500', 'border-zinc-200');
+                btnEl.classList.remove('bg-zinc-950', '', 'text-white', '');
+                btnEl.classList.add('bg-zinc-100', '', 'text-zinc-500', 'border-zinc-200');
                 btnEl.innerHTML = `<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="inline-block mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg> Applied`;
             }
         } catch(e) {
@@ -6861,7 +6844,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
                 actionHtml = `
                 <div class="mt-2.5">
-                    <button onclick="window.coraExecuteCopilotAction('${type}', \`${data.replace(/`/g, '\\`').replace(/"/g, '&quot;')}\`, this)" class="inline-flex items-center px-3 py-1.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 text-[10px] font-bold rounded-lg transition-all shadow-xs border-none cursor-pointer active:scale-97">
+                    <button onclick="window.coraExecuteCopilotAction('${type}', \`${data.replace(/`/g, '\\`').replace(/"/g, '&quot;')}\`, this)" class="inline-flex items-center px-3 py-1.5 bg-zinc-950 text-white hover:bg-zinc-800 text-[10px] font-bold rounded-lg transition-all shadow-xs border-none cursor-pointer active:scale-97">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         ${btnLabel}
                     </button>
@@ -6870,11 +6853,11 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             }
 
             const bubbleClass = isUser 
-                ? 'ml-auto bg-zinc-100 dark:bg-zinc-800 text-zinc-850 dark:text-zinc-100 rounded-2xl rounded-tr-sm shadow-3xs border border-zinc-200/30 dark:border-zinc-700/30 p-3 px-4 max-w-[80%]' 
-                : 'mr-auto bg-white dark:bg-zinc-900 text-zinc-850 dark:text-zinc-100 rounded-2xl rounded-tl-sm shadow-xs border border-zinc-200/50 dark:border-zinc-800/80 p-4 max-w-[85%]';
+                ? 'ml-auto bg-zinc-100 text-zinc-850 rounded-2xl rounded-tr-sm shadow-3xs border border-zinc-200/30 p-3 px-4 max-w-[80%]' 
+                : 'mr-auto bg-white text-zinc-850 rounded-2xl rounded-tl-sm shadow-xs border border-zinc-200/50 p-4 max-w-[85%]';
 
-            const metaColor = 'text-zinc-450 dark:text-zinc-500';
-            const checkColor = 'text-green-600 dark:text-green-500';
+            const metaColor = 'text-zinc-450 ';
+            const checkColor = 'text-green-600 ';
 
             const bubbleHtml = `
             <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'}">
@@ -6907,7 +6890,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (show) {
             if (statusEl) statusEl.innerText = 'typing...';
             const typingHtml = `
-            <div class="cora-copilot-bubble mr-auto bg-zinc-100/50 dark:bg-zinc-900/30 rounded-tl-sm rounded-tr-xl rounded-br-xl rounded-bl-xl p-4 w-[240px] space-y-3 select-none" id="cora-copilot-typing-bubble">
+            <div class="cora-copilot-bubble mr-auto bg-zinc-100/50 rounded-tl-sm rounded-tr-xl rounded-br-xl rounded-bl-xl p-4 w-[240px] space-y-3 select-none" id="cora-copilot-typing-bubble">
                 <div class="cora-skeleton-bar w-[55%]"></div>
                 <div class="cora-skeleton-bar w-[85%]"></div>
                 <div class="cora-skeleton-bar w-[70%]"></div>

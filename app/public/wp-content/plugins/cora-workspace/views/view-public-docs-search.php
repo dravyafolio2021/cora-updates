@@ -43,47 +43,47 @@ $changelogs_json = json_encode( isset( $changelogs ) ? $changelogs : array() );
     <div class="fixed inset-0 backdrop-blur-md bg-black/30 transition-opacity" id="cora-docs-search-backdrop"></div>
     
     <!-- Modal Card Container -->
-    <div class="relative w-full max-w-xl bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[60vh] transition-all transform z-10">
+    <div class="relative w-full max-w-xl bg-white border border-zinc-200/80 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[60vh] transition-all transform z-10">
         
         <!-- Search Input Bar -->
-        <div class="p-3.5 flex items-center gap-3 bg-white dark:bg-zinc-955 border-b border-zinc-100 dark:border-zinc-900">
+        <div class="p-3.5 flex items-center gap-3 bg-white border-b border-zinc-100 ">
             <!-- Search Icon -->
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 dark:text-zinc-550 flex-shrink-0">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 flex-shrink-0">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             
             <!-- Input Box -->
-            <input type="text" id="cora-docs-search-input" oninput="coraOnSearchInput(this.value)" class="flex-1 text-xs border-0 bg-transparent text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-0 w-full" placeholder="Search documentation, modules, and API reference..." autocomplete="off">
+            <input type="text" id="cora-docs-search-input" oninput="coraOnSearchInput(this.value)" class="flex-1 text-xs border-0 bg-transparent text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-0 w-full" placeholder="Search documentation, modules, and API reference..." autocomplete="off">
             
             <!-- Loading Spinner -->
-            <svg id="cora-docs-search-spinner" class="animate-spin h-3.5 w-3.5 text-zinc-450 dark:text-zinc-500 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg id="cora-docs-search-spinner" class="animate-spin h-3.5 w-3.5 text-zinc-450 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
             
             <!-- Shortcut Badges -->
-            <kbd class="pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded border border-zinc-250/60 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-1.5 font-mono text-[9px] font-medium text-zinc-450 dark:text-zinc-500 shadow-sm">ESC</kbd>
+            <kbd class="pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded border border-zinc-250/60 bg-zinc-50 px-1.5 font-mono text-[9px] font-medium text-zinc-450 shadow-sm">ESC</kbd>
         </div>
         
         <!-- Results Scrollable List -->
-        <div id="cora-docs-search-results-list" class="overflow-y-auto max-h-[40vh] bg-white dark:bg-zinc-950">
+        <div id="cora-docs-search-results-list" class="overflow-y-auto max-h-[40vh] bg-white ">
             <!-- Dynamically populated -->
         </div>
         
         <!-- Keyboard shortcuts hints footer -->
-        <div class="border-t border-zinc-100 dark:border-zinc-900 px-4 py-2.5 bg-zinc-50/50 dark:bg-zinc-950/20 text-[9px] text-zinc-400 dark:text-zinc-500 flex items-center justify-between select-none">
+        <div class="border-t border-zinc-100 px-4 py-2.5 bg-zinc-50/50 text-[9px] text-zinc-400 flex items-center justify-between select-none">
             <div class="flex items-center gap-3">
                 <span class="flex items-center gap-1">
-                    <kbd class="px-1 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded font-mono text-[8px]">↑↓</kbd> to navigate
+                    <kbd class="px-1 border border-zinc-200 bg-white rounded font-mono text-[8px]">↑↓</kbd> to navigate
                 </span>
                 <span class="flex items-center gap-1">
-                    <kbd class="px-1 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded font-mono text-[8px]">↵</kbd> to select
+                    <kbd class="px-1 border border-zinc-200 bg-white rounded font-mono text-[8px]">↵</kbd> to select
                 </span>
             </div>
             <div>
                 <span class="flex items-center gap-1">
-                    <kbd class="px-1 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded font-mono text-[8px]">Esc</kbd> to close
+                    <kbd class="px-1 border border-zinc-200 bg-white rounded font-mono text-[8px]">Esc</kbd> to close
                 </span>
             </div>
         </div>
@@ -236,10 +236,10 @@ window.coraPublicLoadPage = function(event, slug, element, pushToHistory = true)
             } else {
                 if (bodyContainer) {
                     bodyContainer.innerHTML = `
-                        <div class="p-8 border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-center max-w-xl mx-auto my-12">
-                            <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-550">Error Loading Page</h2>
+                        <div class="p-8 border border-zinc-200/80 rounded-xl bg-white text-center max-w-xl mx-auto my-12">
+                            <h2 class="text-sm font-bold text-zinc-900 ">Error Loading Page</h2>
                             <p class="text-xs text-zinc-505 mt-2">${res.data && res.data.message ? res.data.message : 'The requested page could not be found or loaded.'}</p>
-                            <a href="#" onclick="coraPublicLoadPage(event, 'platform-overview')" class="inline-block mt-4 text-xs font-semibold text-zinc-955 dark:text-white underline">Back to Overview</a>
+                            <a href="#" onclick="coraPublicLoadPage(event, 'platform-overview')" class="inline-block mt-4 text-xs font-semibold text-zinc-955 underline">Back to Overview</a>
                         </div>
                     `;
                 }
@@ -249,8 +249,8 @@ window.coraPublicLoadPage = function(event, slug, element, pushToHistory = true)
             console.error('AJAX router fetch error:', err);
             if (bodyContainer) {
                 bodyContainer.innerHTML = `
-                    <div class="p-8 border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-955 text-center max-w-xl mx-auto my-12">
-                        <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-55">Connection Refused</h2>
+                    <div class="p-8 border border-zinc-200/80 rounded-xl bg-white text-center max-w-xl mx-auto my-12">
+                        <h2 class="text-sm font-bold text-zinc-900 ">Connection Refused</h2>
                         <p class="text-xs text-zinc-505 mt-2">Failed to connect to the database router. Check your local environment server status.</p>
                     </div>
                 `;
@@ -409,21 +409,21 @@ function coraRenderRecentOrEmptyResults() {
     
     container.innerHTML = `
         <div class="p-6 text-center select-none">
-            <div class="text-[10px] text-zinc-400 dark:text-zinc-550 uppercase font-bold tracking-wider mb-3">Quick Shortcuts</div>
+            <div class="text-[10px] text-zinc-400 uppercase font-bold tracking-wider mb-3">Quick Shortcuts</div>
             <div class="grid grid-cols-2 gap-2.5 max-w-sm mx-auto">
-                <button onclick="coraSelectQuickLink('platform-overview')" class="flex items-center gap-2 p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 text-left text-xs text-zinc-700 dark:text-zinc-350 cursor-pointer bg-white dark:bg-zinc-950 transition-colors">
+                <button onclick="coraSelectQuickLink('platform-overview')" class="flex items-center gap-2 p-2 rounded-lg border border-zinc-200/80 hover:bg-zinc-50 text-left text-xs text-zinc-700 cursor-pointer bg-white transition-colors">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
                     <span class="font-medium">Overview</span>
                 </button>
-                <button onclick="coraSelectQuickLink('workspace-configuration')" class="flex items-center gap-2 p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 text-left text-xs text-zinc-700 dark:text-zinc-350 cursor-pointer bg-white dark:bg-zinc-955 transition-colors">
+                <button onclick="coraSelectQuickLink('workspace-configuration')" class="flex items-center gap-2 p-2 rounded-lg border border-zinc-200/80 hover:bg-zinc-50 text-left text-xs text-zinc-700 cursor-pointer bg-white transition-colors">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     <span class="font-medium">Config Guide</span>
                 </button>
-                <button onclick="coraSelectQuickLink('api')" class="flex items-center gap-2 p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 text-left text-xs text-zinc-700 dark:text-zinc-350 cursor-pointer bg-white dark:bg-zinc-950 transition-colors">
+                <button onclick="coraSelectQuickLink('api')" class="flex items-center gap-2 p-2 rounded-lg border border-zinc-200/80 hover:bg-zinc-50 text-left text-xs text-zinc-700 cursor-pointer bg-white transition-colors">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
                     <span class="font-medium">API Registry</span>
                 </button>
-                <button onclick="coraSelectQuickLink('changelog')" class="flex items-center gap-2 p-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 text-left text-xs text-zinc-700 dark:text-zinc-350 cursor-pointer bg-white dark:bg-zinc-955 transition-colors">
+                <button onclick="coraSelectQuickLink('changelog')" class="flex items-center gap-2 p-2 rounded-lg border border-zinc-200/80 hover:bg-zinc-50 text-left text-xs text-zinc-700 cursor-pointer bg-white transition-colors">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     <span class="font-medium">Changelog</span>
                 </button>
@@ -474,7 +474,7 @@ function coraRenderSearchResults(groupedData, query) {
         const catName = cat.charAt(0).toUpperCase() + cat.slice(1);
         
         html += `
-            <div class="text-[9px] font-bold text-zinc-455 dark:text-zinc-500 uppercase tracking-wider px-4 pt-3 pb-1 border-none select-none">
+            <div class="text-[9px] font-bold text-zinc-455 uppercase tracking-wider px-4 pt-3 pb-1 border-none select-none">
                 ${catName}
             </div>
             <div class="space-y-0.5">
@@ -485,14 +485,14 @@ function coraRenderSearchResults(groupedData, query) {
             const snippetText = item.snippet ? highlightSearchTerm(item.snippet, query) : '';
             
             html += `
-                <a href="#" onclick="coraNavigateFromSearch(event, '${item.slug}')" data-slug="${item.slug}" data-index="${elementIndex}" class="cora-search-result-item flex items-start gap-3 px-4 py-2 mx-2 rounded-lg text-left text-xs text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 hover:text-zinc-950 dark:hover:text-zinc-50 transition-all group">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450 dark:text-zinc-550 mt-0.5 flex-shrink-0 transition-colors group-hover:text-zinc-950 dark:group-hover:text-zinc-100">
+                <a href="#" onclick="coraNavigateFromSearch(event, '${item.slug}')" data-slug="${item.slug}" data-index="${elementIndex}" class="cora-search-result-item flex items-start gap-3 px-4 py-2 mx-2 rounded-lg text-left text-xs text-zinc-650 hover:bg-zinc-50 hover:text-zinc-950 transition-all group">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-450 mt-0.5 flex-shrink-0 transition-colors group-hover:text-zinc-950 ">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
                     </svg>
                     <div class="flex-1 min-w-0">
-                        <div class="font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-955 dark:group-hover:text-white leading-tight">${highlightedTitle}</div>
-                        ${snippetText ? `<div class="text-[10.5px] text-zinc-400 dark:text-zinc-500 mt-1 line-clamp-1 truncate">${snippetText}</div>` : ''}
+                        <div class="font-semibold text-zinc-800 group-hover:text-zinc-955 leading-tight">${highlightedTitle}</div>
+                        ${snippetText ? `<div class="text-[10.5px] text-zinc-400 mt-1 line-clamp-1 truncate">${snippetText}</div>` : ''}
                     </div>
                     <!-- Selection Indicator chevron -->
                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 opacity-0 group-hover:opacity-100 mt-1 transition-all">
@@ -533,13 +533,13 @@ function coraRenderNoResults(query) {
     
     container.innerHTML = `
         <div class="p-8 text-center space-y-2 select-none">
-            <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-300 dark:text-zinc-700 mx-auto">
+            <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-300 mx-auto">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
-            <h3 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">No results found</h3>
-            <p class="text-[10.5px] text-zinc-450 dark:text-zinc-500 max-w-xs mx-auto">We couldn't find matching titles or content for "${escapeHtml(query)}". Try verifying module names.</p>
+            <h3 class="text-xs font-bold text-zinc-800 ">No results found</h3>
+            <p class="text-[10.5px] text-zinc-450 max-w-xs mx-auto">We couldn't find matching titles or content for "${escapeHtml(query)}". Try verifying module names.</p>
         </div>
     `;
     window.currentSelectedIndex = -1;
@@ -552,14 +552,14 @@ function coraHighlightResultItem(index) {
     const items = document.querySelectorAll('.cora-search-result-item');
     items.forEach((item, idx) => {
         if (idx === index) {
-            item.classList.add('bg-zinc-50', 'dark:bg-zinc-900', 'text-zinc-955', 'dark:text-zinc-50');
-            item.classList.remove('text-zinc-650', 'dark:text-zinc-400');
+            item.classList.add('bg-zinc-50', '', 'text-zinc-955', '');
+            item.classList.remove('text-zinc-650', '');
             const chevron = item.querySelector('svg:last-child');
             if (chevron) chevron.classList.remove('opacity-0');
             item.scrollIntoView({ block: 'nearest' });
         } else {
-            item.classList.remove('bg-zinc-50', 'dark:bg-zinc-900', 'text-zinc-955', 'dark:text-zinc-50');
-            item.classList.add('text-zinc-650', 'dark:text-zinc-400');
+            item.classList.remove('bg-zinc-50', '', 'text-zinc-955', '');
+            item.classList.add('text-zinc-650', '');
             const chevron = item.querySelector('svg:last-child');
             if (chevron) chevron.classList.add('opacity-0');
         }
@@ -607,16 +607,16 @@ function resolveContentContainer() {
  * Removes active styling layout tokens from link elements
  */
 function deactivateLink(link) {
-    link.classList.remove('bg-zinc-950', 'text-white', 'dark:bg-white', 'dark:text-zinc-950', 'font-semibold', 'font-medium');
-    link.classList.add('text-zinc-655', 'hover:text-zinc-950', 'hover:bg-zinc-100/70', 'dark:text-zinc-400', 'dark:hover:text-zinc-50', 'dark:hover:bg-zinc-900/60');
+    link.classList.remove('bg-zinc-950', 'text-white', '', '', 'font-semibold', 'font-medium');
+    link.classList.add('text-zinc-655', 'hover:text-zinc-950', 'hover:bg-zinc-100/70', '', '', '');
 }
 
 /**
  * Adds active monochromatic highlight tokens to link element
  */
 function activateLink(link) {
-    link.classList.remove('text-zinc-655', 'hover:text-zinc-955', 'hover:bg-zinc-100/70', 'dark:text-zinc-400', 'dark:hover:text-zinc-50', 'dark:hover:bg-zinc-900/60');
-    link.classList.add('bg-zinc-950', 'text-white', 'dark:bg-white', 'dark:text-zinc-950', 'font-semibold');
+    link.classList.remove('text-zinc-655', 'hover:text-zinc-955', 'hover:bg-zinc-100/70', '', '', '');
+    link.classList.add('bg-zinc-950', 'text-white', '', '', 'font-semibold');
 }
 
 /**
@@ -641,26 +641,26 @@ function expandParentSidebarGroup(link) {
 function showSkeletonLoader(container) {
     container.innerHTML = `
         <div class="animate-pulse space-y-6 max-w-3xl select-none">
-            <div class="h-3 w-1/4 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-            <div class="h-8 w-2/3 bg-zinc-200 dark:bg-zinc-800 rounded-md mt-4"></div>
+            <div class="h-3 w-1/4 bg-zinc-200 rounded"></div>
+            <div class="h-8 w-2/3 bg-zinc-200 rounded-md mt-4"></div>
             <div class="flex gap-4 mt-2">
-                <div class="h-3.5 w-24 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-                <div class="h-3.5 w-32 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                <div class="h-3.5 w-24 bg-zinc-200 rounded"></div>
+                <div class="h-3.5 w-32 bg-zinc-200 rounded"></div>
             </div>
-            <hr class="border-t border-zinc-200/60 dark:border-zinc-800/80 my-6" />
+            <hr class="border-t border-zinc-200/60 my-6" />
             <div class="space-y-3">
-                <div class="h-4 w-full bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-                <div class="h-4 w-11/12 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-                <div class="h-4 w-4/5 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                <div class="h-4 w-full bg-zinc-200 rounded"></div>
+                <div class="h-4 w-11/12 bg-zinc-200 rounded"></div>
+                <div class="h-4 w-4/5 bg-zinc-200 rounded"></div>
             </div>
             <div class="space-y-2.5 pt-4">
                 <div class="flex items-center gap-2">
-                    <div class="h-2 w-2 bg-zinc-200 dark:bg-zinc-800 rounded-full"></div>
-                    <div class="h-3.5 w-1/2 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                    <div class="h-2 w-2 bg-zinc-200 rounded-full"></div>
+                    <div class="h-3.5 w-1/2 bg-zinc-200 rounded"></div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="h-2 w-2 bg-zinc-200 dark:bg-zinc-800 rounded-full"></div>
-                    <div class="h-3.5 w-2/3 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                    <div class="h-2 w-2 bg-zinc-200 rounded-full"></div>
+                    <div class="h-3.5 w-2/3 bg-zinc-200 rounded"></div>
                 </div>
             </div>
         </div>
@@ -677,18 +677,18 @@ function renderPageContent(container, data) {
     container.innerHTML = `
         <article class="max-w-3xl w-full space-y-6">
             <!-- Breadcrumbs & Actions Row -->
-            <div class="flex flex-wrap items-center justify-between gap-4 text-[11px] text-zinc-400 dark:text-zinc-500 select-none">
+            <div class="flex flex-wrap items-center justify-between gap-4 text-[11px] text-zinc-400 select-none">
                 <div class="flex items-center gap-1.5 font-medium">
                     <span>Docs</span>
                     <span>/</span>
-                    <span class="text-zinc-500 dark:text-zinc-400">${catName}</span>
+                    <span class="text-zinc-500 ">${catName}</span>
                     <span>/</span>
-                    <span class="text-zinc-700 dark:text-zinc-350">${data.title}</span>
+                    <span class="text-zinc-700 ">${data.title}</span>
                 </div>
                 
                 <!-- Action Buttons -->
                 <div class="flex items-center gap-2">
-                    <button onclick="coraCopyDocLink('${pageUrl}', this)" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-850 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 transition-colors bg-white dark:bg-zinc-955 font-bold cursor-pointer text-[10.5px]">
+                    <button onclick="coraCopyDocLink('${pageUrl}', this)" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 hover:text-zinc-950 transition-colors bg-white font-bold cursor-pointer text-[10.5px]">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
@@ -700,8 +700,8 @@ function renderPageContent(container, data) {
             
             <!-- Title & Meta -->
             <div class="space-y-2 mt-4">
-                <h1 class="text-3xl font-bold tracking-tight text-zinc-955 dark:text-zinc-50 font-display">${data.title}</h1>
-                <div class="flex items-center gap-3 text-xs text-zinc-450 dark:text-zinc-500">
+                <h1 class="text-3xl font-bold tracking-tight text-zinc-955 font-display">${data.title}</h1>
+                <div class="flex items-center gap-3 text-xs text-zinc-450 ">
                     <div class="flex items-center gap-1.5 select-none">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -714,10 +714,10 @@ function renderPageContent(container, data) {
                 </div>
             </div>
             
-            <hr class="border-t border-zinc-200/60 dark:border-zinc-800/80 my-6" />
+            <hr class="border-t border-zinc-200/60 my-6" />
             
             <!-- Main Content Container -->
-            <div class="prose max-w-none text-zinc-800 dark:text-zinc-300 text-xs leading-relaxed space-y-4">
+            <div class="prose max-w-none text-zinc-800 text-xs leading-relaxed space-y-4">
                 ${data.html}
             </div>
         </article>
@@ -749,8 +749,8 @@ window.coraCopyDocLink = function(url, btn) {
 function renderApiRegistry(container) {
     if (!coraPublicApis || coraPublicApis.length === 0) {
         container.innerHTML = `
-            <div class="p-8 border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-955 text-center select-none">
-                <h2 class="text-xs font-bold text-zinc-900 dark:text-zinc-50">API Registry Empty</h2>
+            <div class="p-8 border border-zinc-200/80 rounded-xl bg-white text-center select-none">
+                <h2 class="text-xs font-bold text-zinc-900 ">API Registry Empty</h2>
                 <p class="text-[10.5px] text-zinc-500 mt-2">No API endpoint schemas are registered on the platform yet.</p>
             </div>
         `;
@@ -760,64 +760,64 @@ function renderApiRegistry(container) {
     let html = `
         <div class="space-y-6">
             <div class="space-y-2">
-                <h1 class="text-2xl font-bold tracking-tight text-zinc-955 dark:text-zinc-50 font-display">API Endpoint Registry</h1>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400">Complete reference of core REST API endpoints and local MCP gateway controllers.</p>
+                <h1 class="text-2xl font-bold tracking-tight text-zinc-955 font-display">API Endpoint Registry</h1>
+                <p class="text-xs text-zinc-500 ">Complete reference of core REST API endpoints and local MCP gateway controllers.</p>
             </div>
-            <hr class="border-t border-zinc-200/60 dark:border-zinc-800/80 my-4" />
+            <hr class="border-t border-zinc-200/60 my-4" />
             <div class="space-y-4">
     `;
     
     coraPublicApis.forEach(api => {
         const methodColor = api.method === 'GET' 
-            ? 'bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-350' 
-            : 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 border border-zinc-950 dark:border-white';
+            ? 'bg-zinc-100 border border-zinc-200 text-zinc-700 ' 
+            : 'bg-zinc-950 text-white border border-zinc-950 ';
             
         const mcpBadge = api.mcp_compatible == 1
-            ? `<span class="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-955/30 border border-emerald-200/60 dark:border-emerald-900/40 px-1.5 py-0.5 rounded-full select-none">
+            ? `<span class="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-full select-none">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> MCP Ready
                </span>`
             : '';
             
         html += `
-            <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-955 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div class="p-4 flex flex-wrap items-center justify-between gap-3 bg-zinc-50/50 dark:bg-zinc-900/30 border-b border-zinc-100 dark:border-zinc-900">
+            <div class="border border-zinc-200/80 rounded-xl bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div class="p-4 flex flex-wrap items-center justify-between gap-3 bg-zinc-50/50 border-b border-zinc-100 ">
                     <div class="flex items-center gap-2.5 font-mono text-xs">
                         <span class="px-2 py-0.5 rounded font-bold text-[10px] tracking-wide ${methodColor}">${api.method}</span>
-                        <span class="font-bold text-zinc-850 dark:text-zinc-200">${api.path}</span>
+                        <span class="font-bold text-zinc-850 ">${api.path}</span>
                     </div>
                     <div class="flex items-center gap-2">
                         ${mcpBadge}
-                        <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-450 uppercase">${api.permission_level}</span>
+                        <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-zinc-500 uppercase">${api.permission_level}</span>
                     </div>
                 </div>
                 <div class="p-4 space-y-4">
-                    <p class="text-xs leading-relaxed text-zinc-650 dark:text-zinc-400">${api.description || 'No description provided.'}</p>
+                    <p class="text-xs leading-relaxed text-zinc-650 ">${api.description || 'No description provided.'}</p>
                     
                     ${api.required_permissions ? `
-                        <div class="text-[11px] text-zinc-500 dark:text-zinc-455">
-                            <span class="font-semibold text-zinc-700 dark:text-zinc-350">Required Scopes:</span> 
-                            <code class="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-1.5 py-0.5 rounded text-zinc-800 dark:text-zinc-300 font-mono text-[10px]">${api.required_permissions}</code>
+                        <div class="text-[11px] text-zinc-500 ">
+                            <span class="font-semibold text-zinc-700 ">Required Scopes:</span> 
+                            <code class="bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded text-zinc-800 font-mono text-[10px]">${api.required_permissions}</code>
                         </div>
                     ` : ''}
                     
                     ${api.request_schema && api.request_schema !== '{}' ? `
                         <div class="space-y-1.5">
-                            <div class="text-[9px] font-bold text-zinc-450 dark:text-zinc-550 uppercase tracking-wider">Request Schema</div>
-                            <pre class="bg-zinc-950 text-zinc-50 dark:text-zinc-200 p-3 rounded-lg font-mono text-[10.5px] border border-zinc-900 overflow-x-auto">${escapeHtml(api.request_schema)}</pre>
+                            <div class="text-[9px] font-bold text-zinc-450 uppercase tracking-wider">Request Schema</div>
+                            <pre class="bg-zinc-950 text-zinc-50 p-3 rounded-lg font-mono text-[10.5px] border border-zinc-900 overflow-x-auto">${escapeHtml(api.request_schema)}</pre>
                         </div>
                     ` : ''}
                     
                     ${api.response_schema && api.response_schema !== '{}' ? `
                         <div class="space-y-1.5">
-                            <div class="text-[9px] font-bold text-zinc-455 dark:text-zinc-550 uppercase tracking-wider">Response Schema</div>
-                            <pre class="bg-zinc-950 text-zinc-50 dark:text-zinc-200 p-3 rounded-lg font-mono text-[10.5px] border border-zinc-900 overflow-x-auto">${escapeHtml(api.response_schema)}</pre>
+                            <div class="text-[9px] font-bold text-zinc-455 uppercase tracking-wider">Response Schema</div>
+                            <pre class="bg-zinc-950 text-zinc-50 p-3 rounded-lg font-mono text-[10.5px] border border-zinc-900 overflow-x-auto">${escapeHtml(api.response_schema)}</pre>
                         </div>
                     ` : ''}
                     
                     ${api.example ? `
                         <div class="space-y-1.5">
-                            <div class="text-[9px] font-bold text-zinc-450 dark:text-zinc-550 uppercase tracking-wider">Usage Example</div>
-                            <pre class="bg-zinc-950 text-zinc-50 dark:text-zinc-200 p-3 rounded-lg font-mono text-[10.5px] border border-zinc-900 overflow-x-auto">${escapeHtml(api.example)}</pre>
+                            <div class="text-[9px] font-bold text-zinc-450 uppercase tracking-wider">Usage Example</div>
+                            <pre class="bg-zinc-950 text-zinc-50 p-3 rounded-lg font-mono text-[10.5px] border border-zinc-900 overflow-x-auto">${escapeHtml(api.example)}</pre>
                         </div>
                     ` : ''}
                 </div>
@@ -838,8 +838,8 @@ function renderApiRegistry(container) {
 function renderChangelogFeed(container) {
     if (!coraPublicChangelogs || coraPublicChangelogs.length === 0) {
         container.innerHTML = `
-            <div class="p-8 border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-955 text-center select-none">
-                <h2 class="text-xs font-bold text-zinc-900 dark:text-zinc-50">Changelog Feed Empty</h2>
+            <div class="p-8 border border-zinc-200/80 rounded-xl bg-white text-center select-none">
+                <h2 class="text-xs font-bold text-zinc-900 ">Changelog Feed Empty</h2>
                 <p class="text-[10.5px] text-zinc-505 mt-2">No release history has been registered yet.</p>
             </div>
         `;
@@ -849,11 +849,11 @@ function renderChangelogFeed(container) {
     let html = `
         <div class="space-y-6">
             <div class="space-y-2">
-                <h1 class="text-2xl font-bold tracking-tight text-zinc-955 dark:text-zinc-50 font-display">Changelog Feed</h1>
-                <p class="text-xs text-zinc-500 dark:text-zinc-450">Chronological history of features, bugfixes, and security integrations across the Cora Platform.</p>
+                <h1 class="text-2xl font-bold tracking-tight text-zinc-955 font-display">Changelog Feed</h1>
+                <p class="text-xs text-zinc-500 ">Chronological history of features, bugfixes, and security integrations across the Cora Platform.</p>
             </div>
-            <hr class="border-t border-zinc-200/60 dark:border-zinc-800/80 my-4" />
-            <div class="relative pl-6 border-l border-zinc-200 dark:border-zinc-800 space-y-8 mt-6">
+            <hr class="border-t border-zinc-200/60 my-4" />
+            <div class="relative pl-6 border-l border-zinc-200 space-y-8 mt-6">
     `;
     
     coraPublicChangelogs.forEach(entry => {
@@ -864,25 +864,25 @@ function renderChangelogFeed(container) {
         });
         
         const moduleBadge = entry.module_key 
-            ? `<span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-150/70 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-850 text-zinc-650 dark:text-zinc-400 select-none">${entry.module_key}</span>`
+            ? `<span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-150/70 border border-zinc-200/80 text-zinc-650 select-none">${entry.module_key}</span>`
             : '';
             
         const ticketBadge = entry.ticket_id
-            ? `<code class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">${entry.ticket_id}</code>`
+            ? `<code class="text-[10px] font-mono text-zinc-400 hover:text-zinc-900 transition-colors">${entry.ticket_id}</code>`
             : '';
             
         html += `
             <div class="relative">
-                <div class="absolute -left-[31px] top-1.5 w-2.5 h-2.5 rounded-full bg-zinc-950 dark:bg-white border-2 border-white dark:border-zinc-950 ring-4 ring-zinc-100 dark:ring-zinc-900/30"></div>
+                <div class="absolute -left-[31px] top-1.5 w-2.5 h-2.5 rounded-full bg-zinc-950 border-2 border-white ring-4 ring-zinc-100 "></div>
                 <div class="space-y-2.5">
                     <div class="flex flex-wrap items-center gap-3">
-                        <span class="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950">v${entry.version}</span>
-                        <h3 class="text-sm font-bold text-zinc-955 dark:text-zinc-50 leading-none">${entry.title}</h3>
+                        <span class="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-950 text-white ">v${entry.version}</span>
+                        <h3 class="text-sm font-bold text-zinc-955 leading-none">${entry.title}</h3>
                         ${moduleBadge}
                         ${ticketBadge}
-                        <span class="text-[10.5px] text-zinc-400 dark:text-zinc-550 ml-auto select-none">${dateStr}</span>
+                        <span class="text-[10.5px] text-zinc-400 ml-auto select-none">${dateStr}</span>
                     </div>
-                    <div class="text-xs leading-relaxed text-zinc-655 dark:text-zinc-400 max-w-2xl bg-zinc-50/20 dark:bg-zinc-955/30 p-3 rounded-lg border border-zinc-200/60 dark:border-zinc-850/80 shadow-sm">
+                    <div class="text-xs leading-relaxed text-zinc-655 max-w-2xl bg-zinc-50/20 p-3 rounded-lg border border-zinc-200/60 shadow-sm">
                         ${entry.description || ''}
                     </div>
                 </div>
@@ -902,35 +902,35 @@ function renderChangelogFeed(container) {
  */
 function renderCoraAiChat(container) {
     container.innerHTML = `
-        <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-955 overflow-hidden flex flex-col h-[550px] shadow-sm max-w-2xl">
-            <div class="px-4 py-3.5 bg-zinc-50/50 dark:bg-zinc-900/30 border-b border-zinc-100 dark:border-zinc-900 flex items-center justify-between select-none">
+        <div class="border border-zinc-200/80 rounded-xl bg-white overflow-hidden flex flex-col h-[550px] shadow-sm max-w-2xl">
+            <div class="px-4 py-3.5 bg-zinc-50/50 border-b border-zinc-100 flex items-center justify-between select-none">
                 <div class="flex items-center gap-2">
-                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-950 dark:text-zinc-50">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-950 ">
                         <path d="M9.81 2.863a.5.5 0 0 0-.955 0L7.335 6.757 3.441 8.277a.5.5 0 0 0 0 .955l3.894 1.52 1.52 3.894a.5.5 0 0 0 .955 0l1.52-3.894 3.894-1.52a.5.5 0 0 0 0-.955l-3.894-1.52-1.52-3.894zM19 14.5a.5.5 0 0 0-.955 0l-.608 1.558-1.558.608a.5.5 0 0 0 0 .955l1.558.608.608 1.558a.5.5 0 0 0 .955 0l.608-1.558 1.558-.608a.5.5 0 0 0 0-.955l-1.558-.608-.608-1.558z"/>
                     </svg>
-                    <span class="font-bold text-sm text-zinc-900 dark:text-zinc-50 font-display">Cora AI Copilot</span>
+                    <span class="font-bold text-sm text-zinc-900 font-display">Cora AI Copilot</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-[9px] font-mono text-zinc-400 dark:text-zinc-550 font-bold uppercase tracking-wider">RAG Gateway Active</span>
+                    <span class="text-[9px] font-mono text-zinc-400 font-bold uppercase tracking-wider">RAG Gateway Active</span>
                 </div>
             </div>
             
-            <div id="cora-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50/10 dark:bg-zinc-955/10 scrollbar-thin">
+            <div id="cora-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50/10 scrollbar-thin">
                 <div class="flex gap-3 max-w-[85%]">
-                    <div class="w-6 h-6 rounded-full bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-white dark:text-zinc-950 select-none flex-shrink-0">AI</div>
-                    <div class="bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-350 p-3 rounded-lg text-xs leading-relaxed border border-zinc-200/50 dark:border-zinc-850/80">
+                    <div class="w-6 h-6 rounded-full bg-zinc-950 flex items-center justify-center text-[10px] font-bold text-white select-none flex-shrink-0">AI</div>
+                    <div class="bg-zinc-100 text-zinc-800 p-3 rounded-lg text-xs leading-relaxed border border-zinc-200/50 ">
                         Hello! I am Cora AI, your developer reference assistant. Ask me anything about Cora platform architecture, modules, roles, or API integrations.
                     </div>
                 </div>
             </div>
             
-            <div class="p-3 border-t border-zinc-100 dark:border-zinc-900 bg-white dark:bg-zinc-955">
+            <div class="p-3 border-t border-zinc-100 bg-white ">
                 <form id="cora-chat-form" onsubmit="coraSubmitChat(event)" class="flex gap-2">
-                    <input type="text" id="cora-chat-input" class="flex-1 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-zinc-950 focus:border-zinc-950 dark:focus:border-white focus:outline-none text-zinc-900 dark:text-zinc-100 placeholder-zinc-400" placeholder="Ask a question about permissions, RAG layer setup, etc..." required autocomplete="off">
-                    <button type="submit" class="px-4 py-1.5 bg-zinc-950 hover:bg-zinc-900 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-955 font-bold rounded-lg transition-colors text-xs flex items-center gap-1.5 border border-zinc-900 dark:border-zinc-100 cursor-pointer select-none">
+                    <input type="text" id="cora-chat-input" class="flex-1 border border-zinc-200 rounded-lg px-3 py-1.5 text-xs bg-white focus:border-zinc-950 focus:outline-none text-zinc-900 placeholder-zinc-400" placeholder="Ask a question about permissions, RAG layer setup, etc..." required autocomplete="off">
+                    <button type="submit" class="px-4 py-1.5 bg-zinc-950 hover:bg-zinc-900 text-white font-bold rounded-lg transition-colors text-xs flex items-center gap-1.5 border border-zinc-900 cursor-pointer select-none">
                         <span>Send</span>
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-white dark:text-zinc-950">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-white ">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
                             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                         </svg>
@@ -957,10 +957,10 @@ window.coraSubmitChat = function(event) {
     const msgList = document.getElementById('cora-chat-messages');
     msgList.insertAdjacentHTML('beforeend', `
         <div class="flex gap-3 max-w-[85%] ml-auto justify-end">
-            <div class="bg-zinc-955 text-white dark:bg-zinc-100 dark:text-zinc-955 p-3 rounded-lg text-xs leading-relaxed border border-zinc-955 dark:border-white shadow-sm">
+            <div class="bg-zinc-955 text-white p-3 rounded-lg text-xs leading-relaxed border border-zinc-955 shadow-sm">
                 ${escapeHtml(doubt)}
             </div>
-            <div class="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-650 dark:text-zinc-450 select-none flex-shrink-0">Me</div>
+            <div class="w-6 h-6 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center text-[10px] font-bold text-zinc-650 select-none flex-shrink-0">Me</div>
         </div>
     `);
     
@@ -970,11 +970,11 @@ window.coraSubmitChat = function(event) {
     const typingId = 'cora-typing-' + Date.now();
     msgList.insertAdjacentHTML('beforeend', `
         <div id="${typingId}" class="flex gap-3 max-w-[85%] select-none">
-            <div class="w-6 h-6 rounded-full bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-white dark:text-zinc-955 flex-shrink-0">AI</div>
-            <div class="bg-zinc-100 dark:bg-zinc-900 text-zinc-400 p-3.5 rounded-lg text-xs border border-zinc-200/50 dark:border-zinc-850 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 bg-zinc-400 dark:bg-zinc-500 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-                <span class="w-1.5 h-1.5 bg-zinc-400 dark:bg-zinc-500 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-                <span class="w-1.5 h-1.5 bg-zinc-400 dark:bg-zinc-500 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+            <div class="w-6 h-6 rounded-full bg-zinc-900 flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">AI</div>
+            <div class="bg-zinc-100 text-zinc-400 p-3.5 rounded-lg text-xs border border-zinc-200/50 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
             </div>
         </div>
     `);
@@ -1019,8 +1019,8 @@ function addAiMessage(msgList, text) {
     
     msgList.insertAdjacentHTML('beforeend', `
         <div class="flex gap-3 max-w-[85%]">
-            <div class="w-6 h-6 rounded-full bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-white dark:text-zinc-950 select-none flex-shrink-0">AI</div>
-            <div class="bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-300 p-3 rounded-lg text-xs leading-relaxed border border-zinc-200/50 dark:border-zinc-850/80 shadow-sm">
+            <div class="w-6 h-6 rounded-full bg-zinc-900 flex items-center justify-center text-[10px] font-bold text-white select-none flex-shrink-0">AI</div>
+            <div class="bg-zinc-100 text-zinc-800 p-3 rounded-lg text-xs leading-relaxed border border-zinc-200/50 shadow-sm">
                 ${formatted}
             </div>
         </div>
@@ -1040,10 +1040,10 @@ function escapeHtml(str) {
  */
 function formatMessageMarkdown(text) {
     let html = escapeHtml(text);
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-zinc-950 dark:text-white">$1</strong>');
-    html = html.replace(/\`(.*?)\`/g, '<code class="font-mono text-[10.5px] px-1 bg-zinc-200/60 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded">$1</code>');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-zinc-950 ">$1</strong>');
+    html = html.replace(/\`(.*?)\`/g, '<code class="font-mono text-[10.5px] px-1 bg-zinc-200/60 text-zinc-900 rounded">$1</code>');
     html = html.replace(/^\- (.*?)$/gm, '<li class="ml-4 list-disc">$1</li>');
-    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="#" onclick="coraSelectQuickLink(\'$2\')" class="underline font-semibold hover:text-zinc-950 dark:hover:text-white">$1</a>');
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="#" onclick="coraSelectQuickLink(\'$2\')" class="underline font-semibold hover:text-zinc-950 ">$1</a>');
     return html.replace(/\n/g, '<br>');
 }
 

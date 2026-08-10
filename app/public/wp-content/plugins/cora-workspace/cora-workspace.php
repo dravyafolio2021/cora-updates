@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.2.82
+ * Version: 3.2.83
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.2.82' );
+define( 'CORA_WORKSPACE_VERSION', '3.2.83' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -35240,37 +35240,37 @@ function cora_ajax_generate_financial_report() {
 
     ob_start();
     ?>
-    <div class="space-y-4 font-sans text-zinc-900 dark:text-zinc-100">
-        <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
+    <div class="space-y-4 font-sans text-zinc-900">
+        <div class="flex items-center justify-between border-b border-zinc-200 pb-3">
             <div>
-                <h4 class="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100"><?php echo esc_html( ucfirst( $report_type ) ); ?> Financial P&L Statement</h4>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400"><?php echo esc_html( $period_label ); ?> &bull; Generated <?php echo esc_html( date( 'M j, Y g:i A' ) ); ?></p>
+                <h4 class="text-sm font-bold tracking-tight text-zinc-900"><?php echo esc_html( ucfirst( $report_type ) ); ?> Financial P&L Statement</h4>
+                <p class="text-[11px] text-zinc-500"><?php echo esc_html( $period_label ); ?> &bull; Generated <?php echo esc_html( date( 'M j, Y g:i A' ) ); ?></p>
             </div>
-            <span class="px-2.5 py-1 text-xs font-mono font-bold rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900">
+            <span class="px-2.5 py-1 text-xs font-mono font-bold rounded-full bg-zinc-900 text-white">
                 <?php echo esc_html( $margin_pct ); ?>% Margin
             </span>
         </div>
 
         <div class="grid grid-cols-2 gap-3 text-xs">
-            <div class="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">
+            <div class="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Gross Revenue</span>
-                <div class="text-base font-extrabold text-zinc-900 dark:text-zinc-100 mt-1">₹<?php echo number_format( $gross_revenue ); ?></div>
+                <div class="text-base font-extrabold text-zinc-900 mt-1">₹<?php echo number_format( $gross_revenue ); ?></div>
             </div>
-            <div class="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">
+            <div class="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Net Profit</span>
-                <div class="text-base font-extrabold text-zinc-900 dark:text-zinc-100 mt-1">₹<?php echo number_format( $net_profit ); ?></div>
+                <div class="text-base font-extrabold text-zinc-900 mt-1">₹<?php echo number_format( $net_profit ); ?></div>
             </div>
         </div>
 
-        <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+        <div class="border border-zinc-200 rounded-lg overflow-hidden">
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
-                    <tr class="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 font-semibold uppercase text-[10px] tracking-wider border-b border-zinc-200 dark:border-zinc-700">
+                    <tr class="bg-zinc-100 text-zinc-600 font-semibold uppercase text-[10px] tracking-wider border-b border-zinc-200">
                         <th class="p-2.5">Category</th>
                         <th class="p-2.5 text-right">Amount (₹)</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-150 dark:divide-zinc-800">
+                <tbody class="divide-y divide-zinc-150">
                     <tr>
                         <td class="p-2.5 font-medium">Operating Costs</td>
                         <td class="p-2.5 text-right font-mono">₹<?php echo number_format( $operating_costs ); ?></td>
@@ -35287,7 +35287,7 @@ function cora_ajax_generate_financial_report() {
                         <td class="p-2.5 font-medium">Agent / Freelancer Splits</td>
                         <td class="p-2.5 text-right font-mono">₹<?php echo number_format( $agent_splits ); ?></td>
                     </tr>
-                    <tr class="bg-zinc-50 dark:bg-zinc-800/40 font-bold border-t border-zinc-200 dark:border-zinc-700">
+                    <tr class="bg-zinc-50 font-bold border-t border-zinc-200">
                         <td class="p-2.5">Total Outflows & Expenses</td>
                         <td class="p-2.5 text-right font-mono">₹<?php echo number_format( $total_expenses ); ?></td>
                     </tr>

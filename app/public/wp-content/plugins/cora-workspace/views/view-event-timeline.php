@@ -117,14 +117,14 @@ $total_blocks    = count( $timeline_blocks );
     </header>
 
     <!-- 2. TOP 3-STEP "HOW IT WORKS" CARD (BULLETPROOF HIGH CONTRAST) -->
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-zinc-100 dark:divide-zinc-800 gap-4 text-xs">
+    <div class="bg-white rounded-2xl p-5 shadow-sm grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-zinc-100 gap-4 text-xs">
         
         <!-- Step 1 -->
         <div class="flex items-center justify-between p-2 md:px-4">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-xl font-extrabold flex items-center justify-center shrink-0 text-xs" style="background-color: #f4f4f5 !important; color: #18181b !important;">1</div>
                 <div>
-                    <div class="font-extrabold text-zinc-900 dark:text-zinc-100" style="color: #09090b !important;">Add Time Blocks</div>
+                    <div class="font-extrabold text-zinc-900 " style="color: #09090b !important;">Add Time Blocks</div>
                     <div class="text-[11px] font-medium" style="color: #71717a !important;">Define dates, start times & Google Maps pins.</div>
                 </div>
             </div>
@@ -138,7 +138,7 @@ $total_blocks    = count( $timeline_blocks );
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-xl font-extrabold flex items-center justify-center shrink-0 text-xs" style="background-color: #f4f4f5 !important; color: #18181b !important;">2</div>
                 <div>
-                    <div class="font-extrabold text-zinc-900 dark:text-zinc-100" style="color: #09090b !important;">Assign Team Crew</div>
+                    <div class="font-extrabold text-zinc-900 " style="color: #09090b !important;">Assign Team Crew</div>
                     <div class="text-[11px] font-medium" style="color: #71717a !important;">Allocate brokers, photographers & drivers.</div>
                 </div>
             </div>
@@ -152,7 +152,7 @@ $total_blocks    = count( $timeline_blocks );
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-xl font-extrabold flex items-center justify-center shrink-0 text-xs" style="background-color: #f4f4f5 !important; color: #18181b !important;">3</div>
                 <div>
-                    <div class="font-extrabold text-zinc-900 dark:text-zinc-100" style="color: #09090b !important;">Share Client Link</div>
+                    <div class="font-extrabold text-zinc-900 " style="color: #09090b !important;">Share Client Link</div>
                     <div class="text-[11px] font-medium" style="color: #71717a !important;">Send live tracking itinerary on WhatsApp.</div>
                 </div>
             </div>
@@ -163,12 +163,12 @@ $total_blocks    = count( $timeline_blocks );
     </div>
 
     <!-- 3. PROJECT ITINERARY SELECTOR & MAIN BOARD CONTAINER -->
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm space-y-6">
+    <div class="bg-white rounded-2xl p-6 shadow-sm space-y-6">
         
         <!-- Project Selector Row -->
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800/60 pb-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-zinc-100 pb-4">
             <div class="flex items-center gap-3">
-                <div class="p-2.5 rounded-xl text-zinc-900 dark:text-zinc-100 shrink-0" style="background-color: #f4f4f5 !important; color: #18181b !important;">
+                <div class="p-2.5 rounded-xl text-zinc-900 shrink-0" style="background-color: #f4f4f5 !important; color: #18181b !important;">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 21h18"></path><path d="M9 8h1"></path><path d="M9 12h1"></path><path d="M9 16h1"></path><path d="M14 8h1"></path><path d="M14 12h1"></path><path d="M14 16h1"></path><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path></svg>
                 </div>
                 <div>
@@ -322,7 +322,7 @@ $total_blocks    = count( $timeline_blocks );
     </div>
 
     <!-- 4. BOTTOM SUMMARY STATS BAR (HIGH CONTRAST) -->
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs divide-y md:divide-y-0 md:divide-x divide-zinc-100 dark:divide-zinc-800">
+    <div class="bg-white rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs divide-y md:divide-y-0 md:divide-x divide-zinc-100 ">
         
         <div class="flex items-center gap-3 px-4 pt-2 md:pt-0">
             <div class="p-2.5 rounded-xl" style="background-color: #f4f4f5 !important; color: #18181b !important;">
@@ -388,19 +388,19 @@ $total_blocks    = count( $timeline_blocks );
 <!-- SIDE DRAWERS FOR ACTIONS -->
 
 <!-- 1. ADD TIMELINE BLOCK DRAWER -->
-<aside id="cora-add-timeline-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
-    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 flex items-center justify-between">
+<aside id="cora-add-timeline-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
+    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
         <div>
-            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Add Time Block</h3>
+            <h3 class="text-sm font-bold text-zinc-900 ">Add Time Block</h3>
             <p class="text-[11px] text-zinc-500 mt-0.5">Add a site visit, due diligence audit, or photo shoot session.</p>
         </div>
-        <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">✕</button>
+        <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 cursor-pointer">✕</button>
     </div>
 
     <div class="p-6 flex-1 overflow-y-auto space-y-4 text-xs">
         <div>
-            <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Select Day</label>
-            <select id="blk-day-select" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="block font-bold text-zinc-800 mb-1">Select Day</label>
+            <select id="blk-day-select" class="w-full bg-zinc-50 border-0 rounded-xl p-3 text-xs font-semibold text-zinc-900 focus:outline-none">
                 <option value="1">Day 1 (Site Visits & Discovery)</option>
                 <option value="2">Day 2 (Due Diligence & Audits)</option>
                 <option value="3">Day 3 (Contract & Closing Banquet)</option>
@@ -408,53 +408,53 @@ $total_blocks    = count( $timeline_blocks );
         </div>
 
         <div>
-            <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Activity Title *</label>
-            <input type="text" id="blk-activity-title" placeholder="e.g. DLF Cyber Park Tower A Inspection..." class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="block font-bold text-zinc-800 mb-1">Activity Title *</label>
+            <input type="text" id="blk-activity-title" placeholder="e.g. DLF Cyber Park Tower A Inspection..." class="w-full bg-zinc-50 border-0 rounded-xl p-3 text-xs font-semibold text-zinc-900 focus:outline-none">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
             <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Start Time</label>
-                <input type="text" id="blk-time-start" placeholder="10:00 AM" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 font-mono text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="block font-bold text-zinc-800 mb-1">Start Time</label>
+                <input type="text" id="blk-time-start" placeholder="10:00 AM" class="w-full bg-zinc-50 border-0 rounded-xl p-3 font-mono text-xs text-zinc-900 focus:outline-none">
             </div>
             <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">End Time</label>
-                <input type="text" id="blk-time-end" placeholder="01:00 PM" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 font-mono text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="block font-bold text-zinc-800 mb-1">End Time</label>
+                <input type="text" id="blk-time-end" placeholder="01:00 PM" class="w-full bg-zinc-50 border-0 rounded-xl p-3 font-mono text-xs text-zinc-900 focus:outline-none">
             </div>
         </div>
 
         <div>
-            <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Venue Address & GPS Location</label>
-            <input type="text" id="blk-venue-address" placeholder="e.g. DLF Cyber City, Gurugram" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 text-xs font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="block font-bold text-zinc-800 mb-1">Venue Address & GPS Location</label>
+            <input type="text" id="blk-venue-address" placeholder="e.g. DLF Cyber City, Gurugram" class="w-full bg-zinc-50 border-0 rounded-xl p-3 text-xs font-medium text-zinc-900 focus:outline-none">
         </div>
 
         <div>
-            <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Assigned Crew Member</label>
-            <input type="text" id="blk-crew-member" placeholder="e.g. Rajesh Sharma (Lead Broker)" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 text-xs font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="block font-bold text-zinc-800 mb-1">Assigned Crew Member</label>
+            <input type="text" id="blk-crew-member" placeholder="e.g. Rajesh Sharma (Lead Broker)" class="w-full bg-zinc-50 border-0 rounded-xl p-3 text-xs font-medium text-zinc-900 focus:outline-none">
         </div>
     </div>
 
-    <div class="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 flex items-center justify-between">
-        <button onclick="window.coraCloseAllDrawers()" class="px-4 py-2 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300">Cancel</button>
+    <div class="p-4 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between">
+        <button onclick="window.coraCloseAllDrawers()" class="px-4 py-2 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-700 ">Cancel</button>
         <button onclick="coraSubmitAddTimelineBlock()" class="px-5 py-2 text-white rounded-xl text-xs font-bold cursor-pointer" style="background-color: #09090b !important;">Add Schedule Block</button>
     </div>
 </aside>
 
 <!-- 2. SHARE CLIENT MOBILE PORTAL DRAWER -->
-<aside id="cora-share-timeline-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
-    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 flex items-center justify-between">
+<aside id="cora-share-timeline-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
+    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
         <div>
-            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Share Client Link</h3>
+            <h3 class="text-sm font-bold text-zinc-900 ">Share Client Link</h3>
             <p class="text-[11px] text-zinc-500 mt-0.5">Send live mobile itinerary link to client or VIP guest.</p>
         </div>
-        <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">✕</button>
+        <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 cursor-pointer">✕</button>
     </div>
 
     <div class="p-6 flex-1 overflow-y-auto space-y-4 text-xs">
         <div>
-            <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Live Mobile Itinerary URL</label>
+            <label class="block font-bold text-zinc-800 mb-1">Live Mobile Itinerary URL</label>
             <div class="flex gap-2">
-                <input type="text" id="cora-timeline-share-url" readonly class="flex-1 bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 font-mono text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none">
+                <input type="text" id="cora-timeline-share-url" readonly class="flex-1 bg-zinc-50 border-0 rounded-xl p-3 font-mono text-xs text-zinc-700 focus:outline-none">
                 <button onclick="coraCopyTimelineShareUrl()" class="px-4 py-2 text-white font-bold rounded-xl cursor-pointer" style="background-color: #09090b !important;">Copy</button>
             </div>
         </div>

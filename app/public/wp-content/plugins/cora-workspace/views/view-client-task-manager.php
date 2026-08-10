@@ -635,25 +635,25 @@ if (!defined('ABSPATH')) {
 }
 </style>
 
-<div class="cora-task-manager-wrap text-zinc-900 dark:text-zinc-100 font-sans px-3 sm:px-4 py-3 sm:py-4 max-w-[1700px] mx-auto pb-20 relative">
+<div class="cora-task-manager-wrap text-zinc-900 font-sans px-3 sm:px-4 py-3 sm:py-4 max-w-[1700px] mx-auto pb-20 relative">
 
     <!-- Page Header -->
     <div class="cora-task-manager-header">
         <div class="cora-task-header-left">
-            <h1 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Client Task Manager</h1>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-snug">Manage end-to-end client deliverables, shoot checklists, and staff assignments for 50+ active studio projects.</p>
+            <h1 class="text-lg font-bold tracking-tight text-zinc-900 ">Client Task Manager</h1>
+            <p class="text-xs text-zinc-500 leading-snug">Manage end-to-end client deliverables, shoot checklists, and staff assignments for 50+ active studio projects.</p>
         </div>
         <div class="cora-task-header-right">
             <button onclick="coraOpenTemplateDrawer(event)" class="cora-task-export-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
                 Apply Template
             </button>
             <button onclick="coraOpenColumnsManager(event)" class="cora-task-export-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
                 Customize Columns
             </button>
             <button onclick="coraExportTasks()" class="cora-task-export-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 dark:text-zinc-400 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 Export
             </button>
             <button onclick="coraOpenCreateTaskDrawer(event)" class="cora-task-new-btn">
@@ -866,7 +866,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
 <!-- DRAWER 1: Task Workspace & Checklist -->
 <div id="drawer-task-details" class="cora-bottom-drawer">
     <!-- Pull Drag Handle Indicator for Mobile Sheet -->
-    <div class="cora-drawer-handle w-12 h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full mx-auto my-3 shrink-0 hidden"></div>
+    <div class="cora-drawer-handle w-12 h-1 bg-zinc-200 rounded-full mx-auto my-3 shrink-0 hidden"></div>
     
     <!-- Compact Header with Inline Title -->
     <div class="px-6 py-4.5 border-b border-zinc-200/80 bg-white flex items-start justify-between shrink-0 gap-4">
@@ -1104,7 +1104,7 @@ if ( $sub_page === 'bookings' || $sub_page === 'photo-shoots' || strpos($req_uri
 <!-- DRAWER 2: Create New Client Task -->
 <div id="drawer-create-task" class="cora-bottom-drawer">
     <!-- Pull Drag Handle Indicator for Mobile Sheet -->
-    <div class="cora-drawer-handle w-12 h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full mx-auto my-3 shrink-0 hidden"></div>
+    <div class="cora-drawer-handle w-12 h-1 bg-zinc-200 rounded-full mx-auto my-3 shrink-0 hidden"></div>
     
     <!-- Header -->
     <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between shrink-0">

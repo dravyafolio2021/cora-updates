@@ -434,47 +434,42 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 #cm-gallery-dlg.open #cm-gallery-card,
 #cm-folder-settings-dlg.open #cm-folder-settings-card { transform:translateX(0) !important; }
 .cm-drawer-header { padding:20px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; justify-content:space-between; background:#fafafa; }
-.cora-dark-theme .cm-drawer-header { border-color:#27272a; background:#1c1c1e; }
+
 .cm-drawer-body { flex:1; overflow-y:auto; padding:24px; }
 .cm-drawer-footer { padding:20px; border-top:1px solid #e4e4e7; display:flex; align-items:center; justify-content:flex-end; gap:12px; background:#fafafa; }
-.cora-dark-theme .cm-drawer-footer { border-color:#27272a; background:#1c1c1e; }
+
 
 /* ─── Dark mode ──────────────────────────────────────────────────────────── */
-.cora-dark-theme #cm-root,
-.cora-dark-theme #cm-header,
-.cora-dark-theme #cm-tab-bar,
-.cora-dark-theme #cm-toolbar,
-.cora-dark-theme #cm-canvas { background:#111113; }
-.cora-dark-theme #cm-tab-bar { background:#111113; border-color:#27272a; }
-.cora-dark-theme #cm-header { border-color:#27272a; }
-.cora-dark-theme #cm-toolbar { border-color:#27272a; }
-.cora-dark-theme .cm-ftab { color:#71717a; }
-.cora-dark-theme .cm-ftab.active { color:#fafafa; border-color:#fafafa; }
-.cora-dark-theme .cm-cell { background:#1c1c1e; border-color:#27272a; }
-.cora-dark-theme .cm-cell-name { background:#1c1c1e; color:#a1a1aa; border-color:#27272a; }
-.cora-dark-theme .cm-cell-icon { background:#27272a; }
-.cora-dark-theme .cm-hbtn { background:#1c1c1e; border-color:#27272a; color:#d4d4d8; }
-.cora-dark-theme .cm-sel,.cora-dark-theme .cm-search { background:#1c1c1e; border-color:#27272a; color:#d4d4d8; }
-.cora-dark-theme #cm-detail { background:#111113; border-color:#27272a; }
-.cora-dark-theme #cm-detail-footer { background:#1c1c1e; border-color:#27272a; }
-.cora-dark-theme .cm-field input,.cora-dark-theme .cm-field textarea,.cora-dark-theme .cm-field select { background:#1c1c1e; border-color:#27272a; color:#fafafa; }
-.cora-dark-theme #cm-editor-card { background:#111113; }
-.cora-dark-theme #cm-editor-bar { background:#1c1c1e; border-color:#27272a; }
-.cora-dark-theme .cm-ebtn { background:#27272a; border-color:#3f3f46; color:#d4d4d8; }
-.cora-dark-theme #cm-confirm-card,
-.cora-dark-theme #cm-folder-card { background:#111113; border-color:#27272a; }
-.cora-dark-theme #cm-folder-card input { background:#1c1c1e; border-color:#27272a; color:#fafafa; }
-.cora-dark-theme #cm-folder-card h3 { color:#fafafa; }
-.cora-dark-theme #cm-folder-card label { color:#d4d4d8; }
-.cora-dark-theme .cm-h-title { color:#fafafa; }
-.cora-dark-theme .cm-ltable thead th { background:#1c1c1e; }
-.cora-dark-theme .cm-ltable tbody tr:hover { background:#1c1c1e; }
-.cora-dark-theme #cm-mobile-bottom-bar { background: rgba(17,17,19,0.95); border-color: #27272a; }
-.cora-dark-theme #cm-header-top #cm-storage-wrap { background: #1c1c1e; border-color: #27272a; color: #fafafa; }
-.cora-dark-theme #cm-storage-analytics-card { background: #18181b; border-color: #27272a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.cora-dark-theme #cm-storage-analytics-card span { color: #fafafa; }
-.cora-dark-theme #cm-sa-free { color: #fafafa !important; }
-.cora-dark-theme .cm-ring-bg { stroke: #27272a; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ─── Mobile Filter Drawer & Chips ─────────────────────────────────────── */
 #cm-btn-mobile-filter { display: none; }
@@ -498,9 +493,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 #cm-mobile-filter-dlg.open #cm-mobile-filter-card {
     transform: translateY(0);
 }
-.cora-dark-theme #cm-mobile-filter-card {
-    background: #111113; border-color: #27272a; color: #fafafa;
-}
+
 
 .cm-chip {
     display: inline-flex;
@@ -526,11 +519,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     font-weight: 700;
     margin-left: 2px;
 }
-.cora-dark-theme .cm-chip {
-    background: #27272a;
-    border-color: #3f3f46;
-    color: #f4f4f5;
-}
+
 
 .cm-lmobile-sub { display: none; }
 .cm-lmain-sub-desktop { display: block; }

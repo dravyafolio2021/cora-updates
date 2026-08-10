@@ -593,22 +593,22 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
     </div>
 
     <!-- MODULE REGISTRY & VERSION CONTROL CENTER -->
-    <div class="cora-module-registry-card mb-8 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
+    <div class="cora-module-registry-card mb-8 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
         
         <!-- Header & Live Search Bar -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-zinc-100 dark:border-zinc-800">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-zinc-100 ">
             <div>
                 <div class="flex items-center gap-2.5 mb-1">
-                    <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight m-0">Module Registry & Version Control</h2>
-                    <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 px-2.5 py-0.5 rounded-full">7 Active Modules • Scalable to 2,000+</span>
+                    <h2 class="text-xl font-bold text-zinc-900 tracking-tight m-0">Module Registry & Version Control</h2>
+                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-full">7 Active Modules • Scalable to 2,000+</span>
                 </div>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Real-time module version tracking, update timestamps, and accomplishment logs across your workspace ecosystem.</p>
+                <p class="text-xs text-zinc-500 m-0">Real-time module version tracking, update timestamps, and accomplishment logs across your workspace ecosystem.</p>
             </div>
 
             <!-- Instant Module Live Search Input -->
             <div class="relative min-w-[260px]">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="cora-module-search-input" onkeyup="coraFilterModules(this.value)" placeholder="Search modules, versions, changelogs..." class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-all">
+                <input type="text" id="cora-module-search-input" onkeyup="coraFilterModules(this.value)" placeholder="Search modules, versions, changelogs..." class="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-all">
             </div>
         </div>
 
@@ -616,24 +616,24 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-5" id="cora-modules-grid">
             
             <!-- Module 1: Real Estate Suite -->
-            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 dark:bg-zinc-950/50 dark:hover:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-4 transition-all" data-search="cora real estate suite v1.4.2 mobile bottom navigation irn rupee symbol">
+            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 border border-zinc-200/60 rounded-xl p-4 transition-all" data-search="cora real estate suite v1.4.2 mobile bottom navigation irn rupee symbol">
                 <div class="flex items-start justify-between gap-3 mb-2">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold text-xs shrink-0">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
                             RE
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Cora Real Estate Suite</h3>
-                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded">v1.4.2</span>
+                                <h3 class="text-sm font-bold text-zinc-900 m-0">Cora Real Estate Suite</h3>
+                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 text-zinc-700 px-1.5 py-0.5 rounded">v1.4.2</span>
                             </div>
                             <span class="text-[10px] text-zinc-400 font-medium">Industry Core Module • Real Estate Brokerage</span>
                         </div>
                     </div>
-                    <span class="text-[9.5px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full shrink-0">• Active Core</span>
+                    <span class="text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">• Active Core</span>
                 </div>
-                <div class="text-[11px] text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900/90 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg p-2.5 mb-2 leading-relaxed">
-                    <strong class="text-zinc-900 dark:text-zinc-100 font-semibold">Latest Update Accomplishments:</strong> Mobile Bottom Navigation Refactor (Shopify capsule bar, floating circular search & AI action buttons), Indian Rupee (₹) icon integration, equal 20% flex tab distribution, and direct click routing.
+                <div class="text-[11px] text-zinc-600 bg-white border border-zinc-200/50 rounded-lg p-2.5 mb-2 leading-relaxed">
+                    <strong class="text-zinc-900 font-semibold">Latest Update Accomplishments:</strong> Mobile Bottom Navigation Refactor (Shopify capsule bar, floating circular search & AI action buttons), Indian Rupee (₹) icon integration, equal 20% flex tab distribution, and direct click routing.
                 </div>
                 <div class="flex items-center justify-between text-[10px] text-zinc-400 font-medium">
                     <span class="flex items-center gap-1"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Last Updated: July 25, 2026 at 16:15 IST</span>
@@ -642,24 +642,24 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
             </div>
 
             <!-- Module 2: Workspace Core -->
-            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 dark:bg-zinc-950/50 dark:hover:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-4 transition-all" data-search="cora workspace core v2.1.0 command palette search overflow desktop header">
+            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 border border-zinc-200/60 rounded-xl p-4 transition-all" data-search="cora workspace core v2.1.0 command palette search overflow desktop header">
                 <div class="flex items-start justify-between gap-3 mb-2">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold text-xs shrink-0">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
                             WS
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Cora Workspace Core</h3>
-                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded">v2.1.0</span>
+                                <h3 class="text-sm font-bold text-zinc-900 m-0">Cora Workspace Core</h3>
+                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 text-zinc-700 px-1.5 py-0.5 rounded">v2.1.0</span>
                             </div>
                             <span class="text-[10px] text-zinc-400 font-medium">Platform Infrastructure • Core Dashboard</span>
                         </div>
                     </div>
-                    <span class="text-[9.5px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full shrink-0">• Active Core</span>
+                    <span class="text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">• Active Core</span>
                 </div>
-                <div class="text-[11px] text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900/90 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg p-2.5 mb-2 leading-relaxed">
-                    <strong class="text-zinc-900 dark:text-zinc-100 font-semibold">Latest Update Accomplishments:</strong> Command Palette Search height & overflow scrolling refactor, desktop sidebar header duplicate search cleanup, and universal subpage search indexing.
+                <div class="text-[11px] text-zinc-600 bg-white border border-zinc-200/50 rounded-lg p-2.5 mb-2 leading-relaxed">
+                    <strong class="text-zinc-900 font-semibold">Latest Update Accomplishments:</strong> Command Palette Search height & overflow scrolling refactor, desktop sidebar header duplicate search cleanup, and universal subpage search indexing.
                 </div>
                 <div class="flex items-center justify-between text-[10px] text-zinc-400 font-medium">
                     <span class="flex items-center gap-1"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 16 14"></polyline></svg> Last Updated: July 25, 2026 at 16:00 IST</span>
@@ -668,24 +668,24 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
             </div>
 
             <!-- Module 3: Studio AI Engine -->
-            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 dark:bg-zinc-950/50 dark:hover:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-4 transition-all" data-search="cora studio ai engine v1.8.0 claude minimalist aesthetic b-roll toast">
+            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 border border-zinc-200/60 rounded-xl p-4 transition-all" data-search="cora studio ai engine v1.8.0 claude minimalist aesthetic b-roll toast">
                 <div class="flex items-start justify-between gap-3 mb-2">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold text-xs shrink-0">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
                             AI
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Cora Studio AI Engine</h3>
-                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded">v1.8.0</span>
+                                <h3 class="text-sm font-bold text-zinc-900 m-0">Cora Studio AI Engine</h3>
+                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 text-zinc-700 px-1.5 py-0.5 rounded">v1.8.0</span>
                             </div>
                             <span class="text-[10px] text-zinc-400 font-medium">AI Agent & B-Roll Generation Subsystem</span>
                         </div>
                     </div>
-                    <span class="text-[9.5px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-2 py-0.5 rounded-full shrink-0">• Enterprise AI</span>
+                    <span class="text-[9.5px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full shrink-0">• Enterprise AI</span>
                 </div>
-                <div class="text-[11px] text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900/90 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg p-2.5 mb-2 leading-relaxed">
-                    <strong class="text-zinc-900 dark:text-zinc-100 font-semibold">Latest Update Accomplishments:</strong> Claude Minimalist Aesthetic UI integration, warm cream (#FBFaf7) video generator styling, monochromatic toast dispatcher, and side drawer modal sheets.
+                <div class="text-[11px] text-zinc-600 bg-white border border-zinc-200/50 rounded-lg p-2.5 mb-2 leading-relaxed">
+                    <strong class="text-zinc-900 font-semibold">Latest Update Accomplishments:</strong> Claude Minimalist Aesthetic UI integration, warm cream (#FBFaf7) video generator styling, monochromatic toast dispatcher, and side drawer modal sheets.
                 </div>
                 <div class="flex items-center justify-between text-[10px] text-zinc-400 font-medium">
                     <span class="flex items-center gap-1"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Last Updated: July 25, 2026 at 15:30 IST</span>
@@ -694,24 +694,24 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
             </div>
 
             <!-- Module 4: CRM & Lead Automation -->
-            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 dark:bg-zinc-950/50 dark:hover:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-4 transition-all" data-search="cora crm lead automation v1.3.5 bookings contact drawer shoot pipeline">
+            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 border border-zinc-200/60 rounded-xl p-4 transition-all" data-search="cora crm lead automation v1.3.5 bookings contact drawer shoot pipeline">
                 <div class="flex items-start justify-between gap-3 mb-2">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold text-xs shrink-0">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
                             CRM
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Cora CRM & Lead Automation</h3>
-                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded">v1.3.5</span>
+                                <h3 class="text-sm font-bold text-zinc-900 m-0">Cora CRM & Lead Automation</h3>
+                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 text-zinc-700 px-1.5 py-0.5 rounded">v1.3.5</span>
                             </div>
                             <span class="text-[10px] text-zinc-400 font-medium">Lead Management & Client Drawer Pipeline</span>
                         </div>
                     </div>
-                    <span class="text-[9.5px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full shrink-0">• Active</span>
+                    <span class="text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">• Active</span>
                 </div>
-                <div class="text-[11px] text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900/90 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg p-2.5 mb-2 leading-relaxed">
-                    <strong class="text-zinc-900 dark:text-zinc-100 font-semibold">Latest Update Accomplishments:</strong> Automated lead capture pipelines, right-sliding contact drawer sheets, shoot booking workflow, and team role permission assignments.
+                <div class="text-[11px] text-zinc-600 bg-white border border-zinc-200/50 rounded-lg p-2.5 mb-2 leading-relaxed">
+                    <strong class="text-zinc-900 font-semibold">Latest Update Accomplishments:</strong> Automated lead capture pipelines, right-sliding contact drawer sheets, shoot booking workflow, and team role permission assignments.
                 </div>
                 <div class="flex items-center justify-between text-[10px] text-zinc-400 font-medium">
                     <span class="flex items-center gap-1"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Last Updated: July 25, 2026 at 14:20 IST</span>
@@ -720,24 +720,24 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
             </div>
 
             <!-- Module 5: Financials & Billing -->
-            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 dark:bg-zinc-950/50 dark:hover:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-4 transition-all" data-search="cora financials billing v1.2.0 saas calculator pdf invoice inr rupee">
+            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 border border-zinc-200/60 rounded-xl p-4 transition-all" data-search="cora financials billing v1.2.0 saas calculator pdf invoice inr rupee">
                 <div class="flex items-start justify-between gap-3 mb-2">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold text-xs shrink-0">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
                             FIN
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Cora Financials & Billing</h3>
-                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded">v1.2.0</span>
+                                <h3 class="text-sm font-bold text-zinc-900 m-0">Cora Financials & Billing</h3>
+                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 text-zinc-700 px-1.5 py-0.5 rounded">v1.2.0</span>
                             </div>
                             <span class="text-[10px] text-zinc-400 font-medium">Invoicing & SaaS Pricing Engine</span>
                         </div>
                     </div>
-                    <span class="text-[9.5px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full shrink-0">• Active</span>
+                    <span class="text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">• Active</span>
                 </div>
-                <div class="text-[11px] text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900/90 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg p-2.5 mb-2 leading-relaxed">
-                    <strong class="text-zinc-900 dark:text-zinc-100 font-semibold">Latest Update Accomplishments:</strong> Interactive SaaS Calculator engine, custom PDF invoice exports, multi-currency support, and Indian Rupee (₹) symbol integration.
+                <div class="text-[11px] text-zinc-600 bg-white border border-zinc-200/50 rounded-lg p-2.5 mb-2 leading-relaxed">
+                    <strong class="text-zinc-900 font-semibold">Latest Update Accomplishments:</strong> Interactive SaaS Calculator engine, custom PDF invoice exports, multi-currency support, and Indian Rupee (₹) symbol integration.
                 </div>
                 <div class="flex items-center justify-between text-[10px] text-zinc-400 font-medium">
                     <span class="flex items-center gap-1"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Last Updated: July 25, 2026 at 12:10 IST</span>
@@ -746,24 +746,24 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
             </div>
 
             <!-- Module 6: Model Context Protocol (MCP) -->
-            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 dark:bg-zinc-950/50 dark:hover:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-4 transition-all" data-search="model context protocol mcp v1.1.0 rest api tools subagents">
+            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 border border-zinc-200/60 rounded-xl p-4 transition-all" data-search="model context protocol mcp v1.1.0 rest api tools subagents">
                 <div class="flex items-start justify-between gap-3 mb-2">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold text-xs shrink-0">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
                             MCP
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Model Context Protocol (MCP)</h3>
-                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded">v1.1.0</span>
+                                <h3 class="text-sm font-bold text-zinc-900 m-0">Model Context Protocol (MCP)</h3>
+                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 text-zinc-700 px-1.5 py-0.5 rounded">v1.1.0</span>
                             </div>
                             <span class="text-[10px] text-zinc-400 font-medium">Agentic AI Protocol Endpoint Interface</span>
                         </div>
                     </div>
-                    <span class="text-[9.5px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-2 py-0.5 rounded-full shrink-0">• Enterprise</span>
+                    <span class="text-[9.5px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full shrink-0">• Enterprise</span>
                 </div>
-                <div class="text-[11px] text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900/90 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg p-2.5 mb-2 leading-relaxed">
-                    <strong class="text-zinc-900 dark:text-zinc-100 font-semibold">Latest Update Accomplishments:</strong> REST API MCP endpoints (`/cora/v1/mcp`), custom tool registry dispatching, subagent protocol bindings, and key authorization guard.
+                <div class="text-[11px] text-zinc-600 bg-white border border-zinc-200/50 rounded-lg p-2.5 mb-2 leading-relaxed">
+                    <strong class="text-zinc-900 font-semibold">Latest Update Accomplishments:</strong> REST API MCP endpoints (`/cora/v1/mcp`), custom tool registry dispatching, subagent protocol bindings, and key authorization guard.
                 </div>
                 <div class="flex items-center justify-between text-[10px] text-zinc-400 font-medium">
                     <span class="flex items-center gap-1"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Last Updated: July 25, 2026 at 11:00 IST</span>
@@ -772,24 +772,24 @@ $industry_title = ( $cora_industry === 'real_estate' ) ? 'Real Estate Profession
             </div>
 
             <!-- Module 7: Git & Lovable Sync Hub -->
-            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 dark:bg-zinc-950/50 dark:hover:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl p-4 transition-all" data-search="git lovable sync hub v1.0.4 github repo branch live url auto save">
+            <div class="cora-module-item-card bg-zinc-50/50 hover:bg-zinc-100/60 border border-zinc-200/60 rounded-xl p-4 transition-all" data-search="git lovable sync hub v1.0.4 github repo branch live url auto save">
                 <div class="flex items-start justify-between gap-3 mb-2">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold text-xs shrink-0">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
                             GIT
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 m-0">Git & Lovable Sync Hub</h3>
-                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded">v1.0.4</span>
+                                <h3 class="text-sm font-bold text-zinc-900 m-0">Git & Lovable Sync Hub</h3>
+                                <span class="text-[10px] font-mono font-semibold bg-zinc-200/70 text-zinc-700 px-1.5 py-0.5 rounded">v1.0.4</span>
                             </div>
                             <span class="text-[10px] text-zinc-400 font-medium">Continuous Deployment & Lovable Integration</span>
                         </div>
                     </div>
-                    <span class="text-[9.5px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full shrink-0">• Active</span>
+                    <span class="text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">• Active</span>
                 </div>
-                <div class="text-[11px] text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900/90 border border-zinc-200/50 dark:border-zinc-800/50 rounded-lg p-2.5 mb-2 leading-relaxed">
-                    <strong class="text-zinc-900 dark:text-zinc-100 font-semibold">Latest Update Accomplishments:</strong> GitHub repository branch sync, Lovable live URL connector, instant AJAX auto-save handlers, and disconnect endpoint handlers.
+                <div class="text-[11px] text-zinc-600 bg-white border border-zinc-200/50 rounded-lg p-2.5 mb-2 leading-relaxed">
+                    <strong class="text-zinc-900 font-semibold">Latest Update Accomplishments:</strong> GitHub repository branch sync, Lovable live URL connector, instant AJAX auto-save handlers, and disconnect endpoint handlers.
                 </div>
                 <div class="flex items-center justify-between text-[10px] text-zinc-400 font-medium">
                     <span class="flex items-center gap-1"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Last Updated: July 25, 2026 at 09:45 IST</span>

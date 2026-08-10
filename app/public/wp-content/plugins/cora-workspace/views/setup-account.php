@@ -23,20 +23,7 @@
             --accent-bg: #ecfdf5;
         }
         
-        .cora-dark-theme {
-            --bg-color: #09090b;
-            --card-bg: #111113;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-tertiary: #71717a;
-            --border-color: #27272a;
-            --input-bg: #18181b;
-            --btn-bg: #f4f4f5;
-            --btn-hover: #e4e4e7;
-            --btn-text: #09090b;
-            --accent: #10b981;
-            --accent-bg: rgba(16,185,129,0.08);
-        }
+        
 
         body {
             background-color: var(--bg-color);
@@ -138,20 +125,14 @@
             color: #71717a;
         }
 
-        .cora-dark-theme input:disabled {
-            background: #1c1c1e;
-            color: #71717a;
-            border-color: #27272a;
-        }
+        
 
         input:focus:not(:disabled) {
             border-color: var(--text-primary);
             box-shadow: 0 0 0 3px rgba(24,24,27,0.06);
         }
 
-        .cora-dark-theme input:focus:not(:disabled) {
-            box-shadow: 0 0 0 3px rgba(244,244,245,0.04);
-        }
+        
 
         .pw-toggle {
             position: absolute;

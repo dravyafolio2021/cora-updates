@@ -422,14 +422,14 @@ if ( is_array( $leave_requests ) ) {
 
 <div class="space-y-6">
     <!-- Redesigned Profile Header - 10X Premium Style -->
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs relative overflow-hidden">
+    <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs relative overflow-hidden">
         <div class="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left z-10 w-full md:w-auto">
             <!-- Premium Avatar with Edit Trigger -->
             <div class="relative group cursor-pointer shrink-0">
                 <?php if ( ! empty( $avatar_url ) ) : ?>
-                    <img src="<?php echo esc_url( $avatar_url ); ?>" alt="Avatar" id="profile-avatar-img" class="w-24 h-24 rounded-full object-cover border-2 border-zinc-200 dark:border-zinc-800 shadow-sm transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                    <img src="<?php echo esc_url( $avatar_url ); ?>" alt="Avatar" id="profile-avatar-img" class="w-24 h-24 rounded-full object-cover border-2 border-zinc-200 shadow-sm transition-transform duration-300 group-hover:scale-105" loading="lazy">
                 <?php else : ?>
-                    <div id="profile-avatar-fallback" class="w-24 h-24 rounded-full flex items-center justify-center text-white font-extrabold text-3xl border-2 border-zinc-200 dark:border-zinc-800 shadow-sm transition-transform duration-300 group-hover:scale-105" style="background-color: <?php echo esc_attr($color_hex); ?>">
+                    <div id="profile-avatar-fallback" class="w-24 h-24 rounded-full flex items-center justify-center text-white font-extrabold text-3xl border-2 border-zinc-200 shadow-sm transition-transform duration-300 group-hover:scale-105" style="background-color: <?php echo esc_attr($color_hex); ?>">
                         <?php echo esc_html( $initials ); ?>
                     </div>
                 <?php endif; ?>
@@ -442,24 +442,24 @@ if ( is_array( $leave_requests ) ) {
             
             <div class="space-y-2">
                 <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                    <h1 class="text-2xl font-extrabold text-zinc-900 dark:text-zinc-55 tracking-tight"><?php echo esc_html($full_name); ?></h1>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-sm">
+                    <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight"><?php echo esc_html($full_name); ?></h1>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-zinc-900 text-white shadow-sm">
                         <?php echo esc_html($role_label); ?>
                     </span>
                     
                     <!-- Dynamic Status Badge -->
                     <?php
                     $status_dot_color = 'text-zinc-400';
-                    $status_bg_color = 'bg-zinc-50 dark:bg-zinc-800 text-zinc-500';
+                    $status_bg_color = 'bg-zinc-50 text-zinc-500';
                     if ( $custom_status === 'Available' ) {
                         $status_dot_color = 'text-emerald-500';
-                        $status_bg_color = 'bg-emerald-50/50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-405 border border-emerald-100/50 dark:border-emerald-900/30';
+                        $status_bg_color = 'bg-emerald-50/50 text-emerald-700 border border-emerald-100/50 ';
                     } elseif ( in_array($custom_status, array('In a Shoot', 'Editing')) ) {
                         $status_dot_color = 'text-amber-500';
-                        $status_bg_color = 'bg-amber-50/50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-100/50 dark:border-amber-900/30';
+                        $status_bg_color = 'bg-amber-50/50 text-amber-700 border border-amber-100/50 ';
                     } elseif ( $custom_status === 'Do Not Disturb' ) {
                         $status_dot_color = 'text-red-500';
-                        $status_bg_color = 'bg-red-50/50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-100/50 dark:border-red-900/30';
+                        $status_bg_color = 'bg-red-50/50 text-red-700 border border-red-100/50 ';
                     }
                     ?>
                     <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase <?php echo $status_bg_color; ?>">
@@ -469,53 +469,53 @@ if ( is_array( $leave_requests ) ) {
                 </div>
                 
                 <?php if ( ! empty($custom_status_msg) ) : ?>
-                    <p class="text-xs text-zinc-600 dark:text-zinc-400 italic">"<?php echo esc_html($custom_status_msg); ?>"</p>
+                    <p class="text-xs text-zinc-600 italic">"<?php echo esc_html($custom_status_msg); ?>"</p>
                 <?php endif; ?>
                 
-                <p class="text-xs text-zinc-500 dark:text-zinc-555 font-medium"><?php echo esc_html($branch_name); ?> · Office Workspace Roster · Joined <?php echo esc_html($joined_formatted); ?></p>
+                <p class="text-xs text-zinc-500 font-medium"><?php echo esc_html($branch_name); ?> · Office Workspace Roster · Joined <?php echo esc_html($joined_formatted); ?></p>
             </div>
         </div>
 
         <!-- Premium Metric Blocks -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full md:w-auto z-10">
-            <div class="bg-zinc-50/30 dark:bg-zinc-800/10 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
-                <span class="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block">Attendance</span>
-                <span class="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight block mt-1"><?php echo $user_attendance_count; ?> <span class="text-xs text-zinc-400 font-bold">days</span></span>
+            <div class="bg-zinc-50/30 border border-zinc-200/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
+                <span class="text-[9px] font-extrabold text-zinc-400 uppercase tracking-widest block">Attendance</span>
+                <span class="text-2xl font-black text-zinc-900 tracking-tight block mt-1"><?php echo $user_attendance_count; ?> <span class="text-xs text-zinc-400 font-bold">days</span></span>
             </div>
-            <div class="bg-zinc-50/30 dark:bg-zinc-800/10 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
-                <span class="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block">My Tasks</span>
-                <span class="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight block mt-1"><?php echo $user_task_count; ?> <span class="text-xs text-zinc-400 font-bold">active</span></span>
+            <div class="bg-zinc-50/30 border border-zinc-200/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
+                <span class="text-[9px] font-extrabold text-zinc-400 uppercase tracking-widest block">My Tasks</span>
+                <span class="text-2xl font-black text-zinc-900 tracking-tight block mt-1"><?php echo $user_task_count; ?> <span class="text-xs text-zinc-400 font-bold">active</span></span>
             </div>
-            <div class="bg-zinc-50/30 dark:bg-zinc-800/10 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
-                <span class="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block">Crew Shifts</span>
-                <span class="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight block mt-1"><?php echo $user_shift_count; ?> <span class="text-xs text-zinc-400 font-bold">roster</span></span>
+            <div class="bg-zinc-50/30 border border-zinc-200/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
+                <span class="text-[9px] font-extrabold text-zinc-400 uppercase tracking-widest block">Crew Shifts</span>
+                <span class="text-2xl font-black text-zinc-900 tracking-tight block mt-1"><?php echo $user_shift_count; ?> <span class="text-xs text-zinc-400 font-bold">roster</span></span>
             </div>
-            <div class="bg-zinc-50/30 dark:bg-zinc-800/10 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
-                <span class="text-[9px] font-extrabold text-zinc-400 dark:text-zinc-555 uppercase tracking-widest block">Audit Trail</span>
-                <span class="text-2xl font-black text-zinc-900 dark:text-zinc-55 tracking-tight block mt-1"><?php echo $user_activity_count; ?> <span class="text-xs text-zinc-400 font-bold">events</span></span>
+            <div class="bg-zinc-50/30 border border-zinc-200/80 rounded-xl p-3.5 text-center sm:text-left min-w-[110px]">
+                <span class="text-[9px] font-extrabold text-zinc-400 uppercase tracking-widest block">Audit Trail</span>
+                <span class="text-2xl font-black text-zinc-900 tracking-tight block mt-1"><?php echo $user_activity_count; ?> <span class="text-xs text-zinc-400 font-bold">events</span></span>
             </div>
         </div>
     </div>
 
     <!-- Navigation Tabs -->
-    <div class="border-b border-zinc-200 dark:border-zinc-800 flex flex-nowrap overflow-x-auto gap-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-        <button onclick="switchProfileTab('tab-info')" id="btn-tab-info" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
+    <div class="border-b border-zinc-200 flex flex-nowrap overflow-x-auto gap-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+        <button onclick="switchProfileTab('tab-info')" id="btn-tab-info" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 hover:text-zinc-900 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             Personal & Work Info
         </button>
-        <button onclick="switchProfileTab('tab-status')" id="btn-tab-status" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
+        <button onclick="switchProfileTab('tab-status')" id="btn-tab-status" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 hover:text-zinc-900 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             Duty Status & Leaves
         </button>
-        <button onclick="switchProfileTab('tab-attendance')" id="btn-tab-attendance" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
+        <button onclick="switchProfileTab('tab-attendance')" id="btn-tab-attendance" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 hover:text-zinc-900 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             Daily Attendance
         </button>
-        <button onclick="switchProfileTab('tab-tasks')" id="btn-tab-tasks" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
+        <button onclick="switchProfileTab('tab-tasks')" id="btn-tab-tasks" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 hover:text-zinc-900 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
             Tasks & Shifts
         </button>
-        <button onclick="switchProfileTab('tab-activity')" id="btn-tab-activity" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
+        <button onclick="switchProfileTab('tab-activity')" id="btn-tab-activity" class="profile-tab-btn shrink-0 border-b-2 border-transparent px-4 py-3 text-xs font-extrabold text-zinc-400 hover:text-zinc-900 transition-all flex items-center gap-2 cursor-pointer bg-transparent">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
             Activity Logs
         </button>
@@ -527,43 +527,43 @@ if ( is_array( $leave_requests ) ) {
             <div class="lg:col-span-2 space-y-6">
                 <!-- Personal details form -->
                 <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-6">
-                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Personal Details</h3>
+                    <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Personal Details</h3>
                     <form id="profile-info-form" onsubmit="coraSaveProfileInfo(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">First Name</label>
+                            <label class="block text-xs font-extrabold text-zinc-700 mb-1.5">First Name</label>
                             <input type="text" id="profile-first-name" value="<?php echo esc_attr( $first_name ); ?>" required class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Last Name</label>
+                            <label class="block text-xs font-extrabold text-zinc-700 mb-1.5">Last Name</label>
                             <input type="text" id="profile-last-name" value="<?php echo esc_attr( $last_name ); ?>" required class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Email Address</label>
-                            <input type="email" value="<?php echo esc_attr( $user->user_email ); ?>" disabled class="cora-input w-full px-3 py-2.5 text-xs rounded-xl bg-zinc-50/50 dark:bg-zinc-800/40 text-zinc-500 dark:text-zinc-500 cursor-not-allowed border-dashed">
+                            <label class="block text-xs font-extrabold text-zinc-700 mb-1.5">Email Address</label>
+                            <input type="email" value="<?php echo esc_attr( $user->user_email ); ?>" disabled class="cora-input w-full px-3 py-2.5 text-xs rounded-xl bg-zinc-50/50 text-zinc-500 cursor-not-allowed border-dashed">
                         </div>
                         <div>
-                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Phone Number</label>
+                            <label class="block text-xs font-extrabold text-zinc-700 mb-1.5">Phone Number</label>
                             <input type="text" id="profile-phone" value="<?php echo esc_attr( $phone ); ?>" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="+91 99999 99999">
                         </div>
                         <div class="sm:col-span-2 flex justify-end">
-                            <button type="submit" class="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-2xs">Save Changes</button>
+                            <button type="submit" class="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-2xs">Save Changes</button>
                         </div>
                     </form>
                 </div>
 
                 <!-- SaaS Upgraded Security & Password Card -->
                 <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Security Credentials</h3>
+                    <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Security Credentials</h3>
                     
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-2">
                         <div class="space-y-1.5">
                             <div class="flex items-center gap-2">
                                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                <span class="text-xs font-extrabold text-zinc-800 dark:text-zinc-200">Account Password Protection</span>
+                                <span class="text-xs font-extrabold text-zinc-800 ">Account Password Protection</span>
                             </div>
-                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400">Encrypted with industry-standard hashing. Last active session audit is active.</p>
+                            <p class="text-[10px] text-zinc-500 ">Encrypted with industry-standard hashing. Last active session audit is active.</p>
                         </div>
-                        <button onclick="openPasswordDrawer()" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-all cursor-pointer border-0 shadow-xs">
+                        <button onclick="openPasswordDrawer()" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-all cursor-pointer border-0 shadow-xs">
                             Update Account Password
                         </button>
                     </div>
@@ -573,34 +573,34 @@ if ( is_array( $leave_requests ) ) {
             <!-- Work Information and Sessions Sidebar -->
             <div class="space-y-6">
                 <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Work Information</h3>
+                    <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Work Information</h3>
                     <div class="space-y-3.5 text-xs">
                         <div class="flex justify-between">
-                            <span class="text-zinc-500 dark:text-zinc-400">Role</span>
-                            <span class="font-bold text-zinc-900 dark:text-zinc-200"><?php echo esc_html($role_label); ?></span>
+                            <span class="text-zinc-500 ">Role</span>
+                            <span class="font-bold text-zinc-900 "><?php echo esc_html($role_label); ?></span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-zinc-500 dark:text-zinc-400">Branch</span>
-                            <span class="font-bold text-zinc-900 dark:text-zinc-200"><?php echo esc_html($branch_name); ?></span>
+                            <span class="text-zinc-500 ">Branch</span>
+                            <span class="font-bold text-zinc-900 "><?php echo esc_html($branch_name); ?></span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-zinc-500 dark:text-zinc-400">Agency</span>
-                            <span class="font-bold text-zinc-900 dark:text-zinc-200"><?php echo esc_html($agency_name); ?></span>
+                            <span class="text-zinc-500 ">Agency</span>
+                            <span class="font-bold text-zinc-900 "><?php echo esc_html($agency_name); ?></span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-zinc-500 dark:text-zinc-400">Joined On</span>
-                            <span class="font-bold text-zinc-900 dark:text-zinc-200"><?php echo esc_html($joined_formatted); ?></span>
+                            <span class="text-zinc-500 ">Joined On</span>
+                            <span class="font-bold text-zinc-900 "><?php echo esc_html($joined_formatted); ?></span>
                         </div>
                     </div>
                 </div>
 
                 <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                    <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
-                        <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider text-[11px] text-zinc-400">Active Sessions</h3>
-                        <button onclick="coraLogOutOtherSessions()" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white font-extrabold text-[9px] border border-zinc-200 dark:border-zinc-700 px-2 py-1 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs border-0 cursor-pointer">Logout Others</button>
+                    <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                        <h3 class="text-sm font-extrabold text-zinc-900 uppercase tracking-wider text-[11px] text-zinc-400">Active Sessions</h3>
+                        <button onclick="coraLogOutOtherSessions()" class="text-zinc-600 hover:text-zinc-900 font-extrabold text-[9px] border border-zinc-200 px-2 py-1 rounded-lg bg-white hover:bg-zinc-50 transition-colors shadow-2xs border-0 cursor-pointer">Logout Others</button>
                     </div>
                     
-                    <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    <div class="divide-y divide-zinc-100 ">
                         <?php
                         $current_token = wp_get_session_token();
                         foreach ( $sessions as $token_key => $sess ) :
@@ -620,7 +620,7 @@ if ( is_array( $leave_requests ) ) {
                         ?>
                             <div class="py-3 flex items-center justify-between">
                                 <div class="flex items-center gap-2.5">
-                                    <div class="text-zinc-500 dark:text-zinc-500">
+                                    <div class="text-zinc-500 ">
                                         <?php if ( strpos( $ua, 'iPhone' ) !== false || strpos( $ua, 'Android' ) !== false ) : ?>
                                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                                         <?php else : ?>
@@ -628,13 +628,13 @@ if ( is_array( $leave_requests ) ) {
                                         <?php endif; ?>
                                     </div>
                                     <div>
-                                        <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                                        <p class="text-xs font-bold text-zinc-800 ">
                                             <?php echo esc_html( "$device on $platform" ); ?>
                                             <?php if ($is_current) : ?>
-                                                <span class="text-[8px] font-extrabold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-100/50 dark:border-emerald-900/30 ml-1">Current</span>
+                                                <span class="text-[8px] font-extrabold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full border border-emerald-100/50 ml-1">Current</span>
                                             <?php endif; ?>
                                         </p>
-                                        <p class="text-[9px] text-zinc-400 dark:text-zinc-500 font-medium"><?php echo esc_html($sess['ip']); ?> · <?php echo esc_html($login_time); ?></p>
+                                        <p class="text-[9px] text-zinc-400 font-medium"><?php echo esc_html($sess['ip']); ?> · <?php echo esc_html($login_time); ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -651,11 +651,11 @@ if ( is_array( $leave_requests ) ) {
             <!-- Duty Status Manager Card -->
             <div class="lg:col-span-1 space-y-6">
                 <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-5">
-                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Duty Status Settings</h3>
+                    <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Duty Status Settings</h3>
                     
                     <form id="profile-status-form" onsubmit="coraUpdateUserStatus(event)" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Availability Status</label>
+                            <label class="block text-xs font-extrabold text-zinc-700 mb-1.5">Availability Status</label>
                             <select id="user-status-select" class="cora-input w-full px-3 py-2 text-xs rounded-xl focus:outline-none font-bold">
                                 <option value="Available" <?php selected($custom_status, 'Available'); ?>>Available / Active</option>
                                 <option value="In a Shoot" <?php selected($custom_status, 'In a Shoot'); ?>>In a Shoot</option>
@@ -666,10 +666,10 @@ if ( is_array( $leave_requests ) ) {
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Status Description message</label>
+                            <label class="block text-xs font-extrabold text-zinc-700 mb-1.5">Status Description message</label>
                             <input type="text" id="user-status-msg" value="<?php echo esc_attr($custom_status_msg); ?>" class="cora-input w-full px-3 py-2 text-xs rounded-xl focus:outline-none" placeholder="e.g. Scouting Udaipur wedding site...">
                         </div>
-                        <button type="submit" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
+                        <button type="submit" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
                             Update Status Broadcast
                         </button>
                     </form>
@@ -677,11 +677,11 @@ if ( is_array( $leave_requests ) ) {
 
                 <!-- Request Leave Request Card -->
                 <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Request Leave Facility</h3>
+                    <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Request Leave Facility</h3>
                     
                     <form id="leave-request-form" onsubmit="coraRequestLeave(event)" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Leave Type</label>
+                            <label class="block text-xs font-extrabold text-zinc-700 mb-1.5">Leave Type</label>
                             <select id="leave-type" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none">
                                 <option value="Casual Leave">Casual Leave</option>
                                 <option value="Medical Leave">Medical Leave / Sick</option>
@@ -691,19 +691,19 @@ if ( is_array( $leave_requests ) ) {
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Start Date</label>
+                                <label class="block text-xs font-extrabold text-zinc-700 mb-1.5">Start Date</label>
                                 <input type="date" id="leave-start" required class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">End Date</label>
+                                <label class="block text-xs font-extrabold text-zinc-700 mb-1.5">End Date</label>
                                 <input type="date" id="leave-end" required class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">Reason for request</label>
+                            <label class="block text-xs font-extrabold text-zinc-700 mb-1.5">Reason for request</label>
                             <textarea id="leave-reason" required rows="2" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none resize-none" placeholder="State reason for leave request..."></textarea>
                         </div>
-                        <button type="submit" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm">
+                        <button type="submit" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm">
                             Submit Request
                         </button>
                     </form>
@@ -715,34 +715,34 @@ if ( is_array( $leave_requests ) ) {
                 <!-- Administrative Approvals Board (Only for Admins) -->
                 <?php if ( $is_admin ) : ?>
                     <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
-                            <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-50 uppercase tracking-wider text-[11px] text-zinc-400">Team Leave Approvals</h3>
-                            <span class="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-400 text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/30">
+                        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                            <h3 class="text-sm font-extrabold text-zinc-900 uppercase tracking-wider text-[11px] text-zinc-400">Team Leave Approvals</h3>
+                            <span class="bg-amber-100 text-amber-800 text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-amber-200 ">
                                 <?php echo count($team_pending_leaves); ?> Pending
                             </span>
                         </div>
                         
                         <div class="space-y-3">
                             <?php if ( empty($team_pending_leaves) ) : ?>
-                                <p class="text-xs text-zinc-400 dark:text-zinc-500 py-4 text-center">Zero pending leave requests to approve.</p>
+                                <p class="text-xs text-zinc-400 py-4 text-center">Zero pending leave requests to approve.</p>
                             <?php else : ?>
                                 <?php foreach ( $team_pending_leaves as $request ) : 
                                     $sub_time = date('d M Y, H:i', $request['submitted_at']);
                                 ?>
-                                    <div class="p-4 bg-zinc-50/50 dark:bg-zinc-800/20 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                    <div class="p-4 bg-zinc-50/50 border border-zinc-200/80 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                         <div class="space-y-1">
                                             <div class="flex items-center gap-2">
-                                                <h4 class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100"><?php echo esc_html($request['user_name']); ?></h4>
-                                                <span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-305"><?php echo esc_html($request['type']); ?></span>
+                                                <h4 class="text-xs font-extrabold text-zinc-900 "><?php echo esc_html($request['user_name']); ?></h4>
+                                                <span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-zinc-200 text-zinc-700 "><?php echo esc_html($request['type']); ?></span>
                                             </div>
-                                            <p class="text-[10px] text-zinc-555 dark:text-zinc-400 font-medium">Dates: <?php echo esc_html($request['start_date']); ?> to <?php echo esc_html($request['end_date']); ?></p>
-                                            <p class="text-xs text-zinc-600 dark:text-zinc-350 italic mt-1 font-medium">"<?php echo esc_html($request['reason']); ?>"</p>
+                                            <p class="text-[10px] text-zinc-555 font-medium">Dates: <?php echo esc_html($request['start_date']); ?> to <?php echo esc_html($request['end_date']); ?></p>
+                                            <p class="text-xs text-zinc-600 italic mt-1 font-medium">"<?php echo esc_html($request['reason']); ?>"</p>
                                             <span class="text-[8px] text-zinc-400 block pt-1">Submitted: <?php echo $sub_time; ?></span>
                                         </div>
                                         
                                         <div class="flex gap-2 w-full sm:w-auto shrink-0 font-extrabold">
-                                            <button onclick="coraUpdateLeaveStatus('<?php echo $request['id']; ?>', 'rejected')" class="flex-1 sm:flex-none px-3.5 py-2 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-755 text-red-655 dark:text-red-400 rounded-xl text-[10px] transition-colors cursor-pointer border-0 font-extrabold">Reject</button>
-                                            <button onclick="coraUpdateLeaveStatus('<?php echo $request['id']; ?>', 'approved')" class="flex-1 sm:flex-none px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-xl text-[10px] transition-colors cursor-pointer border-0 font-extrabold">Approve</button>
+                                            <button onclick="coraUpdateLeaveStatus('<?php echo $request['id']; ?>', 'rejected')" class="flex-1 sm:flex-none px-3.5 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-red-655 rounded-xl text-[10px] transition-colors cursor-pointer border-0 font-extrabold">Reject</button>
+                                            <button onclick="coraUpdateLeaveStatus('<?php echo $request['id']; ?>', 'approved')" class="flex-1 sm:flex-none px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[10px] transition-colors cursor-pointer border-0 font-extrabold">Approve</button>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -753,12 +753,12 @@ if ( is_array( $leave_requests ) ) {
 
                 <!-- Personal Leave Requests History -->
                 <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">My Leave Applications</h3>
+                    <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">My Leave Applications</h3>
                     
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs responsive-table">
                             <thead>
-                                <tr class="bg-zinc-50 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 font-bold border-b border-zinc-200 dark:border-zinc-850">
+                                <tr class="bg-zinc-50 text-zinc-500 font-bold border-b border-zinc-200 ">
                                     <th class="p-3">Type</th>
                                     <th class="p-3">Duration</th>
                                     <th class="p-3">Reason</th>
@@ -766,25 +766,25 @@ if ( is_array( $leave_requests ) ) {
                                     <th class="p-3">Applied</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                            <tbody class="divide-y divide-zinc-100 ">
                                 <?php if ( empty($my_leaves) ) : ?>
                                     <tr class="cora-empty-state-row">
-                                        <td colspan="5" class="p-4 text-center text-zinc-400 dark:text-zinc-500">No leave requests submitted yet.</td>
+                                        <td colspan="5" class="p-4 text-center text-zinc-400 ">No leave requests submitted yet.</td>
                                     </tr>
                                 <?php else : ?>
                                     <?php foreach ( $my_leaves as $leave ) : 
                                         $applied_at = date('d M Y', $leave['submitted_at']);
                                         $lbl_status = 'Pending';
-                                        $status_style = 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30';
+                                        $status_style = 'bg-amber-50 text-amber-700 border border-amber-100 ';
                                         if ( $leave['status'] === 'approved' ) {
                                             $lbl_status = 'Approved';
-                                            $status_style = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900/30';
+                                            $status_style = 'bg-emerald-50 text-emerald-700 border border-emerald-100 ';
                                         } elseif ( $leave['status'] === 'rejected' ) {
                                             $lbl_status = 'Rejected';
-                                            $status_style = 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border border-red-100 dark:border-red-900/30';
+                                            $status_style = 'bg-red-50 text-red-700 border border-red-100 ';
                                         }
                                     ?>
-                                        <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 text-zinc-700 dark:text-zinc-300">
+                                        <tr class="hover:bg-zinc-50/50 text-zinc-700 ">
                                             <td class="p-3 font-semibold" data-label="Type"><?php echo esc_html($leave['type']); ?></td>
                                             <td class="p-3 whitespace-nowrap font-medium" data-label="Duration"><?php echo esc_html($leave['start_date']); ?> to <?php echo esc_html($leave['end_date']); ?></td>
                                             <td class="p-3 max-w-[200px] truncate" data-label="Reason"><?php echo esc_html($leave['reason']); ?></td>
@@ -793,7 +793,7 @@ if ( is_array( $leave_requests ) ) {
                                                     <?php echo $lbl_status; ?>
                                                 </span>
                                             </td>
-                                            <td class="p-3 text-zinc-500 dark:text-zinc-500" data-label="Applied"><?php echo $applied_at; ?></td>
+                                            <td class="p-3 text-zinc-500 " data-label="Applied"><?php echo $applied_at; ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
@@ -810,16 +810,16 @@ if ( is_array( $leave_requests ) ) {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Punch Widget -->
             <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400 font-extrabold font-bold">Today's Attendance</h3>
+                <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400 font-extrabold font-bold">Today's Attendance</h3>
                 
                 <div class="space-y-4 py-2">
                     <div class="flex items-center gap-3">
                         <span class="relative flex h-3 w-3">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 <?php echo $today_punched_in && !$today_punched_out ? 'bg-emerald-400' : 'bg-zinc-300 dark:bg-zinc-650'; ?>"></span>
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 <?php echo $today_punched_in && !$today_punched_out ? 'bg-emerald-400' : 'bg-zinc-300 '; ?>"></span>
                             <span class="relative inline-flex rounded-full h-3 w-3 <?php echo $today_punched_in && !$today_punched_out ? 'bg-emerald-500' : 'bg-zinc-400'; ?>"></span>
                         </span>
                         <div>
-                            <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                            <p class="text-xs font-bold text-zinc-800 ">
                                 <?php if ($today_punched_out) : ?>
                                     Duty Completed
                                 <?php elseif ($today_punched_in) : ?>
@@ -828,23 +828,23 @@ if ( is_array( $leave_requests ) ) {
                                     Not Punched In
                                 <?php endif; ?>
                             </p>
-                            <p class="text-[9px] text-zinc-500 dark:text-zinc-555">GPS geofenced coordinates punch validation is active</p>
+                            <p class="text-[9px] text-zinc-500 ">GPS geofenced coordinates punch validation is active</p>
                         </div>
                     </div>
                     
                     <div class="pt-2 flex flex-col gap-2">
                         <?php if ( ! $today_punched_in ) : ?>
-                            <button onclick="coraPunchAttendance('in')" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
+                            <button onclick="coraPunchAttendance('in')" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
                                 Punch Clock In
                             </button>
                         <?php elseif ( ! $today_punched_out ) : ?>
-                            <button onclick="coraPunchAttendance('out')" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
+                            <button onclick="coraPunchAttendance('out')" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                                 Punch Clock Out
                             </button>
                         <?php else : ?>
-                            <button disabled class="w-full py-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 font-extrabold rounded-xl text-xs cursor-not-allowed border-0">
+                            <button disabled class="w-full py-2.5 bg-zinc-100 text-zinc-400 font-extrabold rounded-xl text-xs cursor-not-allowed border-0">
                                 Punch Card Completed
                             </button>
                         <?php endif; ?>
@@ -856,12 +856,12 @@ if ( is_array( $leave_requests ) ) {
             
             <!-- Attendance History -->
             <div class="lg:col-span-2 cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Monthly Punch Card Records</h3>
+                <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Monthly Punch Card Records</h3>
                 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs responsive-table">
                         <thead>
-                            <tr class="bg-zinc-50 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 font-bold border-b border-zinc-200 dark:border-zinc-850">
+                            <tr class="bg-zinc-50 text-zinc-500 font-bold border-b border-zinc-200 ">
                                 <th class="p-3">Date</th>
                                 <th class="p-3">Punched In</th>
                                 <th class="p-3">Punched Out</th>
@@ -869,25 +869,25 @@ if ( is_array( $leave_requests ) ) {
                                 <th class="p-3">Distance</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                        <tbody class="divide-y divide-zinc-100 ">
                             <?php if ( empty($grouped_attendance) ) : ?>
                                 <tr class="cora-empty-state-row">
-                                    <td colspan="5" class="p-4 text-center text-zinc-400 dark:text-zinc-500">No punch card records found for this month.</td>
+                                    <td colspan="5" class="p-4 text-center text-zinc-400 ">No punch card records found for this month.</td>
                                 </tr>
                             <?php else : ?>
                                 <?php foreach ( $grouped_attendance as $record ) : 
                                     $rec_date = date('d M Y', strtotime($record['date']));
                                 ?>
-                                    <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 text-zinc-700 dark:text-zinc-300">
+                                    <tr class="hover:bg-zinc-50/50 text-zinc-700 ">
                                         <td class="p-3 font-semibold" data-label="Date"><?php echo $rec_date; ?></td>
-                                        <td class="p-3 text-emerald-600 dark:text-emerald-450 font-bold" data-label="Punched In"><?php echo esc_html($record['in']); ?></td>
-                                        <td class="p-3 text-zinc-500 dark:text-zinc-400" data-label="Punched Out"><?php echo esc_html($record['out']); ?></td>
+                                        <td class="p-3 text-emerald-600 font-bold" data-label="Punched In"><?php echo esc_html($record['in']); ?></td>
+                                        <td class="p-3 text-zinc-500 " data-label="Punched Out"><?php echo esc_html($record['out']); ?></td>
                                         <td class="p-3" data-label="GPS Geofence">
-                                            <span class="px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/50 text-zinc-800 dark:text-zinc-355">
+                                            <span class="px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase bg-zinc-100 border border-zinc-200 text-zinc-800 ">
                                                 <?php echo esc_html($record['geofence']); ?>
                                             </span>
                                         </td>
-                                        <td class="p-3 text-zinc-500 dark:text-zinc-500" data-label="Distance"><?php echo esc_html($record['distance']); ?></td>
+                                        <td class="p-3 text-zinc-500 " data-label="Distance"><?php echo esc_html($record['distance']); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -903,45 +903,45 @@ if ( is_array( $leave_requests ) ) {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Tasks Column -->
             <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">My Tasks</h3>
+                <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">My Tasks</h3>
                 
                 <div class="space-y-3">
                     <?php if ( empty($user_tasks) ) : ?>
-                        <p class="text-xs text-zinc-400 dark:text-zinc-500 py-4 text-center">No active tasks assigned to you.</p>
+                        <p class="text-xs text-zinc-400 py-4 text-center">No active tasks assigned to you.</p>
                     <?php else : ?>
                         <?php foreach ( $user_tasks as $task ) : 
                             $priority = $task['priority'] ?? 'medium';
                             $status = $task['status'] ?? 'todo';
                             $due = !empty($task['due_date']) ? date('d M Y', strtotime($task['due_date'])) : 'No due date';
                             
-                            $prio_class = 'bg-zinc-50 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700/50';
+                            $prio_class = 'bg-zinc-50 text-zinc-650 border-zinc-200 ';
                             if ( $priority === 'high' || $priority === 'urgent' ) {
-                                $prio_class = 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-800 dark:text-zinc-250 font-extrabold border-zinc-300 dark:border-zinc-700';
+                                $prio_class = 'bg-zinc-100 text-zinc-800 font-extrabold border-zinc-300 ';
                             }
                             
                             $status_label = 'To Do';
-                            $status_class = 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300';
+                            $status_class = 'bg-zinc-100 text-zinc-700 ';
                             if ( $status === 'in_progress' || $status === 'inprogress' ) {
                                 $status_label = 'In Progress';
-                                $status_class = 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30';
+                                $status_class = 'bg-amber-50 text-amber-700 border border-amber-100 ';
                             } elseif ( $status === 'client_review' || $status === 'review' ) {
                                 $status_label = 'Review';
-                                $status_class = 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border border-blue-100 dark:border-blue-900/30';
+                                $status_class = 'bg-blue-50 text-blue-700 border border-blue-100 ';
                             } elseif ( $status === 'done' ) {
                                 $status_label = 'Completed';
-                                $status_class = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900/30';
+                                $status_class = 'bg-emerald-50 text-emerald-700 border border-emerald-100 ';
                             } elseif ( $status === 'blocked' ) {
                                 $status_label = 'Blocked';
-                                $status_class = 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-455 border border-red-100 dark:border-red-900/30';
+                                $status_class = 'bg-red-50 text-red-700 border border-red-100 ';
                             }
                         ?>
-                            <div class="p-3.5 bg-zinc-50/50 dark:bg-zinc-800/20 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl space-y-2 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
+                            <div class="p-3.5 bg-zinc-50/50 border border-zinc-200/80 rounded-xl space-y-2 hover:border-zinc-300 transition-all">
                                 <div class="flex justify-between items-start gap-3">
-                                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 leading-tight"><?php echo esc_html($task['title']); ?></h4>
+                                    <h4 class="text-xs font-bold text-zinc-900 leading-tight"><?php echo esc_html($task['title']); ?></h4>
                                     <span class="inline-flex shrink-0 px-2 py-0.5 rounded text-[8px] font-extrabold uppercase border <?php echo $prio_class; ?>"><?php echo esc_html($priority); ?></span>
                                 </div>
-                                <p class="text-[10px] text-zinc-500 dark:text-zinc-400 line-clamp-2"><?php echo esc_html($task['desc'] ?? 'No description provided.'); ?></p>
-                                <div class="flex justify-between items-center text-[10px] text-zinc-500 dark:text-zinc-500 pt-1">
+                                <p class="text-[10px] text-zinc-500 line-clamp-2"><?php echo esc_html($task['desc'] ?? 'No description provided.'); ?></p>
+                                <div class="flex justify-between items-center text-[10px] text-zinc-500 pt-1">
                                     <span>Due: <?php echo $due; ?></span>
                                     <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase <?php echo $status_class; ?>"><?php echo $status_label; ?></span>
                                 </div>
@@ -953,11 +953,11 @@ if ( is_array( $leave_requests ) ) {
 
             <!-- Shifts Column -->
             <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">My Shifts Roster</h3>
+                <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">My Shifts Roster</h3>
                 
                 <div class="space-y-3">
                     <?php if ( empty($user_shifts) ) : ?>
-                        <p class="text-xs text-zinc-400 dark:text-zinc-500 py-4 text-center">No shifts scheduled for your user profile.</p>
+                        <p class="text-xs text-zinc-400 py-4 text-center">No shifts scheduled for your user profile.</p>
                     <?php else : ?>
                         <?php foreach ( $user_shifts as $shift ) : 
                             $day_name = esc_html($shift['day'] ?? 'Monday');
@@ -966,13 +966,13 @@ if ( is_array( $leave_requests ) ) {
                             $end = esc_html($shift['end'] ?? '06:00 PM');
                             $venue = esc_html($shift['venue'] ?? 'Office / Main Branch');
                         ?>
-                            <div class="p-3.5 bg-zinc-50/50 dark:bg-zinc-800/20 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl space-y-2">
+                            <div class="p-3.5 bg-zinc-50/50 border border-zinc-200/80 rounded-xl space-y-2">
                                 <div class="flex justify-between items-center gap-2">
-                                    <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/50"><?php echo $day_name; ?></span>
-                                    <span class="text-[10px] font-mono text-zinc-500 dark:text-zinc-500"><?php echo "$start - $end"; ?></span>
+                                    <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-zinc-100 text-zinc-800 border border-zinc-200 "><?php echo $day_name; ?></span>
+                                    <span class="text-[10px] font-mono text-zinc-500 "><?php echo "$start - $end"; ?></span>
                                 </div>
-                                <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 mt-1"><?php echo $activity; ?></h4>
-                                <div class="flex items-center gap-1 text-[9px] text-zinc-500 dark:text-zinc-455 mt-1.5">
+                                <h4 class="text-xs font-bold text-zinc-900 mt-1"><?php echo $activity; ?></h4>
+                                <div class="flex items-center gap-1 text-[9px] text-zinc-500 mt-1.5">
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                     <span class="truncate"><?php echo $venue; ?></span>
                                 </div>
@@ -987,17 +987,17 @@ if ( is_array( $leave_requests ) ) {
     <!-- Tab 5: Smart Activity Logs (Piggy Nation & 7 Days Windowed) -->
     <div id="tab-activity" class="profile-pane space-y-6">
         <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-100 pb-3">
                 <div>
-                    <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider text-[11px] text-zinc-400">My Activities & Logs</h3>
-                    <p class="text-[9px] text-zinc-450 mt-0.5 uppercase tracking-wider font-extrabold text-emerald-600 dark:text-emerald-450">Displaying major actions within a 7-day rolling window</p>
+                    <h3 class="text-sm font-extrabold text-zinc-900 uppercase tracking-wider text-[11px] text-zinc-400">My Activities & Logs</h3>
+                    <p class="text-[9px] text-zinc-450 mt-0.5 uppercase tracking-wider font-extrabold text-emerald-600 ">Displaying major actions within a 7-day rolling window</p>
                 </div>
             </div>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs responsive-table">
                     <thead>
-                        <tr class="bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 font-bold border-b border-zinc-200 dark:border-zinc-850">
+                        <tr class="bg-zinc-50 text-zinc-500 font-bold border-b border-zinc-200 ">
                             <th class="p-3">Time</th>
                             <th class="p-3">Event Type</th>
                             <th class="p-3">Description</th>
@@ -1005,10 +1005,10 @@ if ( is_array( $leave_requests ) ) {
                             <th class="p-3">Device / Platform</th>
                         </tr>
                     </thead>
-                    <tbody id="activity-logs-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    <tbody id="activity-logs-table-body" class="divide-y divide-zinc-100 ">
                         <?php if ( empty($user_activity_logs) ) : ?>
                             <tr class="cora-empty-state-row">
-                                <td colspan="5" class="p-4 text-center text-zinc-400 dark:text-zinc-500">No activity events logged for your user profile in the last 7 days.</td>
+                                <td colspan="5" class="p-4 text-center text-zinc-400 ">No activity events logged for your user profile in the last 7 days.</td>
                             </tr>
                         <?php else : ?>
                             <?php foreach ( $user_activity_logs as $log ) : 
@@ -1029,16 +1029,16 @@ if ( is_array( $leave_requests ) ) {
                                 elseif (strpos($device_raw, 'Android') !== false) $short_os = 'Android';
                                 elseif (strpos($device_raw, 'iPhone') !== false) $short_os = 'iOS';
                             ?>
-                                <tr class="hover:bg-zinc-50/55 dark:hover:bg-zinc-800/30 text-zinc-700 dark:text-zinc-300">
+                                <tr class="hover:bg-zinc-50/55 text-zinc-700 ">
                                     <td class="p-3 whitespace-nowrap" data-label="Time"><?php echo $log_time; ?></td>
                                     <td class="p-3 whitespace-nowrap" data-label="Event Type">
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/50 text-zinc-800 dark:text-zinc-300">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-zinc-100 border border-zinc-200 text-zinc-800 ">
                                             <?php echo $action_type; ?>
                                         </span>
                                     </td>
                                     <td class="p-3" data-label="Description"><?php echo $desc; ?></td>
                                     <td class="p-3 font-mono text-[10px]" data-label="Source IP"><?php echo $ip; ?></td>
-                                    <td class="p-3 whitespace-nowrap text-zinc-500 dark:text-zinc-500" data-label="Device/OS"><?php echo "$short_device on $short_os"; ?></td>
+                                    <td class="p-3 whitespace-nowrap text-zinc-500 " data-label="Device/OS"><?php echo "$short_device on $short_os"; ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -1047,11 +1047,11 @@ if ( is_array( $leave_requests ) ) {
             </div>
 
             <!-- Dynamic Piggy Nation Footer -->
-            <div id="activity-pagination-container" class="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+            <div id="activity-pagination-container" class="pt-4 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500 ">
                 <span id="activity-pagination-info">Showing 1-10 of 10 entries</span>
                 <div class="flex items-center gap-2 font-extrabold">
-                    <button onclick="changeActivityPage(-1)" id="btn-activity-prev" class="px-3 py-1.5 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-zinc-755 dark:text-zinc-300 border-0">Previous</button>
-                    <button onclick="changeActivityPage(1)" id="btn-activity-next" class="px-3 py-1.5 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-zinc-755 dark:text-zinc-300 border-0">Next</button>
+                    <button onclick="changeActivityPage(-1)" id="btn-activity-prev" class="px-3 py-1.5 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-zinc-755 border-0">Previous</button>
+                    <button onclick="changeActivityPage(1)" id="btn-activity-next" class="px-3 py-1.5 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-zinc-755 border-0">Next</button>
                 </div>
             </div>
         </div>
@@ -1062,12 +1062,12 @@ if ( is_array( $leave_requests ) ) {
 <div id="cora-password-drawer-sheet" class="cora-drawer-overlay">
     <div class="cora-drawer-sheet" id="password-drawer-card">
         <!-- Header -->
-        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-850/40">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 ">
             <div>
-                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100">Update Account Password</h3>
+                <h3 class="text-sm font-extrabold text-zinc-900 ">Update Account Password</h3>
                 <p class="text-[9px] text-zinc-450 mt-0.5 uppercase tracking-wider font-extrabold">Identity Verification & Reset</p>
             </div>
-            <button class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1 bg-transparent border-0" onclick="closePasswordDrawer()">
+            <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 bg-transparent border-0" onclick="closePasswordDrawer()">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
@@ -1078,17 +1078,17 @@ if ( is_array( $leave_requests ) ) {
             <div id="pass-step-1" class="space-y-4">
                 <div class="space-y-1.5">
                     <span class="text-[9px] font-black uppercase text-zinc-455 tracking-wider">Step 01 of 02</span>
-                    <h4 class="text-xs font-black text-zinc-900 dark:text-zinc-55">Verify Your Current Identity</h4>
-                    <p class="text-[10px] text-zinc-500 dark:text-zinc-400 leading-relaxed">To ensure secure updates, confirm your current password before configuring new credentials.</p>
+                    <h4 class="text-xs font-black text-zinc-900 ">Verify Your Current Identity</h4>
+                    <p class="text-[10px] text-zinc-500 leading-relaxed">To ensure secure updates, confirm your current password before configuring new credentials.</p>
                 </div>
                 
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Current Password</label>
+                        <label class="block text-[10px] font-extrabold text-zinc-700 mb-1.5 uppercase tracking-wider">Current Password</label>
                         <input type="password" id="drawer-curr-pass" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="Enter active password...">
                     </div>
                     
-                    <button onclick="verifyCurrentPasswordStep()" id="btn-verify-identity" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
+                    <button onclick="verifyCurrentPasswordStep()" id="btn-verify-identity" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
                         Verify Identity Credentials
                     </button>
                 </div>
@@ -1097,18 +1097,18 @@ if ( is_array( $leave_requests ) ) {
             <!-- Step 2: New Password Setup (Hidden Initially) -->
             <div id="pass-step-2" class="space-y-4" style="display: none;">
                 <div class="space-y-1.5">
-                    <span class="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-450 tracking-wider">Step 02 of 02 · Identity Verified</span>
-                    <h4 class="text-xs font-black text-zinc-900 dark:text-zinc-55">Set Up Your New Credentials</h4>
-                    <p class="text-[10px] text-zinc-500 dark:text-zinc-400 leading-relaxed">Choose a strong, unique password to replace your active workspace credentials.</p>
+                    <span class="text-[9px] font-black uppercase text-emerald-600 tracking-wider">Step 02 of 02 · Identity Verified</span>
+                    <h4 class="text-xs font-black text-zinc-900 ">Set Up Your New Credentials</h4>
+                    <p class="text-[10px] text-zinc-500 leading-relaxed">Choose a strong, unique password to replace your active workspace credentials.</p>
                 </div>
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">New Password</label>
+                        <label class="block text-[10px] font-extrabold text-zinc-700 mb-1.5 uppercase tracking-wider">New Password</label>
                         <input type="password" id="drawer-new-pass" oninput="validatePasswordStrength()" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="At least 8 characters...">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Confirm New Password</label>
+                        <label class="block text-[10px] font-extrabold text-zinc-700 mb-1.5 uppercase tracking-wider">Confirm New Password</label>
                         <input type="password" id="drawer-confirm-pass" oninput="validatePasswordStrength()" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="Re-type new password...">
                     </div>
                     
@@ -1118,15 +1118,15 @@ if ( is_array( $leave_requests ) ) {
                             <span class="text-zinc-450">Strength Indicator</span>
                             <span id="strength-label" class="text-zinc-400">Weak</span>
                         </div>
-                        <div class="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                        <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
                             <div id="strength-progress" class="w-1/4 h-full bg-red-500 transition-all duration-300"></div>
                         </div>
                     </div>
 
                     <!-- Criteria Checklist -->
-                    <div class="space-y-2 py-2 bg-zinc-50/50 dark:bg-zinc-800/10 rounded-xl p-3 border border-zinc-100 dark:border-zinc-800/50">
+                    <div class="space-y-2 py-2 bg-zinc-50/50 rounded-xl p-3 border border-zinc-100 ">
                         <p class="text-[9px] font-black uppercase text-zinc-455 tracking-wider mb-1.5">Requirements Checklist</p>
-                        <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                        <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-zinc-500 ">
                             <div class="flex items-center gap-1.5" id="req-len">
                                 <span class="chk-icon text-zinc-350">•</span> At least 8 characters
                             </div>
@@ -1142,7 +1142,7 @@ if ( is_array( $leave_requests ) ) {
                         </div>
                     </div>
                     
-                    <button onclick="saveNewPasswordAction()" id="btn-save-new-pass" disabled class="w-full py-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-555 font-extrabold rounded-xl text-xs transition-colors cursor-not-allowed border-0 shadow-sm flex items-center justify-center gap-2">
+                    <button onclick="saveNewPasswordAction()" id="btn-save-new-pass" disabled class="w-full py-2.5 bg-zinc-100 text-zinc-400 font-extrabold rounded-xl text-xs transition-colors cursor-not-allowed border-0 shadow-sm flex items-center justify-center gap-2">
                         Apply Security Update
                     </button>
                 </div>
@@ -1154,23 +1154,23 @@ if ( is_array( $leave_requests ) ) {
 <!-- ═══ AVATAR CROP DRAWER SHEET ═════════════════════════════════════════════ -->
 <div id="cora-avatar-crop-dlg" class="cora-drawer-overlay">
     <div class="cora-drawer-sheet" id="avatar-crop-card">
-        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/40">
-            <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100">Crop Profile Photo</h3>
-            <button class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer p-1 bg-transparent border-0" onclick="closeAvatarCrop()">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 ">
+            <h3 class="text-sm font-extrabold text-zinc-900 ">Crop Profile Photo</h3>
+            <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 bg-transparent border-0" onclick="closeAvatarCrop()">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         
-        <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center bg-zinc-50/20 dark:bg-zinc-900/10">
-            <div class="relative w-72 h-72 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg overflow-hidden flex items-center justify-center bg-zinc-100 dark:bg-zinc-800">
+        <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center bg-zinc-50/20 ">
+            <div class="relative w-72 h-72 border border-dashed border-zinc-300 rounded-lg overflow-hidden flex items-center justify-center bg-zinc-100 ">
                 <canvas id="crop-canvas" class="max-w-full max-h-full"></canvas>
             </div>
-            <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-4 text-center">Drag inside the canvas selection window to adjust position before saving.</p>
+            <p class="text-[10px] text-zinc-400 mt-4 text-center">Drag inside the canvas selection window to adjust position before saving.</p>
         </div>
         
-        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 flex items-center justify-end gap-3 font-extrabold">
-            <button onclick="closeAvatarCrop()" class="px-4 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-700 dark:text-zinc-300 rounded-lg text-xs transition-colors cursor-pointer shadow-xs border-0">Cancel</button>
-            <button onclick="saveCroppedAvatar()" class="px-5 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-xs transition-colors cursor-pointer shadow-xs border-0">Apply Crop</button>
+        <div class="p-5 border-t border-zinc-200 bg-zinc-50/50 flex items-center justify-end gap-3 font-extrabold">
+            <button onclick="closeAvatarCrop()" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs transition-colors cursor-pointer shadow-xs border-0">Cancel</button>
+            <button onclick="saveCroppedAvatar()" class="px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs transition-colors cursor-pointer shadow-xs border-0">Apply Crop</button>
         </div>
     </div>
 </div>
@@ -1256,7 +1256,7 @@ if ( is_array( $leave_requests ) ) {
         $('#strength-label').text('Weak').removeClass('text-amber-500 text-emerald-500').addClass('text-zinc-400');
         $('#strength-progress').css('width', '25%').removeClass('bg-amber-500 bg-emerald-500').addClass('bg-red-500');
         $('.chk-icon').text('•').removeClass('text-emerald-500').addClass('text-zinc-350');
-        $('#btn-save-new-pass').prop('disabled', true).removeClass('bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900').addClass('bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed');
+        $('#btn-save-new-pass').prop('disabled', true).removeClass('bg-zinc-900 hover:bg-zinc-800 text-white ').addClass('bg-zinc-100 text-zinc-400 cursor-not-allowed');
 
         // Slide open drawer using bulletproof class engine
         $('#cora-password-drawer-sheet').addClass('drawer-open');
@@ -1341,12 +1341,12 @@ if ( is_array( $leave_requests ) ) {
         var saveBtn = $('#btn-save-new-pass');
         if (isValid) {
             saveBtn.prop('disabled', false)
-                .removeClass('bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed')
-                .addClass('bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 cursor-pointer');
+                .removeClass('bg-zinc-100 text-zinc-400 cursor-not-allowed')
+                .addClass('bg-zinc-900 hover:bg-zinc-800 text-white cursor-pointer');
         } else {
             saveBtn.prop('disabled', true)
-                .removeClass('bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 cursor-pointer')
-                .addClass('bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed');
+                .removeClass('bg-zinc-900 hover:bg-zinc-800 text-white cursor-pointer')
+                .addClass('bg-zinc-100 text-zinc-400 cursor-not-allowed');
         }
     }
 
@@ -1355,10 +1355,10 @@ if ( is_array( $leave_requests ) ) {
         var chk = el.find('.chk-icon');
         if (isValid) {
             chk.text('✓').removeClass('text-zinc-350').addClass('text-emerald-500');
-            el.removeClass('text-zinc-500 dark:text-zinc-400').addClass('text-zinc-800 dark:text-zinc-200');
+            el.removeClass('text-zinc-500 ').addClass('text-zinc-800 ');
         } else {
             chk.text('•').removeClass('text-emerald-500').addClass('text-zinc-350');
-            el.removeClass('text-zinc-800 dark:text-zinc-200').addClass('text-zinc-500 dark:text-zinc-400');
+            el.removeClass('text-zinc-800 ').addClass('text-zinc-500 ');
         }
     }
 
@@ -1466,7 +1466,7 @@ if ( is_array( $leave_requests ) ) {
     // Clock In/Out punches with geofencing validation
     function coraPunchAttendance(type) {
         var statusDiv = $('#punch-status-text');
-        statusDiv.removeClass('text-red-500 dark:text-red-400 text-emerald-500').addClass('text-zinc-500').text('Acquiring verified location...').show();
+        statusDiv.removeClass('text-red-500 text-emerald-500').addClass('text-zinc-500').text('Acquiring verified location...').show();
         
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
@@ -1492,14 +1492,14 @@ if ( is_array( $leave_requests ) ) {
                             window.location.reload();
                         }, 1000);
                     } else {
-                        statusDiv.removeClass('text-zinc-500').addClass('text-red-500 dark:text-red-400').text(res.data.message || 'Failed to save punch.');
+                        statusDiv.removeClass('text-zinc-500').addClass('text-red-500 ').text(res.data.message || 'Failed to save punch.');
                     }
                 });
             }, function(error) {
-                statusDiv.removeClass('text-zinc-500').addClass('text-red-500 dark:text-red-400').text('Location access denied or unavailable.');
+                statusDiv.removeClass('text-zinc-500').addClass('text-red-500 ').text('Location access denied or unavailable.');
             });
         } else {
-            statusDiv.removeClass('text-zinc-500').addClass('text-red-500 dark:text-red-400').text('Geolocation is not supported by your browser.');
+            statusDiv.removeClass('text-zinc-500').addClass('text-red-500 ').text('Geolocation is not supported by your browser.');
         }
     }
 

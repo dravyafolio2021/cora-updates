@@ -340,19 +340,19 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
             <input type="range" id="cora-ai-temperature" min="0" max="1" step="0.1" value="0.7" oninput="document.getElementById('cora-ai-temp-val').innerText = this.value" class="w-full">
         </div>
 
-        <div class="cora-ai-field border-t border-zinc-200 dark:border-zinc-800 pt-3">
+        <div class="cora-ai-field border-t border-zinc-200 pt-3">
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" id="cora-ai-tts-toggle">
                 ElevenLabs Audio Output
             </label>
         </div>
 
-        <div class="cora-ai-field border-t border-zinc-200 dark:border-zinc-800 pt-3">
+        <div class="cora-ai-field border-t border-zinc-200 pt-3">
             <label>System Instructions</label>
             <textarea id="cora-ai-system" rows="5" class="cora-ai-textarea">You are Cora AI, the unified platform assistant for the Cora Workspace Platform. Help users with leads, billing calculations, and setting queries.</textarea>
         </div>
 
-        <button type="button" class="mt-auto px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-350 rounded-lg text-center font-semibold transition-colors" onclick="coraClearConversation()">Clear Conversation</button>
+        <button type="button" class="mt-auto px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-lg text-center font-semibold transition-colors" onclick="coraClearConversation()">Clear Conversation</button>
     </div>
 
     <!-- Chat Window -->
@@ -360,11 +360,11 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         <div id="cora-ai-messages" class="cora-ai-messages">
             <!-- Welcome Screen -->
             <div class="cora-ai-welcome" id="cora-ai-welcome-screen">
-                <div class="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-800 border border-zinc-200 shadow-sm">
                     <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Welcome to Cora AI</h3>
+                    <h3 class="text-base font-bold text-zinc-900 ">Welcome to Cora AI</h3>
                     <p class="text-xs text-zinc-500 max-w-sm mt-1">Ask questions, generate draft assets, or perform GST calculations in a few quick keystrokes.</p>
                 </div>
                 <div class="cora-ai-chips">
@@ -403,26 +403,26 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
 <!-- TAB 2: MCP Developer Gateway Settings -->
 <div id="cora-ai-panel-mcp-settings" class="space-y-6 max-w-3xl" style="display:none;">
     <!-- Developer Preview & Token Generation -->
-    <div class="bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
-        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
+    <div class="bg-white border border-zinc-200 rounded-2xl p-6 shadow-xs space-y-4">
+        <div class="border-b border-zinc-100 pb-3 flex items-center justify-between">
             <div>
-                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Model Context Protocol (MCP) AI Tools Server</h3>
+                <h3 class="text-sm font-bold text-zinc-900 ">Model Context Protocol (MCP) AI Tools Server</h3>
                 <p class="text-xs text-zinc-500 mt-0.5">Connect your custom external AI agents directly with Cora's data schemas.</p>
             </div>
-            <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-850 dark:text-zinc-200 text-[9px] font-bold uppercase tracking-wider">Beta Gateway</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-850 text-[9px] font-bold uppercase tracking-wider">Beta Gateway</span>
         </div>
 
-        <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40">
-            <p class="text-xs text-zinc-650 dark:text-zinc-350 leading-relaxed">
+        <div class="p-4 border border-zinc-200 rounded-xl bg-zinc-50/50 ">
+            <p class="text-xs text-zinc-650 leading-relaxed">
                 Cora exposes an <strong>MCP tool server</strong> endpoint. By registering this gateway in your local AI platform (like Claude Desktop or Cursor), your AI assistant can query listings, create leads, check audit logs, and retrieve workspace statistics in real-time.
             </p>
         </div>
 
         <!-- MCP Gateway URL -->
         <div class="space-y-2">
-            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">MCP Gateway Endpoint URL</label>
+            <label class="block text-xs font-bold text-zinc-700 ">MCP Gateway Endpoint URL</label>
             <div class="flex gap-2">
-                <input type="text" id="cora-mcp-gateway-url-direct" readonly value="<?php echo esc_url( $mcp_url ); ?>" class="w-full font-mono bg-zinc-55/40 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none">
+                <input type="text" id="cora-mcp-gateway-url-direct" readonly value="<?php echo esc_url( $mcp_url ); ?>" class="w-full font-mono bg-zinc-55/40 border border-zinc-200 rounded-lg text-xs px-3 py-2 outline-none">
                 <button type="button" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraCopyToClipboardDirect('cora-mcp-gateway-url-direct')">Copy URL</button>
             </div>
         </div>
@@ -431,11 +431,11 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         <form id="cora-mcp-token-form" method="post" action="" class="space-y-4 pt-2">
             <?php wp_nonce_field( 'cora_save_mcp_token_direct', 'cora_mcp_nonce' ); ?>
             <div class="space-y-2">
-                <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Secure Bearer Access Token</label>
+                <label class="block text-xs font-bold text-zinc-700 ">Secure Bearer Access Token</label>
                 <div class="flex gap-2">
-                    <input type="password" id="cora-mcp-access-token-direct" name="cora_mcp_access_token_direct" value="<?php echo esc_attr( $mcp_token ); ?>" class="w-full font-mono bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
-                    <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraToggleTokenVisibilityDirect()">Show</button>
-                    <button type="button" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraGenerateNewMCPTokenDirect()">Regenerate</button>
+                    <input type="password" id="cora-mcp-access-token-direct" name="cora_mcp_access_token_direct" value="<?php echo esc_attr( $mcp_token ); ?>" class="w-full font-mono bg-white border border-zinc-200 rounded-lg text-xs px-3 py-2 outline-none cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
+                    <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-850 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraToggleTokenVisibilityDirect()">Show</button>
+                    <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-850 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraGenerateNewMCPTokenDirect()">Regenerate</button>
                     <button type="submit" name="cora_save_mcp_token_direct_submit" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 shadow-sm">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                         Save Token
@@ -447,21 +447,21 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
     </div>
 
     <!-- Configuration Example Card -->
-    <div class="bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4 mt-6">
-        <div class="border-b border-zinc-100 dark:border-zinc-800/40 pb-3 flex items-center justify-between">
+    <div class="bg-white border border-zinc-200 rounded-2xl p-6 shadow-xs space-y-4 mt-6">
+        <div class="border-b border-zinc-100 pb-3 flex items-center justify-between">
             <div>
-                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Claude Desktop & Cursor Integration</h3>
+                <h3 class="text-sm font-bold text-zinc-900 ">Claude Desktop & Cursor Integration</h3>
                 <p class="text-xs text-zinc-500 mt-0.5">Use the local stdio bridge script to connect external AI agents to Cora.</p>
             </div>
-            <a href="<?php echo esc_url( CORA_WORKSPACE_URL . 'cora-bridge.py' ); ?>" download class="px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1">
+            <a href="<?php echo esc_url( CORA_WORKSPACE_URL . 'cora-bridge.py' ); ?>" download class="px-2.5 py-1 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-850 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1">
                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 Download Bridge Script
             </a>
         </div>
 
-        <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40 space-y-2">
-            <h4 class="text-xs font-bold text-zinc-850 dark:text-zinc-200">How to Setup:</h4>
-            <ol class="list-decimal list-inside text-xs text-zinc-650 dark:text-zinc-350 space-y-1">
+        <div class="p-4 border border-zinc-200 rounded-xl bg-zinc-50/50 space-y-2">
+            <h4 class="text-xs font-bold text-zinc-850 ">How to Setup:</h4>
+            <ol class="list-decimal list-inside text-xs text-zinc-650 space-y-1">
                 <li>Click the button above to download the <code>cora-bridge.py</code> script.</li>
                 <li>Save the script to a stable folder on your local computer (e.g. <code>/Users/yourname/cora-bridge.py</code>).</li>
                 <li>Open your local AI client settings configuration (e.g. <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>).</li>
@@ -626,11 +626,11 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         const viewport = document.getElementById('cora-ai-messages');
         viewport.innerHTML = `
             <div class="cora-ai-welcome" id="cora-ai-welcome-screen">
-                <div class="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-800 border border-zinc-200 shadow-sm">
                     <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Welcome to Cora AI</h3>
+                    <h3 class="text-base font-bold text-zinc-900 ">Welcome to Cora AI</h3>
                     <p class="text-xs text-zinc-500 max-w-sm mt-1">Ask questions, generate draft assets, or perform GST calculations in a few quick keystrokes.</p>
                 </div>
                 <div class="cora-ai-chips">
@@ -684,7 +684,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
                 <div class="cora-skeleton-line w-80"></div>
                 <div class="cora-skeleton-line w-95"></div>
                 <div class="cora-skeleton-line w-60"></div>
-                <div class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-2 font-mono flex items-center gap-1.5">
+                <div class="text-[10px] text-zinc-400 mt-2 font-mono flex items-center gap-1.5">
                     <svg class="cora-ai-spin" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     <span>Generating... <span class="cora-ai-timer-sec">0.0</span>s elapsed</span>
                 </div>
@@ -739,7 +739,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
                 try {
                     data = JSON.parse(res);
                 } catch(e) {
-                    bubble.innerHTML = `<span style="color:var(--status-critical, #ef4444); font-weight:bold;">Parser Error: Invalid JSON response from server.</span><pre class="bg-zinc-100 dark:bg-zinc-900 p-2 rounded text-[10px] overflow-auto max-h-40 mt-2 font-mono border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">${res}</pre>`;
+                    bubble.innerHTML = `<span style="color:var(--status-critical, #ef4444); font-weight:bold;">Parser Error: Invalid JSON response from server.</span><pre class="bg-zinc-100 p-2 rounded text-[10px] overflow-auto max-h-40 mt-2 font-mono border border-zinc-200 text-zinc-700 ">${res}</pre>`;
                     coraScrollToBottom();
                     return;
                 }
@@ -754,7 +754,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
                 let noticeHtml = '';
                 if (data.data.fallback_notice) {
                     noticeHtml = `
-                        <div class="mt-2 text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-955/20 border border-amber-200 dark:border-amber-900/30 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5 font-medium max-w-md">
+                        <div class="mt-2 text-[10px] text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5 font-medium max-w-md">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                             <span>${data.data.fallback_notice}</span>
                         </div>
@@ -776,7 +776,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
                 }
             } else {
                 const errMsg = (data && data.data && data.data.message) ? data.data.message : 'Error retrieving chat completion.';
-                bubble.innerHTML = `<span style="color:var(--status-critical, #ef4444); font-weight:bold;">API Error:</span> <span class="text-zinc-700 dark:text-zinc-300 text-xs">${errMsg}</span>`;
+                bubble.innerHTML = `<span style="color:var(--status-critical, #ef4444); font-weight:bold;">API Error:</span> <span class="text-zinc-700 text-xs">${errMsg}</span>`;
             }
             coraScrollToBottom();
         }).fail(function(xhr, status, error) {
@@ -786,7 +786,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
             const bubble = document.getElementById(loaderId);
             bubble.innerHTML = `
                 <span style="color:var(--status-critical, #ef4444); font-weight:bold;">Network Request Failed:</span>
-                <div class="text-[11px] text-zinc-600 dark:text-zinc-400 mt-2 font-mono p-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded">
+                <div class="text-[11px] text-zinc-600 mt-2 font-mono p-2 bg-zinc-50 border border-zinc-200 rounded">
                     <div>HTTP Status: ${xhr.status} (${xhr.statusText || 'Unknown'})</div>
                     <div>Status Label: ${status}</div>
                     <div>Error detail: ${error || 'Connection refused or aborted'}</div>
@@ -822,7 +822,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
             .replace(/>/g, "&gt;")
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/`([^`]+)`/g, '<code class="bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono text-xs">$1</code>')
+            .replace(/`([^`]+)`/g, '<code class="bg-zinc-100 px-1 py-0.5 rounded font-mono text-xs">$1</code>')
             .replace(/\n/g, '<br>');
         return formatted;
     }

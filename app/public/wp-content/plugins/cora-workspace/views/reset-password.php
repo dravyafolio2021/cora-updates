@@ -19,17 +19,7 @@
             --btn-text: #ffffff;
         }
         
-        .cora-dark-theme {
-            --bg-color: #09090b;
-            --card-bg: #111113;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --border-color: #27272a;
-            --input-bg: #18181b;
-            --btn-bg: #f4f4f5;
-            --btn-hover: #e4e4e7;
-            --btn-text: #09090b;
-        }
+        
 
         body {
             background-color: var(--bg-color);

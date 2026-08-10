@@ -76,27 +76,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             --step-done: #10b981;
         }
 
-        .cora-dark-theme {
-            --bg-color: #09090b;
-            --card-bg: #111113;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-tertiary: #71717a;
-            --border-color: #27272a;
-            --border-light: #1c1c1e;
-            --input-bg: #18181b;
-            --input-hover-bg: #1c1c1e;
-            --btn-bg: #f4f4f5;
-            --btn-hover: #e4e4e7;
-            --btn-text: #09090b;
-            --accent: #10b981;
-            --accent-bg: rgba(16,185,129,0.08);
-            --divider-color: #27272a;
-            --card-hover-border: #52525b;
-            --step-inactive: #27272a;
-            --step-active: #f4f4f5;
-            --step-done: #10b981;
-        }
+        
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -130,10 +110,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             overflow: hidden;
         }
 
-        .cora-dark-theme #onboarding-brand-sidebar {
-            background: linear-gradient(135deg, #0a1714 0%, #09090b 100%);
-            border-color: #27272a;
-        }
+        
 
         #onboarding-form-area {
             flex: 1;
@@ -229,11 +206,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             z-index: 3;
         }
 
-        .cora-dark-theme .cora-scene-logo-card {
-            background: #ffffff;
-            color: #09090b;
-            box-shadow: 0 12px 32px rgba(255, 255, 255, 0.08);
-        }
+        
 
         .cora-scene-widget {
             position: absolute;
@@ -247,11 +220,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             z-index: 2;
         }
 
-        .cora-dark-theme .cora-scene-widget {
-            background: rgba(17, 17, 19, 0.75);
-            border-color: rgba(16, 185, 129, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
+        
 
         .widget-left {
             bottom: 80px;
@@ -388,9 +357,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             box-shadow: 0 0 0 4px rgba(24,24,27,0.06);
         }
 
-        .cora-dark-theme .step-indicator-item.active .step-indicator-circle {
-            box-shadow: 0 0 0 4px rgba(244,244,245,0.06);
-        }
+        
 
         .step-indicator-item.active .step-indicator-label {
             color: var(--text-primary);
@@ -494,9 +461,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             box-shadow: 0 0 0 3px rgba(24,24,27,0.06);
         }
 
-        .cora-dark-theme input:focus {
-            box-shadow: 0 0 0 3px rgba(244,244,245,0.04);
-        }
+        
 
         .pw-toggle {
             position: absolute;
@@ -1278,7 +1243,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                     <p class="activation-sub" id="activation-sub">Configuring features, CRM pipeline, and team roles for your industry.</p>
                     
                     <div class="secure-badge-pill" id="activation-secure-pill" style="display:none;">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600 dark:text-emerald-450"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600 "><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         <span>Your data is secure. We'll never share it with anyone.</span>
                     </div>
                 </div>

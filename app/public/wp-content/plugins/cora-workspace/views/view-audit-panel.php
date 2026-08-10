@@ -65,19 +65,19 @@ $total_events = count( $filtered_logs );
 <!-- Header -->
 <div class="cora-page-header flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div class="flex items-center gap-3">
-        <span class="w-10 h-10 rounded-xl bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center shrink-0 shadow-xs">
+        <span class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
             <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
         </span>
         <div>
-            <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">System Activity Audit Logs</h1>
+            <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900 ">System Activity Audit Logs</h1>
             <p class="text-sm text-zinc-500 mt-0.5">Real-time security activity stream, user access logs, and administrative event auditing.</p>
         </div>
     </div>
     <div class="flex items-center gap-2.5">
-        <button onclick="exportLogsCSV()" class="px-4 py-2 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-white text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-3xs flex items-center gap-2">
+        <button onclick="exportLogsCSV()" class="px-4 py-2 bg-zinc-950 text-white hover:bg-zinc-800 text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-3xs flex items-center gap-2">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             Export CSV
         </button>
@@ -85,11 +85,11 @@ $total_events = count( $filtered_logs );
 </div>
 
 <!-- Tabs Navigation -->
-<div class="flex border-b border-zinc-200 dark:border-zinc-800 mt-6 gap-2">
-    <button id="tab-activity-btn" class="px-4 py-2 border-b-2 border-zinc-900 dark:border-white text-zinc-900 dark:text-white font-bold text-xs cursor-pointer active-tab transition-all" onclick="coraSwitchAuditTab('activity')">
+<div class="flex border-b border-zinc-200 mt-6 gap-2">
+    <button id="tab-activity-btn" class="px-4 py-2 border-b-2 border-zinc-900 text-zinc-900 font-bold text-xs cursor-pointer active-tab transition-all" onclick="coraSwitchAuditTab('activity')">
         Activity Log
     </button>
-    <button id="tab-cost-btn" class="px-4 py-2 border-b-2 border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium text-xs cursor-pointer transition-all" onclick="coraSwitchAuditTab('cost')">
+    <button id="tab-cost-btn" class="px-4 py-2 border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 font-medium text-xs cursor-pointer transition-all" onclick="coraSwitchAuditTab('cost')">
         AI Usage & Costs
     </button>
 </div>
@@ -98,36 +98,36 @@ $total_events = count( $filtered_logs );
 
 <!-- Metrics Bar -->
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+    <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
         <div>
             <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Total Events Logged</span>
-            <div class="text-xl font-bold text-zinc-900 dark:text-white mt-1 font-mono"><?php echo number_format( $total_events ); ?></div>
+            <div class="text-xl font-bold text-zinc-900 mt-1 font-mono"><?php echo number_format( $total_events ); ?></div>
         </div>
-        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+    <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
         <div>
             <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Audit Status</span>
-            <div class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-1.5 flex items-center gap-1.5">
+            <div class="text-xs font-semibold text-emerald-600 mt-1.5 flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Active Security Monitoring
             </div>
         </div>
-        <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+    <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
         <div>
             <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Security Scope</span>
-            <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 mt-1.5">
+            <div class="text-xs font-semibold text-zinc-800 mt-1.5">
                 <?php echo ($current_agency === 'super' || (function_exists('cora_is_super_owner') && cora_is_super_owner())) ? 'Super Admin' : 'Workspace Admin'; ?> Access
             </div>
         </div>
-        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
         </div>
     </div>
@@ -136,7 +136,7 @@ $total_events = count( $filtered_logs );
 <!-- Main Audit Log Section -->
 <div class="space-y-4 mt-6">
     <!-- Organized Filter Toolbar (Bulletproof Flex Layout) -->
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xs">
+    <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-2xs">
         <div class="flex flex-wrap items-center gap-3">
             <!-- 1. Search Actor (Flexible, min 220px) -->
             <div class="relative flex-1" style="min-width: 220px !important; flex: 1 1 220px !important;">
@@ -173,7 +173,7 @@ $total_events = count( $filtered_logs );
 
             <!-- 5. Reset Button -->
             <div style="flex: 0 0 auto !important;">
-                <button type="button" onclick="resetLogFilters()" class="px-4 py-2 text-xs font-semibold text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 rounded-xl transition-all cursor-pointer" style="height: 40px !important; line-height: 22px !important;">
+                <button type="button" onclick="resetLogFilters()" class="px-4 py-2 text-xs font-semibold text-zinc-600 hover:text-zinc-900 bg-zinc-100 border border-zinc-200/80 rounded-xl transition-all cursor-pointer" style="height: 40px !important; line-height: 22px !important;">
                     Reset
                 </button>
             </div>
@@ -181,11 +181,11 @@ $total_events = count( $filtered_logs );
     </div>
 
     <!-- Logs Table -->
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-2xs overflow-hidden">
+    <div class="bg-white border border-zinc-200/80 rounded-2xl shadow-2xs overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full border-collapse text-left text-xs text-zinc-800 dark:text-zinc-200 min-w-[850px]">
+            <table class="w-full border-collapse text-left text-xs text-zinc-800 min-w-[850px]">
                 <thead>
-                    <tr class="bg-zinc-50/70 dark:bg-zinc-800/40 border-b border-zinc-150 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 font-bold text-[10px] uppercase tracking-wider select-none">
+                    <tr class="bg-zinc-50/70 border-b border-zinc-150 text-zinc-400 font-bold text-[10px] uppercase tracking-wider select-none">
                         <th class="py-3.5 px-4 w-44">Timestamp</th>
                         <th class="py-3.5 px-4 w-52">User & Role</th>
                         <th class="py-3.5 px-4 w-40">Event Type</th>
@@ -194,7 +194,7 @@ $total_events = count( $filtered_logs );
                         <th class="py-3.5 px-4 w-36">Device</th>
                     </tr>
                 </thead>
-                <tbody id="logs-table-body" class="divide-y divide-zinc-100 dark:divide-zinc-800/50 font-medium">
+                <tbody id="logs-table-body" class="divide-y divide-zinc-100 font-medium">
                     <!-- Dynamic rendering via JS -->
                 </tbody>
             </table>
@@ -202,10 +202,10 @@ $total_events = count( $filtered_logs );
         
         <!-- Empty State -->
         <div id="logs-empty-state" class="hidden p-12 text-center space-y-3">
-            <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mx-auto flex items-center justify-center">
+            <div class="w-12 h-12 rounded-full bg-zinc-100 text-zinc-400 mx-auto flex items-center justify-center">
                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </div>
-            <div class="text-sm font-semibold text-zinc-700 dark:text-zinc-300">No matching audit log entries</div>
+            <div class="text-sm font-semibold text-zinc-700 ">No matching audit log entries</div>
             <p class="text-xs text-zinc-400 max-w-sm mx-auto">Try broadening your search terms or clearing date filters to view all activity logs.</p>
         </div>
     </div>
@@ -217,49 +217,49 @@ $total_events = count( $filtered_logs );
 <div id="cora-audit-cost-section" class="space-y-6 mt-6 hidden">
     <!-- Metrics Bar -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+        <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Total Tokens Consumed</span>
-                <div class="text-xl font-bold text-zinc-900 dark:text-white mt-1 font-mono">1,482,900</div>
+                <div class="text-xl font-bold text-zinc-900 mt-1 font-mono">1,482,900</div>
             </div>
-            <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div class="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             </div>
         </div>
 
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+        <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">AI Compute Cost</span>
-                <div class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 font-mono">$29.65</div>
+                <div class="text-xl font-bold text-emerald-600 mt-1 font-mono">$29.65</div>
             </div>
-            <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
             </div>
         </div>
 
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
+        <div class="bg-white border border-zinc-200/80 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Active Model</span>
-                <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 mt-1.5 flex items-center gap-1.5">
+                <div class="text-xs font-semibold text-zinc-800 mt-1.5 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Claude 3.5 Sonnet
                 </div>
             </div>
-            <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div class="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 12V7H5a2 2 0 0 1 2-2h14V4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5z"></path><line x1="12" y1="12" x2="20" y2="12"></line></svg>
             </div>
         </div>
     </div>
 
     <!-- Cost breakdown table -->
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-2xs overflow-hidden">
-        <div class="p-4 border-b border-zinc-150 dark:border-zinc-800 flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Estimated Token Utilization by Component</h3>
+    <div class="bg-white border border-zinc-200/80 rounded-2xl shadow-2xs overflow-hidden">
+        <div class="p-4 border-b border-zinc-150 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-zinc-900 ">Estimated Token Utilization by Component</h3>
             <span class="text-[10px] text-zinc-400">Updated hourly</span>
         </div>
         <div class="overflow-x-auto">
-            <table class="w-full border-collapse text-left text-xs text-zinc-800 dark:text-zinc-200">
+            <table class="w-full border-collapse text-left text-xs text-zinc-800 ">
                 <thead>
-                    <tr class="bg-zinc-50/70 dark:bg-zinc-800/40 border-b border-zinc-150 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 font-bold text-[10px] uppercase tracking-wider select-none">
+                    <tr class="bg-zinc-50/70 border-b border-zinc-150 text-zinc-400 font-bold text-[10px] uppercase tracking-wider select-none">
                         <th class="py-3 px-4">Component / Module</th>
                         <th class="py-3 px-4">Active Model</th>
                         <th class="py-3 px-4">Prompt Tokens</th>
@@ -267,34 +267,34 @@ $total_events = count( $filtered_logs );
                         <th class="py-3 px-4">Est. Cost</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/50 font-medium">
-                    <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                        <td class="py-3 px-4 font-semibold text-zinc-900 dark:text-zinc-100">Leads CRM Auto-SLA & Routing</td>
+                <tbody class="divide-y divide-zinc-100 font-medium">
+                    <tr class="hover:bg-zinc-50/50 transition-colors">
+                        <td class="py-3 px-4 font-semibold text-zinc-900 ">Leads CRM Auto-SLA & Routing</td>
                         <td class="py-3 px-4 font-mono">Claude 3.5 Sonnet</td>
                         <td class="py-3 px-4 font-mono">412,000</td>
                         <td class="py-3 px-4 font-mono">105,400</td>
-                        <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-mono font-bold">$9.54</td>
+                        <td class="py-3 px-4 text-emerald-600 font-mono font-bold">$9.54</td>
                     </tr>
-                    <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                        <td class="py-3 px-4 font-semibold text-zinc-900 dark:text-zinc-100">Scheduler Auto-Itinerary & Shift Planning</td>
+                    <tr class="hover:bg-zinc-50/50 transition-colors">
+                        <td class="py-3 px-4 font-semibold text-zinc-900 ">Scheduler Auto-Itinerary & Shift Planning</td>
                         <td class="py-3 px-4 font-mono">Claude 3.5 Sonnet</td>
                         <td class="py-3 px-4 font-mono">518,000</td>
                         <td class="py-3 px-4 font-mono">180,200</td>
-                        <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-mono font-bold">$12.91</td>
+                        <td class="py-3 px-4 text-emerald-600 font-mono font-bold">$12.91</td>
                     </tr>
-                    <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                        <td class="py-3 px-4 font-semibold text-zinc-900 dark:text-zinc-100">Smart Command Search & Routing</td>
+                    <tr class="hover:bg-zinc-50/50 transition-colors">
+                        <td class="py-3 px-4 font-semibold text-zinc-900 ">Smart Command Search & Routing</td>
                         <td class="py-3 px-4 font-mono">Gemini 1.5 Flash</td>
                         <td class="py-3 px-4 font-mono">182,500</td>
                         <td class="py-3 px-4 font-mono">32,100</td>
-                        <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-mono font-bold">$1.12</td>
+                        <td class="py-3 px-4 text-emerald-600 font-mono font-bold">$1.12</td>
                     </tr>
-                    <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                        <td class="py-3 px-4 font-semibold text-zinc-900 dark:text-zinc-100">WordPress Media Alt & SEO Optimizer</td>
+                    <tr class="hover:bg-zinc-50/50 transition-colors">
+                        <td class="py-3 px-4 font-semibold text-zinc-900 ">WordPress Media Alt & SEO Optimizer</td>
                         <td class="py-3 px-4 font-mono">Claude 3.5 Sonnet</td>
                         <td class="py-3 px-4 font-mono">214,300</td>
                         <td class="py-3 px-4 font-mono">38,400</td>
-                        <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-mono font-bold">$6.08</td>
+                        <td class="py-3 px-4 text-emerald-600 font-mono font-bold">$6.08</td>
                     </tr>
                 </tbody>
             </table>
@@ -308,14 +308,14 @@ function coraSwitchAuditTab(tab) {
         jQuery('#cora-audit-activity-section').removeClass('hidden');
         jQuery('#cora-audit-cost-section').addClass('hidden');
         
-        jQuery('#tab-activity-btn').addClass('border-zinc-900 dark:border-white text-zinc-900 dark:text-white font-bold').removeClass('border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium');
-        jQuery('#tab-cost-btn').removeClass('border-zinc-900 dark:border-white text-zinc-900 dark:text-white font-bold').addClass('border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium');
+        jQuery('#tab-activity-btn').addClass('border-zinc-900 text-zinc-900 font-bold').removeClass('border-transparent text-zinc-400 hover:text-zinc-700 font-medium');
+        jQuery('#tab-cost-btn').removeClass('border-zinc-900 text-zinc-900 font-bold').addClass('border-transparent text-zinc-400 hover:text-zinc-700 font-medium');
     } else {
         jQuery('#cora-audit-activity-section').addClass('hidden');
         jQuery('#cora-audit-cost-section').removeClass('hidden');
         
-        jQuery('#tab-cost-btn').addClass('border-zinc-900 dark:border-white text-zinc-900 dark:text-white font-bold').removeClass('border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium');
-        jQuery('#tab-activity-btn').removeClass('border-zinc-900 dark:border-white text-zinc-900 dark:text-white font-bold').addClass('border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium');
+        jQuery('#tab-cost-btn').addClass('border-zinc-900 text-zinc-900 font-bold').removeClass('border-transparent text-zinc-400 hover:text-zinc-700 font-medium');
+        jQuery('#tab-activity-btn').removeClass('border-zinc-900 text-zinc-900 font-bold').addClass('border-transparent text-zinc-400 hover:text-zinc-700 font-medium');
     }
 }
 
@@ -340,16 +340,16 @@ function getEventTypeBadgeClass(actionType) {
     const base = "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ";
     switch(actionType) {
         case 'Authentication':
-            return base + "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800";
+            return base + "bg-emerald-50 text-emerald-700 border-emerald-200 ";
         case 'Git Sync':
-            return base + "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border-blue-200 dark:border-blue-800";
+            return base + "bg-blue-50 text-blue-700 border-blue-200 ";
         case 'Permissions':
         case 'User Management':
-            return base + "bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400 border-purple-200 dark:border-purple-800";
+            return base + "bg-purple-50 text-purple-700 border-purple-200 ";
         case 'Invitation':
-            return base + "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800";
+            return base + "bg-amber-50 text-amber-700 border-amber-200 ";
         default:
-            return base + "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700";
+            return base + "bg-zinc-100 text-zinc-700 border-zinc-200 ";
     }
 }
 
@@ -415,16 +415,16 @@ function filterLogs() {
         }
 
         html += `
-            <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
+            <tr class="hover:bg-zinc-50/50 transition-colors">
                 <td class="py-3 px-4 text-zinc-500 font-mono text-[11px]">${formattedDate}</td>
                 <td class="py-3 px-4">
-                    <div class="font-bold text-zinc-900 dark:text-zinc-100">${escapeHtml(log.user_name || 'System / Admin')}</div>
+                    <div class="font-bold text-zinc-900 ">${escapeHtml(log.user_name || 'System / Admin')}</div>
                     <div class="text-[10px] text-zinc-400 font-mono mt-0.5">${escapeHtml(roleLabel)}</div>
                 </td>
                 <td class="py-3 px-4">
                     <span class="${badgeClass}">${actionLabel}</span>
                 </td>
-                <td class="py-3 px-4 text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-[320px] break-words text-xs">${detailsText}</td>
+                <td class="py-3 px-4 text-zinc-600 leading-relaxed max-w-[320px] break-words text-xs">${detailsText}</td>
                 <td class="py-3 px-4 text-zinc-500 font-mono text-[11px]">${escapeHtml(log.ip || '127.0.0.1')}</td>
                 <td class="py-3 px-4 text-zinc-500 font-medium text-[11px]">${escapeHtml(log.device || 'Mac OS / Chrome')}</td>
             </tr>

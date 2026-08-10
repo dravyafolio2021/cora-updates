@@ -316,11 +316,6 @@ body,
     box-sizing: border-box !important;
 }
 
-.cora-dark-theme .cora-island-card {
-    background-color: rgba(9, 9, 11, 0.95) !important;
-    border-color: #27272a !important;
-    box-shadow: 0 10px 30px -5px rgba(0,0,0,0.5), 0 4px 12px -2px rgba(0,0,0,0.3) !important;
-}
 
 /* AI Mode View input pill wrapper */
 .cora-island-input-pill {
@@ -338,10 +333,6 @@ body,
     height: 100% !important;
 }
 
-.cora-dark-theme .cora-island-input-pill {
-    background-color: #18181b !important;
-    border-color: #27272a !important;
-}
 
 /* Ask AI button inside pill */
 .cora-island-ask-btn {
@@ -365,18 +356,11 @@ body,
     transition: background-color 0.15s ease !important;
 }
 
-.cora-dark-theme .cora-island-ask-btn {
-    background-color: #ffffff !important;
-    color: #09090b !important;
-}
 
 .cora-island-ask-btn:hover {
     background-color: #27272a !important;
 }
 
-.cora-dark-theme .cora-island-ask-btn:hover {
-    background-color: #e4e4e7 !important;
-}
 
 /* Mobile Island Buttons */
 .cora-island-btn-menu {
@@ -394,10 +378,6 @@ body,
     outline: none !important;
 }
 
-.cora-dark-theme .cora-island-btn-menu {
-    background-color: #18181b !important;
-    color: #fafafa !important;
-}
 
 .cora-island-btn-ai {
     width: 40px !important;
@@ -415,12 +395,6 @@ body,
     box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
 }
 
-.cora-dark-theme .cora-island-btn-ai {
-    background-color: #09090b !important;
-    border-color: #27272a !important;
-    color: #fafafa !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
-}
 
 .cora-island-btn-menu.hidden,
 .cora-island-btn-ai.hidden {
@@ -437,16 +411,10 @@ body,
     padding: 2px 4px !important;
 }
 
-.cora-dark-theme .cora-island-nav-link {
-    color: #a1a1aa !important;
-}
 
 .cora-island-nav-link:hover {
     color: #09090b !important;
 }
 
-.cora-dark-theme .cora-island-nav-link:hover {
-    color: #ffffff !important;
-}
 
 

@@ -159,9 +159,9 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
 </style>
 
 <!-- PAGE HEADER -->
-<div class="cora-page-header flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-200/80 dark:border-zinc-800/80 pb-6 mb-6">
+<div class="cora-page-header flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-200/80 pb-6 mb-6">
     <div class="flex items-center gap-3.5">
-        <div class="w-11 h-11 rounded-2xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center text-xs font-bold shadow-2xs shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-zinc-900 text-white flex items-center justify-center text-xs font-bold shadow-2xs shrink-0">
             <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                 <circle cx="12" cy="10" r="3"></circle>
@@ -169,8 +169,8 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
         </div>
         <div>
             <div class="flex items-center gap-3">
-                <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Google Business Profile Broker Owner</h1>
-                <span class="px-2.5 py-0.5 text-[9px] font-black bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-md uppercase tracking-wider">AI Marketing</span>
+                <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900 ">Google Business Profile Broker Owner</h1>
+                <span class="px-2.5 py-0.5 text-[9px] font-black bg-zinc-900 text-white rounded-md uppercase tracking-wider">AI Marketing</span>
             </div>
             <p class="cora-section-desc text-xs font-medium text-zinc-500 mt-0.5">Manage your Google Maps listing, reply to live client reviews with AI assistance, and publish updates to Maps.</p>
         </div>
@@ -179,22 +179,22 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
     <!-- Header Actions -->
     <div class="flex items-center gap-3 font-extrabold">
         <?php if ( $is_admin ) : ?>
-            <button onclick="coraGbpToggleKeysPanel()" class="px-3.5 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-xs rounded-xl transition-all shadow-xs flex items-center gap-2 cursor-pointer border-0">
+            <button onclick="coraGbpToggleKeysPanel()" class="px-3.5 py-2 bg-white border border-zinc-200 text-zinc-800 hover:bg-zinc-50 text-xs rounded-xl transition-all shadow-xs flex items-center gap-2 cursor-pointer border-0">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 API Credentials
             </button>
         <?php endif; ?>
         
         <?php if ( $cora_gbp_is_connected ) : ?>
-            <div class="flex items-center gap-2 bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 px-3.5 py-2 rounded-xl shadow-xs">
+            <div class="flex items-center gap-2 bg-white border border-zinc-200/80 px-3.5 py-2 rounded-xl shadow-xs">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-200"><?php echo $gbp_name; ?></span>
+                <span class="text-xs font-bold text-zinc-900 "><?php echo $gbp_name; ?></span>
                 <button onclick="coraGbpDisconnect()" class="ml-2 text-[10px] font-bold text-zinc-400 hover:text-red-650 transition-colors cursor-pointer bg-transparent border-0">Disconnect</button>
             </div>
         <?php else : ?>
-            <div class="flex items-center gap-2 bg-zinc-100 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800/80 px-3.5 py-2 rounded-xl">
+            <div class="flex items-center gap-2 bg-zinc-100 border border-zinc-200/80 px-3.5 py-2 rounded-xl">
                 <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
-                <span class="text-xs font-semibold text-zinc-500 dark:text-zinc-450">Not Connected</span>
+                <span class="text-xs font-semibold text-zinc-500 ">Not Connected</span>
             </div>
         <?php endif; ?>
     </div>
@@ -205,26 +205,26 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
 <div id="cora-gbp-keys-panel" class="cora-drawer-overlay">
     <div class="cora-drawer-sheet animate-none" id="gbp-keys-drawer-card">
         <!-- Header -->
-        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-850/40">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 ">
             <div>
-                <h3 class="text-sm font-extrabold text-zinc-900 dark:text-zinc-100">Google Cloud API Credentials</h3>
+                <h3 class="text-sm font-extrabold text-zinc-900 ">Google Cloud API Credentials</h3>
                 <p class="text-[9px] text-zinc-450 mt-0.5 uppercase tracking-wider font-extrabold">System Config</p>
             </div>
-            <button class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-105 cursor-pointer p-1 bg-transparent border-0" onclick="coraGbpToggleKeysPanel()">
+            <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 bg-transparent border-0" onclick="coraGbpToggleKeysPanel()">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         
         <!-- Content -->
         <div class="flex-1 overflow-y-auto p-6 space-y-6 select-none">
-            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">Enter your Google Cloud project credentials to enable live Google Business Profile sync and Places search. These keys are secured and applied globally.</p>
+            <p class="text-[11px] text-zinc-500 leading-relaxed font-medium">Enter your Google Cloud project credentials to enable live Google Business Profile sync and Places search. These keys are secured and applied globally.</p>
             
-            <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/80 dark:border-zinc-800 space-y-2">
-                <span class="text-[9px] font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider block">Google Cloud OAuth Redirect URI</span>
-                <p class="text-[10px] text-zinc-550 dark:text-zinc-400 leading-relaxed font-medium">To avoid redirect mismatch errors, copy this URL and add it under <strong>Authorized redirect URIs</strong> in your Google Cloud Console Credentials page:</p>
-                <div class="flex items-center justify-between gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2 font-mono text-[9px] text-zinc-700 dark:text-zinc-350 select-all">
+            <div class="p-3.5 bg-zinc-50 rounded-xl border border-zinc-200/80 space-y-2">
+                <span class="text-[9px] font-bold text-zinc-900 uppercase tracking-wider block">Google Cloud OAuth Redirect URI</span>
+                <p class="text-[10px] text-zinc-550 leading-relaxed font-medium">To avoid redirect mismatch errors, copy this URL and add it under <strong>Authorized redirect URIs</strong> in your Google Cloud Console Credentials page:</p>
+                <div class="flex items-center justify-between gap-2 bg-white border border-zinc-200 rounded-lg p-2 font-mono text-[9px] text-zinc-700 select-all">
                     <span class="truncate" id="cora-gbp-redirect-uri"><?php echo esc_html(home_url('/workspace/gbp')); ?></span>
-                    <button type="button" onclick="navigator.clipboard.writeText('<?php echo esc_js(home_url('/workspace/gbp')); ?>'); window.coraShowToast('Redirect URI copied!');" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer bg-transparent border-0 p-0.5 shrink-0 flex items-center justify-center">
+                    <button type="button" onclick="navigator.clipboard.writeText('<?php echo esc_js(home_url('/workspace/gbp')); ?>'); window.coraShowToast('Redirect URI copied!');" class="text-zinc-400 hover:text-zinc-900 cursor-pointer bg-transparent border-0 p-0.5 shrink-0 flex items-center justify-center">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                     </button>
                 </div>
@@ -232,30 +232,30 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Google OAuth Client ID</label>
+                    <label class="block text-[10px] font-extrabold text-zinc-700 mb-1.5 uppercase tracking-wider">Google OAuth Client ID</label>
                     <div class="relative">
                         <input type="password" id="cora-gbp-input-client-id" value="<?php echo esc_attr($display_client_id); ?>" placeholder="e.g. 123456-abc.apps.googleusercontent.com" class="cora-input w-full rounded-xl pl-3 pr-10 py-2.5 text-xs font-mono focus:outline-none">
-                        <button type="button" onclick="coraToggleGbpInputMask('cora-gbp-input-client-id')" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer p-0.5">
+                        <button type="button" onclick="coraToggleGbpInputMask('cora-gbp-input-client-id')" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 bg-transparent border-0 cursor-pointer p-0.5">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
                 </div>
                 
                 <div>
-                    <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Google OAuth Client Secret</label>
+                    <label class="block text-[10px] font-extrabold text-zinc-700 mb-1.5 uppercase tracking-wider">Google OAuth Client Secret</label>
                     <div class="relative">
                         <input type="password" id="cora-gbp-input-client-secret" value="<?php echo esc_attr($display_client_secret); ?>" placeholder="GOCSPX-..." class="cora-input w-full rounded-xl pl-3 pr-10 py-2.5 text-xs font-mono focus:outline-none">
-                        <button type="button" onclick="coraToggleGbpInputMask('cora-gbp-input-client-secret')" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer p-0.5">
+                        <button type="button" onclick="coraToggleGbpInputMask('cora-gbp-input-client-secret')" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 bg-transparent border-0 cursor-pointer p-0.5">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
                 </div>
                 
                 <div>
-                    <label class="block text-[10px] font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Google Maps / Places API Key (Optional)</label>
+                    <label class="block text-[10px] font-extrabold text-zinc-700 mb-1.5 uppercase tracking-wider">Google Maps / Places API Key (Optional)</label>
                     <div class="relative">
                         <input type="password" id="cora-gbp-input-api-key" value="<?php echo esc_attr($display_maps_key); ?>" placeholder="AIzaSy..." class="cora-input w-full rounded-xl pl-3 pr-10 py-2.5 text-xs font-mono focus:outline-none">
-                        <button type="button" onclick="coraToggleGbpInputMask('cora-gbp-input-api-key')" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer p-0.5">
+                        <button type="button" onclick="coraToggleGbpInputMask('cora-gbp-input-api-key')" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 bg-transparent border-0 cursor-pointer p-0.5">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
@@ -264,14 +264,14 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
         </div>
         
         <!-- Footer -->
-        <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 flex items-center justify-between gap-3 font-extrabold">
-            <button onclick="coraGbpAuthorizeDemo()" type="button" class="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs">
+        <div class="p-5 border-t border-zinc-200 bg-zinc-50/50 flex items-center justify-between gap-3 font-extrabold">
+            <button onclick="coraGbpAuthorizeDemo()" type="button" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 1-Click Demo Setup
             </button>
             <div class="flex items-center gap-2">
-                <button onclick="coraGbpToggleKeysPanel()" class="px-4 py-2 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-850 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-700 dark:text-zinc-300 rounded-lg text-xs transition-colors cursor-pointer border-0 shadow-xs">Cancel</button>
-                <button onclick="coraGbpSaveApiKeys()" class="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-extrabold rounded-xl transition-colors shadow-sm flex items-center gap-2 cursor-pointer border-0">Save Changes</button>
+                <button onclick="coraGbpToggleKeysPanel()" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs transition-colors cursor-pointer border-0 shadow-xs">Cancel</button>
+                <button onclick="coraGbpSaveApiKeys()" class="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-extrabold rounded-xl transition-colors shadow-sm flex items-center gap-2 cursor-pointer border-0">Save Changes</button>
             </div>
         </div>
     </div>
@@ -283,8 +283,8 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
     <!-- ===== STATE: AUTHENTICATED BUT NOT CONNECTED (CHOOSE LOCATION) ===== -->
     <div class="max-w-4xl mx-auto my-8 space-y-8 text-left">
         <div class="text-center space-y-2">
-            <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-50">Select Your Google Business Location</h2>
-            <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Your Google Account has been authenticated successfully. Please choose which Google Business Profile location you want to link to Cora:</p>
+            <h2 class="text-xl font-bold text-zinc-900 ">Select Your Google Business Location</h2>
+            <p class="text-xs font-medium text-zinc-500 max-w-lg mx-auto">Your Google Account has been authenticated successfully. Please choose which Google Business Profile location you want to link to Cora:</p>
         </div>
 
         <div id="cora-gbp-location-picker" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -296,7 +296,7 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
         </div>
 
         <div class="pt-6 text-center">
-            <button onclick="coraGbpDisconnect()" class="px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-extrabold rounded-xl transition-all cursor-pointer border-0 shadow-xs">
+            <button onclick="coraGbpDisconnect()" class="px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-extrabold rounded-xl transition-all cursor-pointer border-0 shadow-xs">
                 Disconnect Google Account
             </button>
         </div>
@@ -305,23 +305,23 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
     <!-- ===== UNCONNECTED STATE: TWO-WAY CONNECTION OPTIONS ===== -->
     <div class="max-w-4xl mx-auto my-8 space-y-8">
         <div class="text-center space-y-2">
-            <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-50">Connect Your Google Business Profile</h2>
-            <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Select one of the options below to sync your Google Maps business listing, read reviews, and manage your online reputation.</p>
+            <h2 class="text-xl font-bold text-zinc-900 ">Connect Your Google Business Profile</h2>
+            <p class="text-xs font-medium text-zinc-500 max-w-lg mx-auto">Select one of the options below to sync your Google Maps business listing, read reviews, and manage your online reputation.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Card 1: Google Places Search (Recommended & Quick) -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
                 <div class="space-y-3">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shadow-2xs">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shadow-2xs">
                         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Option 1: Quick Search &amp; Connect</h3>
-                            <span class="px-2 py-0.5 text-[8px] font-black bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-md uppercase tracking-wider">Recommended</span>
+                            <h3 class="text-sm font-bold text-zinc-900 ">Option 1: Quick Search &amp; Connect</h3>
+                            <span class="px-2 py-0.5 text-[8px] font-black bg-zinc-900 text-white rounded-md uppercase tracking-wider">Recommended</span>
                         </div>
-                        <p class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">Search your business name in Google Places. Syncs real-time review ratings instantly without Google account login or OAuth credentials.</p>
+                        <p class="text-[11px] font-medium text-zinc-500 mt-1 leading-relaxed">Search your business name in Google Places. Syncs real-time review ratings instantly without Google account login or OAuth credentials.</p>
                     </div>
                 </div>
 
@@ -339,7 +339,7 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
                                 autocomplete="off"
                             >
                         </div>
-                        <button id="cora-gbp-search-btn" onclick="coraGbpSearchRealBusiness()" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-extrabold rounded-xl transition-all whitespace-nowrap cursor-pointer shadow-xs border-0">
+                        <button id="cora-gbp-search-btn" onclick="coraGbpSearchRealBusiness()" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-extrabold rounded-xl transition-all whitespace-nowrap cursor-pointer shadow-xs border-0">
                             Search
                         </button>
                     </div>
@@ -347,19 +347,19 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
             </div>
 
             <!-- Card 2: Google OAuth Authorization -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
                 <div class="space-y-3">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shadow-2xs">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center shadow-2xs">
                         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Option 2: 1-Click Google OAuth</h3>
-                        <p class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">Log in using your official Google Workspace / Google Account to reply directly to reviews and write Maps updates from Cora. Requires OAuth Client ID config.</p>
+                        <h3 class="text-sm font-bold text-zinc-900 ">Option 2: 1-Click Google OAuth</h3>
+                        <p class="text-[11px] font-medium text-zinc-500 mt-1 leading-relaxed">Log in using your official Google Workspace / Google Account to reply directly to reviews and write Maps updates from Cora. Requires OAuth Client ID config.</p>
                     </div>
                 </div>
 
                 <div class="pt-2">
-                    <button onclick="coraGbpConnectPlatformGoogleOAuth()" class="w-full justify-center px-4 py-2.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-150 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-xs font-extrabold rounded-xl transition-all shadow-xs flex items-center gap-2 cursor-pointer border-0">
+                    <button onclick="coraGbpConnectPlatformGoogleOAuth()" class="w-full justify-center px-4 py-2.5 bg-white border border-zinc-200 text-zinc-900 hover:bg-zinc-50 text-xs font-extrabold rounded-xl transition-all shadow-xs flex items-center gap-2 cursor-pointer border-0">
                         <svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                         Sign in with Google Account
                     </button>
@@ -379,15 +379,15 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
     <div class="lg:col-span-2 space-y-6">
         
         <!-- Google Reviews Inbox -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xs space-y-4">
-            <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4">
+        <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-zinc-100 pb-4">
                 <div class="flex items-center gap-3">
-                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-55">Google Reviews Inbox</h3>
+                    <h3 class="text-base font-bold text-zinc-900 ">Google Reviews Inbox</h3>
                     <?php if ($gbp_rating > 0) : ?>
-                        <span class="text-xs bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-250 dark:border-emerald-900/35 px-2.5 py-0.5 rounded-full font-bold"><?php echo number_format($gbp_rating, 1); ?> ★ Rating</span>
+                        <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-250 px-2.5 py-0.5 rounded-full font-bold"><?php echo number_format($gbp_rating, 1); ?> ★ Rating</span>
                     <?php endif; ?>
                 </div>
-                <button onclick="coraGbpLoadReviews()" class="text-xs font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3.5 py-2 transition-colors flex items-center gap-1.5 cursor-pointer">
+                <button onclick="coraGbpLoadReviews()" class="text-xs font-bold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 rounded-xl px-3.5 py-2 transition-colors flex items-center gap-1.5 cursor-pointer">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                     Refresh Reviews
                 </button>
@@ -400,7 +400,7 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
                     <span class="text-[10px] font-bold uppercase tracking-wider">Syncing review stream...</span>
                 </div>
                 <?php for ($s = 0; $s < 3; $s++) : ?>
-                    <div class="space-y-3 py-3 border-b border-zinc-100 dark:border-zinc-800/40 last:border-0">
+                    <div class="space-y-3 py-3 border-b border-zinc-100 last:border-0">
                         <div class="flex items-center gap-3">
                             <div class="cora-skeleton w-10 h-10 rounded-full"></div>
                             <div class="space-y-1.5 flex-1">
@@ -417,32 +417,32 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
             </div>
 
             <!-- Live Reviews List Feed -->
-            <div id="cora-gbp-reviews-list" class="space-y-4 divide-y divide-zinc-100 dark:divide-zinc-800 hidden"></div>
+            <div id="cora-gbp-reviews-list" class="space-y-4 divide-y divide-zinc-100 hidden"></div>
 
             <!-- Empty Reviews State -->
             <div id="cora-gbp-reviews-empty" class="hidden py-8 flex flex-col items-center gap-2 text-center">
                 <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1.4" fill="none" class="text-zinc-300"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 <div>
-                    <h4 class="text-xs font-bold text-zinc-850 dark:text-zinc-200">No reviews retrieved for <?php echo $gbp_name; ?></h4>
+                    <h4 class="text-xs font-bold text-zinc-850 ">No reviews retrieved for <?php echo $gbp_name; ?></h4>
                     <p class="text-xs text-zinc-400 mt-0.5 max-w-sm mx-auto font-medium">Connect your Google OAuth Client ID using the credentials panel to authorize live review synchronisation.</p>
                 </div>
             </div>
         </div>
 
         <!-- Google Maps Post & Offer Publisher -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xs space-y-4">
-            <div class="border-b border-zinc-100 dark:border-zinc-800 pb-3">
-                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-55">Publish to Google Maps</h3>
+        <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-xs space-y-4">
+            <div class="border-b border-zinc-100 pb-3">
+                <h3 class="text-base font-bold text-zinc-900 ">Publish to Google Maps</h3>
                 <p class="text-xs text-zinc-500 mt-0.5 font-medium">Posts appear on your Google Business listing within minutes.</p>
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-wider block mb-1.5">Post Content &amp; Announcement *</label>
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1.5">Post Content &amp; Announcement *</label>
                     <textarea id="cora-gbp-post-content" rows="3" class="cora-input w-full rounded-xl p-3 text-xs font-medium focus:outline-none" placeholder="Share a recent update, announcements, or seasonal offer..."></textarea>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="text-[10px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-wider block mb-1.5">Call to Action Button</label>
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1.5">Call to Action Button</label>
                         <select id="cora-gbp-post-cta" class="cora-input w-full rounded-xl p-2.5 text-xs font-bold focus:outline-none text-zinc-800 cursor-pointer">
                             <option value="NONE">None</option>
                             <option value="BOOK_NOW" selected>Book Now</option>
@@ -451,13 +451,13 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold text-zinc-400 dark:text-zinc-505 uppercase tracking-wider block mb-1.5">CTA Link URL</label>
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1.5">CTA Link URL</label>
                         <input type="url" id="cora-gbp-post-cta-url" class="cora-input w-full rounded-xl p-2.5 text-xs font-medium focus:outline-none" placeholder="https://yourwebsite.com">
                     </div>
                 </div>
             </div>
-            <div class="flex justify-end border-t border-zinc-100 dark:border-zinc-800 pt-4">
-                <button id="cora-gbp-publish-btn" onclick="coraGbpPublishPost()" class="px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-extrabold rounded-xl transition-colors flex items-center gap-2 cursor-pointer shadow-sm border-0">
+            <div class="flex justify-end border-t border-zinc-100 pt-4">
+                <button id="cora-gbp-publish-btn" onclick="coraGbpPublishPost()" class="px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-extrabold rounded-xl transition-colors flex items-center gap-2 cursor-pointer shadow-sm border-0">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                     Publish Post to Google Maps
                 </button>
@@ -466,13 +466,13 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
 
         <?php if (!empty($cora_gbp_posts)): ?>
         <!-- Published Posts History -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xs space-y-3">
-            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-50 border-b border-zinc-100 dark:border-zinc-800 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Published Posts History</h3>
+        <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-xs space-y-3">
+            <h3 class="text-sm font-bold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Published Posts History</h3>
             <div class="space-y-2">
                 <?php foreach (array_slice($cora_gbp_posts, 0, 5) as $gbp_post): ?>
-                <div class="flex items-start justify-between gap-3 py-2.5 border-b border-zinc-50 dark:border-zinc-800 last:border-0">
-                    <p class="text-xs text-zinc-700 dark:text-zinc-300 font-medium leading-relaxed flex-1"><?php echo esc_html($gbp_post['content'] ?? ''); ?></p>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-50 dark:bg-emerald-955 text-emerald-700 dark:text-emerald-400 border border-emerald-250 dark:border-emerald-900/30 shrink-0">Published</span>
+                <div class="flex items-start justify-between gap-3 py-2.5 border-b border-zinc-50 last:border-0">
+                    <p class="text-xs text-zinc-700 font-medium leading-relaxed flex-1"><?php echo esc_html($gbp_post['content'] ?? ''); ?></p>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-700 border border-emerald-250 shrink-0">Published</span>
                 </div>
                 <?php endforeach; ?>
             </div>
@@ -485,50 +485,50 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
     <div class="space-y-6">
         
         <!-- Connected Business Card -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xs space-y-4">
-            <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
-                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-50 uppercase tracking-wider text-[11px] text-zinc-400">Connected Listing Profile</h3>
-                <span class="text-[10px] bg-emerald-50 dark:bg-emerald-955 text-emerald-700 dark:text-emerald-400 border border-emerald-250 dark:border-emerald-900/30 px-2 py-0.5 rounded-full font-bold">ACTIVE</span>
+        <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                <h3 class="text-sm font-bold text-zinc-900 uppercase tracking-wider text-[11px] text-zinc-400">Connected Listing Profile</h3>
+                <span class="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-250 px-2 py-0.5 rounded-full font-bold">ACTIVE</span>
             </div>
             <div class="space-y-4">
                 <div class="flex items-center gap-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center text-sm font-extrabold shadow-xs shrink-0"><?php echo $gbp_initials; ?></div>
+                    <div class="w-12 h-12 rounded-2xl bg-zinc-900 text-white flex items-center justify-center text-sm font-extrabold shadow-xs shrink-0"><?php echo $gbp_initials; ?></div>
                     <div>
-                        <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 leading-tight"><?php echo $gbp_name; ?></h4>
+                        <h4 class="text-sm font-bold text-zinc-900 leading-tight"><?php echo $gbp_name; ?></h4>
                         <?php if ($gbp_cat) : ?><p class="text-xs text-zinc-555 font-medium mt-0.5"><?php echo $gbp_cat; ?></p><?php endif; ?>
                     </div>
                 </div>
 
                 <?php if ($gbp_rating > 0) : ?>
-                <div class="flex items-center gap-2 p-3 bg-amber-50/50 dark:bg-amber-955/15 rounded-xl border border-amber-255/60 dark:border-amber-900/25">
+                <div class="flex items-center gap-2 p-3 bg-amber-50/50 rounded-xl border border-amber-255/60 ">
                     <span class="text-amber-500 text-sm font-bold"><?php echo number_format($gbp_rating, 1); ?> ★</span>
-                    <span class="text-xs font-bold text-zinc-800 dark:text-zinc-250"><?php echo number_format($gbp_reviews); ?> Google Reviews</span>
+                    <span class="text-xs font-bold text-zinc-800 "><?php echo number_format($gbp_reviews); ?> Google Reviews</span>
                 </div>
                 <?php endif; ?>
 
-                <div class="space-y-2.5 text-xs text-zinc-700 dark:text-zinc-350">
+                <div class="space-y-2.5 text-xs text-zinc-700 ">
                     <?php if ($gbp_addr) : ?>
                     <div>
-                        <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block mb-0.5">Address</span>
-                        <p class="font-medium leading-relaxed text-zinc-650 dark:text-zinc-300"><?php echo $gbp_addr; ?></p>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Address</span>
+                        <p class="font-medium leading-relaxed text-zinc-650 "><?php echo $gbp_addr; ?></p>
                     </div>
                     <?php endif; ?>
                     <?php if ($gbp_phone) : ?>
                     <div>
-                        <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block mb-0.5">Phone</span>
-                        <p class="font-bold text-zinc-900 dark:text-zinc-100"><?php echo $gbp_phone; ?></p>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Phone</span>
+                        <p class="font-bold text-zinc-900 "><?php echo $gbp_phone; ?></p>
                     </div>
                     <?php endif; ?>
                     <?php if ($gbp_website) : ?>
                     <div>
-                        <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block mb-0.5">Website</span>
-                        <a href="<?php echo $gbp_website; ?>" target="_blank" class="font-bold text-blue-600 dark:text-blue-400 hover:underline truncate block"><?php echo $gbp_website; ?></a>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Website</span>
+                        <a href="<?php echo $gbp_website; ?>" target="_blank" class="font-bold text-blue-600 hover:underline truncate block"><?php echo $gbp_website; ?></a>
                     </div>
                     <?php endif; ?>
                 </div>
             </div>
 
-            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+            <div class="pt-3 border-t border-zinc-100 flex justify-between items-center">
                 <button onclick="coraGbpDisconnect()" class="text-[11px] font-bold text-zinc-400 hover:text-red-655 transition-colors cursor-pointer bg-transparent border-0">
                     Disconnect listing
                 </button>
@@ -649,20 +649,20 @@ window.coraGbpSearchRealBusiness = function() {
 
                 var stars = '';
                 if (ratingVal > 0) {
-                    stars = `<span class="bg-amber-50 dark:bg-amber-955/15 text-amber-600 dark:text-amber-450 px-2 py-0.5 rounded font-black text-[9px] border border-amber-250/40">${ratingVal.toFixed(1)} ★ (${reviewCount} reviews)</span>`;
+                    stars = `<span class="bg-amber-50 text-amber-600 px-2 py-0.5 rounded font-black text-[9px] border border-amber-250/40">${ratingVal.toFixed(1)} ★ (${reviewCount} reviews)</span>`;
                 }
 
                 var card = `
-                    <div class="p-4 bg-zinc-55/20 dark:bg-zinc-800/10 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-zinc-350 dark:hover:border-zinc-700 transition-all shadow-2xs">
+                    <div class="p-4 bg-zinc-55/20 border border-zinc-200/80 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-zinc-350 transition-all shadow-2xs">
                         <div class="space-y-1">
                             <div class="flex items-center gap-2">
-                                <h4 class="text-xs font-black text-zinc-900 dark:text-zinc-100 leading-tight">${name}</h4>
-                                <span class="text-[9px] font-black uppercase bg-zinc-100 dark:bg-zinc-850 px-2 py-0.5 rounded text-zinc-500">${type}</span>
+                                <h4 class="text-xs font-black text-zinc-900 leading-tight">${name}</h4>
+                                <span class="text-[9px] font-black uppercase bg-zinc-100 px-2 py-0.5 rounded text-zinc-500">${type}</span>
                             </div>
-                            <p class="text-[10px] text-zinc-555 dark:text-zinc-400 font-medium leading-relaxed">${address}</p>
+                            <p class="text-[10px] text-zinc-555 font-medium leading-relaxed">${address}</p>
                             ${stars}
                         </div>
-                        <button onclick='coraGbpSaveSelectedPlace(${JSON.stringify(place).replace(/'/g, "&apos;")})' class="w-full sm:w-auto px-4 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-[10px] font-extrabold rounded-xl transition-all cursor-pointer shadow-xs shrink-0 border-0">Connect listing</button>
+                        <button onclick='coraGbpSaveSelectedPlace(${JSON.stringify(place).replace(/'/g, "&apos;")})' class="w-full sm:w-auto px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-extrabold rounded-xl transition-all cursor-pointer shadow-xs shrink-0 border-0">Connect listing</button>
                     </div>
                 `;
                 wrap.append(card);
@@ -671,12 +671,12 @@ window.coraGbpSearchRealBusiness = function() {
             // Fallback for API failure or no places found
             var msg = res.data && typeof res.data === 'string' ? res.data : 'No matching Places found.';
             var fallback = `
-                <div class="p-4 bg-zinc-50/50 dark:bg-zinc-800/20 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl space-y-3.5">
+                <div class="p-4 bg-zinc-50/50 border border-zinc-200/80 rounded-2xl space-y-3.5">
                     <div>
-                        <h4 class="text-xs font-bold text-zinc-850 dark:text-zinc-200">Google Places API Fallback Connection</h4>
-                        <p class="text-[10px] text-zinc-505 dark:text-zinc-450 mt-1 leading-relaxed">${msg} You can connect manually as a custom listing below.</p>
+                        <h4 class="text-xs font-bold text-zinc-850 ">Google Places API Fallback Connection</h4>
+                        <p class="text-[10px] text-zinc-505 mt-1 leading-relaxed">${msg} You can connect manually as a custom listing below.</p>
                     </div>
-                    <button onclick="coraGbpSaveCustomBusiness('${query.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-[10px] font-extrabold rounded-xl transition-colors cursor-pointer border-0 shadow-xs">
+                    <button onclick="coraGbpSaveCustomBusiness('${query.replace(/'/g, "\\'")}')" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-extrabold rounded-xl transition-colors cursor-pointer border-0 shadow-xs">
                         Connect manual listing: "${query}"
                     </button>
                 </div>
@@ -772,7 +772,7 @@ window.coraGbpLoadReviews = function() {
                     if (i <= ratingNum) {
                         starsHtml += '<span class="text-amber-500 font-bold">★</span>';
                     } else {
-                        starsHtml += '<span class="text-zinc-200 dark:text-zinc-800">★</span>';
+                        starsHtml += '<span class="text-zinc-200 ">★</span>';
                     }
                 }
 
@@ -784,9 +784,9 @@ window.coraGbpLoadReviews = function() {
                 
                 if (rev.reviewReply && rev.reviewReply.comment) {
                     replyHtml = `
-                        <div class="mt-3 p-3 bg-zinc-55 dark:bg-zinc-800/40 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
-                            <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">My Response</span>
-                            <p class="text-xs text-zinc-700 dark:text-zinc-300 mt-1 font-medium">${rev.reviewReply.comment}</p>
+                        <div class="mt-3 p-3 bg-zinc-55 rounded-xl border border-zinc-100 ">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">My Response</span>
+                            <p class="text-xs text-zinc-700 mt-1 font-medium">${rev.reviewReply.comment}</p>
                         </div>
                     `;
                 } else {
@@ -794,16 +794,16 @@ window.coraGbpLoadReviews = function() {
                         <div class="mt-3 space-y-2">
                             <textarea id="reply-text-${revKey}" rows="2" class="cora-input w-full rounded-xl p-2.5 text-xs focus:outline-none" placeholder="Write reply comment..."></textarea>
                             <div class="flex justify-end">
-                                <button onclick="coraGbpSubmitReply('${rev.name}', '${revKey}')" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-[10px] font-extrabold rounded-lg transition-colors cursor-pointer border-0 shadow-sm">Submit AI Assistant Reply</button>
+                                <button onclick="coraGbpSubmitReply('${rev.name}', '${revKey}')" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-extrabold rounded-lg transition-colors cursor-pointer border-0 shadow-sm">Submit AI Assistant Reply</button>
                             </div>
                         </div>
                     `;
                 }
 
                 var avatarHtml = avatar 
-                    ? `<img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-zinc-200 dark:border-zinc-700 shadow-2xs" onerror="this.style.display='none'; $(this).next().show();" loading="lazy">` 
+                    ? `<img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-zinc-200 shadow-2xs" onerror="this.style.display='none'; $(this).next().show();" loading="lazy">` 
                     : '';
-                var avatarFallbackHtml = `<div class="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center font-black text-zinc-500 dark:text-zinc-400 text-xs shadow-2xs shrink-0">${author.substring(0,2).toUpperCase()}</div>`;
+                var avatarFallbackHtml = `<div class="w-10 h-10 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center font-black text-zinc-500 text-xs shadow-2xs shrink-0">${author.substring(0,2).toUpperCase()}</div>`;
                 var finalAvatar = `<div class="shrink-0 relative">${avatarHtml}<div style="${avatar ? 'display:none;' : ''}" class="fallback-wrap">${avatarFallbackHtml}</div></div>`;
 
                 var item = `
@@ -811,14 +811,14 @@ window.coraGbpLoadReviews = function() {
                         <div class="flex items-center gap-3">
                             ${finalAvatar}
                             <div>
-                                <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 leading-tight">${author}</h4>
+                                <h4 class="text-xs font-bold text-zinc-900 leading-tight">${author}</h4>
                                 <div class="flex items-center gap-1.5 mt-0.5">
                                     <div class="flex text-xs">${starsHtml}</div>
                                     <span class="text-[10px] text-zinc-400 font-medium">${dateStr}</span>
                                 </div>
                             </div>
                         </div>
-                        <p class="text-xs text-zinc-650 dark:text-zinc-350 leading-relaxed font-medium mt-1">${comment}</p>
+                        <p class="text-xs text-zinc-650 leading-relaxed font-medium mt-1">${comment}</p>
                         ${replyHtml}
                     </div>
                 `;

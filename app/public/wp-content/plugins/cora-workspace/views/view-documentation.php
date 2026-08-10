@@ -76,16 +76,16 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
 <div class="space-y-6" id="cora-docs-container">
     
     <!-- Header Area -->
-    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200/80 dark:border-zinc-800 pb-5">
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200/80 pb-5">
         <div class="flex items-center gap-3">
-            <span class="text-zinc-900 dark:text-zinc-100">
+            <span class="text-zinc-900 ">
                 <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                 </svg>
             </span>
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Documentation Control Desk</h1>
+                <h1 class="text-2xl font-bold tracking-tight text-zinc-900 ">Documentation Control Desk</h1>
                 <p class="text-xs text-zinc-500 mt-0.5">Manage internal documentation pages, publish to the public developer portal, and configure API registries.</p>
             </div>
         </div>
@@ -93,12 +93,12 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
         <!-- Global Search Bar -->
         <div class="flex items-center gap-3">
             <div class="relative">
-                <input type="text" id="cora-docs-global-search" oninput="coraDocsGlobalSearch(this.value)" class="w-64 border border-zinc-200 dark:border-zinc-800 rounded-lg py-1.5 pl-8 pr-3 text-xs bg-white dark:bg-zinc-950 focus:border-zinc-450 dark:focus:border-zinc-650 focus:outline-none text-zinc-900 dark:text-zinc-100" placeholder="Search documentation content...">
+                <input type="text" id="cora-docs-global-search" oninput="coraDocsGlobalSearch(this.value)" class="w-64 border border-zinc-200 rounded-lg py-1.5 pl-8 pr-3 text-xs bg-white focus:border-zinc-450 focus:outline-none text-zinc-900 " placeholder="Search documentation content...">
                 <span class="absolute left-2.5 top-2.5 text-zinc-400">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </span>
             </div>
-            <a href="<?php echo esc_url( home_url( '/docs' ) ); ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors select-none">
+            <a href="<?php echo esc_url( home_url( '/docs' ) ); ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-bold text-zinc-700 hover:bg-zinc-50 transition-colors select-none">
                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                 Public Docs Portal
             </a>
@@ -106,7 +106,7 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
     </div>
 
     <!-- Navigation Sub-Tabs -->
-    <div class="flex border-b border-zinc-200 dark:border-zinc-800 gap-6 text-xs font-bold text-zinc-500 pb-0.5 select-none overflow-x-auto">
+    <div class="flex border-b border-zinc-200 gap-6 text-xs font-bold text-zinc-500 pb-0.5 select-none overflow-x-auto">
         <button onclick="coraDocsSwitchTab('overview')" class="cora-docs-subtab-btn active pb-2 border-b-2 border-transparent cursor-pointer focus:outline-none transition-colors" id="tab-btn-overview">Platform Overview</button>
         <button onclick="coraDocsSwitchTab('changelog')" class="cora-docs-subtab-btn pb-2 border-b-2 border-transparent cursor-pointer focus:outline-none transition-colors" id="tab-btn-changelog">Changelog</button>
         <button onclick="coraDocsSwitchTab('modules')" class="cora-docs-subtab-btn pb-2 border-b-2 border-transparent cursor-pointer focus:outline-none transition-colors" id="tab-btn-modules">Modules</button>
@@ -124,17 +124,17 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
             
             <!-- Editor Column -->
             <div class="lg:col-span-2 space-y-4">
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-sm">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                        <h2 class="text-sm font-bold text-zinc-900 flex items-center gap-1.5">
                             Platform Overview Content
-                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-450 uppercase"><?php echo esc_html( $overview_page['status'] ?? 'draft' ); ?></span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-zinc-100 text-zinc-650 uppercase"><?php echo esc_html( $overview_page['status'] ?? 'draft' ); ?></span>
                         </h2>
                         
                         <!-- Actions -->
                         <div class="flex items-center gap-2">
-                            <button onclick="coraDocsToggleEdit('overview')" class="text-xs px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 select-none cursor-pointer" id="btn-edit-overview">Edit</button>
-                            <button onclick="coraDocsOpenHistory(<?php echo intval( $overview_page['id'] ?? 0 ); ?>)" class="text-xs px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 select-none cursor-pointer">History</button>
+                            <button onclick="coraDocsToggleEdit('overview')" class="text-xs px-2.5 py-1 border border-zinc-200 rounded-lg text-zinc-600 hover:bg-zinc-50 select-none cursor-pointer" id="btn-edit-overview">Edit</button>
+                            <button onclick="coraDocsOpenHistory(<?php echo intval( $overview_page['id'] ?? 0 ); ?>)" class="text-xs px-2.5 py-1 border border-zinc-200 rounded-lg text-zinc-600 hover:bg-zinc-50 select-none cursor-pointer">History</button>
                             
                             <?php if ( isset( $overview_page['status'] ) && $overview_page['status'] === 'approved_internal' ) : ?>
                             <button onclick="coraDocsPublishPage(<?php echo intval( $overview_page['id'] ); ?>, 'public_live')" class="text-xs px-2.5 py-1 bg-zinc-950 text-white rounded-lg select-none cursor-pointer">Publish to Public</button>
@@ -144,9 +144,9 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
 
                     <!-- Editor Box -->
                     <div id="cora-docs-overview-editor-box" class="hidden space-y-3">
-                        <textarea id="cora-docs-overview-textarea" rows="12" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 text-xs bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-450"><?php echo esc_textarea( $overview_page['content'] ?? '' ); ?></textarea>
+                        <textarea id="cora-docs-overview-textarea" rows="12" class="w-full border border-zinc-200 rounded-lg p-3 text-xs bg-zinc-50 text-zinc-900 font-mono focus:outline-none focus:border-zinc-450"><?php echo esc_textarea( $overview_page['content'] ?? '' ); ?></textarea>
                         <div class="flex items-center gap-2 justify-end">
-                            <select id="cora-docs-overview-status" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-1 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 focus:outline-none outline-none">
+                            <select id="cora-docs-overview-status" class="border border-zinc-200 rounded-lg px-2 py-1 text-xs text-zinc-700 bg-white focus:outline-none outline-none">
                                 <option value="draft" <?php selected( $overview_page['status'] ?? 'draft', 'draft' ); ?>>Draft</option>
                                 <option value="approved_internal" <?php selected( $overview_page['status'] ?? 'draft', 'approved_internal' ); ?>>Approved Internal</option>
                                 <option value="public_live" <?php selected( $overview_page['status'] ?? 'draft', 'public_live' ); ?>>Public Live</option>
@@ -156,7 +156,7 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
                     </div>
 
                     <!-- Preview Box -->
-                    <div id="cora-docs-overview-preview-box" class="prose max-w-none text-xs dark:prose-invert">
+                    <div id="cora-docs-overview-preview-box" class="prose max-w-none text-xs ">
                         <?php echo cora_markdown_to_html( $overview_page['content'] ?? 'No overview page created yet. Click edit to begin.' ); ?>
                     </div>
                 </div>
@@ -164,53 +164,53 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
 
             <!-- Meta Information Column -->
             <div class="space-y-4">
-                <div class="bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-450 dark:text-zinc-500">Platform Meta Information</h3>
+                <div class="bg-zinc-50 border border-zinc-200/80 rounded-xl p-5 shadow-sm space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-450 ">Platform Meta Information</h3>
                     
-                    <div class="space-y-3 divide-y divide-zinc-200/60 dark:divide-zinc-850">
+                    <div class="space-y-3 divide-y divide-zinc-200/60 ">
                         <div class="pt-0 flex items-center justify-between text-xs">
                             <span class="text-zinc-500">Platform Version:</span>
-                            <span class="font-mono font-bold text-zinc-900 dark:text-zinc-50">v2.2.1</span>
+                            <span class="font-mono font-bold text-zinc-900 ">v2.2.1</span>
                         </div>
                         <div class="pt-2.5 flex items-center justify-between text-xs">
                             <span class="text-zinc-500">Foundation Stack:</span>
-                            <span class="font-bold text-zinc-900 dark:text-zinc-50">WordPress 6.x SaaS</span>
+                            <span class="font-bold text-zinc-900 ">WordPress 6.x SaaS</span>
                         </div>
                         <div class="pt-2.5 flex items-center justify-between text-xs">
                             <span class="text-zinc-500">AI Framework:</span>
-                            <span class="font-bold text-zinc-900 dark:text-zinc-50">Gemini 3.5 Flash RAG</span>
+                            <span class="font-bold text-zinc-900 ">Gemini 3.5 Flash RAG</span>
                         </div>
                         <div class="pt-2.5 flex items-center justify-between text-xs">
                             <span class="text-zinc-500">Last Synced:</span>
-                            <span class="text-zinc-650 dark:text-zinc-400 font-mono text-[11px]"><?php echo date('Y-m-d H:i'); ?></span>
+                            <span class="text-zinc-650 font-mono text-[11px]"><?php echo date('Y-m-d H:i'); ?></span>
                         </div>
                     </div>
 
                     <!-- Modules List Table -->
                     <div class="space-y-2.5 pt-4">
                         <h4 class="text-[10px] font-bold uppercase tracking-wider text-zinc-450">Active Modules List</h4>
-                        <div class="overflow-hidden border border-zinc-200/80 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950">
+                        <div class="overflow-hidden border border-zinc-200/80 rounded-lg bg-white ">
                             <table class="w-full text-[11px] text-left border-collapse">
                                 <thead>
-                                    <tr class="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+                                    <tr class="bg-zinc-50 border-b border-zinc-200 ">
                                         <th class="p-2 text-zinc-500 font-bold">Module ID</th>
                                         <th class="p-2 text-zinc-500 font-bold">Version</th>
                                         <th class="p-2 text-zinc-500 font-bold">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="border-b border-zinc-150/50 dark:border-zinc-850">
-                                        <td class="p-2 font-medium text-zinc-900 dark:text-zinc-100">User Management</td>
+                                    <tr class="border-b border-zinc-150/50 ">
+                                        <td class="p-2 font-medium text-zinc-900 ">User Management</td>
                                         <td class="p-2 font-mono text-zinc-500">v1.0.0</td>
                                         <td class="p-2"><span class="px-1.5 py-0.5 rounded-full text-[9px] bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">Live</span></td>
                                     </tr>
-                                    <tr class="border-b border-zinc-150/50 dark:border-zinc-850">
-                                        <td class="p-2 font-medium text-zinc-900 dark:text-zinc-100">Email outbound</td>
+                                    <tr class="border-b border-zinc-150/50 ">
+                                        <td class="p-2 font-medium text-zinc-900 ">Email outbound</td>
                                         <td class="p-2 font-mono text-zinc-500">v1.0.1</td>
                                         <td class="p-2"><span class="px-1.5 py-0.5 rounded-full text-[9px] bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">Live</span></td>
                                     </tr>
-                                    <tr class="border-b border-zinc-150/50 dark:border-zinc-850">
-                                        <td class="p-2 font-medium text-zinc-900 dark:text-zinc-100">Document Vault</td>
+                                    <tr class="border-b border-zinc-150/50 ">
+                                        <td class="p-2 font-medium text-zinc-900 ">Document Vault</td>
                                         <td class="p-2 font-mono text-zinc-500">v0.9.8</td>
                                         <td class="p-2"><span class="px-1.5 py-0.5 rounded-full text-[9px] bg-amber-50 text-amber-700 font-bold border border-amber-100">Staged</span></td>
                                     </tr>
@@ -221,13 +221,13 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
                 </div>
 
                 <!-- Auto-Update Diagnostic Triggers -->
-                <div class="bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-4">
+                <div class="bg-zinc-50 border border-zinc-200/80 rounded-xl p-5 shadow-sm space-y-4">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-500">Diagnostic Simulation Panel</h3>
                     <p class="text-[10px] text-zinc-500">Test the platform auto-update triggers. Firing these simulates background actions on the platform and creates draft changelogs or doc updates.</p>
                     <div class="space-y-2 pt-2">
-                        <button onclick="coraDocsSimulateTrigger('register_module')" class="w-full text-center px-3 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 rounded-lg text-xs font-bold transition-all cursor-pointer select-none">Simulate Module Registration</button>
-                        <button onclick="coraDocsSimulateTrigger('status_changed')" class="w-full text-center px-3 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 rounded-lg text-xs font-bold transition-all cursor-pointer select-none">Simulate Module Status Change</button>
-                        <button onclick="coraDocsSimulateTrigger('feature_completed')" class="w-full text-center px-3 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 rounded-lg text-xs font-bold transition-all cursor-pointer select-none">Simulate Feature Completed</button>
+                        <button onclick="coraDocsSimulateTrigger('register_module')" class="w-full text-center px-3 py-2 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-100 rounded-lg text-xs font-bold transition-all cursor-pointer select-none">Simulate Module Registration</button>
+                        <button onclick="coraDocsSimulateTrigger('status_changed')" class="w-full text-center px-3 py-2 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-100 rounded-lg text-xs font-bold transition-all cursor-pointer select-none">Simulate Module Status Change</button>
+                        <button onclick="coraDocsSimulateTrigger('feature_completed')" class="w-full text-center px-3 py-2 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-100 rounded-lg text-xs font-bold transition-all cursor-pointer select-none">Simulate Feature Completed</button>
                     </div>
                 </div>
             </div>
@@ -240,17 +240,17 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
     <div id="cora-docs-tab-changelog" class="cora-docs-tab-content space-y-4 hidden">
         
         <!-- Filters & Tools -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
             <div class="flex flex-wrap gap-3 items-center flex-1">
                 <!-- Search changelog -->
                 <div class="relative">
-                    <input type="text" id="cora-changelog-search" oninput="coraDocsFilterChangelog()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg py-1.5 pl-8 pr-3 text-xs bg-white dark:bg-zinc-950 focus:outline-none" placeholder="Filter by changes...">
+                    <input type="text" id="cora-changelog-search" oninput="coraDocsFilterChangelog()" class="border border-zinc-200 rounded-lg py-1.5 pl-8 pr-3 text-xs bg-white focus:outline-none" placeholder="Filter by changes...">
                     <span class="absolute left-2.5 top-2.5 text-zinc-400">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </span>
                 </div>
                 <!-- Module Filter -->
-                <select id="cora-changelog-module-filter" onchange="coraDocsFilterChangelog()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <select id="cora-changelog-module-filter" onchange="coraDocsFilterChangelog()" class="border border-zinc-200 rounded-lg px-2 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                     <option value="">All Threads</option>
                     <option value="platform">Platform Level</option>
                     <?php foreach ($registered_modules as $key => $mod) : ?>
@@ -258,7 +258,7 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
                     <?php endforeach; ?>
                 </select>
                 <!-- Status Filter -->
-                <select id="cora-changelog-status-filter" onchange="coraDocsFilterChangelog()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 outline-none cursor-pointer">
+                <select id="cora-changelog-status-filter" onchange="coraDocsFilterChangelog()" class="border border-zinc-200 rounded-lg px-2 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                     <option value="">All Statuses</option>
                     <option value="released">Released</option>
                     <option value="in_progress">In Progress</option>
@@ -289,23 +289,23 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
                     );
                     $status_badge = $status_colors[$entry['status']] ?? 'bg-zinc-100 text-zinc-500';
                 ?>
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-3 changelog-entry-card" data-module="<?php echo esc_attr($entry['module_key'] ?: 'platform'); ?>" data-status="<?php echo esc_attr($entry['status']); ?>">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-sm space-y-3 changelog-entry-card" data-module="<?php echo esc_attr($entry['module_key'] ?: 'platform'); ?>" data-status="<?php echo esc_attr($entry['status']); ?>">
                     <div class="flex items-start justify-between flex-wrap gap-2">
                         <div class="flex items-center gap-2.5">
                             <span class="px-2 py-0.5 text-[9.5px] font-bold rounded-full uppercase <?php echo $category_class; ?>"><?php echo esc_html($category_label); ?></span>
                             <span class="text-xs font-mono font-bold text-zinc-400">v<?php echo esc_html($entry['version']); ?></span>
                             <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold uppercase border <?php echo $status_badge; ?>"><?php echo esc_html($entry['status']); ?></span>
                             <?php if ( ! empty($entry['ticket_id']) ) : ?>
-                            <span class="text-xs font-mono text-zinc-450 dark:text-zinc-500 border-l border-zinc-200 pl-2">Ticket: <?php echo esc_html($entry['ticket_id']); ?></span>
+                            <span class="text-xs font-mono text-zinc-450 border-l border-zinc-200 pl-2">Ticket: <?php echo esc_html($entry['ticket_id']); ?></span>
                             <?php endif; ?>
                         </div>
                         <span class="text-[10px] text-zinc-400 font-mono"><?php echo date('M j, Y', strtotime($entry['created_at'])); ?></span>
                     </div>
 
-                    <h3 class="text-xs font-bold text-zinc-950 dark:text-zinc-50 changelog-card-title"><?php echo esc_html($entry['title']); ?></h3>
+                    <h3 class="text-xs font-bold text-zinc-950 changelog-card-title"><?php echo esc_html($entry['title']); ?></h3>
                     <p class="text-xs text-zinc-700 leading-relaxed font-sans"><?php echo esc_html($entry['description']); ?></p>
                     
-                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-850">
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 ">
                         <span class="text-[10.5px] text-zinc-400">Recorded by Admin</span>
                         <button onclick="coraDocsEditChangelog(<?php echo htmlspecialchars(json_encode($entry)); ?>)" class="text-xs text-zinc-500 hover:text-zinc-850 flex items-center gap-1 cursor-pointer">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -346,20 +346,20 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
                     $doc_content = $mod_doc['content'] ?? "# " . esc_html($mod['name']) . "\n\nConfigure module documentation page parameters.";
                 ?>
                 <div id="cora-docs-mod-content-<?php echo esc_attr($key); ?>" class="cora-docs-module-view-box space-y-4 hidden">
-                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm">
+                    <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-sm">
                         <div class="flex items-center justify-between mb-4 border-b border-zinc-150/40 pb-4">
                             <div>
-                                <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                                <h2 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
                                     <?php echo esc_html($mod['name']); ?> Page
-                                    <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-zinc-100 dark:bg-zinc-850 text-zinc-600 dark:text-zinc-400 uppercase"><?php echo esc_html( $mod_doc['status'] ?? 'draft' ); ?></span>
+                                    <span class="text-[9.5px] px-2 py-0.5 rounded-full font-bold bg-zinc-100 text-zinc-600 uppercase"><?php echo esc_html( $mod_doc['status'] ?? 'draft' ); ?></span>
                                 </h2>
                                 <p class="text-[10px] text-zinc-450 mt-0.5">Assigned key: <code class="font-mono text-zinc-650"><?php echo esc_html($key); ?></code></p>
                             </div>
                             
                             <!-- Actions -->
                             <div class="flex items-center gap-2">
-                                <button onclick="coraDocsToggleEdit('<?php echo esc_attr($key); ?>')" class="text-xs px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-600 hover:bg-zinc-50 cursor-pointer" id="btn-edit-<?php echo esc_attr($key); ?>">Edit</button>
-                                <button onclick="coraDocsOpenHistory(<?php echo intval( $mod_doc['id'] ?? 0 ); ?>)" class="text-xs px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-600 hover:bg-zinc-50 cursor-pointer">History</button>
+                                <button onclick="coraDocsToggleEdit('<?php echo esc_attr($key); ?>')" class="text-xs px-2.5 py-1 border border-zinc-200 rounded-lg text-zinc-600 hover:bg-zinc-50 cursor-pointer" id="btn-edit-<?php echo esc_attr($key); ?>">Edit</button>
+                                <button onclick="coraDocsOpenHistory(<?php echo intval( $mod_doc['id'] ?? 0 ); ?>)" class="text-xs px-2.5 py-1 border border-zinc-200 rounded-lg text-zinc-600 hover:bg-zinc-50 cursor-pointer">History</button>
                                 
                                 <?php if ( isset($mod_doc['status']) && $mod_doc['status'] === 'approved_internal' ) : ?>
                                 <button onclick="coraDocsPublishPage(<?php echo intval( $mod_doc['id'] ); ?>, 'public_live')" class="text-xs px-3 py-1 bg-zinc-950 text-white rounded-lg select-none cursor-pointer">Publish to Public</button>
@@ -369,9 +369,9 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
 
                         <!-- Editor Area -->
                         <div id="cora-docs-editor-box-<?php echo esc_attr($key); ?>" class="hidden space-y-3">
-                            <textarea id="cora-docs-textarea-<?php echo esc_attr($key); ?>" rows="15" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 text-xs bg-zinc-50 text-zinc-900 font-mono focus:outline-none"><?php echo esc_textarea( $doc_content ); ?></textarea>
+                            <textarea id="cora-docs-textarea-<?php echo esc_attr($key); ?>" rows="15" class="w-full border border-zinc-200 rounded-lg p-3 text-xs bg-zinc-50 text-zinc-900 font-mono focus:outline-none"><?php echo esc_textarea( $doc_content ); ?></textarea>
                             <div class="flex items-center gap-2 justify-end">
-                                <select id="cora-docs-status-<?php echo esc_attr($key); ?>" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-1 text-xs text-zinc-700 bg-white focus:outline-none">
+                                <select id="cora-docs-status-<?php echo esc_attr($key); ?>" class="border border-zinc-200 rounded-lg px-2 py-1 text-xs text-zinc-700 bg-white focus:outline-none">
                                     <option value="draft" <?php selected( $mod_doc['status'] ?? 'draft', 'draft' ); ?>>Draft</option>
                                     <option value="approved_internal" <?php selected( $mod_doc['status'] ?? 'draft', 'approved_internal' ); ?>>Approved Internal</option>
                                     <option value="public_live" <?php selected( $mod_doc['status'] ?? 'draft', 'public_live' ); ?>>Public Live</option>
@@ -397,17 +397,17 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
     <div id="cora-docs-tab-api" class="cora-docs-tab-content space-y-4 hidden">
         
         <!-- Filters Toolbar -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-4 shadow-sm flex flex-wrap gap-4 items-center justify-between">
             <div class="flex flex-wrap gap-3 items-center flex-1">
                 <!-- Search APIs -->
                 <div class="relative">
-                    <input type="text" id="cora-api-search" oninput="coraDocsFilterApi()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg py-1.5 pl-8 pr-3 text-xs bg-white dark:bg-zinc-950 focus:outline-none" placeholder="Filter path or permissions...">
+                    <input type="text" id="cora-api-search" oninput="coraDocsFilterApi()" class="border border-zinc-200 rounded-lg py-1.5 pl-8 pr-3 text-xs bg-white focus:outline-none" placeholder="Filter path or permissions...">
                     <span class="absolute left-2.5 top-2.5 text-zinc-400">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </span>
                 </div>
                 <!-- Method filter -->
-                <select id="cora-api-method-filter" onchange="coraDocsFilterApi()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
+                <select id="cora-api-method-filter" onchange="coraDocsFilterApi()" class="border border-zinc-200 rounded-lg px-2 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                     <option value="">All Methods</option>
                     <option value="GET">GET</option>
                     <option value="POST">POST</option>
@@ -415,7 +415,7 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
                     <option value="DELETE">DELETE</option>
                 </select>
                 <!-- MCP Filter -->
-                <select id="cora-api-mcp-filter" onchange="coraDocsFilterApi()" class="border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
+                <select id="cora-api-mcp-filter" onchange="coraDocsFilterApi()" class="border border-zinc-200 rounded-lg px-2 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                     <option value="">All Endpoints</option>
                     <option value="1">MCP Compatible Only</option>
                 </select>
@@ -441,15 +441,15 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
                     );
                     $method_class = $method_colors[$api['method']] ?? 'bg-zinc-100 text-zinc-800';
                 ?>
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-4 api-endpoint-card" data-method="<?php echo esc_attr($api['method']); ?>" data-mcp="<?php echo intval($api['mcp_compatible']); ?>">
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-sm space-y-4 api-endpoint-card" data-method="<?php echo esc_attr($api['method']); ?>" data-mcp="<?php echo intval($api['mcp_compatible']); ?>">
                     <div class="flex items-center justify-between flex-wrap gap-2">
                         <div class="flex items-center gap-3">
                             <span class="px-2 py-0.5 text-[9.5px] font-mono font-bold rounded-md uppercase border <?php echo $method_class; ?>"><?php echo esc_html($api['method']); ?></span>
-                            <code class="text-xs font-mono font-bold text-zinc-950 dark:text-zinc-105 api-card-path"><?php echo esc_html($api['path']); ?></code>
+                            <code class="text-xs font-mono font-bold text-zinc-950 api-card-path"><?php echo esc_html($api['path']); ?></code>
                         </div>
                         <div class="flex items-center gap-2">
                             <?php if ( $api['mcp_compatible'] ) : ?>
-                            <span class="px-2 py-0.5 rounded-full text-[9px] bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <span class="px-2 py-0.5 rounded-full text-[9px] bg-zinc-100 border border-zinc-300 text-zinc-700 font-bold uppercase tracking-wider flex items-center gap-1">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> MCP Ready
                             </span>
                             <?php endif; ?>
@@ -460,7 +460,7 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
                     <p class="text-xs text-zinc-650 leading-relaxed font-sans"><?php echo esc_html($api['description']); ?></p>
 
                     <!-- Toggleable details -->
-                    <details class="group border border-zinc-150/60 dark:border-zinc-850 rounded-lg overflow-hidden bg-zinc-50/50">
+                    <details class="group border border-zinc-150/60 rounded-lg overflow-hidden bg-zinc-50/50">
                         <summary class="flex justify-between items-center p-3 text-xs font-bold text-zinc-500 cursor-pointer select-none outline-none hover:bg-zinc-50">
                             Show Request/Response Details
                             <span class="transition-transform group-open:rotate-180">
@@ -491,7 +491,7 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
                         </div>
                     </details>
 
-                    <div class="flex items-center justify-end gap-3 pt-2.5 border-t border-zinc-100 dark:border-zinc-850">
+                    <div class="flex items-center justify-end gap-3 pt-2.5 border-t border-zinc-100 ">
                         <button onclick="coraDocsEditApi(<?php echo htmlspecialchars(json_encode($api)); ?>)" class="text-xs text-zinc-500 hover:text-zinc-850 flex items-center gap-1 cursor-pointer">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                             Edit Reference
@@ -507,7 +507,7 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
          SUBTAB 5: WORKSPACE GUIDES
          ─────────────────────────────────────────────────────────────────────── -->
     <div id="cora-docs-tab-guides" class="cora-docs-tab-content space-y-6 hidden">
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-4">
+        <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-sm space-y-4">
             <div class="flex items-center justify-between mb-2">
                 <h2 class="text-sm font-bold text-zinc-900 flex items-center gap-1.5">
                     Workspace Combination Logic & Guide
@@ -790,7 +790,7 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
 </div>
 
 <!-- Backdrop overlay for drawers -->
-<div id="cora-docs-drawer-backdrop" class="fixed inset-0 bg-black/15 dark:bg-black/35 z-40 hidden" onclick="coraDocsCloseAllDrawers()"></div>
+<div id="cora-docs-drawer-backdrop" class="fixed inset-0 bg-black/15 z-40 hidden" onclick="coraDocsCloseAllDrawers()"></div>
 
 <!-- JAVASCRIPT LOGIC -->
 <script>

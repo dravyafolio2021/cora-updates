@@ -478,25 +478,25 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
 }
 ?>
 
-<div id="cora-scheduler-unified-wrapper" class="space-y-6 font-sans text-zinc-900 dark:text-zinc-100 max-w-[1700px] mx-auto pb-12 select-none">
+<div id="cora-scheduler-unified-wrapper" class="space-y-6 font-sans text-zinc-900 max-w-[1700px] mx-auto pb-12 select-none">
     
     <!-- STANDARD PAGE HEADER -->
     <div class="flex flex-row items-start justify-between gap-4 w-full">
         <div>
-            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Team Scheduler</h1>
-            <p class="text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 sm:mt-1">Manage event timelines and crew shifts in one place.</p>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 ">Team Scheduler</h1>
+            <p class="text-[11px] sm:text-xs text-zinc-500 mt-0.5 sm:mt-1">Manage event timelines and crew shifts in one place.</p>
         </div>
         
         <!-- Header Actions: Timeline Context (visible only when active tab is timeline) -->
         <div id="header-actions-timeline" class="flex items-center gap-1.5 sm:gap-2 shrink-0 <?php echo $active_tab === 'timeline' ? '' : 'hidden'; ?>">
-            <button onclick="coraExportTimelineICal()" class="p-2 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:text-zinc-950 dark:hover:text-white rounded-xl transition-all shadow-2xs cursor-pointer flex items-center justify-center" title="Sync to Calendar">
+            <button onclick="coraExportTimelineICal()" class="p-2 bg-white border border-zinc-200/80 hover:text-zinc-950 rounded-xl transition-all shadow-2xs cursor-pointer flex items-center justify-center" title="Sync to Calendar">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </button>
-            <button onclick="coraOpenShareTimelineDrawer('<?php echo esc_js( $active_timeline['id'] ?? '' ); ?>')" class="px-2.5 py-2 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 font-semibold rounded-xl text-[10px] sm:text-xs transition-all flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
+            <button onclick="coraOpenShareTimelineDrawer('<?php echo esc_js( $active_timeline['id'] ?? '' ); ?>')" class="px-2.5 py-2 bg-white text-zinc-800 hover:bg-zinc-50 font-semibold rounded-xl text-[10px] sm:text-xs transition-all flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                 <span class="hidden sm:inline">Share Client Link</span>
             </button>
-            <button onclick="coraOpenAddTimelineBlockDrawer()" class="px-3 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-[10px] sm:text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs">
+            <button onclick="coraOpenAddTimelineBlockDrawer()" class="px-3 py-2 bg-zinc-950 text-white font-bold rounded-xl text-[10px] sm:text-xs hover:bg-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Add Time Block</span>
             </button>
@@ -504,7 +504,7 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
  
         <!-- Header Actions: Roster Context (visible only when active tab is roster) -->
         <div id="header-actions-roster" class="flex items-center gap-1.5 sm:gap-2 shrink-0 <?php echo $active_tab === 'roster' ? '' : 'hidden'; ?>">
-            <button onclick="coraOpenAddShiftDrawer()" class="px-3 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-[10px] sm:text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs">
+            <button onclick="coraOpenAddShiftDrawer()" class="px-3 py-2 bg-zinc-950 text-white font-bold rounded-xl text-[10px] sm:text-xs hover:bg-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Assign Shift</span>
             </button>
@@ -512,20 +512,20 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
     </div>
 
     <!-- OPTIMIZED SEGMENTED TOOLBAR -->
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-2.5 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+    <div class="bg-white rounded-2xl border border-zinc-200/80 p-2.5 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
         <!-- Left: Tab Switcher pills -->
-        <div class="flex items-center gap-1 bg-zinc-100/80 dark:bg-zinc-800/80 p-1 rounded-xl w-full md:w-auto justify-between shrink-0 max-w-full overflow-x-auto">
-            <button onclick="window.coraSwitchSchedulerTab('timeline')" id="tab-btn-timeline" class="cora-scheduler-tab-btn flex-1 md:flex-initial text-center shrink-0 px-3.5 py-1.5 text-xs rounded-lg transition-all cursor-pointer <?php echo $active_tab === 'timeline' ? 'active bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700/80' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50'; ?>">Itinerary Timeline</button>
-            <button onclick="window.coraSwitchSchedulerTab('roster')" id="tab-btn-roster" class="cora-scheduler-tab-btn flex-1 md:flex-initial text-center shrink-0 px-3.5 py-1.5 text-xs rounded-lg transition-all cursor-pointer <?php echo $active_tab === 'roster' ? 'active bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-2xs font-bold border border-zinc-200/80 dark:border-zinc-700/80' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-medium hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50'; ?>">Crew Shift Roster</button>
+        <div class="flex items-center gap-1 bg-zinc-100/80 p-1 rounded-xl w-full md:w-auto justify-between shrink-0 max-w-full overflow-x-auto">
+            <button onclick="window.coraSwitchSchedulerTab('timeline')" id="tab-btn-timeline" class="cora-scheduler-tab-btn flex-1 md:flex-initial text-center shrink-0 px-3.5 py-1.5 text-xs rounded-lg transition-all cursor-pointer <?php echo $active_tab === 'timeline' ? 'active bg-white text-zinc-950 shadow-2xs font-bold border border-zinc-200/80 ' : 'text-zinc-500 hover:text-zinc-900 font-medium hover:bg-zinc-200/50 '; ?>">Itinerary Timeline</button>
+            <button onclick="window.coraSwitchSchedulerTab('roster')" id="tab-btn-roster" class="cora-scheduler-tab-btn flex-1 md:flex-initial text-center shrink-0 px-3.5 py-1.5 text-xs rounded-lg transition-all cursor-pointer <?php echo $active_tab === 'roster' ? 'active bg-white text-zinc-950 shadow-2xs font-bold border border-zinc-200/80 ' : 'text-zinc-500 hover:text-zinc-900 font-medium hover:bg-zinc-200/50 '; ?>">Crew Shift Roster</button>
         </div>
  
         <!-- Right side: active page selectors & info -->
         <!-- Timeline Controls (visible only when timeline view is active) -->
         <div id="toolbar-controls-timeline" class="w-full md:w-auto flex flex-nowrap items-center gap-2.5 justify-start md:justify-end overflow-x-auto max-w-full pb-0.5 md:pb-0 scrollbar-none <?php echo $active_tab === 'timeline' ? '' : 'hidden'; ?>">
             <!-- Duration Span -->
-            <div class="flex items-center justify-start gap-1.5 bg-zinc-50 dark:bg-zinc-850/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl px-2.5 py-1 shrink-0" title="Duration Span">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <select id="cora-timeline-span-select" onchange="coraHandleSpanSelectChange(this.value)" class="bg-transparent border-0 outline-none text-xs font-bold focus:outline-none cursor-pointer text-zinc-900 dark:text-zinc-100 max-w-[68px] sm:max-w-[80px] md:max-w-none py-0.5 w-full">
+            <div class="flex items-center justify-start gap-1.5 bg-zinc-50 border border-zinc-200/60 rounded-xl px-2.5 py-1 shrink-0" title="Duration Span">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <select id="cora-timeline-span-select" onchange="coraHandleSpanSelectChange(this.value)" class="bg-transparent border-0 outline-none text-xs font-bold focus:outline-none cursor-pointer text-zinc-900 max-w-[68px] sm:max-w-[80px] md:max-w-none py-0.5 w-full">
                     <option value="3" selected>3 Days</option>
                     <option value="6">6 Days</option>
                     <option value="7">7 Days</option>
@@ -533,12 +533,12 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                     <option value="30">30 Days</option>
                     <option value="custom">Custom...</option>
                 </select>
-                <input type="number" id="cora-timeline-custom-span-input" min="1" max="90" placeholder="Days" class="hidden border-0 bg-transparent text-xs font-bold w-12 focus:outline-none text-zinc-900 dark:text-zinc-100 py-0.5" onchange="coraChangeTimelineSpan(this.value)" onkeyup="coraChangeTimelineSpan(this.value)">
+                <input type="number" id="cora-timeline-custom-span-input" min="1" max="90" placeholder="Days" class="hidden border-0 bg-transparent text-xs font-bold w-12 focus:outline-none text-zinc-900 py-0.5" onchange="coraChangeTimelineSpan(this.value)" onkeyup="coraChangeTimelineSpan(this.value)">
             </div>
             <!-- Active Project -->
-            <div class="flex items-center justify-start gap-1.5 bg-zinc-50 dark:bg-zinc-850/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl px-2.5 py-1 shrink-0" title="Active Project">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                <select onchange="coraSwitchTimelineProject(this.value)" class="bg-transparent border-0 outline-none text-xs font-bold focus:outline-none cursor-pointer text-zinc-900 dark:text-zinc-100 max-w-[85px] sm:max-w-[200px] md:max-w-none py-0.5 truncate w-full">
+            <div class="flex items-center justify-start gap-1.5 bg-zinc-50 border border-zinc-200/60 rounded-xl px-2.5 py-1 shrink-0" title="Active Project">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                <select onchange="coraSwitchTimelineProject(this.value)" class="bg-transparent border-0 outline-none text-xs font-bold focus:outline-none cursor-pointer text-zinc-900 max-w-[85px] sm:max-w-[200px] md:max-w-none py-0.5 truncate w-full">
                     <?php foreach ( $cora_event_timelines as $tl ) : ?>
                         <option value="<?php echo esc_attr( $tl['id'] ); ?>" <?php selected( $tl['id'], $active_timeline['id'] ); ?>>
                             <?php echo esc_html( $tl['title'] ); ?>
@@ -547,23 +547,23 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                 </select>
             </div>
             <!-- Client Info Badge -->
-            <div id="header-client-badge" class="text-xs font-semibold text-zinc-550 dark:text-zinc-400 shrink-0 flex items-center justify-start gap-1.5 bg-zinc-50 dark:bg-zinc-850/40 px-2.5 py-1.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60" title="Client Details">
+            <div id="header-client-badge" class="text-xs font-semibold text-zinc-550 shrink-0 flex items-center justify-start gap-1.5 bg-zinc-50 px-2.5 py-1.5 rounded-xl border border-zinc-200/60 " title="Client Details">
                 <div class="flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    <strong class="text-zinc-900 dark:text-white font-bold truncate max-w-[65px] sm:max-w-[110px]"><?php echo esc_html( $active_timeline['client_name'] ); ?></strong>
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <strong class="text-zinc-900 font-bold truncate max-w-[65px] sm:max-w-[110px]"><?php echo esc_html( $active_timeline['client_name'] ); ?></strong>
                 </div>
                 <div class="hidden sm:flex items-center gap-1.5">
-                    <span class="text-zinc-300 dark:text-zinc-700">|</span>
-                    <span class="font-mono text-zinc-650 dark:text-zinc-400"><?php echo esc_html( $active_timeline['client_phone'] ); ?></span>
+                    <span class="text-zinc-300 ">|</span>
+                    <span class="font-mono text-zinc-650 "><?php echo esc_html( $active_timeline['client_phone'] ); ?></span>
                 </div>
             </div>
         </div>
 
         <!-- Roster Controls (visible only when roster view is active) -->
         <div id="toolbar-controls-roster" class="w-full md:w-auto flex flex-wrap items-center gap-2.5 justify-start md:justify-end <?php echo $active_tab === 'roster' ? '' : 'hidden'; ?>">
-            <div class="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-850/40 px-3 py-1.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-center md:justify-start gap-1.5 w-full md:w-auto" title="Active View">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 dark:text-zinc-500 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
-                <span>Active View: <strong class="text-zinc-900 dark:text-white font-bold">Field Staff Allocation</strong></span>
+            <div class="text-[11px] font-bold text-zinc-500 bg-zinc-50 px-3 py-1.5 rounded-xl border border-zinc-200/60 flex items-center justify-center md:justify-start gap-1.5 w-full md:w-auto" title="Active View">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+                <span>Active View: <strong class="text-zinc-900 font-bold">Field Staff Allocation</strong></span>
             </div>
         </div>
     </div>
@@ -574,17 +574,17 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
         <!-- Timeline 4-KPI Stats Grid -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 order-2 md:order-none">
             <!-- Card 1: Total Days -->
-            <div class="p-3.5 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200 flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
-                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 truncate">Total Days</span>
-                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div class="p-3.5 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200 flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
+                <div class="flex items-center justify-between text-zinc-500 ">
+                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 truncate">Total Days</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
                 </div>
                 <div>
-                    <div id="kpi-stat-total-days" class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate"><?php echo $stat_total_days; ?> Day<?php echo $stat_total_days === 1 ? '' : 's'; ?></div>
+                    <div id="kpi-stat-total-days" class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate"><?php echo $stat_total_days; ?> Day<?php echo $stat_total_days === 1 ? '' : 's'; ?></div>
                     <div class="mt-1 hidden sm:block">
-                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-650 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-850/40 px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-800 inline-flex items-center gap-1.5 truncate max-w-full">
+                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-650 bg-zinc-50 px-2.5 py-0.5 rounded-full border border-zinc-200/60 inline-flex items-center gap-1.5 truncate max-w-full">
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
                             Project span
                         </span>
@@ -593,17 +593,17 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
             </div>
 
             <!-- Card 2: Total Events -->
-            <div class="p-3.5 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200 flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
-                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 truncate">Total Events</span>
-                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div class="p-3.5 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200 flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
+                <div class="flex items-center justify-between text-zinc-500 ">
+                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 truncate">Total Events</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="3" cy="6" r="1"></circle><circle cx="3" cy="12" r="1"></circle><circle cx="3" cy="18" r="1"></circle></svg>
                     </div>
                 </div>
                 <div>
-                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate"><?php echo $stat_total_events; ?> Events</div>
+                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate"><?php echo $stat_total_events; ?> Events</div>
                     <div class="mt-1 hidden sm:block">
-                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-650 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-850/40 px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-800 inline-flex items-center gap-1.5 truncate max-w-full">
+                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-650 bg-zinc-50 px-2.5 py-0.5 rounded-full border border-zinc-200/60 inline-flex items-center gap-1.5 truncate max-w-full">
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><circle cx="3" cy="6" r="1"></circle><circle cx="3" cy="12" r="1"></circle></svg>
                             Itinerary checkpoints
                         </span>
@@ -612,17 +612,17 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
             </div>
 
             <!-- Card 3: Completed -->
-            <div class="p-3.5 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200 flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
-                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 truncate">Completed</span>
-                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div class="p-3.5 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200 flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
+                <div class="flex items-center justify-between text-zinc-500 ">
+                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 truncate">Completed</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                     </div>
                 </div>
                 <div>
-                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate"><?php echo $stat_completed; ?> Done</div>
+                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate"><?php echo $stat_completed; ?> Done</div>
                     <div class="mt-1 hidden sm:block">
-                        <span class="text-[9.5px] sm:text-[10px] font-bold text-emerald-700 dark:text-emerald-450 bg-emerald-50/50 dark:bg-emerald-950/20 px-2.5 py-0.5 rounded-full border border-emerald-200/50 dark:border-emerald-900 inline-flex items-center gap-1.5 truncate max-w-full">
+                        <span class="text-[9.5px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50/50 px-2.5 py-0.5 rounded-full border border-emerald-200/50 inline-flex items-center gap-1.5 truncate max-w-full">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span> Shoot progress
                         </span>
                     </div>
@@ -630,17 +630,17 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
             </div>
 
             <!-- Card 4: Remaining -->
-            <div class="p-3.5 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200 flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
-                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 truncate">Remaining</span>
-                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div class="p-3.5 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200 flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0">
+                <div class="flex items-center justify-between text-zinc-500 ">
+                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 truncate">Remaining</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </div>
                 </div>
                 <div>
-                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate"><?php echo $stat_upcoming; ?> Pending</div>
+                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate"><?php echo $stat_upcoming; ?> Pending</div>
                     <div class="mt-1 hidden sm:block">
-                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-650 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-850/40 px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-800 inline-flex items-center gap-1.5 truncate max-w-full">
+                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-650 bg-zinc-50 px-2.5 py-0.5 rounded-full border border-zinc-200/60 inline-flex items-center gap-1.5 truncate max-w-full">
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                             Awaiting execution
                         </span>
@@ -650,23 +650,23 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
         </div>
 
         <!-- TIMELINE FEED BLOCK CARD CONTAINER -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-3 sm:p-5 shadow-xs space-y-4 sm:space-y-6 order-1 md:order-none">
+        <div class="bg-white rounded-2xl border border-zinc-200/80 p-3 sm:p-5 shadow-xs space-y-4 sm:space-y-6 order-1 md:order-none">
             
             <!-- Day Selector Pills Row -->
-            <div class="space-y-3.5 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+            <div class="space-y-3.5 border-b border-zinc-100 pb-4">
                 <!-- Row 1: Section Title -->
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-white">Event Itinerary Blocks</h3>
-                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Project checkpoints, locations, and assigned crew schedules</p>
+                    <h3 class="text-sm font-bold text-zinc-900 ">Event Itinerary Blocks</h3>
+                    <p class="text-[11px] text-zinc-500 mt-0.5">Project checkpoints, locations, and assigned crew schedules</p>
                 </div>
                 
                 <!-- Row 2: Horizontal Scrolling Day Pills -->
-                <div class="flex items-center gap-1.5 bg-zinc-100/80 dark:bg-zinc-800/80 p-1 rounded-xl overflow-x-auto w-fit max-w-full border border-zinc-200/60 dark:border-zinc-700/60 shadow-2xs" id="cora-day-pills-container">
-                    <button onclick="coraFilterTimelineDay('all', this)" data-day-val="all" class="tl-day-pill px-3 py-1.5 text-xs rounded-lg transition-all cursor-pointer font-bold bg-white dark:bg-zinc-850 text-zinc-950 dark:text-white shadow-2xs border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 whitespace-nowrap">
+                <div class="flex items-center gap-1.5 bg-zinc-100/80 p-1 rounded-xl overflow-x-auto w-fit max-w-full border border-zinc-200/60 shadow-2xs" id="cora-day-pills-container">
+                    <button onclick="coraFilterTimelineDay('all', this)" data-day-val="all" class="tl-day-pill px-3 py-1.5 text-xs rounded-lg transition-all cursor-pointer font-bold bg-white text-zinc-950 shadow-2xs border border-zinc-200/80 shrink-0 whitespace-nowrap">
                         All Days
                     </button>
                     <?php foreach ( $unique_days as $day_num => $day_info ) : ?>
-                        <button onclick="coraFilterTimelineDay(<?php echo esc_attr( $day_num ); ?>, this)" data-day-val="<?php echo esc_attr( $day_num ); ?>" title="<?php echo esc_attr( $day_info['title'] ); ?>" class="tl-day-pill px-3 py-1.5 text-xs rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-semibold hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 shrink-0 whitespace-nowrap">
+                        <button onclick="coraFilterTimelineDay(<?php echo esc_attr( $day_num ); ?>, this)" data-day-val="<?php echo esc_attr( $day_num ); ?>" title="<?php echo esc_attr( $day_info['title'] ); ?>" class="tl-day-pill px-3 py-1.5 text-xs rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 font-semibold hover:bg-zinc-200/50 shrink-0 whitespace-nowrap">
                             <?php echo esc_html( $day_info['date'] ); ?>
                         </button>
                     <?php endforeach; ?>
@@ -681,45 +681,45 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                 $is_completed = ($status === 'Completed');
                 $is_in_progress = ($status === 'In Progress');
 
-                $node_bg_class = 'bg-zinc-400 dark:bg-zinc-650';
-                $status_classes = 'bg-zinc-100 dark:bg-zinc-850 text-zinc-700 dark:text-zinc-300 border border-zinc-200/50 dark:border-zinc-800';
+                $node_bg_class = 'bg-zinc-400 ';
+                $status_classes = 'bg-zinc-100 text-zinc-700 border border-zinc-200/50 ';
 
                 if ( $is_completed ) {
-                    $node_bg_class = 'bg-zinc-950 dark:bg-white';
-                    $status_classes = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800';
+                    $node_bg_class = 'bg-zinc-950 ';
+                    $status_classes = 'bg-emerald-500/10 text-emerald-600 border border-emerald-200 ';
                 } elseif ( $is_in_progress ) {
                     $node_bg_class = 'bg-amber-500';
-                    $status_classes = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800';
+                    $status_classes = 'bg-amber-500/10 text-amber-600 border border-amber-200 ';
                 }
             ?>
             
             <div class="cora-tl-block-card flex items-start gap-4 sm:gap-6 group" data-day="<?php echo $day_num; ?>">
                 
                 <!-- Left Time Slot Box -->
-                <div class="hidden sm:block p-3 rounded-2xl text-center shrink-0 w-28 sm:w-32 space-y-0.5 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs bg-zinc-50 dark:bg-zinc-900/50">
-                    <div class="flex items-center justify-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-zinc-450 dark:text-zinc-555">
+                <div class="hidden sm:block p-3 rounded-2xl text-center shrink-0 w-28 sm:w-32 space-y-0.5 border border-zinc-200/80 shadow-2xs bg-zinc-50 ">
+                    <div class="flex items-center justify-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-zinc-450 ">
                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                         <span>TIME SLOT</span>
                     </div>
-                    <div class="font-mono font-extrabold text-sm text-zinc-900 dark:text-white"><?php echo esc_html( $blk['time_start'] ); ?></div>
-                    <div class="text-[10px] font-mono text-zinc-450 dark:text-zinc-500">to <?php echo esc_html( $blk['time_end'] ); ?></div>
+                    <div class="font-mono font-extrabold text-sm text-zinc-900 "><?php echo esc_html( $blk['time_start'] ); ?></div>
+                    <div class="text-[10px] font-mono text-zinc-450 ">to <?php echo esc_html( $blk['time_end'] ); ?></div>
                 </div>
 
                 <!-- Vertical Axis Node Dot & Connecting Line -->
                 <div class="hidden sm:flex relative flex-col items-center self-stretch shrink-0">
-                    <div class="w-3.5 h-3.5 rounded-full z-10 my-4 shadow-xs border-2 border-white dark:border-zinc-900 <?php echo $node_bg_class; ?>"></div>
-                    <div class="w-0.5 flex-1 -my-2 bg-zinc-200 dark:bg-zinc-800"></div>
+                    <div class="w-3.5 h-3.5 rounded-full z-10 my-4 shadow-xs border-2 border-white <?php echo $node_bg_class; ?>"></div>
+                    <div class="w-0.5 flex-1 -my-2 bg-zinc-200 "></div>
                 </div>
 
                 <!-- Right Card Container -->
-                <div class="flex-1 rounded-2xl p-4 sm:p-5 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs hover:shadow-xs min-w-0 overflow-hidden">
+                <div class="flex-1 rounded-2xl p-4 sm:p-5 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 bg-white border border-zinc-200/80 shadow-2xs hover:shadow-xs min-w-0 overflow-hidden">
                     
                     <!-- Activity Info & Attribute Badges -->
                     <div class="space-y-3 flex-1 min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
                             <?php $blk_date_str = date('d M', strtotime("+ " . ($day_num - 1) . " days", $base_start_timestamp)); ?>
-                            <span class="px-2.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-zinc-150 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/60 shrink-0"><?php echo esc_html(strtoupper($blk_date_str)); ?></span>
-                            <span class="inline-flex sm:hidden items-center gap-1 px-2.5 py-0.5 rounded-md text-[9px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/60 shrink-0">
+                            <span class="px-2.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-zinc-150 text-zinc-650 border border-zinc-200/60 shrink-0"><?php echo esc_html(strtoupper($blk_date_str)); ?></span>
+                            <span class="inline-flex sm:hidden items-center gap-1 px-2.5 py-0.5 rounded-md text-[9px] font-mono font-bold bg-zinc-100 text-zinc-650 border border-zinc-200/50 shrink-0">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                 <?php echo esc_html( $blk['time_start'] ); ?> - <?php echo esc_html( $blk['time_end'] ); ?>
                             </span>
@@ -730,36 +730,36 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                                     <option value="In Progress" <?php selected( $status, 'In Progress' ); ?>>● In Progress</option>
                                     <option value="Upcoming" <?php selected( $status, 'Upcoming' ); ?>>● Upcoming</option>
                                 </select>
-                                <button onclick="coraDeleteBlockItem('<?php echo esc_js($block_id); ?>')" title="Delete Block" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/30 dark:hover:bg-rose-900/50 dark:text-rose-400 rounded-lg text-xs transition-colors cursor-pointer border border-rose-200 dark:border-rose-800 flex items-center justify-center">
+                                <button onclick="coraDeleteBlockItem('<?php echo esc_js($block_id); ?>')" title="Delete Block" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs transition-colors cursor-pointer border border-rose-200 flex items-center justify-center">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                 </button>
                             </div>
                         </div>
 
-                        <h3 class="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-white break-words min-w-0 leading-snug"><?php echo esc_html( $blk['activity'] ); ?></h3>
+                        <h3 class="text-base sm:text-lg font-bold tracking-tight text-zinc-900 break-words min-w-0 leading-snug"><?php echo esc_html( $blk['activity'] ); ?></h3>
                         
-                        <p class="text-xs flex items-center gap-1.5 flex-wrap font-medium text-zinc-500 dark:text-zinc-400">
+                        <p class="text-xs flex items-center gap-1.5 flex-wrap font-medium text-zinc-500 ">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            <span class="font-bold text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $blk['venue'] ); ?></span>
-                            <span class="text-zinc-300 dark:text-zinc-700">·</span>
-                            <a href="<?php echo esc_url( $blk['gps_url'] ); ?>" target="_blank" class="hover:underline font-bold text-[11px] text-zinc-950 dark:text-zinc-200 flex items-center gap-1">
+                            <span class="font-bold text-zinc-800 "><?php echo esc_html( $blk['venue'] ); ?></span>
+                            <span class="text-zinc-300 ">·</span>
+                            <a href="<?php echo esc_url( $blk['gps_url'] ); ?>" target="_blank" class="hover:underline font-bold text-[11px] text-zinc-950 flex items-center gap-1">
                                 Google Maps GPS →
                             </a>
                         </p>
 
                         <!-- Attribute Badges Row -->
                         <div class="flex items-center gap-2 pt-1 text-[10px] font-bold">
-                            <span class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800">
+                            <span class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 bg-zinc-50 text-zinc-700 border border-zinc-200 ">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 21h18"></path><path d="M9 8h1"></path><path d="M9 12h1"></path><path d="M9 16h1"></path><path d="M14 8h1"></path><path d="M14 12h1"></path><path d="M14 16h1"></path><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path></svg>
                                 <span><?php echo esc_html( $blk['type_tag'] ?? 'Site Visit' ); ?></span>
                             </span>
 
-                            <span class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800">
+                            <span class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 bg-zinc-50 text-zinc-700 border border-zinc-200 ">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                 <span><?php echo esc_html( $blk['duration_tag'] ?? '2.5 Hrs' ); ?></span>
                             </span>
 
-                            <span class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800">
+                            <span class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 bg-zinc-50 text-zinc-700 border border-zinc-200 ">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
                                 <span><?php echo esc_html( $blk['dist_tag'] ?? '12.4 km' ); ?></span>
                             </span>
@@ -769,15 +769,15 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                     <!-- Right Assigned Crew & Actions -->
                     <div class="flex flex-col md:items-end justify-between gap-3 text-right shrink-0">
                         <div class="flex items-center justify-between w-full md:w-auto">
-                            <span class="text-[9.5px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">ASSIGNED TEAM CREW</span>
+                            <span class="text-[9.5px] font-extrabold uppercase tracking-wider text-zinc-400 ">ASSIGNED TEAM CREW</span>
                         </div>
 
                         <div class="flex flex-col gap-1.5 items-end">
                             <?php foreach ( $blk['crew'] as $cw ) : 
                                 $cw_initials = strtoupper(substr($cw, 0, 1));
                             ?>
-                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800">
-                                    <div class="w-4 h-4 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[8px] border border-zinc-200/50 dark:border-zinc-800/50 shrink-0">
+                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1.5 bg-zinc-50 text-zinc-900 border border-zinc-200 ">
+                                    <div class="w-4 h-4 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[8px] border border-zinc-200/50 shrink-0">
                                         <?php echo esc_html($cw_initials); ?>
                                     </div>
                                     <?php echo esc_html( $cw ); ?>
@@ -786,8 +786,8 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                         </div>
 
                         <!-- WhatsApp Dispatch Button -->
-                        <button onclick="coraShareBlockWhatsApp('<?php echo esc_js( $blk['activity'] ); ?>', '<?php echo esc_js( $blk['venue'] ); ?>', '<?php echo esc_js( $blk['time_start'] ); ?>')" title="WhatsApp Dispatch" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 dark:border-zinc-700/80">
-                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-600 dark:text-emerald-500"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.99c-.002 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                        <button onclick="coraShareBlockWhatsApp('<?php echo esc_js( $blk['activity'] ); ?>', '<?php echo esc_js( $blk['venue'] ); ?>', '<?php echo esc_js( $blk['time_start'] ); ?>')" title="WhatsApp Dispatch" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 ">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-600 "><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.99c-.002 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                             <span>Dispatch WhatsApp</span>
                         </button>
                     </div>
@@ -800,17 +800,17 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
 <div id="panel-view-roster" class="<?php echo $active_tab === 'roster' ? '' : 'hidden'; ?> space-y-6 flex flex-col">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 order-2 md:order-none">
             <!-- Card 1: Scheduled Shifts -->
-            <div class="p-3.5 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200">
-                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 truncate">Scheduled Shifts</span>
-                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div class="p-3.5 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200">
+                <div class="flex items-center justify-between text-zinc-500 ">
+                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 truncate">Scheduled Shifts</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                     </div>
                 </div>
                 <div>
-                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate"><?php echo $total_shifts; ?> Shifts</div>
+                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate"><?php echo $total_shifts; ?> Shifts</div>
                     <div class="mt-1 hidden sm:block">
-                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-650 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-850/40 px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-800 inline-flex items-center gap-1.5 truncate max-w-full">
+                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-650 bg-zinc-50 px-2.5 py-0.5 rounded-full border border-zinc-200/60 inline-flex items-center gap-1.5 truncate max-w-full">
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                             Field staff count
                         </span>
@@ -819,10 +819,10 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
             </div>
 
             <!-- Card 2: On-Site Now -->
-            <div class="p-3.5 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200">
-                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 truncate">On-Site Now</span>
-                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div class="p-3.5 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200">
+                <div class="flex items-center justify-between text-zinc-500 ">
+                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 truncate">On-Site Now</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -830,9 +830,9 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                     </div>
                 </div>
                 <div>
-                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate"><?php echo $on_site_count; ?> Active</div>
+                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate"><?php echo $on_site_count; ?> Active</div>
                     <div class="mt-1 hidden sm:block">
-                        <span class="text-[9.5px] sm:text-[10px] font-bold text-emerald-700 dark:text-emerald-455 bg-emerald-50/50 dark:bg-emerald-950/20 px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center gap-1.5 truncate max-w-full">
+                        <span class="text-[9.5px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50/50 px-2.5 py-0.5 rounded-full border border-emerald-200/60 inline-flex items-center gap-1.5 truncate max-w-full">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span> GPS Verified
                         </span>
                     </div>
@@ -840,17 +840,17 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
             </div>
 
             <!-- Card 3: Conflict Shield -->
-            <div class="p-3.5 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200">
-                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 truncate">Conflict Shield</span>
-                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div class="p-3.5 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200">
+                <div class="flex items-center justify-between text-zinc-500 ">
+                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 truncate">Conflict Shield</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                     </div>
                 </div>
                 <div>
-                    <div class="text-base sm:text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-450 truncate">100% Safe</div>
+                    <div class="text-base sm:text-2xl font-black tracking-tight text-emerald-600 truncate">100% Safe</div>
                     <div class="mt-1 hidden sm:block">
-                        <span class="text-[9.5px] sm:text-[10px] font-bold text-emerald-700 dark:text-emerald-455 bg-emerald-50/50 dark:bg-emerald-950/20 px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center gap-1.5 truncate max-w-full">
+                        <span class="text-[9.5px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50/50 px-2.5 py-0.5 rounded-full border border-emerald-200/60 inline-flex items-center gap-1.5 truncate max-w-full">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span> Double-booking check
                         </span>
                     </div>
@@ -858,17 +858,17 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
             </div>
 
             <!-- Card 4: Labor Payouts -->
-            <div class="p-3.5 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200">
-                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 truncate">Labor Payouts</span>
-                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center font-extrabold text-xs shrink-0 select-none">
+            <div class="p-3.5 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200">
+                <div class="flex items-center justify-between text-zinc-500 ">
+                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 truncate">Labor Payouts</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center font-extrabold text-xs shrink-0 select-none">
                         ₹
                     </div>
                 </div>
                 <div>
-                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-white truncate">₹<?php echo number_format( $total_payout_sum ); ?></div>
+                    <div class="text-base sm:text-2xl font-black tracking-tight text-zinc-950 truncate">₹<?php echo number_format( $total_payout_sum ); ?></div>
                     <div class="mt-1 hidden sm:block">
-                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-650 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-850/40 px-2.5 py-0.5 rounded-full border border-zinc-200/60 dark:border-zinc-800 inline-flex items-center gap-1.5 truncate max-w-full">
+                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-650 bg-zinc-50 px-2.5 py-0.5 rounded-full border border-zinc-200/60 inline-flex items-center gap-1.5 truncate max-w-full">
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>
                             Synced to financials
                         </span>
@@ -912,45 +912,45 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
             $status = $sh['status'] ?? 'Confirmed';
             
             // Re-apply status class
-            $status_bg = 'bg-zinc-500/10 text-zinc-650 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800';
+            $status_bg = 'bg-zinc-500/10 text-zinc-650 border border-zinc-200 ';
             if ( $status === 'On-Site' || $status === 'In Progress' ) {
-                $status_bg = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800';
+                $status_bg = 'bg-amber-500/10 text-amber-600 border border-amber-200 ';
             } elseif ( $status === 'Confirmed' || $status === 'Completed' ) {
-                $status_bg = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800';
+                $status_bg = 'bg-emerald-500/10 text-emerald-600 border border-emerald-200 ';
             } elseif ( $status === 'Cancelled' ) {
-                $status_bg = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800';
+                $status_bg = 'bg-rose-500/10 text-rose-600 border border-rose-200 ';
             }
             
             $sh_json = htmlspecialchars( json_encode( $sh ), ENT_QUOTES, 'UTF-8' );
         ?>
-        <div id="shift-row-<?php echo esc_attr($sh_id); ?>" class="sh-card p-3.5 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-4 min-w-0">
-            <div class="flex items-start justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+        <div id="shift-row-<?php echo esc_attr($sh_id); ?>" class="sh-card p-3.5 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-4 min-w-0">
+            <div class="flex items-start justify-between gap-3 pb-3 border-b border-zinc-100 ">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-8 h-8 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-sm shrink-0 border border-zinc-200/50 dark:border-zinc-800/50 sh-card-staff-initials">
+                    <div class="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-sm shrink-0 border border-zinc-200/50 sh-card-staff-initials">
                         <?php echo esc_html($initials); ?>
                     </div>
                     <div class="min-w-0">
-                        <h4 class="font-bold text-zinc-900 dark:text-white text-sm truncate sh-card-staff-name"><?php echo esc_html($name); ?></h4>
-                        <p class="text-[11px] font-semibold text-zinc-450 dark:text-zinc-500 truncate sh-card-staff-role"><?php echo esc_html($role); ?></p>
+                        <h4 class="font-bold text-zinc-900 text-sm truncate sh-card-staff-name"><?php echo esc_html($name); ?></h4>
+                        <p class="text-[11px] font-semibold text-zinc-450 truncate sh-card-staff-role"><?php echo esc_html($role); ?></p>
                     </div>
                 </div>
                 <div class="text-right shrink-0">
-                    <span class="text-[9px] font-extrabold uppercase tracking-wider text-zinc-450 dark:text-zinc-500 block">CALL TIME</span>
-                    <span class="text-[11px] font-mono font-bold text-zinc-700 dark:text-zinc-300 sh-card-time"><?php echo esc_html($timeStart); ?> - <?php echo esc_html($timeEnd); ?></span>
+                    <span class="text-[9px] font-extrabold uppercase tracking-wider text-zinc-450 block">CALL TIME</span>
+                    <span class="text-[11px] font-mono font-bold text-zinc-700 sh-card-time"><?php echo esc_html($timeStart); ?> - <?php echo esc_html($timeEnd); ?></span>
                 </div>
             </div>
             <div class="space-y-1.5 min-w-0">
-                <div class="text-[9.5px] font-extrabold uppercase tracking-widest text-zinc-450 dark:text-zinc-500">SHOOT / PRODUCTION PROJECT</div>
-                <h3 class="font-bold text-zinc-900 dark:text-white text-sm sm:text-base tracking-tight leading-snug break-words sh-card-project-title"><?php echo esc_html($project); ?></h3>
-                <div class="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate pt-1">
+                <div class="text-[9.5px] font-extrabold uppercase tracking-widest text-zinc-450 ">SHOOT / PRODUCTION PROJECT</div>
+                <h3 class="font-bold text-zinc-900 text-sm sm:text-base tracking-tight leading-snug break-words sh-card-project-title"><?php echo esc_html($project); ?></h3>
+                <div class="flex items-center gap-1.5 text-xs text-zinc-500 font-medium truncate pt-1">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     <span class="truncate sh-card-venue"><?php echo esc_html($venue ?: 'Location TBD'); ?></span>
                 </div>
             </div>
-            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-3">
+            <div class="pt-3 border-t border-zinc-100 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
-                    <span class="text-xs font-mono font-bold text-zinc-650 dark:text-zinc-300 sh-card-date"><?php echo esc_html($date); ?></span>
-                    <span class="text-xs font-extrabold text-zinc-900 dark:text-white font-mono sh-card-payout">₹<?php echo number_format($rate); ?></span>
+                    <span class="text-xs font-mono font-bold text-zinc-650 sh-card-date"><?php echo esc_html($date); ?></span>
+                    <span class="text-xs font-extrabold text-zinc-900 font-mono sh-card-payout">₹<?php echo number_format($rate); ?></span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <select onchange="coraQuickUpdateShiftStatus('<?php echo esc_js($sh_id); ?>', this.value)" class="px-2.5 py-1 rounded-full text-[9px] font-bold border outline-none cursor-pointer sh-card-status <?php echo esc_attr($status_bg); ?>">
@@ -960,13 +960,13 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                         <option value="Completed" <?php selected($status, 'Completed'); ?>>Completed</option>
                         <option value="Cancelled" <?php selected($status, 'Cancelled'); ?>>Cancelled</option>
                     </select>
-                    <button data-shift="<?php echo esc_attr($sh_json); ?>" onclick="coraOpenEditShiftDrawerFromBtn(this)" title="Edit / Reassign Shift" class="p-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:text-zinc-300 rounded-lg text-xs transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
+                    <button data-shift="<?php echo esc_attr($sh_json); ?>" onclick="coraOpenEditShiftDrawerFromBtn(this)" title="Edit / Reassign Shift" class="p-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-700 rounded-lg text-xs transition-colors cursor-pointer border border-zinc-200 flex items-center justify-center">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M11 4H4a2 2 0 0 1-2 2v14a2 2 0 0 1 2 2h14a2 2 0 0 1 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     </button>
-                    <button onclick="coraShareBlockWhatsApp('<?php echo esc_js($role); ?>', '<?php echo esc_js($venue); ?>', '<?php echo esc_js($timeStart); ?>', 'https://maps.google.com/?q=<?php echo urlencode($venue); ?>', '<?php echo esc_js($phone); ?>')" title="WhatsApp Dispatch" class="p-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:text-zinc-300 rounded-lg text-xs transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="text-emerald-600 dark:text-emerald-400 shrink-0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.99c-.002 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    <button onclick="coraShareBlockWhatsApp('<?php echo esc_js($role); ?>', '<?php echo esc_js($venue); ?>', '<?php echo esc_js($timeStart); ?>', 'https://maps.google.com/?q=<?php echo urlencode($venue); ?>', '<?php echo esc_js($phone); ?>')" title="WhatsApp Dispatch" class="p-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-700 rounded-lg text-xs transition-colors cursor-pointer border border-zinc-200 flex items-center justify-center">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="text-emerald-600 shrink-0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.99c-.002 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                     </button>
-                    <button onclick="coraDeleteShiftRow('<?php echo esc_js($sh_id); ?>')" title="Delete Shift" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-455 rounded-lg text-xs transition-colors cursor-pointer border border-rose-200 dark:border-rose-800/80 flex items-center justify-center">
+                    <button onclick="coraDeleteShiftRow('<?php echo esc_js($sh_id); ?>')" title="Delete Shift" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs transition-colors cursor-pointer border border-rose-200 flex items-center justify-center">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
                 </div>
@@ -976,70 +976,70 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
     </div>
 
         <!-- WORKSPACE OWNER OPERATIONAL GUIDANCE BANNER -->
-        <div class="bg-zinc-50 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3 mt-6 order-3 md:order-none">
+        <div class="bg-zinc-50 border border-zinc-200/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3 mt-6 order-3 md:order-none">
             <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-7 h-7 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center shrink-0">
+                    <div class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center shrink-0">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     </div>
                     <div>
-                        <h4 class="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Workspace Owner Crew Management</h4>
-                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">How to manage technical crew allocations, auto-import CRM bookings, and track live payouts</p>
+                        <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Workspace Owner Crew Management</h4>
+                        <p class="text-[11px] text-zinc-500 font-medium">How to manage technical crew allocations, auto-import CRM bookings, and track live payouts</p>
                     </div>
                 </div>
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-zinc-200/60 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-300/40 dark:border-zinc-700/60">Operational Guide</span>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-zinc-200/60 text-zinc-700 border border-zinc-300/40 ">Operational Guide</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] pt-1">
-                <div class="p-3 bg-white dark:bg-zinc-850 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 space-y-1">
-                    <div class="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
-                        <span class="w-4 h-4 rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center justify-center font-mono text-[9px] font-extrabold">1</span>
+                <div class="p-3 bg-white rounded-xl border border-zinc-200/60 space-y-1">
+                    <div class="font-bold text-zinc-900 flex items-center gap-1.5">
+                        <span class="w-4 h-4 rounded-full bg-zinc-100 text-zinc-800 flex items-center justify-center font-mono text-[9px] font-extrabold">1</span>
                         Assign Staff & Crew
                     </div>
-                    <p class="text-zinc-500 dark:text-zinc-400 text-[10.5px]">Click <strong>"+ Assign Shift"</strong> in the top toolbar to assign DoPs, Drone Pilots, or Editors to shoots.</p>
+                    <p class="text-zinc-500 text-[10.5px]">Click <strong>"+ Assign Shift"</strong> in the top toolbar to assign DoPs, Drone Pilots, or Editors to shoots.</p>
                 </div>
-                <div class="p-3 bg-white dark:bg-zinc-850 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 space-y-1">
-                    <div class="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
-                        <span class="w-4 h-4 rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center justify-center font-mono text-[9px] font-extrabold">2</span>
+                <div class="p-3 bg-white rounded-xl border border-zinc-200/60 space-y-1">
+                    <div class="font-bold text-zinc-900 flex items-center gap-1.5">
+                        <span class="w-4 h-4 rounded-full bg-zinc-100 text-zinc-800 flex items-center justify-center font-mono text-[9px] font-extrabold">2</span>
                         Auto-Fill CRM Bookings
                     </div>
-                    <p class="text-zinc-500 dark:text-zinc-400 text-[10.5px]">Use the <strong>Auto-Fill dropdown</strong> inside the drawer to instantly populate venue, date, and client shoot info from active CRM leads.</p>
+                    <p class="text-zinc-500 text-[10.5px]">Use the <strong>Auto-Fill dropdown</strong> inside the drawer to instantly populate venue, date, and client shoot info from active CRM leads.</p>
                 </div>
-                <div class="p-3 bg-white dark:bg-zinc-850 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 space-y-1">
-                    <div class="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
-                        <span class="w-4 h-4 rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center justify-center font-mono text-[9px] font-extrabold">3</span>
+                <div class="p-3 bg-white rounded-xl border border-zinc-200/60 space-y-1">
+                    <div class="font-bold text-zinc-900 flex items-center gap-1.5">
+                        <span class="w-4 h-4 rounded-full bg-zinc-100 text-zinc-800 flex items-center justify-center font-mono text-[9px] font-extrabold">3</span>
                         Status & WhatsApp Dispatch
                     </div>
-                    <p class="text-zinc-500 dark:text-zinc-400 text-[10.5px]">Track <strong>Confirmed → On-Site → Completed</strong> progress, and send shift briefing alerts directly to WhatsApp.</p>
+                    <p class="text-zinc-500 text-[10.5px]">Track <strong>Confirmed → On-Site → Completed</strong> progress, and send shift briefing alerts directly to WhatsApp.</p>
                 </div>
             </div>
         </div>
     </div>
-    <aside id="cora-add-shift-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[460px] max-w-[90vw] bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
+    <aside id="cora-add-shift-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[460px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
     <div class="flex flex-col h-full">
         <!-- Header -->
-        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/80 flex items-center justify-between">
+        <div class="p-5 border-b border-zinc-200 bg-zinc-50/80 flex items-center justify-between">
             <div>
-                <h3 class="text-sm font-bold text-zinc-950 dark:text-white">Assign Field Staff Shift</h3>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">3-step wizard with CRM auto-fill & conflict check.</p>
+                <h3 class="text-sm font-bold text-zinc-950 ">Assign Field Staff Shift</h3>
+                <p class="text-[11px] text-zinc-500 mt-0.5">3-step wizard with CRM auto-fill & conflict check.</p>
             </div>
-            <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer">✕</button>
+            <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 cursor-pointer">✕</button>
         </div>
 
         <!-- Step Progress Indicator -->
-        <div class="px-6 py-3 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 flex items-center justify-between text-[11px] font-bold">
-            <div id="cora-step-indicator-1" class="flex items-center gap-1.5 text-zinc-950 dark:text-white font-bold">
-                <span class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center text-[10px] font-bold">1</span>
+        <div class="px-6 py-3 border-b border-zinc-200/80 bg-white flex items-center justify-between text-[11px] font-bold">
+            <div id="cora-step-indicator-1" class="flex items-center gap-1.5 text-zinc-950 font-bold">
+                <span class="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold">1</span>
                 <span>Crew & Lead</span>
             </div>
-            <div class="h-px bg-zinc-200 dark:bg-zinc-800 flex-1 mx-2"></div>
-            <div id="cora-step-indicator-2" class="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-600">
-                <span class="w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 flex items-center justify-center text-[10px] font-bold">2</span>
+            <div class="h-px bg-zinc-200 flex-1 mx-2"></div>
+            <div id="cora-step-indicator-2" class="flex items-center gap-1.5 text-zinc-400 ">
+                <span class="w-5 h-5 rounded-full bg-zinc-100 text-zinc-600 flex items-center justify-center text-[10px] font-bold">2</span>
                 <span>Project & Venue</span>
             </div>
-            <div class="h-px bg-zinc-200 dark:bg-zinc-800 flex-1 mx-2"></div>
-            <div id="cora-step-indicator-3" class="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-600">
-                <span class="w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 flex items-center justify-center text-[10px] font-bold">3</span>
+            <div class="h-px bg-zinc-200 flex-1 mx-2"></div>
+            <div id="cora-step-indicator-3" class="flex items-center gap-1.5 text-zinc-400 ">
+                <span class="w-5 h-5 rounded-full bg-zinc-100 text-zinc-600 flex items-center justify-center text-[10px] font-bold">3</span>
                 <span>Time & Payout</span>
             </div>
         </div>
@@ -1051,12 +1051,12 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
 
             <!-- STEP 1: CREW & LEAD AUTO-FILL -->
             <div id="cora-shift-step-1" class="space-y-4">
-                <div class="bg-zinc-50 dark:bg-zinc-900/50 p-3.5 rounded-2xl border border-zinc-200/60 dark:border-zinc-800 shadow-2xs">
-                    <label class="font-bold text-zinc-800 dark:text-zinc-200 mb-1 flex items-center gap-1.5">
+                <div class="bg-zinc-50 p-3.5 rounded-2xl border border-zinc-200/60 shadow-2xs">
+                    <label class="font-bold text-zinc-800 mb-1 flex items-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                         <span>Auto-Fill details from CRM Leads</span>
                     </label>
-                    <select id="sh-lead-import-select" onchange="coraAutoFillShiftFromLead(this)" class="w-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 rounded-xl p-2.5 outline-none font-semibold text-zinc-900 dark:text-zinc-100 cursor-pointer text-xs mt-1 shadow-3xs">
+                    <select id="sh-lead-import-select" onchange="coraAutoFillShiftFromLead(this)" class="w-full border border-zinc-200 bg-white rounded-xl p-2.5 outline-none font-semibold text-zinc-900 cursor-pointer text-xs mt-1 shadow-3xs">
                         <option value="">-- Select Active CRM Lead to Import --</option>
                         <?php foreach ( $cora_leads_for_import as $ld ) : 
                             $lead_fn = trim($ld['first_name'] ?? '');
@@ -1088,13 +1088,13 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
 
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="font-bold text-zinc-800 dark:text-zinc-200">Staff Member *</label>
-                        <button type="button" onclick="coraToggleInlineAddUserForm()" class="text-[11px] font-bold text-zinc-950 dark:text-white hover:underline flex items-center gap-1 cursor-pointer">
+                        <label class="font-bold text-zinc-800 ">Staff Member *</label>
+                        <button type="button" onclick="coraToggleInlineAddUserForm()" class="text-[11px] font-bold text-zinc-950 hover:underline flex items-center gap-1 cursor-pointer">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             <span>Create New Staff</span>
                         </button>
                     </div>
-                    <select id="sh-staff-select" onchange="coraOnStaffSelectChange(this)" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 bg-white dark:bg-zinc-900 outline-none font-semibold text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                    <select id="sh-staff-select" onchange="coraOnStaffSelectChange(this)" class="w-full border border-zinc-200 rounded-xl p-3 bg-white outline-none font-semibold text-zinc-900 cursor-pointer">
                         <option value="">-- Select Available Staff Member --</option>
                         <?php 
                         $wp_users_list = get_users( array( 'number' => 50, 'orderby' => 'display_name' ) );
@@ -1133,22 +1133,22 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                 </div>
 
                 <!-- Inline Quick Add User Form (Collapsible) -->
-                <div id="cora-inline-add-user-box" class="hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl p-3.5 space-y-3 my-2 shadow-2xs">
-                    <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
-                        <span class="font-bold text-zinc-900 dark:text-white text-xs flex items-center gap-1.5">
+                <div id="cora-inline-add-user-box" class="hidden border border-zinc-200 bg-zinc-50 rounded-xl p-3.5 space-y-3 my-2 shadow-2xs">
+                    <div class="flex items-center justify-between border-b border-zinc-200 pb-2">
+                        <span class="font-bold text-zinc-900 text-xs flex items-center gap-1.5">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="17" y1="11" x2="23" y2="11"></line></svg>
                             <span>Create New Field Staff / Agent User</span>
                         </span>
-                        <button type="button" onclick="coraToggleInlineAddUserForm()" class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-xs cursor-pointer">✕</button>
+                        <button type="button" onclick="coraToggleInlineAddUserForm()" class="text-zinc-400 hover:text-zinc-700 text-xs cursor-pointer">✕</button>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-0.5">Full Name *</label>
-                        <input type="text" id="new-user-fullname" placeholder="e.g. Vikram Malhotra" class="w-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-lg p-2 text-xs font-semibold outline-none text-zinc-900 dark:text-zinc-100">
+                        <label class="block text-[11px] font-semibold text-zinc-700 mb-0.5">Full Name *</label>
+                        <input type="text" id="new-user-fullname" placeholder="e.g. Vikram Malhotra" class="w-full border border-zinc-200 bg-white rounded-lg p-2 text-xs font-semibold outline-none text-zinc-900 ">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-0.5">Primary Role</label>
-                            <select id="new-user-role" class="w-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-lg p-2 text-xs font-semibold outline-none text-zinc-900 dark:text-zinc-100">
+                            <label class="block text-[11px] font-semibold text-zinc-700 mb-0.5">Primary Role</label>
+                            <select id="new-user-role" class="w-full border border-zinc-200 bg-white rounded-lg p-2 text-xs font-semibold outline-none text-zinc-900 ">
                                 <?php if ( $active_industry === 'photography_studio' ) : ?>
                                     <option value="Director of Photography (DoP)">DoP / Camera Lead</option>
                                     <option value="Certified Drone Pilot">Drone Pilot</option>
@@ -1165,19 +1165,19 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-0.5">WhatsApp Phone</label>
-                            <input type="text" id="new-user-phone" placeholder="9876500112" class="w-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-lg p-2 text-xs font-mono outline-none text-zinc-900 dark:text-zinc-100">
+                            <label class="block text-[11px] font-semibold text-zinc-700 mb-0.5">WhatsApp Phone</label>
+                            <input type="text" id="new-user-phone" placeholder="9876500112" class="w-full border border-zinc-200 bg-white rounded-lg p-2 text-xs font-mono outline-none text-zinc-900 ">
                         </div>
                     </div>
-                    <button type="button" onclick="coraQuickCreateStaffUser()" class="w-full py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5">
+                    <button type="button" onclick="coraQuickCreateStaffUser()" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>Save & Auto-Select Staff Member</span>
                     </button>
                 </div>
 
                 <div>
-                    <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Staff Role</label>
-                    <select id="sh-staff-role" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 bg-white dark:bg-zinc-900 outline-none font-semibold text-zinc-900 dark:text-zinc-100">
+                    <label class="block font-bold text-zinc-800 mb-1">Staff Role</label>
+                    <select id="sh-staff-role" class="w-full border border-zinc-200 rounded-xl p-3 bg-white outline-none font-semibold text-zinc-900 ">
                         <?php if ( $active_industry === 'photography_studio' ) : ?>
                             <option value="Director of Photography (DoP)">Director of Photography (DoP)</option>
                             <option value="Certified Drone Pilot">Certified Drone Pilot</option>
@@ -1195,21 +1195,21 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                 </div>
 
                 <div>
-                    <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Staff WhatsApp Phone</label>
-                    <input type="text" id="sh-staff-phone" placeholder="9876543210" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 font-mono outline-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                    <label class="block font-bold text-zinc-800 mb-1">Staff WhatsApp Phone</label>
+                    <input type="text" id="sh-staff-phone" placeholder="9876543210" class="w-full border border-zinc-200 rounded-xl p-3 font-mono outline-none bg-white text-zinc-900 ">
                 </div>
             </div>
 
             <!-- STEP 2: SHOOT & LOCATION -->
             <div id="cora-shift-step-2" class="hidden space-y-4">
                 <div>
-                    <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1"><?php echo esc_html($label_project); ?> *</label>
-                    <input type="text" id="sh-project-title" placeholder="e.g. Commercial Media Campaign Shoot..." class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 outline-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-semibold">
+                    <label class="block font-bold text-zinc-800 mb-1"><?php echo esc_html($label_project); ?> *</label>
+                    <input type="text" id="sh-project-title" placeholder="e.g. Commercial Media Campaign Shoot..." class="w-full border border-zinc-200 rounded-xl p-3 outline-none bg-white text-zinc-900 font-semibold">
                 </div>
 
                 <div>
-                    <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1"><?php echo esc_html($label_venue); ?></label>
-                    <input type="text" id="sh-venue" placeholder="e.g. Cora Studio 1, DLF Cyber City..." class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 outline-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                    <label class="block font-bold text-zinc-800 mb-1"><?php echo esc_html($label_venue); ?></label>
+                    <input type="text" id="sh-venue" placeholder="e.g. Cora Studio 1, DLF Cyber City..." class="w-full border border-zinc-200 rounded-xl p-3 outline-none bg-white text-zinc-900 ">
                 </div>
             </div>
 
@@ -1217,12 +1217,12 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
             <div id="cora-shift-step-3" class="hidden space-y-4">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Shift Date *</label>
-                        <input type="date" id="sh-date" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 outline-none font-semibold text-zinc-900 dark:text-white bg-white dark:bg-zinc-900">
+                        <label class="block font-bold text-zinc-800 mb-1">Shift Date *</label>
+                        <input type="date" id="sh-date" class="w-full border border-zinc-200 rounded-xl p-3 outline-none font-semibold text-zinc-900 bg-white ">
                     </div>
                     <div>
-                        <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Shift Type</label>
-                        <select id="sh-type" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 outline-none font-semibold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                        <label class="block font-bold text-zinc-800 mb-1">Shift Type</label>
+                        <select id="sh-type" class="w-full border border-zinc-200 rounded-xl p-3 outline-none font-semibold bg-white text-zinc-900 ">
                             <option value="Standard (8h)">Standard (8h)</option>
                             <option value="Half-Day (4h)">Half-Day (4h)</option>
                             <option value="Overtime (12h)">Overtime (12h)</option>
@@ -1232,51 +1232,51 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Start Time</label>
-                        <input type="text" id="sh-time-start" value="09:00 AM" placeholder="09:00 AM" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 font-mono outline-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                        <label class="block font-bold text-zinc-800 mb-1">Start Time</label>
+                        <input type="text" id="sh-time-start" value="09:00 AM" placeholder="09:00 AM" class="w-full border border-zinc-200 rounded-xl p-3 font-mono outline-none bg-white text-zinc-900 ">
                     </div>
                     <div>
-                        <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">End Time</label>
-                        <input type="text" id="sh-time-end" value="05:00 PM" placeholder="05:00 PM" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 font-mono outline-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                        <label class="block font-bold text-zinc-800 mb-1">End Time</label>
+                        <input type="text" id="sh-time-end" value="05:00 PM" placeholder="05:00 PM" class="w-full border border-zinc-200 rounded-xl p-3 font-mono outline-none bg-white text-zinc-900 ">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Day-Rate Payout (₹)</label>
-                    <input type="number" id="sh-day-rate" value="25000" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 font-mono font-bold outline-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                    <label class="block font-bold text-zinc-800 mb-1">Day-Rate Payout (₹)</label>
+                    <input type="number" id="sh-day-rate" value="25000" class="w-full border border-zinc-200 rounded-xl p-3 font-mono font-bold outline-none bg-white text-zinc-900 ">
                 </div>
             </div>
         </div>
 
         <!-- Wizard Navigation Footer -->
-        <div class="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/80 flex items-center justify-between">
-            <button type="button" id="cora-btn-shift-back" onclick="coraShiftWizardStep(-1)" class="hidden px-4 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-100 cursor-pointer">
+        <div class="p-4 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between">
+            <button type="button" id="cora-btn-shift-back" onclick="coraShiftWizardStep(-1)" class="hidden px-4 py-2 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-100 cursor-pointer">
                 ← Back
             </button>
-            <button type="button" id="cora-btn-shift-cancel" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-100 cursor-pointer">
+            <button type="button" id="cora-btn-shift-cancel" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-100 cursor-pointer">
                 Cancel
             </button>
 
-            <button type="button" id="cora-btn-shift-next" onclick="coraShiftWizardStep(1)" class="px-5 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 cursor-pointer flex items-center gap-1.5 shadow-xs">
+            <button type="button" id="cora-btn-shift-next" onclick="coraShiftWizardStep(1)" class="px-5 py-2 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 cursor-pointer flex items-center gap-1.5 shadow-xs">
                 <span>Next: Project & Location</span>
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </button>
 
-            <button type="button" id="cora-btn-shift-submit" onclick="coraSubmitAddShift()" class="hidden px-5 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 cursor-pointer shadow-xs">
+            <button type="button" id="cora-btn-shift-submit" onclick="coraSubmitAddShift()" class="hidden px-5 py-2 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 cursor-pointer shadow-xs">
                 Assign Shift
             </button>
         </div>
     </div>
 </aside>
 
-<aside id="cora-edit-shift-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
+<aside id="cora-edit-shift-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
     <div class="flex flex-col h-full">
-        <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/80 flex items-center justify-between">
+        <div class="p-5 border-b border-zinc-200 bg-zinc-50/80 flex items-center justify-between">
             <div>
-                <h3 class="text-sm font-bold text-zinc-950 dark:text-white">Edit & Reassign Field Shift</h3>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Reassign staff member, update call-times, day-rate or shift status.</p>
+                <h3 class="text-sm font-bold text-zinc-950 ">Edit & Reassign Field Shift</h3>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Reassign staff member, update call-times, day-rate or shift status.</p>
             </div>
-            <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer">✕</button>
+            <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 cursor-pointer">✕</button>
         </div>
 
         <div class="p-6 flex-1 overflow-y-auto space-y-4 text-xs">
@@ -1284,13 +1284,13 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
 
             <div>
                 <div class="flex items-center justify-between mb-1">
-                    <label class="font-bold text-zinc-800 dark:text-zinc-200">Reassign Staff Member *</label>
-                    <button type="button" onclick="coraToggleEditInlineAddUserForm()" class="text-[11px] font-bold text-zinc-950 dark:text-white hover:underline flex items-center gap-1 cursor-pointer">
+                    <label class="font-bold text-zinc-800 ">Reassign Staff Member *</label>
+                    <button type="button" onclick="coraToggleEditInlineAddUserForm()" class="text-[11px] font-bold text-zinc-950 hover:underline flex items-center gap-1 cursor-pointer">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>Create New User</span>
                     </button>
                 </div>
-                <select id="edit-sh-staff-select" onchange="coraOnEditStaffSelectChange(this)" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 bg-white dark:bg-zinc-900 outline-none font-semibold text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                <select id="edit-sh-staff-select" onchange="coraOnEditStaffSelectChange(this)" class="w-full border border-zinc-200 rounded-xl p-3 bg-white outline-none font-semibold text-zinc-900 cursor-pointer">
                     <option value="Karan Malhotra" data-role="Director of Photography (DoP)" data-phone="9876543210" data-rate="25000">Karan Malhotra (Director of Photography)</option>
                     <option value="Rohan Verma" data-role="Certified Drone Pilot" data-phone="9811223344" data-rate="18000">Rohan Verma (Certified Drone Pilot)</option>
                     <option value="Rajesh Sharma" data-role="Senior Listing Agent" data-phone="9988776655" data-rate="20000">Rajesh Sharma (Senior Listing Agent)</option>
@@ -1301,22 +1301,22 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
             </div>
 
             <!-- Edit Drawer Inline Add User Box -->
-            <div id="cora-edit-inline-add-user-box" class="hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl p-3.5 space-y-3 my-2 shadow-2xs">
-                <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
-                    <span class="font-bold text-zinc-900 dark:text-white text-xs flex items-center gap-1.5">
+            <div id="cora-edit-inline-add-user-box" class="hidden border border-zinc-200 bg-zinc-50 rounded-xl p-3.5 space-y-3 my-2 shadow-2xs">
+                <div class="flex items-center justify-between border-b border-zinc-200 pb-2">
+                    <span class="font-bold text-zinc-900 text-xs flex items-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="17" y1="11" x2="23" y2="11"></line></svg>
                         Create & Reassign New Staff Member
                     </span>
-                    <button type="button" onclick="coraToggleEditInlineAddUserForm()" class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-xs cursor-pointer">✕</button>
+                    <button type="button" onclick="coraToggleEditInlineAddUserForm()" class="text-zinc-400 hover:text-zinc-700 text-xs cursor-pointer">✕</button>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-0.5">Full Name *</label>
-                    <input type="text" id="edit-new-user-fullname" placeholder="e.g. Sameer Kapoor" class="w-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-lg p-2 text-xs font-semibold outline-none text-zinc-900 dark:text-zinc-100">
+                    <label class="block text-[11px] font-semibold text-zinc-700 mb-0.5">Full Name *</label>
+                    <input type="text" id="edit-new-user-fullname" placeholder="e.g. Sameer Kapoor" class="w-full border border-zinc-200 bg-white rounded-lg p-2 text-xs font-semibold outline-none text-zinc-900 ">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-0.5">Role</label>
-                        <select id="edit-new-user-role" class="w-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-lg p-2 text-xs font-semibold outline-none text-zinc-900 dark:text-zinc-100">
+                        <label class="block text-[11px] font-semibold text-zinc-700 mb-0.5">Role</label>
+                        <select id="edit-new-user-role" class="w-full border border-zinc-200 bg-white rounded-lg p-2 text-xs font-semibold outline-none text-zinc-900 ">
                             <option value="Director of Photography (DoP)">DoP / Camera Lead</option>
                             <option value="Certified Drone Pilot">Drone Pilot</option>
                             <option value="Senior Listing Agent">Senior Listing Agent</option>
@@ -1324,18 +1324,18 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-0.5">WhatsApp Phone</label>
-                        <input type="text" id="edit-new-user-phone" placeholder="9876500999" class="w-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-lg p-2 text-xs font-mono outline-none text-zinc-900 dark:text-zinc-100">
+                        <label class="block text-[11px] font-semibold text-zinc-700 mb-0.5">WhatsApp Phone</label>
+                        <input type="text" id="edit-new-user-phone" placeholder="9876500999" class="w-full border border-zinc-200 bg-white rounded-lg p-2 text-xs font-mono outline-none text-zinc-900 ">
                     </div>
                 </div>
-                <button type="button" onclick="coraQuickCreateEditStaffUser()" class="w-full py-2 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-xs">
+                <button type="button" onclick="coraQuickCreateEditStaffUser()" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-xs">
                     + Save & Auto-Select Staff Member
                 </button>
             </div>
 
             <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Staff Role</label>
-                <select id="edit-sh-staff-role" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 bg-white dark:bg-zinc-900 outline-none font-semibold text-zinc-900 dark:text-zinc-100">
+                <label class="block font-bold text-zinc-800 mb-1">Staff Role</label>
+                <select id="edit-sh-staff-role" class="w-full border border-zinc-200 rounded-xl p-3 bg-white outline-none font-semibold text-zinc-900 ">
                     <option value="Director of Photography (DoP)">Director of Photography (DoP)</option>
                     <option value="Certified Drone Pilot">Certified Drone Pilot</option>
                     <option value="Senior Listing Agent">Senior Listing Agent</option>
@@ -1345,28 +1345,28 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
             </div>
 
             <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Staff WhatsApp Phone</label>
-                <input type="text" id="edit-sh-staff-phone" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 font-mono outline-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                <label class="block font-bold text-zinc-800 mb-1">Staff WhatsApp Phone</label>
+                <input type="text" id="edit-sh-staff-phone" class="w-full border border-zinc-200 rounded-xl p-3 font-mono outline-none bg-white text-zinc-900 ">
             </div>
 
             <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Property Listing / Project</label>
-                <input type="text" id="edit-sh-project-title" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 outline-none font-semibold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                <label class="block font-bold text-zinc-800 mb-1">Property Listing / Project</label>
+                <input type="text" id="edit-sh-project-title" class="w-full border border-zinc-200 rounded-xl p-3 outline-none font-semibold bg-white text-zinc-900 ">
             </div>
 
             <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Venue / Location</label>
-                <input type="text" id="edit-sh-venue" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 outline-none font-semibold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                <label class="block font-bold text-zinc-800 mb-1">Venue / Location</label>
+                <input type="text" id="edit-sh-venue" class="w-full border border-zinc-200 rounded-xl p-3 outline-none font-semibold bg-white text-zinc-900 ">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Shift Date</label>
-                    <input type="date" id="edit-sh-date" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 outline-none font-semibold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                    <label class="block font-bold text-zinc-800 mb-1">Shift Date</label>
+                    <input type="date" id="edit-sh-date" class="w-full border border-zinc-200 rounded-xl p-3 outline-none font-semibold bg-white text-zinc-900 ">
                 </div>
                 <div>
-                    <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Shift Status</label>
-                    <select id="edit-sh-status" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 bg-white dark:bg-zinc-900 outline-none font-bold text-zinc-900 dark:text-zinc-100">
+                    <label class="block font-bold text-zinc-800 mb-1">Shift Status</label>
+                    <select id="edit-sh-status" class="w-full border border-zinc-200 rounded-xl p-3 bg-white outline-none font-bold text-zinc-900 ">
                         <option value="Confirmed">Confirmed</option>
                         <option value="On-Site">On-Site</option>
                         <option value="Scheduled">Scheduled</option>
@@ -1378,47 +1378,47 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Start Time</label>
-                    <input type="text" id="edit-sh-time-start" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 font-mono outline-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                    <label class="block font-bold text-zinc-800 mb-1">Start Time</label>
+                    <input type="text" id="edit-sh-time-start" class="w-full border border-zinc-200 rounded-xl p-3 font-mono outline-none bg-white text-zinc-900 ">
                 </div>
                 <div>
-                    <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">End Time</label>
-                    <input type="text" id="edit-sh-time-end" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 font-mono outline-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                    <label class="block font-bold text-zinc-800 mb-1">End Time</label>
+                    <input type="text" id="edit-sh-time-end" class="w-full border border-zinc-200 rounded-xl p-3 font-mono outline-none bg-white text-zinc-900 ">
                 </div>
             </div>
 
             <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Day-Rate Payout (₹)</label>
-                <input type="number" id="edit-sh-day-rate" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 font-mono font-bold outline-none bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+                <label class="block font-bold text-zinc-800 mb-1">Day-Rate Payout (₹)</label>
+                <input type="number" id="edit-sh-day-rate" class="w-full border border-zinc-200 rounded-xl p-3 font-mono font-bold outline-none bg-white text-zinc-900 ">
             </div>
         </div>
 
-        <div class="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/80 flex items-center justify-between gap-3">
-            <button onclick="coraDeleteEditShift()" class="px-4 py-2 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg text-xs font-bold transition-all cursor-pointer">Delete Shift</button>
+        <div class="p-4 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between gap-3">
+            <button onclick="coraDeleteEditShift()" class="px-4 py-2 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-bold transition-all cursor-pointer">Delete Shift</button>
             <div class="flex items-center gap-2">
-                <button onclick="window.coraCloseAllDrawers()" class="px-4 py-2 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800">Cancel</button>
-                <button onclick="coraSaveEditShift()" class="px-5 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 cursor-pointer">Save Changes</button>
+                <button onclick="window.coraCloseAllDrawers()" class="px-4 py-2 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white ">Cancel</button>
+                <button onclick="coraSaveEditShift()" class="px-5 py-2 bg-zinc-950 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 cursor-pointer">Save Changes</button>
             </div>
         </div>
     </div>
 </aside>
 
-<aside id="cora-add-timeline-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
-    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 flex items-center justify-between">
+<aside id="cora-add-timeline-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
+    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
         <div>
-            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Add Time Block</h3>
+            <h3 class="text-sm font-bold text-zinc-900 ">Add Time Block</h3>
             <p class="text-[11px] text-zinc-500 mt-0.5">Add a site visit, due diligence audit, or photo shoot session.</p>
         </div>
-        <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">✕</button>
+        <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 cursor-pointer">✕</button>
     </div>
 
     <div class="p-6 flex-1 overflow-y-auto space-y-4 text-xs">
-        <div class="bg-zinc-50 dark:bg-zinc-850 p-3.5 rounded-2xl border border-zinc-200/60 dark:border-zinc-800 shadow-2xs">
-            <label class="font-bold text-zinc-800 dark:text-zinc-200 mb-1 flex items-center gap-1.5">
+        <div class="bg-zinc-50 p-3.5 rounded-2xl border border-zinc-200/60 shadow-2xs">
+            <label class="font-bold text-zinc-800 mb-1 flex items-center gap-1.5">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-amber-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                 <span>Auto-Fill details from CRM Leads</span>
             </label>
-            <select id="blk-lead-import-select" onchange="coraAutoFillBlockFromLead(this)" class="w-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 rounded-xl p-2.5 outline-none font-semibold text-zinc-900 dark:text-zinc-100 cursor-pointer text-xs mt-1 shadow-3xs">
+            <select id="blk-lead-import-select" onchange="coraAutoFillBlockFromLead(this)" class="w-full border border-zinc-200 bg-white rounded-xl p-2.5 outline-none font-semibold text-zinc-900 cursor-pointer text-xs mt-1 shadow-3xs">
                 <option value="">-- Select Active CRM Lead to Import --</option>
                 <?php foreach ( $cora_leads_for_import as $ld ) : 
                     $lead_name = trim(($ld['first_name'] ?? '') . ' ' . ($ld['last_name'] ?? ''));
@@ -1447,8 +1447,8 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
         </div>
 
         <div>
-            <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Select Day</label>
-            <select id="blk-day-select" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="block font-bold text-zinc-800 mb-1">Select Day</label>
+            <select id="blk-day-select" class="w-full bg-zinc-50 border-0 rounded-xl p-3 text-xs font-semibold text-zinc-900 focus:outline-none">
                 <option value="1">Day 1 (Site Visits & Discovery)</option>
                 <option value="2">Day 2 (Due Diligence & Audits)</option>
                 <option value="3">Day 3 (Contract & Closing Banquet)</option>
@@ -1456,52 +1456,52 @@ if ( $req_view === 'timeline' || $sub_page === 'event_timeline' || $sub_page ===
         </div>
 
         <div>
-            <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Activity Title *</label>
-            <input type="text" id="blk-activity-title" placeholder="e.g. DLF Cyber Park Tower A Inspection..." class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="block font-bold text-zinc-800 mb-1">Activity Title *</label>
+            <input type="text" id="blk-activity-title" placeholder="e.g. DLF Cyber Park Tower A Inspection..." class="w-full bg-zinc-50 border-0 rounded-xl p-3 text-xs font-semibold text-zinc-900 focus:outline-none">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
             <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Start Time</label>
-                <input type="text" id="blk-time-start" placeholder="10:00 AM" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 font-mono text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="block font-bold text-zinc-800 mb-1">Start Time</label>
+                <input type="text" id="blk-time-start" placeholder="10:00 AM" class="w-full bg-zinc-50 border-0 rounded-xl p-3 font-mono text-xs text-zinc-900 focus:outline-none">
             </div>
             <div>
-                <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">End Time</label>
-                <input type="text" id="blk-time-end" placeholder="01:00 PM" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 font-mono text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                <label class="block font-bold text-zinc-800 mb-1">End Time</label>
+                <input type="text" id="blk-time-end" placeholder="01:00 PM" class="w-full bg-zinc-50 border-0 rounded-xl p-3 font-mono text-xs text-zinc-900 focus:outline-none">
             </div>
         </div>
 
         <div>
-            <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Venue Address & GPS Location</label>
-            <input type="text" id="blk-venue-address" placeholder="e.g. DLF Cyber City, Gurugram" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 text-xs font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="block font-bold text-zinc-800 mb-1">Venue Address & GPS Location</label>
+            <input type="text" id="blk-venue-address" placeholder="e.g. DLF Cyber City, Gurugram" class="w-full bg-zinc-50 border-0 rounded-xl p-3 text-xs font-medium text-zinc-900 focus:outline-none">
         </div>
 
         <div>
-            <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Assigned Crew Member</label>
-            <input type="text" id="blk-crew-member" placeholder="e.g. Rajesh Sharma (Lead Broker)" class="w-full bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 text-xs font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none">
+            <label class="block font-bold text-zinc-800 mb-1">Assigned Crew Member</label>
+            <input type="text" id="blk-crew-member" placeholder="e.g. Rajesh Sharma (Lead Broker)" class="w-full bg-zinc-50 border-0 rounded-xl p-3 text-xs font-medium text-zinc-900 focus:outline-none">
         </div>
     </div>
 
-    <div class="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 flex items-center justify-between">
-        <button onclick="window.coraCloseAllDrawers()" class="px-4 py-2 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300">Cancel</button>
+    <div class="p-4 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between">
+        <button onclick="window.coraCloseAllDrawers()" class="px-4 py-2 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-700 ">Cancel</button>
         <button onclick="coraSubmitAddTimelineBlock()" class="px-5 py-2 text-white rounded-xl text-xs font-bold cursor-pointer" style="background-color: #09090b !important;">Add Schedule Block</button>
     </div>
 </aside>
 
-<aside id="cora-share-timeline-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
-    <div class="p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 flex items-center justify-between">
+<aside id="cora-share-timeline-drawer" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out select-none">
+    <div class="p-5 border-b border-zinc-200 bg-zinc-50 flex items-center justify-between">
         <div>
-            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Share Client Link</h3>
+            <h3 class="text-sm font-bold text-zinc-900 ">Share Client Link</h3>
             <p class="text-[11px] text-zinc-500 mt-0.5">Send live mobile itinerary link to client or VIP guest.</p>
         </div>
-        <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">✕</button>
+        <button onclick="window.coraCloseAllDrawers()" class="p-1 text-zinc-400 hover:text-zinc-900 cursor-pointer">✕</button>
     </div>
 
     <div class="p-6 flex-1 overflow-y-auto space-y-4 text-xs">
         <div>
-            <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Live Mobile Itinerary URL</label>
+            <label class="block font-bold text-zinc-800 mb-1">Live Mobile Itinerary URL</label>
             <div class="flex gap-2">
-                <input type="text" id="cora-timeline-share-url" readonly class="flex-1 bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl p-3 font-mono text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none">
+                <input type="text" id="cora-timeline-share-url" readonly class="flex-1 bg-zinc-50 border-0 rounded-xl p-3 font-mono text-xs text-zinc-700 focus:outline-none">
                 <button onclick="coraCopyTimelineShareUrl()" class="px-4 py-2 text-white font-bold rounded-xl cursor-pointer" style="background-color: #09090b !important;">Copy</button>
             </div>
         </div>
@@ -1565,8 +1565,8 @@ window.coraSwitchSchedulerTab = function(tabName) {
         if (headerActions) headerActions.classList.add('hidden');
         if (toolbarControls) toolbarControls.classList.add('hidden');
         if (btn) {
-            btn.classList.remove('active', 'bg-white', 'dark:bg-zinc-800', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', 'dark:border-zinc-700/80');
-            btn.classList.add('text-zinc-500', 'hover:text-zinc-900', 'dark:text-zinc-400', 'dark:hover:text-white', 'font-medium', 'hover:bg-zinc-200/50', 'dark:hover:bg-zinc-800/50');
+            btn.classList.remove('active', 'bg-white', '', 'text-zinc-950', '', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', '');
+            btn.classList.add('text-zinc-500', 'hover:text-zinc-900', '', '', 'font-medium', 'hover:bg-zinc-200/50', '');
         }
     });
 
@@ -1579,8 +1579,8 @@ window.coraSwitchSchedulerTab = function(tabName) {
     if (ha) ha.classList.remove('hidden');
     if (tc) tc.classList.remove('hidden');
     if (b) {
-        b.classList.remove('text-zinc-500', 'hover:text-zinc-900', 'dark:text-zinc-400', 'dark:hover:text-white', 'font-medium', 'hover:bg-zinc-200/50', 'dark:hover:bg-zinc-800/50');
-        b.classList.add('active', 'bg-white', 'dark:bg-zinc-800', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', 'dark:border-zinc-700/80');
+        b.classList.remove('text-zinc-500', 'hover:text-zinc-900', '', '', 'font-medium', 'hover:bg-zinc-200/50', '');
+        b.classList.add('active', 'bg-white', '', 'text-zinc-950', '', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', '');
     }
 
     var clientBadge = document.getElementById('header-client-badge');
@@ -1686,14 +1686,14 @@ window.coraShiftWizardStep = function(dir) {
         if (!ind) continue;
         var badge = ind.querySelector('span:first-child');
         if (i === target) {
-            ind.className = 'flex items-center gap-1.5 text-zinc-950 dark:text-white font-bold';
-            if (badge) badge.className = 'w-5 h-5 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center text-[10px] font-bold';
+            ind.className = 'flex items-center gap-1.5 text-zinc-950 font-bold';
+            if (badge) badge.className = 'w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold';
         } else if (i < target) {
-            ind.className = 'flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold';
+            ind.className = 'flex items-center gap-1.5 text-emerald-600 font-bold';
             if (badge) badge.className = 'w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold';
         } else {
-            ind.className = 'flex items-center gap-1.5 text-zinc-400 dark:text-zinc-600';
-            if (badge) badge.className = 'w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 flex items-center justify-center text-[10px] font-bold';
+            ind.className = 'flex items-center gap-1.5 text-zinc-400 ';
+            if (badge) badge.className = 'w-5 h-5 rounded-full bg-zinc-100 text-zinc-600 flex items-center justify-center text-[10px] font-bold';
         }
     }
 
@@ -1807,7 +1807,7 @@ window.coraSubmitAddShift = function() {
     if (grid) {
         var card = document.createElement('div');
         card.id = 'shift-row-' + newId;
-        card.className = 'sh-card p-3.5 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-4 min-w-0';
+        card.className = 'sh-card p-3.5 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-4 min-w-0';
         
         var initials = name.charAt(0).toUpperCase();
         var shiftObj = {
@@ -1827,49 +1827,49 @@ window.coraSubmitAddShift = function() {
         var shiftJson = JSON.stringify(shiftObj).replace(/"/g, '&quot;');
         
         card.innerHTML = '\
-            <div class="flex items-start justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">\
+            <div class="flex items-start justify-between gap-3 pb-3 border-b border-zinc-100 ">\
                 <div class="flex items-center gap-3 min-w-0">\
-                    <div class="w-8 h-8 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-sm shrink-0 border border-zinc-200/50 dark:border-zinc-800/50 sh-card-staff-initials">\
+                    <div class="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-sm shrink-0 border border-zinc-200/50 sh-card-staff-initials">\
                         ' + initials + '\
                     </div>\
                     <div class="min-w-0">\
-                        <h4 class="font-bold text-zinc-900 dark:text-white text-sm truncate sh-card-staff-name">' + name + '</h4>\
-                        <p class="text-[11px] font-semibold text-zinc-450 dark:text-zinc-500 truncate sh-card-staff-role">' + role + '</p>\
+                        <h4 class="font-bold text-zinc-900 text-sm truncate sh-card-staff-name">' + name + '</h4>\
+                        <p class="text-[11px] font-semibold text-zinc-450 truncate sh-card-staff-role">' + role + '</p>\
                     </div>\
                 </div>\
                 <div class="text-right shrink-0">\
-                    <span class="text-[9px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-555 block">CALL TIME</span>\
-                    <span class="text-[11px] font-mono font-bold text-zinc-700 dark:text-zinc-300 sh-card-time">' + timeStart + ' - ' + timeEnd + '</span>\
+                    <span class="text-[9px] font-extrabold uppercase tracking-wider text-zinc-400 block">CALL TIME</span>\
+                    <span class="text-[11px] font-mono font-bold text-zinc-700 sh-card-time">' + timeStart + ' - ' + timeEnd + '</span>\
                 </div>\
             </div>\
             <div class="space-y-1.5 min-w-0">\
-                <div class="text-[9.5px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-555">SHOOT / PRODUCTION PROJECT</div>\
-                <h3 class="font-bold text-zinc-900 dark:text-white text-sm sm:text-base tracking-tight leading-snug break-words sh-card-project-title">' + project + '</h3>\
-                <div class="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate pt-1">\
+                <div class="text-[9.5px] font-extrabold uppercase tracking-widest text-zinc-400 ">SHOOT / PRODUCTION PROJECT</div>\
+                <h3 class="font-bold text-zinc-900 text-sm sm:text-base tracking-tight leading-snug break-words sh-card-project-title">' + project + '</h3>\
+                <div class="flex items-center gap-1.5 text-xs text-zinc-500 font-medium truncate pt-1">\
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>\
                     <span class="truncate sh-card-venue">' + venue + '</span>\
                 </div>\
             </div>\
-            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-3">\
+            <div class="pt-3 border-t border-zinc-100 flex items-center justify-between gap-3">\
                 <div class="flex items-center gap-3">\
-                    <span class="text-xs font-mono font-bold text-zinc-650 dark:text-zinc-300 sh-card-date">' + date + '</span>\
-                    <span class="text-xs font-extrabold text-zinc-900 dark:text-white font-mono sh-card-payout">₹' + parseInt(rate).toLocaleString() + '</span>\
+                    <span class="text-xs font-mono font-bold text-zinc-650 sh-card-date">' + date + '</span>\
+                    <span class="text-xs font-extrabold text-zinc-900 font-mono sh-card-payout">₹' + parseInt(rate).toLocaleString() + '</span>\
                 </div>\
                 <div class="flex items-center gap-1.5">\
-                    <select onchange="coraQuickUpdateShiftStatus(\'' + newId + '\', this.value)" class="px-2.5 py-1 rounded-full text-[9px] font-bold border outline-none cursor-pointer sh-card-status bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">\
+                    <select onchange="coraQuickUpdateShiftStatus(\'' + newId + '\', this.value)" class="px-2.5 py-1 rounded-full text-[9px] font-bold border outline-none cursor-pointer sh-card-status bg-emerald-500/10 text-emerald-600 border-emerald-200 ">\
                         <option value="Confirmed" selected>Confirmed</option>\
                         <option value="On-Site">On-Site</option>\
                         <option value="Scheduled">Scheduled</option>\
                         <option value="Completed">Completed</option>\
                         <option value="Cancelled">Cancelled</option>\
                     </select>\
-                    <button data-shift="' + shiftJson + '" onclick="coraOpenEditShiftDrawerFromBtn(this)" title="Edit / Reassign Shift" class="p-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:text-zinc-300 rounded-lg text-xs transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">\
+                    <button data-shift="' + shiftJson + '" onclick="coraOpenEditShiftDrawerFromBtn(this)" title="Edit / Reassign Shift" class="p-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-700 rounded-lg text-xs transition-colors cursor-pointer border border-zinc-200 flex items-center justify-center">\
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M11 4H4a2 2 0 0 1-2 2v14a2 2 0 0 1 2 2h14a2 2 0 0 1 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>\
                     </button>\
-                    <button onclick="coraShareBlockWhatsApp(\'' + role + '\', \'' + venue + '\', \'' + timeStart + '\', \'https://maps.google.com/?q=' + encodeURIComponent(venue) + '\', \'' + phone + '\')" title="WhatsApp Dispatch" class="p-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:text-zinc-300 rounded-lg text-xs transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">\
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="text-emerald-600 dark:text-emerald-400 shrink-0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.99c-.002 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>\
+                    <button onclick="coraShareBlockWhatsApp(\'' + role + '\', \'' + venue + '\', \'' + timeStart + '\', \'https://maps.google.com/?q=' + encodeURIComponent(venue) + '\', \'' + phone + '\')" title="WhatsApp Dispatch" class="p-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-700 rounded-lg text-xs transition-colors cursor-pointer border border-zinc-200 flex items-center justify-center">\
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="text-emerald-600 shrink-0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.99c-.002 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>\
                     </button>\
-                    <button onclick="coraDeleteShiftRow(\'' + newId + '\')" title="Delete Shift" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-455 rounded-lg text-xs transition-colors cursor-pointer border border-rose-200 dark:border-rose-800/80 flex items-center justify-center">\
+                    <button onclick="coraDeleteShiftRow(\'' + newId + '\')" title="Delete Shift" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs transition-colors cursor-pointer border border-rose-200 flex items-center justify-center">\
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>\
                     </button>\
                 </div>\
@@ -2029,13 +2029,13 @@ window.coraSaveEditShift = function() {
             
             // Re-apply status class
             selectStatus.className = selectStatus.className.replace(/bg-\w+-500\/10 text-\w+-\d+.*border-\w+-\d+/, '');
-            var status_bg = 'bg-zinc-500/10 text-zinc-650 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800';
+            var status_bg = 'bg-zinc-500/10 text-zinc-650 border border-zinc-200 ';
             if ( status === 'On-Site' || status === 'In Progress' ) {
-                status_bg = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800';
+                status_bg = 'bg-amber-500/10 text-amber-600 border border-amber-200 ';
             } else if ( status === 'Confirmed' || status === 'Completed' ) {
-                status_bg = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800';
+                status_bg = 'bg-emerald-500/10 text-emerald-600 border border-emerald-200 ';
             } else if ( status === 'Cancelled' ) {
-                status_bg = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800';
+                status_bg = 'bg-rose-500/10 text-rose-600 border border-rose-200 ';
             }
             selectStatus.className = 'px-2.5 py-1 rounded-full text-[9px] font-bold border outline-none cursor-pointer sh-card-status ' + status_bg;
         }
@@ -2090,13 +2090,13 @@ window.coraDeleteShiftRow = function(shiftId) {
 };
 
 window.coraQuickUpdateShiftStatus = function(shiftId, newStatus) {
-    var status_bg = 'bg-zinc-500/10 text-zinc-650 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800';
+    var status_bg = 'bg-zinc-500/10 text-zinc-650 border border-zinc-200 ';
     if ( newStatus === 'On-Site' || newStatus === 'In Progress' ) {
-        status_bg = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800';
+        status_bg = 'bg-amber-500/10 text-amber-600 border border-amber-200 ';
     } else if ( newStatus === 'Confirmed' || newStatus === 'Completed' ) {
-        status_bg = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800';
+        status_bg = 'bg-emerald-500/10 text-emerald-600 border border-emerald-200 ';
     } else if ( newStatus === 'Cancelled' ) {
-        status_bg = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800';
+        status_bg = 'bg-rose-500/10 text-rose-600 border border-rose-200 ';
     }
     
     var row = document.getElementById('shift-row-' + shiftId);
@@ -2130,22 +2130,22 @@ window.coraUpdateCardSelectionVisuals = function(row, isChecked) {
     var textSpan = row.querySelector('.sh-card-select-text');
 
     if (isChecked) {
-        row.classList.add('ring-2', 'ring-zinc-950', 'dark:ring-white', 'border-zinc-950', 'dark:border-white');
+        row.classList.add('ring-2', 'ring-zinc-950', '', 'border-zinc-950', '');
         if (btn) {
-            btn.className = 'sh-card-select-btn px-2.5 py-1 rounded-lg text-[9.5px] font-extrabold uppercase tracking-wider border transition-all cursor-pointer flex items-center gap-1.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 border-zinc-950 dark:border-white shadow-xs';
+            btn.className = 'sh-card-select-btn px-2.5 py-1 rounded-lg text-[9.5px] font-extrabold uppercase tracking-wider border transition-all cursor-pointer flex items-center gap-1.5 bg-zinc-950 text-white border-zinc-950 shadow-xs';
         }
-        if (ring) ring.className = 'sh-card-select-ring w-3.5 h-3.5 rounded-full border border-white dark:border-zinc-950 flex items-center justify-center transition-all bg-white dark:bg-zinc-950';
+        if (ring) ring.className = 'sh-card-select-ring w-3.5 h-3.5 rounded-full border border-white flex items-center justify-center transition-all bg-white ';
         if (checkSvg) {
             checkSvg.classList.remove('hidden');
-            checkSvg.className = 'sh-card-select-check text-zinc-950 dark:text-white';
+            checkSvg.className = 'sh-card-select-check text-zinc-950 ';
         }
         if (textSpan) textSpan.textContent = 'Selected';
     } else {
-        row.classList.remove('ring-2', 'ring-zinc-950', 'dark:ring-white', 'border-zinc-950', 'dark:border-white');
+        row.classList.remove('ring-2', 'ring-zinc-950', '', 'border-zinc-950', '');
         if (btn) {
-            btn.className = 'sh-card-select-btn px-2.5 py-1 rounded-lg text-[9.5px] font-extrabold uppercase tracking-wider border transition-all cursor-pointer flex items-center gap-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-800';
+            btn.className = 'sh-card-select-btn px-2.5 py-1 rounded-lg text-[9.5px] font-extrabold uppercase tracking-wider border transition-all cursor-pointer flex items-center gap-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-500 border-zinc-200/80 ';
         }
-        if (ring) ring.className = 'sh-card-select-ring w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center transition-all bg-white dark:bg-zinc-900';
+        if (ring) ring.className = 'sh-card-select-ring w-3.5 h-3.5 rounded-full border border-zinc-300 flex items-center justify-center transition-all bg-white ';
         if (checkSvg) checkSvg.classList.add('hidden');
         if (textSpan) textSpan.textContent = 'Select';
     }
@@ -2186,11 +2186,11 @@ window.coraUpdateBulkBarVisibility = function() {
 
     if (allSelected) {
         if (masterCheck) masterCheck.classList.remove('hidden');
-        if (masterIcon) masterIcon.className = 'w-3.5 h-3.5 rounded-md border border-zinc-950 dark:border-white flex items-center justify-center transition-all bg-zinc-950 dark:bg-white';
+        if (masterIcon) masterIcon.className = 'w-3.5 h-3.5 rounded-md border border-zinc-950 flex items-center justify-center transition-all bg-zinc-950 ';
         if (masterLabel) masterLabel.textContent = 'Deselect All';
     } else {
         if (masterCheck) masterCheck.classList.add('hidden');
-        if (masterIcon) masterIcon.className = 'w-3.5 h-3.5 rounded-md border border-zinc-400 dark:border-zinc-500 flex items-center justify-center transition-all bg-white dark:bg-zinc-900';
+        if (masterIcon) masterIcon.className = 'w-3.5 h-3.5 rounded-md border border-zinc-400 flex items-center justify-center transition-all bg-white ';
         if (masterLabel) masterLabel.textContent = 'Select All';
     }
 
@@ -2238,15 +2238,15 @@ window.coraExportShiftPayouts = function() {
 
 window.coraFilterTimelineDay = function(dayNum, btnEl) {
     document.querySelectorAll('.tl-day-pill').forEach(function(b){
-        b.classList.remove('active', 'bg-white', 'dark:bg-zinc-800', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', 'dark:border-zinc-700/80');
-        b.classList.add('text-zinc-500', 'hover:text-zinc-900', 'dark:text-zinc-400', 'dark:hover:text-white', 'font-medium', 'hover:bg-zinc-200/50', 'dark:hover:bg-zinc-800/50');
+        b.classList.remove('active', 'bg-white', '', 'text-zinc-950', '', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', '');
+        b.classList.add('text-zinc-500', 'hover:text-zinc-900', '', '', 'font-medium', 'hover:bg-zinc-200/50', '');
         b.style.backgroundColor = '';
         b.style.color = '';
     });
 
     if (btnEl) {
-        btnEl.classList.remove('text-zinc-500', 'hover:text-zinc-900', 'dark:text-zinc-400', 'dark:hover:text-white', 'font-medium', 'hover:bg-zinc-200/50', 'dark:hover:bg-zinc-800/50');
-        btnEl.classList.add('active', 'bg-white', 'dark:bg-zinc-800', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', 'dark:border-zinc-700/80');
+        btnEl.classList.remove('text-zinc-500', 'hover:text-zinc-900', '', '', 'font-medium', 'hover:bg-zinc-200/50', '');
+        btnEl.classList.add('active', 'bg-white', '', 'text-zinc-950', '', 'shadow-2xs', 'font-bold', 'border', 'border-zinc-200/80', '');
         btnEl.style.backgroundColor = '';
         btnEl.style.color = '';
     }
@@ -2306,7 +2306,7 @@ window.coraChangeTimelineSpan = function(spanDays) {
     var container = document.getElementById('cora-day-pills-container');
     if (container) {
         var baseDate = new Date(2026, 6, 20); // Jul 20, 2026
-        var html = '<button onclick="coraFilterTimelineDay(\'all\', this)" data-day-val="all" class="tl-day-pill px-3 py-1.5 text-xs rounded-lg transition-all cursor-pointer font-bold bg-white dark:bg-zinc-850 text-zinc-950 dark:text-white shadow-2xs border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 whitespace-nowrap">All Days</button>';
+        var html = '<button onclick="coraFilterTimelineDay(\'all\', this)" data-day-val="all" class="tl-day-pill px-3 py-1.5 text-xs rounded-lg transition-all cursor-pointer font-bold bg-white text-zinc-950 shadow-2xs border border-zinc-200/80 shrink-0 whitespace-nowrap">All Days</button>';
         
         for (var i = 1; i <= spanDays; i++) {
             var dObj = new Date(baseDate.getTime());
@@ -2315,7 +2315,7 @@ window.coraChangeTimelineSpan = function(spanDays) {
             var monthStr = dObj.toLocaleString('en-US', { month: 'short' });
             var dateStr = dayNumStr + ' ' + monthStr;
             
-            html += '<button onclick="coraFilterTimelineDay(' + i + ', this)" data-day-val="' + i + '" title="Day ' + i + ' (' + dateStr + ')" class="tl-day-pill px-3 py-1.5 text-xs rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white font-semibold hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 shrink-0 whitespace-nowrap">' + dateStr + '</button>';
+            html += '<button onclick="coraFilterTimelineDay(' + i + ', this)" data-day-val="' + i + '" title="Day ' + i + ' (' + dateStr + ')" class="tl-day-pill px-3 py-1.5 text-xs rounded-lg transition-all cursor-pointer text-zinc-500 hover:text-zinc-900 font-semibold hover:bg-zinc-200/50 shrink-0 whitespace-nowrap">' + dateStr + '</button>';
         }
         container.innerHTML = html;
     }
@@ -2339,11 +2339,11 @@ window.coraChangeBlockStatus = function(blockId, newStatus) {
     if (select) {
         select.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold border outline-none cursor-pointer transition-all ';
         if (newStatus === 'Completed') {
-            select.className += 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800';
+            select.className += 'bg-emerald-500/10 text-emerald-600 border border-emerald-200 ';
         } else if (newStatus === 'In Progress') {
-            select.className += 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800';
+            select.className += 'bg-amber-500/10 text-amber-600 border border-amber-200 ';
         } else {
-            select.className += 'bg-zinc-100 dark:bg-zinc-850 text-zinc-700 dark:text-zinc-300 border border-zinc-200/50 dark:border-zinc-800';
+            select.className += 'bg-zinc-100 text-zinc-700 border border-zinc-200/50 ';
         }
     }
 
@@ -2444,50 +2444,50 @@ window.coraSubmitAddTimelineBlock = function() {
         card.setAttribute('data-day', day);
         
         card.innerHTML = '\
-            <div class="hidden sm:block p-3 rounded-2xl text-center shrink-0 w-28 sm:w-32 space-y-0.5 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs bg-zinc-50 dark:bg-zinc-900/50">\
-                <div class="flex items-center justify-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-zinc-450 dark:text-zinc-555">\
+            <div class="hidden sm:block p-3 rounded-2xl text-center shrink-0 w-28 sm:w-32 space-y-0.5 border border-zinc-200/80 shadow-2xs bg-zinc-50 ">\
+                <div class="flex items-center justify-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-zinc-450 ">\
                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>\
                     <span>TIME SLOT</span>\
                 </div>\
-                <div class="font-mono font-extrabold text-sm text-zinc-900 dark:text-white">' + timeStart + '</div>\
-                <div class="text-[10px] font-mono text-zinc-450 dark:text-zinc-500">to ' + timeEnd + '</div>\
+                <div class="font-mono font-extrabold text-sm text-zinc-900 ">' + timeStart + '</div>\
+                <div class="text-[10px] font-mono text-zinc-450 ">to ' + timeEnd + '</div>\
             </div>\
             <div class="hidden sm:flex relative flex-col items-center self-stretch shrink-0">\
-                <div class="w-3.5 h-3.5 rounded-full z-10 my-4 shadow-xs border-2 border-white dark:border-zinc-900 bg-amber-500"></div>\
-                <div class="w-0.5 flex-1 -my-2 bg-zinc-200 dark:bg-zinc-800"></div>\
+                <div class="w-3.5 h-3.5 rounded-full z-10 my-4 shadow-xs border-2 border-white bg-amber-500"></div>\
+                <div class="w-0.5 flex-1 -my-2 bg-zinc-200 "></div>\
             </div>\
-            <div class="flex-1 rounded-2xl p-4 sm:p-5 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs hover:shadow-xs min-w-0 overflow-hidden">\
+            <div class="flex-1 rounded-2xl p-4 sm:p-5 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 bg-white border border-zinc-200/80 shadow-2xs hover:shadow-xs min-w-0 overflow-hidden">\
                 <div class="space-y-3 flex-1 min-w-0">\
                     <div class="flex items-center gap-2 flex-wrap">\
-                        <span class="px-2.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-zinc-150 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/60 shrink-0">DAY ' + day + '</span>\
-                        <span class="inline-flex sm:hidden items-center gap-1 px-2.5 py-0.5 rounded-md text-[9px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/60 shrink-0">\
+                        <span class="px-2.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-zinc-150 text-zinc-650 border border-zinc-200/60 shrink-0">DAY ' + day + '</span>\
+                        <span class="inline-flex sm:hidden items-center gap-1 px-2.5 py-0.5 rounded-md text-[9px] font-mono font-bold bg-zinc-100 text-zinc-650 border border-zinc-200/50 shrink-0">\
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>\
                             ' + timeStart + ' - ' + timeEnd + '\
                         </span>\
                         <div class="flex items-center gap-2">\
-                            <select onchange="coraChangeBlockStatus(\'' + blockId + '\', this.value)" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border outline-none cursor-pointer transition-all bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">\
+                            <select onchange="coraChangeBlockStatus(\'' + blockId + '\', this.value)" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border outline-none cursor-pointer transition-all bg-amber-500/10 text-amber-600 border-amber-200 ">\
                                 <option value="Completed">✓ Completed</option>\
                                 <option value="In Progress" selected>● In Progress</option>\
                                 <option value="Upcoming">● Upcoming</option>\
                             </select>\
-                            <button onclick="coraDeleteBlockItem(\'' + blockId + '\')" title="Delete Block" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/30 dark:hover:bg-rose-900/50 dark:text-rose-400 rounded-lg text-xs transition-colors cursor-pointer border border-rose-200 dark:border-rose-800 flex items-center justify-center">\
+                            <button onclick="coraDeleteBlockItem(\'' + blockId + '\')" title="Delete Block" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs transition-colors cursor-pointer border border-rose-200 flex items-center justify-center">\
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>\
                             </button>\
                         </div>\
                     </div>\
-                    <h3 class="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-white break-words min-w-0 leading-snug">' + title + '</h3>\
-                    <p class="text-xs flex items-center gap-1.5 flex-wrap font-medium text-zinc-500 dark:text-zinc-400">\
+                    <h3 class="text-base sm:text-lg font-bold tracking-tight text-zinc-900 break-words min-w-0 leading-snug">' + title + '</h3>\
+                    <p class="text-xs flex items-center gap-1.5 flex-wrap font-medium text-zinc-500 ">\
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>\
-                        <span class="font-bold text-zinc-800 dark:text-zinc-200">' + venue + '</span>\
+                        <span class="font-bold text-zinc-800 ">' + venue + '</span>\
                     </p>\
                 </div>\
                 <div class="flex flex-col md:items-end justify-between gap-3 text-right shrink-0">\
-                    <span class="text-[9.5px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">ASSIGNED TEAM CREW</span>\
-                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800">\
+                    <span class="text-[9.5px] font-extrabold uppercase tracking-wider text-zinc-400 ">ASSIGNED TEAM CREW</span>\
+                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1.5 bg-zinc-50 text-zinc-900 border border-zinc-200 ">\
                         ' + crew + '\
                     </span>\
-                    <button onclick="coraShareBlockWhatsApp(\'' + title + '\', \'' + venue + '\', \'' + timeStart + '\')" title="WhatsApp Dispatch" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 dark:border-zinc-700/80">\
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-600 dark:text-emerald-500"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.99c-.002 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>\
+                    <button onclick="coraShareBlockWhatsApp(\'' + title + '\', \'' + venue + '\', \'' + timeStart + '\')" title="WhatsApp Dispatch" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 ">\
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-600 "><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.99c-.002 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>\
                         <span>Dispatch WhatsApp</span>\
                     </button>\
                 </div>\
@@ -2798,25 +2798,25 @@ if (window.coraSubmitAddTimelineBlock) {
             var feed = document.getElementById('cora-timeline-blocks-feed');
             if (feed) {
                 var html = '<div class="cora-tl-block-card flex items-start gap-4 sm:gap-6 group" data-day="' + newBlock.day + '">' +
-                    '<div class="hidden sm:block p-3 rounded-2xl text-center shrink-0 w-28 sm:w-32 space-y-0.5 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs bg-zinc-50 dark:bg-zinc-900/50">' +
-                    '<div class="flex items-center justify-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-zinc-450 dark:text-zinc-555">' +
+                    '<div class="hidden sm:block p-3 rounded-2xl text-center shrink-0 w-28 sm:w-32 space-y-0.5 border border-zinc-200/80 shadow-2xs bg-zinc-50 ">' +
+                    '<div class="flex items-center justify-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-zinc-450 ">' +
                     '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' +
                     '<span>TIME SLOT</span></div>' +
-                    '<div class="font-mono font-extrabold text-sm text-zinc-900 dark:text-white">' + newBlock.time_start + '</div>' +
-                    '<div class="text-[10px] font-mono text-zinc-450 dark:text-zinc-500">to ' + newBlock.time_end + '</div></div>' +
+                    '<div class="font-mono font-extrabold text-sm text-zinc-900 ">' + newBlock.time_start + '</div>' +
+                    '<div class="text-[10px] font-mono text-zinc-450 ">to ' + newBlock.time_end + '</div></div>' +
                     '<div class="hidden sm:flex relative flex-col items-center self-stretch shrink-0">' +
-                    '<div class="w-3.5 h-3.5 rounded-full z-10 my-4 shadow-xs border-2 border-white dark:border-zinc-900 bg-amber-500"></div>' +
-                    '<div class="w-0.5 flex-1 -my-2 bg-zinc-200 dark:bg-zinc-800"></div></div>' +
-                    '<div class="flex-1 rounded-2xl p-4 sm:p-5 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs hover:shadow-xs">' +
+                    '<div class="w-3.5 h-3.5 rounded-full z-10 my-4 shadow-xs border-2 border-white bg-amber-500"></div>' +
+                    '<div class="w-0.5 flex-1 -my-2 bg-zinc-200 "></div></div>' +
+                    '<div class="flex-1 rounded-2xl p-4 sm:p-5 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 bg-white border border-zinc-200/80 shadow-2xs hover:shadow-xs">' +
                     '<div class="space-y-3 flex-1">' +
                     '<div class="flex items-center gap-2 flex-wrap">' +
-                    '<span class="px-2.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-zinc-150 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/60 shrink-0">DAY ' + newBlock.day + '</span>' +
-                    '<span class="inline-flex sm:hidden items-center gap-1 px-2.5 py-0.5 rounded-md text-[9px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/60 shrink-0">' +
+                    '<span class="px-2.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-zinc-150 text-zinc-650 border border-zinc-200/60 shrink-0">DAY ' + newBlock.day + '</span>' +
+                    '<span class="inline-flex sm:hidden items-center gap-1 px-2.5 py-0.5 rounded-md text-[9px] font-mono font-bold bg-zinc-100 text-zinc-650 border border-zinc-200/50 shrink-0">' +
                     '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' + newBlock.time_start + ' - ' + newBlock.time_end + '</span>' +
                     '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border bg-amber-500/10 text-amber-600 border-amber-200">● Upcoming</span></div>' +
-                    '<h3 class="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-white">' + newBlock.activity + '</h3>' +
-                    '<p class="text-xs flex items-center gap-1.5 flex-wrap font-medium text-zinc-500 dark:text-zinc-400">' +
-                    '<span class="font-bold text-zinc-800 dark:text-zinc-200">' + newBlock.venue + '</span></p></div></div></div>';
+                    '<h3 class="text-base sm:text-lg font-bold tracking-tight text-zinc-900 ">' + newBlock.activity + '</h3>' +
+                    '<p class="text-xs flex items-center gap-1.5 flex-wrap font-medium text-zinc-500 ">' +
+                    '<span class="font-bold text-zinc-800 ">' + newBlock.venue + '</span></p></div></div></div>';
                 feed.insertAdjacentHTML('beforeend', html);
             }
         });
