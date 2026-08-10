@@ -5,9 +5,9 @@
   "start_url": "/workspace/dashboard",
   "scope": "/",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#18181b",
+  "theme_color": "#ffffff",
   "categories": ["business", "productivity"],
   "icons": [
     {

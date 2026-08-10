@@ -289,6 +289,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     window.location.reload();
                 }
             });
+            // Lock mobile screen orientation to portrait-primary
+            if (window.screen && window.screen.orientation && typeof window.screen.orientation.lock === 'function') {
+                window.screen.orientation.lock('portrait-primary').catch(function() {});
+            }
         }
     </script>
 
