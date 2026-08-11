@@ -2757,6 +2757,142 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
 </head>
 <body class="bg-white text-zinc-900 antialiased overflow-x-hidden">
+
+<!-- Cora Premium Full-Screen Loading Splash Screen -->
+<div id="cora-app-splash-screen" style="
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    user-select: none;
+">
+    <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+        transform: translateY(-20px);
+    ">
+        <!-- Logo Icon Card with Reveal Animation -->
+        <div class="cora-splash-logo-card" style="
+            width: 72px;
+            height: 72px;
+            background: #18181b;
+            color: #ffffff;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 32px rgba(24, 24, 27, 0.12);
+        ">
+            <svg width="32" height="32" viewBox="0 0 14 14" fill="none">
+                <rect x="3" y="3" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-1" style="transform: scale(0); opacity: 0;"/>
+                <rect x="7.5" y="3" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-2" style="transform: scale(0); opacity: 0;"/>
+                <rect x="3" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-3" style="transform: scale(0); opacity: 0;"/>
+                <rect x="7.5" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-4" style="transform: scale(0); opacity: 0;"/>
+            </svg>
+        </div>
+        
+        <!-- App Title -->
+        <div style="
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #18181b;
+            text-align: center;
+        ">
+            Cora Workspace
+        </div>
+        
+        <!-- Loading Progress Bar -->
+        <div style="
+            width: 140px;
+            height: 2px;
+            background: #f4f4f5;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        ">
+            <div class="cora-splash-progress-bar" style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 40px;
+                background: #18181b;
+                border-radius: 2px;
+            "></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Critical Splash Keyframe Animations */
+    @keyframes cora-reveal-dot {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .cora-splash-dot {
+        transform-origin: center;
+        animation: cora-reveal-dot 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .cora-splash-dot.dot-1 { animation-delay: 0.05s; }
+    .cora-splash-dot.dot-2 { animation-delay: 0.15s; }
+    .cora-splash-dot.dot-3 { animation-delay: 0.25s; }
+    .cora-splash-dot.dot-4 { animation-delay: 0.35s; }
+
+    @keyframes cora-splash-pulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 12px 32px rgba(24, 24, 27, 0.12); }
+        50% { transform: scale(0.96); box-shadow: 0 8px 20px rgba(24, 24, 27, 0.08); }
+    }
+    .cora-splash-logo-card {
+        animation: cora-splash-pulse 2s ease-in-out infinite;
+        animation-delay: 0.5s;
+    }
+
+    @keyframes cora-splash-slide-bar {
+        0% { left: -40px; }
+        100% { left: 140px; }
+    }
+    .cora-splash-progress-bar {
+        animation: cora-splash-slide-bar 1.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+    }
+</style>
+
+<script>
+    (function() {
+        // Fast cleanup if page loading is extremely instant
+        var hideSplash = function() {
+            var splash = document.getElementById('cora-app-splash-screen');
+            if (splash) {
+                splash.style.opacity = '0';
+                splash.style.transform = 'translateY(-20px)';
+                setTimeout(function() {
+                    if (splash.parentNode) {
+                        splash.parentNode.removeChild(splash);
+                    }
+                }, 400);
+            }
+        };
+        // Wait for page load or fallback after 3 seconds max
+        if (document.readyState === 'complete') {
+            setTimeout(hideSplash, 600);
+        } else {
+            window.addEventListener('load', function() {
+                setTimeout(hideSplash, 600);
+            });
+            setTimeout(hideSplash, 3000); // Fallback
+        }
+    })();
+</script>
 <?php if ( isset( $_COOKIE['cora_impersonator_wp_user_id'] ) ) : ?>
     <style>
         .cora-impersonation-banner {

@@ -29,14 +29,14 @@ $google_auth_url = home_url( '/workspace/auth/google' );
 
 // Determine starting step
 $url_step = isset( $_GET['step'] ) ? intval( $_GET['step'] ) : 0;
-if ( $url_step >= 2 && $url_step <= 4 && $is_logged_in ) {
+if ( $url_step >= 2 && $url_step <= 5 && $is_logged_in ) {
     $initial_step = $url_step;
 } elseif ( $is_logged_in && ! empty( $has_business ) && empty( $has_industry ) ) {
     $initial_step = 3;
 } elseif ( $is_logged_in && empty( $has_business ) ) {
     $initial_step = 2;
 } elseif ( $is_logged_in && $onboarding_done === '1' ) {
-    $initial_step = 4; // Will redirect
+    $initial_step = 5; // Will redirect
 } else {
     $initial_step = 1;
 }
@@ -886,6 +886,156 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             }
         }
     }
+
+    /* ── PWA Onboarding Styling ────────────────────────────── */
+    .pwa-mockup-container {
+        margin: 24px auto;
+        width: 100%;
+        max-width: 320px;
+        display: flex;
+        justify-content: center;
+        user-select: none;
+    }
+
+    .pwa-mockup-frame {
+        width: 100%;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .pwa-mockup-frame:hover {
+        transform: translateY(-4px);
+    }
+
+    .pwa-mockup-header {
+        height: 32px;
+        background: #fafafa;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 12px;
+    }
+
+    .pwa-mockup-dots {
+        display: flex;
+        gap: 6px;
+    }
+
+    .pwa-mockup-dots span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #e4e4e7;
+    }
+
+    .pwa-mockup-url {
+        font-size: 10px;
+        color: var(--text-tertiary);
+        font-family: monospace;
+        letter-spacing: 0.05em;
+    }
+
+    .pwa-mockup-content {
+        padding: 32px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+        background: radial-gradient(circle at 50% 50%, #fafbfc 0%, #ffffff 100%);
+    }
+
+    .pwa-mockup-icon-card {
+        width: 64px;
+        height: 64px;
+        background: #18181b;
+        color: #ffffff;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 12px 24px rgba(24, 24, 27, 0.15);
+        animation: bounceIcon 3s ease-in-out infinite;
+    }
+
+    @keyframes bounceIcon {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    .pwa-mockup-appname {
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+    }
+
+    .pwa-mockup-badge {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #10b981;
+        background: #ecfdf5;
+        padding: 4px 8px;
+        border-radius: 12px;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .pwa-instructions-box {
+        background: #fafafa;
+        border: 1px dashed var(--border-color);
+        border-radius: 12px;
+        padding: 16px;
+        margin: 20px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        animation: fadeIn 0.3s ease-out;
+        text-align: left;
+    }
+
+    .pwa-instructions-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+    }
+
+    .pwa-instructions-text {
+        font-size: 11px;
+        line-height: 1.5;
+        color: var(--text-secondary);
+    }
+
+    .skip-btn {
+        width: 100%;
+        text-align: center;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        margin-top: 16px;
+        padding: 8px;
+        transition: color 0.2s;
+    }
+
+    .skip-btn:hover {
+        color: var(--text-primary);
+    }
 </style>
 </head>
 <body>
@@ -943,7 +1093,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <span class="step-num">1</span>
                         <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
-                    <span class="step-indicator-label">Profile</span>
+                    <span class="step-indicator-label">Account</span>
                 </div>
                 <div class="step-indicator-line" data-line="1"></div>
                 
@@ -952,7 +1102,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <span class="step-num">2</span>
                         <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
-                    <span class="step-indicator-label">Industry</span>
+                    <span class="step-indicator-label">Profile</span>
                 </div>
                 <div class="step-indicator-line" data-line="2"></div>
                 
@@ -961,13 +1111,22 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <span class="step-num">3</span>
                         <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
-                    <span class="step-indicator-label">Workspace</span>
+                    <span class="step-indicator-label">Industry</span>
                 </div>
                 <div class="step-indicator-line" data-line="3"></div>
                 
-                <div class="step-indicator-item" data-step="4">
+                <div class="step-indicator-item" id="step-pwa-indicator" data-step="4">
                     <div class="step-indicator-circle">
                         <span class="step-num">4</span>
+                        <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="step-indicator-label">App</span>
+                </div>
+                <div class="step-indicator-line" id="step-pwa-line" data-line="4"></div>
+                
+                <div class="step-indicator-item" data-step="5">
+                    <div class="step-indicator-circle">
+                        <span class="step-num">5</span>
                         <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
                     <span class="step-indicator-label">Finish</span>
@@ -1230,8 +1389,66 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 </div>
             </div>
 
-            <!-- ═══ STEP 4 — ACTIVATION ═══ -->
+            <!-- ═══ STEP 4 — PWA APP PROMOTION ═══ -->
             <div class="step-panel" id="step-4" data-step="4">
+                <div class="step-label" style="text-align:center;">Step 4 of 5</div>
+                <h2 class="ob-title" style="text-align:center; margin-bottom: 8px;">Install Cora App</h2>
+                <p class="ob-subtitle" style="text-align:center; margin-bottom: 24px;">For a premium desktop and mobile experience, install Cora to run standalone from your Dock or Home Screen.</p>
+
+                <!-- PWA Animated Device Illustration Mockup -->
+                <div class="pwa-mockup-container">
+                    <div class="pwa-mockup-frame">
+                        <div class="pwa-mockup-header">
+                            <div class="pwa-mockup-dots"><span></span><span></span><span></span></div>
+                            <div class="pwa-mockup-url">heycora.in</div>
+                        </div>
+                        <div class="pwa-mockup-content">
+                            <div class="pwa-mockup-icon-card">
+                                <svg width="28" height="28" viewBox="0 0 14 14" fill="none">
+                                    <rect width="14" height="14" rx="3.5" fill="#18181b"/>
+                                    <rect x="3" y="3" width="3.5" height="3.5" rx="1" fill="#ffffff"/>
+                                    <rect x="7.5" y="3" width="3.5" height="3.5" rx="1" fill="#ffffff"/>
+                                    <rect x="3" y="7.5" width="3.5" height="3.5" rx="1" fill="#ffffff"/>
+                                    <rect x="7.5" y="7.5" width="3.5" height="3.5" rx="1" fill="#ffffff"/>
+                                </svg>
+                            </div>
+                            <span class="pwa-mockup-appname">Cora Workspace</span>
+                            <span class="pwa-mockup-badge">PWA Verified</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Install Button -->
+                <button type="button" class="submit-btn" id="ob-pwa-install-btn" onclick="triggerPWAInstallation()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Install Cora App
+                </button>
+
+                <!-- iOS Custom Instructions -->
+                <div id="ob-pwa-ios-instructions" class="pwa-instructions-box" style="display:none;">
+                    <div class="pwa-instructions-header">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-650"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        <span>iOS Safari Setup</span>
+                    </div>
+                    <p class="pwa-instructions-text">Tap the Share icon <svg style="display:inline-block; vertical-align:middle;" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/><path d="M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg> in Safari, scroll down and choose <strong>Add to Home Screen</strong>.</p>
+                </div>
+
+                <!-- Desktop Generic Instructions -->
+                <div id="ob-pwa-desktop-instructions" class="pwa-instructions-box" style="display:none;">
+                    <div class="pwa-instructions-header">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-650"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        <span>App Installation</span>
+                    </div>
+                    <p class="pwa-instructions-text">Click the install prompt in your browser's address bar to add Cora to your device.</p>
+                </div>
+
+                <button type="button" class="skip-btn" onclick="skipPWAInstallation()">
+                    Continue in Browser
+                </button>
+            </div>
+
+            <!-- ═══ STEP 5 — ACTIVATION ═══ -->
+            <div class="step-panel" id="step-5" data-step="5">
                 <div class="activation-state" id="activation-state">
                     <div class="activation-spinner" id="activation-spinner"></div>
                     <div class="activation-check" id="activation-check">
@@ -1273,6 +1490,19 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
     var isLoggedIn = <?php echo $is_logged_in ? 'true' : 'false'; ?>;
 
     // ── Initialize ────────────────────────────────────────────
+    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isStandalone) {
+        var pwaIndicator = document.getElementById('step-pwa-indicator');
+        var pwaLine = document.getElementById('step-pwa-line');
+        if (pwaIndicator) pwaIndicator.style.display = 'none';
+        if (pwaLine) pwaLine.style.display = 'none';
+        var step5CircleNum = document.querySelector('.step-indicator-item[data-step="5"] .step-num');
+        if (step5CircleNum) step5CircleNum.textContent = '4';
+        if (currentStep === 4) {
+            currentStep = 5;
+        }
+    }
+
     updateStepProgress(currentStep);
     showStep(currentStep);
 
@@ -1312,7 +1542,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         currentStep = step;
         updateStepProgress(step);
 
-        if (step === 4 && selectedIndustry) {
+        if (step === 5 && selectedIndustry) {
             triggerActivation();
         }
     }
@@ -1589,10 +1819,57 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             showToast('Please select an industry.');
             return;
         }
-        showStep(4);
+        if (isStandalone) {
+            showStep(5);
+        } else {
+            showStep(4);
+        }
     };
 
-    // ═══ STEP 4 — ACTIVATION ═════════════════════════════════
+    // ── PWA Setup & Installation ──────────────────────────────
+    var coraPwaDeferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        coraPwaDeferredPrompt = e;
+        var installBtn = document.getElementById('ob-pwa-install-btn');
+        if (installBtn) {
+            installBtn.style.display = 'block';
+        }
+        var desktopInst = document.getElementById('ob-pwa-desktop-instructions');
+        if (desktopInst) desktopInst.style.display = 'none';
+    });
+
+    window.triggerPWAInstallation = function() {
+        if (coraPwaDeferredPrompt) {
+            coraPwaDeferredPrompt.prompt();
+            coraPwaDeferredPrompt.userChoice.then(function(choiceResult) {
+                if (choiceResult.outcome === 'accepted') {
+                    showToast('Cora App installation started.');
+                    setTimeout(function() {
+                        showStep(5);
+                    }, 1000);
+                } else {
+                    showToast('Installation declined.');
+                }
+                coraPwaDeferredPrompt = null;
+            });
+        } else {
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+                document.getElementById('ob-pwa-ios-instructions').style.display = 'block';
+                document.getElementById('ob-pwa-desktop-instructions').style.display = 'none';
+            } else {
+                document.getElementById('ob-pwa-desktop-instructions').style.display = 'block';
+                document.getElementById('ob-pwa-ios-instructions').style.display = 'none';
+            }
+        }
+    };
+
+    window.skipPWAInstallation = function() {
+        showStep(5);
+    };
+
+    // ═══ STEP 5 — ACTIVATION ═════════════════════════════════
 
     function triggerActivation() {
         var formData = new FormData();
