@@ -7637,7 +7637,13 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
         gap: 16px;
         position: relative;
         width: 100% !important;
-        max-width: none !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    @media (max-width: 767px) {
+        .cora-writing-sheet {
+            padding: 24px 16px !important;
+        }
     }
     .cora-serif-editor .ql-editor { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: 1.125rem; line-height: 1.8; color: #18181b; }
     .cora-sans-editor .ql-editor { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1.05rem; line-height: 1.75; color: #18181b; }
@@ -7652,11 +7658,68 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
         z-index: 40 !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
         margin: 0 auto 16px auto !important;
-        max-width: max-content !important;
+        max-width: 100% !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        flex-wrap: wrap !important;
         gap: 2px !important;
+    }
+    
+    /* Bulletproof Responsive/Horizontal Scroll Prevention Overrides */
+    #cora-full-page-editor main {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+    }
+    .cora-writing-sheet * {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .ql-container.ql-snow, .ql-editor {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+    
+    @media (max-width: 767px) {
+        #cora-editor-left-sidebar {
+            display: none !important;
+        }
+        #cora-article-inspector {
+            position: fixed !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 82vh !important;
+            z-index: 250 !important;
+            border-top: 1px solid #e4e4e7 !important;
+            border-left: none !important;
+            border-radius: 16px 16px 0 0 !important;
+            box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1), 0 -8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
+        }
+        #cora-article-inspector:not(.translate-y-full):not(.collapsed-inspector) {
+            transform: translateY(0) !important;
+        }
+        #cora-inspector-backdrop:not(.hidden) {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(0, 0, 0, 0.4) !important;
+            backdrop-filter: blur(2px) !important;
+            z-index: 240 !important;
+            display: block !important;
+        }
+    }
+
+    @media (max-width: 639px) {
+        #cora-btn-save-draft,
+        #cora-btn-submit-review {
+            display: none !important;
+        }
     }
 
     .ql-snow.ql-toolbar button, .ql-snow .ql-toolbar button {
@@ -8008,8 +8071,8 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 <div class="w-full cora-writing-sheet">
                     
                     <!-- Beehiiv Horizontal Settings Bar -->
-                    <div class="w-full border-b border-zinc-200/80 pb-3.5 flex items-center justify-between gap-4 text-xs font-semibold relative select-none">
-                        <div class="flex items-center gap-3">
+                    <div class="w-full border-b border-zinc-200/80 pb-3.5 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold relative select-none">
+                        <div class="flex flex-wrap items-center gap-2">
                             <!-- Toggle: Title & subtitle -->
                             <div class="relative inline-block text-left" id="beehiiv-dropdown-title-subtitle-wrap">
                                 <button type="button" onclick="window.coraToggleBeehiivDropdown('title-subtitle')" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-zinc-700 bg-white transition-all flex items-center gap-1.5 cursor-pointer">
@@ -9786,18 +9849,34 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
         }
 
         window.coraInitializeWorkspaceEditorSettings = function() {
-            // Force expand sidebars and default to active tabs
+            const isMobile = window.innerWidth < 768;
+            
             try {
                 const inspector = document.getElementById('cora-article-inspector');
+                const backdrop = document.getElementById('cora-inspector-backdrop');
                 if (inspector) {
-                    inspector.classList.remove('collapsed-inspector');
+                    if (isMobile) {
+                        inspector.classList.add('collapsed-inspector');
+                        inspector.classList.add('translate-y-full');
+                        if (backdrop) backdrop.classList.add('hidden');
+                        localStorage.setItem('cora_article_inspector_collapsed', 'true');
+                    } else {
+                        inspector.classList.remove('collapsed-inspector');
+                        inspector.classList.remove('translate-y-full');
+                        if (backdrop) backdrop.classList.add('hidden');
+                        localStorage.setItem('cora_article_inspector_collapsed', 'false');
+                    }
                 }
-                localStorage.setItem('cora_article_inspector_collapsed', 'false');
                 
                 const leftSidebar = document.getElementById('cora-editor-left-sidebar');
                 if (leftSidebar) {
-                    leftSidebar.classList.remove('hidden');
-                    leftSidebar.classList.add('flex');
+                    if (isMobile) {
+                        leftSidebar.classList.add('hidden');
+                        leftSidebar.classList.remove('flex');
+                    } else {
+                        leftSidebar.classList.remove('hidden');
+                        leftSidebar.classList.add('flex');
+                    }
                 }
                 
                 const activeTab = document.querySelector('.inspector-tab-btn.tab-active');
