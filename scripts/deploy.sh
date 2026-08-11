@@ -58,7 +58,7 @@ BACKUP_DIR="\$PLUGINS_DIR/$BACKUP_NAME"
 
 echo "  Creating backup..."
 if [ -d "\$PLUGIN_DIR" ]; then
-    cp -r "\$PLUGIN_DIR" "\$BACKUP_DIR"
+    mv "\$PLUGIN_DIR" "\$BACKUP_DIR"
 fi
 
 # Ensure cleanup trap on failure
