@@ -5434,12 +5434,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 });
 
                 gridCells += `
-                    <div class="p-2 flex flex-col gap-1 overflow-hidden group hover:bg-zinc-50/40 transition-colors${isToday ? ' bg-zinc-50 ring-1 ring-inset ring-zinc-300 ' : ''}">
-                        <div class="flex justify-between items-center select-none shrink-0">
+                    <div class="p-2 group hover:bg-zinc-50/40 transition-colors${isToday ? ' bg-zinc-50 ring-1 ring-inset ring-zinc-300 ' : ''}" style="display: flex; flex-direction: column; gap: 4px; height: 100%; overflow: hidden;">
+                        <div class="select-none" style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; min-height: 16px;">
                             <span class="text-[10px] font-bold font-mono${isToday ? ' w-5 h-5 bg-zinc-950 text-white rounded-full flex items-center justify-center' : ' text-zinc-400'}">${day}</span>
                             <span onclick="openCreateArticleDrawer('${dayDateStr}')" class="opacity-0 group-hover:opacity-100 text-[10px] text-zinc-450 hover:text-zinc-900 cursor-pointer transition-opacity font-bold">+</span>
                         </div>
-                        <div class="flex flex-col gap-0.5 overflow-y-auto scrollbar-hide flex-1 min-h-0">${itemsHtml}</div>
+                        <div class="scrollbar-hide" style="display: flex; flex-direction: column; gap: 2px; overflow-y: auto; flex: 1; min-height: 0;">${itemsHtml}</div>
                     </div>
                 `;
             }

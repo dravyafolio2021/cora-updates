@@ -1,1 +1,3 @@
 SAVE ARTICLE: id=1, status=draft, raw_status=draft
+SAVE ARTICLE: id=2, status=draft, raw_status=draft
+SAVE ARTICLE: id=3683, status=draft, raw_status=draft
