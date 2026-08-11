@@ -1040,6 +1040,91 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
 </head>
 <body>
 
+<!-- Mobile Orientation Lock Shield -->
+<div id="cora-orientation-lock-shield" style="
+    position: fixed;
+    inset: 0;
+    z-index: 1000000;
+    background: #ffffff;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    user-select: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+">
+    <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+        max-width: 280px;
+    ">
+        <!-- Rotating Phone Animation SVG -->
+        <div class="cora-rotate-icon-container">
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-cora-rotate" style="color: #18181b;">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                <line x1="12" y1="18" x2="12.01" y2="18" stroke-width="3" />
+            </svg>
+        </div>
+        <div>
+            <h3 style="font-size: 15px; font-weight: 800; color: #18181b; margin: 0; letter-spacing: -0.01em;">Portrait Mode Required</h3>
+            <p style="font-size: 12px; color: #52525b; margin-top: 8px; line-height: 1.6; font-weight: 500;">Please rotate your device back to portrait. Cora Workspace is optimized for portrait view on mobile devices.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+/* CSS Media Query to display shield ONLY on mobile/tablet widths in landscape orientation */
+@media (orientation: landscape) and (max-width: 1023px) {
+    #cora-orientation-lock-shield {
+        display: flex !important;
+    }
+    body {
+        overflow: hidden !important;
+        height: 100vh !important;
+    }
+}
+@keyframes cora-device-rotate {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-90deg); }
+}
+.animate-cora-rotate {
+    animation: cora-device-rotate 2.4s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+.cora-rotate-icon-container {
+    padding: 16px;
+    background: #f4f4f5;
+    border-radius: 20px;
+    border: 1px solid #e4e4e7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+
+<script>
+    (function() {
+        function lockScreenOrientation() {
+            if (screen.orientation && typeof screen.orientation.lock === 'function') {
+                screen.orientation.lock('portrait-primary').catch(function() {});
+            } else if (screen.lockOrientation) {
+                screen.lockOrientation('portrait-primary');
+            } else if (screen.mozLockOrientation) {
+                screen.mozLockOrientation('portrait-primary');
+            } else if (screen.msLockOrientation) {
+                screen.msLockOrientation('portrait-primary');
+            }
+        }
+        window.addEventListener('load', lockScreenOrientation);
+        window.addEventListener('orientationchange', lockScreenOrientation);
+        document.addEventListener('click', lockScreenOrientation, { once: true });
+        document.addEventListener('touchstart', lockScreenOrientation, { once: true });
+    })();
+</script>
+
 <div id="onboarding-page-container">
     <!-- Brand Sidebar -->
     <div id="onboarding-brand-sidebar">
