@@ -1,10 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { login } from './helpers';
 
-test('Article editor responsiveness and overflow prevention validation', async ({ page }) => {
-  const consoleLogs: string[] = [];
+test('Article editor responsiveness and functional metrics validation', async ({ page }) => {
   page.on('console', msg => {
-    consoleLogs.push(`[${msg.type()}] ${msg.text()}`);
+    console.log(`[BROWSER CONSOLE] [${msg.type()}] ${msg.text()}`);
+  });
+
+  page.on('pageerror', error => {
+    console.log(`[BROWSER UNCAUGHT EXCEPTION] ${error.stack || error.message}`);
   });
 
   await login(page, 'owner.studio@cora.local', 'cora_secure_pass_123');
@@ -28,6 +31,9 @@ test('Article editor responsiveness and overflow prevention validation', async (
   await page.waitForSelector(editorSelector, { state: 'visible', timeout: 15000 });
   console.log('Article editor successfully initialized and visible');
 
+  // Allow a short duration for AJAX content rendering to parse and populate metrics
+  await page.waitForTimeout(2000);
+
   // Test 1: Desktop responsiveness width check
   console.log('--- TEST 1: Desktop Editor Width Check ---');
   await page.setViewportSize({ width: 1280, height: 800 });
@@ -45,8 +51,32 @@ test('Article editor responsiveness and overflow prevention validation', async (
   console.log('Desktop viewport metrics:', JSON.stringify(overflowMetrics));
   expect(overflowMetrics?.hasHorizontalOverflow).toBe(false);
 
-  // Test 2: Mobile responsiveness width check (resize viewport to 375px)
-  console.log('\n--- TEST 2: Mobile Editor Width Check ---');
+  // Test 2: Sidebar dynamic metrics and outline verification
+  console.log('\n--- TEST 2: Sidebar Dynamic Metrics & Outline Verification ---');
+  
+  // Wait for word count to update to be non-zero
+  await expect(page.locator('#left-stat-words')).not.toHaveText('0', { timeout: 10000 });
+  const wordsText = await page.locator('#left-stat-words').textContent();
+  const wordsCount = parseInt(wordsText || '0', 10);
+  console.log('Document word count extracted from sidebar:', wordsCount);
+  expect(wordsCount).toBeGreaterThan(0);
+
+  // Wait for headings count to update to be non-zero
+  await expect(page.locator('#left-stat-headings')).not.toHaveText('0', { timeout: 10000 });
+  const headingsText = await page.locator('#left-stat-headings').textContent();
+  const headingsCount = parseInt(headingsText || '0', 10);
+  console.log('Document headings count extracted from sidebar:', headingsCount);
+  expect(headingsCount).toBeGreaterThan(0);
+
+  // Wait for the outline panel to be populated with heading links
+  const outlineSelector = '#cora-outline-hierarchy-list a';
+  await page.waitForSelector(outlineSelector, { state: 'attached', timeout: 10000 });
+  const outlineLinksCount = await page.locator(outlineSelector).count();
+  console.log('Outline hierarchy links count:', outlineLinksCount);
+  expect(outlineLinksCount).toBeGreaterThan(0);
+
+  // Test 3: Mobile responsiveness width check (resize viewport to 375px)
+  console.log('\n--- TEST 3: Mobile Editor Width Check ---');
   await page.setViewportSize({ width: 375, height: 667 });
   await page.waitForTimeout(500);
 
@@ -73,5 +103,5 @@ test('Article editor responsiveness and overflow prevention validation', async (
   console.log('Mobile viewport metrics:', JSON.stringify(overflowMetrics));
   expect(overflowMetrics?.hasHorizontalOverflow).toBe(false);
 
-  console.log('Editor responsiveness E2E checks passed perfectly!');
+  console.log('Editor responsiveness & metrics E2E checks passed perfectly!');
 });

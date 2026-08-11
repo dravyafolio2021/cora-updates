@@ -6438,7 +6438,7 @@ jQuery(document).ready(function($) {
             window.coraQuillListingCoordinator = coraQuillListingCoordinator;
 
             if (coraPendingEditorContent !== null) {
-                coraQuillListingCoordinator.root.innerHTML = coraPendingEditorContent;
+                coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(coraPendingEditorContent);
                 coraPendingEditorContent = null;
                 if (window.coraUpdateWordCount) {
                     window.coraUpdateWordCount();
@@ -6627,7 +6627,7 @@ jQuery(document).ready(function($) {
 
         initListingCoordinatorComponentsIfNeeded();
         if (coraQuillListingCoordinator) {
-            coraQuillListingCoordinator.root.innerHTML = '';
+            coraQuillListingCoordinator.setText('');
         } else {
             coraPendingEditorContent = '';
         }
@@ -6671,7 +6671,7 @@ jQuery(document).ready(function($) {
 
         initListingCoordinatorComponentsIfNeeded();
         if (coraQuillListingCoordinator) {
-            coraQuillListingCoordinator.root.innerHTML = '<p class="text-zinc-400 animate-pulse">Loading content from server...</p>';
+            coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML('<p class="text-zinc-400 animate-pulse">Loading content from server...</p>');
         } else {
             coraPendingEditorContent = '<p class="text-zinc-400 animate-pulse">Loading content from server...</p>';
         }
@@ -6728,7 +6728,7 @@ jQuery(document).ready(function($) {
                 }
 
                 if (coraQuillListingCoordinator) {
-                    coraQuillListingCoordinator.root.innerHTML = data.content || '';
+                    coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(data.content || '');
                 } else {
                     coraPendingEditorContent = data.content || '';
                 }
@@ -6794,7 +6794,7 @@ jQuery(document).ready(function($) {
                 }
             } else {
                 if (coraQuillListingCoordinator) {
-                    coraQuillListingCoordinator.root.innerHTML = '';
+                    coraQuillListingCoordinator.setText('');
                 } else {
                     coraPendingEditorContent = '';
                 }
@@ -7302,7 +7302,7 @@ jQuery(document).ready(function($) {
                 <li><strong>Price Margins:</strong> Appraised at premium local index values.</li>
             </ul>
             `;
-            coraQuillListingCoordinator.root.innerHTML = html;
+            coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(html);
         }
 
         $('#cora-geo-entities-list span').removeClass('border-zinc-200 text-zinc-400').addClass('border-zinc-350 text-zinc-700 font-bold bg-zinc-100');
@@ -7417,7 +7417,7 @@ jQuery(document).ready(function($) {
             updatedHTML = updatedHTML + priceTable;
         }
 
-        coraQuillListingCoordinator.root.innerHTML = updatedHTML;
+        coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(updatedHTML);
         
         // Update checkmarks
         $('#chk-geo-direct-answer').prop('checked', true);
@@ -7683,11 +7683,61 @@ jQuery(document).ready(function($) {
 
     window.coraUpdateWordCount = function() {
         let text = '';
-        if (window.coraQuillListingCoordinator) {
+        let headings = 0;
+        let images = 0;
+        let links = 0;
+        let h1s = 0;
+        let internalLinks = 0;
+        let externalLinks = 0;
+        let altTextOk = true;
+        let imageList = [];
+        
+        if (window.coraQuillListingCoordinator && window.coraQuillListingCoordinator.root) {
+            const root = window.coraQuillListingCoordinator.root;
             text = window.coraQuillListingCoordinator.getText() || '';
+            headings = root.querySelectorAll('h1, h2, h3, h4').length;
+            h1s = root.querySelectorAll('h1').length;
+            imageList = root.querySelectorAll('img');
+            images = imageList.length;
+            
+            const linkList = root.querySelectorAll('a');
+            links = linkList.length;
+            
+            const homeUrl = window.location.origin;
+            linkList.forEach(link => {
+                const href = link.getAttribute('href') || '';
+                if (href.startsWith('/') || href.startsWith('#') || href.includes(homeUrl)) {
+                    internalLinks++;
+                } else if (href.startsWith('http')) {
+                    externalLinks++;
+                } else {
+                    internalLinks++;
+                }
+            });
+            
+            // Alt text verification
+            if (images > 0) {
+                let missingAlt = 0;
+                imageList.forEach(img => {
+                    if (!img.getAttribute('alt')) {
+                        missingAlt++;
+                    }
+                });
+                if (missingAlt === images) {
+                    altTextOk = false;
+                }
+            } else {
+                altTextOk = false;
+            }
         } else {
             text = $('#cora-quill-editor').text() || '';
+            headings = $('#cora-quill-editor').find('h1, h2, h3, h4').length;
+            h1s = $('#cora-quill-editor').find('h1').length;
+            images = $('#cora-quill-editor').find('img').length;
+            links = $('#cora-quill-editor').find('a').length;
+            internalLinks = links; // Fallback
         }
+        
         const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
         const mins = Math.ceil(words / 200);
         
@@ -7697,20 +7747,109 @@ jQuery(document).ready(function($) {
         // Update Content Insights grid
         $('#insight-words-count').text(words);
         $('#insight-read-time').text(`${mins} min`);
-        
-        let headings = 0;
-        let images = 0;
-        
-        if (window.coraQuillListingCoordinator && window.coraQuillListingCoordinator.root) {
-            headings = window.coraQuillListingCoordinator.root.querySelectorAll('h2, h3, h4').length;
-            images = window.coraQuillListingCoordinator.root.querySelectorAll('img').length;
-        } else {
-            headings = $('#cora-quill-editor').find('h2, h3, h4').length;
-            images = $('#cora-quill-editor').find('img').length;
-        }
-        
         $('#insight-headings-count').text(headings);
         $('#insight-images-count').text(images);
+        
+        // Update Left Sidebar stats
+        $('#left-stat-words').text(words);
+        $('#left-stat-headings').text(headings);
+        $('#left-stat-images').text(images);
+        $('#left-stat-links').text(links);
+        $('#seo-stat-internal-links').text(internalLinks);
+        $('#seo-stat-external-links').text(externalLinks);
+        
+        if (typeof window.coraRebuildOutline === 'function') {
+            window.coraRebuildOutline();
+        }
+        
+        if (typeof window.coraUpdateLeftSidebarMediaGrid === 'function') {
+            window.coraUpdateLeftSidebarMediaGrid();
+        }
+        
+        // Recalculate SEO / Content Score dynamically
+        let score = 0;
+        score += Math.min(40, Math.round((words / 600) * 40));
+        score += Math.min(20, headings * 5);
+        score += Math.min(20, images * 10);
+        score += Math.min(20, links * 10);
+        
+        if (words === 0) score = 0;
+        
+        $('#cora-seo-score-display').text(score);
+        const ring = document.getElementById('cora-seo-score-ring');
+        if (ring) {
+            ring.setAttribute('stroke-dasharray', `${score}, 100`);
+        }
+        
+        $('#left-score-value').text(`${score}/100`);
+        $('#left-score-bar').css('width', `${score}%`);
+        
+        // Dynamic checklist sync
+        const hasTitle = $('#cora-article-title').val() || '';
+        const hasH1 = (h1s > 0 || hasTitle.trim().length > 0);
+        const hasMeta = ($('#cora-article-excerpt-bh').val() || $('#cora-article-excerpt').val() || '').trim().length > 0;
+        
+        // H1 Tag Checklist
+        if (hasH1) {
+            $('#chk-chk-h1').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
+            $('#chk-indicator-h1').text('Active').removeClass('text-red-500 bg-red-50').addClass('text-zinc-400');
+        } else {
+            $('#chk-chk-h1').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+            $('#chk-indicator-h1').text('Missing').removeClass('text-zinc-400').addClass('text-red-500');
+        }
+        
+        // Meta Description Checklist
+        if (hasMeta) {
+            $('#chk-chk-meta').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
+            $('#chk-indicator-meta').text('Active').removeClass('text-red-500').addClass('text-zinc-400');
+        } else {
+            $('#chk-chk-meta').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+            $('#chk-indicator-meta').text('Missing').removeClass('text-zinc-400').addClass('text-red-500');
+        }
+        
+        // Image Alt Text Checklist
+        if (images > 0) {
+            if (altTextOk) {
+                $('#chk-chk-alt').text('✓').removeClass('text-zinc-300 text-red-500').addClass('text-emerald-600 font-bold');
+                $('#chk-indicator-alt').text('Active').removeClass('text-red-500').addClass('text-zinc-400');
+            } else {
+                $('#chk-chk-alt').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+                $('#chk-indicator-alt').text('No Alt').removeClass('text-zinc-400').addClass('text-red-500');
+            }
+        } else {
+            $('#chk-chk-alt').text('✗').removeClass('text-zinc-300 text-emerald-600').addClass('text-red-500 font-bold');
+            $('#chk-indicator-alt').text('No Images').removeClass('text-zinc-400').addClass('text-red-500');
+        }
+        
+        // Overall Checklist Badge
+        let criticalIssues = 0;
+        if (!hasH1) criticalIssues++;
+        if (!hasMeta) criticalIssues++;
+        
+        if (criticalIssues === 0 && altTextOk && internalLinks > 0) {
+            $('#checklist-issues-badge').text('Optimal').removeClass('bg-red-50 text-red-700 border-red-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-emerald-50 text-emerald-700 border-emerald-150');
+        } else if (criticalIssues > 0) {
+            $('#checklist-issues-badge').text('Critical').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-red-50 text-red-700 border-red-150');
+        } else {
+            $('#checklist-issues-badge').text('Needs Tweaks').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-red-50 text-red-700 border-red-150').addClass('bg-amber-50 text-amber-700 border-amber-150');
+        }
+        
+        if (score >= 80) {
+            $('#left-score-grade').text('A').removeClass('bg-red-50 text-red-700 border-red-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-emerald-50 text-emerald-700 border-emerald-150');
+            $('#cora-seo-status-text').text('Optimized').removeClass('text-red-500 text-amber-500').addClass('text-emerald-600');
+            if (ring) ring.setAttribute('class', 'text-emerald-500 transition-all duration-300');
+            $('#left-score-message').text('Perfect optimization! Ready to publish.');
+        } else if (score >= 50) {
+            $('#left-score-grade').text('B').removeClass('bg-red-50 text-red-700 border-red-150 bg-emerald-50 text-emerald-700 border-emerald-150').addClass('bg-amber-50 text-amber-700 border-amber-150');
+            $('#cora-seo-status-text').text('Good').removeClass('text-red-500 text-emerald-600').addClass('text-amber-500');
+            if (ring) ring.setAttribute('class', 'text-amber-500 transition-all duration-300');
+            $('#left-score-message').text('Good job! A few more tweaks and you\'re set.');
+        } else {
+            $('#left-score-grade').text('C').removeClass('bg-emerald-50 text-emerald-700 border-emerald-150 bg-amber-50 text-amber-700 border-amber-150').addClass('bg-red-50 text-red-700 border-red-150');
+            $('#cora-seo-status-text').text('Poor').removeClass('text-emerald-600 text-amber-500').addClass('text-red-500');
+            if (ring) ring.setAttribute('class', 'text-red-500 transition-all duration-300');
+            $('#left-score-message').text('Needs attention. Fix the checklist issues.');
+        }
 
         coraUpdateSEOAudits();
     };
@@ -7769,7 +7908,7 @@ jQuery(document).ready(function($) {
                 updatedHTML = `<p><strong>Market Analysis:</strong> Capital values in this micro-market are experiencing a strong 12% YoY appreciation, driven by premium developer acquisitions and enhanced regional connectivity. Appraised at optimal index values.</p>` + currentHTML;
             }
 
-            coraQuillListingCoordinator.root.innerHTML = updatedHTML;
+            coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(updatedHTML);
             
             $('#cora-ai-tone-drawer').addClass('collapsed hidden translate-x-full pointer-events-none');
             window.coraShowToast(`Tone updated to ${tone.toUpperCase()} successfully!`, 'success');
@@ -7802,7 +7941,7 @@ jQuery(document).ready(function($) {
                 .replace(/\boccured\b/gi, 'occurred');
 
             let changed = (replacedHTML !== currentHTML);
-            coraQuillListingCoordinator.root.innerHTML = replacedHTML;
+            coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(replacedHTML);
 
             if (changed) {
                 window.coraShowToast('Grammar scans complete. Typos corrected!', 'success');
@@ -9471,7 +9610,7 @@ jQuery(document).ready(function($) {
             $('#cora-page-order-input').val(0);
             $('#cora-page-seo-desc-input').val('');
             if (coraPageQuill) {
-                coraPageQuill.root.innerHTML = '';
+                coraPageQuill.setText('');
             }
 
             $.post(coraREData.ajaxUrl, {
@@ -9488,7 +9627,7 @@ jQuery(document).ready(function($) {
                     $('#cora-page-order-input').val(res.data.menu_order || 0);
                     $('#cora-page-seo-desc-input').val(res.data.seo_description || '');
                     if (coraPageQuill) {
-                        coraPageQuill.root.innerHTML = res.data.content || '';
+                        coraPageQuill.clipboard.dangerouslyPasteHTML(res.data.content || '');
                     }
                 } else {
                     window.coraShowToast(res.data || 'Failed to load page details.');
@@ -9504,7 +9643,7 @@ jQuery(document).ready(function($) {
             $('#cora-page-order-input').val(0);
             $('#cora-page-seo-desc-input').val('');
             if (coraPageQuill) {
-                coraPageQuill.root.innerHTML = '';
+                coraPageQuill.setText('');
             }
         }
 
