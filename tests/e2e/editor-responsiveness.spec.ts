@@ -63,18 +63,6 @@ test('Article editor responsiveness and functional metrics validation', async ({
   console.log('\n--- TEST 2: Sidebar Dynamic Metrics & Outline Verification ---');
   
   // Wait for word count to update to be non-zero
-  const editorTextContent = await page.locator('#cora-quill-editor').innerText();
-  console.log('DEBUG: #cora-quill-editor inner text:', JSON.stringify(editorTextContent));
-  
-  const debugQuillVal = await page.evaluate(() => {
-    return window.coraQuillListingCoordinator ? {
-      text: window.coraQuillListingCoordinator.getText(),
-      html: window.coraQuillListingCoordinator.root.innerHTML,
-      wordCountText: document.getElementById('left-stat-words')?.textContent
-    } : 'NO_QUILL';
-  });
-  console.log('DEBUG: Quill internal state:', JSON.stringify(debugQuillVal));
-
   await expect(page.locator('#left-stat-words')).not.toHaveText('0', { timeout: 10000 });
   const wordsText = await page.locator('#left-stat-words').textContent();
   const wordsCount = parseInt(wordsText || '0', 10);
