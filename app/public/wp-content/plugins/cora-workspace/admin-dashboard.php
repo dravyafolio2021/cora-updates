@@ -4388,54 +4388,54 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <div class="w-full flex flex-col items-center justify-center gap-2.5 py-2 px-0 select-none" id="cora-quick-actions-bar">
                     <?php if ( $is_studio ) : ?>
                         <!-- Predefined actions Row 1 -->
-                        <div class="w-full flex flex-wrap items-center justify-center gap-2.5 px-4">
-                            <button onclick="coraNavigateTo('bookings'); document.getElementById('cora-add-booking-btn')?.click();" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                        <div class="w-full flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-4">
+                            <button onclick="coraNavigateTo('bookings'); document.getElementById('cora-add-booking-btn')?.click();" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                 Book a Shoot
                             </button>
-                            <button onclick="coraNavigateTo('equipment'); window.openAddGearDrawer?.();" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                            <button onclick="coraNavigateTo('equipment'); window.openAddGearDrawer?.();" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                                 Register Gear
                             </button>
-                            <button onclick="coraNavigateTo('crew-scheduler')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                            <button onclick="coraNavigateTo('crew-scheduler')" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                                 Assign Crew
                             </button>
                         </div>
                         <!-- Predefined actions Row 2 -->
-                        <div class="w-full flex flex-wrap items-center justify-center gap-2.5 px-4 mt-0.5">
-                            <button onclick="coraNavigateTo('media')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                        <div class="w-full flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-4 mt-0.5">
+                            <button onclick="coraNavigateTo('media')" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                 Upload Media
                             </button>
-                            <button onclick="coraNavigateTo('invoicing')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                            <button onclick="coraNavigateTo('invoicing')" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
                                 Create Invoice
                             </button>
                         </div>
                     <?php else : ?>
                         <!-- Predefined actions Row 1 -->
-                        <div class="w-full flex flex-wrap items-center justify-center gap-2.5 px-4">
-                            <button onclick="coraNavigateTo('bookings'); document.getElementById('cora-add-booking-btn')?.click();" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                        <div class="w-full flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-4">
+                            <button onclick="coraNavigateTo('bookings'); document.getElementById('cora-add-booking-btn')?.click();" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                 Schedule Showing
                             </button>
-                            <button onclick="coraNavigateTo('ai-assistants')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                            <button onclick="coraNavigateTo('ai-assistants')" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                 Draft Captions
                             </button>
-                            <button onclick="coraNavigateTo('leads')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                            <button onclick="coraNavigateTo('leads')" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                                 Add Lead
                             </button>
                         </div>
                         <!-- Predefined actions Row 2 -->
-                        <div class="w-full flex flex-wrap items-center justify-center gap-2.5 px-4 mt-0.5">
-                            <button onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                        <div class="w-full flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-4 mt-0.5">
+                            <button onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                                 Create Brochure
                             </button>
-                            <button onclick="coraNavigateTo('listings')" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
+                            <button onclick="coraNavigateTo('listings')" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                                 View Listings
                             </button>
@@ -4443,7 +4443,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <?php endif; ?>
 
                     <!-- Custom Shortcuts row (centered, sits on its own row below) -->
-                    <div class="flex flex-wrap items-center justify-center gap-2.5 w-full mt-0.5">
+                    <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 w-full mt-0.5">
                         <!-- Custom Actions (from localStorage) -->
                         <div id="cora-custom-actions-container" class="contents"></div>
 

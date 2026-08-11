@@ -3366,9 +3366,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div><!-- end cora-search-container -->
                 
                 <!-- Premium Dynamic Quick Actions (2-Row Balanced 6-Button Responsive Layout) -->
-                <div class="flex flex-col items-center justify-center gap-3 sm:gap-4 mt-6 mb-6">
+                <div class="flex flex-col items-center justify-center gap-2.5 sm:gap-4 mt-6 mb-6">
                     <!-- Row 1: Quick actions label (desktop only) + 3 Primary Actions -->
-                    <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                    <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-4">
                         <span class="hidden sm:inline-block text-xs font-bold text-zinc-800 dark:text-zinc-200 tracking-tight mr-1 select-none">Quick actions:</span>
                         
                         <button onclick="coraNavigateTo('bookings'); document.getElementById('cora-add-booking-btn')?.click();" class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer">
@@ -3387,8 +3387,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </button>
                     </div>
 
-                    <!-- Row 2: Secondary Actions + AI Custom Shortcuts Button -->
-                    <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                    <!-- Row 2: Secondary Actions -->
+                    <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-4 mt-0.5">
                         <button onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                             Create Brochure
@@ -3398,7 +3398,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                             View Listings
                         </button>
+                    </div>
 
+                    <!-- Row 3: Custom Shortcuts (centered, sits on its own row below) -->
+                    <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 w-full mt-0.5">
                         <!-- Custom Actions (from localStorage) -->
                         <div id="cora-custom-actions-container" class="contents"></div>
 
