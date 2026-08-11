@@ -1,0 +1,1 @@
+SAVE ARTICLE: id=1, status=draft, raw_status=draft
