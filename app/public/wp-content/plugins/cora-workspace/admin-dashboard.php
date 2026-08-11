@@ -8151,8 +8151,10 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                             </div>
                         </div>
 
+                    </div><!-- /#cora-editor-slash-menu -->
+
                     <!-- Quill Rich-Text Editor Canvas Container -->
-                    <div id="cora-quill-editor" class="w-full text-zinc-900 min-h-[420px] border-none focus:outline-none text-base leading-relaxed mt-2"></div>
+                    <div id="cora-quill-editor" class="w-full text-zinc-900 border-none focus:outline-none text-base leading-relaxed mt-2" style="min-height: 420px;"></div>
 
                 </div><!-- /.cora-writing-sheet -->
 
