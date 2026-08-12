@@ -2795,14 +2795,28 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 </div>
 
 <style>
-/* CSS Media Query to display shield ONLY on mobile/tablet widths in landscape orientation */
+/* CSS Media Query to lock mobile/tablet landscape orientation visually to portrait layout */
 @media (orientation: landscape) and (max-width: 1023px) {
     #cora-orientation-lock-shield {
-        display: flex !important;
+        display: none !important;
+    }
+    html {
+        width: 100vw !important;
+        height: 100vh !important;
+        overflow: hidden !important;
     }
     body {
-        overflow: hidden !important;
-        height: 100vh !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vh !important;
+        height: 100vw !important;
+        min-height: 100vw !important;
+        transform: rotate(-90deg) translate(-100vh, 0) !important;
+        transform-origin: top left !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
     }
 }
 @keyframes cora-device-rotate {
@@ -7648,22 +7662,41 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
     .cora-serif-editor .ql-editor { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: 1.125rem; line-height: 1.8; color: #18181b; }
     .cora-sans-editor .ql-editor { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1.05rem; line-height: 1.75; color: #18181b; }
     .ql-toolbar.ql-snow {
-        border: 1px solid #e4e4e7 !important;
-        border-radius: 12px !important;
-        padding: 6px 12px !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid #e4e4e7 !important;
+        border-radius: 0 !important;
+        padding: 8px 48px !important;
         position: sticky !important;
-        top: 12px !important;
-        background: rgba(255, 255, 255, 0.95) !important;
+        top: 0 !important;
+        background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(8px) !important;
         z-index: 40 !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
-        margin: 0 auto 16px auto !important;
-        max-width: 100% !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+        margin-left: -48px !important;
+        margin-right: -48px !important;
+        margin-top: 0 !important;
+        margin-bottom: 20px !important;
+        width: calc(100% + 96px) !important;
+        max-width: none !important;
         display: flex !important;
         align-items: center !important;
-        justify-content: center !important;
+        justify-content: flex-start !important;
         flex-wrap: wrap !important;
-        gap: 2px !important;
+        gap: 4px !important;
+        transition: all 0.2s ease !important;
+    }
+    @media (max-width: 767px) {
+        .ql-toolbar.ql-snow {
+            top: 0 !important;
+            margin-left: -16px !important;
+            margin-right: -16px !important;
+            margin-bottom: 12px !important;
+            width: calc(100% + 32px) !important;
+            padding: 6px 16px !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+        }
     }
     
     /* Bulletproof Responsive/Horizontal Scroll Prevention Overrides */
@@ -7841,9 +7874,23 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
     .ql-size-13px  { font-size: 13px !important; }
     .ql-size-18px  { font-size: 18px !important; }
     .ql-size-24px  { font-size: 24px !important; }
-    /* Slash picker spinner */
-    @keyframes ql-spin { to { transform: rotate(360deg); } }
-    .animate-spin { animation: ql-spin 0.8s linear infinite; }
+    /* AI Writing Assistant transitions */
+    #cora-ai-writing-assistant {
+        max-height: 500px;
+        opacity: 1;
+        overflow: hidden;
+        transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+    }
+    #cora-ai-writing-assistant.hidden-assistant {
+        max-height: 0 !important;
+        opacity: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        border-color: transparent !important;
+        pointer-events: none;
+    }
     </style>
 
     <div id="cora-full-page-editor" class="hidden fixed inset-0 z-[100] bg-white flex-col h-full overflow-hidden select-none">
@@ -7897,6 +7944,10 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     </button>
                     <button type="button" class="p-1.5 hover:bg-zinc-50 text-zinc-450 hover:text-zinc-900 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="AI Insights" onclick="coraSwitchInspectorTab('copilot')">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5.5 5.5 0 0 0 12.5 2.5a5.5 5.5 0 0 0-5.5 5.5c0 1.3.5 2.6 1.5 3.5.7.8 1.2 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>
+                    </button>
+                    <!-- AI Assistant Toggle Sparkle -->
+                    <button type="button" class="p-1.5 hover:bg-zinc-50 text-zinc-450 hover:text-violet-650 rounded-lg transition-colors cursor-pointer border-none bg-transparent" id="cora-toggle-ai-assistant-btn" title="AI Writing Assistant" onclick="coraToggleAIAssistant()">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-violet-600"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </button>
                     <button type="button" class="p-1.5 hover:bg-zinc-50 text-zinc-450 hover:text-zinc-900 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="Comments & Collaboration" onclick="window.coraShowToast('Editor comments drawer is coming soon.', 'info')">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
@@ -8317,7 +8368,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     <input type="text" id="cora-article-subtitle" placeholder="Add a subtitle or summary for your article..." class="text-lg md:text-xl font-medium text-zinc-550 placeholder:text-zinc-300 w-full border-none focus:ring-0 focus:outline-none bg-transparent leading-relaxed tracking-tight mb-4">
                     
                     <!-- ST-3: Inline AI Writing Assistant Card -->
-                    <div id="cora-ai-writing-assistant" class="w-full rounded-2xl border border-zinc-200 bg-zinc-50/20 p-4 shadow-3xs space-y-3 font-sans select-none my-4">
+                    <div id="cora-ai-writing-assistant" class="w-full rounded-2xl border border-zinc-200 bg-zinc-50/20 p-4 shadow-3xs space-y-3 font-sans select-none my-4 hidden-assistant">
                         <div class="flex items-center gap-2 text-xs font-bold text-zinc-800">
                             <!-- Clean Sparkle SVG -->
                             <span class="p-1 rounded bg-violet-100/50 text-violet-650 border border-violet-100 flex items-center justify-center shrink-0">
@@ -8326,8 +8377,8 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                             <span>AI Writing Assistant</span>
                         </div>
                         <div class="relative flex items-center bg-white border border-zinc-200 rounded-xl px-3 py-2 shadow-3xs focus-within:border-zinc-400">
-                            <input type="text" id="cora-ai-prompt-input" placeholder="Ask AI to write, improve, or expand..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-850 placeholder:text-zinc-350 pr-8" onkeydown="if(event.key === 'Enter') coraExecuteAIPrompt()">
-                            <button type="button" onclick="coraExecuteAIPrompt()" class="absolute right-2 text-zinc-450 hover:text-zinc-950 transition-colors border-none bg-transparent cursor-pointer p-1">
+                            <input type="text" id="cora-ai-prompt-input" placeholder="Ask AI to write, improve, or expand..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-850 placeholder:text-zinc-355 pr-8" onkeydown="if(event.key === 'Enter') coraExecuteAIPrompt()">
+                            <button type="button" onclick="coraExecuteAIPrompt()" class="absolute right-2 text-zinc-455 hover:text-zinc-950 transition-colors border-none bg-transparent cursor-pointer p-1">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                             </button>
                         </div>
@@ -8349,12 +8400,6 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                 Add examples
                             </button>
                         </div>
-                    </div>
-                    
-                    <!-- Slash Command Hint -->
-                    <div class="flex items-center gap-2 py-2 px-3 bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs text-zinc-500 font-mono select-none cursor-pointer hover:bg-zinc-100 hover:border-zinc-300 transition-colors" onclick="if(window.coraQuillListingCoordinator) { window.coraQuillListingCoordinator.focus(); } else { jQuery('#cora-quill-editor').focus(); }">
-                        <span class="px-1.5 py-0.5 bg-zinc-200 text-zinc-800 font-bold rounded text-[10px]">/</span>
-                        <span>Type <kbd class="font-bold text-zinc-800">/</kbd> for slash commands or select text for formatting</span>
                     </div>
 
                     <!-- Notion-Style Slash Commands Menu -->
@@ -9848,10 +9893,41 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             inlinePopup.querySelector('#cora-inline-btn-simplify').addEventListener('click', () => runInlineAction('simplify'));
         }
 
+        window.coraToggleAIAssistant = function() {
+            const assistant = document.getElementById('cora-ai-writing-assistant');
+            const btn = document.getElementById('cora-toggle-ai-assistant-btn');
+            if (assistant) {
+                const isHidden = assistant.classList.contains('hidden-assistant');
+                if (isHidden) {
+                    assistant.classList.remove('hidden-assistant');
+                    if (btn) btn.classList.add('bg-zinc-100');
+                    localStorage.setItem('cora_ai_assistant_open', 'true');
+                } else {
+                    assistant.classList.add('hidden-assistant');
+                    if (btn) btn.classList.remove('bg-zinc-100');
+                    localStorage.setItem('cora_ai_assistant_open', 'false');
+                }
+            }
+        };
+
         window.coraInitializeWorkspaceEditorSettings = function() {
             const isMobile = window.innerWidth < 768;
             
             try {
+                // Restore AI Assistant toggle state
+                const aiOpen = localStorage.getItem('cora_ai_assistant_open');
+                const assistant = document.getElementById('cora-ai-writing-assistant');
+                const btn = document.getElementById('cora-toggle-ai-assistant-btn');
+                if (assistant) {
+                    if (aiOpen === 'true') {
+                        assistant.classList.remove('hidden-assistant');
+                        if (btn) btn.classList.add('bg-zinc-100');
+                    } else {
+                        assistant.classList.add('hidden-assistant');
+                        if (btn) btn.classList.remove('bg-zinc-100');
+                    }
+                }
+
                 const inspector = document.getElementById('cora-article-inspector');
                 const backdrop = document.getElementById('cora-inspector-backdrop');
                 if (inspector) {

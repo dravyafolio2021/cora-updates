@@ -6419,7 +6419,7 @@ jQuery(document).ready(function($) {
 
             coraQuillListingCoordinator = new Quill('#cora-quill-editor', {
                 theme: 'snow',
-                placeholder: 'Start writing your masterpiece...',
+                placeholder: "Start writing... Type '/' for slash commands or select text to format.",
                 modules: {
                     toolbar: [
                         [{ 'header': [1, 2, 3, 4, false] }],
