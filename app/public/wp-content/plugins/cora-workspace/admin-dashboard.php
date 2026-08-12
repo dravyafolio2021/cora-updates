@@ -8033,13 +8033,15 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             <!-- ST-1: Left Outline Sidebar -->
             <aside id="cora-editor-left-sidebar" class="w-64 bg-zinc-50/50 border-r border-zinc-200 shrink-0 overflow-y-auto hidden md:flex flex-col select-none">
                 <!-- Navigation Tabs: Outline / Media -->
-                <div class="flex border-b border-zinc-200 bg-zinc-100/50 text-[10px] font-bold uppercase tracking-wider select-none shrink-0 font-sans">
-                    <button type="button" onclick="coraSwitchLeftSidebarTab('outline', this)" class="cora-left-tab-btn flex-1 py-3 text-center border-b-2 border-zinc-950 text-zinc-900 font-bold bg-white/40 cursor-pointer">
-                        Outline
-                    </button>
-                    <button type="button" onclick="coraSwitchLeftSidebarTab('media', this)" class="cora-left-tab-btn flex-1 py-3 text-center border-b-2 border-transparent text-zinc-450 hover:text-zinc-700 cursor-pointer">
-                        Media
-                    </button>
+                <div class="p-2.5 bg-zinc-50 border-b border-zinc-200 select-none shrink-0 font-sans">
+                    <div class="flex p-0.5 bg-zinc-105 rounded-lg border border-zinc-200/40 text-[11px] font-bold">
+                        <button type="button" onclick="coraSwitchLeftSidebarTab('outline', this)" class="cora-left-tab-btn flex-1 py-1.5 text-center rounded-md text-zinc-900 bg-white shadow-3xs border border-zinc-200/10 cursor-pointer transition-all active:scale-97">
+                            Outline
+                        </button>
+                        <button type="button" onclick="coraSwitchLeftSidebarTab('media', this)" class="cora-left-tab-btn flex-1 py-1.5 text-center rounded-md text-zinc-450 hover:text-zinc-800 cursor-pointer transition-all active:scale-97">
+                            Media
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Tab Panel: Outline -->
@@ -8106,10 +8108,24 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 <div id="cora-left-panel-media" class="hidden p-4 space-y-4 flex-1 overflow-y-auto font-sans">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Article Media</span>
-                        <button type="button" class="text-zinc-500 hover:text-zinc-900 text-[10px] font-bold border border-zinc-200 rounded px-2.5 py-1 bg-white shadow-3xs cursor-pointer" onclick="window.coraMediaSelectTarget = 'inline'; coraOpenMediaLibrary();">+ Add</button>
+                        <button type="button" class="inline-flex items-center gap-1 text-zinc-650 hover:text-zinc-900 text-[10px] font-bold border border-zinc-200 rounded-lg px-2.5 py-1.5 bg-white shadow-3xs cursor-pointer hover:bg-zinc-50 transition-all active:scale-95" onclick="window.coraMediaSelectTarget = 'inline'; coraOpenMediaLibrary();">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Add
+                        </button>
                     </div>
                     <div class="grid grid-cols-2 gap-2" id="left-sidebar-media-grid">
-                        <div class="text-[10px] text-zinc-400 italic col-span-2 text-center py-6">No images embedded yet</div>
+                        <!-- Populated dynamically via JS: coraUpdateLeftSidebarMediaGrid() -->
+                        <div class="col-span-2 border border-dashed border-zinc-200 bg-zinc-50/50 rounded-xl p-6 text-center select-none mt-2">
+                            <div class="inline-flex p-3 bg-zinc-100 rounded-full text-zinc-400 mb-3 border border-zinc-200/50">
+                                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            </div>
+                            <span class="block text-xs font-bold text-zinc-800 mb-1">No Embedded Media</span>
+                            <span class="block text-[10px] text-zinc-450 leading-relaxed max-w-[170px] mx-auto mb-4">Add images to your article to see them mapped here.</span>
+                            <button type="button" class="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-[10px] font-bold text-zinc-700 bg-white transition-all cursor-pointer shadow-3xs" onclick="window.coraMediaSelectTarget = 'inline'; coraOpenMediaLibrary();">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Add Image
+                            </button>
+                        </div>
                     </div>
                 </div>
             </aside>
@@ -9364,8 +9380,12 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 jQuery('#cora-left-panel-outline').addClass('hidden');
                 jQuery('#cora-left-panel-media').removeClass('hidden');
             }
-            jQuery('.cora-left-tab-btn').removeClass('border-zinc-950 text-zinc-900 font-bold bg-white/40').addClass('border-transparent text-zinc-450');
-            jQuery(btn).addClass('border-zinc-950 text-zinc-900 font-bold bg-white/40').removeClass('border-transparent text-zinc-450');
+            jQuery('.cora-left-tab-btn')
+                .removeClass('text-zinc-900 bg-white shadow-3xs border border-zinc-200/10 font-bold')
+                .addClass('text-zinc-450 border-transparent hover:text-zinc-800');
+            jQuery(btn)
+                .addClass('text-zinc-900 bg-white shadow-3xs border border-zinc-200/10 font-bold')
+                .removeClass('text-zinc-450 border-transparent hover:text-zinc-800');
         };
 
         // Dynamic hierarchical outline builder
@@ -9447,7 +9467,19 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
             const grid = jQuery('#left-sidebar-media-grid');
             
             if (images.length === 0) {
-                grid.html('<div class="text-[10px] text-zinc-400 italic col-span-2 text-center py-6">No images embedded yet</div>');
+                grid.html(`
+                    <div class="col-span-2 border border-dashed border-zinc-200 bg-zinc-50/50 rounded-xl p-6 text-center select-none mt-2">
+                        <div class="inline-flex p-3 bg-zinc-100 rounded-full text-zinc-400 mb-3 border border-zinc-200/50">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        </div>
+                        <span class="block text-xs font-bold text-zinc-800 mb-1">No Embedded Media</span>
+                        <span class="block text-[10px] text-zinc-450 leading-relaxed max-w-[170px] mx-auto mb-4">Add images to your article to see them mapped here.</span>
+                        <button type="button" class="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-[10px] font-bold text-zinc-700 bg-white transition-all cursor-pointer shadow-3xs" onclick="window.coraMediaSelectTarget = 'inline'; coraOpenMediaLibrary();">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Add Image
+                        </button>
+                    </div>
+                `);
                 return;
             }
             
@@ -9458,19 +9490,34 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 if (!src) return;
                 
                 const card = jQuery(`
-                    <div class="group relative aspect-square bg-zinc-150 rounded-lg border border-zinc-200 overflow-hidden cursor-pointer hover:border-zinc-450 transition-all select-none">
+                    <div class="group relative aspect-square bg-zinc-50 rounded-xl border border-zinc-250/70 overflow-hidden cursor-pointer hover:border-zinc-400 hover:shadow-3xs transition-all duration-300 select-none">
                         <img src="${src}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-[9px] font-bold">
-                            View in Editor
+                        <!-- Number Badge -->
+                        <span class="absolute top-1.5 left-1.5 bg-white/90 backdrop-blur-xs text-zinc-800 text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-3xs border border-zinc-250/20 select-none">
+                            #${idx + 1}
+                        </span>
+                        
+                        <!-- Premium Action Overlay -->
+                        <div class="absolute inset-0 bg-zinc-950/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1.5 transition-all duration-200">
+                            <button type="button" class="locate-btn flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white text-zinc-900 rounded-lg text-[9px] font-bold hover:bg-zinc-100 active:scale-95 transition-all shadow-sm border-none cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                Locate
+                            </button>
+                            <button type="button" class="delete-btn flex items-center justify-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[9px] font-bold active:scale-95 transition-all shadow-sm border-none cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                Delete
+                            </button>
                         </div>
                     </div>
                 `);
                 
-                card.on('click', function() {
+                // Locate click handler
+                card.find('.locate-btn').on('click', function(e) {
+                    e.stopPropagation();
                     img.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     
                     // Flash highlight outline on image element
-                    img.style.outline = '4px solid #000000';
+                    img.style.outline = '4px solid #8b5cf6';
                     img.style.outlineOffset = '2px';
                     setTimeout(() => {
                         img.style.outline = 'none';
@@ -9486,7 +9533,34 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                 window.coraQuillListingCoordinator.setSelection(index, 1);
                             }
                         }
-                    } catch(e) {}
+                    } catch(err) {}
+                });
+                
+                // Delete click handler
+                card.find('.delete-btn').on('click', function(e) {
+                    e.stopPropagation();
+                    try {
+                        const Q = window.Quill || (typeof Quill !== 'undefined' ? Quill : null);
+                        if (Q) {
+                            const blot = Q.find(img);
+                            if (blot) {
+                                const index = window.coraQuillListingCoordinator.getIndex(blot);
+                                window.coraQuillListingCoordinator.deleteText(index, 1);
+                                if (window.coraShowToast) {
+                                    window.coraShowToast('Image removed. Press Cmd+Z to undo.', 'success');
+                                }
+                            }
+                        }
+                    } catch(err) {
+                        if (window.coraShowToast) {
+                            window.coraShowToast('Failed to delete image.', 'error');
+                        }
+                    }
+                });
+
+                // Clicking anywhere on card triggers locate
+                card.on('click', function() {
+                    card.find('.locate-btn').trigger('click');
                 });
                 
                 grid.append(card);
@@ -10041,41 +10115,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                 });
             };
 
-            // 2. Wrap coraSelectMedia to sync cover and inline article canvas insertion
-            const originalSelectMedia = window.coraSelectMedia;
-            window.coraSelectMedia = function(id, url) {
-                const target = window.coraMediaSelectTarget || 'thumbnail';
-                if (target === 'inline') {
-                    if (window.coraQuillListingCoordinator) {
-                        const range = window.coraQuillListingCoordinator.getSelection();
-                        const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
-                        window.coraQuillListingCoordinator.insertEmbed(index, 'image', url);
-                        window.coraQuillListingCoordinator.insertText(index + 1, '\n');
-                        window.coraQuillListingCoordinator.setSelection(index + 2, 0);
-                        window.coraShowToast('Image inserted inline at cursor.', 'success');
-                    }
-                    if (typeof window.coraToggleMediaDrawer === 'function') {
-                        window.coraToggleMediaDrawer(false);
-                    }
-                    if (typeof window.coraUpdateWordCount === 'function') {
-                        window.coraUpdateWordCount();
-                    }
-                    if (typeof window.coraTriggerEditorAutoSave === 'function') {
-                        window.coraTriggerEditorAutoSave();
-                    }
-                } else {
-                    if (window.coraMediaSelectTarget === 'cover') {
-                        jQuery('#cora-thumbnail-id').val(id);
-                        jQuery('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
-                        jQuery('#cora-thumbnail-placeholder').addClass('hidden');
-                        jQuery('#cora-thumbnail-img-bh').attr('src', url).removeClass('hidden');
-                        jQuery('#cora-thumbnail-placeholder-bh').addClass('hidden');
-                    }
-                    if (typeof originalSelectMedia === 'function') {
-                        originalSelectMedia(id, url);
-                    }
-                }
-            };
+
 
             // 3. Wrap coraRemoveCoverImage to clear post thumbnail
             const originalRemoveCoverImage = window.coraRemoveCoverImage;

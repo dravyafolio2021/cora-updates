@@ -6855,10 +6855,34 @@ jQuery(document).ready(function($) {
     
     window.coraSelectMedia = function(id, url) {
         const target = window.coraMediaSelectTarget || 'thumbnail';
-        if (target === 'cover') {
+        if (target === 'inline') {
+            if (window.coraQuillListingCoordinator) {
+                const range = window.coraQuillListingCoordinator.getSelection();
+                const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
+                window.coraQuillListingCoordinator.insertEmbed(index, 'image', url);
+                window.coraQuillListingCoordinator.insertText(index + 1, '\n');
+                window.coraQuillListingCoordinator.setSelection(index + 2, 0);
+                if (window.coraShowToast) {
+                    window.coraShowToast('Image inserted inline at cursor.', 'success');
+                }
+            }
+            if (typeof window.coraUpdateWordCount === 'function') {
+                window.coraUpdateWordCount();
+            }
+            if (typeof window.coraTriggerEditorAutoSave === 'function') {
+                window.coraTriggerEditorAutoSave();
+            }
+        } else if (target === 'cover') {
             $('#cora-cover-image-img').attr('src', url).removeClass('hidden');
             $('#cora-cover-image-placeholder').addClass('hidden');
             $('#cora-article-cover-url').val(url);
+            
+            // Sync post thumbnail inputs and Beehiiv preview uploader
+            $('#cora-thumbnail-id').val(id);
+            $('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
+            $('#cora-thumbnail-placeholder').addClass('hidden');
+            $('#cora-thumbnail-img-bh').attr('src', url).removeClass('hidden');
+            $('#cora-thumbnail-placeholder-bh').addClass('hidden');
         } else {
             $('#cora-thumbnail-id').val(id);
             $('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
