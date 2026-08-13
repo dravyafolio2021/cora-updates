@@ -10935,86 +10935,6 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             </div>
         </div>
     </aside>
-    <?php
-    $cora_mobile_drawer_items = array();
-    if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
-        foreach ( $nav_groups as $group ) {
-            if ( empty( $group['items'] ) || ! is_array( $group['items'] ) ) continue;
-            foreach ( $group['items'] as $target => $item ) {
-                $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' );
-                if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
-                    continue;
-                }
-                $cora_mobile_drawer_items[$target] = $item;
-            }
-        }
-    }
-    ?>
-    <!-- Mobile Bottom Navigation Drawer Sheet -->
-    <div id="cora-mobile-nav-drawer" class="fixed inset-0 z-[99999] hidden flex-col justify-end select-none">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-zinc-950/40 backdrop-blur-sm transition-opacity duration-300" onclick="window.coraToggleMobileNavDrawer(false)"></div>
-        
-        <!-- Drawer Container -->
-        <div class="relative w-full bg-white border-t border-zinc-200 rounded-t-3xl shadow-2xl flex flex-col select-none max-h-[75vh]" style="z-index: 1; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); transform: translateY(100%); padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));">
-            
-            <!-- Drag Handle / Header Indicator -->
-            <div class="w-full flex items-center justify-center py-3 cursor-pointer shrink-0" onclick="window.coraToggleMobileNavDrawer(false)">
-                <div class="w-12 h-1.5 bg-zinc-250 rounded-full"></div>
-            </div>
-            
-            <!-- Drawer Header -->
-            <div class="px-5 pb-3.5 border-b border-zinc-100 flex items-center justify-between shrink-0">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">All Modules & Tools</span>
-                <button onclick="window.coraToggleMobileNavDrawer(false)" class="p-1 rounded-full text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer border-none bg-transparent">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
-            
-            <!-- Drawer Grid Content -->
-            <div class="flex-1 overflow-y-auto p-5 no-scrollbar" style="-webkit-overflow-scrolling: touch;">
-                <div class="grid grid-cols-3 gap-y-5 gap-x-4">
-                    <?php foreach ( $cora_mobile_drawer_items as $target => $item ) : 
-                        $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
-                        $is_active = ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) );
-                    ?>
-                        <a href="<?php echo esc_url($nav_url); ?>" class="flex flex-col items-center text-center gap-2 group decoration-none" style="text-decoration: none;">
-                            <div class="w-11 h-11 rounded-xl flex items-center justify-center border transition-all <?php echo $is_active ? 'bg-zinc-950 border-zinc-950 text-white' : 'bg-zinc-50 border-zinc-200/80 text-zinc-655 hover:bg-zinc-100 hover:text-zinc-900'; ?>">
-                                <span class="[&>svg]:w-5 [&>svg]:h-5 shrink-0">
-                                    <?php echo $item['icon']; ?>
-                                </span>
-                            </div>
-                            <span class="text-[10px] font-bold tracking-tight <?php echo $is_active ? 'text-zinc-950' : 'text-zinc-500 hover:text-zinc-900'; ?> leading-tight break-words max-w-[84px]"><?php echo esc_html($item['title']); ?></span>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-    window.coraToggleMobileNavDrawer = function(forceShow) {
-        const drawer = document.getElementById('cora-mobile-nav-drawer');
-        if (!drawer) return;
-        const container = drawer.querySelector('.relative.w-full');
-        const isHidden = drawer.classList.contains('hidden');
-        const shouldShow = forceShow !== undefined ? forceShow : isHidden;
-        
-        if (shouldShow) {
-            drawer.classList.remove('hidden');
-            // Force reflow
-            drawer.offsetHeight;
-            container.style.transform = 'translateY(0)';
-            document.body.style.overflow = 'hidden';
-        } else {
-            container.style.transform = 'translateY(100%)';
-            setTimeout(() => {
-                drawer.classList.add('hidden');
-                document.body.style.overflow = '';
-            }, 300);
-        }
-    };
-    </script>
 
     <!-- Mobile Floating Bottom Navigation (3-State Adaptive Floating Island Bar) -->
     <div id="cora-mobile-floating-island" class="cora-mobile-island-wrapper lg:hidden fixed bottom-4 left-0 right-0 z-[9980] w-[calc(100vw-32px)] max-w-[460px] mx-auto transition-all duration-300 ease-out select-none" style="position: fixed !important; bottom: 16px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; z-index: 9980 !important; width: calc(100vw - 32px) !important; max-width: 460px !important; box-sizing: border-box !important;">
@@ -11084,6 +11004,92 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
     </div>
     </div> <!-- .flex.flex-row.flex-1.min-h-0 -->
 </div> <!-- #cora-workspace -->
+
+<?php
+$cora_mobile_drawer_items = array();
+if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
+    foreach ( $nav_groups as $group ) {
+        if ( empty( $group['items'] ) || ! is_array( $group['items'] ) ) continue;
+        foreach ( $group['items'] as $target => $item ) {
+            $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' );
+            if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
+                continue;
+            }
+            $cora_mobile_drawer_items[$target] = $item;
+        }
+    }
+}
+?>
+<!-- Mobile Bottom Navigation Drawer Sheet (outside #cora-workspace so it renders as true fixed portal) -->
+<div id="cora-mobile-nav-drawer" style="display:none; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end;">
+    <!-- Backdrop -->
+    <div onclick="window.coraToggleMobileNavDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);"></div>
+
+    <!-- Drawer Sheet -->
+    <div id="cora-mobile-nav-drawer-sheet" style="position:relative; z-index:1; width:100%; background:#fff; border-top:1px solid #e4e4e7; border-radius:24px 24px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,0.12); display:flex; flex-direction:column; max-height:75vh; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); transform:translateY(100%); padding-bottom:max(12px,env(safe-area-inset-bottom,0px));">
+
+        <!-- Drag Handle -->
+        <div onclick="window.coraToggleMobileNavDrawer(false)" style="display:flex; align-items:center; justify-content:center; padding:10px 0 6px; cursor:pointer; flex-shrink:0;">
+            <div style="width:44px; height:5px; border-radius:99px; background:#d4d4d8;"></div>
+        </div>
+
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 20px 12px; border-bottom:1px solid #f4f4f5; flex-shrink:0;">
+            <span style="font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#a1a1aa;">All Modules &amp; Tools</span>
+            <button onclick="window.coraToggleMobileNavDrawer(false)" style="background:none; border:none; cursor:pointer; color:#a1a1aa; padding:4px; display:flex; align-items:center; justify-content:center; border-radius:50%;">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <!-- Grid -->
+        <div style="flex:1; overflow-y:auto; padding:20px; -webkit-overflow-scrolling:touch;">
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px 16px;">
+                <?php foreach ( $cora_mobile_drawer_items as $target => $item ) :
+                    $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
+                    $is_active = ( $sub_page === $target || str_replace('_','-',$sub_page) === str_replace('_','-',$target) );
+                    $icon_bg   = $is_active ? 'background:#09090b; border-color:#09090b; color:#fff;' : 'background:#f4f4f5; border-color:#e4e4e7; color:#71717a;';
+                    $lbl_color = $is_active ? '#09090b' : '#71717a';
+                ?>
+                <a href="<?php echo esc_url($nav_url); ?>" style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; text-decoration:none;">
+                    <div style="width:48px; height:48px; border-radius:14px; border:1px solid; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.15s; <?php echo $icon_bg; ?>">
+                        <span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px;">
+                            <?php echo $item['icon']; ?>
+                        </span>
+                    </div>
+                    <span style="font-size:9.5px; font-weight:700; letter-spacing:-0.01em; line-height:1.2; word-break:break-word; max-width:72px; color:<?php echo $lbl_color; ?>;"><?php echo esc_html($item['title']); ?></span>
+                </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    window.coraToggleMobileNavDrawer = function(forceShow) {
+        var drawer  = document.getElementById('cora-mobile-nav-drawer');
+        var sheet   = document.getElementById('cora-mobile-nav-drawer-sheet');
+        if (!drawer || !sheet) return;
+        var isHidden  = (drawer.style.display === 'none' || drawer.style.display === '');
+        var shouldShow = forceShow !== undefined ? !!forceShow : isHidden;
+
+        if (shouldShow) {
+            drawer.style.display = 'flex';
+            // force reflow so the transition starts from translateY(100%)
+            sheet.getBoundingClientRect();
+            sheet.style.transform = 'translateY(0)';
+            document.body.style.overflow = 'hidden';
+        } else {
+            sheet.style.transform = 'translateY(100%)';
+            document.body.style.overflow = '';
+            setTimeout(function() {
+                drawer.style.display = 'none';
+            }, 310);
+        }
+    };
+})();
+</script>
+
 <?php
 wp_print_media_templates();
 wp_print_footer_scripts();
