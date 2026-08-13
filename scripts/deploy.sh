@@ -102,14 +102,14 @@ EOF
 
 # Run deployment based on target
 if [ "$TARGET" = "main" ]; then
-    deploy_site "Main Production" "$MAIN_PATH"
+    deploy_site "Main Site (heycora.in)" "$MAIN_PATH"
 elif [ "$TARGET" = "demo" ]; then
-    deploy_site "Demo Environment" "$DEMO_PATH"
+    deploy_site "App Public (app.heycora.in)" "$DEMO_PATH"
 elif [ "$TARGET" = "staging" ]; then
-    deploy_site "Staging Environment" "$STAGING_PATH"
+    deploy_site "Staging Internal (stagging.heycora.in)" "$STAGING_PATH"
 elif [ "$TARGET" = "both" ]; then
-    deploy_site "Demo Environment" "$DEMO_PATH"
-    deploy_site "Main Production" "$MAIN_PATH"
+    deploy_site "Staging Internal (stagging.heycora.in)" "$STAGING_PATH"
+    deploy_site "App Public (app.heycora.in)" "$DEMO_PATH"
 else
     echo "ERROR: Invalid target. Choose 'main', 'demo', 'staging', or 'both'." >&2
     exit 1
