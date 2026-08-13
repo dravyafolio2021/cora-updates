@@ -84,13 +84,13 @@ test.describe('Mobile Floating Island Interactive States', () => {
     const askBtn2 = page.locator('.cora-island-ask-btn');
     await askBtn2.click();
 
-    // Verify it navigated to MCP page
-    await page.waitForURL(/.*\/mcp/);
-    await expect(page).toHaveURL(/.*\/mcp/);
+    // Verify it opened the right-side AI sidebar inline
+    const sidebar = page.locator('#cora-ai-sidebar');
+    await expect(sidebar).toBeVisible();
+    await expect(sidebar).not.toHaveClass(/collapsed/);
 
-    // Verify the message is submitted and rendered in the chat messages
-    const chatMessages = page.locator('#cora-ai-messages');
-    await expect(chatMessages).toBeVisible();
-    await expect(chatMessages).toContainText('Financial query test');
+    // Verify the message is submitted and rendered in the sidebar chat
+    const sidebarChat = page.locator('#cora-sidebar-chat');
+    await expect(sidebarChat).toContainText('Financial query test');
   });
 });

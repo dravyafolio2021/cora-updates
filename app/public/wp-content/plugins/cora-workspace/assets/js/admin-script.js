@@ -1132,13 +1132,16 @@ jQuery(document).ready(function($) {
         `);
         chat.scrollTop(chat[0].scrollHeight);
 
+        const ajaxUrlEndpoint = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+        const ajaxNonceSec = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+
         // Actual AJAX call to backend
         $.ajax({
-            url: coraREWPData.ajaxUrl,
+            url: ajaxUrlEndpoint,
             method: 'POST',
             data: {
                 action: 'cora_ai_chat',
-                security: coraREWPData.ajaxNonce,
+                security: ajaxNonceSec,
                 message: text
             },
             success: function(response) {
@@ -1163,6 +1166,8 @@ jQuery(document).ready(function($) {
             }
         });
     }
+
+    window.coraExecuteAIChat = coraExecuteAIChat;
 
     // 9. Premium AI Modules Switch Toggles
     window.coraToggleModule = function(moduleName, isChecked) {
@@ -11218,6 +11223,17 @@ jQuery(document).ready(function($) {
             $mcpInput.val(prompt);
             if (typeof window.coraSendChatMessage === 'function') {
                 window.coraSendChatMessage();
+            }
+            $('#cora-island-ai-input').val('');
+            return;
+        }
+
+        // Check if global AI sidebar is present
+        const $sidebar = $('#cora-ai-sidebar');
+        if ($sidebar.length && typeof window.coraToggleSidebar === 'function') {
+            window.coraToggleSidebar(true);
+            if (prompt && typeof window.coraExecuteAIChat === 'function') {
+                window.coraExecuteAIChat(prompt);
             }
             $('#cora-island-ai-input').val('');
             return;
