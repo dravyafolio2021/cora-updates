@@ -48,7 +48,47 @@ if ( isset( $_POST['cora_save_mcp_token_direct_submit'] ) && check_admin_referer
     }
 }
 
-$cora_users = ( in_array( $sub_page, array( 'dashboard', 'bookings', 'team-roles', 'equipment', 'blogs' ) ) ) ? get_users() : array();
+$cora_users = array();
+if ( in_array( $sub_page, array( 'dashboard', 'bookings', 'team-roles', 'equipment', 'blogs' ) ) ) {
+    $args = array();
+    $active_ws_id = isset( $cora_active_workspace['id'] ) ? $cora_active_workspace['id'] : '';
+    $active_ws_slug = isset( $cora_active_workspace['slug'] ) ? $cora_active_workspace['slug'] : '';
+    $agency_id_context = function_exists('cora_get_current_user_agency_id') ? cora_get_current_user_agency_id() : '';
+    
+    $meta_query = array('relation' => 'OR');
+    if ( ! empty( $active_ws_slug ) && $active_ws_slug !== 'super' ) {
+        $meta_query[] = array(
+            'key'     => 'cora_agency_id',
+            'value'   => $active_ws_slug,
+            'compare' => '='
+        );
+    }
+    if ( ! empty( $active_ws_id ) ) {
+        $meta_query[] = array(
+            'key'     => 'cora_agency_id',
+            'value'   => $active_ws_id,
+            'compare' => '='
+        );
+        $meta_query[] = array(
+            'key'     => 'cora_agency_id',
+            'value'   => 'agency_' . $active_ws_id,
+            'compare' => '='
+        );
+    }
+    if ( ! empty( $agency_id_context ) && $agency_id_context !== 'super' && $agency_id_context !== $active_ws_slug ) {
+        $meta_query[] = array(
+            'key'     => 'cora_agency_id',
+            'value'   => $agency_id_context,
+            'compare' => '='
+        );
+    }
+    
+    if ( count( $meta_query ) > 1 ) {
+        $args['meta_query'] = $meta_query;
+    }
+    
+    $cora_users = get_users( $args );
+}
 $cora_workspace_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings' ) ) ) ? cora_db_get_properties() : array();
 $cora_permissions = get_option( 'cora_role_permissions', array() );
 // Auto-grant access to new enterprise modules for all active roles
