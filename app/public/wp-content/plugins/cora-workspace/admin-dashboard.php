@@ -7937,26 +7937,6 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
 
             <!-- Header Action Controls & Buttons -->
             <div class="flex items-center gap-2.5">
-                <!-- Icon Actions Bar -->
-                <div class="hidden sm:flex items-center gap-1 border-r border-zinc-200 pr-2.5">
-                    <button type="button" class="p-1.5 hover:bg-zinc-50 text-zinc-450 hover:text-zinc-900 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="Verify Compliance" onclick="coraSwitchInspectorTab('claims')">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    </button>
-                    <button type="button" class="p-1.5 hover:bg-zinc-50 text-zinc-450 hover:text-zinc-900 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="AI Insights" onclick="coraSwitchInspectorTab('copilot')">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5.5 5.5 0 0 0 12.5 2.5a5.5 5.5 0 0 0-5.5 5.5c0 1.3.5 2.6 1.5 3.5.7.8 1.2 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>
-                    </button>
-                    <!-- AI Assistant Toggle Sparkle -->
-                    <button type="button" class="p-1.5 hover:bg-zinc-50 text-zinc-450 hover:text-violet-650 rounded-lg transition-colors cursor-pointer border-none bg-transparent" id="cora-toggle-ai-assistant-btn" title="AI Writing Assistant" onclick="coraToggleAIAssistant()">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-violet-600"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    </button>
-                    <button type="button" class="p-1.5 hover:bg-zinc-50 text-zinc-450 hover:text-zinc-900 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="Comments & Collaboration" onclick="window.coraShowToast('Editor comments drawer is coming soon.', 'info')">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    </button>
-                    <button type="button" class="p-1.5 hover:bg-zinc-50 text-zinc-450 hover:text-zinc-900 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="Version History" onclick="window.coraShowToast('Version recovery history is coming soon.', 'info')">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    </button>
-                </div>
-
                 <!-- Preview Button -->
                 <button type="button" class="px-3.5 py-1.5 border border-zinc-200 rounded-lg text-zinc-700 bg-white hover:bg-zinc-50 hover:text-zinc-900 transition-all cursor-pointer text-xs font-semibold active:scale-95 shadow-3xs flex items-center gap-1.5" onclick="coraPreviewArticle()">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-450"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
@@ -7966,11 +7946,6 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 <!-- Save Draft Button -->
                 <button type="button" id="cora-btn-save-draft" class="px-3.5 py-1.5 border border-zinc-200 rounded-lg text-zinc-700 bg-white hover:bg-zinc-50 hover:text-zinc-900 transition-all cursor-pointer text-xs font-semibold active:scale-95 shadow-3xs flex items-center gap-1.5" onclick="coraSaveArticle('draft')">
                     Save Draft
-                </button>
-
-                <!-- Submit for Review Button -->
-                <button type="button" id="cora-btn-submit-review" class="px-3.5 py-1.5 border border-zinc-200 rounded-lg text-zinc-700 bg-white hover:bg-zinc-50 hover:text-zinc-900 transition-all cursor-pointer text-xs font-semibold active:scale-95 shadow-3xs flex items-center gap-1.5" onclick="coraSubmitArticleForReview()">
-                    Submit for Review
                 </button>
 
                 <!-- Split Button for Publish Live -->
@@ -7988,32 +7963,9 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             Publish Immediately
                         </button>
-                        <button type="button" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="window.coraToggleBeehiivDropdown('visibility'); window.coraTogglePublishDropdown(false);">
+                        <button type="button" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="window.coraTriggerSchedulePublish(); window.coraTogglePublishDropdown(false);">
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                             Schedule Publish...
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Three-dot button ... -->
-                <div class="relative" id="cora-header-more-wrap">
-                    <button type="button" class="p-2 border border-zinc-200 text-zinc-650 hover:text-zinc-900 hover:bg-zinc-50 rounded-lg transition-all cursor-pointer flex items-center justify-center active:scale-95 shadow-3xs" onclick="window.coraToggleHeaderMoreDropdown()">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.8" fill="none"><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle></svg>
-                    </button>
-                    <!-- Dropdown Menu -->
-                    <div id="cora-header-more-dropdown-menu" class="hidden absolute right-0 top-full mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1.5 z-[99] text-xs font-semibold text-zinc-700">
-                        <button type="button" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraSaveArticle('draft'); window.coraToggleHeaderMoreDropdown(false);">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                            Save Draft
-                        </button>
-                        <button type="button" id="cora-btn-submit-review" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraSubmitArticleForReview(); window.coraToggleHeaderMoreDropdown(false);">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Submit for Review
-                        </button>
-                        <div class="h-px bg-zinc-150 my-1"></div>
-                        <button type="button" class="w-full text-left px-4 py-2 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent" onclick="coraToggleArticleInspector(); window.coraToggleHeaderMoreDropdown(false);">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
-                            Toggle Inspector Sidebar
                         </button>
                     </div>
                 </div>
@@ -8139,7 +8091,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                 <div class="w-full cora-writing-sheet">
                     
                     <!-- Beehiiv Horizontal Settings Bar -->
-                    <div class="w-full border-b border-zinc-200/80 pb-3.5 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold relative select-none">
+                    <div class="hidden w-full border-b border-zinc-200/80 pb-3.5 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold relative select-none">
                         <div class="flex flex-wrap items-center gap-2">
                             <!-- Toggle: Title & subtitle -->
                             <div class="relative inline-block text-left" id="beehiiv-dropdown-title-subtitle-wrap">

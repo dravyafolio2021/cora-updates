@@ -8505,6 +8505,22 @@ jQuery(document).ready(function($) {
         });
     };
 
+    window.coraTriggerSchedulePublish = function() {
+        if (typeof window.coraSwitchInspectorTab === 'function') {
+            window.coraSwitchInspectorTab('meta');
+        }
+        if (typeof window.coraToggleArticleInspector === 'function') {
+            window.coraToggleArticleInspector(true);
+        }
+        setTimeout(function() {
+            const input = document.getElementById('cora-article-scheduled-date');
+            if (input) {
+                input.focus();
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 300);
+    };
+
     window.coraApplyBeehiivChanges = function(type) {
         if (type === 'title-subtitle') {
             $('#cora-article-excerpt').val($('#cora-article-excerpt-bh').val()).trigger('input');
