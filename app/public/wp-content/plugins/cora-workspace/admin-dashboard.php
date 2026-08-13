@@ -8038,8 +8038,9 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                         <button type="button" onclick="coraSwitchLeftSidebarTab('outline', this)" class="cora-left-tab-btn flex-1 py-1.5 text-center rounded-md text-zinc-900 bg-white shadow-3xs border border-zinc-200/10 cursor-pointer transition-all active:scale-97">
                             Outline
                         </button>
-                        <button type="button" onclick="coraSwitchLeftSidebarTab('media', this)" class="cora-left-tab-btn flex-1 py-1.5 text-center rounded-md text-zinc-450 hover:text-zinc-800 cursor-pointer transition-all active:scale-97">
-                            Media
+                        <button type="button" disabled class="flex-1 py-1.5 text-center rounded-md text-zinc-400 cursor-not-allowed flex items-center justify-center gap-1 opacity-60 font-sans select-none border-none bg-transparent">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            <span>Media</span>
                         </button>
                     </div>
                 </div>
