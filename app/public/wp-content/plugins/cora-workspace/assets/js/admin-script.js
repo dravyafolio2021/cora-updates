@@ -8347,10 +8347,16 @@ jQuery(document).ready(function($) {
                 $('#cora-article-id').val(savedId);
                 $('#cora-editor-save-status').html('<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block mr-1"></span>Saved');
 
-                // Generate and open dynamic preview URL
-                const origin = window.location.origin;
+                // Generate and open dynamic preview URL safely
+                let previewUrl = '';
                 const homePath = (window.coraREData && window.coraREData.siteUrl) ? window.coraREData.siteUrl : '';
-                const previewUrl = origin + homePath + '/shared-preview/' + savedId;
+                if (homePath.indexOf('http://') === 0 || homePath.indexOf('https://') === 0) {
+                    previewUrl = homePath.replace(/\/$/, '') + '/shared-preview/' + savedId;
+                } else {
+                    const origin = window.location.origin;
+                    const cleanHome = homePath.replace(/^\//, '').replace(/\/$/, '');
+                    previewUrl = origin.replace(/\/$/, '') + '/' + (cleanHome ? cleanHome + '/' : '') + 'shared-preview/' + savedId;
+                }
 
                 window.open(previewUrl, '_blank');
                 window.coraShowToast('Branded preview opened successfully.', 'success');
