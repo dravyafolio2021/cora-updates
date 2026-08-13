@@ -64,26 +64,29 @@ $calendar_events = array(
 $current_day = 14; // Mock active focus day
 ?>
 
+<?php
+
+$calendar_header_args = array(
+    'title'            => 'Workspace Calendar',
+    'description'      => 'Manage corporate schedules, client photo shoot bookings, and team shifts.',
+    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+    'ai_stack'         => true,
+    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'cta'              => array(
+        'text'        => 'Add Event',
+        'mobile_text' => 'Add Event',
+        'onclick'     => "if(window.coraShowToast) window.coraShowToast('Add Event drawer coming soon!', 'info')",
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+        'visible'     => true,
+    ),
+);
+
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $calendar_header_args );
+}
+?>
+
 <div class="space-y-6 font-sans text-zinc-900 select-none max-w-[1700px] mx-auto pb-12">
-    <!-- ═══ 1. STANDARDIZED PAGE HEADER & CTA ACTION BAR ═════════════════════════════════ -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 w-full">
-        <div class="min-w-0">
-            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-950 leading-snug">Workspace Calendar</h1>
-            <p class="text-xs sm:text-sm text-zinc-500 mt-1.5 leading-relaxed">Manage corporate schedules, client photo shoot bookings, and team shifts.</p>
-        </div>
-
-        <div class="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
-            <button onclick="if(window.coraShowToast) window.coraShowToast('Calendar sync updated.', 'success')" class="flex-1 sm:flex-none px-5 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold rounded-full transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-2">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                Sync External
-            </button>
-            <button onclick="if(window.coraShowToast) window.coraShowToast('Add Event drawer coming soon!', 'info')" class="w-full sm:w-auto px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-full transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Add Event
-            </button>
-        </div>
-    </div>
-
     <!-- Main Workspace Split Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <!-- 3/4 Width: Interactive Calendar Grid -->
