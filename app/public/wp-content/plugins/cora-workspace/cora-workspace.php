@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.4.36
+ * Version: 3.4.37
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.4.36' );
+define( 'CORA_WORKSPACE_VERSION', '3.4.37' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -14178,7 +14178,20 @@ Understand everything about the Cora platform, which includes:
 5. Listing Geolocation & Sync: Syncs MLS data from Zillow URLs and checks RERA registration IDs for properties.
 6. Quotas & Status Connection: Workspace connection indicator shows 'Connected' using the global platform-wide Gemini API key, with dynamic sliding limits (30 reqs/5h, 100 reqs/24h) tracked per workspace.
 Answer concisely, professionally, and matching the light Notion-styled/Claude-cream aesthetic of the platform. Avoid mention of raw API keys.";
-    $system_prompt = sanitize_text_field( $_POST['system_prompt'] ?? $default_prompt );
+    $system_prompt = $_POST['system_prompt'] ?? $default_prompt;
+    $current_page = sanitize_text_field( $_POST['current_page'] ?? 'dashboard' );
+    $page_contexts = array(
+        'dashboard'  => "The user is currently viewing the main dashboard workspace. Focus on general productivity, quick overview tasks, workspace settings, connection status, and co-founder briefing metrics.",
+        'leads'      => "The user is currently viewing the Lead Management CRM Pipeline. Focus on managing prospective clients, lead status categories (new, contacted, proposal, negotiation, closed), WhatsApp message reminders, and booking tours.",
+        'bookings'   => "The user is currently viewing the Bookings Calendar. Focus on scheduling appointments, viewing photographer slots, and editing showing dates.",
+        'financials' => "The user is currently viewing Financials & Invoices. Focus on invoicing clients, state GST calculations (Jaipur/Delhi SGST & CGST split), and profit breakdowns.",
+        'vault'      => "The user is currently viewing the Secure Document Vault. Focus on client contracts, PDF templates, and uploading and auditing official credentials.",
+        'settings'   => "The user is currently viewing Workspace & Member Settings. Focus on API keys, role governance, adding members, and editing platform options.",
+        'portfolio'  => "The user is currently viewing the Photography Portfolio. Focus on image galleries, upload presets, client review links, and asset metadata.",
+    );
+    $page_instruction = isset( $page_contexts[$current_page] ) ? $page_contexts[$current_page] : "The user is currently viewing the {$current_page} section.";
+    $system_prompt .= "\n[CURRENT CONTEXT] " . $page_instruction;
+    $system_prompt = sanitize_textarea_field( $system_prompt );
 
     if ( empty( $message ) ) {
         wp_send_json_error( 'No message provided.' );

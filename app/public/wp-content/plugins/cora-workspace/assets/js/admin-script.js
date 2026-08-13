@@ -1138,6 +1138,8 @@ jQuery(document).ready(function($) {
         const ajaxUrlEndpoint = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
         const ajaxNonceSec = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
 
+        const curPage = window.coraCurrentView || new URLSearchParams(window.location.search).get('sub_page') || 'dashboard';
+
         // Actual AJAX call to backend
         $.ajax({
             url: ajaxUrlEndpoint,
@@ -1145,7 +1147,8 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'cora_ai_chat',
                 security: ajaxNonceSec,
-                message: text
+                message: text,
+                current_page: curPage
             },
             success: function(response) {
                 $(`#${typingId}`).remove();
@@ -11253,11 +11256,82 @@ jQuery(document).ready(function($) {
         $('#cora-island-ai-input').val('');
     };
 
+    window.coraInitSidebarContext = function() {
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        const curPage = window.coraCurrentView || new URLSearchParams(window.location.search).get('sub_page') || pathParts[pathParts.length - 1] || 'dashboard';
+        
+        const welcomeMessages = {
+            dashboard: "Hello! I am Cora, your workspace co-founder intelligence. Ask me about your business stats, recent logs, or quick actions.",
+            leads: "Hello! I am Cora, your CRM and Lead assistant. Ask me about lead details, WhatsApp reminder drafts, or scheduling follow-up calls.",
+            financials: "Hello! I am Cora, your Financials & Billing copilot. Ask me about state GST splits, invoicing clients, or profit metrics.",
+            vault: "Hello! I am Cora, your Document Vault assistant. Ask me about e-sign templates, active client contracts, or secure credentials audits.",
+            bookings: "Hello! I am Cora, your Booking Calendar coordinator. Ask me about photog appointments, showing slot availabilities, or photographer calendars.",
+            settings: "Hello! I am Cora, your Workspace Governance assistant. Ask me about system configurations, API keys, or team member role assignments.",
+            portfolio: "Hello! I am Cora, your Portfolio & Asset manager. Ask me about client photo reviews, upload resolutions, or optimizing image SEO."
+        };
+        
+        const quickPrompts = {
+            dashboard: [
+                { text: "Summarize today's workspace activity", label: "Summarize activity" },
+                { text: "Show current automations status", label: "Check automations" }
+            ],
+            leads: [
+                { text: "Draft a WhatsApp reminder for Ananya Sharma", label: "Draft reminder for Ananya" },
+                { text: "Check status of Rohit & Sneha's deal", label: "Check Rohit & Sneha's deal" }
+            ],
+            financials: [
+                { text: "Calculate GST for 50,000 INR Delhi-Jaipur split", label: "Calculate GST split" },
+                { text: "Create a draft invoice template", label: "Draft invoice template" }
+            ],
+            vault: [
+                { text: "Verify the RERA registration document", label: "Verify RERA doc" },
+                { text: "Draft a client lease agreement", label: "Draft lease agreement" }
+            ],
+            bookings: [
+                { text: "Check photographer slots for tomorrow", label: "Check photog slots" },
+                { text: "Schedule a new listing tour", label: "Schedule tour" }
+            ],
+            settings: [
+                { text: "Explain role governance access permissions", label: "Explain roles" },
+                { text: "Check Gemini API connection status", label: "Check connection status" }
+            ],
+            portfolio: [
+                { text: "Scan my gallery for missing SEO meta details", label: "Scan image SEO" },
+                { text: "Generate a client review sharing link", label: "Create sharing link" }
+            ]
+        };
+        
+        const welcomeText = welcomeMessages[curPage] || welcomeMessages.dashboard;
+        const prompts = quickPrompts[curPage] || quickPrompts.dashboard;
+        
+        const welcomeBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
+        if (welcomeBubble.length) {
+            welcomeBubble.text(welcomeText);
+        }
+        
+        const shortcutsContainer = $('.cora-ai-sidebar-shortcuts');
+        if (shortcutsContainer.length && prompts) {
+            let html = `<span class="cora-sidebar-sublabel text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2.5 block">Quick Prompts</span>`;
+            prompts.forEach(p => {
+                const escapedText = p.text.replace(/'/g, "\\'");
+                html += `
+                    <button class="cora-shortcut-btn w-full text-left p-2.5 text-xs text-zinc-655 border border-zinc-200 rounded-md hover:bg-zinc-50 hover:text-zinc-955 transition-colors mb-2 cursor-pointer font-medium" onclick="coraSendShortcut('${escapedText}')">
+                        ${p.label}
+                    </button>
+                `;
+            });
+            shortcutsContainer.html(html);
+        }
+    };
+
     $(document).ready(function() {
         const savedMode = localStorage.getItem('cora_mobile_island_mode') || 'ai';
         if (typeof window.coraToggleIslandState === 'function' && $('#cora-mobile-floating-island').length) {
             window.coraToggleIslandState(savedMode);
         }
+
+        // Initialize sidebar context based on current page
+        window.coraInitSidebarContext();
 
         // Toggle popover card when focusing/clicking island inputs
         $(document).on('click focus', '#cora-island-ai-input, #cora-island-view-compact', function(e) {
