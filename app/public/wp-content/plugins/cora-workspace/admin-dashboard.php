@@ -2240,6 +2240,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 border-top-left-radius: 20px !important;
                 border-top-right-radius: 20px !important;
             }
+            #cora-ai-sidebar .cora-ai-sidebar-body {
+                padding-bottom: 76px !important;
+            }
             }
             
             #cora-ai-sidebar.collapsed {

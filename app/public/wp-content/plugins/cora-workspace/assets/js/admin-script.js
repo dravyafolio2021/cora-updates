@@ -11330,6 +11330,19 @@ jQuery(document).ready(function($) {
         if (welcomeBubble.length) {
             welcomeBubble.text(welcomeText);
         }
+
+        // Update header model label with dynamic RAG context
+        const pageNames = {
+            dashboard: "Dashboard",
+            leads: "Leads",
+            financials: "Finance",
+            vault: "Vault",
+            bookings: "Bookings",
+            settings: "Settings",
+            portfolio: "Portfolio"
+        };
+        const activePageName = pageNames[curPage] || "Workspace";
+        $('#cora-sidebar-model-label').text('Gemini 2.5 Flash • ' + activePageName);
         
         const shortcutsContainer = $('.cora-ai-sidebar-shortcuts');
         if (shortcutsContainer.length && prompts) {
