@@ -11194,7 +11194,7 @@ jQuery(document).ready(function($) {
     });
 
     // Adaptive 3-State Floating Mobile Island Controller
-    window.coraToggleIslandState = function(targetState) {
+    window.coraToggleIslandState = function(targetState, skipFocus) {
         let newState = targetState;
         
         const currentState = localStorage.getItem('cora_mobile_island_mode') || 'ai';
@@ -11225,7 +11225,9 @@ jQuery(document).ready(function($) {
             // Hide Right Star Button
             $('#cora-island-state-ai-btn').addClass('hidden').hide();
             
-            setTimeout(function() { $('#cora-island-ai-input').focus(); }, 100);
+            if (!skipFocus) {
+                setTimeout(function() { $('#cora-island-ai-input').focus(); }, 100);
+            }
         } else if (newState === 'nav') {
             // Hide Left Menu Toggle Button
             $('#cora-island-state-menu-btn').addClass('hidden').hide();
@@ -11414,14 +11416,14 @@ jQuery(document).ready(function($) {
     $(document).ready(function() {
         const savedMode = localStorage.getItem('cora_mobile_island_mode') || 'ai';
         if (typeof window.coraToggleIslandState === 'function' && $('#cora-mobile-floating-island').length) {
-            window.coraToggleIslandState(savedMode);
+            window.coraToggleIslandState(savedMode, true);
         }
 
         // Initialize sidebar context based on current page
         window.coraInitSidebarContext();
 
-        // Open the native AI sidebar when focusing/clicking island inputs
-        $(document).on('click focus', '#cora-island-ai-input, #cora-island-view-compact', function(e) {
+        // Open the native AI sidebar ONLY when the user clicks the island input field
+        $(document).on('click', '#cora-island-ai-input', function(e) {
             e.stopPropagation();
             if (typeof window.coraToggleSidebar === 'function') {
                 window.coraToggleSidebar(true);
