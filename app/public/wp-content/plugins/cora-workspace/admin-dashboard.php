@@ -2227,13 +2227,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 border-top-right-radius: 20px !important;
                 border-bottom-left-radius: 0 !important;
                 border-bottom-right-radius: 0 !important;
-                box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1), 0 -8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+                box-shadow: none !important;
                 transform: translateY(0) !important;
                 transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s !important;
                 z-index: 9970 !important;
             }
             #cora-ai-sidebar .cora-ai-sidebar-body {
-                padding-bottom: 84px !important;
+                padding-bottom: 0 !important;
             }
             
             #cora-ai-sidebar.collapsed {
@@ -2242,6 +2242,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 visibility: hidden !important;
                 box-shadow: none !important;
                 display: flex !important;
+            }
+
+            /* Remove island shadow when AI drawer is open */
+            #cora-mobile-floating-island.cora-island-docked .cora-island-card {
+                box-shadow: none !important;
             }
         }
 
