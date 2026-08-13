@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.4.7
+ * Version: 3.4.8
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.4.7' );
+define( 'CORA_WORKSPACE_VERSION', '3.4.8' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -1167,6 +1167,27 @@ function cora_workspace_handle_workspace_route() {
             }
         }
         wp_die( __( 'Invalid or secure portfolio link.', 'cora-workspace' ), __( 'Access Denied', 'cora-workspace' ), array( 'response' => 403 ) );
+    }
+
+    // Intercept Branded Public/Shareable Preview Page
+    $preview_idx = -1;
+    if ( isset( $path_parts[0] ) && 'shared-preview' === $path_parts[0] ) {
+        $preview_idx = 1;
+    } else if ( isset( $path_parts[1] ) && 'shared-preview' === $path_parts[1] ) {
+        $preview_idx = 2;
+    }
+
+    if ( $preview_idx !== -1 ) {
+        $preview_post_id = isset( $path_parts[$preview_idx] ) ? intval( $path_parts[$preview_idx] ) : 0;
+        if ( $preview_post_id > 0 ) {
+            $preview_post = get_post( $preview_post_id );
+            if ( $preview_post && 'post' === $preview_post->post_type ) {
+                nocache_headers();
+                include CORA_WORKSPACE_PATH . 'public-preview-view.php';
+                exit;
+            }
+        }
+        wp_die( __( 'Invalid or unavailable article preview link.', 'cora-workspace' ), __( 'Access Denied', 'cora-workspace' ), array( 'response' => 404 ) );
     }
 
     $shared_form_idx = -1;
