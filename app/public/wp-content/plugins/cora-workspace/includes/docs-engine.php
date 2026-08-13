@@ -1113,8 +1113,7 @@ function cora_ajax_public_query_rag() {
     
     $system_prompt = "You are Cora AI, an intelligent, helpful developer assistant for the Cora Platform. 
 Your objective is to answer technical and general questions about the Cora Platform and its workspace modules.
-If you are provided with retrieved knowledge base context below, use it to accurately address the query.
-Otherwise, use your general knowledge of the Cora Platform (which features dynamic bookings, crew schedule boards, lead generation pipelines, CGST/SGST ledger sheets, e-signing vault registry, etc.) to give a clear and professional answer.
+If you are provided with retrieved knowledge base context below, use it to address the query. If the retrieved context is insufficient, irrelevant, or does not directly answer the question, or if no specific context is found, you MUST fallback to and use your general knowledge of the Cora Platform (which features dynamic bookings, crew scheduler boards, geofenced attendance logs, lead generation pipelines, CGST/SGST ledger sheets, e-signing vault registry, white-labeled Elementor themes, PWA wizard, etc.) to construct a complete, detailed, and accurate response. Do not state that you cannot answer the question or that the context is insufficient if you can answer it using your general knowledge of the Cora platform.
 Always respond in short, clear, and bulleted or formatted Markdown. Avoid conversational fluff.
 
 Retrieved Context:

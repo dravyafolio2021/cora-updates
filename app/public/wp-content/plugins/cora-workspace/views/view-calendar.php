@@ -65,23 +65,24 @@ $current_day = 14; // Mock active focus day
 ?>
 
 <div class="space-y-6 font-sans text-zinc-900 select-none max-w-[1700px] mx-auto pb-12">
-    <!-- Page Header -->
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-zinc-200">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-zinc-950">● Workspace Calendar</h1>
-            <p class="text-xs font-medium text-zinc-500 mt-1">Manage corporate schedules, client photo shoot bookings, and team shifts.</p>
+    <!-- ═══ 1. STANDARDIZED PAGE HEADER & CTA ACTION BAR ═════════════════════════════════ -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 w-full">
+        <div class="min-w-0">
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-950 leading-snug">Workspace Calendar</h1>
+            <p class="text-xs sm:text-sm text-zinc-500 mt-1.5 leading-relaxed">Manage corporate schedules, client photo shoot bookings, and team shifts.</p>
         </div>
-        <div class="flex items-center gap-3">
-            <button onclick="if(window.coraShowToast) window.coraShowToast('Calendar sync updated.', 'success')" class="px-4 py-2 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs cursor-pointer flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+
+        <div class="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
+            <button onclick="if(window.coraShowToast) window.coraShowToast('Calendar sync updated.', 'success')" class="flex-1 sm:flex-none px-5 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold rounded-full transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-2">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 Sync External
             </button>
-            <button onclick="if(window.coraShowToast) window.coraShowToast('Add Event drawer coming soon!', 'info')" class="px-4.5 py-2.5 bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <button onclick="if(window.coraShowToast) window.coraShowToast('Add Event drawer coming soon!', 'info')" class="w-full sm:w-auto px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-full transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Add Event
             </button>
         </div>
-    </header>
+    </div>
 
     <!-- Main Workspace Split Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
