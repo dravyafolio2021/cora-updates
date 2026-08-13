@@ -8310,7 +8310,33 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        const coverHtml = coverUrl ? `<div style="width:100%; height:320px; overflow:hidden; border-radius:16px; margin-bottom:32px;"><img src="${coverUrl}" style="width:100%; height:100%; object-fit:cover;"></div>` : '';
+        // Extract dynamic active workspace context info
+        const wsName = (window.coraREData && window.coraREData.activeWorkspace && window.coraREData.activeWorkspace.name) 
+                       ? window.coraREData.activeWorkspace.name 
+                       : 'Cora Workspace';
+
+        // Extract selected author and calculate initials badge
+        const authorSelect = document.getElementById('cora-article-assignee');
+        let authorName = 'Cora Editor';
+        if (authorSelect && authorSelect.selectedIndex > -1) {
+            const selectedText = authorSelect.options[authorSelect.selectedIndex].text;
+            if (selectedText && selectedText.trim() !== 'Unassigned' && selectedText.trim() !== '') {
+                authorName = selectedText.trim();
+            }
+        }
+
+        const getInitials = (name) => {
+            const parts = name.split(' ').filter(p => p.trim().length > 0);
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            } else if (parts.length === 1) {
+                return parts[0].substring(0, 2).toUpperCase();
+            }
+            return 'CE';
+        };
+        const authorInitials = getInitials(authorName);
+
+        const coverHtml = coverUrl ? `<div class="cover-image-wrap"><img src="${coverUrl}"></div>` : '';
 
         previewWindow.document.write(`
             <!DOCTYPE html>
@@ -8320,108 +8346,281 @@ jQuery(document).ready(function($) {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Preview: ${title}</title>
                 <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
+                    
                     body {
-                        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
                         color: #18181b;
-                        background-color: #fafafa;
+                        background-color: #faf9f6; /* Elegant warm cream background matching Anthropic design guidelines */
                         margin: 0;
-                        padding: 40px 20px;
-                        line-height: 1.6;
+                        padding: 0;
+                        line-height: 1.65;
+                        -webkit-font-smoothing: antialiased;
                     }
-                    .preview-container {
-                        max-width: 680px;
-                        margin: 0 auto;
+                    
+                    /* Branded top navigation bar */
+                    .preview-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding: 14px 24px;
                         background: #ffffff;
-                        padding: 40px;
+                        border-bottom: 1px solid #e4e4e7;
+                        position: sticky;
+                        top: 0;
+                        z-index: 50;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.01);
+                    }
+                    .header-left {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+                    .brand-logo {
+                        color: #09090b;
+                    }
+                    .workspace-name {
+                        font-size: 12px;
+                        font-weight: 700;
+                        color: #18181b;
+                        letter-spacing: -0.01em;
+                        text-transform: uppercase;
+                    }
+                    .status-indicator {
+                        width: 6px;
+                        height: 6px;
+                        border-radius: 50%;
+                        background: #10b981;
+                        display: inline-block;
+                    }
+                    .header-right {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    .badge {
+                        font-size: 9px;
+                        font-weight: 800;
+                        padding: 4px 10px;
+                        border-radius: 6px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                        font-family: 'Inter', sans-serif;
+                    }
+                    .preview-badge {
+                        background: #18181b;
+                        color: #ffffff;
+                    }
+                    .draft-badge {
+                        background: #f4f4f5;
+                        color: #71717a;
+                        border: 1px solid #e4e4e7;
+                    }
+                    
+                    /* Content Main Container */
+                    .preview-container {
+                        max-width: 720px;
+                        margin: 48px auto;
+                        background: #ffffff;
+                        padding: 56px 64px;
                         border: 1px solid #e4e4e7;
                         border-radius: 20px;
-                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+                        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.015);
                     }
-                    h1 {
+                    
+                    @media (max-width: 768px) {
+                        .preview-container {
+                            margin: 16px;
+                            padding: 32px 20px;
+                            border-radius: 12px;
+                        }
+                    }
+                    
+                    /* Cover Image */
+                    .cover-image-wrap {
+                        width: 100%;
+                        height: 340px;
+                        overflow: hidden;
+                        border-radius: 12px;
+                        margin-bottom: 40px;
+                        border: 1px solid #f4f4f5;
+                    }
+                    .cover-image-wrap img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                    
+                    /* Article Title */
+                    h1.article-title {
                         font-size: 2.5rem;
                         font-weight: 800;
                         color: #09090b;
-                        line-height: 1.15;
+                        line-height: 1.2;
                         margin-top: 0;
                         margin-bottom: 24px;
-                        letter-spacing: -0.02em;
+                        letter-spacing: -0.025em;
                     }
-                    .meta-info {
+                    
+                    /* Meta Info Bar */
+                    .article-meta {
                         display: flex;
                         align-items: center;
                         gap: 12px;
-                        font-size: 0.8rem;
-                        color: #71717a;
-                        margin-bottom: 32px;
+                        margin-bottom: 40px;
                         border-bottom: 1px solid #f4f4f5;
-                        padding-bottom: 16px;
+                        padding-bottom: 24px;
                     }
-                    .badge {
-                        background: #f4f4f5;
-                        color: #18181b;
-                        padding: 2px 8px;
-                        border-radius: 9999px;
+                    .author-avatar {
+                        width: 38px;
+                        height: 38px;
+                        border-radius: 50%;
+                        background: #27272a;
+                        color: #ffffff;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 13px;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: -0.01em;
+                        font-family: 'Inter', sans-serif;
+                    }
+                    .meta-details {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 2px;
+                    }
+                    .author-name {
+                        font-size: 13px;
                         font-weight: 600;
+                        color: #18181b;
                     }
+                    .meta-sub {
+                        font-size: 11px;
+                        color: #71717a;
+                    }
+                    
+                    /* Article content typesetting */
                     .content {
-                        font-size: 1.05rem;
+                        font-family: 'Lora', Georgia, Charter, serif; /* Editorial Font Stack */
+                        font-size: 1.125rem;
                         color: #27272a;
                         line-height: 1.8;
                     }
                     .content h2 {
-                        font-size: 1.5rem;
+                        font-family: 'Inter', sans-serif;
+                        font-size: 1.65rem;
+                        font-weight: 850;
+                        color: #09090b;
+                        margin-top: 48px;
+                        margin-bottom: 18px;
+                        letter-spacing: -0.02em;
+                        line-height: 1.3;
+                    }
+                    .content h3 {
+                        font-family: 'Inter', sans-serif;
+                        font-size: 1.3rem;
                         font-weight: 700;
                         color: #09090b;
                         margin-top: 36px;
-                        margin-bottom: 16px;
-                    }
-                    .content h3 {
-                        font-size: 1.25rem;
-                        font-weight: 700;
-                        color: #09090b;
-                        margin-top: 28px;
-                        margin-bottom: 12px;
+                        margin-bottom: 14px;
+                        letter-spacing: -0.01em;
                     }
                     .content p {
                         margin-top: 0;
-                        margin-bottom: 24px;
+                        margin-bottom: 26px;
                     }
+                    
+                    /* Table formats */
                     .content table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin-bottom: 24px;
-                        font-size: 0.9rem;
+                        margin: 32px 0;
+                        font-size: 0.95rem;
+                        font-family: 'Inter', sans-serif;
                     }
                     .content th, .content td {
                         border: 1px solid #e4e4e7;
-                        padding: 8px 12px;
+                        padding: 12px 16px;
+                        text-align: left;
                     }
                     .content th {
-                        background: #f4f4f5;
+                        background: #fafafa;
+                        font-weight: 700;
+                        color: #09090b;
                     }
-                    .cora-inline-cta-card, .cora-equipment-showcase-card, .cora-related-article-card {
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
+                    .content tr:hover {
+                        background: #fafafa;
+                    }
+                    
+                    /* Custom interactive blocks styling overrides */
+                    .cora-inline-cta-card, .cora-equipment-showcase-card, .cora-related-article-card, .cora-listing-card, .cora-equipment-card, .cora-gallery-showcase, .cora-pullquote-block, .cora-editorial-signature {
+                        font-family: 'Inter', sans-serif !important;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.015) !important;
+                        border: 1px solid #e4e4e7 !important;
+                        border-radius: 14px !important;
+                        transition: all 0.25s ease;
+                    }
+                    .cora-inline-cta-card:hover, .cora-related-article-card:hover, .cora-listing-card:hover, .cora-equipment-card:hover {
+                        transform: translateY(-1.5px);
+                        box-shadow: 0 8px 30px rgba(0,0,0,0.03) !important;
+                        border-color: #d4d4d8 !important;
+                    }
+                    
+                    /* Signature card specific fixes */
+                    .cora-editorial-signature p {
+                        margin-bottom: 0 !important;
+                    }
+                    
+                    /* Footer branding */
+                    .preview-footer {
+                        text-align: center;
+                        margin-top: 64px;
+                        padding-top: 24px;
+                        border-top: 1px solid #f4f4f5;
+                        font-size: 11px;
+                        color: #a1a1aa;
+                        font-family: 'Inter', sans-serif;
                     }
                 </style>
             </head>
             <body>
+                <header class="preview-header">
+                    <div class="header-left">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none" class="brand-logo"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                        <span class="workspace-name">${wsName}</span>
+                        <span class="status-indicator"></span>
+                    </div>
+                    <div class="header-right">
+                        <span class="badge preview-badge">PREVIEW MODE</span>
+                        <span class="badge draft-badge">Draft Preview</span>
+                    </div>
+                </header>
+
                 <div class="preview-container">
                     ${coverHtml}
-                    <h1>${title}</h1>
-                    <div class="meta-info">
-                        <span class="badge">PREVIEW MODE</span>
-                        <span>Generated at: ${new Date().toLocaleString()}</span>
-                        <span>· By Nitin & Shanaya Arora</span>
+                    <h1 class="article-title">${title}</h1>
+                    <div class="article-meta">
+                        <div class="author-avatar">${authorInitials}</div>
+                        <div class="meta-details">
+                            <span class="author-name">By ${authorName}</span>
+                            <span class="meta-sub">Generated on ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
                     </div>
                     <div class="content">
                         ${content}
                     </div>
+                    
+                    <footer class="preview-footer">
+                        Generated via Cora Workspace Platform · Secure Draft Preview
+                    </footer>
                 </div>
             </body>
             </html>
         `);
         previewWindow.document.close();
-        window.coraShowToast('Premium article preview generated.', 'success');
+        window.coraShowToast('Branded article preview generated.', 'success');
     };
 
     window.coraFindSynonyms = function() {
