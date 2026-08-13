@@ -3189,22 +3189,62 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <!-- Global Dark Topbar (Shopify UI/UX) -->
     <?php
     $cora_current_user_id = get_current_user_id();
-    $cora_all_notifications = get_option( 'cora_notifications', array() );
     $cora_user_notifications = array();
     $cora_unread_count = 0;
-    if ( is_array( $cora_all_notifications ) ) {
-        foreach ( $cora_all_notifications as $notif ) {
-            if ( isset( $notif['user_id'] ) && intval( $notif['user_id'] ) === $cora_current_user_id ) {
-                $cora_user_notifications[] = $notif;
-                if ( empty( $notif['read'] ) ) {
+
+    // Primary source: DB table wp_cora_notifications (canonical since migration)
+    if ( function_exists( 'cora_db_get_agency_id' ) ) {
+        global $wpdb;
+        $_cora_agency_id = cora_db_get_agency_id();
+        $_cora_db_notifs = $wpdb->get_results( $wpdb->prepare(
+            "SELECT id, title, body, is_read, action_url, created_at
+             FROM {$wpdb->prefix}cora_notifications
+             WHERE user_id = %d AND agency_id = %d
+             ORDER BY created_at DESC
+             LIMIT 100",
+            $cora_current_user_id,
+            $_cora_agency_id
+        ), ARRAY_A );
+        if ( is_array( $_cora_db_notifs ) ) {
+            foreach ( $_cora_db_notifs as $_n ) {
+                $cora_user_notifications[] = array(
+                    'id'          => 'notif_' . intval( $_n['id'] ),
+                    'user_id'     => $cora_current_user_id,
+                    'title'       => $_n['title'],
+                    'description' => $_n['body'],
+                    'timestamp'   => strtotime( $_n['created_at'] ),
+                    'read'        => ! empty( $_n['is_read'] ),
+                    'action_url'  => esc_url_raw( $_n['action_url'] ?? '' ),
+                );
+                if ( empty( $_n['is_read'] ) ) {
                     $cora_unread_count++;
                 }
             }
         }
-        usort( $cora_user_notifications, function( $a, $b ) {
-            return ($b['timestamp'] ?? 0) - ($a['timestamp'] ?? 0);
-        } );
     }
+
+    // Legacy fallback: merge any option-based notifications not already in DB results
+    $_cora_db_ids_in_list = array_map( function($x) { return $x['id']; }, $cora_user_notifications );
+    $_cora_option_notifs = get_option( 'cora_notifications', array() );
+    if ( is_array( $_cora_option_notifs ) ) {
+        foreach ( $_cora_option_notifs as $_notif ) {
+            if (
+                isset( $_notif['user_id'] ) &&
+                intval( $_notif['user_id'] ) === $cora_current_user_id &&
+                ! in_array( $_notif['id'] ?? '', $_cora_db_ids_in_list, true )
+            ) {
+                $cora_user_notifications[] = $_notif;
+                if ( empty( $_notif['read'] ) ) {
+                    $cora_unread_count++;
+                }
+            }
+        }
+    }
+
+    // Sort by timestamp descending
+    usort( $cora_user_notifications, function( $a, $b ) {
+        return ( $b['timestamp'] ?? 0 ) - ( $a['timestamp'] ?? 0 );
+    } );
     $cora_display_name = $current_wp_user->display_name ? $current_wp_user->display_name : ($current_wp_user->first_name ? $current_wp_user->first_name : 'Dravya Bansal');
     $cora_initials = strtoupper(substr($cora_display_name, 0, 1));
 
@@ -11298,12 +11338,14 @@ wp_print_footer_scripts();
         const mobileBadge = document.getElementById('cora-mobile-notif-badge');
         const sidebarBadge = document.getElementById('cora-sidebar-notif-badge');
 
-        // Filter to last 24 hours (86400 seconds)
+        // Filter to last 7 days (604800 seconds); surface all recent activity
         const nowSec = Math.floor(Date.now() / 1000);
-        const last24hNotifications = coraNotifications.filter(n => (nowSec - parseInt(n.timestamp || 0)) <= 86400);
+        const last7dNotifications = coraNotifications.filter(n => (nowSec - parseInt(n.timestamp || 0)) <= 604800);
+        // If nothing in 7 days, show all (so panel is never confusingly blank when data exists)
+        const filteredNotifications = last7dNotifications.length > 0 ? last7dNotifications : coraNotifications.slice(0, 25);
 
-        const displayList = last24hNotifications.slice(0, 15);
-        const unreadCount = last24hNotifications.filter(n => !n.read).length;
+        const displayList = filteredNotifications.slice(0, 25);
+        const unreadCount = filteredNotifications.filter(n => !n.read).length;
 
         // Update badges
         if (unreadCount > 0) {
@@ -11330,11 +11372,11 @@ wp_print_footer_scripts();
             if (mobileListContainer) mobileListContainer.innerHTML = '';
             
             if (emptyState) {
-                emptyState.textContent = 'No notifications in the last 24 hours.';
+                emptyState.textContent = 'No notifications yet.';
                 emptyState.classList.remove('hidden');
             }
             if (sidebarEmptyState) {
-                sidebarEmptyState.textContent = 'No notifications in the last 24 hours.';
+                sidebarEmptyState.textContent = 'No notifications yet.';
                 sidebarEmptyState.classList.remove('hidden');
             }
             if (mobileEmptyState) {
