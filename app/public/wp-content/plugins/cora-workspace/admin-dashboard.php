@@ -1769,6 +1769,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             -webkit-box-shadow: none !important;
         }
 
+        #cora-notif-dropdown:not(.collapsed) {
+            transform: translateX(0) !important;
+            pointer-events: auto !important;
+            visibility: visible !important;
+            display: flex !important;
+        }
+
         aside[id$="-drawer"] {
 
             position: fixed !important;
