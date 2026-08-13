@@ -11341,6 +11341,7 @@ wp_print_footer_scripts();
         const shouldOpen = forceShow !== undefined ? forceShow : isCollapsed;
         if (shouldOpen) {
             drawer.classList.remove('collapsed');
+            drawer.style.display = ''; // Clear inline styles
         } else {
             drawer.classList.add('collapsed');
         }
@@ -11360,8 +11361,13 @@ wp_print_footer_scripts();
             if (id !== exceptId) {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.classList.add('hidden');
-                    el.style.display = 'none';
+                    if (id === 'cora-notif-dropdown') {
+                        el.classList.add('collapsed');
+                        el.style.display = ''; // Reset inline display
+                    } else {
+                        el.classList.add('hidden');
+                        el.style.display = 'none';
+                    }
                 }
             }
         });
