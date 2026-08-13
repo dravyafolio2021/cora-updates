@@ -10896,6 +10896,87 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             </div>
         </div>
     </aside>
+    <?php
+    $cora_mobile_drawer_items = array();
+    if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
+        foreach ( $nav_groups as $group ) {
+            if ( empty( $group['items'] ) || ! is_array( $group['items'] ) ) continue;
+            foreach ( $group['items'] as $target => $item ) {
+                $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' );
+                if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
+                    continue;
+                }
+                $cora_mobile_drawer_items[$target] = $item;
+            }
+        }
+    }
+    ?>
+    <!-- Mobile Bottom Navigation Drawer Sheet -->
+    <div id="cora-mobile-nav-drawer" class="fixed inset-0 z-[99999] hidden flex-col justify-end select-none">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-zinc-950/40 backdrop-blur-sm transition-opacity duration-300" onclick="window.coraToggleMobileNavDrawer(false)"></div>
+        
+        <!-- Drawer Container -->
+        <div class="relative w-full bg-white border-t border-zinc-200 rounded-t-3xl shadow-2xl flex flex-col select-none max-h-[75vh]" style="z-index: 1; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); transform: translateY(100%); padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));">
+            
+            <!-- Drag Handle / Header Indicator -->
+            <div class="w-full flex items-center justify-center py-3 cursor-pointer shrink-0" onclick="window.coraToggleMobileNavDrawer(false)">
+                <div class="w-12 h-1.5 bg-zinc-250 rounded-full"></div>
+            </div>
+            
+            <!-- Drawer Header -->
+            <div class="px-5 pb-3.5 border-b border-zinc-100 flex items-center justify-between shrink-0">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">All Modules & Tools</span>
+                <button onclick="window.coraToggleMobileNavDrawer(false)" class="p-1 rounded-full text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer border-none bg-transparent">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <!-- Drawer Grid Content -->
+            <div class="flex-1 overflow-y-auto p-5 no-scrollbar" style="-webkit-overflow-scrolling: touch;">
+                <div class="grid grid-cols-3 gap-y-5 gap-x-4">
+                    <?php foreach ( $cora_mobile_drawer_items as $target => $item ) : 
+                        $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
+                        $is_active = ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) );
+                    ?>
+                        <a href="<?php echo esc_url($nav_url); ?>" class="flex flex-col items-center text-center gap-2 group decoration-none" style="text-decoration: none;">
+                            <div class="w-11 h-11 rounded-xl flex items-center justify-center border transition-all <?php echo $is_active ? 'bg-zinc-950 border-zinc-950 text-white' : 'bg-zinc-50 border-zinc-200/80 text-zinc-655 hover:bg-zinc-100 hover:text-zinc-900'; ?>">
+                                <span class="[&>svg]:w-5 [&>svg]:h-5 shrink-0">
+                                    <?php echo $item['icon']; ?>
+                                </span>
+                            </div>
+                            <span class="text-[10px] font-bold tracking-tight <?php echo $is_active ? 'text-zinc-950' : 'text-zinc-500 hover:text-zinc-900'; ?> leading-tight break-words max-w-[84px]"><?php echo esc_html($item['title']); ?></span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    window.coraToggleMobileNavDrawer = function(forceShow) {
+        const drawer = document.getElementById('cora-mobile-nav-drawer');
+        if (!drawer) return;
+        const container = drawer.querySelector('.relative.w-full');
+        const isHidden = drawer.classList.contains('hidden');
+        const shouldShow = forceShow !== undefined ? forceShow : isHidden;
+        
+        if (shouldShow) {
+            drawer.classList.remove('hidden');
+            // Force reflow
+            drawer.offsetHeight;
+            container.style.transform = 'translateY(0)';
+            document.body.style.overflow = 'hidden';
+        } else {
+            container.style.transform = 'translateY(100%)';
+            setTimeout(() => {
+                drawer.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+    };
+    </script>
+
     <!-- Mobile Floating Bottom Navigation (3-State Adaptive Floating Island Bar) -->
     <div id="cora-mobile-floating-island" class="cora-mobile-island-wrapper lg:hidden fixed bottom-4 left-0 right-0 z-[9980] w-[calc(100vw-32px)] max-w-[460px] mx-auto transition-all duration-300 ease-out select-none" style="position: fixed !important; bottom: 16px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; z-index: 9980 !important; width: calc(100vw - 32px) !important; max-width: 460px !important; box-sizing: border-box !important;">
         <div class="cora-island-card w-full flex items-center justify-between transition-all duration-300">
@@ -10948,7 +11029,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/></svg>
                     <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">Finance</span>
                 </a>
-                <a href="javascript:void(0)" onclick="const sb=document.querySelector('.cora-sidebar'); if(sb){ sb.classList.toggle('mobile-open'); sb.classList.toggle('hidden'); }" class="cora-island-nav-link">
+                <a href="javascript:void(0)" onclick="window.coraToggleMobileNavDrawer(true);" class="cora-island-nav-link">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                     <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">More</span>
                 </a>

@@ -321,17 +321,24 @@ jQuery(document).ready(function($) {
         coraToggleSidebar(isCollapsed);
     });
 
-    // Mobile Navigation Sidebar Drawer Toggle
+    // Mobile Navigation Bottom Drawer Toggle
     $('#cora-mobile-menu-toggle').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        $('.cora-sidebar').removeClass('-translate-x-full').addClass('translate-x-0');
-        $('#cora-sidebar-backdrop').removeClass('hidden');
+        if (typeof window.coraToggleMobileNavDrawer === 'function') {
+            window.coraToggleMobileNavDrawer(true);
+        } else {
+            $('.cora-sidebar').removeClass('-translate-x-full').addClass('translate-x-0');
+            $('#cora-sidebar-backdrop').removeClass('hidden');
+        }
     });
 
     $('#cora-mobile-menu-close, #cora-sidebar-backdrop').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
+        if (typeof window.coraToggleMobileNavDrawer === 'function') {
+            window.coraToggleMobileNavDrawer(false);
+        }
         $('.cora-sidebar').removeClass('translate-x-0').addClass('-translate-x-full');
         $('#cora-sidebar-backdrop').addClass('hidden');
     });
