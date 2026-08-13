@@ -170,6 +170,12 @@ The **Content AI Suite** is an enterprise-grade content lifecycle and SEO optimi
 * **Financials**: Revenue tracking, payment status monitoring.
 * **Event Timeline**: Chronological activity feed across all modules.
 
+### 2.11 Workspace Calendar Subsystem (v3.4.28)
+The Workspace Calendar acts as the master planning scheduler for photography studio shoots, client site visits, and team shifts:
+* **Multi-View Scheduling Planner**: Full support for Monthly grid calendars, Weekly timeline grids, and Daily agenda planner layouts.
+* **5-Step Guided Event Wizard Modal**: Dynamic, step-by-step event creation wizard prompting details (Title, Type, Date, Assignee, Notifications) inside a clean overlay modal.
+* **Item Persistence**: Custom calendar day numbers remain visible and styled even when cells are populated with multi-day events or crew allocations.
+
 ---
 
 ## Section 3: Canvas Theme Builder & Elementor/Lovable Integration
@@ -220,9 +226,24 @@ The `/docs` endpoint renders a premium three-column documentation portal.
 
 ---
 
-## Section 5: Multi-Tenant Database Architecture
+## Section 5: UI Shell & Standardized Page Layouts (v3.4.28)
 
-### 5.1 Core Custom Tables
+### 5.1 Standardized Header Action Bar
+All active workspace subviews (Calendar, Event Timeline, Analytics, Email Suite, Financials, Media Library, Forms & Reviews, Settings Suite, Modules Hub, and Google Profile View) adhere to a unified page header design framework:
+* **Branding & Visuals**: Titles are styled using high-contrast bold margins and Outfit display headings, aligned with description subtitles detailing key module workflows.
+* **Integrated AI Platform Shortcuts Stack**: An overlapping brand icon stack (ChatGPT, Gemini, Claude, Perplexity, YouTube) is positioned inside the header, providing 1-click workspace assistance and redirection.
+* **On-Demand Tutorial Walkthroughs**: A dedicated YouTube tutorial trigger button is standard on all headers, opening helpful walkthrough guides inside side drawer sheets.
+
+### 5.2 Dynamic Module Access & Locked States
+* **Padlock Sidebar Indicators**: Sidebar navigation targets that are locked or unavailable on the active workspace subscription tier (e.g., Social Suite, Inbox, Automations) dynamically replace standard icons with padlock vectors.
+* **Premium Locked State Card**: Attempting to access these locked pages renders a premium, centralized monochromatic subscription callout card rather than standard blanks, requesting updates or quota elevation.
+* **Custom Workspace Mode Toggling**: Enables administrators to personalize workspace configurations by toggling specific operational sub-tabs or marketing features.
+
+---
+
+## Section 6: Multi-Tenant Database Architecture
+
+### 6.1 Core Custom Tables
 | Table | Purpose |
 | :--- | :--- |
 | `cora_agencies` | Root tenant isolation |
@@ -235,12 +256,12 @@ The `/docs` endpoint renders a premium three-column documentation portal.
 | `cora_canvas_pages` | Theme builder pages |
 | `cora_documents` | Document vault records |
 
-### 5.2 Agency Isolation Pattern
+### 6.2 Agency Isolation Pattern
 All queries filter by `agency_id`. Owner roles see all branches; branch-level roles are filtered by `branch_id`.
 
 ---
 
-## Section 6: AI Integration & MCP Gateway
+## Section 7: AI Integration & MCP Gateway
 
 * **Multi-Provider AI Routing**: Gemini 3.5 Flash, Claude 3.5 Sonnet, GPT-4o with automatic fallback.
 * **RAG Knowledge Base** (`views/view-rag.php`): Per-tenant workspace knowledge sync.
@@ -248,7 +269,7 @@ All queries filter by `agency_id`. Owner roles see all branches; branch-level ro
 
 ---
 
-## Section 7: Testing & Quality Assurance
+## Section 8: Testing & Quality Assurance
 
 * **Playwright E2E**: Tiered test suites (Tier 1-4) covering auth, CRUD, integration, and workload flows.
 * **Build Validation**: `scripts/build.sh` checks version consistency and packages `updates/cora-workspace.zip`.
