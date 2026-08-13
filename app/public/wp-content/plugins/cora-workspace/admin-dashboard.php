@@ -1757,10 +1757,17 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             box-shadow: none !important;
             -webkit-box-shadow: none !important;
             visibility: hidden !important;
-            display: none !important;
         }
 
-
+        /* Override collapsed display:none for desktop notifications side drawer to allow smooth sliding transitions */
+        #cora-notif-dropdown.collapsed {
+            display: flex !important;
+            visibility: visible !important;
+            transform: translateX(100%) !important;
+            pointer-events: none !important;
+            box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+        }
 
         aside[id$="-drawer"] {
 
@@ -7201,8 +7208,8 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         </div>
     </aside>
 
-
-
+    <!-- Notifications Backdrop (Desktop Only) -->
+    <div id="cora-notif-backdrop" onclick="window.coraToggleNotificationDrawer(false)" class="hidden fixed inset-0 bg-black/45 backdrop-blur-[4px] z-[9998] transition-opacity duration-300 opacity-0" style="position:fixed; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);"></div>
 
     <!-- Notifications Side Drawer Panel -->
     <aside id="cora-notif-dropdown" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[400px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
@@ -11361,14 +11368,28 @@ wp_print_footer_scripts();
         }
         // Desktop: right-side panel
         const drawer = document.getElementById('cora-notif-dropdown');
+        const backdrop = document.getElementById('cora-notif-backdrop');
         if (!drawer) return;
         const isCollapsed = drawer.classList.contains('collapsed');
         const shouldOpen = forceShow !== undefined ? forceShow : isCollapsed;
         if (shouldOpen) {
             drawer.classList.remove('collapsed');
             drawer.style.display = ''; // Clear inline styles
+            if (backdrop) {
+                backdrop.classList.remove('hidden');
+                backdrop.getBoundingClientRect(); // force reflow
+                backdrop.style.opacity = '1';
+            }
+            document.body.style.overflow = 'hidden';
         } else {
             drawer.classList.add('collapsed');
+            if (backdrop) {
+                backdrop.style.opacity = '0';
+                setTimeout(function() {
+                    backdrop.classList.add('hidden');
+                }, 300);
+            }
+            document.body.style.overflow = '';
         }
     };
 
