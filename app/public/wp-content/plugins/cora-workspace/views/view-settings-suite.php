@@ -3288,6 +3288,7 @@ $cora_settings_tabs = array(
                 });
             });
         })(jQuery);
+        </script>
 
         <!-- Custom Confirmation Drawer (replaces all browser confirm() dialogs) -->
         <div id="cora-confirm-drawer" class="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center" style="display:none !important;">
