@@ -11643,6 +11643,11 @@ wp_print_footer_scripts();
 <div id="cora-command-palette" class="fixed inset-0 z-[999999] hidden items-start justify-center p-4 pt-[6vh] md:pt-[10vh] bg-zinc-950/40 backdrop-blur-sm transition-all duration-200">
     <div class="cora-command-container w-full max-w-2xl bg-white border border-zinc-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-transform transform scale-95 duration-200" style="height: 460px; max-height: 80vh;">
         
+        <!-- Mobile Drag Handle Area -->
+        <div class="md:hidden flex items-center justify-center pt-3 pb-1 shrink-0 cursor-grab active:cursor-grabbing select-none" id="cora-command-drag-handle-area">
+            <div class="w-12 h-1 bg-zinc-200 rounded-full"></div>
+        </div>
+
         <!-- Search Input Header -->
         <div class="flex items-center gap-3 px-4 border-b border-zinc-100 py-3.5 shrink-0">
             <svg class="text-zinc-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -11687,7 +11692,7 @@ wp_print_footer_scripts();
     display: flex !important;
 }
 #cora-command-palette.active .cora-command-container {
-    transform: scale(1) !important;
+    transform: scale(1);
 }
 .cora-command-item.selected {
     background-color: #f4f4f5 !important;
@@ -11705,6 +11710,33 @@ wp_print_footer_scripts();
 .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* Mobile Bottom Sheet & Search Optimizations */
+@media (max-width: 767px) {
+    #cora-command-palette {
+        align-items: flex-end !important;
+        justify-content: center !important;
+        padding: 0 !important;
+    }
+    #cora-command-palette .cora-command-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 75vh !important;
+        max-height: 75vh !important;
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-top-left-radius: 24px !important;
+        border-top-right-radius: 24px !important;
+        transform: translateY(100%);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #cora-command-palette.active .cora-command-container {
+        transform: translateY(0);
+    }
+    #cora-command-input {
+        font-size: 16px !important;
+    }
 }
 </style>
 
@@ -12441,6 +12473,90 @@ wp_print_footer_scripts();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        // Mobile Swipe-to-Dismiss Gesture Support for Command Palette
+        (function() {
+            const palette = document.getElementById('cora-command-palette');
+            if (!palette) return;
+
+            const container = palette.querySelector('.cora-command-container');
+            const resultsArea = document.getElementById('cora-command-results');
+            if (!container) return;
+
+            let startY = 0;
+            let currentY = 0;
+            let isDragging = false;
+            let scrollStartTop = 0;
+
+            container.addEventListener('touchstart', function(e) {
+                if (window.innerWidth >= 768) return;
+
+                const touch = e.touches[0];
+                startY = touch.clientY;
+                currentY = startY;
+                isDragging = false;
+
+                if (resultsArea) {
+                    scrollStartTop = resultsArea.scrollTop;
+                } else {
+                    scrollStartTop = 0;
+                }
+            }, { passive: true });
+
+            container.addEventListener('touchmove', function(e) {
+                if (window.innerWidth >= 768) return;
+
+                const touch = e.touches[0];
+                const deltaY = touch.clientY - startY;
+
+                // Only drag downwards
+                if (deltaY <= 0) {
+                    if (isDragging) {
+                        if (e.cancelable) e.preventDefault();
+                        container.style.transform = 'translateY(0px)';
+                        isDragging = false;
+                    }
+                    return;
+                }
+
+                // Allow dragging if not scrolling results or if results are scrolled to the top
+                const isTargetInResults = e.target.closest('#cora-command-results');
+                const shouldDrag = !isTargetInResults || (scrollStartTop <= 0);
+
+                if (shouldDrag) {
+                    if (e.cancelable) e.preventDefault();
+                    isDragging = true;
+                    currentY = touch.clientY;
+
+                    // Apply translation down to the sheet in real-time
+                    container.style.transform = `translateY(${deltaY}px)`;
+                    container.style.transition = 'none'; // Disable transition during drag
+                }
+            }, { passive: false });
+
+            container.addEventListener('touchend', function(e) {
+                if (window.innerWidth >= 768) return;
+
+                if (isDragging) {
+                    isDragging = false;
+                    const deltaY = currentY - startY;
+                    const threshold = 120; // Dismiss threshold in pixels
+
+                    container.style.transition = ''; // Restore transition
+
+                    if (deltaY > threshold) {
+                        coraCloseCommandPalette();
+                        // Reset transform after animation finishes
+                        setTimeout(() => {
+                            container.style.transform = '';
+                        }, 250);
+                    } else {
+                        // Snap back
+                        container.style.transform = 'translateY(0)';
+                    }
+                }
+            }, { passive: true });
+        })();
+
         // Dynamic Browser Local timezone Greeting calculation
         (function() {
             const hour = new Date().getHours();
@@ -12656,8 +12772,11 @@ wp_print_footer_scripts();
             if (e.target.closest('.cora-sidebar-search') || e.target.closest('[onclick*="coraOpenCommandPalette"]')) return;
 
             const palette = document.getElementById('cora-command-palette');
-            if (palette && !palette.classList.contains('hidden') && !palette.contains(e.target)) {
-                coraCloseCommandPalette();
+            if (palette && !palette.classList.contains('hidden')) {
+                const container = palette.querySelector('.cora-command-container');
+                if (container && !container.contains(e.target)) {
+                    coraCloseCommandPalette();
+                }
             }
 
             const inlinePalette = document.getElementById('cora-inline-command-palette');
