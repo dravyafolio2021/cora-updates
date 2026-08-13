@@ -4891,19 +4891,8 @@ window.coraRenderQuickActionsBar = function() {
 
     var totalItems = activeActions.concat([creatorBtn]);
 
-    // Determine split index for forced wrapping
-    var splitIdx = -1;
-    if (totalItems.length > 1) {
-        splitIdx = Math.ceil(totalItems.length / 2);
-    }
-
     var buttonsHtml = totalItems.map(function(item, idx) {
         var html = '';
-        if (idx === splitIdx) {
-            // Force line break to make exactly 2 rows
-            html += '<div style="flex-basis: 100%; height: 0;"></div>';
-        }
-
         if (item.isCreator) {
             html += '<button type="button" onclick="' + item.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0">' +
                 '<span class="cora-ai-gradient-pill-inner">' +
@@ -4920,7 +4909,7 @@ window.coraRenderQuickActionsBar = function() {
         return html;
     }).join('');
 
-    bar.innerHTML = '<div class="w-full flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 px-2 sm:px-4">' +
+    bar.innerHTML = '<div class="w-full flex flex-row flex-nowrap items-center overflow-x-auto gap-x-2 px-4 justify-start md:justify-center no-scrollbar py-0.5" style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">' +
         buttonsHtml +
     '</div>';
 };
