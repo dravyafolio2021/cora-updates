@@ -11152,28 +11152,9 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
             sheet.style.transform = 'translateY(100%)';
             document.body.style.overflow = '';
             setTimeout(function() { drawer.style.display = 'none'; }, 310);
-        }
-    };
-
-    // Smart toggle: bottom drawer on mobile, right-side drawer on desktop
-    var _origToggle = window.coraToggleNotificationDrawer;
-    window.coraToggleNotificationDrawer = function(forceShow) {
-        if (window.innerWidth < 768) {
-            window.coraToggleMobileNotifDrawer(forceShow);
-        } else {
-            if (typeof _origToggle === 'function') {
-                _origToggle(forceShow);
-            } else {
-                var drawer = document.getElementById('cora-notif-dropdown');
-                if (!drawer) return;
-                var isCollapsed = drawer.classList.contains('collapsed');
-                var shouldOpen  = forceShow !== undefined ? !!forceShow : isCollapsed;
-                if (shouldOpen) { drawer.classList.remove('collapsed'); }
-                else            { drawer.classList.add('collapsed'); }
-            }
-        }
     };
 })();
+
 </script>
 
 
@@ -11329,15 +11310,23 @@ wp_print_footer_scripts();
     window.coraRenderMobileNotifications = renderCoraNotifications;
 
     window.coraToggleNotificationDrawer = function(forceShow) {
+        // On mobile, use the bottom sheet drawer instead
+        if (window.innerWidth < 768) {
+            if (typeof window.coraToggleMobileNotifDrawer === 'function') {
+                window.coraToggleMobileNotifDrawer(forceShow);
+            }
+            return;
+        }
+        // Desktop: right-side panel
         const drawer = document.getElementById('cora-notif-dropdown');
         if (!drawer) return;
         const isCollapsed = drawer.classList.contains('collapsed');
         const shouldOpen = forceShow !== undefined ? forceShow : isCollapsed;
-        
         if (shouldOpen) {
             drawer.classList.remove('collapsed');
         } else {
             drawer.classList.add('collapsed');
+        }
         }
     };
 
