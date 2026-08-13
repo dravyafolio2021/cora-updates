@@ -1760,11 +1760,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             display: none !important;
         }
 
-        /* Fix Tailwind flex/hidden conflict — .hidden must always win */
-        #cora-workspace .hidden,
-        #cora-global-topbar .hidden {
-            display: none !important;
-        }
+
 
         aside[id$="-drawer"] {
 
@@ -11200,8 +11196,12 @@ wp_print_footer_scripts();
     function renderCoraNotifications() {
         const listContainer = document.getElementById('cora-notif-list');
         const sidebarListContainer = document.getElementById('cora-sidebar-notif-list');
+        const mobileListContainer = document.getElementById('cora-mobile-notif-list');
+        
         const emptyState = document.getElementById('cora-notif-empty');
         const sidebarEmptyState = document.getElementById('cora-sidebar-notif-empty');
+        const mobileEmptyState    = document.getElementById('cora-mobile-notif-empty');
+        
         const badge = document.getElementById('cora-notif-badge');
         const mobileBadge = document.getElementById('cora-mobile-notif-badge');
         const sidebarBadge = document.getElementById('cora-sidebar-notif-badge');
@@ -11235,6 +11235,8 @@ wp_print_footer_scripts();
         if (displayList.length === 0) {
             if (listContainer) listContainer.innerHTML = '';
             if (sidebarListContainer) sidebarListContainer.innerHTML = '';
+            if (mobileListContainer) mobileListContainer.innerHTML = '';
+            
             if (emptyState) {
                 emptyState.textContent = 'No notifications in the last 24 hours.';
                 emptyState.classList.remove('hidden');
@@ -11243,11 +11245,16 @@ wp_print_footer_scripts();
                 sidebarEmptyState.textContent = 'No notifications in the last 24 hours.';
                 sidebarEmptyState.classList.remove('hidden');
             }
+            if (mobileEmptyState) {
+                mobileEmptyState.style.display = 'block';
+            }
             return;
         }
 
         if (emptyState) emptyState.classList.add('hidden');
         if (sidebarEmptyState) sidebarEmptyState.classList.add('hidden');
+        if (mobileEmptyState) mobileEmptyState.style.display = 'none';
+        
         let html = '';
 
         displayList.forEach(notif => {
@@ -11292,25 +11299,16 @@ wp_print_footer_scripts();
             });
         }
 
-        // Also populate the mobile bottom drawer list
-        const mobileListContainer = document.getElementById('cora-mobile-notif-list');
-        const mobileEmptyState    = document.getElementById('cora-mobile-notif-empty');
         if (mobileListContainer) {
-            if (displayList.length === 0) {
-                mobileListContainer.innerHTML = '';
-                if (mobileEmptyState) mobileEmptyState.style.display = 'block';
-            } else {
-                if (mobileEmptyState) mobileEmptyState.style.display = 'none';
-                mobileListContainer.innerHTML = html;
-                mobileListContainer.querySelectorAll('[data-id]').forEach(el => {
-                    el.addEventListener('click', function(e) {
-                        const notifId    = this.getAttribute('data-id');
-                        const actionUrl  = this.getAttribute('data-url');
-                        window.coraToggleMobileNotifDrawer(false);
-                        handleCoraNotifClick(e, notifId, actionUrl);
-                    });
+            mobileListContainer.innerHTML = html;
+            mobileListContainer.querySelectorAll('[data-id]').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    const notifId    = this.getAttribute('data-id');
+                    const actionUrl  = this.getAttribute('data-url');
+                    window.coraToggleMobileNotifDrawer(false);
+                    handleCoraNotifClick(e, notifId, actionUrl);
                 });
-            }
+            });
         }
     }
 
