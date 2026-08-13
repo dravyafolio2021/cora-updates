@@ -11517,9 +11517,7 @@ wp_print_footer_scripts();
         const bellBtn = document.getElementById('cora-notif-bell-btn');
         const markAllBtn = document.getElementById('cora-notif-mark-all-btn');
 
-        if (bellBtn) {
-            bellBtn.addEventListener('click', toggleNotificationDropdown);
-        }
+        // Bell button click handler is already defined inline in HTML (onclick="window.coraToggleNotificationDrawer()") to avoid double triggering.
         if (markAllBtn) {
             markAllBtn.addEventListener('click', markAllNotificationsRead);
         }
