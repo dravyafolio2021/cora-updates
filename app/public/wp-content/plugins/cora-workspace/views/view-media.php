@@ -741,20 +741,31 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 
     <!-- ─── HEADER ──────────────────────────────────────────────── -->
     <div id="cm-header">
-        <div id="cm-header-top">
-            <!-- Icon + title -->
-            <span style="color:#a1a1aa;flex-shrink:0">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-            </span>
-            <div>
-                <div class="cm-h-title">Media Library</div>
-                <div class="cm-h-subtitle">Property photos, documents, floor plans, and all agency assets</div>
-            </div>
+        <?php
+        $media_header_args = array(
+            'title'            => 'Media Library',
+            'description'      => 'Property photos, documents, floor plans, and all agency assets.',
+            'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',
+            'ai_stack'         => true,
+            'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+            'cta'              => array(
+                'text'        => 'Upload',
+                'mobile_text' => 'Upload',
+                'onclick'     => "document.getElementById('cm-file-input').click()",
+                'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>',
+                'visible'     => true,
+            ),
+        );
 
-            <div class="cm-h-sep"></div>
+        if ( function_exists( 'cora_render_workspace_header' ) ) {
+            cora_render_workspace_header( $media_header_args );
+        }
+        ?>
 
+        <!-- Hidden elements to be relocated dynamically into standard header via JS -->
+        <div style="display:none">
             <!-- Storage bar -->
-            <div class="cm-h-storage cm-storage-healthy" style="display:none;position:relative" id="cm-storage-wrap" onmouseenter="cmShowStorageAnalytics(true)" onmouseleave="cmShowStorageAnalytics(false)" onclick="cmToggleStorageAnalytics(event)">
+            <div class="cm-h-storage cm-storage-healthy" style="position:relative" id="cm-storage-wrap" onmouseenter="cmShowStorageAnalytics(true)" onmouseleave="cmShowStorageAnalytics(false)" onclick="cmToggleStorageAnalytics(event)">
                 <svg class="cm-storage-ring-svg" width="28" height="28" viewBox="0 0 36 36">
                     <path class="cm-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#e4e4e7" stroke-width="3" fill="none"/>
                     <path id="cm-ring-fill" class="cm-ring-fill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#10b981" stroke-width="3.5" fill="none" stroke-linecap="round"/>
@@ -789,10 +800,6 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             </div>
 
             <button id="cm-bulk-btn" onclick="cmToggleBulk()" class="cm-hbtn">Select</button>
-            <button onclick="document.getElementById('cm-file-input').click()" class="cm-hbtn primary">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                Upload
-            </button>
             <input type="file" id="cm-file-input" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" style="display:none" onchange="cmHandleFiles(this.files)">
         </div>
 
@@ -3187,6 +3194,42 @@ function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/<
 function cmIcon(type,sz){sz=sz||22;var ic={image:'<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" stroke="#a1a1aa" stroke-width="1.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',video:'<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" stroke="#a1a1aa" stroke-width="1.5" fill="none"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg>',audio:'<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" stroke="#a1a1aa" stroke-width="1.5" fill="none"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>',document:'<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" stroke="#a1a1aa" stroke-width="1.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'};return ic[type]||ic.document;}
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", function() {
+    const appendMediaActions = function(containerSelector) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        // Prevent duplicate appending
+        if (container.querySelector('#cm-storage-wrap') || container.querySelector('[data-media-action="bulk"]')) return;
+
+        // Get elements from original locations
+        const storageEl = document.getElementById('cm-storage-wrap');
+        const toggleEl = document.querySelector('.cm-toggle');
+        const bulkBtn = document.getElementById('cm-bulk-btn');
+
+        const ctaBtn = container.querySelector('button:not(.group)');
+
+        if (storageEl) {
+            // Un-hide storage bar if initialized
+            storageEl.style.display = 'inline-flex';
+            if (ctaBtn) container.insertBefore(storageEl, ctaBtn);
+            else container.appendChild(storageEl);
+        }
+        if (toggleEl) {
+            if (ctaBtn) container.insertBefore(toggleEl, ctaBtn);
+            else container.appendChild(toggleEl);
+        }
+        if (bulkBtn) {
+            bulkBtn.setAttribute('data-media-action', 'bulk');
+            if (ctaBtn) container.insertBefore(bulkBtn, ctaBtn);
+            else container.appendChild(bulkBtn);
+        }
+    };
+
+    appendMediaActions('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0');
+    appendMediaActions('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0');
+});
+
 if(typeof coraREData!=='undefined'){
     if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',cmInit);
     else cmInit();
