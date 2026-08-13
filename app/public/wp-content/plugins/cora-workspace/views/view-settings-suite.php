@@ -2590,6 +2590,46 @@ $cora_settings_tabs = array(
                 </div>
             </div>
 
+            <!-- PWA/App Manual Installation Card -->
+            <div class="cora-shopify-card mt-6">
+                <!-- Header -->
+                <div class="cora-shopify-card-header border-b border-zinc-150 pb-3 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 m-0">Desktop & Mobile Application</h3>
+                        <p class="text-xs text-zinc-500 m-0">Install Cora Workspace as a standalone application on your device.</p>
+                    </div>
+                </div>
+
+                <div class="cora-shopify-card-body pt-5 relative">
+                    <div class="p-5 bg-zinc-50 border border-zinc-200 rounded-2xl flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-900 shrink-0 border border-zinc-200 shadow-3xs">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        </div>
+                        <div class="space-y-1 flex-1">
+                            <h4 class="text-xs font-bold text-zinc-900 m-0 flex items-center gap-2">
+                                <span>Install App Manually</span>
+                            </h4>
+                            <p class="text-xs text-zinc-650 m-0 font-medium leading-relaxed">
+                                Even if you previously chose "Don't ask me again," you can trigger manual installation to place the Cora Workspace app on your desktop dock or mobile home screen.
+                            </p>
+                            <div class="pt-3">
+                                <button type="button" id="cora-settings-pwa-install-btn" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97 select-none">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    <span>Install App</span>
+                                </button>
+                                <p id="cora-settings-pwa-installed-text" class="hidden text-xs text-emerald-650 font-bold m-0 flex items-center gap-1">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                    <span>Workspace app is already installed or running.</span>
+                                </p>
+                                <p id="cora-settings-pwa-unavailable-text" class="hidden text-xs text-zinc-450 font-semibold m-0 leading-normal">
+                                    Manual installation is currently not supported by your browser. If you are on iOS Safari, tap the Share button and select <strong>Add to Home Screen</strong>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- FLOATING STICKY BOTTOM CTA BAR -->
             <div class="sticky bottom-4 z-40 bg-white/95 backdrop-blur-md border border-zinc-200 px-5 py-3.5 rounded-2xl flex items-center justify-between flex-wrap gap-4 select-none shadow-xl transition-all">
                 <div class="text-[11px] text-zinc-500 font-medium flex items-center gap-2">
@@ -2775,6 +2815,54 @@ $cora_settings_tabs = array(
 
             document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(coraRenderSettingsUpdateTimeline, 50);
+
+                // Manual PWA/App Install State & Actions Handler
+                const settingsInstallBtn = document.getElementById('cora-settings-pwa-install-btn');
+                const installedText = document.getElementById('cora-settings-pwa-installed-text');
+                const unavailableText = document.getElementById('cora-settings-pwa-unavailable-text');
+
+                function updateSettingsPwaState() {
+                    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+                    const prompt = window.coraPwaDeferredPrompt || (window.parent && window.parent.coraPwaDeferredPrompt);
+                    
+                    if (isStandalone) {
+                        if (settingsInstallBtn) settingsInstallBtn.classList.add('hidden');
+                        if (installedText) installedText.classList.remove('hidden');
+                        if (unavailableText) unavailableText.classList.add('hidden');
+                    } else if (prompt) {
+                        if (settingsInstallBtn) settingsInstallBtn.classList.remove('hidden');
+                        if (installedText) installedText.classList.add('hidden');
+                        if (unavailableText) unavailableText.classList.add('hidden');
+                    } else {
+                        if (settingsInstallBtn) settingsInstallBtn.classList.add('hidden');
+                        if (installedText) installedText.classList.add('hidden');
+                        if (unavailableText) unavailableText.classList.remove('hidden');
+                    }
+                }
+
+                updateSettingsPwaState();
+                setInterval(updateSettingsPwaState, 1500);
+
+                if (settingsInstallBtn) {
+                    settingsInstallBtn.addEventListener('click', function() {
+                        const prompt = window.coraPwaDeferredPrompt || (window.parent && window.parent.coraPwaDeferredPrompt);
+                        if (prompt) {
+                            prompt.prompt();
+                            prompt.userChoice.then((choiceResult) => {
+                                if (choiceResult.outcome === 'accepted') {
+                                    updateSettingsPwaState();
+                                    if (window.coraShowToast) {
+                                        window.coraShowToast('Thank you for installing Cora Workspace!', 'success');
+                                    }
+                                }
+                            });
+                        } else {
+                            if (window.coraShowToast) {
+                                window.coraShowToast('Installation prompt is not ready. Please verify if your browser supports PWAs.', 'error');
+                            }
+                        }
+                    });
+                }
             });
             </script>
             

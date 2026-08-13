@@ -14188,6 +14188,7 @@ function coraHidePwaPrompt() {
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     coraPwaDeferredPrompt = e;
+    window.coraPwaDeferredPrompt = e; // Expose globally for manual PWA install button in Settings
     const installBtn = document.getElementById('cora-pwa-install-btn');
     if (installBtn) {
         installBtn.classList.remove('hidden');
