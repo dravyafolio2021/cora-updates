@@ -13,8 +13,7 @@
 - `[ ]` 4. Update Admin Dashboard Settings dropdowns and Onboarding cards
   - `[ ]` Add "Custom Workspace" option in Settings Suite dropdown
   - `[ ]` Add "Custom Workspace" option in Super Admin Workspace Edit drawer
-  - `[ ]` Add "Custom Workspace" card to `views/onboarding.php`
-- `[ ]` 5. Verify Build and Deploy
-  - `[ ]` Run build script and resolve any syntax issues
+  - `[x]` Add `#cora-island-ai-popover` HTML structure to `#cora-mobile-floating-island` in `admin-dashboard.php`
+- `[/]` Add interactive toggle & click-outside event handlers in `assets/js/admin-script.js` and resolve any syntax issues
   - `[ ]` Bump version to `3.4.18`
   - `[ ]` Deploy updates to staging and demo environments

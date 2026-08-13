@@ -11208,6 +11208,7 @@ jQuery(document).ready(function($) {
 
     window.coraSubmitIslandAI = function() {
         const prompt = $('#cora-island-ai-input').val().trim();
+        $('#cora-island-ai-popover').addClass('hidden');
         if (typeof window.coraToggleCopilot === 'function') {
             window.coraToggleCopilot(true);
             if (prompt && typeof window.coraSendCopilotMessage === 'function') {
@@ -11254,6 +11255,19 @@ jQuery(document).ready(function($) {
         if (typeof window.coraToggleIslandState === 'function' && $('#cora-mobile-floating-island').length) {
             window.coraToggleIslandState(savedMode);
         }
+
+        // Toggle popover card when focusing/clicking island inputs
+        $(document).on('click focus', '#cora-island-ai-input, #cora-island-view-compact', function(e) {
+            e.stopPropagation();
+            $('#cora-island-ai-popover').removeClass('hidden');
+        });
+
+        // Close popover when clicking outside the floating island wrapper
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#cora-mobile-floating-island').length) {
+                $('#cora-island-ai-popover').addClass('hidden');
+            }
+        });
     });
 
     // Pagination State & Handlers

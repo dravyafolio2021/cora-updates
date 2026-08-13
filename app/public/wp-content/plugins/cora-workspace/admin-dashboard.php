@@ -11066,6 +11066,87 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
 
     <!-- Mobile Floating Bottom Navigation (3-State Adaptive Floating Island Bar) -->
     <div id="cora-mobile-floating-island" class="cora-mobile-island-wrapper lg:hidden fixed bottom-4 left-0 right-0 z-[9980] w-[calc(100vw-32px)] max-w-[460px] mx-auto transition-all duration-300 ease-out" style="position: fixed !important; bottom: 16px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; z-index: 9980 !important; width: calc(100vw - 32px) !important; max-width: 460px !important; box-sizing: border-box !important;">
+        <!-- The Connected AI Popover Card -->
+        <div id="cora-island-ai-popover" class="hidden w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 shadow-2xl mb-3 flex flex-col gap-4 max-h-[65vh] overflow-y-auto" style="box-sizing: border-box !important;">
+            
+            <!-- Quick Actions Grid -->
+            <div class="flex flex-col gap-2">
+                <!-- Row 1 -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraNavigateTo('blogs'); $('#cora-island-ai-popover').addClass('hidden'); }" class="flex items-center justify-center gap-1.5 py-2 px-1 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 rounded-full text-[11px] font-semibold text-zinc-750 dark:text-zinc-250 cursor-pointer transition-colors shadow-sm">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-555"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        <span>Write Article</span>
+                    </button>
+                    <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraNavigateTo('settings'); $('#cora-island-ai-popover').addClass('hidden'); }" class="flex items-center justify-center gap-1.5 py-2 px-1 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 rounded-full text-[11px] font-semibold text-zinc-750 dark:text-zinc-250 cursor-pointer transition-colors shadow-sm">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-555"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span>Build Form</span>
+                    </button>
+                    <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraNavigateTo('portfolio'); $('#cora-island-ai-popover').addClass('hidden'); }" class="flex items-center justify-center gap-1.5 py-2 px-1 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 rounded-full text-[11px] font-semibold text-zinc-750 dark:text-zinc-250 cursor-pointer transition-colors shadow-sm">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-555"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>Upload Media</span>
+                    </button>
+                </div>
+                <!-- Row 2 -->
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraNavigateTo('vault'); $('#cora-island-ai-popover').addClass('hidden'); }" class="flex items-center justify-center gap-1.5 py-2 px-2 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 rounded-full text-[11px] font-semibold text-zinc-750 dark:text-zinc-250 cursor-pointer transition-colors shadow-sm">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-555"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        <span>Upload File</span>
+                    </button>
+                    <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraNavigateTo('financials'); $('#cora-island-ai-popover').addClass('hidden'); }" class="flex items-center justify-center gap-1.5 py-2 px-2 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 rounded-full text-[11px] font-semibold text-zinc-750 dark:text-zinc-250 cursor-pointer transition-colors shadow-sm">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-555"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="22" x2="9" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line><line x1="8" y1="8" x2="16" y2="8"></line></svg>
+                        <span>Create Invoice</span>
+                    </button>
+                </div>
+                <!-- Row 3 (Custom Shortcuts) -->
+                <div class="flex justify-center mt-1">
+                    <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraNavigateTo('mcp'); $('#cora-island-ai-popover').addClass('hidden'); }" class="flex items-center justify-center gap-1.5 py-1.5 px-4 border border-violet-200 dark:border-violet-800 bg-violet-50/40 dark:bg-violet-950/20 hover:bg-violet-50 dark:hover:bg-violet-950/30 rounded-full text-[11px] font-bold text-violet-600 dark:text-violet-400 cursor-pointer transition-colors shadow-sm">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-violet-555"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path></svg>
+                        <span>Custom Shortcuts</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI Co-founder Briefing -->
+            <div class="border border-zinc-150 dark:border-zinc-800 rounded-2xl bg-zinc-50/40 dark:bg-zinc-850 p-4 shadow-sm flex flex-col gap-3">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-150/60 dark:border-zinc-800">
+                    <div class="flex items-center gap-2">
+                        <div class="h-7 w-7 rounded-lg bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path></svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <h4 class="text-[10px] font-extrabold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">AI Co-Founder Briefing</h4>
+                            <span class="text-[9px] text-zinc-450 dark:text-zinc-400 font-medium">Real-time workspace insights and summaries</span>
+                        </div>
+                    </div>
+                    <span class="h-4.5 px-2 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 font-bold text-[8px] flex items-center justify-center border border-emerald-100 dark:border-emerald-900 uppercase tracking-wider">🟢 Active</span>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-750 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="text-[9px] shrink-0">🟢</span>
+                            <span class="text-[10.5px] font-bold text-zinc-700 dark:text-zinc-300 truncate">AI Co-founder</span>
+                        </div>
+                        <span class="text-[8px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider shrink-0 bg-zinc-50 dark:bg-zinc-700 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-650">Online</span>
+                    </div>
+                    <div class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-750 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="text-[9px] shrink-0">🟢</span>
+                            <span class="text-[10.5px] font-bold text-zinc-700 dark:text-zinc-300 truncate">AI Marketing</span>
+                        </div>
+                        <span class="text-[8px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider shrink-0 bg-zinc-50 dark:bg-zinc-700 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-650">Monitoring</span>
+                    </div>
+                    <div class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-750 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="text-[9px] shrink-0">🟢</span>
+                            <span class="text-[10.5px] font-bold text-zinc-700 dark:text-zinc-300 truncate">Automations</span>
+                        </div>
+                        <span class="text-[8px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider shrink-0 bg-zinc-50 dark:bg-zinc-700 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-650">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="cora-island-card w-full flex items-center justify-between transition-all duration-300">
             
             <!-- State 1 & 2: Menu Toggle Button (Left) -->
