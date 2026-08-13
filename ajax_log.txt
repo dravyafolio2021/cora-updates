@@ -56,3 +56,4 @@ SAVE ARTICLE: id=3719, status=draft, raw_status=draft
 SAVE ARTICLE: id=3719, status=draft, raw_status=draft
 SAVE ARTICLE: id=3719, status=draft, raw_status=draft
 SAVE ARTICLE: id=3719, status=draft, raw_status=draft
+SAVE ARTICLE: id=3766, status=draft, raw_status=draft

@@ -1,17 +1,20 @@
-# Task List - Website Statistics UI Refinement & Server Deployment
+# Task List - Custom Workspace Mode
 
-- `[x]` 1. Research & Discovery
-  - `[x]` Identify divide-y border collision with rounded row corners in `view-canvas.php`
-  - `[x]` Verify border properties on Row elements via E2E playwright checks
-- `[x]` 2. Implementation
-  - `[x]` Remove divide-y classes from container in `view-canvas.php`
-  - `[x]` Deployed custom straight separator divs between stats rows
-  - `[x]` Increment plugin version to 3.4.0 in `cora-workspace.php` and `updates/cora-workspace.json`
-- `[x]` 3. Build release
-  - `[x]` Run `build.sh` to package releases zip at `updates/cora-workspace.zip`
-- `[x]` 4. Commit and Push
-  - `[x]` Stage and commit changes locally
-  - `[x]` Push changes to origin main
-  - `[x]` Bump version to `3.4.0` and build release zip
-- `[x]` 5. Perform deployment to staging and production
-  - `[x]` Run deploy script to push zip package to server via SSH
+- `[ ]` 1. Create the Custom Workspace Module Class
+  - `[ ]` Create `modules/custom-workspace/class-custom-module.php` with dynamic navigation filtering
+  - `[ ]` Register the custom module in `modules/class-cora-module-registry.php`
+- `[ ]` 2. Enable Custom Industry Option in Backend
+  - `[ ]` Whitelist `custom` in `cora_get_active_industry()` in `cora-workspace.php`
+  - `[ ]` Support `custom` activation in `cora_ajax_onboarding_activate_workspace()`
+  - `[ ]` Register the `cora_save_custom_features` AJAX handler
+- `[ ]` 3. Implement Interactive Module Toggles in View Page
+  - `[ ]` Modify `views/view-feature-hub.php` to render custom checkboxes/switches if active industry is `custom`
+  - `[ ]` Add jQuery handlers to post toggled states to `cora_save_custom_features` AJAX action
+- `[ ]` 4. Update Admin Dashboard Settings dropdowns and Onboarding cards
+  - `[ ]` Add "Custom Workspace" option in Settings Suite dropdown
+  - `[ ]` Add "Custom Workspace" option in Super Admin Workspace Edit drawer
+  - `[ ]` Add "Custom Workspace" card to `views/onboarding.php`
+- `[ ]` 5. Verify Build and Deploy
+  - `[ ]` Run build script and resolve any syntax issues
+  - `[ ]` Bump version to `3.4.18`
+  - `[ ]` Deploy updates to staging and demo environments

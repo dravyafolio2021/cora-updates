@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace Platform
  * Plugin URI: https://heycora.in
  * Description: A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.
- * Version: 3.4.13
+ * Version: 3.4.20
  * Author: Cora Studio Platform Team
  * Author URI: https://heycora.in
  * License: GPL2
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.4.13' );
+define( 'CORA_WORKSPACE_VERSION', '3.4.20' );
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -1443,7 +1443,7 @@ function cora_workspace_handle_workspace_route() {
         // ── INDUSTRY MODE SWITCHER (Server-side, reliable) ──────────────────────
         if ( ! empty( $_GET['set_industry'] ) && cora_is_super_owner() ) {
             $requested = sanitize_text_field( $_GET['set_industry'] );
-            if ( in_array( $requested, array( 'real_estate', 'photography_studio' ), true ) ) {
+            if ( in_array( $requested, array( 'real_estate', 'photography_studio', 'custom' ), true ) ) {
                 update_option( 'cora_workspace_industry', $requested );
                 // Set cookie for 1 year
                 setcookie( 'cora_workspace_industry', $requested, time() + 86400 * 365, '/', '', is_ssl(), false );
@@ -1595,6 +1595,7 @@ function cora_workspace_admin_assets( $hook ) {
         'favicon_url'      => get_option( 'cora_brand_favicon_url', '' ),
         'logo_url'         => get_option( 'cora_brand_logo_url', '' ),
         'sidebar_title'    => get_option( 'cora_sidebar_title', 'cora' ),
+        'activeIndustry'   => cora_get_active_industry(),
         'version'          => CORA_WORKSPACE_VERSION,
     ) );
 }
@@ -2192,7 +2193,7 @@ if ( ! function_exists( 'cora_get_active_industry' ) ) {
 function cora_get_active_industry() {
     if ( ! empty( $_GET['industry'] ) ) {
         $ind = sanitize_text_field( $_GET['industry'] );
-        if ( in_array( $ind, array( 'real_estate', 'photography', 'photography_studio' ), true ) ) {
+        if ( in_array( $ind, array( 'real_estate', 'photography', 'photography_studio', 'custom' ), true ) ) {
             if ( $ind === 'photography' ) {
                 $ind = 'photography_studio';
             }
@@ -2222,6 +2223,30 @@ function cora_get_active_industry() {
         $ind = 'photography_studio';
     }
     return $ind;
+}
+}
+
+/**
+ * Retrieve enabled custom workspace features with default fallback options.
+ */
+if ( ! function_exists( 'cora_get_custom_enabled_features' ) ) {
+function cora_get_custom_enabled_features() {
+    $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '';
+    $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+    $custom_features_key = 'cora_custom_enabled_features' . $agency_suffix;
+
+    $enabled = get_option( $custom_features_key, false );
+    if ( $enabled === false ) {
+        // By default: all Workspace, Sales Channel, and AI Marketing features are enabled.
+        // Operations features (CRM leads, scheduler, camera gear, tasks, showings, listings, attendance) are disabled by default.
+        return array(
+            'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
+            'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
+            'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
+        );
+    }
+
+    return is_array( $enabled ) ? $enabled : array();
 }
 }
 
@@ -16214,7 +16239,14 @@ function cora_ajax_save_system_settings_suite() {
 
     // Sync industry-specific site title and tagline
     $active_ind_save = isset( $_POST['cora_workspace_industry'] ) ? sanitize_text_field( $_POST['cora_workspace_industry'] ) : get_option( 'cora_workspace_industry', 'real_estate' );
-    $is_studio_save  = ( $active_ind_save === 'photography' || $active_ind_save === 'photography_studio' || $active_ind_save === 'studio' );
+    if ( $active_ind_save === 'photography' ) {
+        $active_ind_save = 'photography_studio';
+    }
+    if ( in_array( $active_ind_save, array( 'real_estate', 'photography_studio', 'custom' ), true ) ) {
+        setcookie( 'cora_workspace_industry', $active_ind_save, time() + 86400 * 365, '/' );
+        $_COOKIE['cora_workspace_industry'] = $active_ind_save;
+    }
+    $is_studio_save  = ( $active_ind_save === 'photography_studio' );
 
     if ( isset( $_POST['blogname'] ) ) {
         $b_title = sanitize_text_field( $_POST['blogname'] );
@@ -20360,6 +20392,11 @@ function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
         'knowledge-base'     => 'dashboard',
         'attendance'         => 'dashboard',
         'ai-assistants'      => 'dashboard',
+        'activity-timeline'  => 'dashboard',
+        'automations'        => 'dashboard',
+        'inbox'              => 'dashboard',
+        'analytics'          => 'dashboard',
+        'social-meta'        => 'dashboard',
     );
 
     // For Studio Mode, map 'feature-hub' to 'portfolio'
@@ -23844,6 +23881,38 @@ function cora_ajax_mark_all_notifs_read() {
 }
 }
 add_action( 'wp_ajax_cora_ajax_mark_all_notifs_read', 'cora_ajax_mark_all_notifs_read' );
+
+if ( ! function_exists( 'cora_ajax_clear_all_notifs' ) ) {
+function cora_ajax_clear_all_notifs() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    $user_id = get_current_user_id();
+    if ( ! $user_id ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    }
+
+    global $wpdb;
+    $agency_id = cora_db_get_agency_id();
+    $wpdb->delete(
+        $wpdb->prefix . 'cora_notifications',
+        array( 'user_id' => $user_id, 'agency_id' => $agency_id ),
+        array( '%d', '%d' )
+    );
+
+    $notifications = get_option( 'cora_notifications', array() );
+    if ( is_array( $notifications ) ) {
+        $filtered = array();
+        foreach ( $notifications as $notif ) {
+            if ( ! isset( $notif['user_id'] ) || intval( $notif['user_id'] ) !== $user_id ) {
+                $filtered[] = $notif;
+            }
+        }
+        update_option( 'cora_notifications', $filtered );
+    }
+    wp_send_json_success();
+}
+}
+add_action( 'wp_ajax_cora_ajax_clear_all_notifs', 'cora_ajax_clear_all_notifs' );
 
 if ( ! function_exists( 'cora_validate_password' ) ) {
 function cora_validate_password( $password ) {
@@ -31088,8 +31157,7 @@ function cora_ajax_onboarding_activate_workspace() {
         $industry = 'real_estate';
     }
 
-    // For 'custom' mode, default to real_estate internally but store the preference
-    $active_industry = ( $industry === 'custom' ) ? 'real_estate' : $industry;
+    $active_industry = $industry;
     update_option( 'cora_workspace_industry', $active_industry );
     update_user_meta( $user_id, 'cora_onboarding_industry_selected', $industry );
 
@@ -31120,6 +31188,42 @@ function cora_ajax_onboarding_activate_workspace() {
 }
 }
 add_action( 'wp_ajax_cora_onboarding_activate_workspace', 'cora_ajax_onboarding_activate_workspace' );
+
+/**
+ * AJAX — Save custom features enabled state for custom mode workspace.
+ */
+if ( ! function_exists( 'cora_ajax_save_custom_features' ) ) {
+function cora_ajax_save_custom_features() {
+    $nonce = $_POST['security'] ?? ($_POST['nonce'] ?? '');
+    if ( ! wp_verify_nonce( $nonce, 'cora_workspace_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_settings_nonce' ) ) {
+        if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'cora_super_admin' ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed. Please refresh and try again.' ) );
+        }
+    }
+
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Authentication required.' ) );
+    }
+
+    $features = isset( $_POST['features'] ) ? (array) $_POST['features'] : array();
+    $sanitized = array();
+    foreach ( $features as $feat ) {
+        $sanitized[] = sanitize_key( $feat );
+    }
+
+    $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '';
+    $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
+    $custom_features_key = 'cora_custom_enabled_features' . $agency_suffix;
+
+    update_option( $custom_features_key, $sanitized );
+
+    cora_log_activity( 'Settings', 'Custom workspace features updated: ' . implode( ', ', $sanitized ) );
+
+    wp_send_json_success( array( 'message' => 'Modules updated successfully.' ) );
+}
+}
+add_action( 'wp_ajax_cora_save_custom_features', 'cora_ajax_save_custom_features' );
+add_action( 'wp_ajax_nopriv_cora_save_custom_features', 'cora_ajax_save_custom_features' );
 
 /**
  * AJAX — Request a passwordless magic link.
@@ -32704,7 +32808,7 @@ add_action( 'wp_ajax_cora_super_get_users', 'cora_ajax_super_get_users' );
 if ( ! function_exists( 'cora_ajax_switch_industry_mode' ) ) {
 function cora_ajax_switch_industry_mode() {
     $industry = isset( $_POST['industry'] ) ? sanitize_text_field( $_POST['industry'] ) : 'photography_studio';
-    if ( in_array( $industry, array( 'real_estate', 'photography', 'photography_studio' ), true ) ) {
+    if ( in_array( $industry, array( 'real_estate', 'photography', 'photography_studio', 'custom' ), true ) ) {
         if ( $industry === 'photography' ) {
             $industry = 'photography_studio';
         }
@@ -32761,7 +32865,7 @@ function cora_ajax_super_update_workspace() {
     if ( $raw_ind === 'photography' ) {
         $raw_ind = 'photography_studio';
     }
-    $industry = in_array( $raw_ind, array( 'real_estate', 'photography_studio' ), true ) ? $raw_ind : 'real_estate';
+    $industry = in_array( $raw_ind, array( 'real_estate', 'photography_studio', 'custom' ), true ) ? $raw_ind : 'real_estate';
 
     $owner_email = isset( $_POST['owner_email'] ) ? sanitize_email( $_POST['owner_email'] ) : '';
 

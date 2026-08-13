@@ -87,6 +87,21 @@ echo "  Flushing caches..."
 wp cache flush --allow-root
 wp rewrite flush --allow-root
 
+echo "  Resetting OPcache..."
+php -r "if(function_exists('opcache_reset')){opcache_reset();echo 'OPcache CLI reset OK';}" 2>/dev/null || true
+# Also reset via HTTP by creating a temp file
+cat > "$SITE_PATH/opcache-reset-cora.php" << 'OPCACHE_SCRIPT'
+<?php
+if(function_exists('opcache_reset')){opcache_reset();echo 'opcache_reset:ok';}else{echo 'opcache:not_available';}
+@unlink(__FILE__);
+OPCACHE_SCRIPT
+# Try to hit it via curl to reset web-facing OPcache
+SITE_URL=\$(wp option get siteurl --allow-root 2>/dev/null || echo "")
+if [ -n "\$SITE_URL" ]; then
+    curl -s -o /dev/null "\$SITE_URL/opcache-reset-cora.php" 2>/dev/null || true
+fi
+rm -f "$SITE_PATH/opcache-reset-cora.php" 2>/dev/null || true
+
 # Run small sanity test
 echo "  Verifying version info..."
 VERSION_ACTIVE=\$(wp plugin get cora-workspace --field=version --allow-root)

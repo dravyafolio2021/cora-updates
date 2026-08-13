@@ -1408,6 +1408,19 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <div class="industry-desc">Client leads, shoot scheduling, equipment tracking</div>
                     </div>
 
+                    <div class="industry-card" data-industry="custom" onclick="selectIndustry(this)">
+                        <div class="industry-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </div>
+                        <div class="industry-name">Custom Workspace</div>
+                        <div class="industry-desc">Enable only the modules you need and build your custom platform</div>
+                    </div>
+
                     <div class="industry-card locked" data-industry="marketing_agency" onclick="selectIndustry(this)">
                         <span class="coming-soon-badge">Coming Soon</span>
                         <div class="industry-icon">

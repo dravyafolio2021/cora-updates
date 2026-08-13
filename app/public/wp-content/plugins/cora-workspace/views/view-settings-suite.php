@@ -574,6 +574,7 @@ $cora_settings_tabs = array(
                             <?php $industry = $current_industry; ?>
                             <option value="real_estate" <?php selected( $industry, 'real_estate' ); ?>>Real Estate Agency</option>
                             <option value="photography_studio" <?php selected( $industry, 'photography_studio' ); ?>>Photography Studio</option>
+                            <option value="custom" <?php selected( $industry, 'custom' ); ?>>Custom Workspace</option>
                         </select>
                     </div>
 
