@@ -11159,6 +11159,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
             sheet.style.transform = 'translateY(100%)';
             document.body.style.overflow = '';
             setTimeout(function() { drawer.style.display = 'none'; }, 310);
+        }
     };
 })();
 
