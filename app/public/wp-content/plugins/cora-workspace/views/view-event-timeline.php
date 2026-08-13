@@ -90,31 +90,28 @@ $timeline_blocks = $active_timeline['blocks'] ?? array();
 $total_timelines = count( $cora_event_timelines );
 $total_blocks    = count( $timeline_blocks );
 ?>
+<?php
+$timeline_header_args = array(
+    'title'            => 'Multi-Day Tour & Event Planner',
+    'description'      => 'Organize multi-day property tours, photo shoots, and crew itineraries with live GPS tracking.',
+    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+    'ai_stack'         => true,
+    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'cta'              => array(
+        'text'        => 'Add Time Block',
+        'mobile_text' => 'Add Block',
+        'onclick'     => "coraOpenAddTimelineBlockDrawer()",
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+        'visible'     => true,
+    ),
+);
+
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $timeline_header_args );
+}
+?>
 
 <div id="cora-event-timeline-wrapper" class="space-y-6 font-sans text-zinc-900 select-none max-w-[1700px] mx-auto pb-12">
-    <!-- ═══ 1. STANDARDIZED PAGE HEADER & CTA ACTION BAR ═════════════════════════════════ -->
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-zinc-200">
-        <div>
-            <div class="flex items-center gap-2.5">
-                <h1 class="text-2xl font-bold tracking-tight text-zinc-950">● Multi-Day Tour & Event Planner</h1>
-            </div>
-            <p class="text-xs font-medium text-zinc-500 mt-1">Organize multi-day property tours, photo shoots, and crew itineraries with live GPS tracking.</p>
-        </div>
-
-        <div class="flex items-center gap-3 flex-wrap">
-            <button onclick="coraExportTimelineICal()" class="p-2.5 bg-white border border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 text-zinc-800 rounded-xl transition-all shadow-2xs cursor-pointer flex items-center justify-center" title="Sync to Calendar">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            </button>
-            <button onclick="coraOpenShareTimelineDrawer('<?php echo esc_js( $active_timeline['id'] ?? '' ); ?>')" class="px-4 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-2 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                Share Client Link
-            </button>
-            <button onclick="coraOpenAddTimelineBlockDrawer()" class="px-4.5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Add Time Block
-            </button>
-        </div>
-    </header>
 
     <!-- 2. TOP 3-STEP "HOW IT WORKS" CARD (BULLETPROOF HIGH CONTRAST) -->
     <div class="bg-white rounded-2xl p-5 shadow-sm grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-zinc-100 gap-4 text-xs">
@@ -530,4 +527,46 @@ window.coraCloseAllDrawers = function() {
     if (bd) bd.classList.add('hidden');
     document.querySelectorAll('aside').forEach(function(a){ a.classList.add('collapsed'); });
 };
+
+document.addEventListener("DOMContentLoaded", function() {
+    const appendButtons = function(containerSelector) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        // Prevent duplicate appending
+        if (container.querySelector('[data-timeline-action="share"]')) return;
+
+        // Share button
+        const shareBtn = document.createElement('button');
+        shareBtn.setAttribute('data-timeline-action', 'share');
+        shareBtn.className = 'px-4 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-2 cursor-pointer';
+        shareBtn.onclick = function() {
+            window.coraOpenShareTimelineDrawer('<?php echo esc_js( $active_timeline['id'] ?? '' ); ?>');
+        };
+        shareBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hidden sm:inline">Share Client Link</span><span class="sm:hidden">Share</span>
+        `;
+
+        // iCal button
+        const icalBtn = document.createElement('button');
+        icalBtn.setAttribute('data-timeline-action', 'ical');
+        icalBtn.className = 'p-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 rounded-xl transition-all shadow-2xs cursor-pointer flex items-center justify-center';
+        icalBtn.onclick = window.coraExportTimelineICal;
+        icalBtn.title = 'Sync to Calendar';
+        icalBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
+
+        const ctaBtn = container.querySelector('button:not(.group)');
+        if (ctaBtn) {
+            container.insertBefore(icalBtn, ctaBtn);
+            container.insertBefore(shareBtn, ctaBtn);
+        } else {
+            container.appendChild(icalBtn);
+            container.appendChild(shareBtn);
+        }
+    };
+
+    appendButtons('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0');
+    appendButtons('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0');
+});
 </script>
