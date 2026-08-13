@@ -382,30 +382,27 @@ $cora_settings_tabs = array(
 }
 </style>
 
-<div class="cora-shopify-settings-theme"><div class="cora-page-header flex flex-row items-center justify-between gap-4 border-b border-zinc-150/70 pb-4">
-    <div class="flex items-center gap-3">
-        <span class="cora-page-emoji text-zinc-900 flex shrink-0">
-            <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-        </span>
-        <div>
-            <h1 class="cora-page-title text-lg sm:text-2xl font-bold tracking-tight text-zinc-900 m-0">System Settings Complete Suite</h1>
-            <p class="text-xs text-zinc-500 mt-0.5 hidden sm:block">Global network parameters, reading/writing defaults, discussion moderation rules, and SEO permalinks.</p>
-        </div>
-    </div>
-    <div class="flex items-center gap-2 shrink-0">
-        <button type="button" class="p-2 bg-zinc-50 hover:bg-zinc-100 text-zinc-650 rounded-xl border border-zinc-200 shadow-3xs cursor-pointer" onclick="coraClearSystemCache()" title="Clear Cache">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-        </button>
-        <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-97" onclick="coraSaveSystemSettingsSuite()">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-            <span class="hidden sm:inline">Save All Settings</span>
-            <span class="sm:hidden">Save All</span>
-        </button>
-    </div>
-</div>
+<div class="cora-shopify-settings-theme">
+<?php
+$settings_header_args = array(
+    'title'            => 'System Settings Complete Suite',
+    'description'      => 'Global network parameters, reading/writing defaults, discussion moderation rules, and SEO permalinks.',
+    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+    'ai_stack'         => true,
+    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'cta'              => array(
+        'text'        => 'Save All Settings',
+        'mobile_text' => 'Save All',
+        'onclick'     => "coraSaveSystemSettingsSuite()",
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>',
+        'visible'     => true,
+    ),
+);
+
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $settings_header_args );
+}
+?>
 
 <!-- Mobile Horizontal Tab Strip (Hidden on Desktop) -->
 <div class="lg:hidden flex overflow-x-auto gap-5 pb-0.5 mb-4 scrollbar-none border-b border-zinc-200/50 w-full mt-4" style="-webkit-overflow-scrolling: touch;">
@@ -3485,6 +3482,37 @@ $cora_settings_tabs = array(
             window.coraShowToast('A system error occurred during purge.');
             $btn.prop('disabled', false).text('Purge Old wp_options Cache');
         });
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        const appendSettingsActions = function(containerSelector, isMobile) {
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+
+            // Prevent duplicate appending
+            if (container.querySelector('[data-settings-action="clear-cache"]')) return;
+
+            // Clear Cache button
+            const cacheBtn = document.createElement('button');
+            cacheBtn.setAttribute('data-settings-action', 'clear-cache');
+            cacheBtn.className = 'p-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-650 rounded-xl transition-all shadow-2xs cursor-pointer flex items-center justify-center';
+            cacheBtn.title = 'Clear Cache';
+            cacheBtn.onclick = function() {
+                if (typeof window.coraClearSystemCache === 'function') {
+                    window.coraClearSystemCache();
+                }
+            };
+            cacheBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>`;
+
+            const ctaBtn = container.querySelector('button:not(.group)');
+            if (ctaBtn) {
+                container.insertBefore(cacheBtn, ctaBtn);
+            } else {
+                container.appendChild(cacheBtn);
+            }
+        };
+
+        appendSettingsActions('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0', false);
+        appendSettingsActions('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0', true);
     });
 })(jQuery);
 </script>

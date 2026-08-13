@@ -159,46 +159,27 @@ $gbp_initials = !empty($gbp_name) ? strtoupper( mb_substr( $gbp_name, 0, 2 ) ) :
 </style>
 
 <!-- PAGE HEADER -->
-<div class="cora-page-header flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-200/80 pb-6 mb-6">
-    <div class="flex items-center gap-3.5">
-        <div class="w-11 h-11 rounded-2xl bg-zinc-900 text-white flex items-center justify-center text-xs font-bold shadow-2xs shrink-0">
-            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-        </div>
-        <div>
-            <div class="flex items-center gap-3">
-                <h1 class="cora-page-title text-2xl font-bold tracking-tight text-zinc-900 ">Google Business Profile Broker Owner</h1>
-                <span class="px-2.5 py-0.5 text-[9px] font-black bg-zinc-900 text-white rounded-md uppercase tracking-wider">AI Marketing</span>
-            </div>
-            <p class="cora-section-desc text-xs font-medium text-zinc-500 mt-0.5">Manage your Google Maps listing, reply to live client reviews with AI assistance, and publish updates to Maps.</p>
-        </div>
-    </div>
+<?php
+$gbp_header_args = array(
+    'title'            => 'Google Business Profile Broker Owner',
+    'description'      => 'Manage your Google Maps listing, reply to live client reviews with AI assistance, and publish updates to Maps.',
+    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+    'ai_stack'         => true,
+    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'cta'              => array(
+        'text'        => 'API Credentials',
+        'mobile_text' => 'Credentials',
+        'onclick'     => "coraGbpToggleKeysPanel()",
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+        'visible'     => $is_admin,
+        'class'       => '!bg-white hover:!bg-zinc-50 !text-zinc-800 !border-zinc-200 hover:!border-zinc-300 border shadow-2xs',
+    ),
+);
 
-    <!-- Header Actions -->
-    <div class="flex items-center gap-3 font-extrabold">
-        <?php if ( $is_admin ) : ?>
-            <button onclick="coraGbpToggleKeysPanel()" class="px-3.5 py-2 bg-white border border-zinc-200 text-zinc-800 hover:bg-zinc-50 text-xs rounded-xl transition-all shadow-xs flex items-center gap-2 cursor-pointer border-0">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                API Credentials
-            </button>
-        <?php endif; ?>
-        
-        <?php if ( $cora_gbp_is_connected ) : ?>
-            <div class="flex items-center gap-2 bg-white border border-zinc-200/80 px-3.5 py-2 rounded-xl shadow-xs">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs font-bold text-zinc-900 "><?php echo $gbp_name; ?></span>
-                <button onclick="coraGbpDisconnect()" class="ml-2 text-[10px] font-bold text-zinc-400 hover:text-red-650 transition-colors cursor-pointer bg-transparent border-0">Disconnect</button>
-            </div>
-        <?php else : ?>
-            <div class="flex items-center gap-2 bg-zinc-100 border border-zinc-200/80 px-3.5 py-2 rounded-xl">
-                <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
-                <span class="text-xs font-semibold text-zinc-500 ">Not Connected</span>
-            </div>
-        <?php endif; ?>
-    </div>
-</div>
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $gbp_header_args );
+}
+?>
 
 <?php if ( $is_admin ) : ?>
 <!-- API CREDENTIALS CONFIGURATION PANEL (Right-Sliding Side Drawer) -->
@@ -884,5 +865,53 @@ $(document).ready(function() {
     if ($('#cora-gbp-reviews-loading').length > 0) {
         window.coraGbpLoadReviews();
     }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Append AI Marketing Badge next to the Title
+    document.querySelectorAll('.cora-workspace-header .cora-page-title').forEach(function(titleEl) {
+        if (titleEl.querySelector('.cora-gbp-badge')) return;
+        const badge = document.createElement('span');
+        badge.className = 'cora-gbp-badge ml-3 px-2.5 py-0.5 text-[9px] font-black bg-zinc-900 text-white rounded-md uppercase tracking-wider inline-block align-middle select-none';
+        badge.textContent = 'AI Marketing';
+        titleEl.appendChild(badge);
+    });
+
+    // 2. Append Connection Status Indicator
+    const appendGbpStatus = function(containerSelector) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        if (container.querySelector('[data-gbp-action="status"]')) return;
+
+        const statusDiv = document.createElement('div');
+        statusDiv.setAttribute('data-gbp-action', 'status');
+        statusDiv.className = 'flex items-center gap-2 shrink-0 select-none';
+
+        <?php if ( $cora_gbp_is_connected ) : ?>
+            statusDiv.className += ' bg-white border border-zinc-200/80 px-3.5 py-1.5 rounded-xl shadow-xs';
+            statusDiv.innerHTML = `
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-bold text-zinc-900"><?php echo esc_js($gbp_name); ?></span>
+                <button onclick="coraGbpDisconnect()" class="ml-2 text-[10px] font-bold text-zinc-400 hover:text-red-650 transition-colors cursor-pointer bg-transparent border-0">Disconnect</button>
+            `;
+        <?php else : ?>
+            statusDiv.className += ' bg-zinc-100 border border-zinc-200/80 px-3.5 py-1.5 rounded-xl';
+            statusDiv.innerHTML = `
+                <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
+                <span class="text-xs font-semibold text-zinc-500">Not Connected</span>
+            `;
+        <?php endif; ?>
+
+        const ctaBtn = container.querySelector('button:not(.group)');
+        if (ctaBtn) {
+            container.insertBefore(statusDiv, ctaBtn);
+        } else {
+            container.appendChild(statusDiv);
+        }
+    };
+
+    appendGbpStatus('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0');
+    appendGbpStatus('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0');
 });
 </script>

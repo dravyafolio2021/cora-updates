@@ -151,11 +151,19 @@ if ( $cora_industry === 'custom' ) {
     );
     ?>
     <div class="cora-fh-container" style="user-select: none;">
-        <div class="cora-fh-header">
-            <span class="cora-fh-badge-pill">Custom Workspace</span>
-            <h1 class="cora-fh-title">App Modules Hub</h1>
-            <p class="cora-fh-subtitle">Toggle modules on/off to customize your workspace. Your changes will instantly adapt the sidebar layout.</p>
-        </div>
+        <?php
+        $modules_header_args = array(
+            'title'            => 'App Modules Hub',
+            'description'      => 'Toggle modules on/off to customize your workspace. Your changes will instantly adapt the sidebar layout.',
+            'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>',
+            'ai_stack'         => true,
+            'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+        );
+
+        if ( function_exists( 'cora_render_workspace_header' ) ) {
+            cora_render_workspace_header( $modules_header_args );
+        }
+        ?>
 
         <div style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 20px; padding: 32px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.04); box-sizing: border-box; width: 100%;">
             <form id="cora-custom-features-form" onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 32px;">
