@@ -4863,7 +4863,6 @@ window.coraRenderQuickActionsBar = function() {
     if (!bar) return;
 
     var isDesktop = window.innerWidth >= 768;
-    var maxActions = isDesktop ? 6 : 5;
 
     // Load custom shortcuts from localStorage
     var customStored = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
@@ -4878,10 +4877,6 @@ window.coraRenderQuickActionsBar = function() {
     // Merge predefined actions with custom actions
     var allActions = CORA_PREDEFINED_ACTIONS.concat(customActions);
 
-    // Limit actions
-    var activeActions = allActions.slice(0, maxActions);
-
-    // Add Custom Shortcuts button as the last element
     var creatorBtn = {
         isCreator: true,
         label: 'Custom Shortcuts',
@@ -4889,29 +4884,73 @@ window.coraRenderQuickActionsBar = function() {
         icon: '<svg viewBox="0 0 24 24" width="13" height="13" class="text-purple-600 shrink-0" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path></svg>'
     };
 
-    var totalItems = activeActions.concat([creatorBtn]);
+    if (isDesktop) {
+        // Desktop: Render in one single centered row
+        var activeActions = allActions.slice(0, 6);
+        var totalItems = activeActions.concat([creatorBtn]);
 
-    var buttonsHtml = totalItems.map(function(item, idx) {
-        var html = '';
-        if (item.isCreator) {
-            html += '<button type="button" onclick="' + item.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0">' +
-                '<span class="cora-ai-gradient-pill-inner">' +
+        var buttonsHtml = totalItems.map(function(item) {
+            if (item.isCreator) {
+                return '<button type="button" onclick="' + item.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0">' +
+                    '<span class="cora-ai-gradient-pill-inner">' +
+                        item.icon +
+                        '<span>' + item.label + '</span>' +
+                    '</span>' +
+                '</button>';
+            } else {
+                return '<button onclick="' + item.onclick + '" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">' +
                     item.icon +
-                    '<span>' + item.label + '</span>' +
-                '</span>' +
-            '</button>';
-        } else {
-            html += '<button onclick="' + item.onclick + '" class="flex justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[11px] sm:text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">' +
-                item.icon +
-                ' <span>' + item.label + '</span>' +
-            '</button>';
-        }
-        return html;
-    }).join('');
+                    ' <span>' + item.label + '</span>' +
+                '</button>';
+            }
+        }).join('');
 
-    bar.innerHTML = '<div class="w-full flex flex-row flex-nowrap items-center overflow-x-auto gap-x-2 px-4 justify-start md:justify-center no-scrollbar py-0.5" style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">' +
-        buttonsHtml +
-    '</div>';
+        bar.innerHTML = '<div class="w-full flex flex-row flex-wrap items-center justify-center gap-x-2.5 gap-y-1.5 px-4 py-0.5">' +
+            buttonsHtml +
+        '</div>';
+
+    } else {
+        // Mobile layout:
+        // Row 1: 3 chips
+        // Row 2: 2 chips
+        // Row 3: Custom Shortcuts chip
+        var row1Actions = allActions.slice(0, 3);
+        var row2Actions = allActions.slice(3, 5);
+
+        var row1Html = row1Actions.map(function(item) {
+            return '<button onclick="' + item.onclick + '" class="flex-1 flex justify-center items-center gap-1 px-2.5 py-1.5 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[10px] font-bold transition-all shadow-3xs cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis select-none" style="min-width: 0;">' +
+                item.icon +
+                ' <span class="truncate">' + item.label + '</span>' +
+            '</button>';
+        }).join('');
+
+        var row2Html = row2Actions.map(function(item) {
+            return '<button onclick="' + item.onclick + '" class="flex-1 flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[10.5px] font-bold transition-all shadow-3xs cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis select-none" style="min-width: 0; max-width: 48%;">' +
+                item.icon +
+                ' <span class="truncate">' + item.label + '</span>' +
+            '</button>';
+        }).join('');
+
+        var creatorHtml = '<button type="button" onclick="' + creatorBtn.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0 text-[10.5px] font-bold">' +
+            '<span class="cora-ai-gradient-pill-inner px-4 py-1.5">' +
+                creatorBtn.icon +
+                '<span>' + creatorBtn.label + '</span>' +
+            '</span>' +
+        '</button>';
+
+        var html = '<div class="w-full flex flex-col gap-2 px-4">';
+        
+        if (row1Html) {
+            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-between gap-2">' + row1Html + '</div>';
+        }
+        if (row2Html) {
+            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-center gap-2">' + row2Html + '</div>';
+        }
+        html += '<div class="w-full flex flex-row items-center justify-center mt-0.5">' + creatorHtml + '</div>';
+        html += '</div>';
+
+        bar.innerHTML = html;
+    }
 };
 
 window.coraRenderCustomActions = window.coraRenderQuickActionsBar;
