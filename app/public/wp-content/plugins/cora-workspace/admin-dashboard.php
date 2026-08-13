@@ -2231,6 +2231,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 transform: translateY(0) !important;
                 transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s !important;
                 z-index: 9970 !important;
+                padding-bottom: 0 !important;
+            }
+            #cora-ai-sidebar .cora-ai-sidebar-header {
+                border-top-left-radius: 20px !important;
+                border-top-right-radius: 20px !important;
             }
             #cora-ai-sidebar .cora-ai-sidebar-body {
                 padding-bottom: 0 !important;
