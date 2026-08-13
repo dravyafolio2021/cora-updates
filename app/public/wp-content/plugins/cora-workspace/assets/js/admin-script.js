@@ -11343,6 +11343,47 @@ jQuery(document).ready(function($) {
         };
         const activePageName = pageNames[curPage] || "Workspace";
         $('#cora-sidebar-model-label').text('Gemini 2.5 Flash • ' + activePageName);
+
+        // Update dynamic RAG Popover HTML
+        const popoverEl = $('#cora-sidebar-rag-popover');
+        if (popoverEl.length) {
+            const ragScope = {
+                dashboard: "Workspace Stats & Activity",
+                leads: "CRM Contacts & Leads Pipeline",
+                financials: "GST Splits, Invoices & Financials",
+                vault: "Secure Document E-Signatures",
+                bookings: "Booking Schedule & Availability",
+                settings: "Workspace configurations",
+                portfolio: "Image Assets & Metadata SEO"
+            };
+
+            let ragHtml = `
+                <div style="font-weight: 700; font-size: 10px; color: #18181b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #e4e4e7; padding-bottom: 6px;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #22c55e; display: inline-block; animation: pulse 2s infinite;"></span>
+                    RAG Knowledge Memory
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; font-size: 10.5px; font-weight: 500; color: #52525b;">
+            `;
+
+            Object.keys(ragScope).forEach(key => {
+                const label = ragScope[key];
+                const isActive = (key === curPage);
+                ragHtml += `
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #f4f4f5;">
+                        <span style="${isActive ? 'color: #18181b; font-weight: 700;' : 'color: #71717a;'}">${label}</span>
+                        <span style="${isActive ? 'color: #22c55e; font-weight: 700; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 1px 6px; border-radius: 4px; font-size: 9px;' : 'color: #a1a1aa; background: #f4f4f5; border: 1px solid #e4e4e7; padding: 1px 6px; border-radius: 4px; font-size: 9px;'}">${isActive ? 'Active' : 'Connected'}</span>
+                    </div>
+                `;
+            });
+
+            ragHtml += `
+                </div>
+                <div style="font-size: 9px; color: #a1a1aa; font-weight: 500; text-align: center; margin-top: 8px; border-top: 1px solid #e4e4e7; padding-top: 6px;">
+                    Syncing with live page updates
+                </div>
+            `;
+            popoverEl.html(ragHtml);
+        }
         
         const shortcutsContainer = $('.cora-ai-sidebar-shortcuts');
         if (shortcutsContainer.length && prompts) {
@@ -11356,6 +11397,17 @@ jQuery(document).ready(function($) {
                 `;
             });
             shortcutsContainer.html(html);
+        }
+    };
+
+    window.coraToggleRAGScopePopover = function(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const popover = $('#cora-sidebar-rag-popover');
+        if (popover.length) {
+            popover.toggleClass('hidden');
         }
     };
 
@@ -11373,6 +11425,13 @@ jQuery(document).ready(function($) {
             e.stopPropagation();
             if (typeof window.coraToggleSidebar === 'function') {
                 window.coraToggleSidebar(true);
+            }
+        });
+
+        // Close RAG popover when clicking outside of it
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#cora-sidebar-model-pill, #cora-sidebar-rag-popover').length) {
+                $('#cora-sidebar-rag-popover').addClass('hidden');
             }
         });
     });

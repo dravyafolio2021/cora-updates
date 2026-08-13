@@ -7332,9 +7332,10 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" style="color: #a1a1aa;"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
                     <!-- Active Model Pill -->
-                    <div id="cora-sidebar-model-pill" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 9999px; font-size: 10px; font-weight: 600; color: #71717a; cursor: default; white-space: nowrap;">
+                    <div id="cora-sidebar-model-pill" onclick="window.coraToggleRAGScopePopover(event)" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 9999px; font-size: 10px; font-weight: 600; color: #71717a; cursor: pointer; white-space: nowrap; position: relative;">
                         <span style="width: 5px; height: 5px; border-radius: 50%; background: #22c55e; display: inline-block;"></span>
                         <span id="cora-sidebar-model-label">Gemini 2.5 Flash</span>
+                        <div id="cora-sidebar-rag-popover" class="hidden" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); width: 240px; z-index: 10000; text-align: left; pointer-events: auto;"></div>
                     </div>
                 </div>
                 <!-- Right: Settings + Close -->
