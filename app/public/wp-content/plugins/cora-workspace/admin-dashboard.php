@@ -294,6 +294,34 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="apple-touch-icon" href="<?php echo CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png'; ?>">
     <script>
+        // Global error catcher for diagnostic visibility
+        window.addEventListener('error', function(e) {
+            console.error('Cora Platform Error:', e);
+            var msg = e.message || 'Unknown error';
+            var file = e.filename ? e.filename.split('/').pop() : 'inline';
+            var line = e.lineno || '0';
+            var displayErr = function() {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Error: ' + msg + ' (' + file + ':' + line + ')', 'error');
+                } else {
+                    setTimeout(displayErr, 1000);
+                }
+            };
+            displayErr();
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Cora Unhandled Promise Rejection:', e);
+            var reason = e.reason ? (e.reason.message || e.reason) : 'Promise rejected';
+            var displayRej = function() {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Promise Error: ' + reason, 'error');
+                } else {
+                    setTimeout(displayRej, 1000);
+                }
+            };
+            displayRej();
+        });
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 <?php
@@ -3313,7 +3341,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </button>
             <!-- Notifications Bell -->
             <div class="relative shrink-0">
-                <button id="cora-notif-bell-btn" onclick="window.coraToggleNotificationDrawer();" class="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-850 rounded-lg transition-all cursor-pointer flex items-center justify-center shrink-0" title="Notifications">
+                <button id="cora-notif-bell-btn" onclick="if(event) event.stopPropagation(); window.coraToggleNotificationDrawer();" class="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-850 rounded-lg transition-all cursor-pointer flex items-center justify-center shrink-0" title="Notifications">
                     <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
@@ -3463,11 +3491,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             </div>
 
             <div class="flex items-center gap-2">
-                <button onclick="window.coraToggleNotificationDrawer();" class="relative p-1 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0">
+                <button onclick="if(event) event.stopPropagation(); window.coraToggleNotificationDrawer();" class="relative p-1 text-zinc-400 hover:text-white transition-all cursor-pointer flex items-center justify-center shrink-0">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                     <span id="cora-mobile-notif-badge" class="<?php echo $cora_unread_count > 0 ? '' : 'hidden'; ?> absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full border border-[#09090b]"></span>
                 </button>
-                <div onclick="window.coraToggleProfilePopover(event);" class="flex items-center cursor-pointer shrink-0">
+                <div onclick="window.coraToggleProfilePopover(event);" class="cora-header-profile-btn flex items-center cursor-pointer shrink-0">
                     <div class="relative w-7 h-7 rounded-full flex items-center justify-center shrink-0 leading-none">
                         <?php if ( $current_user_avatar ) : ?>
                             <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-7 h-7 rounded-full object-cover shrink-0 select-none border border-zinc-700/60" alt="<?php echo esc_attr($cora_display_name); ?>" />
@@ -11548,6 +11576,7 @@ wp_print_footer_scripts();
             const popover = document.getElementById('cora-header-profile-popover');
             if (popover && !popover.classList.contains('hidden') && !e.target.closest('.cora-header-profile-btn') && !e.target.closest('#cora-header-profile-popover')) {
                 popover.classList.add('hidden');
+                popover.style.display = 'none';
             }
         });
 
