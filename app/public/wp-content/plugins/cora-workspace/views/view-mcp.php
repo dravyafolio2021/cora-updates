@@ -301,6 +301,37 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         border-color: #27272a;
         background: #18181b;
     }
+    @media (max-width: 768px) {
+        .cora-ai-tabs {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 4px;
+        }
+        .cora-ai-tab {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+        .cora-ai-workspace {
+            grid-template-columns: 1fr;
+            min-height: auto;
+        }
+        .cora-ai-sidebar {
+            border-right: none;
+            border-bottom: 1px solid #e4e4e7;
+        }
+        .dark .cora-ai-sidebar {
+            border-bottom-color: #27272a;
+        }
+    }
+    @media (max-width: 480px) {
+        .cora-ai-chips {
+            grid-template-columns: 1fr;
+        }
+        .cora-ai-welcome {
+            padding: 20px;
+        }
+    }
 </style>
 
 <!-- Tabs Navigation -->
@@ -404,12 +435,12 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
 <div id="cora-ai-panel-mcp-settings" class="space-y-6 max-w-3xl" style="display:none;">
     <!-- Developer Preview & Token Generation -->
     <div class="bg-white border border-zinc-200 rounded-2xl p-6 shadow-xs space-y-4">
-        <div class="border-b border-zinc-100 pb-3 flex items-center justify-between">
+        <div class="border-b border-zinc-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <h3 class="text-sm font-bold text-zinc-900 ">Model Context Protocol (MCP) AI Tools Server</h3>
                 <p class="text-xs text-zinc-500 mt-0.5">Connect your custom external AI agents directly with Cora's data schemas.</p>
             </div>
-            <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-850 text-[9px] font-bold uppercase tracking-wider">Beta Gateway</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-850 text-[9px] font-bold uppercase tracking-wider self-start sm:self-center">Beta Gateway</span>
         </div>
 
         <div class="p-4 border border-zinc-200 rounded-xl bg-zinc-50/50 ">
@@ -421,9 +452,9 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         <!-- MCP Gateway URL -->
         <div class="space-y-2">
             <label class="block text-xs font-bold text-zinc-700 ">MCP Gateway Endpoint URL</label>
-            <div class="flex gap-2">
+            <div class="flex flex-col sm:flex-row gap-2">
                 <input type="text" id="cora-mcp-gateway-url-direct" readonly value="<?php echo esc_url( $mcp_url ); ?>" class="w-full font-mono bg-zinc-55/40 border border-zinc-200 rounded-lg text-xs px-3 py-2 outline-none">
-                <button type="button" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraCopyToClipboardDirect('cora-mcp-gateway-url-direct')">Copy URL</button>
+                <button type="button" class="w-full sm:w-auto px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraCopyToClipboardDirect('cora-mcp-gateway-url-direct')">Copy URL</button>
             </div>
         </div>
 
@@ -432,14 +463,16 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
             <?php wp_nonce_field( 'cora_save_mcp_token_direct', 'cora_mcp_nonce' ); ?>
             <div class="space-y-2">
                 <label class="block text-xs font-bold text-zinc-700 ">Secure Bearer Access Token</label>
-                <div class="flex gap-2">
+                <div class="flex flex-col sm:flex-row gap-2">
                     <input type="password" id="cora-mcp-access-token-direct" name="cora_mcp_access_token_direct" value="<?php echo esc_attr( $mcp_token ); ?>" class="w-full font-mono bg-white border border-zinc-200 rounded-lg text-xs px-3 py-2 outline-none cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
-                    <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-850 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraToggleTokenVisibilityDirect()">Show</button>
-                    <button type="button" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-850 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraGenerateNewMCPTokenDirect()">Regenerate</button>
-                    <button type="submit" name="cora_save_mcp_token_direct_submit" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 shadow-sm">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                        Save Token
-                    </button>
+                    <div class="flex gap-2 w-full sm:w-auto shrink-0 justify-end">
+                        <button type="button" class="flex-1 sm:flex-none px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-850 font-bold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraToggleTokenVisibilityDirect()">Show</button>
+                        <button type="button" class="flex-1 sm:flex-none px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-850 font-bold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraGenerateNewMCPTokenDirect()">Regenerate</button>
+                        <button type="submit" name="cora_save_mcp_token_direct_submit" class="flex-1 sm:flex-none px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            Save Token
+                        </button>
+                    </div>
                 </div>
                 <p class="text-[10px] text-zinc-400 mt-1">Authenticate requests by sending this value in the HTTP header: <code>Authorization: Bearer &lt;token&gt;</code>.</p>
             </div>
@@ -448,12 +481,12 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
 
     <!-- Configuration Example Card -->
     <div class="bg-white border border-zinc-200 rounded-2xl p-6 shadow-xs space-y-4 mt-6">
-        <div class="border-b border-zinc-100 pb-3 flex items-center justify-between">
+        <div class="border-b border-zinc-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <h3 class="text-sm font-bold text-zinc-900 ">Claude Desktop & Cursor Integration</h3>
                 <p class="text-xs text-zinc-500 mt-0.5">Use the local stdio bridge script to connect external AI agents to Cora.</p>
             </div>
-            <a href="<?php echo esc_url( CORA_WORKSPACE_URL . 'cora-bridge.py' ); ?>" download class="px-2.5 py-1 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-850 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1">
+            <a href="<?php echo esc_url( CORA_WORKSPACE_URL . 'cora-bridge.py' ); ?>" download class="w-full sm:w-auto justify-center px-2.5 py-1.5 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-850 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1">
                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 Download Bridge Script
             </a>

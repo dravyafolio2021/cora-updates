@@ -3527,12 +3527,12 @@ $_cora_spl_badge = ucwords( str_replace( '_', ' ', $_cora_splash_type ) ) ?: 'In
             </a>
         </div>
         
-        <div class="flex lg:hidden w-full items-center justify-between bg-transparent py-0.5">
+        <div class="flex lg:hidden w-full items-center justify-between bg-transparent py-0.5" style="gap: 10px !important;">
             <div onclick="if(typeof window.coraNavigateTo==='function'){window.coraNavigateTo('dashboard');}" class="flex items-center cursor-pointer select-none shrink-0 hover:opacity-85 transition-opacity pr-1.5">
                 <span class="tracking-normal font-black text-[13px] text-white">CORA</span>
             </div>
 
-            <div onclick="window.coraOpenCommandPalette();" class="mx-2 flex items-center justify-between text-zinc-400 text-xs cursor-pointer" style="max-width: 248px; height: 32px; background-color: #343434e3; border-radius: 8px; border: none; padding: 0 10px; flex: 1;">
+            <div onclick="window.coraOpenCommandPalette();" class="mx-2 flex items-center justify-between text-zinc-400 text-xs cursor-pointer" style="max-width: 280px; height: 32px; background-color: #343434e3; border-radius: 8px; border: none; padding: 0 10px; flex: 1;">
                 <div class="flex items-center gap-1.5">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <span class="text-[11px]">Search anything...</span>
@@ -11065,7 +11065,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
     </aside>
 
     <!-- Mobile Floating Bottom Navigation (3-State Adaptive Floating Island Bar) -->
-    <div id="cora-mobile-floating-island" class="cora-mobile-island-wrapper lg:hidden fixed bottom-4 left-0 right-0 z-[9980] w-[calc(100vw-32px)] max-w-[460px] mx-auto transition-all duration-300 ease-out select-none" style="position: fixed !important; bottom: 16px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; z-index: 9980 !important; width: calc(100vw - 32px) !important; max-width: 460px !important; box-sizing: border-box !important;">
+    <div id="cora-mobile-floating-island" class="cora-mobile-island-wrapper lg:hidden fixed bottom-4 left-0 right-0 z-[9980] w-[calc(100vw-32px)] max-w-[460px] mx-auto transition-all duration-300 ease-out" style="position: fixed !important; bottom: 16px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; z-index: 9980 !important; width: calc(100vw - 32px) !important; max-width: 460px !important; box-sizing: border-box !important;">
         <div class="cora-island-card w-full flex items-center justify-between transition-all duration-300">
             
             <!-- State 1 & 2: Menu Toggle Button (Left) -->
