@@ -11265,6 +11265,10 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         var shouldShow = forceShow !== undefined ? !!forceShow : isHidden;
 
         if (shouldShow) {
+            // Close AI sidebar if open
+            if (typeof window.coraToggleSidebar === 'function') {
+                window.coraToggleSidebar(false);
+            }
             if (!fromPopState) {
                 history.pushState({ drawer: 'mobile-nav' }, '');
             }

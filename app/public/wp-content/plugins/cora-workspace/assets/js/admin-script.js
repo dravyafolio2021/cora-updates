@@ -1040,12 +1040,23 @@ jQuery(document).ready(function($) {
         const quickBtn = $('#cora-quick-ai-btn');
         const backdrop = $('#cora-ai-sidebar-backdrop');
         const island = $('#cora-mobile-floating-island');
+        
+        // Break infinite loops/recursion from focus events by checking state first
+        const isCurrentlyShown = !sidebar.hasClass('collapsed');
+        if (show === isCurrentlyShown) {
+            return;
+        }
+
         if (show) {
             sidebar.removeClass('collapsed');
             quickBtn.addClass('bg-zinc-100 border-zinc-300');
             backdrop.removeClass('hidden');
             island.addClass('cora-island-docked');
-            $('#cora-island-ai-input').focus();
+            
+            const input = $('#cora-island-ai-input');
+            if (input.length && !input.is(':focus')) {
+                input.focus();
+            }
         } else {
             sidebar.addClass('collapsed');
             quickBtn.removeClass('bg-zinc-100 border-zinc-300');
