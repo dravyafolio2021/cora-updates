@@ -1038,13 +1038,16 @@ jQuery(document).ready(function($) {
     window.coraToggleSidebar = function(show) {
         const sidebar = $('#cora-ai-sidebar');
         const quickBtn = $('#cora-quick-ai-btn');
+        const backdrop = $('#cora-sidebar-backdrop');
         if (show) {
             sidebar.removeClass('collapsed');
             quickBtn.addClass('bg-zinc-100 border-zinc-300');
+            backdrop.removeClass('hidden');
             $('#cora-sidebar-chat-input').focus();
         } else {
             sidebar.addClass('collapsed');
             quickBtn.removeClass('bg-zinc-100 border-zinc-300');
+            backdrop.addClass('hidden');
         }
     };
 
