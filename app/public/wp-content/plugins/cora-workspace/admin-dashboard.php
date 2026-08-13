@@ -11044,26 +11044,37 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
             </button>
         </div>
 
-        <!-- Grid -->
-        <div style="flex:1; overflow-y:auto; padding:20px; -webkit-overflow-scrolling:touch;">
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px 16px;">
+        <!-- Grid of 2 Column Bars -->
+        <div style="flex:1; overflow-y:auto; padding:16px; -webkit-overflow-scrolling:touch;">
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;">
                 <?php foreach ( $cora_mobile_drawer_items as $target => $item ) :
                     $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
                     $is_active = ( $sub_page === $target || str_replace('_','-',$sub_page) === str_replace('_','-',$target) );
-                    $icon_bg   = $is_active ? 'background:#09090b; border-color:#09090b; color:#fff;' : 'background:#f4f4f5; border-color:#e4e4e7; color:#71717a;';
-                    $lbl_color = $is_active ? '#09090b' : '#71717a';
+                    
+                    if ( $is_active ) {
+                        $bar_style = 'background:#f4f4f5; border-color:#e4e4e7; color:#09090b; font-weight:700;';
+                        $icon_color = '#09090b';
+                    } else {
+                        $bar_style = 'background:#ffffff; border-color:#e4e4e7; color:#27272a; font-weight:600;';
+                        $icon_color = '#71717a';
+                    }
                 ?>
-                <a href="<?php echo esc_url($nav_url); ?>" style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; text-decoration:none;">
-                    <div style="width:48px; height:48px; border-radius:14px; border:1px solid; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.15s; <?php echo $icon_bg; ?>">
-                        <span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px;">
-                            <?php echo $item['icon']; ?>
-                        </span>
-                    </div>
-                    <span style="font-size:9.5px; font-weight:700; letter-spacing:-0.01em; line-height:1.2; word-break:break-word; max-width:72px; color:<?php echo $lbl_color; ?>;"><?php echo esc_html($item['title']); ?></span>
+                <a href="<?php echo esc_url($nav_url); ?>" style="display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid; border-radius:12px; text-decoration:none; transition:all 0.15s; <?php echo $bar_style; ?>">
+                    <span class="cora-mobile-nav-icon-wrapper" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; color:<?php echo $icon_color; ?>; flex-shrink:0;">
+                        <?php echo $item['icon']; ?>
+                    </span>
+                    <span style="font-size:12px; letter-spacing:-0.01em; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?php echo esc_html($item['title']); ?></span>
                 </a>
                 <?php endforeach; ?>
             </div>
         </div>
+
+        <style>
+        .cora-mobile-nav-icon-wrapper svg {
+            width: 18px !important;
+            height: 18px !important;
+        }
+        </style>
     </div>
 </div>
 
