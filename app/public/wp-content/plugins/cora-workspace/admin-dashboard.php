@@ -1760,7 +1760,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             display: none !important;
         }
 
+        /* Fix Tailwind flex/hidden conflict — .hidden must always win */
+        #cora-workspace .hidden,
+        #cora-global-topbar .hidden {
+            display: none !important;
+        }
+
         aside[id$="-drawer"] {
+
             position: fixed !important;
             top: 0 !important;
             right: 0 !important;
@@ -3328,7 +3335,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         </div>
 
         <!-- Header User Profile Popover Card (Shared Desktop & Mobile, Merged Punch Widget) -->
-        <div id="cora-header-profile-popover" class="hidden fixed top-[56px] right-4 w-64 bg-white border border-zinc-200 rounded-2xl shadow-xl p-4 z-[9990] flex flex-col gap-2.5 animate-in fade-in slide-in-from-top-2 duration-150 select-none">
+        <div id="cora-header-profile-popover" class="hidden fixed top-[56px] right-4 w-64 bg-white border border-zinc-200 rounded-2xl shadow-xl p-4 z-[9990] gap-2.5 animate-in fade-in slide-in-from-top-2 duration-150 select-none" style="flex-direction:column;">
             <!-- User Profile Header -->
             <div class="flex items-center gap-3 px-1 select-none">
                 <?php if ( $current_user_avatar ) : ?>
@@ -11327,7 +11334,6 @@ wp_print_footer_scripts();
         } else {
             drawer.classList.add('collapsed');
         }
-        }
     };
 
     window.coraCloseAllPopovers = function(exceptId) {
@@ -11343,7 +11349,10 @@ wp_print_footer_scripts();
         popoverIds.forEach(function(id) {
             if (id !== exceptId) {
                 const el = document.getElementById(id);
-                if (el) el.classList.add('hidden');
+                if (el) {
+                    el.classList.add('hidden');
+                    el.style.display = 'none';
+                }
             }
         });
     };
@@ -11356,10 +11365,13 @@ wp_print_footer_scripts();
         window.coraCloseAllPopovers('cora-header-profile-popover');
         if (isHidden) {
             popover.classList.remove('hidden');
+            popover.style.display = 'flex';
         } else {
             popover.classList.add('hidden');
+            popover.style.display = 'none';
         }
     };
+
 
     // Toggle drawer from bell
     function toggleNotificationDropdown(e) {
