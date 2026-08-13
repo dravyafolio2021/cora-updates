@@ -1038,7 +1038,7 @@ jQuery(document).ready(function($) {
     window.coraToggleSidebar = function(show) {
         const sidebar = $('#cora-ai-sidebar');
         const quickBtn = $('#cora-quick-ai-btn');
-        const backdrop = $('#cora-sidebar-backdrop');
+        const backdrop = $('#cora-ai-sidebar-backdrop');
         const island = $('#cora-mobile-floating-island');
         const islandCard = island.find('.cora-island-card');
         if (show) {
@@ -11222,6 +11222,16 @@ jQuery(document).ready(function($) {
         const currentState = localStorage.getItem('cora_mobile_island_mode') || 'ai';
         if (!newState) {
             newState = currentState === 'ai' ? 'nav' : 'ai';
+        }
+
+        // Close AI sidebar if switching away from AI view
+        if (newState !== 'ai') {
+            if (typeof window.coraToggleSidebar === 'function') {
+                const sidebar = $('#cora-ai-sidebar');
+                if (!sidebar.hasClass('collapsed')) {
+                    window.coraToggleSidebar(false);
+                }
+            }
         }
 
         localStorage.setItem('cora_mobile_island_mode', newState);
