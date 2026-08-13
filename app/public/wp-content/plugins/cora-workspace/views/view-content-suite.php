@@ -262,7 +262,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </div>
 
 <!-- Tabs Navigation -->
-<div class="flex items-center gap-1 border-b border-zinc-200 mt-7 pt-2 mb-6 px-4 sm:px-6 lg:px-8 select-none overflow-x-auto scrollbar-hide" id="cora-content-tabs" style="flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 44px;">
+<div class="flex items-center gap-1 border-b border-zinc-200 mt-7 pt-2 mb-6 pl-0 pr-4 sm:pr-6 lg:pr-8 select-none overflow-x-auto scrollbar-hide" id="cora-content-tabs" style="flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 44px;">
     <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-zinc-950 text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-overview" onclick="switchContentTab('ct-overview')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
         Overview
