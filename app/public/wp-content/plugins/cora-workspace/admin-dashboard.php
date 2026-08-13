@@ -11044,9 +11044,9 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
             </button>
         </div>
 
-        <!-- Grid of 2 Column Bars -->
-        <div style="flex:1; overflow-y:auto; padding:16px; -webkit-overflow-scrolling:touch;">
-            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;">
+        <!-- List of 1 Column Bars -->
+        <div style="flex:1; overflow-y:auto; padding:16px 20px; -webkit-overflow-scrolling:touch;">
+            <div style="display:flex; flex-direction:column; gap:8px;">
                 <?php foreach ( $cora_mobile_drawer_items as $target => $item ) :
                     $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
                     $is_active = ( $sub_page === $target || str_replace('_','-',$sub_page) === str_replace('_','-',$target) );
@@ -11059,11 +11059,11 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
                         $icon_color = '#71717a';
                     }
                 ?>
-                <a href="<?php echo esc_url($nav_url); ?>" style="display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid; border-radius:12px; text-decoration:none; transition:all 0.15s; <?php echo $bar_style; ?>">
+                <a href="<?php echo esc_url($nav_url); ?>" style="display:flex; align-items:center; gap:12px; padding:12px 16px; border:1px solid; border-radius:12px; text-decoration:none; transition:all 0.15s; <?php echo $bar_style; ?>">
                     <span class="cora-mobile-nav-icon-wrapper" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; color:<?php echo $icon_color; ?>; flex-shrink:0;">
                         <?php echo $item['icon']; ?>
                     </span>
-                    <span style="font-size:12px; letter-spacing:-0.01em; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?php echo esc_html($item['title']); ?></span>
+                    <span style="font-size:13px; letter-spacing:-0.01em; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?php echo esc_html($item['title']); ?></span>
                 </a>
                 <?php endforeach; ?>
             </div>
@@ -11080,7 +11080,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 
 <script>
 (function() {
-    window.coraToggleMobileNavDrawer = function(forceShow) {
+    window.coraToggleMobileNavDrawer = function(forceShow, fromPopState) {
         var drawer  = document.getElementById('cora-mobile-nav-drawer');
         var sheet   = document.getElementById('cora-mobile-nav-drawer-sheet');
         if (!drawer || !sheet) return;
@@ -11088,6 +11088,9 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         var shouldShow = forceShow !== undefined ? !!forceShow : isHidden;
 
         if (shouldShow) {
+            if (!fromPopState) {
+                history.pushState({ drawer: 'mobile-nav' }, '');
+            }
             drawer.style.display = 'flex';
             sheet.getBoundingClientRect();
             sheet.style.transform = 'translateY(0)';
@@ -11098,6 +11101,10 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
             setTimeout(function() {
                 drawer.style.display = 'none';
             }, 310);
+
+            if (!fromPopState && history.state && history.state.drawer === 'mobile-nav') {
+                history.back();
+            }
         }
     };
 })();
@@ -11146,7 +11153,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 
 <script>
 (function() {
-    window.coraToggleMobileNotifDrawer = function(forceShow) {
+    window.coraToggleMobileNotifDrawer = function(forceShow, fromPopState) {
         var drawer = document.getElementById('cora-mobile-notif-bottom-drawer');
         var sheet  = document.getElementById('cora-mobile-notif-bottom-sheet');
         if (!drawer || !sheet) return;
@@ -11154,9 +11161,11 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         var shouldShow = forceShow !== undefined ? !!forceShow : isHidden;
 
         if (shouldShow) {
-            // Sync notification content into mobile drawer
             if (typeof window.coraRenderMobileNotifications === 'function') {
                 window.coraRenderMobileNotifications();
+            }
+            if (!fromPopState) {
+                history.pushState({ drawer: 'mobile-notif' }, '');
             }
             drawer.style.display = 'flex';
             sheet.getBoundingClientRect();
@@ -11166,10 +11175,26 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
             sheet.style.transform = 'translateY(100%)';
             document.body.style.overflow = '';
             setTimeout(function() { drawer.style.display = 'none'; }, 310);
+
+            if (!fromPopState && history.state && history.state.drawer === 'mobile-notif') {
+                history.back();
+            }
         }
     };
-})();
 
+    // Global listener for mobile browser back swipe / back button navigation
+    window.addEventListener('popstate', function(event) {
+        var navDrawer = document.getElementById('cora-mobile-nav-drawer');
+        var notifDrawer = document.getElementById('cora-mobile-notif-bottom-drawer');
+
+        if (navDrawer && navDrawer.style.display === 'flex') {
+            window.coraToggleMobileNavDrawer(false, true);
+        }
+        if (notifDrawer && notifDrawer.style.display === 'flex') {
+            window.coraToggleMobileNotifDrawer(false, true);
+        }
+    });
+})();
 </script>
 
 
