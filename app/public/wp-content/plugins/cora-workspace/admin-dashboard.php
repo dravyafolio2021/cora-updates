@@ -7301,35 +7301,36 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
 
     <!-- Collapsible Right-side AI Sidebar (Notion-AI style) -->
     <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 lg:top-[52px] right-0 left-0 z-[999] h-full lg:h-[calc(100vh-52px)] w-full max-w-full bg-white border-t border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
-        <div class="cora-ai-sidebar-header w-full border-b border-zinc-200/80 bg-zinc-50 shrink-0 px-4 py-3 select-none">
+        <div class="cora-ai-sidebar-header w-full shrink-0 select-none" style="padding: 10px 16px; background: #fafafa; border-bottom: 1px solid #e4e4e7;">
             <div class="flex justify-between items-center w-full max-w-3xl mx-auto">
-                <div class="cora-ai-sidebar-title text-xs font-bold text-zinc-800 flex items-center gap-1.5 cursor-pointer hover:text-zinc-950 transition-colors" onclick="coraClearSidebarChat()">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-555">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/>
-                    </svg>
-                    <span>New Conversation</span>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
+                <!-- Left: New Conversation + Model Pill -->
                 <div class="flex items-center gap-2">
-                    <!-- Settings/Filter Icon -->
-                    <button class="text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer border-0 bg-transparent p-1" title="AI Settings">
+                    <div class="cora-ai-sidebar-title flex items-center gap-1.5 cursor-pointer transition-colors" onclick="coraClearSidebarChat()" style="font-size: 12px; font-weight: 700; color: #27272a;">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" style="color: #52525b;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/>
+                        </svg>
+                        <span>New Conversation</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" style="color: #a1a1aa;"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <!-- Active Model Pill -->
+                    <div id="cora-sidebar-model-pill" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 9999px; font-size: 10px; font-weight: 600; color: #71717a; cursor: default; white-space: nowrap;">
+                        <span style="width: 5px; height: 5px; border-radius: 50%; background: #22c55e; display: inline-block;"></span>
+                        <span id="cora-sidebar-model-label">Gemini 2.5 Flash</span>
+                    </div>
+                </div>
+                <!-- Right: Settings + Close -->
+                <div class="flex items-center gap-1">
+                    <button style="color: #a1a1aa; border: 0; background: transparent; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#3f3f46'" onmouseout="this.style.color='#a1a1aa'" title="AI Settings">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="4" y1="21" x2="4" y2="14"></line>
-                            <line x1="4" y1="10" x2="4" y2="3"></line>
-                            <line x1="12" y1="21" x2="12" y2="12"></line>
-                            <line x1="12" y1="8" x2="12" y2="3"></line>
-                            <line x1="20" y1="21" x2="20" y2="16"></line>
-                            <line x1="20" y1="12" x2="20" y2="3"></line>
-                            <line x1="1" y1="14" x2="7" y2="14"></line>
-                            <line x1="9" y1="8" x2="15" y2="8"></line>
-                            <line x1="17" y1="16" x2="23" y2="16"></line>
+                            <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
+                            <line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line>
+                            <line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>
                         </svg>
                     </button>
-                    <!-- Close Button -->
-                    <button class="cora-ai-sidebar-close text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer border-0 bg-transparent p-1" onclick="coraToggleSidebar(false)">
+                    <button class="cora-ai-sidebar-close" onclick="coraToggleSidebar(false)" style="color: #a1a1aa; border: 0; background: transparent; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#18181b'" onmouseout="this.style.color='#a1a1aa'">
                         <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
                     </button>
                 </div>
@@ -7413,10 +7414,11 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                 </div>
             </div>
         </div>
-        <div class="cora-ai-sidebar-footer-input p-3 border-t border-zinc-200/80 bg-zinc-50 shrink-0">
-            <div class="flex items-center gap-2 max-w-3xl mx-auto w-full">
-                <input type="text" id="cora-sidebar-chat-input" placeholder="Ask Cora AI..." onkeydown="if(event.key === 'Enter') coraSendSidebarChatMessage()" class="flex-1 border border-zinc-200 rounded-md p-2 text-xs bg-white focus:border-zinc-400 focus:outline-none">
-                <button class="cora-btn-primary px-3 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded text-xs transition-colors cursor-pointer shrink-0" onclick="coraSendSidebarChatMessage()">Send</button>
+        <div class="cora-ai-sidebar-footer-input shrink-0" style="padding: 10px 16px; background: #fafafa; border-top: 1px solid #e4e4e7;">
+            <div class="max-w-3xl mx-auto w-full" style="display: flex; align-items: center; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 9999px; padding: 3px 3px 3px 14px; box-sizing: border-box;">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" style="color: #71717a; flex-shrink: 0; margin-right: 8px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="cora-sidebar-chat-input" placeholder="Search or ask Cora AI..." onkeydown="if(event.key === 'Enter') coraSendSidebarChatMessage()" style="flex: 1; border: none; outline: none; box-shadow: none; font-size: 13px; background: transparent; color: #18181b; padding: 0; margin: 0; font-family: inherit; font-weight: 500;">
+                <button onclick="coraSendSidebarChatMessage()" style="height: 34px; padding: 0 16px; background-color: #09090b; color: #fff; border-radius: 9999px; font-size: 12px; font-weight: 700; border: none; outline: none; cursor: pointer; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-left: 6px; transition: background-color 0.15s ease;" onmouseover="this.style.backgroundColor='#27272a'" onmouseout="this.style.backgroundColor='#09090b'">Ask AI</button>
             </div>
         </div>
     </aside>
