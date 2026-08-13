@@ -222,7 +222,7 @@ $vault_header_args = array(
     'description'        => 'Manage legally binding contracts, proposals, client invoices, and e-sign registry workflows.',
     'icon'               => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
     'ai_stack'           => true,
-    'tutorial_onclick'   => '', // No specific video walkthrough for Vault page, hides the YouTube button
+    'tutorial_onclick'   => "window.open('https://www.youtube.com/@heycora', '_blank')",
     'cta'                => array(
         'text'        => 'Create Document Wizard',
         'mobile_text' => 'Create Doc',
