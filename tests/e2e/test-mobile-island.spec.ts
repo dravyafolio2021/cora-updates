@@ -63,5 +63,34 @@ test.describe('Mobile Floating Island Interactive States', () => {
     console.log(`Final Nav View style: "${finalNavStyle}", class: "${finalNavClass}"`);
 
     await page.screenshot({ path: 'tests/e2e/mobile-island-final-ai-state.png' });
+
+    // 4. Test typing a prompt and submitting it when copilot is active (e.g. on blogs page)
+    const inputEl = page.locator('#cora-island-ai-input');
+    await inputEl.fill('Hello Cora, help me with leads');
+    const askBtn = page.locator('.cora-island-ask-btn');
+    await askBtn.click();
+
+    // Verify copilot/agent chat messages contain the query
+    const copilotMessages = page.locator('#cora-copilot-chat-history');
+    await expect(copilotMessages).toContainText('Hello Cora, help me with leads');
+
+    // 5. Navigate to financials page (where copilot is NOT active)
+    await page.goto('/workspace/financials?industry=real_estate');
+    await page.waitForLoadState('networkidle');
+
+    // Type a prompt on financials page
+    const inputEl2 = page.locator('#cora-island-ai-input');
+    await inputEl2.fill('Financial query test');
+    const askBtn2 = page.locator('.cora-island-ask-btn');
+    await askBtn2.click();
+
+    // Verify it navigated to MCP page
+    await page.waitForURL(/.*\/mcp/);
+    await expect(page).toHaveURL(/.*\/mcp/);
+
+    // Verify the message is submitted and rendered in the chat messages
+    const chatMessages = page.locator('#cora-ai-messages');
+    await expect(chatMessages).toBeVisible();
+    await expect(chatMessages).toContainText('Financial query test');
   });
 });

@@ -11211,17 +11211,23 @@ jQuery(document).ready(function($) {
             }
             return;
         }
-        if (typeof window.coraOpenSidebarChat === 'function') {
-            window.coraOpenSidebarChat();
-        } else {
-            $('#cora-ai-sidebar').removeClass('hidden');
-        }
-        
-        const $aiInput = $('#cora-ai-chat-input, #cora-ai-input-field');
-        if ($aiInput.length) {
-            $aiInput.val(prompt);
+
+        // If we are already on the MCP page, submit directly
+        const $mcpInput = $('#cora-ai-input');
+        if ($mcpInput.length) {
+            $mcpInput.val(prompt);
             if (typeof window.coraSendChatMessage === 'function') {
                 window.coraSendChatMessage();
+            }
+            $('#cora-island-ai-input').val('');
+            return;
+        }
+
+        // Otherwise, store prompt in session storage and navigate to mcp page
+        if (prompt) {
+            sessionStorage.setItem('cora_pending_ai_prompt', prompt);
+            if (typeof window.coraNavigateTo === 'function') {
+                window.coraNavigateTo('mcp');
             }
         }
         $('#cora-island-ai-input').val('');

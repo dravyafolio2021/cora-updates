@@ -904,4 +904,20 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         html += '</div>';
         return html;
     }
+
+    // Expose send chat message globally
+    window.coraSendChatMessage = coraSendChatMessage;
+
+    // Check for pending prompt on page load
+    jQuery(document).ready(function() {
+        const pendingPrompt = sessionStorage.getItem('cora_pending_ai_prompt');
+        if (pendingPrompt) {
+            sessionStorage.removeItem('cora_pending_ai_prompt');
+            const inputEl = document.getElementById('cora-ai-input');
+            if (inputEl) {
+                inputEl.value = pendingPrompt;
+                coraSendChatMessage();
+            }
+        }
+    });
 </script>
