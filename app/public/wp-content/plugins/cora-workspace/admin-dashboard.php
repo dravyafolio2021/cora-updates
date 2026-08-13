@@ -2214,21 +2214,23 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             #cora-ai-sidebar {
                 position: fixed !important;
                 top: auto !important;
-                bottom: 0 !important;
+                bottom: 72px !important;
                 left: 0 !important;
                 right: 0 !important;
-                height: 60vh !important;
-                max-height: 60vh !important;
+                height: calc(60vh - 72px) !important;
+                max-height: calc(60vh - 72px) !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 border-top: 1px solid #e4e4e7 !important;
                 border-left: none !important;
                 border-top-left-radius: 20px !important;
                 border-top-right-radius: 20px !important;
+                border-bottom-left-radius: 0 !important;
+                border-bottom-right-radius: 0 !important;
                 box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1), 0 -8px 10px -6px rgba(0, 0, 0, 0.1) !important;
                 transform: translateY(0) !important;
                 transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s !important;
-                z-index: 99999 !important;
+                z-index: 9970 !important;
             }
             
             #cora-ai-sidebar.collapsed {
@@ -7353,13 +7355,6 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         <button class="cora-shortcut-btn w-full text-left p-2.5 text-xs text-zinc-500 border border-zinc-200 rounded-md hover:bg-zinc-50 hover:text-zinc-900 transition-colors cursor-pointer font-medium" onclick="coraSendShortcut('Show current automations status')">Check automations</button>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="cora-ai-sidebar-footer-input shrink-0" style="padding: 8px 16px; background: transparent; border-top: 1px solid #e4e4e7;">
-            <div class="max-w-3xl mx-auto w-full" style="display: flex; align-items: center; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 9999px; padding: 3px 3px 3px 14px; box-sizing: border-box;">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" style="color: #71717a; flex-shrink: 0; margin-right: 8px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="cora-sidebar-chat-input" placeholder="Search or ask Cora AI..." onkeydown="if(event.key === 'Enter') coraSendSidebarChatMessage()" style="flex: 1; border: none; outline: none; box-shadow: none; font-size: 13px; background: transparent; color: #18181b; padding: 0; margin: 0; font-family: inherit; font-weight: 500;">
-                <button onclick="coraSendSidebarChatMessage()" style="height: 34px; padding: 0 16px; background-color: #09090b; color: #fff; border-radius: 9999px; font-size: 12px; font-weight: 700; border: none; outline: none; cursor: pointer; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-left: 6px; transition: background-color 0.15s ease;" onmouseover="this.style.backgroundColor='#27272a'" onmouseout="this.style.backgroundColor='#09090b'">Ask AI</button>
             </div>
         </div>
     </aside>

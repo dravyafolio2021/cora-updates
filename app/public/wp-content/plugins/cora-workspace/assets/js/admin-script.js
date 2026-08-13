@@ -1098,9 +1098,9 @@ jQuery(document).ready(function($) {
         $('#cora-sidebar-search-input').focus();
     });
 
-    // Send chat messages from input box
+    // Send chat messages — reads from the native island input (sidebar has no own input)
     window.coraSendSidebarChatMessage = function() {
-        const input = $('#cora-sidebar-chat-input');
+        const input = $('#cora-island-ai-input');
         const text = input.val().trim();
         if (!text) return;
 
@@ -11222,6 +11222,8 @@ jQuery(document).ready(function($) {
 
     window.coraSubmitIslandAI = function() {
         const prompt = $('#cora-island-ai-input').val().trim();
+
+        // Priority 1: If copilot is available (e.g. blogs page agent), route there
         if (typeof window.coraToggleCopilot === 'function') {
             window.coraToggleCopilot(true);
             if (prompt && typeof window.coraSendCopilotMessage === 'function') {
@@ -11231,7 +11233,7 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        // If we are already on the MCP page, submit directly
+        // Priority 2: If MCP page AI input exists, route there
         const $mcpInput = $('#cora-ai-input');
         if ($mcpInput.length) {
             $mcpInput.val(prompt);
@@ -11242,23 +11244,12 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        // Check if global AI sidebar is present
-        const $sidebar = $('#cora-ai-sidebar');
-        if ($sidebar.length && typeof window.coraToggleSidebar === 'function') {
+        // Default: Open the native sidebar and send message there
+        if (typeof window.coraToggleSidebar === 'function') {
             window.coraToggleSidebar(true);
-            if (prompt && typeof window.coraExecuteAIChat === 'function') {
-                window.coraExecuteAIChat(prompt);
-            }
-            $('#cora-island-ai-input').val('');
-            return;
         }
-
-        // Otherwise, store prompt in session storage and navigate to mcp page
-        if (prompt) {
-            sessionStorage.setItem('cora_pending_ai_prompt', prompt);
-            if (typeof window.coraNavigateTo === 'function') {
-                window.coraNavigateTo('mcp');
-            }
+        if (prompt && typeof window.coraExecuteAIChat === 'function') {
+            window.coraExecuteAIChat(prompt);
         }
         $('#cora-island-ai-input').val('');
     };
