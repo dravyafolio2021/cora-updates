@@ -38,31 +38,62 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         border-bottom-color: var(--text-primary, #09090b);
     }
     .cora-ai-workspace {
-        display: grid;
-        grid-template-columns: 280px 1fr;
-        gap: 20px;
+        display: flex;
+        flex-direction: column;
         min-height: 550px;
         background: #fff;
         border: 1px solid #e4e4e7;
         border-radius: 16px;
         overflow: hidden;
+        position: relative;
     }
     .dark .cora-ai-workspace {
         background: #18181b;
         border-color: #27272a;
     }
     .cora-ai-sidebar {
-        background: #fafafa;
-        border-right: 1px solid #e4e4e7;
-        padding: 16px;
         display: flex;
         flex-direction: column;
         gap: 16px;
         font-size: 12px;
     }
-    .dark .cora-ai-sidebar {
+    .cora-chat-header {
+        height: 52px;
+        border-bottom: 1px solid #e4e4e7;
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fafafa;
+    }
+    .dark .cora-chat-header {
+        border-bottom-color: #27272a;
         background: #121214;
-        border-right-color: #27272a;
+    }
+    .cora-ai-header-select {
+        font-size: 11px;
+        font-weight: 600;
+        background: #fff;
+        border: 1px solid #d4d4d8;
+        color: #18181b;
+        border-radius: 9999px;
+        padding: 4px 10px;
+        outline: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .dark .cora-ai-header-select {
+        background: #18181b;
+        border-color: #27272a;
+        color: #f4f4f5;
+    }
+    .cora-ai-header-select:hover {
+        background: #f4f4f5;
+        border-color: #a1a1aa;
+    }
+    .dark .cora-ai-header-select:hover {
+        background: #27272a;
+        border-color: #3f3f46;
     }
     .cora-ai-chat-container {
         display: flex;
@@ -313,15 +344,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
             font-size: 12px;
         }
         .cora-ai-workspace {
-            grid-template-columns: 1fr;
             min-height: auto;
-        }
-        .cora-ai-sidebar {
-            border-right: none;
-            border-bottom: 1px solid #e4e4e7;
-        }
-        .dark .cora-ai-sidebar {
-            border-bottom-color: #27272a;
         }
     }
     @media (max-width: 480px) {
@@ -341,53 +364,70 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
     <div class="cora-ai-tab" onclick="coraSwitchAIPanel('rag-settings')">RAG Knowledge Base</div>
 </div>
 
-<!-- TAB 1: AI Chat Assistant -->
-<div id="cora-ai-panel-chat" class="cora-ai-workspace">
-    <!-- Left Sidebar Settings -->
-    <div class="cora-ai-sidebar">
-        <div class="cora-ai-field">
-            <label>AI Provider</label>
-            <select id="cora-ai-provider" class="cora-ai-select" onchange="coraOnProviderChange()">
-                <option value="gemini" selected>Google Gemini</option>
-                <option value="groq">Groq</option>
-                <option value="openrouter">OpenRouter</option>
-                <option value="llama_nv">Llama (NVIDIA)</option>
-                <option value="deepseek_nv" disabled>DeepSeek (NVIDIA) (Coming Soon)</option>
-                <option value="gemma_nv" disabled>Gemma (NVIDIA) (Coming Soon)</option>
-                <option value="gpt_oss_nv">GPT OSS (NVIDIA)</option>
-                <option value="glm_nv" disabled>GLM (NVIDIA) (Coming Soon)</option>
-                <option value="minimax_nv" disabled>Minimax (NVIDIA) (Coming Soon)</option>
-                <option value="moonshot_nv" disabled>Moonshot (NVIDIA) (Coming Soon)</option>
-            </select>
-        </div>
+<!-- Local backdrop for AI settings drawer -->
+<div id="cora-ai-drawer-backdrop" onclick="coraToggleAISettingsDrawer(false)" class="hidden fixed inset-0 bg-black/30 z-[99988] backdrop-blur-[1.5px] transition-opacity duration-200 cursor-pointer"></div>
 
+<!-- Right-Sliding AI Settings Drawer -->
+<div id="cora-ai-settings-drawer" class="fixed inset-y-0 right-0 z-[99999] w-80 bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full">
+    <div class="p-4 border-b border-zinc-150 dark:border-zinc-800 flex items-center justify-between">
+        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">AI Model Settings</h3>
+        <button type="button" class="text-zinc-400 hover:text-zinc-650 cursor-pointer p-1 border-none bg-transparent" onclick="coraToggleAISettingsDrawer(false)">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+    <div class="flex-1 p-5 overflow-y-auto space-y-5">
         <div class="cora-ai-field">
-            <label>Model Selector</label>
-            <select id="cora-ai-model" class="cora-ai-select"></select>
-        </div>
-
-        <div class="cora-ai-field">
-            <label>Temperature (<span id="cora-ai-temp-val">0.7</span>)</label>
+            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Temperature (<span id="cora-ai-temp-val">0.7</span>)</label>
             <input type="range" id="cora-ai-temperature" min="0" max="1" step="0.1" value="0.7" oninput="document.getElementById('cora-ai-temp-val').innerText = this.value" class="w-full">
         </div>
 
-        <div class="cora-ai-field border-t border-zinc-200 pt-3">
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="cora-ai-tts-toggle">
+        <div class="cora-ai-field border-t border-zinc-150 dark:border-zinc-800 pt-4">
+            <label class="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                <input type="checkbox" id="cora-ai-tts-toggle" class="rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950">
                 ElevenLabs Audio Output
             </label>
         </div>
 
-        <div class="cora-ai-field border-t border-zinc-200 pt-3">
-            <label>System Instructions</label>
-            <textarea id="cora-ai-system" rows="5" class="cora-ai-textarea">You are Cora AI, the unified platform assistant for the Cora Workspace Platform. Help users with leads, billing calculations, and setting queries.</textarea>
+        <div class="cora-ai-field border-t border-zinc-150 dark:border-zinc-800 pt-4">
+            <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">System Instructions</label>
+            <textarea id="cora-ai-system" rows="6" class="w-full border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-xs bg-white dark:bg-zinc-950 outline-none text-zinc-800 dark:text-zinc-200">You are Cora AI, the unified platform assistant for the Cora Workspace Platform. Help users with leads, billing calculations, and setting queries.</textarea>
         </div>
-
-        <button type="button" class="mt-auto px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-lg text-center font-semibold transition-colors" onclick="coraClearConversation()">Clear Conversation</button>
+        
+        <div class="pt-4 border-t border-zinc-150 dark:border-zinc-800">
+            <button type="button" class="w-full px-4 py-2.5 bg-zinc-100 hover:bg-zinc-250 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 rounded-lg text-center font-bold text-xs transition-colors border-none" onclick="coraClearConversation(); coraToggleAISettingsDrawer(false);">Clear Conversation</button>
+        </div>
     </div>
+</div>
 
+<!-- TAB 1: AI Chat Assistant -->
+<div id="cora-ai-panel-chat" class="cora-ai-workspace">
     <!-- Chat Window -->
     <div class="cora-ai-chat-container">
+        <!-- Chat Header -->
+        <div class="cora-chat-header border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/40 shrink-0">
+            <!-- Left: Model selectors -->
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5">
+                    <select id="cora-ai-provider" class="cora-ai-header-select text-xs font-bold bg-white border border-zinc-250 rounded-full px-3 py-1 outline-none cursor-pointer" onchange="coraOnProviderChange()">
+                        <option value="gemini" selected>Google Gemini</option>
+                        <option value="groq">Groq</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="llama_nv">Llama (NVIDIA)</option>
+                        <option value="gpt_oss_nv">GPT OSS (NVIDIA)</option>
+                    </select>
+                    
+                    <select id="cora-ai-model" class="cora-ai-header-select text-xs font-semibold bg-white border border-zinc-250 rounded-full px-3 py-1 outline-none cursor-pointer"></select>
+                </div>
+            </div>
+
+            <!-- Right: Settings Drawer Trigger -->
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="coraToggleAISettingsDrawer(true)" class="p-1.5 text-zinc-500 hover:text-zinc-850 dark:hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center border-none bg-transparent" title="AI Model Settings">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
+            </div>
+        </div>
+
         <div id="cora-ai-messages" class="cora-ai-messages">
             <!-- Welcome Screen -->
             <div class="cora-ai-welcome" id="cora-ai-welcome-screen">
@@ -528,6 +568,21 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
 </div>
 
 <script>
+    window.coraToggleAISettingsDrawer = function(open) {
+        const drawer = document.getElementById('cora-ai-settings-drawer');
+        const backdrop = document.getElementById('cora-ai-drawer-backdrop');
+        if (!drawer || !backdrop) return;
+        if (open) {
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.add('translate-x-0');
+            backdrop.classList.remove('hidden');
+        } else {
+            drawer.classList.remove('translate-x-0');
+            drawer.classList.add('translate-x-full');
+            backdrop.classList.add('hidden');
+        }
+    };
+
     // Models list mapping
     const coraAIModels = {
         groq: [
