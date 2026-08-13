@@ -1092,115 +1092,59 @@ aside[id$="-drawer"].collapsed {
 }
 </style>
 
-    <!-- 1. HEADER SECTION & DATE SELECTOR -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
-        <div class="w-full sm:w-auto">
-            <div class="flex items-center justify-between gap-2 w-full">
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight flex items-center gap-2">
-                    <span>Financial Overview</span>
-                    <span class="text-zinc-400 text-lg font-normal">✦</span>
-                </h1>
-                
-                <!-- Mobile-only Action Menu Button -->
-                <div class="relative block sm:hidden">
-                    <button type="button" onclick="window.toggleFinancialActionMenu(event)" class="px-3.5 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm cora-micro-interact">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        <span>Action</span>
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </button>
-                    
-                    <!-- Mobile Action Menu Popover -->
-                    <div id="cora-fin-action-popover-mobile" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
-                        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openAddLedgerDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            <span>Add Ledger Entry</span>
-                        </button>
-                        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openCreateInvoiceDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                            <span>Create Client Invoice</span>
-                        </button>
-                        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openProcessPayoutDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                            <span>Process Payout</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <p class="text-xs sm:text-sm text-zinc-500 mt-1 font-medium">
-                Real-time insights into your studio's financial performance.
-            </p>
-        </div>
+<?php
+$financials_header_args = array(
+    'title'            => 'Financial Overview',
+    'description'      => "Real-time insights into your studio's financial performance.",
+    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>',
+    'ai_stack'         => true,
+    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'cta'              => array(
+        'text'        => 'New Action',
+        'mobile_text' => 'Action',
+        'onclick'     => "window.toggleFinancialActionMenu(event)",
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+        'visible'     => true,
+    ),
+);
 
-        <!-- Date Range Selector & Actions -->
-        <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-            
-            <!-- Date Range Selector Sub-Row (contains Date toggle + Reports icon button) -->
-            <div class="flex items-center gap-2 w-full sm:w-auto flex-1">
-                <!-- Date Range Selector Dropdown -->
-                <div class="relative flex-1 sm:flex-none">
-                    <div onclick="window.toggleFinancialDatePopover(event)" class="w-full sm:w-auto justify-between flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl shadow-sm cursor-pointer text-xs font-bold text-zinc-800 hover:bg-zinc-50 transition-all cora-micro-interact">
-                        <div class="flex items-center gap-2">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                            <span id="cora-selected-date-range">All Time</span>
-                        </div>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </div>
-                    
-                    <!-- Popover Date Dropdown -->
-                    <div id="cora-fin-date-popover" class="hidden absolute left-0 mt-2 w-full sm:w-48 bg-white rounded-xl shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
-                        <button type="button" onclick="window.selectFinancialDateRange('This Month', '01 Jul – 31 Jul 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
-                            <span>This Month</span>
-                        </button>
-                        <button type="button" onclick="window.selectFinancialDateRange('Last Month', '01 Jun – 30 Jun 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
-                            <span>Last Month</span>
-                        </button>
-                        <button type="button" onclick="window.selectFinancialDateRange('Last 3 Months', '01 Apr – 30 Jun 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
-                            <span>Last 3 Months</span>
-                        </button>
-                        <button type="button" onclick="window.selectFinancialDateRange('Last 6 Months', '01 Jan – 30 Jun 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
-                            <span>Last 6 Months</span>
-                        </button>
-                        <button type="button" onclick="window.selectFinancialDateRange('Year to Date', '01 Jan – 31 Dec 2026')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
-                            <span>Year to Date</span>
-                        </button>
-                        <button type="button" onclick="window.selectFinancialDateRange('All Time', 'All Time')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between">
-                            <span>All Time</span>
-                        </button>
-                    </div>
-                </div>
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $financials_header_args );
+}
+?>
 
-                <button type="button" onclick="window.openFinancialReportsDrawer()" class="p-2.5 bg-white text-zinc-700 hover:bg-zinc-50 rounded-xl transition-colors cursor-pointer shadow-sm cora-micro-interact flex items-center justify-center shrink-0 h-[36px] w-[36px]" title="Automated Reports & Schedule">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                </button>
-            </div>
-
-            <!-- Primary Action Menu Button (Hidden on mobile) -->
-            <div class="relative hidden sm:block">
-                <button type="button" onclick="window.toggleFinancialActionMenu(event)" class="px-4 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-sm cora-micro-interact">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>New Action</span>
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </button>
-
-                <!-- Popover Action Menu Dropdown -->
-                <div id="cora-fin-action-popover" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
-                    <button type="button" onclick="window.toggleFinancialActionMenu(); window.openAddLedgerDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        <span>Add Ledger Entry</span>
-                    </button>
-                    <button type="button" onclick="window.toggleFinancialActionMenu(); window.openCreateInvoiceDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                        <span>Create Client Invoice</span>
-                    </button>
-                    <button type="button" onclick="window.toggleFinancialActionMenu(); window.openProcessPayoutDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                        <span>Process Payout</span>
-                    </button>
-                </div>
-            </div>
-
-        </div>
+<!-- Popover Action Menu Dropdown Container (Hidden & relocated dynamically) -->
+<div class="hidden">
+    <div id="cora-fin-action-popover" class="absolute mt-2 w-56 bg-white rounded-xl border border-zinc-200 shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
+        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openAddLedgerDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors border-0 bg-transparent cursor-pointer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Add Ledger Entry</span>
+        </button>
+        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openCreateInvoiceDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors border-0 bg-transparent cursor-pointer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <span>Create Client Invoice</span>
+        </button>
+        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openProcessPayoutDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors border-0 bg-transparent cursor-pointer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            <span>Process Payout</span>
+        </button>
     </div>
+    
+    <div id="cora-fin-action-popover-mobile" class="absolute mt-2 w-48 bg-white rounded-xl border border-zinc-200 shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none">
+        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openAddLedgerDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors border-0 bg-transparent cursor-pointer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Add Ledger Entry</span>
+        </button>
+        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openCreateInvoiceDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors border-0 bg-transparent cursor-pointer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <span>Create Client Invoice</span>
+        </button>
+        <button type="button" onclick="window.toggleFinancialActionMenu(); window.openProcessPayoutDrawer();" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2 transition-colors border-0 bg-transparent cursor-pointer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            <span>Process Payout</span>
+        </button>
+    </div>
+</div>
     <!-- SKELETON LOADING STATE (shown briefly on page load, then hidden) -->
     <div id="cora-fin-skeleton-content" class="space-y-6">
         <!-- Skeleton KPI Row -->
@@ -2340,24 +2284,32 @@ aside[id$="-drawer"].collapsed {
         if (e) e.stopPropagation();
         var popDesktop = document.getElementById('cora-fin-action-popover');
         var popMobile = document.getElementById('cora-fin-action-popover-mobile');
-        var datePop = document.getElementById('cora-fin-date-popover');
         
-        if (datePop) datePop.classList.add('hidden');
+        // Hide date popovers
+        const datePopHeader = document.getElementById('cora-fin-date-popover-header');
+        if (datePopHeader) datePopHeader.classList.add('hidden');
         
-        // Toggle active one based on visibility/existence
-        if (popDesktop && window.getComputedStyle(popDesktop.parentNode).display !== 'none') {
-            if (popMobile) popMobile.classList.add('hidden');
-            popDesktop.classList.toggle('hidden');
-        } else if (popMobile) {
-            if (popDesktop) popDesktop.classList.add('hidden');
-            popMobile.classList.toggle('hidden');
+        if (e && e.currentTarget) {
+            const btn = e.currentTarget;
+            const isMob = btn.closest('.md\\:hidden');
+            const targetPop = isMob ? popMobile : popDesktop;
+            const otherPop = isMob ? popDesktop : popMobile;
+            
+            if (otherPop) otherPop.classList.add('hidden');
+            if (targetPop) {
+                btn.parentNode.style.position = 'relative';
+                btn.parentNode.appendChild(targetPop);
+                targetPop.classList.toggle('hidden');
+            }
+        } else {
+            if (popDesktop) popDesktop.classList.toggle('hidden');
         }
     };
 
     window.toggleFinancialDatePopover = function(e) {
         if (e) e.stopPropagation();
-        var pop = document.getElementById('cora-fin-date-popover');
-        if (pop) pop.classList.toggle('hidden');
+        const p = document.getElementById('cora-fin-date-popover-header');
+        if (p) p.classList.toggle('hidden');
         
         var popDesktop = document.getElementById('cora-fin-action-popover');
         var popMobile = document.getElementById('cora-fin-action-popover-mobile');
@@ -2370,8 +2322,86 @@ aside[id$="-drawer"].collapsed {
         if (popDesktop && !popDesktop.classList.contains('hidden')) popDesktop.classList.add('hidden');
         var popMobile = document.getElementById('cora-fin-action-popover-mobile');
         if (popMobile && !popMobile.classList.contains('hidden')) popMobile.classList.add('hidden');
-        var datePop = document.getElementById('cora-fin-date-popover');
-        if (datePop && !datePop.classList.contains('hidden')) datePop.classList.add('hidden');
+        const p = document.getElementById('cora-fin-date-popover-header');
+        if (p) p.classList.add('hidden');
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const appendFinancialActions = function(containerSelector, isMobile) {
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+
+            // Prevent duplicate
+            if (container.querySelector('[data-financial-action="date"]')) return;
+
+            // Date selector dropdown wrapper
+            const dateWrap = document.createElement('div');
+            dateWrap.setAttribute('data-financial-action', 'date');
+            dateWrap.className = 'relative flex-1 sm:flex-none';
+            dateWrap.innerHTML = `
+                <div onclick="window.toggleFinancialDatePopover(event)" class="w-full sm:w-auto justify-between flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-zinc-200 shadow-sm cursor-pointer text-xs font-bold text-zinc-800 hover:bg-zinc-50 transition-all select-none">
+                    <div class="flex items-center gap-2">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span id="cora-selected-date-range-header">All Time</span>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <!-- Popover Date Dropdown -->
+                <div id="cora-fin-date-popover-header" class="hidden absolute right-0 mt-2 w-full sm:w-48 bg-white rounded-xl border border-zinc-200 shadow-2xl z-50 p-1 space-y-0.5 animate-fade-in select-none text-left">
+                    <button type="button" onclick="window.selectFinancialDateRange('This Month', '01 Jul – 31 Jul 2026');" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between border-0 bg-transparent cursor-pointer">
+                        <span>This Month</span>
+                    </button>
+                    <button type="button" onclick="window.selectFinancialDateRange('Last Month', '01 Jun – 30 Jun 2026');" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between border-0 bg-transparent cursor-pointer">
+                        <span>Last Month</span>
+                    </button>
+                    <button type="button" onclick="window.selectFinancialDateRange('Last 3 Months', '01 Apr – 30 Jun 2026');" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between border-0 bg-transparent cursor-pointer">
+                        <span>Last 3 Months</span>
+                    </button>
+                    <button type="button" onclick="window.selectFinancialDateRange('Last 6 Months', '01 Jan – 30 Jun 2026');" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between border-0 bg-transparent cursor-pointer">
+                        <span>Last 6 Months</span>
+                    </button>
+                    <button type="button" onclick="window.selectFinancialDateRange('Year to Date', '01 Jan – 31 Dec 2026');" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between border-0 bg-transparent cursor-pointer">
+                        <span>Year to Date</span>
+                    </button>
+                    <button type="button" onclick="window.selectFinancialDateRange('All Time', 'All Time');" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center justify-between border-0 bg-transparent cursor-pointer">
+                        <span>All Time</span>
+                    </button>
+                </div>
+            `;
+
+            // Automated Reports button
+            const reportBtn = document.createElement('button');
+            reportBtn.setAttribute('data-financial-action', 'report');
+            reportBtn.className = 'p-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 rounded-xl transition-colors cursor-pointer shadow-sm flex items-center justify-center shrink-0 h-[36px] w-[36px]';
+            reportBtn.title = 'Automated Reports & Schedule';
+            reportBtn.onclick = function() {
+                if (typeof window.openFinancialReportsDrawer === 'function') {
+                    window.openFinancialReportsDrawer();
+                }
+            };
+            reportBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
+
+            const ctaBtn = container.querySelector('button:not(.group)');
+            if (ctaBtn) {
+                container.insertBefore(dateWrap, ctaBtn);
+                container.insertBefore(reportBtn, ctaBtn);
+            } else {
+                container.appendChild(dateWrap);
+                container.appendChild(reportBtn);
+            }
+        };
+
+        const origSelectFinDateRange = window.selectFinancialDateRange;
+        window.selectFinancialDateRange = function(rangeName, displayValue) {
+            if (typeof origSelectFinDateRange === 'function') {
+                origSelectFinDateRange(rangeName, displayValue);
+            }
+            const el = document.getElementById('cora-selected-date-range-header');
+            if (el) el.innerText = rangeName;
+        };
+
+        appendFinancialActions('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0', false);
+        appendFinancialActions('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0', true);
     });
 
     window.selectFinancialDateRange = function(label, rangeStr) {
