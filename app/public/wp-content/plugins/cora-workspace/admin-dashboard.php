@@ -7346,65 +7346,6 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
 
                 <!-- Native AI Integration Block (persists inside sidebar) -->
                 <div id="cora-sidebar-native-integration" class="flex flex-col gap-4">
-                    <!-- Quick Actions Grid -->
-                    <div class="flex flex-col gap-2">
-                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Quick Actions</span>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraToggleSidebar(false); coraNavigateTo('blogs'); }" class="flex items-center justify-center gap-1.5 py-2 px-1 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-full text-[11px] font-semibold text-zinc-700 cursor-pointer transition-colors shadow-sm">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                <span>Write Article</span>
-                            </button>
-                            <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraToggleSidebar(false); coraNavigateTo('settings'); }" class="flex items-center justify-center gap-1.5 py-2 px-1 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-full text-[11px] font-semibold text-zinc-700 cursor-pointer transition-colors shadow-sm">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                <span>Build Form</span>
-                            </button>
-                            <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraToggleSidebar(false); coraNavigateTo('portfolio'); }" class="flex items-center justify-center gap-1.5 py-2 px-1 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-full text-[11px] font-semibold text-zinc-700 cursor-pointer transition-colors shadow-sm">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                <span>Upload Media</span>
-                            </button>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraToggleSidebar(false); coraNavigateTo('vault'); }" class="flex items-center justify-center gap-1.5 py-2 px-2 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-full text-[11px] font-semibold text-zinc-700 cursor-pointer transition-colors shadow-sm">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                                <span>Upload File</span>
-                            </button>
-                            <button type="button" onclick="if(typeof coraNavigateTo==='function'){ coraToggleSidebar(false); coraNavigateTo('financials'); }" class="flex items-center justify-center gap-1.5 py-2 px-2 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-full text-[11px] font-semibold text-zinc-700 cursor-pointer transition-colors shadow-sm">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="22" x2="9" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line><line x1="8" y1="8" x2="16" y2="8"></line></svg>
-                                <span>Create Invoice</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- AI Co-Founder Briefing -->
-                    <div class="border border-zinc-150 rounded-2xl bg-zinc-50/40 p-3.5 shadow-sm flex flex-col gap-2.5">
-                        <div class="flex items-center justify-between pb-2 border-b border-zinc-150/60">
-                            <div class="flex items-center gap-2">
-                                <div class="h-6 w-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path></svg>
-                                </div>
-                                <div class="flex flex-col">
-                                    <h4 class="text-[10px] font-extrabold text-zinc-900 uppercase tracking-wider">AI Co-Founder Briefing</h4>
-                                    <span class="text-[9px] text-zinc-450 font-medium">Real-time workspace insights</span>
-                                </div>
-                            </div>
-                            <span class="h-4 px-1.5 rounded-full bg-emerald-50 text-emerald-600 font-bold text-[8px] flex items-center justify-center border border-emerald-100 uppercase tracking-wider">Active</span>
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <div class="px-2 py-1 rounded-lg bg-white border border-zinc-100 flex items-center justify-between">
-                                <div class="flex items-center gap-1.5 min-w-0"><span class="text-[8px] shrink-0">🟢</span><span class="text-[10px] font-bold text-zinc-700 truncate">AI Co-founder</span></div>
-                                <span class="text-[8px] text-zinc-500 font-bold uppercase tracking-wider bg-zinc-50 px-1.5 py-0.5 rounded border border-zinc-200">Online</span>
-                            </div>
-                            <div class="px-2 py-1 rounded-lg bg-white border border-zinc-100 flex items-center justify-between">
-                                <div class="flex items-center gap-1.5 min-w-0"><span class="text-[8px] shrink-0">🟢</span><span class="text-[10px] font-bold text-zinc-700 truncate">AI Marketing</span></div>
-                                <span class="text-[8px] text-zinc-500 font-bold uppercase tracking-wider bg-zinc-50 px-1.5 py-0.5 rounded border border-zinc-200">Monitoring</span>
-                            </div>
-                            <div class="px-2 py-1 rounded-lg bg-white border border-zinc-100 flex items-center justify-between">
-                                <div class="flex items-center gap-1.5 min-w-0"><span class="text-[8px] shrink-0">🟢</span><span class="text-[10px] font-bold text-zinc-700 truncate">Automations</span></div>
-                                <span class="text-[8px] text-zinc-500 font-bold uppercase tracking-wider bg-zinc-50 px-1.5 py-0.5 rounded border border-zinc-200">Active</span>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Dynamic Quick Prompts -->
                     <div class="cora-ai-sidebar-shortcuts pt-3 border-t border-zinc-200">
                         <span class="cora-sidebar-sublabel text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2.5 block">Quick Prompts</span>
@@ -7414,7 +7355,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                 </div>
             </div>
         </div>
-        <div class="cora-ai-sidebar-footer-input shrink-0" style="padding: 10px 16px; background: #fafafa; border-top: 1px solid #e4e4e7;">
+        <div class="cora-ai-sidebar-footer-input shrink-0" style="padding: 8px 16px; background: transparent; border-top: 1px solid #e4e4e7;">
             <div class="max-w-3xl mx-auto w-full" style="display: flex; align-items: center; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 9999px; padding: 3px 3px 3px 14px; box-sizing: border-box;">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" style="color: #71717a; flex-shrink: 0; margin-right: 8px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 <input type="text" id="cora-sidebar-chat-input" placeholder="Search or ask Cora AI..." onkeydown="if(event.key === 'Enter') coraSendSidebarChatMessage()" style="flex: 1; border: none; outline: none; box-shadow: none; font-size: 13px; background: transparent; color: #18181b; padding: 0; margin: 0; font-family: inherit; font-weight: 500;">
