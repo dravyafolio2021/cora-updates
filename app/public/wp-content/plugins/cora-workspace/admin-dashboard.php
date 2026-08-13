@@ -6712,15 +6712,37 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
 
             <!-- SECTION: WORKSPACE AUTOMATIONS -->
             <?php if ( $sub_page === 'automations' ) : ?>
-            <section id="cora-page-automations" class="cora-page-section cora-active">
-                <?php include CORA_WORKSPACE_PATH . 'views/view-automations.php'; ?>
+            <section id="cora-page-automations" class="cora-page-section cora-active flex items-center justify-center min-h-[70vh]">
+                <div class="max-w-md w-full bg-white border border-zinc-200 rounded-2xl p-8 text-center space-y-4 shadow-sm select-none">
+                    <div class="w-12 h-12 rounded-full bg-zinc-50 text-zinc-900 flex items-center justify-center mx-auto border border-zinc-200/50">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <div class="space-y-1.5">
+                        <h3 class="text-base font-bold text-zinc-950">Automations & Workflows Locked</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed">This feature is not available on your current plan. Please upgrade to unlock custom automations, triggers, and third-party webhooks.</p>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="if(window.coraShowToast) window.coraShowToast('Upgrade request sent to administrator', 'success')" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer border-none">Upgrade Plan</button>
+                    </div>
+                </div>
             </section>
             <?php endif; ?>
 
             <!-- SECTION: WORKSPACE UNIFIED INBOX -->
             <?php if ( $sub_page === 'inbox' ) : ?>
-            <section id="cora-page-inbox" class="cora-page-section cora-active">
-                <?php include CORA_WORKSPACE_PATH . 'views/view-inbox.php'; ?>
+            <section id="cora-page-inbox" class="cora-page-section cora-active flex items-center justify-center min-h-[70vh]">
+                <div class="max-w-md w-full bg-white border border-zinc-200 rounded-2xl p-8 text-center space-y-4 shadow-sm select-none">
+                    <div class="w-12 h-12 rounded-full bg-zinc-50 text-zinc-900 flex items-center justify-center mx-auto border border-zinc-200/50">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <div class="space-y-1.5">
+                        <h3 class="text-base font-bold text-zinc-950">Inbox Locked</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed">This feature is not available on your current plan. Please upgrade to unlock unified messaging, client email sync, and SMS channels.</p>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="if(window.coraShowToast) window.coraShowToast('Upgrade request sent to administrator', 'success')" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer border-none">Upgrade Plan</button>
+                    </div>
+                </div>
             </section>
             <?php endif; ?>
 
@@ -6733,8 +6755,19 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
 
             <!-- SECTION: META MARKETING SUITE -->
             <?php if ( $sub_page === 'social-meta' ) : ?>
-            <section id="cora-page-social-meta" class="cora-page-section cora-active">
-                <?php include CORA_WORKSPACE_PATH . 'views/view-social-meta.php'; ?>
+            <section id="cora-page-social-meta" class="cora-page-section cora-active flex items-center justify-center min-h-[70vh]">
+                <div class="max-w-md w-full bg-white border border-zinc-200 rounded-2xl p-8 text-center space-y-4 shadow-sm select-none">
+                    <div class="w-12 h-12 rounded-full bg-zinc-50 text-zinc-900 flex items-center justify-center mx-auto border border-zinc-200/50">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <div class="space-y-1.5">
+                        <h3 class="text-base font-bold text-zinc-950">Facebook & Instagram Locked</h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed">This feature is not available on your current plan. Please upgrade to unlock direct Facebook posts, Instagram reels scheduler, and lead ads sync.</p>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="if(window.coraShowToast) window.coraShowToast('Upgrade request sent to administrator', 'success')" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer border-none">Upgrade Plan</button>
+                    </div>
+                </div>
             </section>
             <?php endif; ?>
 
