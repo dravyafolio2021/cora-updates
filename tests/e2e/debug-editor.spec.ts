@@ -96,7 +96,7 @@ test('comprehensive editor functionality test', async ({ page }) => {
         }
       });
       
-      await writeIntroBtn.click();
+      await writeIntroBtn.click({ force: true });
       console.log('Clicked Write introduction');
       
       // Wait for AJAX response

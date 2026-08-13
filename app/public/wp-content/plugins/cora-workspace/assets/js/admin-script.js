@@ -6826,7 +6826,20 @@ jQuery(document).ready(function($) {
     };
 
     window.coraOpenMediaLibrary = function() {
-        coraToggleMediaDrawer(true);
+        if (typeof wp !== 'undefined' && wp.media) {
+            const frame = wp.media({
+                title: 'Select or Upload Media',
+                button: { text: 'Select' },
+                multiple: false
+            });
+            frame.on('select', function() {
+                const attachment = frame.state().get('selection').first().toJSON();
+                window.coraSelectMedia(attachment.id, attachment.url);
+            });
+            frame.open();
+        } else {
+            coraToggleMediaDrawer(true);
+        }
     };
     
     window.coraFetchMediaLibrary = function() {
