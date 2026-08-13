@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v3.2.88+).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v3.4.0).
 
 ---
 
@@ -36,14 +36,15 @@ Cora follows a strict Notion/Shopify-inspired monochromatic aesthetic, built upo
 To preserve the monochromatic design language, colorful accents are strictly prohibited for decorative purposes and are reserved exclusively for functional state indicators:
 
 ```
-[ Active / Success ]  --->  🟢 Emerald/Green  (`bg-emerald-500`, `text-green-500`)
-[ Pending / Warning ]  --->  🟡 Amber/Yellow   (`bg-amber-500`, `text-amber-500`)
-[ Critical / Error ]   --->  🔴 Red           (`bg-red-500`, `text-red-500`)
-[ Neutral / Info ]     --->  🔵 Blue/Zinc     (`bg-blue-500`, `text-zinc-500`)
+[ Active / Success ]  --->  Emerald/Green  (bg-emerald-500, text-green-500)
+[ Pending / Warning ]  --->  Amber/Yellow   (bg-amber-500, text-amber-500)
+[ Critical / Error ]   --->  Red           (bg-red-500, text-red-500)
+[ Neutral / Info ]     --->  Blue/Zinc     (bg-blue-500, text-zinc-500)
 ```
 
 #### Typography Stack & Iconography Rules
 * **UI Sans-Serif**: `Inter`, `-apple-system`, `BlinkMacSystemFont`, `sans-serif` for all UI text, headings, buttons, and form labels.
+* **Display Headings**: `Outfit`, `sans-serif` for large page titles, hero headings, and documentation headers.
 * **Monospace Stack**: `JetBrains Mono`, `ui-monospace`, `monospace` for version tags, code blocks, numeric IDs, financial values, and system metrics.
 * **Vector Iconography**: All icons must use thin-lined vector SVGs (`stroke-width: 1.8` or `2.2`). Native emojis, outdated web-font icons, or browser glyphs are strictly forbidden.
 
@@ -59,37 +60,14 @@ window.coraShowToast(message, type = 'info');
 ```
 
 #### Implementation Architecture
-1. **DOM Container**: Automatically injected into the DOM on first call at `#cora-toast-container` with fixed positioning:
-   `fixed bottom-5 right-5 z-[9999] flex flex-col-reverse gap-2.5 pointer-events-none`
-2. **Toast Component Styling**:
-   `bg-white text-zinc-800 text-xs font-semibold px-4 py-3 rounded-xl shadow-lg border border-zinc-200 flex items-center gap-3 pointer-events-auto transition-all duration-300 transform translate-y-3 opacity-0 select-none max-w-sm`
-3. **Duplicate Deduplication & Scale Bounce**: If a toast with identical message text is dispatched while already visible:
-   - Prevents duplicate stacking.
-   - Triggers a subtle **120ms scale bounce animation** (`transform: scale(1.06)` $\rightarrow$ `scale(1)`).
-   - Resets the 3000ms auto-dismiss timer.
-4. **Lifecycle & Animation**:
-   - Slide & Fade In: 50ms post-mount removal of `translate-y-3 opacity-0`.
-   - Auto-Dismiss: Auto-triggers slide-out animation at 3000ms, followed by DOM removal at 3300ms.
+1. **DOM Container**: Automatically injected into the DOM on first call at `#cora-toast-container` with fixed positioning.
+2. **Duplicate Deduplication & Scale Bounce**: If a toast with identical message text is dispatched while already visible, prevents duplicate stacking and triggers a subtle 120ms scale bounce animation.
+3. **Lifecycle & Animation**: Slide and fade in at 50ms, auto-dismiss at 3000ms with slide-out.
 
 ---
 
 ### 1.4 Drawer-Based UI Sheets (No Native Modals)
 To preserve screen layout context and maintain workspace continuity, modal overlays for complex workflows are replaced with right-sliding side drawer sheets.
-
-#### Architectural Specification
-```html
-<div class="fixed inset-y-0 right-0 z-50 w-full max-w-xl bg-white shadow-2xl border-l border-zinc-200 transform transition-transform duration-300 translate-x-full">
-    <!-- Header with Close Button -->
-    <div class="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
-        <h3 class="text-sm font-bold text-zinc-900">Drawer Title</h3>
-        <button class="text-zinc-400 hover:text-zinc-900 transition-colors p-1" onclick="closeDrawer()">✕</button>
-    </div>
-    <!-- Scrollable Drawer Body -->
-    <div class="p-6 overflow-y-auto space-y-4">
-        <!-- Form Controls / Data Panels -->
-    </div>
-</div>
-```
 
 #### Drawer Roster Across Platform
 * **Shoot Booking & Showing Drawer**: Form drawer for adding shoot schedules and site visits.
@@ -102,257 +80,179 @@ To preserve screen layout context and maintain workspace continuity, modal overl
 
 ---
 
-### 1.5 PWA Screen Orientation Lock (v3.2.85)
-To ensure optimal UI density and prevent layout breakages on handheld devices, Cora locks screen orientation to portrait mode.
+### 1.5 PWA Architecture & Onboarding (v3.3.0+)
 
-1. **Manifest Lock**: Defined in `/cora-manifest.json`:
-   ```json
-   {
-     "name": "Cora Workspace",
-     "short_name": "Cora Admin",
-     "start_url": "/workspace/dashboard",
-     "display": "standalone",
-     "orientation": "portrait-primary",
-     "background_color": "#ffffff",
-     "theme_color": "#ffffff"
-   }
-   ```
-2. **JavaScript Screen Orientation API Lock (v3.2.85)**: Executed during service worker boot in `admin-dashboard.php`:
-   ```javascript
-   if (window.screen && window.screen.orientation && typeof window.screen.orientation.lock === 'function') {
-       window.screen.orientation.lock('portrait-primary').catch(function() {});
-   }
-   ```
+#### PWA Onboarding Wizard (v3.3.0)
+When a workspace is first accessed on a mobile device, Cora displays a premium PWA onboarding wizard that guides users through the "Add to Home Screen" installation flow:
+* **Animated Loading Splash Screen**: Full-screen premium branded splash during initial asset load.
+* **Step-by-Step Install Instructions**: Visual guide for iOS Safari Share and Android Chrome Install App flows.
+* **Persistent Preference Storage**: Tracks `cora-pwa-installed` in `localStorage` to prevent repeat prompts.
 
----
+#### Screen Orientation Lock (v3.2.85)
+1. **Manifest Lock**: `"orientation": "portrait-primary"` in `/cora-manifest.json`.
+2. **JavaScript Screen Orientation API Lock**: Executed during service worker boot.
+3. **Landscape Shield Overlay (v3.3.0)**: A full-screen blocking overlay with rotation icon displayed when users rotate to landscape.
 
-### 1.6 Service Worker Dynamic Cache Eviction (v3.2.84)
-The service worker (`/cora-service-worker.js`) intercepts all platform requests at root scope (`/`). In **v3.2.84**, a dynamic cache eviction engine was introduced to prevent mobile browser storage bloat.
-
-#### Cache Configuration & Bounds
-```javascript
-const CACHE_NAME = 'cora-workspace-v3.2.88';
-const DYNAMIC_CACHE = 'cora-dynamic-v3.2.88';
-const MAX_DYNAMIC_CACHE_ITEMS = 150;
-```
-
-#### FIFO Cache Eviction Algorithm
-```javascript
-async function trimCache(cacheName, maxItems) {
-  const cache = await caches.open(cacheName);
-  const keys = await cache.keys();
-  if (keys.length > maxItems) {
-    const toDelete = keys.slice(0, keys.length - maxItems);
-    await Promise.all(toDelete.map(key => cache.delete(key)));
-  }
-}
-```
-
-#### Strategy Mapping Matrix
-| Request Type | Caching Strategy | Target Assets / Routes | Fallback / Eviction Policy |
-| :--- | :--- | :--- | :--- |
-| **Scripts & Styles** | `Stale-While-Revalidate` | `.css`, `.js`, `.woff2`, `.ttf` | Background revalidation; cached assets served immediately. |
-| **HTML Navigation** | `Network-First` | Full HTML page views (`/workspace/*`) | On network failure or HTTP 5xx errors (502, 503, 504), falls back to cache or `/cora-offline.html`. |
-| **API & AJAX** | `Network-Only` | `admin-ajax.php`, `/wp-json/*` | Bypasses SW completely; never cached to ensure 100% data freshness. |
-| **Static Assets** | `Cache-First` | Images, icons, static graphics | Served from cache; missing assets fetched and stored in dynamic cache with `trimCache(150)` FIFO eviction. |
+#### Service Worker Dynamic Cache Eviction (v3.2.84)
+| Request Type | Caching Strategy | Target Assets / Routes |
+| :--- | :--- | :--- |
+| **Scripts & Styles** | `Stale-While-Revalidate` | `.css`, `.js`, `.woff2`, `.ttf` |
+| **HTML Navigation** | `Network-First` | Full HTML page views (`/workspace/*`) |
+| **API & AJAX** | `Network-Only` | `admin-ajax.php`, `/wp-json/*` |
+| **Static Assets** | `Cache-First` | Images, icons, static graphics (FIFO eviction at 150 items) |
 
 ---
 
-### 1.7 Asset Versioning & Zero-Downtime Service Worker Lifecycle
-To guarantee that users always receive updated CSS/JS bundles without stale cache issues, asset enqueues and Service Worker registrations include explicit versioning parameters.
-
-1. **Asset Cache-Busting Parameters**:
-   ```html
-   <link rel="stylesheet" href="/assets/css/tailwind-built.css?v=3.2.88" />
-   <link rel="stylesheet" href="/assets/css/admin-style.css?v=3.2.88" />
-   ```
-2. **Service Worker Registration Query Parameters**:
-   ```javascript
-   navigator.serviceWorker.register('/cora-service-worker.js?v=3.2.88&token=' + token, { scope: '/' });
-   ```
-3. **Automated SW Update Handshake**:
-   - On SW update detection (`reg.addEventListener('updatefound')`), the new worker is sent a `skipWaiting` message:
-     ```javascript
-     newWorker.postMessage({ type: 'skipWaiting' });
-     ```
-   - When the new SW assumes control, the client page automatically reloads via the `controllerchange` event listener for a seamless, zero-downtime update:
-     ```javascript
-     var refreshing = false;
-     navigator.serviceWorker.addEventListener('controllerchange', function() {
-         if (!refreshing) {
-             refreshing = true;
-             window.location.reload();
-         }
-     });
-     ```
-
----
-
-### 1.8 Mobile Version Update Banner (v3.2.73)
-Introduced in **v3.2.73**, an in-app update notification card sits sticky within the sidebar administrator popover menu (`#cora-in-app-update-notice`).
-
-```html
-<div id="cora-in-app-update-notice" class="hidden px-2 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl flex flex-col gap-1.5">
-    <div class="flex items-center gap-1.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-        <span class="text-[10px] font-bold text-zinc-800 uppercase tracking-wide">Update Available</span>
-    </div>
-    <p class="text-[10px] text-zinc-500 leading-normal font-medium">New version <code class="font-mono text-zinc-700 font-bold" id="cora-update-ver">v1.4.0</code> is ready. Upgrade instantly.</p>
-    <button type="button" id="cora-btn-app-upgrade" class="w-full py-1.5 bg-zinc-950 hover:opacity-85 text-white font-bold rounded-lg text-[10px] transition-colors cursor-pointer text-center select-none shadow-3xs" onclick="coraTriggerInAppUpgrade(this)">
-        Upgrade Workspace
-    </button>
-</div>
-```
-
-* **Behavior**: Displays real-time platform upgrade availability with an animated pulse indicator.
-* **One-Click Upgrade**: Clicking **Upgrade Workspace** triggers client-side service worker cache clearing and immediate asset revalidation without forcing manual browser cache resets.
+### 1.6 Deployment Pipeline & Atomic Backup Strategy (v3.3.9)
+* **Atomic Backup**: Uses `mv` instead of `cp -r` for backup operations to avoid symlink stat errors on the target server.
+* **Build Script** (`scripts/build.sh`): Validates version consistency across plugin header, `CORA_WORKSPACE_VERSION` constant, and `updates/cora-workspace.json` manifest.
+* **Release Artifacts**: Packaged at `updates/cora-workspace.zip` with versioned manifest at `updates/cora-workspace.json`.
 
 ---
 
 ## Section 2: Core SaaS Business Modules
 
 ### 2.1 Content AI Suite & Myra Assistant
-The **Content AI Suite** is an enterprise-grade content lifecycle and SEO optimization engine. At the core of the suite is **Myra** — a floating, state-aware AI Content Manager designed specifically for high-volume content studios, digital agencies, and real estate operations.
+The **Content AI Suite** is an enterprise-grade content lifecycle and SEO optimization engine. At the core is **Myra** — a floating, state-aware AI Content Manager.
 
-#### Myra AI Assistant ("The Cora Expert")
-Myra operates as an active workspace copilot with real-time awareness of user activity across all 7 Content Suite dashboards.
-* **Floating Launcher & Copilot Drawer**: Positioned at the bottom-center of the dashboard viewport. Displays an online badge and active status.
-* **Workspace State Awareness**: Extracted automatically via `getContentSuiteState()`. Myra evaluates:
-  - **Active Subtab**: Current view ID (e.g., `ct-overview`, `ct-opportunities`, `ct-library`, `ct-seo`).
-  - **Editor Context**: Document ID, document title, target focus keyword, and real-time word count when the full-page editor is active.
-  - **Library State**: Top 3 recent articles and their workflow status (*Draft*, *In Review*, *Published*).
-  - **Opportunity Pipeline**: Top 3 detected keyword opportunities along with search volume and intent impact scores.
-* **Provider & Model Switching**: Supports dynamic switching between configured AI providers (Google Gemini 3.5 Flash, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o) with live token tracking.
-* **Direct Workspace Action Tag Execution**: Myra can issue actionable system directives appended to text responses:
-  - `[ACTION:set_title:New Title Here]`: Updates active article title.
-  - `[ACTION:set_keyword:Target Keyword]`: Sets focus SEO keyword.
-  - `[ACTION:insert_text:<p>Text</p>]`: Injects formatted content into the editor.
-  - `[ACTION:save_article:draft]`: Triggers background auto-save.
-  - `[ACTION:create_article:Title]`: Instantiates a new content draft.
-  - `[ACTION:scan_opportunities:now]`: Re-runs keyword and topic gap scans.
+#### Myra AI Assistant
+* **Floating Launcher & Copilot Drawer**: Bottom-center position with online badge. Collapsible panel design (v3.4.0).
+* **Workspace State Awareness**: Evaluates active subtab, editor context (document ID/title/keyword/word count), library state, and opportunity pipeline.
+* **Provider & Model Switching**: Google Gemini 3.5 Flash, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o with live token tracking.
+* **Action Tag Execution**: `[ACTION:set_title]`, `[ACTION:set_keyword]`, `[ACTION:insert_text]`, `[ACTION:save_article]`, `[ACTION:create_article]`, `[ACTION:scan_opportunities]`.
 
----
+### 2.2 Content Editor (Quill WYSIWYG) — v3.3.0+
+* **Sticky Docked Toolbar (v3.4.0)**: Remains visible while scrolling through long-form content.
+* **Slash Command Hint**: Placeholder "Type / for commands..." for quick formatting access.
+* **Document Outline & Metrics (v3.3.9)**: Real-time word count, character count, paragraph count, reading time.
+* **Mobile Quick Action Bar (v3.3.7)**: Compact floating bar with Bold, Italic, Link, Heading, List.
+* **Landscape Auto-Rotate Lock (v3.4.0)**: Enforces vertical scroll in editor.
 
-### 2.2 The 7 Content Suite Dashboards
-The Content Suite consolidates content operations into seven specialized, synchronized subtabs:
-
-| Subtab | ID | Key Capabilities & Components |
+### 2.3 The 7 Content Suite Dashboards
+| Subtab | ID | Key Capabilities |
 |---|---|---|
-| **Overview** | `ct-overview` | Timeframe selectors (`7D`, `30D`, `90D`, `12M`), top KPI cards (Total Published, Organic Sessions, AI Visibility Score, Active Workflows), and quick launcher shortcuts. |
-| **Opportunities** | `ct-opportunities` | Visual conversion funnel charts (TOFU, MOFU, BOFU), topic cluster filters, keyword intent classification, search volume metrics, and automated gap detection. |
-| **Calendar** | `ct-calendar` | Multi-view editorial planner featuring **Monthly**, **Weekly**, and **Kanban** subviews with drag-and-drop stage updates (*Draft*, *Scheduled*, *Published*). |
-| **Content Library** | `ct-library` | Interactive Notion-styled data table with synchronized pagination, inline title editors, instant status dropdowns, tag management, and bulk operations toolbar. |
-| **SEO Visibility** | `ct-seo` | Generative Engine Optimization (GEO) tracking across ChatGPT, Perplexity, Gemini, and Claude. Features 7 audit tabs: *Checklist*, *Meta Descriptors*, *Core Web Vitals*, *DOM Structure*, *Keyword Density*, *Backlink Badges*, and *AI Insights*. |
-| **Performance** | `ct-performance` | Direct Google Search Console (GSC) API integration displaying organic impressions, clicks, average position, CTR graphs, and a closed-loop revenue attribution ledger. |
-| **Automations** | `ct-automations` | Instant IndexNow pinger engine, automated GSC URL submission, XML sitemap auto-refresh, and AI internal linking rule triggers. |
+| **Overview** | `ct-overview` | KPI cards, timeframe selectors, quick launchers |
+| **Opportunities** | `ct-opportunities` | Funnel charts, topic clusters, keyword intent |
+| **Calendar** | `ct-calendar` | Monthly/Weekly/Kanban editorial planner (v3.3.1 day number fix) |
+| **Content Library** | `ct-library` | Notion-styled data table, pagination, inline editors |
+| **SEO Visibility** | `ct-seo` | GEO tracking, 7 audit tabs, backlink badges |
+| **Performance** | `ct-performance` | GSC API integration, CTR graphs |
+| **Automations** | `ct-automations` | IndexNow, GSC submission, sitemap refresh |
 
----
+### 2.4 Lead Management Suite
+* **Kanban Pipeline**: Drag-and-drop across *New*, *Contacted*, *Qualified*, *Proposal Sent*, *Won*, *Lost*.
+* **Lead Detail Drawer**: Metadata, activity timeline, direct outreach, client conversion.
 
-### 2.3 Lead Management Suite
-The **Lead Management Suite** (`views/view-leads.php`) provides an enterprise CRM pipeline designed for fast lead capture, qualification, and revenue conversion.
+### 2.5 Media Library & Advanced Editor
+* **MIME Filters**, **Dropzone Uploader**, **Storage Quota Meter**
+* **Crop Presets**: 1:1, 4:3, 16:9, Free Crop with rotation and flipping.
+* **Left Sidebar Controls (v3.4.0)**: Segment tabs, media card presets, locate and delete mapping.
+* **SEO Metadata Manager**: Alt text, caption, description fields.
 
-#### Drag-and-Drop Kanban Pipeline
-* **Pipeline Stages**: *New Leads*, *Contacted*, *Qualified*, *Proposal Sent*, *Won*, *Lost*.
-* **Interactive Drag-and-Drop**: Built using standard HTML5 drag-and-drop primitives with instant AJAX status synchronization.
-* **Real-Time Column Recalculation**: Moving a lead card automatically updates column lead counts and aggregates deal monetary totals.
+### 2.6 Email Management Suite
+* **Outbox & Compose**: Recipient auto-complete, personalization variables, live HTML preview.
+* **Hostinger SMTP Integration**: Port 587/465, connection diagnostics.
 
-#### Lead Profiles & Right-Sliding Side Drawers
-The Lead Detail Side Drawer preserves workspace context and includes:
-* **Lead Metadata**: Contact name, email, phone number, GSTIN, deal value, and lead score.
-* **Activity Timeline**: Chronological log of form submissions, email opens, call logs, and status updates.
-* **Direct Outreach Engine**: Send templated email communications directly from the lead profile.
-* **Client Conversion Action**: Single-click transformation of qualified leads into active platform Client Accounts.
+### 2.7 Document Vault & Document Studio
+* **5-Step Wizard**: Document type, line items with SAC codes, GST math, e-sign audit.
+* **GST Engine**: Auto CGST/SGST (intra-state) or IGST (inter-state) calculation.
 
----
+### 2.8 Forms & Review Acquisition
+* Multi-channel review settings, WhatsApp automation with Hinglish presets.
+* Public review portal at `view-public-review-portal.php`.
 
-### 2.4 Media Library & Advanced Editor
-The **Media Library & Editor Suite** (`views/view-media.php`, `views/view-media-editor.php`) manages binary assets, media transformations, and SEO metadata.
+### 2.9 Crew Scheduler & Equipment Management
+* **Crew Scheduler**: Timeline-based crew assignment for studio shoots.
+* **Equipment Manager**: Asset check-in/check-out lifecycle.
+* **Client Task Manager**: Task assignment and progress tracking.
 
-#### Folder Structure & File Filtering
-* **MIME Filters**: Instant client-side and server-side filtering across asset classes (*All Media*, *Images*, *Videos*, *Documents*, *Audio*).
-* **Dropzone Uploader**: Multi-file drag-and-drop uploader with real-time upload progress indicators.
-* **Storage Quota Meter**: Monitors disk space utilization.
-
-#### Dynamic Crop Presets & Canvas Transformations
-* **Aspect Ratio Crop Presets**: `1:1 Square`, `4:3 Standard`, `16:9 Widescreen`, and `Free Crop`.
-* **Transform Tools**: Clockwise (+90°) and counter-clockwise (-90°) canvas rotation, horizontal/vertical axis flipping.
-* **Dimension Rescaling**: Custom width and height pixel input fields with aspect ratio lock options.
-
-#### SEO Metadata Manager
-* **Attachment Title**: Internal title attribute.
-* **Alt Text (Alternative Text)**: Essential tag required for WCAG accessibility compliance and image search ranking.
-* **Caption & Description**: Form fields for frontend rendering and internal cataloging.
-
----
-
-### 2.5 Email Management Suite
-The **Email Suite** (`views/view-emails.php`) handles official transactional emails, promotional campaigns, and automated sequence execution.
-
-#### Outbox & Compose Center
-* **Recipient Selector**: Auto-completes client contacts and lead records.
-* **Dynamic Personalization Variables**: Supports one-click tag insertion (`{{client_name}}`, `{{property_address}}`, `{{invoice_total}}`).
-* **Live Preview Card**: Split-screen editor showing real-time HTML email preview.
-* **Hostinger Business SMTP Integration**: Connected directly to `smtp.hostinger.com` (Port 587/465) with a dynamic connection status badge and test outbox logs.
-
----
-
-### 2.6 Document Vault & Document Studio
-The **Document Vault** (`views/view-vault.php`) manages business documentation, automated GST tax calculations, and legally binding E-Sign workflows.
-
-#### Guided 5-Step Stepper Wizard
-1. **Step 1 (Document Type & Details)**: Select category (*Proposal*, *Invoice*, *Contract*, *SLA*) and document number prefix.
-2. **Step 3 (Line Items & SAC Codes)**: Add billable items, quantities, rates, and Service Accounting Codes (SAC 998381 / 997212).
-3. **Step 4 (GST Math & Payment Terms)**: Automatic tax breakdown calculation and Place of Supply (POS) validation.
-4. **Step 5 (E-Sign Auditing & Verification)**: Apply digital signatures, watermark overlays, compile PDF, and generate share links.
-
-#### GST Tax Calculation Breakdown Card
-The Document Studio contains an automated Indian GST engine adhering to state tax rules:
-* **Intra-State Transaction (Same State POS)**: CGST (9%) + SGST (9%).
-* **Inter-State Transaction (Different State POS)**: IGST (18%).
+### 2.10 Financial Module & Event Timeline
+* **Financials**: Revenue tracking, payment status monitoring.
+* **Event Timeline**: Chronological activity feed across all modules.
 
 ---
 
 ## Section 3: Canvas Theme Builder & Elementor/Lovable Integration
 
 ### 3.1 Draft vs. Live Theme State Management
-Cora implements a strict dual-state theme architecture managed via the database table `{$wpdb->prefix}cora_canvas_themes`.
-
-* **Draft Themes**: Isolated sandbox for styling and layout experimentation. Accessible only via preview parameters (`?preview=true&cv_theme=ID`).
-* **Live Theme**: Production-active styling and global theme context. served to all public site visitors. Exactly 1 live theme is active per agency workspace.
-
----
+* **Draft Themes**: Isolated sandbox accessible via `?preview=true&cv_theme=ID`.
+* **Live Theme**: Production-active, exactly 1 per agency.
 
 ### 3.2 Pages & Navigation Menu Management
-* **Dual-Layer Storage**: `cora_canvas_pages` stores workspace-specific layout types (`header`, `footer`, `single`, `archive`, `error-404`, `page`), SEO fields, and agency tenancy locks, while delegating content rendering to Elementor via `wp_posts.ID`.
-* **Bidirectional Navigation Menu Synchronization**: Navigation menus created in Canvas automatically synchronize two-ways with native WordPress menus (`wp_terms`, `wp_term_taxonomy`, `wp_term_relationships`). Any menu item reordered, added, or modified inside Canvas updates the underlying WordPress term taxonomy, ensuring Elementor Nav Menu widgets render updated menu trees instantly.
-
----
+* **Dual-Layer Storage**: Canvas pages map to WordPress posts for Elementor rendering.
+* **Bidirectional Menu Sync**: Canvas menus sync two-ways with WordPress `nav_menu` taxonomy.
 
 ### 3.3 Elementor Editor Reskin & White-Labeling
-The native Elementor top bar is replaced with a custom, high-density 2-row Cora toolbar (`cora-elementor-reskin.js` and `cora-elementor-reskin.css`).
+* **2-Row Custom Toolbar**: Context bar + tooling controls.
+* **Complete White-Labeling**: Native header, admin bar, upsells, and AI tooltips all removed.
 
-#### Row 1: Context & Metadata Bar
-1. **Brand & Navigation**: Cora typography logo (`CORA`) and `Theme Dashboard` back button.
-2. **Breadcrumb Trail**: Dynamic path displaying system section (`Theme Builder`), document title, and document type badge (`HEADER`, `FOOTER`, `PAGE`).
-3. **Save Status Indicator**: Live status dot (Green for Live, Slate for Draft) and status text.
-
-#### Row 2: Tooling & Action Controls
-1. **Widget Panel Trigger (`+ Add`)**: Invokes `$e.run('document/elements/deselect-all')` to trigger Elementor's editor lifecycle.
-2. **Library & Extensions**: Direct access to `Templates` modal, `Git` version control drawer, and Page `Settings`.
-3. **History Controls**: Native `Undo` and `Redo` triggers.
-4. **Responsive Device Switcher**: Toggles viewport breakpoint modes (`desktop`, `tablet`, `mobile`).
-5. **Publish Split Button**: Primary `Publish` button paired with a dropdown chevron offering `Save Draft`.
-
-#### Total White-Labeling & Branding Scrubbing
-* **Native Header Removal**: Hides Elementor MUI AppBars and top bar headers.
-* **WordPress Admin Bar Scrubbing**: Suppresses `#wpadminbar` and hides all panel menu items referencing "WordPress" or "Exit to Dashboard".
-* **Upsell & Notice Suppression**: Strips promotional banners, upgrade notices, and plugin install CTAs.
-* **AI Tooltip & Sparkle Scrubbing**: Removes Elementor Angie AI sparkle buttons and tooltips.
+### 3.4 Git & Lovable AI Integration
+* **OAuth 2.0 Device Flow** for GitHub authentication.
+* **Auto-Commit on Publish** to linked repository.
+* **Lovable AI Prompting Bridge** enforcing Cora design system.
 
 ---
 
-### 3.4 Git & Lovable AI Integration
-* **OAuth 2.0 Device Flow**: Generates a user code and directs the user to `github.com/login/device` while polling token state.
-* **Automated Repository Creation**: Creates a private repository under the user's GitHub account named after the workspace (e.g. `cora-my-agency-site`).
-* **Auto-Commit on Publish**: Listening hooks automatically construct a commit payload whenever a user publishes changes, pushing the commit to GitHub.
-* **Lovable AI Prompting Bridge**: Constructs structured design prompts enforcing the Cora notion/monochromatic design system, color palettes, and component hierarchy.
+## Section 4: Public Developer Documentation Portal (v3.2.90+)
+
+### 4.1 Three-Column Notion-Like Layout
+The `/docs` endpoint renders a premium three-column documentation portal.
+
+| Component File | Purpose |
+| :--- | :--- |
+| `view-public-docs.php` | Master layout container |
+| `view-public-docs-header.php` | Sticky header with branding, search, actions |
+| `view-public-docs-sidebar.php` | Left navigation with collapsible categories |
+| `view-public-docs-content.php` | Main prose content with feature cards |
+| `view-public-docs-widgets.php` | Right AI Playground panel |
+| `view-public-docs-search.php` | Command palette search overlay and AJAX router |
+
+### 4.2 AI Playground Sidebar (v3.2.94 to v3.2.101)
+* RAG-powered chatbot, suggested quick questions, streaming responses.
+
+### 4.3 Command Palette Search
+* `Cmd+K` / `Ctrl+K` overlay with keyboard navigation and AJAX page loading via `history.pushState`.
+
+### 4.4 Mobile Responsiveness (v3.4.0)
+* **Mobile**: Single column, hamburger sidebar overlay, simplified header.
+* **Tablet**: Two columns (sidebar + content).
+* **Desktop**: Full three-column layout.
+
+---
+
+## Section 5: Multi-Tenant Database Architecture
+
+### 5.1 Core Custom Tables
+| Table | Purpose |
+| :--- | :--- |
+| `cora_agencies` | Root tenant isolation |
+| `cora_branches` | Sub-office segmentation |
+| `cora_leads` | Lead CRM pipeline |
+| `cora_clients` | Converted client accounts |
+| `cora_bookings` | Showings and shoot bookings |
+| `cora_ledger` | Financial transaction log |
+| `cora_canvas_themes` | Theme builder themes |
+| `cora_canvas_pages` | Theme builder pages |
+| `cora_documents` | Document vault records |
+
+### 5.2 Agency Isolation Pattern
+All queries filter by `agency_id`. Owner roles see all branches; branch-level roles are filtered by `branch_id`.
+
+---
+
+## Section 6: AI Integration & MCP Gateway
+
+* **Multi-Provider AI Routing**: Gemini 3.5 Flash, Claude 3.5 Sonnet, GPT-4o with automatic fallback.
+* **RAG Knowledge Base** (`views/view-rag.php`): Per-tenant workspace knowledge sync.
+* **MCP Gateway** (`views/view-mcp.php`): JSON-RPC over WebSockets with role-based permissions.
+
+---
+
+## Section 7: Testing & Quality Assurance
+
+* **Playwright E2E**: Tiered test suites (Tier 1-4) covering auth, CRUD, integration, and workload flows.
+* **Build Validation**: `scripts/build.sh` checks version consistency and packages `updates/cora-workspace.zip`.
+
+---
+
+*Cora Platform v3.4.0 — Last updated: August 13, 2026.*

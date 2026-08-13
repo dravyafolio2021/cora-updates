@@ -146,6 +146,7 @@ The Canvas module relies on secure AJAX endpoints to handle data mutation.
 | `cora_create_nav_menu` | `nonce`, `menu_name` | Creates a new WordPress `nav_menu` taxonomy term. |
 | `cora_delete_nav_menu` | `nonce`, `menu_id` | Permanently deletes a WordPress menu via `wp_delete_nav_menu`. |
 | `cora_ajax_get_preview_url` | `nonce`, `post_id` | Fetches the frontend preview URL for a given Elementor post. |
+| `cora_ajax_canvas_save_site_identity` | `nonce`, `theme_id`, `site_title`, `tagline`, `favicon_url` | Synchronizes theme site title, tagline, and favicon to WordPress options. |
 
 ## Section 9: Database Schema
 
@@ -185,8 +186,29 @@ Canvas leverages custom database tables to maintain agency isolation and rapid q
 Security and multi-tenancy are built into the Canvas architecture:
 
 - **Agency Isolation**: All queries against custom tables filter by `agency_id` to ensure tenants cannot access each other's data.
-- **cora_branch_manager Role**: This specific user role has restricted read-only access. When handling write operations (such as saving themes or deleting pages), the backend explicitely verifies `if ( ! $write && in_array( 'cora_branch_manager', $roles ) )` and prevents mutation. Branch managers can view themes and pages but cannot publish changes or alter global settings.
-- **Admin/Manager Roles**: Full access is granted to `administrator` and `cora_manager` roles.
+- **cora_branch_manager Role**: This specific user role has restricted read-only access. When handling write operations (such as saving themes or deleting pages), the backend explicitly verifies role membership and prevents mutation. Branch managers can view themes and pages but cannot publish changes or alter global settings.
+- **Admin/Manager Roles**: Full access is granted to `administrator`, `cora_manager`, `cora_workspace_owner`, `cora_studio_owner`, and `cora_re_broker_owner` roles.
+- **Dynamic Capability Grants**: Workspace admins are dynamically granted `manage_options` for Elementor site editor requests to enable full editor functionality within the white-labeled sandbox.
+
+## Section 11: Recent Canvas Improvements (v3.2.53 → v3.4.0)
+
+### 11.1 Elementor Iframe Fixes
+* **Race Condition Resolution (v3.2.55)**: Extended iframe loading timeout limits to prevent blank editor states during slow network conditions.
+* **WordPress Admin Bar Suppression**: `#wpadminbar` is hidden inside editor preview iframes, and the `admin-bar` body margin is reset to 0px to prevent content offset gaps.
+* **Body Padding Override**: Theme body `padding-top` is overridden to prevent content offset gaps in the preview render.
+
+### 11.2 Template & Routing Improvements
+* **Elementor Library Preview**: `view-canvas-render.php` template is now served for `elementor_library` post type previews, preventing routing conflicts.
+* **Post Type Interception Guard**: The frontend router no longer intercepts `elementor_library` post types, resolving preview rendering issues.
+* **Homepage Routing Fallback**: Fixed conflict when the default WordPress queried object ID is populated, ensuring clean workspace-specific URLs.
+
+### 11.3 Site Identity Synchronization
+When theme settings are saved via the Canvas UI, the site title, tagline, and favicon URL are synchronized to WordPress core options (`blogname`, `blogdescription`, `site_icon`), ensuring consistency across Elementor widgets and WordPress templates.
+
+### 11.4 White-Label Enforcement
+* **Launch Direct Editor Button Hidden**: The "Edit with Elementor" button is hidden via CSS to enforce the white-labeled iframe sandbox experience.
+* **Clean Workspace URLs**: Root routing is restricted to preview states only, preventing leakage of standard WordPress admin URLs.
 
 ---
-*This documentation is intended for AI reference and developer onboarding, detailing the exact architecture, UI overrides, and data flows of the Cora Canvas module.*
+*This documentation reflects Cora Canvas module changes through v3.4.0. Last updated: August 13, 2026.*
+

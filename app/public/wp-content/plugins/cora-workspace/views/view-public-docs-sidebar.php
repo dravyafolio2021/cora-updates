@@ -3,7 +3,18 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
-<aside id="cora-docs-sidebar" class="w-64 flex-shrink-0 flex flex-col gap-5 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 pb-12 select-none">
+<!-- Mobile Backdrop -->
+<div id="cora-docs-mobile-backdrop" class="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm z-40 hidden md:hidden transition-opacity opacity-0" onclick="coraToggleMobileSidebar()"></div>
+
+<aside id="cora-docs-mobile-sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-zinc-200 transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:w-64 md:border-r-0 md:bg-transparent flex-shrink-0 flex flex-col gap-5 md:sticky md:top-24 md:max-h-[calc(100vh-8rem)] h-full md:h-auto overflow-y-auto px-4 md:px-0 pt-6 md:pt-0 pr-2 pb-12 select-none shadow-2xl md:shadow-none">
+    
+    <!-- Mobile Close Button -->
+    <div class="flex items-center justify-between md:hidden mb-2 px-1.5">
+        <span class="font-bold text-sm tracking-tight font-display text-zinc-950">Menu</span>
+        <button onclick="coraToggleMobileSidebar()" class="text-zinc-500 hover:text-zinc-900 p-1.5 bg-zinc-50 rounded-md border border-zinc-200 focus:outline-none cursor-pointer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
     
     <!-- PAGE CATEGORIES COLLAPSIBLE GROUPS -->
     <div class="space-y-2">
@@ -477,5 +488,37 @@ function coraToggleSidebarGroup(button) {
         }, 300);
     }
 }
+
+// Add Mobile Toggle Logic
+function coraToggleMobileSidebar() {
+    const sidebar = document.getElementById('cora-docs-mobile-sidebar');
+    const backdrop = document.getElementById('cora-docs-mobile-backdrop');
+    
+    if (sidebar.classList.contains('-translate-x-full')) {
+        // Open
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+        // small delay for transition
+        setTimeout(() => { backdrop.classList.remove('opacity-0'); backdrop.classList.add('opacity-100'); }, 10);
+    } else {
+        // Close
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.remove('opacity-100');
+        backdrop.classList.add('opacity-0');
+        setTimeout(() => { backdrop.classList.add('hidden'); }, 300);
+    }
+}
+
+// Intercept link clicks to close the sidebar on mobile
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebarLinks = document.querySelectorAll('#cora-docs-mobile-sidebar a.cora-nav-link, #cora-docs-mobile-sidebar button[onclick^="coraPublicShowSection"]');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth < 768) {
+                coraToggleMobileSidebar();
+            }
+        });
+    });
+});
 </script>
 

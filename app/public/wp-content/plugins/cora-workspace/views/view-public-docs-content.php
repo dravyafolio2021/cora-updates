@@ -47,7 +47,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) ) . ' min read';
 ?>
 
 <!-- Standard markdown page output box -->
-<div class="flex-1 min-w-0 bg-white border border-zinc-200/80 rounded-xl p-6 md:p-8 shadow-xs transition-all duration-200" id="cora-public-main-content">
+<div class="flex-1 min-w-0 bg-white border border-zinc-200/80 rounded-xl p-4 sm:p-6 md:p-8 shadow-xs transition-all duration-200 w-full" id="cora-public-main-content">
     
     <!-- Sub-container 1: Standard Page Layout -->
     <div id="cora-public-page-layout" class="space-y-6">

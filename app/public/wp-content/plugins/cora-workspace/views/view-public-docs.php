@@ -77,11 +77,11 @@ if ( ! defined( 'ABSPATH' ) ) {
         }
 
         /* Hide scrollbars for the docs sidebar to allow independent scrolling without clipping */
-        #cora-docs-sidebar {
+        #cora-docs-mobile-sidebar {
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none;  /* IE and Edge */
         }
-        #cora-docs-sidebar::-webkit-scrollbar {
+        #cora-docs-mobile-sidebar::-webkit-scrollbar {
             display: none; /* Chrome, Safari and Opera */
         }
 
@@ -111,13 +111,13 @@ if ( ! defined( 'ABSPATH' ) ) {
     <?php include CORA_WORKSPACE_PATH . 'views/view-public-docs-header.php'; ?>
 
     <!-- Main Workspace Container -->
-    <div class="flex-1 flex max-w-7xl w-full mx-auto px-6 py-8 gap-8 items-start">
+    <div class="flex-1 flex max-w-7xl w-full mx-auto px-4 md:px-6 py-4 md:py-8 gap-0 md:gap-8 items-start relative">
         
         <!-- TASK 2: Sidebar Navigation component -->
         <?php include CORA_WORKSPACE_PATH . 'views/view-public-docs-sidebar.php'; ?>
 
         <!-- Main Display Panel -->
-        <main class="flex-1 min-w-0 flex gap-8 items-start">
+        <main class="flex-1 min-w-0 flex flex-col lg:flex-row gap-4 lg:gap-8 items-start w-full">
             
             <!-- TASK 3: Content area component -->
             <?php include CORA_WORKSPACE_PATH . 'views/view-public-docs-content.php'; ?>
