@@ -58,20 +58,29 @@ $crew_rankings = array(
 );
 ?>
 
+<?php
+$analytics_header_args = array(
+    'title'            => 'Workspace Business Intelligence',
+    'description'      => 'Analyze lead conversion rates, revenue performance metrics, and crew operation rankings.',
+    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>',
+    'ai_stack'         => true,
+    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'cta'              => array(
+        'text'        => 'Export Report PDF',
+        'mobile_text' => 'Export PDF',
+        'onclick'     => "if(window.coraShowToast) window.coraShowToast('Analytics report exported as PDF.', 'success')",
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
+        'visible'     => true,
+        'class'       => '!bg-white hover:!bg-zinc-50 !text-zinc-800 !border-zinc-200 hover:!border-zinc-300 border shadow-2xs',
+    ),
+);
+
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $analytics_header_args );
+}
+?>
+
 <div class="space-y-6 font-sans text-zinc-900 select-none max-w-[1700px] mx-auto pb-12">
-    <!-- Page Header -->
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-zinc-200">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-zinc-950">● Workspace Business Intelligence</h1>
-            <p class="text-xs font-medium text-zinc-500 mt-1">Analyze lead conversion rates, revenue performance metrics, and crew operation rankings.</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <button onclick="if(window.coraShowToast) window.coraShowToast('Analytics report exported as PDF.', 'success')" class="px-4 py-2 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs cursor-pointer flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                Export Report PDF
-            </button>
-        </div>
-    </header>
 
     <!-- Metrics Cards Grid -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
