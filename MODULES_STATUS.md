@@ -9,7 +9,7 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v3.4.0) | `cora-workspace.php`, `view-settings-suite.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v3.4.28) | `cora-workspace.php`, `view-settings-suite.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
 | **Email Management** | `feature/email-management` | 🟢 Merged to Main | `views/view-emails.php`, `cora-workspace.php` | Email Module Agent |
 | **File Manager** | `feature/document-studio-vault` | 🟢 Merged to Main | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
@@ -115,6 +115,7 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| v3.4.28 | Aug 14, 2026 | Mobile documentation responsive layout overhaul, left navigation sliding drawer transition, command palette styling fixes |
 | v3.4.0 | Aug 12, 2026 | Sticky docked toolbar, collapsible AI assistant, slash hint, landscape auto-rotate lock, left sidebar segment tabs in media editor |
 | v3.3.9 | Aug 11, 2026 | Document outline & metrics functional, atomic deploy backup fix |
 | v3.3.7 | Aug 10, 2026 | Mobile quick action bar, horizontal scroll prevention |

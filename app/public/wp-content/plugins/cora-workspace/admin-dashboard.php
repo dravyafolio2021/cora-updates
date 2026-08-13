@@ -2947,138 +2947,148 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     })();
 </script>
 
-<!-- Cora Premium Full-Screen Loading Splash Screen -->
-<div id="cora-app-splash-screen" style="
-    position: fixed;
-    inset: 0;
-    background: #ffffff;
-    z-index: 100000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    opacity: 1;
-    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
-    user-select: none;
-">
-    <div style="
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 24px;
-        transform: translateY(-20px);
-    ">
-        <!-- Logo Icon Card with Reveal Animation -->
-        <div class="cora-splash-logo-card" style="
-            width: 72px;
-            height: 72px;
-            background: #18181b;
-            color: #ffffff;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 12px 32px rgba(24, 24, 27, 0.12);
-        ">
-            <svg width="32" height="32" viewBox="0 0 14 14" fill="none">
-                <rect x="3" y="3" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-1" style="transform: scale(0); opacity: 0;"/>
-                <rect x="7.5" y="3" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-2" style="transform: scale(0); opacity: 0;"/>
-                <rect x="3" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-3" style="transform: scale(0); opacity: 0;"/>
-                <rect x="7.5" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-4" style="transform: scale(0); opacity: 0;"/>
+<?php
+// ─── Splash Screen: RAG-powered AI Co-Founder Insight ──────────────────────
+$_cora_splash_text  = '';
+$_cora_splash_type  = '';
+$_cora_splash_leads = 0;
+
+if ( function_exists( 'cora_db_get_agency_id' ) ) {
+    global $wpdb;
+    $_cora_spl_aid  = cora_db_get_agency_id();
+    $_cora_rag_tbl  = $wpdb->prefix . 'cora_rag_knowledge';
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $_cora_rag_tbl ) ) {
+        $_cora_rag_row = $wpdb->get_row( $wpdb->prepare(
+            "SELECT content, source_type FROM {$_cora_rag_tbl} WHERE agency_id = %d ORDER BY RAND() LIMIT 1",
+            $_cora_spl_aid
+        ), ARRAY_A );
+        if ( ! empty( $_cora_rag_row['content'] ) ) {
+            $_cora_splash_text = wp_strip_all_tags( $_cora_rag_row['content'] );
+            $_cora_splash_type = sanitize_text_field( $_cora_rag_row['source_type'] );
+        }
+    }
+    $_cora_leads_raw    = get_option( 'cora_workspace_leads', array() );
+    $_cora_splash_leads = is_array( $_cora_leads_raw ) ? count( $_cora_leads_raw ) : 0;
+}
+
+$_cora_spl_fallbacks = array(
+    array( 'text' => 'Consistency is the edge. Teams that follow up within 24 hours close 60% more deals.',               'type' => 'Business Wisdom' ),
+    array( 'text' => 'Your next breakthrough client is already in your pipeline — nurture every lead with intent.',        'type' => 'Growth Insight'  ),
+    array( 'text' => 'Every signed contract builds trust. Design your process around the client, not the paperwork.',      'type' => 'Operations'      ),
+    array( 'text' => 'Automations free up hours — invest them back into the relationships that scale your studio.',        'type' => 'Productivity'    ),
+    array( 'text' => 'Great photography wins first impressions. Your visual portfolio is your strongest closing tool.',    'type' => 'Studio Insight'  ),
+    array( 'text' => 'Data beats gut feeling. Review your financials weekly — small leaks become big losses over time.',   'type' => 'Finance'         ),
+);
+$_cora_spl_fb = $_cora_spl_fallbacks[ array_rand( $_cora_spl_fallbacks ) ];
+if ( empty( $_cora_splash_text ) ) {
+    $_cora_splash_text = $_cora_spl_fb['text'];
+    $_cora_splash_type = $_cora_spl_fb['type'];
+}
+if ( mb_strlen( $_cora_splash_text ) > 162 ) {
+    $_cora_splash_text = mb_substr( $_cora_splash_text, 0, 159 ) . '…';
+}
+$_cora_spl_badge = ucwords( str_replace( '_', ' ', $_cora_splash_type ) ) ?: 'Insight';
+?>
+<!-- Cora AI Co-Founder Insight Splash Screen -->
+<div id="cora-app-splash-screen" style="position:fixed;inset:0;background:#ffffff;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:1;transition:opacity 0.4s cubic-bezier(0.25,1,0.5,1),transform 0.4s cubic-bezier(0.25,1,0.5,1);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;user-select:none;padding:32px 24px;">
+
+    <!-- Brand mark -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:13px;margin-bottom:30px;">
+        <div class="cora-splash-logo-card" style="width:58px;height:58px;background:#18181b;color:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(24,24,27,0.14);">
+            <svg width="25" height="25" viewBox="0 0 14 14" fill="none">
+                <rect x="3" y="3" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-1" style="transform:scale(0);opacity:0;"/>
+                <rect x="7.5" y="3" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-2" style="transform:scale(0);opacity:0;"/>
+                <rect x="3" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-3" style="transform:scale(0);opacity:0;"/>
+                <rect x="7.5" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-4" style="transform:scale(0);opacity:0;"/>
             </svg>
         </div>
-        
-        <!-- App Title -->
-        <div style="
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: #18181b;
-            text-align: center;
-        ">
-            Cora Workspace
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:#52525b;">CORA WORKSPACE</div>
+    </div>
+
+    <!-- AI Co-Founder Insight Card -->
+    <div class="cora-splash-insight-card" style="width:100%;max-width:340px;background:#fafafa;border:1px solid #e4e4e7;border-radius:18px;padding:19px 21px;opacity:0;transform:translateY(10px);">
+        <!-- Header row -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:9px;">
+                <div style="width:30px;height:30px;background:#18181b;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div>
+                    <div style="font-size:10.5px;font-weight:700;color:#18181b;line-height:1.2;">Cora Intelligence</div>
+                    <div style="font-size:9px;color:#a1a1aa;font-weight:500;margin-top:1px;">AI Co-Founder · Daily Brief</div>
+                </div>
+            </div>
+            <span style="font-size:8px;font-weight:700;color:#71717a;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:5px;padding:2px 8px;letter-spacing:0.03em;white-space:nowrap;"><?php echo esc_html( $_cora_spl_badge ); ?></span>
         </div>
-        
-        <!-- Loading Progress Bar -->
-        <div style="
-            width: 140px;
-            height: 2px;
-            background: #f4f4f5;
-            border-radius: 2px;
-            overflow: hidden;
-            position: relative;
-        ">
-            <div class="cora-splash-progress-bar" style="
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100%;
-                width: 40px;
-                background: #18181b;
-                border-radius: 2px;
-            "></div>
+        <!-- Insight text -->
+        <p style="font-size:13px;line-height:1.65;color:#27272a;font-weight:500;margin:0 0 14px 0;"><?php echo esc_html( $_cora_splash_text ); ?></p>
+        <!-- Footer -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:11px;border-top:1px solid #f0f0f0;">
+            <div style="display:flex;align-items:center;gap:5px;">
+                <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;animation:cora-pulse-dot 2s ease-in-out infinite;"></span>
+                <span style="font-size:9px;color:#a1a1aa;font-weight:600;">Workspace active</span>
+            </div>
+            <?php if ( $_cora_splash_leads > 0 ) : ?>
+            <span style="font-size:9px;color:#a1a1aa;font-weight:600;"><?php echo intval( $_cora_splash_leads ); ?> leads in pipeline</span>
+            <?php endif; ?>
         </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div style="width:100%;max-width:340px;height:2px;background:#f4f4f5;border-radius:2px;overflow:hidden;position:relative;margin-top:24px;">
+        <div class="cora-splash-progress-bar" style="position:absolute;top:0;left:0;height:100%;width:64px;background:#18181b;border-radius:2px;"></div>
     </div>
 </div>
 
 <style>
-    /* Critical Splash Keyframe Animations */
     @keyframes cora-reveal-dot {
-        0% { transform: scale(0); opacity: 0; }
+        0%   { transform: scale(0); opacity: 0; }
         100% { transform: scale(1); opacity: 1; }
     }
-    .cora-splash-dot {
-        transform-origin: center;
-        animation: cora-reveal-dot 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
+    .cora-splash-dot { transform-origin: center; animation: cora-reveal-dot 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
     .cora-splash-dot.dot-1 { animation-delay: 0.05s; }
     .cora-splash-dot.dot-2 { animation-delay: 0.15s; }
     .cora-splash-dot.dot-3 { animation-delay: 0.25s; }
     .cora-splash-dot.dot-4 { animation-delay: 0.35s; }
 
     @keyframes cora-splash-pulse {
-        0%, 100% { transform: scale(1); box-shadow: 0 12px 32px rgba(24, 24, 27, 0.12); }
-        50% { transform: scale(0.96); box-shadow: 0 8px 20px rgba(24, 24, 27, 0.08); }
+        0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(24,24,27,0.14); }
+        50%       { transform: scale(0.94); box-shadow: 0 4px 14px rgba(24,24,27,0.07); }
     }
-    .cora-splash-logo-card {
-        animation: cora-splash-pulse 2s ease-in-out infinite;
-        animation-delay: 0.5s;
-    }
+    .cora-splash-logo-card { animation: cora-splash-pulse 2.4s ease-in-out infinite; animation-delay: 0.5s; }
 
     @keyframes cora-splash-slide-bar {
-        0% { left: -40px; }
-        100% { left: 140px; }
+        0%   { left: -70px; }
+        100% { left: 110%;  }
     }
-    .cora-splash-progress-bar {
-        animation: cora-splash-slide-bar 1.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+    .cora-splash-progress-bar { animation: cora-splash-slide-bar 1.4s cubic-bezier(0.65,0,0.35,1) infinite; }
+
+    @keyframes cora-pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: 0.4; transform: scale(0.7); }
     }
+    @keyframes cora-insight-fadein {
+        0%   { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0);    }
+    }
+    .cora-splash-insight-card { animation: cora-insight-fadein 0.55s cubic-bezier(0.25,1,0.5,1) 0.3s forwards; }
 </style>
 
 <script>
     (function() {
-        // Fast cleanup if page loading is extremely instant
         var hideSplash = function() {
             var splash = document.getElementById('cora-app-splash-screen');
             if (splash) {
                 splash.style.opacity = '0';
-                splash.style.transform = 'translateY(-20px)';
-                setTimeout(function() {
-                    if (splash.parentNode) {
-                        splash.parentNode.removeChild(splash);
-                    }
-                }, 400);
+                splash.style.transform = 'translateY(-16px)';
+                setTimeout(function() { if (splash.parentNode) splash.parentNode.removeChild(splash); }, 400);
             }
         };
-        // Wait for page load or fallback after 3 seconds max
         if (document.readyState === 'complete') {
-            setTimeout(hideSplash, 600);
+            setTimeout(hideSplash, 900);
         } else {
-            window.addEventListener('load', function() {
-                setTimeout(hideSplash, 600);
-            });
-            setTimeout(hideSplash, 3000); // Fallback
+            window.addEventListener('load', function() { setTimeout(hideSplash, 900); });
+            setTimeout(hideSplash, 3500);
         }
     })();
 </script>
@@ -11633,6 +11643,11 @@ wp_print_footer_scripts();
 <div id="cora-command-palette" class="fixed inset-0 z-[999999] hidden items-start justify-center p-4 pt-[6vh] md:pt-[10vh] bg-zinc-950/40 backdrop-blur-sm transition-all duration-200">
     <div class="cora-command-container w-full max-w-2xl bg-white border border-zinc-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-transform transform scale-95 duration-200" style="height: 460px; max-height: 80vh;">
         
+        <!-- Mobile Drag Handle Area -->
+        <div class="md:hidden flex items-center justify-center pt-3 pb-1 shrink-0 cursor-grab active:cursor-grabbing select-none" id="cora-command-drag-handle-area">
+            <div class="w-12 h-1 bg-zinc-200 rounded-full"></div>
+        </div>
+
         <!-- Search Input Header -->
         <div class="flex items-center gap-3 px-4 border-b border-zinc-100 py-3.5 shrink-0">
             <svg class="text-zinc-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -11677,7 +11692,7 @@ wp_print_footer_scripts();
     display: flex !important;
 }
 #cora-command-palette.active .cora-command-container {
-    transform: scale(1) !important;
+    transform: scale(1);
 }
 .cora-command-item.selected {
     background-color: #f4f4f5 !important;
@@ -11695,6 +11710,33 @@ wp_print_footer_scripts();
 .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* Mobile Bottom Sheet & Search Optimizations */
+@media (max-width: 767px) {
+    #cora-command-palette {
+        align-items: flex-end !important;
+        justify-content: center !important;
+        padding: 0 !important;
+    }
+    #cora-command-palette .cora-command-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 75vh !important;
+        max-height: 75vh !important;
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-top-left-radius: 24px !important;
+        border-top-right-radius: 24px !important;
+        transform: translateY(100%);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #cora-command-palette.active .cora-command-container {
+        transform: translateY(0);
+    }
+    #cora-command-input {
+        font-size: 16px !important;
+    }
 }
 </style>
 
@@ -12431,6 +12473,90 @@ wp_print_footer_scripts();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        // Mobile Swipe-to-Dismiss Gesture Support for Command Palette
+        (function() {
+            const palette = document.getElementById('cora-command-palette');
+            if (!palette) return;
+
+            const container = palette.querySelector('.cora-command-container');
+            const resultsArea = document.getElementById('cora-command-results');
+            if (!container) return;
+
+            let startY = 0;
+            let currentY = 0;
+            let isDragging = false;
+            let scrollStartTop = 0;
+
+            container.addEventListener('touchstart', function(e) {
+                if (window.innerWidth >= 768) return;
+
+                const touch = e.touches[0];
+                startY = touch.clientY;
+                currentY = startY;
+                isDragging = false;
+
+                if (resultsArea) {
+                    scrollStartTop = resultsArea.scrollTop;
+                } else {
+                    scrollStartTop = 0;
+                }
+            }, { passive: true });
+
+            container.addEventListener('touchmove', function(e) {
+                if (window.innerWidth >= 768) return;
+
+                const touch = e.touches[0];
+                const deltaY = touch.clientY - startY;
+
+                // Only drag downwards
+                if (deltaY <= 0) {
+                    if (isDragging) {
+                        if (e.cancelable) e.preventDefault();
+                        container.style.transform = 'translateY(0px)';
+                        isDragging = false;
+                    }
+                    return;
+                }
+
+                // Allow dragging if not scrolling results or if results are scrolled to the top
+                const isTargetInResults = e.target.closest('#cora-command-results');
+                const shouldDrag = !isTargetInResults || (scrollStartTop <= 0);
+
+                if (shouldDrag) {
+                    if (e.cancelable) e.preventDefault();
+                    isDragging = true;
+                    currentY = touch.clientY;
+
+                    // Apply translation down to the sheet in real-time
+                    container.style.transform = `translateY(${deltaY}px)`;
+                    container.style.transition = 'none'; // Disable transition during drag
+                }
+            }, { passive: false });
+
+            container.addEventListener('touchend', function(e) {
+                if (window.innerWidth >= 768) return;
+
+                if (isDragging) {
+                    isDragging = false;
+                    const deltaY = currentY - startY;
+                    const threshold = 120; // Dismiss threshold in pixels
+
+                    container.style.transition = ''; // Restore transition
+
+                    if (deltaY > threshold) {
+                        coraCloseCommandPalette();
+                        // Reset transform after animation finishes
+                        setTimeout(() => {
+                            container.style.transform = '';
+                        }, 250);
+                    } else {
+                        // Snap back
+                        container.style.transform = 'translateY(0)';
+                    }
+                }
+            }, { passive: true });
+        })();
+
         // Dynamic Browser Local timezone Greeting calculation
         (function() {
             const hour = new Date().getHours();
@@ -12646,8 +12772,11 @@ wp_print_footer_scripts();
             if (e.target.closest('.cora-sidebar-search') || e.target.closest('[onclick*="coraOpenCommandPalette"]')) return;
 
             const palette = document.getElementById('cora-command-palette');
-            if (palette && !palette.classList.contains('hidden') && !palette.contains(e.target)) {
-                coraCloseCommandPalette();
+            if (palette && !palette.classList.contains('hidden')) {
+                const container = palette.querySelector('.cora-command-container');
+                if (container && !container.contains(e.target)) {
+                    coraCloseCommandPalette();
+                }
             }
 
             const inlinePalette = document.getElementById('cora-inline-command-palette');

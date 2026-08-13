@@ -159,7 +159,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) ) . ' min read';
                     </div>
                     <div class="space-y-1">
                         <h4 class="text-xs font-bold text-zinc-900 font-sans">Universal Auto-Save</h4>
-                        <p class="text-[11px] text-zinc-500 leading-relaxed">Background debounce auto-save utilizing WordPress transient filters.</p>
+                        <p class="text-[11px] text-zinc-500 leading-relaxed">Background debounce auto-save utilizing database transient filters.</p>
                     </div>
                 </div>
 
@@ -204,14 +204,15 @@ $reading_time = max( 1, ceil( $word_count / 200 ) ) . ' min read';
                 <div class="flex items-center gap-3.5 py-1.5 border border-transparent border-b-zinc-100/50 ">
                     <div class="p-2 border border-zinc-200/80 rounded-lg text-zinc-950 bg-zinc-50/50 shrink-0">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M16.5 7.5L12 18L7.5 7.5"></path>
-                            <path d="M14.5 7.5L12 14.5L9.5 7.5"></path>
+                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                            <line x1="6" y1="18" x2="6.01" y2="18"></line>
                         </svg>
                     </div>
                     <div class="min-w-0">
                         <span class="block text-[10px] uppercase tracking-wider font-bold text-zinc-400 ">Backend</span>
-                        <span class="block text-xs font-semibold text-zinc-750 truncate">WordPress 6.x foundation</span>
+                        <span class="block text-xs font-semibold text-zinc-750 truncate">PHP 8.2 Router &amp; Core</span>
                     </div>
                 </div>
 
@@ -258,6 +259,11 @@ $reading_time = max( 1, ceil( $word_count / 200 ) ) . ' min read';
             </div>
         </div>
 
+    </div>
+    
+    <!-- Legal Footnote & Component Declaration -->
+    <div class="pt-6 mt-8 border-t border-zinc-150/70 text-[9px] text-zinc-400 leading-normal select-none">
+        * Architectural Subsystem Note: Cora Workspace runs on a PHP 8.2 backend utilizing select database persistence and hooks abstraction layers. All rights reserved.
     </div>
     
     </div> <!-- End of #cora-public-page-layout -->

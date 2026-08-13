@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v3.4.0).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v3.4.28).
 
 ---
 
@@ -255,4 +255,4 @@ All queries filter by `agency_id`. Owner roles see all branches; branch-level ro
 
 ---
 
-*Cora Platform v3.4.0 — Last updated: August 13, 2026.*
+*Cora Platform v3.4.28 — Last updated: August 14, 2026.*

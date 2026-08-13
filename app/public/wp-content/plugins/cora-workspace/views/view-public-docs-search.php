@@ -1228,8 +1228,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<!-- Mobile AI Sidebar Backdrop -->
+<div id="cora-public-ai-backdrop" class="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm z-40 hidden transition-opacity opacity-0" onclick="window.coraToggleAiSidebar(false)"></div>
+
 <!-- Ask Cora AI sliding right sidebar container -->
-<div id="cora-public-ai-sidebar" class="fixed top-0 right-0 bottom-0 w-[420px] bg-white border-l border-zinc-200 z-50 shadow-2xl transition-transform duration-300 transform translate-x-full flex flex-col font-sans">
+<div id="cora-public-ai-sidebar" class="fixed top-0 right-0 bottom-0 w-full max-w-[420px] bg-white border-l border-zinc-200 z-50 shadow-2xl transition-transform duration-300 transform translate-x-full flex flex-col font-sans">
     <!-- Header -->
     <div class="px-5 py-4 border-b border-zinc-100 flex items-center justify-between select-none shrink-0 bg-white">
         <div class="flex items-center gap-2.5">
@@ -1407,10 +1410,16 @@ window.coraToggleAiSidebar = function(show) {
 
     // Mobile: Toggle sliding sidebar drawer
     const sidebar = document.getElementById('cora-public-ai-sidebar');
+    const backdrop = document.getElementById('cora-public-ai-backdrop');
     if (!sidebar) return;
     if (show) {
         sidebar.classList.remove('translate-x-full');
         sidebar.classList.add('translate-x-0');
+        if (backdrop) {
+            backdrop.classList.remove('hidden');
+            // small delay for transition
+            setTimeout(() => { backdrop.classList.remove('opacity-0'); backdrop.classList.add('opacity-100'); }, 10);
+        }
         setTimeout(() => {
             const input = document.getElementById('cora-sidebar-chat-input');
             if (input) input.focus();
@@ -1418,6 +1427,11 @@ window.coraToggleAiSidebar = function(show) {
     } else {
         sidebar.classList.remove('translate-x-0');
         sidebar.classList.add('translate-x-full');
+        if (backdrop) {
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+            setTimeout(() => { backdrop.classList.add('hidden'); }, 300);
+        }
     }
 };
 

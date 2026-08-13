@@ -86,10 +86,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </svg>
             </button>
 
-            <!-- Administrator Avatar -->
-            <div class="h-6 w-6 rounded-full bg-zinc-950 border border-zinc-200 flex items-center justify-center text-[11px] font-bold text-white select-none shadow-sm cursor-pointer" title="Platform Admin: Shruti">
-                S
-            </div>
+
         </div>
     </div>
 </header>
