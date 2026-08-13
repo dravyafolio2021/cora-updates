@@ -272,11 +272,6 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         Opportunities
         <span class="ml-1 px-1.5 py-0.5 bg-zinc-900 text-white text-[9px] font-bold rounded-full">NEW</span>
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-calendar" onclick="switchContentTab('ct-calendar')">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        Calendar
-        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 text-zinc-400 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
-    </button>
     <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-library" onclick="switchContentTab('ct-library')" id="btn-tab-articles-list">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
         Content Library <?php if ($total_articles > 0): ?><span class="ml-1 px-1.5 py-0.5 bg-zinc-200 text-zinc-700 text-[9px] font-bold rounded-full"><?php echo $total_articles; ?></span><?php endif; ?>
@@ -285,13 +280,20 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
         SEO & AI Visibility
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-performance" onclick="switchContentTab('ct-performance')">
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-calendar" onclick="switchContentTab('ct-calendar')">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        Calendar
+        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 text-zinc-400 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
+    </button>
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-performance" onclick="switchContentTab('ct-performance')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><polyline points="17 6 23 6 23 12"></polyline></svg>
         Performance
+        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 text-zinc-400 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-automations" onclick="switchContentTab('ct-automations')">
+    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-automations" onclick="switchContentTab('ct-automations')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
         Automations
+        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 text-zinc-400 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
     </button>
     <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-brain" onclick="switchContentTab('ct-brain')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z"></path></svg>
@@ -2607,15 +2609,15 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     };
 
     function switchContentTab(tabId) {
-        if (tabId === 'ct-brain') {
+        if (['ct-brain', 'ct-calendar', 'ct-performance', 'ct-automations'].includes(tabId)) {
+            let label = 'Coming Soon';
+            if (tabId === 'ct-brain') label = 'Business Brain';
+            else if (tabId === 'ct-calendar') label = 'Content Calendar';
+            else if (tabId === 'ct-performance') label = 'Performance';
+            else if (tabId === 'ct-automations') label = 'Automations';
+            
             if (window.coraShowToast) {
-                window.coraShowToast('Business Brain is coming soon! This knowledge base module is currently in development.', 'info');
-            }
-            return;
-        }
-        if (tabId === 'ct-calendar') {
-            if (window.coraShowToast) {
-                window.coraShowToast('Content Calendar is locked and will be launched in a future update.', 'info');
+                window.coraShowToast(label + ' is locked and will be launched in a future update.', 'info');
             }
             return;
         }
@@ -2759,7 +2761,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 ct = 'ct-overview';
             }
         }
-        if (ct === 'ct-brain' || ct === 'ct-calendar') {
+        if (['ct-brain', 'ct-calendar', 'ct-performance', 'ct-automations'].includes(ct)) {
             ct = 'ct-overview';
         }
         switchContentTab(ct);
