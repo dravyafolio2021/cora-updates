@@ -1072,9 +1072,14 @@ jQuery(document).ready(function($) {
         }
         $('#cora-sidebar-chat').html(`
             <div class="chat-bubble ai bg-zinc-100 text-zinc-850 rounded-lg rounded-bl-none p-3 text-xs leading-relaxed self-start border border-zinc-200/50 shadow-sm max-w-[85%]">
-                Hello! I am Cora, your real estate workspace intelligence. Ask me about bookings, client messages, or writing listing descriptions.
+                Hello! I am Cora, your workspace co-founder intelligence. Ask me about your business stats, recent logs, or quick actions.
             </div>
         `);
+        // Show native integration block again & re-init context
+        $('#cora-sidebar-native-integration').show();
+        if (typeof window.coraInitSidebarContext === 'function') {
+            window.coraInitSidebarContext();
+        }
     };
 
     // Search bar opens the command palette modal (excluding sidebar search input container)
@@ -1111,6 +1116,9 @@ jQuery(document).ready(function($) {
     // Master execution for chat rendering and mock answers
     function coraExecuteAIChat(text) {
         const chat = $('#cora-sidebar-chat');
+
+        // Hide the native integration block once conversation starts
+        $('#cora-sidebar-native-integration').slideUp(200);
         
         // Append User bubble
         chat.append(`<div class="chat-bubble user">${text}</div>`);
@@ -11214,7 +11222,6 @@ jQuery(document).ready(function($) {
 
     window.coraSubmitIslandAI = function() {
         const prompt = $('#cora-island-ai-input').val().trim();
-        $('#cora-island-ai-popover').addClass('hidden');
         if (typeof window.coraToggleCopilot === 'function') {
             window.coraToggleCopilot(true);
             if (prompt && typeof window.coraSendCopilotMessage === 'function') {
@@ -11333,16 +11340,11 @@ jQuery(document).ready(function($) {
         // Initialize sidebar context based on current page
         window.coraInitSidebarContext();
 
-        // Toggle popover card when focusing/clicking island inputs
+        // Open the native AI sidebar when focusing/clicking island inputs
         $(document).on('click focus', '#cora-island-ai-input, #cora-island-view-compact', function(e) {
             e.stopPropagation();
-            $('#cora-island-ai-popover').removeClass('hidden');
-        });
-
-        // Close popover when clicking outside the floating island wrapper
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('#cora-mobile-floating-island').length) {
-                $('#cora-island-ai-popover').addClass('hidden');
+            if (typeof window.coraToggleSidebar === 'function') {
+                window.coraToggleSidebar(true);
             }
         });
     });
