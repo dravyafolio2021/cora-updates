@@ -8932,15 +8932,15 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                             </button>
                         </div>
                         <div class="relative flex items-center bg-white border border-zinc-200 rounded-lg px-2.5 py-1.5 focus-within:border-zinc-400 shadow-3xs">
-                            <input type="text" id="cora-seo-keyword" placeholder="Enter target keyword..." oninput="coraUpdateSEOAudits()" class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-350 pr-6" value="AI search visibility">
+                            <input type="text" id="cora-seo-keyword" placeholder="Enter target keyword..." oninput="coraUpdateSEOAudits()" class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-350 pr-6" value="">
                         </div>
                         <div class="space-y-1">
                             <div class="flex items-center justify-between text-[10px] font-bold text-zinc-550">
                                 <span>Keyword Density</span>
-                                <span id="cora-seo-density-badge" class="font-mono">18/18</span>
+                                <span id="cora-seo-density-badge" class="font-mono hidden">0.00% (0x)</span>
                             </div>
                             <div class="w-full bg-zinc-150 rounded-full h-1">
-                                <div id="cora-seo-density-bar" class="bg-emerald-500 h-1 rounded-full" style="width: 100%;"></div>
+                                <div id="cora-seo-density-bar" class="bg-emerald-500 h-1 rounded-full animate-all duration-300" style="width: 0%;"></div>
                             </div>
                         </div>
                     </div>
@@ -8949,12 +8949,12 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     <div class="p-4 bg-white border border-zinc-200 rounded-xl shadow-3xs space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Readability</span>
-                            <span class="text-xs font-bold text-emerald-600 block" id="cora-readability-status-text">Good</span>
+                            <span class="text-xs font-bold text-zinc-400 block animate-all duration-300" id="cora-readability-status-text">--</span>
                         </div>
                         <div class="space-y-1.5">
-                            <span class="text-[10px] text-zinc-400 block" id="cora-readability-subtext">Grade 8 · Easy to read</span>
+                            <span class="text-[10px] text-zinc-400 block animate-all duration-300" id="cora-readability-subtext">No Content</span>
                             <div class="w-full bg-zinc-150 rounded-full h-1">
-                                <div id="cora-readability-bar" class="bg-emerald-500 h-1 rounded-full" style="width: 85%;"></div>
+                                <div id="cora-readability-bar" class="bg-emerald-500 h-1 rounded-full animate-all duration-300" style="width: 0%;"></div>
                             </div>
                         </div>
                     </div>
@@ -9010,30 +9010,21 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                         <div class="space-y-3.5 text-xs">
                             <div>
                                 <span class="text-[10px] text-zinc-400 block uppercase font-bold tracking-wider leading-none">Target Audience</span>
-                                <span class="font-semibold text-zinc-800 mt-1 block">Marketing professionals, SEO specialists</span>
+                                <span class="font-semibold text-zinc-450 mt-1 block" id="cora-brief-audience">No content to analyze</span>
                             </div>
                             <div>
                                 <span class="text-[10px] text-zinc-400 block uppercase font-bold tracking-wider leading-none mb-1">Intent</span>
-                                <span class="px-2.5 py-0.5 bg-emerald-50 border border-emerald-150 rounded-full text-emerald-700 text-[10px] font-bold inline-block select-none">Informational</span>
+                                <div id="cora-brief-intent">
+                                    <span class="px-2.5 py-0.5 bg-zinc-100 border border-zinc-200 rounded-full text-zinc-500 text-[10px] font-bold inline-block select-none">N/A</span>
+                                </div>
                             </div>
                             <div>
                                 <div class="flex items-center justify-between mb-1.5 select-none">
                                     <span class="text-[10px] text-zinc-400 uppercase font-bold tracking-wider leading-none">Top Competitors</span>
                                     <a href="javascript:void(0)" onclick="window.coraShowToast('Competitor details is coming soon.', 'info')" class="text-[10px] font-bold text-zinc-900 hover:underline">View all</a>
                                 </div>
-                                <div class="divide-y divide-zinc-100 text-xs">
-                                    <div class="py-1.5 flex items-center justify-between">
-                                        <span class="text-zinc-650"><strong class="text-zinc-805 mr-1 font-semibold">1</strong> Search Engine Journal</span>
-                                        <span class="font-mono text-zinc-500">92</span>
-                                    </div>
-                                    <div class="py-1.5 flex items-center justify-between">
-                                        <span class="text-zinc-650"><strong class="text-zinc-805 mr-1 font-semibold">2</strong> Backlinko</span>
-                                        <span class="font-mono text-zinc-500">89</span>
-                                    </div>
-                                    <div class="py-1.5 flex items-center justify-between">
-                                        <span class="text-zinc-650"><strong class="text-zinc-805 mr-1 font-semibold">3</strong> Semrush Blog</span>
-                                        <span class="font-mono text-zinc-500">87</span>
-                                    </div>
+                                <div class="divide-y divide-zinc-100 text-xs" id="cora-brief-competitors">
+                                    <div class="py-2 text-zinc-450 italic text-[11px] text-center">No competitors analyzed</div>
                                 </div>
                             </div>
                         </div>
@@ -9047,27 +9038,12 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                     <div class="border border-zinc-200 rounded-xl overflow-hidden bg-white p-4 shadow-3xs space-y-3">
                         <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
                             <span class="text-[10px] font-extrabold text-zinc-550 uppercase tracking-wider block">Grounded Claims Ledger</span>
-                            <span class="px-1.5 py-0.5 bg-green-50 text-green-650 text-[8px] font-extrabold rounded-md uppercase tracking-wider border border-green-100/50">Verified</span>
+                            <span class="px-1.5 py-0.5 bg-zinc-100 text-zinc-400 text-[8px] font-extrabold rounded-md uppercase tracking-wider border border-zinc-200" id="cora-claims-ledger-status">No Content</span>
                         </div>
 
                         <!-- Claims Ledger Container -->
                         <div class="space-y-3 text-xs leading-normal" id="cora-editor-claims-list">
-                            <!-- Verified RAG Source item 1 -->
-                            <div class="p-2.5 rounded-lg bg-zinc-50/50 border border-zinc-100 space-y-1">
-                                <div class="font-bold text-zinc-900">Claim: "Pricing package starts at ₹12,500"</div>
-                                <div class="text-[10px] text-zinc-450 flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                    Source: Bandra Studio Sessions (Verified)
-                                </div>
-                            </div>
-                            <!-- Verified RAG Source item 2 -->
-                            <div class="p-2.5 rounded-lg bg-zinc-50/50 border border-zinc-100 space-y-1">
-                                <div class="font-bold text-zinc-900">Claim: "Sessions include 3 outfit changes"</div>
-                                <div class="text-[10px] text-zinc-450 flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                    Source: Session Guidelines (Verified)
-                                </div>
-                            </div>
+                            <div class="py-3 text-zinc-450 italic text-[11px] text-center">No content to audit. Add text to the editor to run the Claims check.</div>
                         </div>
 
                         <!-- Manual claims verification action button -->

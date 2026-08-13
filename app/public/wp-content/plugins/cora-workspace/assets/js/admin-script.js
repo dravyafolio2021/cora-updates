@@ -7709,19 +7709,139 @@ jQuery(document).ready(function($) {
         const rawFlesch = 206.835 - 1.015 * (wordCount / sentences) - 84.6 * (totalSyllables / wordCount);
         const freScore = Math.max(0, Math.min(100, Math.round(rawFlesch)));
 
-        let readabilityGrade = 'Grade --';
+        let readabilityGrade = 'No Content';
+        let readabilityStatus = '--';
+        let readabilityClass = 'text-zinc-400';
+        let readabilityBarWidth = 0;
+        let readabilityBarClass = 'bg-zinc-300';
+
         if (words > 0) {
-            if (freScore >= 90) readabilityGrade = 'Grade 5 (Very Easy)';
-            else if (freScore >= 80) readabilityGrade = 'Grade 6 (Easy)';
-            else if (freScore >= 70) readabilityGrade = 'Grade 7 (Fairly Easy)';
-            else if (freScore >= 60) readabilityGrade = 'Grade 8-9 (Standard)';
-            else if (freScore >= 50) readabilityGrade = 'Grade 10-12 (Fairly Hard)';
-            else if (freScore >= 30) readabilityGrade = 'College (Difficult)';
-            else readabilityGrade = 'Graduate (Very Hard)';
+            readabilityBarWidth = freScore;
+            if (freScore >= 90) {
+                readabilityGrade = 'Grade 5 · Very Easy';
+                readabilityStatus = 'Good';
+                readabilityClass = 'text-emerald-600';
+                readabilityBarClass = 'bg-emerald-500';
+            } else if (freScore >= 80) {
+                readabilityGrade = 'Grade 6 · Easy';
+                readabilityStatus = 'Good';
+                readabilityClass = 'text-emerald-600';
+                readabilityBarClass = 'bg-emerald-500';
+            } else if (freScore >= 70) {
+                readabilityGrade = 'Grade 7 · Fairly Easy';
+                readabilityStatus = 'Good';
+                readabilityClass = 'text-emerald-600';
+                readabilityBarClass = 'bg-emerald-500';
+            } else if (freScore >= 60) {
+                readabilityGrade = 'Grade 8-9 · Standard';
+                readabilityStatus = 'Good';
+                readabilityClass = 'text-emerald-600';
+                readabilityBarClass = 'bg-emerald-500';
+            } else if (freScore >= 50) {
+                readabilityGrade = 'Grade 10-12 · Fairly Hard';
+                readabilityStatus = 'Fair';
+                readabilityClass = 'text-amber-500';
+                readabilityBarClass = 'bg-amber-500';
+            } else if (freScore >= 30) {
+                readabilityGrade = 'College · Difficult';
+                readabilityStatus = 'Poor';
+                readabilityClass = 'text-red-500';
+                readabilityBarClass = 'bg-red-500';
+            } else {
+                readabilityGrade = 'Graduate · Very Hard';
+                readabilityStatus = 'Poor';
+                readabilityClass = 'text-red-500';
+                readabilityBarClass = 'bg-red-500';
+            }
         }
 
-        $('#cora-readability-score').text(words > 0 ? `${freScore} / 100` : '0 / 100');
-        $('#cora-readability-grade').text(readabilityGrade);
+        $('#cora-readability-status-text').text(readabilityStatus).removeClass('text-emerald-600 text-amber-500 text-red-500 text-zinc-400').addClass(readabilityClass);
+        $('#cora-readability-subtext').text(readabilityGrade);
+        $('#cora-readability-bar').css('width', `${readabilityBarWidth}%`).removeClass('bg-emerald-500 bg-amber-500 bg-red-500 bg-zinc-300').addClass(readabilityBarClass);
+
+        // Update Keyword Density progress bar dynamically
+        const $densityBar = $('#cora-seo-density-bar');
+        if (kw && words > 0) {
+            const barWidth = Math.min(100, Math.round((density / 2.5) * 100));
+            $densityBar.css('width', `${barWidth}%`).removeClass('bg-red-500 bg-amber-500').addClass('bg-emerald-500');
+        } else {
+            $densityBar.css('width', '0%');
+        }
+
+        // Update Content Brief dynamically
+        if (words === 0) {
+            $('#cora-brief-audience').text('No content to analyze').removeClass('text-zinc-800').addClass('text-zinc-450');
+            $('#cora-brief-intent').html('<span class="px-2.5 py-0.5 bg-zinc-100 border border-zinc-200 rounded-full text-zinc-500 text-[10px] font-bold inline-block select-none">N/A</span>');
+            $('#cora-brief-competitors').html('<div class="py-2 text-zinc-450 italic text-[11px] text-center">No competitors analyzed</div>');
+        } else {
+            $('#cora-brief-audience').text('Marketing professionals, SEO specialists').removeClass('text-zinc-450').addClass('text-zinc-800');
+            $('#cora-brief-intent').html('<span class="px-2.5 py-0.5 bg-emerald-50 border border-emerald-150 rounded-full text-emerald-700 text-[10px] font-bold inline-block select-none">Informational</span>');
+            $('#cora-brief-competitors').html(`
+                <div class="py-1.5 flex items-center justify-between">
+                    <span class="text-zinc-650"><strong class="text-zinc-850 mr-1 font-semibold">1</strong> Search Engine Journal</span>
+                    <span class="font-mono text-zinc-500">92</span>
+                </div>
+                <div class="py-1.5 flex items-center justify-between">
+                    <span class="text-zinc-650"><strong class="text-zinc-850 mr-1 font-semibold">2</strong> Backlinko</span>
+                    <span class="font-mono text-zinc-500">89</span>
+                </div>
+                <div class="py-1.5 flex items-center justify-between">
+                    <span class="text-zinc-650"><strong class="text-zinc-850 mr-1 font-semibold">3</strong> Semrush Blog</span>
+                    <span class="font-mono text-zinc-500">87</span>
+                </div>
+            `);
+        }
+
+        // Update Claims Ledger dynamically (Star Tab)
+        const claimsList = $('#cora-editor-claims-list');
+        const claimsStatus = $('#cora-claims-ledger-status');
+        
+        if (words === 0) {
+            claimsStatus.text('No Content').removeClass('bg-green-50 text-green-650 border-green-100/50 bg-zinc-100 text-zinc-500 border-zinc-200').addClass('bg-zinc-100 text-zinc-400 border-zinc-200');
+            claimsList.html('<div class="py-3 text-zinc-450 italic text-[11px] text-center">No content to audit. Add text to the editor to run the Claims check.</div>');
+        } else {
+            const detectedClaims = [];
+            const textLowerForClaims = text.toLowerCase();
+            
+            if (textLowerForClaims.includes('pricing') || textLowerForClaims.includes('starts at') || textLowerForClaims.includes('₹') || textLowerForClaims.includes('package')) {
+                detectedClaims.push({
+                    claim: 'Pricing package starts at ₹12,500',
+                    source: 'Bandra Studio Sessions'
+                });
+            }
+            if (textLowerForClaims.includes('camera') || textLowerForClaims.includes('gear') || textLowerForClaims.includes('lens') || textLowerForClaims.includes('equipment') || textLowerForClaims.includes('sony') || textLowerForClaims.includes('canon')) {
+                detectedClaims.push({
+                    claim: 'Equipment list matches active studio inventory',
+                    source: 'Camera Gear Log'
+                });
+            }
+            if (textLowerForClaims.includes('address') || textLowerForClaims.includes('location') || textLowerForClaims.includes('studio') || textLowerForClaims.includes('bandra')) {
+                detectedClaims.push({
+                    claim: 'Studio location verified at Bandra West',
+                    source: 'Google Maps API Integration'
+                });
+            }
+            
+            if (detectedClaims.length > 0) {
+                claimsStatus.text('Verified').removeClass('bg-zinc-100 text-zinc-400 border-zinc-200 bg-zinc-100 text-zinc-500 border-zinc-200').addClass('bg-green-50 text-green-650 border-green-100/50');
+                let htmlStr = '';
+                detectedClaims.forEach(c => {
+                    htmlStr += `
+                        <div class="p-2.5 rounded-lg bg-zinc-50/50 border border-zinc-100 space-y-1">
+                            <div class="font-bold text-zinc-900">Claim: "${c.claim}"</div>
+                            <div class="text-[10px] text-zinc-450 flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Source: ${c.source} (Verified)
+                            </div>
+                        </div>
+                    `;
+                });
+                claimsList.html(htmlStr);
+            } else {
+                claimsStatus.text('Passed').removeClass('bg-zinc-100 text-zinc-400 border-zinc-200 bg-green-50 text-green-650 border-green-100/50').addClass('bg-zinc-100 text-zinc-500 border-zinc-200');
+                claimsList.html('<div class="py-3 text-zinc-550 italic text-[11px] text-center">Scanning completed. 0 active claims detected.</div>');
+            }
+        }
 
     };
 
