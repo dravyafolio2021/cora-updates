@@ -2233,7 +2233,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 z-index: 9970 !important;
             }
             #cora-ai-sidebar .cora-ai-sidebar-body {
-                padding-bottom: 72px !important;
+                padding-bottom: 84px !important;
             }
             
             #cora-ai-sidebar.collapsed {
@@ -2242,26 +2242,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 visibility: hidden !important;
                 box-shadow: none !important;
                 display: flex !important;
-            }
-
-            /* Island docked state — flush merged with sidebar */
-            #cora-mobile-floating-island.cora-island-docked {
-                bottom: 0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                margin: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                z-index: 9975 !important;
-            }
-            #cora-mobile-floating-island.cora-island-docked .cora-island-card {
-                border-radius: 0 !important;
-                border-left: none !important;
-                border-right: none !important;
-                border-bottom: none !important;
-                border-top: 1px solid #e4e4e7 !important;
-                box-shadow: none !important;
-                background: #ffffff !important;
             }
         }
 
@@ -7322,7 +7302,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
 
             <!-- SECTION: TASKS -->
     <!-- Local backdrop for AI bottom sheet sidebar (mobile/tablet only) -->
-    <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden fixed inset-0 bg-black/35 z-[9988] backdrop-blur-[1px] transition-opacity duration-300 cursor-pointer lg:hidden" style="position:fixed !important; inset:0 !important; z-index:9988 !important; background:rgba(0,0,0,0.35) !important; backdrop-filter:blur(1px) !important; -webkit-backdrop-filter:blur(1px) !important;"></div>
+    <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden fixed inset-0 bg-black/35 z-[9960] backdrop-blur-[1px] transition-opacity duration-300 cursor-pointer lg:hidden" style="position:fixed !important; inset:0 !important; z-index:9960 !important; background:rgba(0,0,0,0.35) !important; backdrop-filter:blur(1px) !important; -webkit-backdrop-filter:blur(1px) !important;"></div>
 
     <!-- Collapsible Right-side AI Sidebar (Notion-AI style) -->
     <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 lg:top-[52px] right-0 left-0 z-[999] h-full lg:h-[calc(100vh-52px)] w-full max-w-full bg-white border-t border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
