@@ -2214,11 +2214,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             #cora-ai-sidebar {
                 position: fixed !important;
                 top: auto !important;
-                bottom: 72px !important;
+                bottom: 0 !important;
                 left: 0 !important;
                 right: 0 !important;
-                height: calc(60vh - 72px) !important;
-                max-height: calc(60vh - 72px) !important;
+                height: 60vh !important;
+                max-height: 60vh !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 border-top: 1px solid #e4e4e7 !important;
@@ -2232,6 +2232,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s !important;
                 z-index: 9970 !important;
             }
+            #cora-ai-sidebar .cora-ai-sidebar-body {
+                padding-bottom: 72px !important;
+            }
             
             #cora-ai-sidebar.collapsed {
                 transform: translateY(100%) !important;
@@ -2239,6 +2242,26 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 visibility: hidden !important;
                 box-shadow: none !important;
                 display: flex !important;
+            }
+
+            /* Island docked state — flush merged with sidebar */
+            #cora-mobile-floating-island.cora-island-docked {
+                bottom: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 9975 !important;
+            }
+            #cora-mobile-floating-island.cora-island-docked .cora-island-card {
+                border-radius: 0 !important;
+                border-left: none !important;
+                border-right: none !important;
+                border-bottom: none !important;
+                border-top: 1px solid #e4e4e7 !important;
+                box-shadow: none !important;
+                background: #ffffff !important;
             }
         }
 

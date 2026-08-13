@@ -1039,15 +1039,51 @@ jQuery(document).ready(function($) {
         const sidebar = $('#cora-ai-sidebar');
         const quickBtn = $('#cora-quick-ai-btn');
         const backdrop = $('#cora-sidebar-backdrop');
+        const island = $('#cora-mobile-floating-island');
+        const islandCard = island.find('.cora-island-card');
         if (show) {
             sidebar.removeClass('collapsed');
             quickBtn.addClass('bg-zinc-100 border-zinc-300');
             backdrop.removeClass('hidden');
-            $('#cora-sidebar-chat-input').focus();
+            // Dock island flush to sidebar — override inline !important styles
+            island.addClass('cora-island-docked');
+            island.css({
+                'bottom': '0',
+                'width': '100%',
+                'max-width': '100%',
+                'margin': '0'
+            });
+            islandCard.css({
+                'border-radius': '0',
+                'border-left': 'none',
+                'border-right': 'none',
+                'border-bottom': 'none',
+                'border-top': '1px solid #e4e4e7',
+                'box-shadow': 'none',
+                'background': '#ffffff'
+            });
+            $('#cora-island-ai-input').focus();
         } else {
             sidebar.addClass('collapsed');
             quickBtn.removeClass('bg-zinc-100 border-zinc-300');
             backdrop.addClass('hidden');
+            // Undock island — restore original inline styles
+            island.removeClass('cora-island-docked');
+            island.css({
+                'bottom': '16px',
+                'width': 'calc(100vw - 32px)',
+                'max-width': '460px',
+                'margin': '0 auto'
+            });
+            islandCard.css({
+                'border-radius': '',
+                'border-left': '',
+                'border-right': '',
+                'border-bottom': '',
+                'border-top': '',
+                'box-shadow': '',
+                'background': ''
+            });
         }
     };
 
