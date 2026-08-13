@@ -74,32 +74,28 @@ $neutral_pct  = $total_requests > 0 ? round( ( $neutral_count / $total_requests 
 $negative_pct = $total_requests > 0 ? round( ( $negative_count / $total_requests ) * 100 ) : 0;
 ?>
 
-<div id="cora-reviews-feedback-wrapper" class="space-y-3.5 font-sans text-zinc-900 relative">
-    <!-- Ultra-Compact Space-Optimized Header Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-0.5">
-        <div class="space-y-0.5">
-            <div class="flex items-center gap-2 flex-wrap">
-                <h1 class="text-lg sm:text-xl font-extrabold text-zinc-950 tracking-tight m-0 leading-none">Reviews & Feedback</h1>
-                <span class="px-2 py-0.5 rounded-full bg-white text-zinc-600 text-[10px] sm:text-[11px] font-medium border border-zinc-200 flex items-center gap-1 shadow-2xs shrink-0">
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    <span>Verified Shield Active</span>
-                </span>
-            </div>
-            <p class="text-[11px] text-zinc-500 m-0 leading-tight hidden sm:block">Automated 5-star review collector, multi-channel dispatch engine, and private reputation shield.</p>
-        </div>
+<?php
+$reviews_header_args = array(
+    'title'            => 'Reviews & Feedback',
+    'description'      => 'Automated 5-star review collector, multi-channel dispatch engine, and private reputation shield.',
+    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>',
+    'ai_stack'         => true,
+    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'cta'              => array(
+        'text'        => 'Request Review',
+        'mobile_text' => 'Request',
+        'onclick'     => "window.coraOpenSendReviewDrawer()",
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+        'visible'     => true,
+    ),
+);
 
-        <!-- Action Buttons (Full-Width Grid on Mobile, Flex Inline on Desktop) -->
-        <div class="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center shrink-0">
-            <button type="button" onclick="coraOpenSendReviewDrawer()" class="h-9 px-3.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer active:scale-97">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>Request Review</span>
-            </button>
-            <button type="button" onclick="coraOpenReportDrawer()" class="h-9 px-3.5 bg-white border border-zinc-200 text-zinc-800 text-xs font-extrabold rounded-xl hover:bg-zinc-50 transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1.5">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                <span>Reports</span>
-            </button>
-        </div>
-    </div>    <!-- 4 KPI Metrics Cards Grid — 2x2 Grid on Mobile, 4 Columns on Desktop -->
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $reviews_header_args );
+}
+?>
+
+<div id="cora-reviews-feedback-wrapper" class="space-y-3.5 font-sans text-zinc-900 relative">    <!-- 4 KPI Metrics Cards Grid — 2x2 Grid on Mobile, 4 Columns on Desktop -->
     <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3.5">
         <!-- Card 1: Total Requests Sent (Blue Tinted Background) -->
         <div class="bg-blue-50/60 border border-blue-100 rounded-2xl p-2.5 sm:p-4 space-y-1 sm:space-y-2 relative overflow-hidden shadow-2xs">
@@ -1497,6 +1493,51 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 800);
         });
     }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const appendReviewsActions = function(containerSelector, isMobile) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        // Prevent duplicate appending
+        if (container.querySelector('[data-reviews-action="shield"]') || container.querySelector('[data-reviews-action="reports"]')) return;
+
+        // Verified Shield Badge
+        const shieldDiv = document.createElement('div');
+        shieldDiv.setAttribute('data-reviews-action', 'shield');
+        shieldDiv.className = 'flex items-center gap-1 bg-white border border-zinc-200 px-3 py-1.5 rounded-xl shadow-2xs shrink-0 select-none';
+        shieldDiv.innerHTML = `
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-650"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span class="text-[10px] sm:text-xs font-semibold text-zinc-650">Verified Shield Active</span>
+        `;
+
+        // Reports button
+        const reportsBtn = document.createElement('button');
+        reportsBtn.setAttribute('data-reviews-action', 'reports');
+        reportsBtn.className = 'px-3.5 py-2 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer';
+        reportsBtn.onclick = function() {
+            if (typeof window.coraOpenReportDrawer === 'function') {
+                window.coraOpenReportDrawer();
+            }
+        };
+        reportsBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span class="hidden sm:inline">Reports</span><span class="sm:hidden">Reports</span>
+        `;
+
+        const ctaBtn = container.querySelector('button:not(.group)');
+        if (ctaBtn) {
+            container.insertBefore(shieldDiv, ctaBtn);
+            container.insertBefore(reportsBtn, ctaBtn);
+        } else {
+            container.appendChild(shieldDiv);
+            container.appendChild(reportsBtn);
+        }
+    };
+
+    appendReviewsActions('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0', false);
+    appendReviewsActions('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0', true);
 });
 </script>
 

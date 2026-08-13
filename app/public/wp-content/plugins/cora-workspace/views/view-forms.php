@@ -9,21 +9,40 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="cora-forms-module" class="w-full flex-1 min-h-0 flex flex-col overflow-hidden" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <!-- STATE 1: FORMS LIST VIEW -->
     <div id="forms-list-state" class="flex-1 flex flex-col overflow-y-auto p-6 md:p-8 gap-6">
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-200/60 pb-5 shrink-0 gap-4">
-            <div class="space-y-1">
-                <h1 class="text-xl font-bold tracking-tight text-zinc-900 ">Cora Forms</h1>
-                <p class="text-xs text-zinc-500 max-w-2xl">Design and share Notion-style interactive forms. Automatically collect leads into your CRM database.</p>
-            </div>
-            <button id="btn-create-form" class="h-9 px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium transition-all flex items-center justify-center gap-2 shrink-0 whitespace-nowrap w-full sm:w-auto hidden sm:flex">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Create form
-            </button>
-            <span class="flex sm:hidden items-center gap-1.5 text-[10px] text-zinc-400 bg-zinc-100 rounded-lg px-3 py-2 w-full justify-center">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                Form editor available on desktop
-            </span>
+<?php
+$forms_header_args = array(
+    'title'            => 'Cora Forms',
+    'description'      => 'Design and share Notion-style interactive forms. Automatically collect leads into your CRM database.',
+    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>',
+    'ai_stack'         => true,
+    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'cta'              => array(
+        'text'        => 'Create form',
+        'mobile_text' => '',
+        'onclick'     => '',
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+        'visible'     => true,
+        'class'       => '!hidden sm:!flex', // Hide on mobile
+    ),
+);
+
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $forms_header_args );
+}
+?>
+        <!-- Mobile-only editor notice -->
+        <div class="flex sm:hidden items-center gap-1.5 text-[10px] text-zinc-400 bg-zinc-100/80 border border-zinc-200/50 rounded-lg px-3 py-2 w-full justify-center select-none shrink-0 mb-2">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            Form editor available on desktop
         </div>
+
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.cora-workspace-header button:not(.group)').forEach(function(btn) {
+                btn.id = 'btn-create-form';
+            });
+        });
+        </script>
 
         <!-- Sub-page Tab Bar -->
         <div class="flex items-center gap-1 border-b border-zinc-200/60 pb-px mb-4 overflow-x-auto whitespace-nowrap scrollbar-none py-1 shrink-0 min-h-[44px]">
