@@ -7560,12 +7560,16 @@ jQuery(document).ready(function($) {
         
         const $ring = $('#cora-seo-score-ring');
         $ring.attr('stroke-dasharray', `${score}, 100`);
-        $ring.removeClass('text-zinc-950 text-red-500 text-amber-500 text-emerald-500');
+        $ring.removeClass('text-zinc-950 text-red-500 text-amber-500 text-emerald-500 text-zinc-300');
         
         const statusText = $('#cora-seo-status-text');
-        statusText.removeClass('text-red-500 text-amber-500 text-emerald-500');
+        statusText.removeClass('text-red-500 text-amber-500 text-emerald-500 text-zinc-400');
 
-        if (score >= 70) {
+        if (words === 0) {
+            $ring.addClass('text-zinc-300');
+            statusText.addClass('text-zinc-400').text('Empty Document');
+            $('#cora-seo-score-display').text('0');
+        } else if (score >= 70) {
             $ring.addClass('text-emerald-500');
             statusText.addClass('text-emerald-500').text('Optimal SEO');
         } else if (score >= 30) {
@@ -7641,16 +7645,19 @@ jQuery(document).ready(function($) {
         }
 
         // Update display elements & ring colors
-        const activeGeoScore = window.coraGeoAutoOptimized ? 95 : 65;
+        const activeGeoScore = (words === 0) ? 0 : (window.coraGeoAutoOptimized ? 95 : geoScore);
         $('#cora-geo-score-display').text(activeGeoScore);
         const $geoRing = $('#cora-geo-score-ring');
         $geoRing.attr('stroke-dasharray', `${activeGeoScore}, 100`);
-        $geoRing.removeClass('text-red-500 text-amber-500 text-emerald-500');
+        $geoRing.removeClass('text-red-500 text-amber-500 text-emerald-500 text-zinc-300');
         
         const geoStatusText = $('#cora-geo-status-text');
-        geoStatusText.removeClass('text-red-500 text-amber-500 text-emerald-500');
+        geoStatusText.removeClass('text-red-500 text-amber-500 text-emerald-500 text-zinc-400');
 
-        if (activeGeoScore >= 75) {
+        if (activeGeoScore === 0) {
+            $geoRing.addClass('text-zinc-300');
+            geoStatusText.addClass('text-zinc-400').text('Empty Document');
+        } else if (activeGeoScore >= 75) {
             $geoRing.addClass('text-emerald-500');
             geoStatusText.addClass('text-emerald-500').text('Optimal AI Search');
         } else if (activeGeoScore >= 50) {

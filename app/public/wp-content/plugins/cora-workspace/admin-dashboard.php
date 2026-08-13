@@ -8887,6 +8887,7 @@ document.addEventListener('DOMContentLoaded',window.coraRenderCustomActions);
                                 Move to Trash
                             </button>
                         </div>
+                    </div>
 
                     <!-- Footer Action Buttons -->
                     <div class="flex items-center justify-between border-t border-zinc-200/80 pt-4 mt-6 select-none">
