@@ -355,6 +355,14 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
             padding: 20px;
         }
     }
+    @media (max-width: 1023px) {
+        .cora-ai-input-wrapper {
+            display: none !important;
+        }
+        .cora-ai-messages {
+            padding-bottom: 90px !important;
+        }
+    }
 </style>
 
 <!-- Tabs Navigation -->
@@ -997,7 +1005,12 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
     window.coraSendChatMessage = coraSendChatMessage;
 
     // Check for pending prompt on page load
-    jQuery(document).ready(function() {
+    jQuery(document).ready(function($) {
+        const $islandInput = $('#cora-island-ai-input');
+        if ($islandInput.length) {
+            $islandInput.attr('placeholder', 'Ask Cora AI...');
+        }
+
         const pendingPrompt = sessionStorage.getItem('cora_pending_ai_prompt');
         if (pendingPrompt) {
             sessionStorage.removeItem('cora_pending_ai_prompt');
