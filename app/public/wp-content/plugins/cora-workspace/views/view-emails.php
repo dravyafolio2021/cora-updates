@@ -6,36 +6,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="flex-1 flex flex-col min-h-0 bg-zinc-50 p-6 md:p-8" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     
-    <!-- Top Header Bar -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-zinc-200 shrink-0">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-zinc-900 flex items-center gap-2.5">
-                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-800 "><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                Email Module
-            </h1>
-            <p class="text-xs text-zinc-500 mt-1">Manage official communications, reusable email templates, automated sequences, outbox logs, and Hostinger SMTP settings.</p>
-        </div>
-        
-        <!-- Connection Badge & Quick Actions -->
-        <div class="flex items-center gap-3 shrink-0">
-            <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-xl">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs font-semibold text-emerald-700 " id="smtp-status-badge">Hostinger Business SMTP Connected</span>
-            </div>
-            
-            <button onclick="coraSwitchEmailSubTab('email-tab-compose')" 
-                    class="h-9 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-xs border-0 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 5v14M5 12h14"/></svg>
-                New Email
-            </button>
+<?php
+$emails_header_args = array(
+    'title'            => 'Email Module',
+    'description'      => 'Manage official communications, reusable email templates, automated sequences, outbox logs, and Hostinger SMTP settings.',
+    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>',
+    'ai_stack'         => true,
+    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+    'cta'              => array(
+        'text'        => 'New Email',
+        'mobile_text' => 'New Email',
+        'onclick'     => "coraSwitchEmailSubTab('email-tab-compose')",
+        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 5v14M5 12h14"/></svg>',
+        'visible'     => true,
+    ),
+);
 
-            <button onclick="openSmtpTestDrawer()" 
-                    class="h-9 px-3.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-                SMTP Test
-            </button>
-        </div>
-    </div>
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $emails_header_args );
+}
+?>
 
     <!-- Top KPI Summary Cards Row -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 shrink-0">
@@ -1277,4 +1267,49 @@ window.coraSaveSMTPSettings = function() {
         }
     });
 };
+
+document.addEventListener("DOMContentLoaded", function() {
+    const appendEmailActions = function(containerSelector, isMobile) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        // Prevent duplicate appending
+        if (container.querySelector('[data-email-action="badge"]')) return;
+
+        // Connection Badge
+        const badgeDiv = document.createElement('div');
+        badgeDiv.setAttribute('data-email-action', 'badge');
+        badgeDiv.className = 'flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl';
+        badgeDiv.innerHTML = `
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-[10px] sm:text-xs font-semibold text-emerald-700" id="smtp-status-badge">Hostinger SMTP Connected</span>
+        `;
+
+        // SMTP Test button
+        const testBtn = document.createElement('button');
+        testBtn.setAttribute('data-email-action', 'test');
+        testBtn.className = 'px-3.5 py-2 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold rounded-xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer';
+        testBtn.onclick = function() {
+            if (typeof window.openSmtpTestDrawer === 'function') {
+                window.openSmtpTestDrawer();
+            }
+        };
+        testBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+            <span class="hidden sm:inline">SMTP Test</span><span class="sm:hidden">Test</span>
+        `;
+
+        const ctaBtn = container.querySelector('button:not(.group)');
+        if (ctaBtn) {
+            container.insertBefore(badgeDiv, ctaBtn);
+            container.insertBefore(testBtn, ctaBtn);
+        } else {
+            container.appendChild(badgeDiv);
+            container.appendChild(testBtn);
+        }
+    };
+
+    appendEmailActions('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0', false);
+    appendEmailActions('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0', true);
+});
 </script>
