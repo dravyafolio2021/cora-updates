@@ -11369,9 +11369,9 @@ jQuery(document).ready(function($) {
                 const label = ragScope[key];
                 const isActive = (key === curPage);
                 ragHtml += `
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #f4f4f5;">
-                        <span style="${isActive ? 'color: #18181b; font-weight: 700;' : 'color: #71717a;'}">${label}</span>
-                        <span style="${isActive ? 'color: #22c55e; font-weight: 700; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 1px 6px; border-radius: 4px; font-size: 9px;' : 'color: #a1a1aa; background: #f4f4f5; border: 1px solid #e4e4e7; padding: 1px 6px; border-radius: 4px; font-size: 9px;'}">${isActive ? 'Active' : 'Connected'}</span>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: ${isActive ? '6px 8px' : '4px 0'}; margin: ${isActive ? '0 -8px' : '0'}; background: ${isActive ? '#f0fdf4' : 'transparent'}; border-radius: ${isActive ? '6px' : '0'}; border-bottom: ${isActive ? 'none' : '1px dashed #f4f4f5'};">
+                        <span style="${isActive ? 'color: #166534; font-weight: 700;' : 'color: #71717a;'}">${label}</span>
+                        <span style="${isActive ? 'color: #166534; font-weight: 700; background: #dcfce7; border: 1px solid #bbf7d0; padding: 1px 6px; border-radius: 4px; font-size: 9px;' : 'color: #a1a1aa; background: #f4f4f5; border: 1px solid #e4e4e7; padding: 1px 6px; border-radius: 4px; font-size: 9px;'}">${isActive ? 'Active' : 'Connected'}</span>
                     </div>
                 `;
             });

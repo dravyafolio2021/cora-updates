@@ -11398,6 +11398,9 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 wp_print_media_templates();
 wp_print_footer_scripts();
 ?>
+<script>
+window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? 'dashboard' : $sub_page ); ?>;
+</script>
 <!-- Workspace Script -->
 <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/admin-script.js?v=' . CORA_WORKSPACE_VERSION; ?>" defer></script>
 

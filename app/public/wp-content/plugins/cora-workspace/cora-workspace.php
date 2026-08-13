@@ -14198,7 +14198,7 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
     }
 
     $active_model   = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
-    $gemini_key_b64 = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) ? CORA_PLATFORM_GEMINI_API_KEY : '';
+    $gemini_key_b64 = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) && ! empty( CORA_PLATFORM_GEMINI_API_KEY ) ? CORA_PLATFORM_GEMINI_API_KEY : get_option( 'cora_workspace_ai_gemini_key', '' );
     $openai_key_b64 = get_option( 'cora_workspace_ai_openai_key', '' );
 
     // ── Route 1: Gemini ──────────────────────────────────────────
