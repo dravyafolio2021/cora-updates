@@ -2996,54 +2996,51 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 </script>
 
 <?php
-// ─── Splash Screen: RAG-powered AI Co-Founder Insight ──────────────────────
-$_cora_splash_text  = '';
-$_cora_splash_type  = '';
-$_cora_splash_leads = 0;
+// ─── Splash Screen: Visual & Decision-Oriented AI Co-Founder Briefing ──────
+$_cora_leads_raw    = get_option( 'cora_workspace_leads', array() );
+$_cora_splash_leads = is_array( $_cora_leads_raw ) ? count( $_cora_leads_raw ) : 0;
+$_cora_bookings_raw = get_option( 'cora_workspace_clients', array() );
+$_cora_splash_books = is_array( $_cora_bookings_raw ) ? count( $_cora_bookings_raw ) : 0;
+$_cora_tx_raw       = get_option( 'cora_workspace_ledger', array() );
+$_cora_splash_tx    = is_array( $_cora_tx_raw ) ? count( $_cora_tx_raw ) : 0;
 
-if ( function_exists( 'cora_db_get_agency_id' ) ) {
-    global $wpdb;
-    $_cora_spl_aid  = cora_db_get_agency_id();
-    $_cora_rag_tbl  = $wpdb->prefix . 'cora_rag_knowledge';
-    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $_cora_rag_tbl ) ) {
-        $_cora_rag_row = $wpdb->get_row( $wpdb->prepare(
-            "SELECT content, source_type FROM {$_cora_rag_tbl} WHERE agency_id = %d ORDER BY RAND() LIMIT 1",
-            $_cora_spl_aid
-        ), ARRAY_A );
-        if ( ! empty( $_cora_rag_row['content'] ) ) {
-            $_cora_splash_text = wp_strip_all_tags( $_cora_rag_row['content'] );
-            $_cora_splash_type = sanitize_text_field( $_cora_rag_row['source_type'] );
-        }
-    }
-    $_cora_leads_raw    = get_option( 'cora_workspace_leads', array() );
-    $_cora_splash_leads = is_array( $_cora_leads_raw ) ? count( $_cora_leads_raw ) : 0;
+// Dynamic Decision-Oriented Insight Engine
+if ( $_cora_splash_leads > 0 ) {
+    $_cora_spl_badge    = 'Pipeline Velocity';
+    $_cora_spl_title    = 'Prioritize Lead Conversion Window';
+    $_cora_splash_text  = 'Inquiries contacted within 24 hours convert 60% faster. Focus on high-intent deals currently active in your CRM pipeline.';
+    $_cora_spl_metric1  = $_cora_splash_leads . ' Leads';
+    $_cora_spl_label1   = 'In Funnel';
+    $_cora_spl_metric2  = 'High';
+    $_cora_spl_label2   = 'Conversion Window';
+    $_cora_spl_icon     = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>';
+} elseif ( $_cora_splash_books > 0 ) {
+    $_cora_spl_badge    = 'Studio Operations';
+    $_cora_spl_title    = 'Shoot Readiness & Crew Briefing';
+    $_cora_splash_text  = 'Scheduled showings & shoots require confirmed call-times. Ensure gear manifests and crew assignments are locked.';
+    $_cora_spl_metric1  = $_cora_splash_books . ' Sessions';
+    $_cora_spl_label1   = 'Scheduled';
+    $_cora_spl_metric2  = '100%';
+    $_cora_spl_label2   = 'Roster Ready';
+    $_cora_spl_icon     = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
+} else {
+    $_cora_spl_badge    = 'Strategic Growth';
+    $_cora_spl_title    = 'Client Acquisition & Portfolio Reach';
+    $_cora_splash_text  = 'Visual presentation is your highest-leverage closing asset. Deploy automated follow-ups to expand inbound studio inquiries.';
+    $_cora_spl_metric1  = 'Active';
+    $_cora_spl_label1   = 'System Status';
+    $_cora_spl_metric2  = 'Optimal';
+    $_cora_spl_label2   = 'AI RAG Engine';
+    $_cora_spl_icon     = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 12 12 16 12 13 16 13 16 11 12 11 12 8"></polygon></svg>';
 }
-
-$_cora_spl_fallbacks = array(
-    array( 'text' => 'Consistency is the edge. Teams that follow up within 24 hours close 60% more deals.',               'type' => 'Business Wisdom' ),
-    array( 'text' => 'Your next breakthrough client is already in your pipeline — nurture every lead with intent.',        'type' => 'Growth Insight'  ),
-    array( 'text' => 'Every signed contract builds trust. Design your process around the client, not the paperwork.',      'type' => 'Operations'      ),
-    array( 'text' => 'Automations free up hours — invest them back into the relationships that scale your studio.',        'type' => 'Productivity'    ),
-    array( 'text' => 'Great photography wins first impressions. Your visual portfolio is your strongest closing tool.',    'type' => 'Studio Insight'  ),
-    array( 'text' => 'Data beats gut feeling. Review your financials weekly — small leaks become big losses over time.',   'type' => 'Finance'         ),
-);
-$_cora_spl_fb = $_cora_spl_fallbacks[ array_rand( $_cora_spl_fallbacks ) ];
-if ( empty( $_cora_splash_text ) ) {
-    $_cora_splash_text = $_cora_spl_fb['text'];
-    $_cora_splash_type = $_cora_spl_fb['type'];
-}
-if ( mb_strlen( $_cora_splash_text ) > 162 ) {
-    $_cora_splash_text = mb_substr( $_cora_splash_text, 0, 159 ) . '…';
-}
-$_cora_spl_badge = ucwords( str_replace( '_', ' ', $_cora_splash_type ) ) ?: 'Insight';
 ?>
 <!-- Cora AI Co-Founder Insight Splash Screen -->
 <div id="cora-app-splash-screen" style="position:fixed;inset:0;background:#ffffff;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:1;transition:opacity 0.4s cubic-bezier(0.25,1,0.5,1),transform 0.4s cubic-bezier(0.25,1,0.5,1);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;user-select:none;padding:32px 24px;">
 
     <!-- Brand mark -->
-    <div style="display:flex;flex-direction:column;align-items:center;gap:13px;margin-bottom:30px;">
-        <div class="cora-splash-logo-card" style="width:58px;height:58px;background:#18181b;color:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(24,24,27,0.14);">
-            <svg width="25" height="25" viewBox="0 0 14 14" fill="none">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:11px;margin-bottom:24px;">
+        <div class="cora-splash-logo-card" style="width:52px;height:52px;background:#18181b;color:#fff;border-radius:15px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(24,24,27,0.12);">
+            <svg width="22" height="22" viewBox="0 0 14 14" fill="none">
                 <rect x="3" y="3" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-1" style="transform:scale(0);opacity:0;"/>
                 <rect x="7.5" y="3" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-2" style="transform:scale(0);opacity:0;"/>
                 <rect x="3" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-3" style="transform:scale(0);opacity:0;"/>
@@ -3053,37 +3050,58 @@ $_cora_spl_badge = ucwords( str_replace( '_', ' ', $_cora_splash_type ) ) ?: 'In
         <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:#52525b;">CORA WORKSPACE</div>
     </div>
 
-    <!-- AI Co-Founder Insight Card -->
-    <div class="cora-splash-insight-card" style="width:100%;max-width:340px;background:#fafafa;border:1px solid #e4e4e7;border-radius:18px;padding:19px 21px;opacity:0;transform:translateY(10px);">
-        <!-- Header row -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <!-- Visual, Decision-Oriented AI Co-Founder Briefing Card -->
+    <div class="cora-splash-insight-card" style="width:100%;max-width:380px;background:#ffffff;border:1px solid #e4e4e7;border-radius:18px;padding:20px 22px;box-shadow:0 6px 20px rgba(0,0,0,0.03);opacity:0;transform:translateY(10px);">
+        
+        <!-- Header row with Category Badge -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
             <div style="display:flex;align-items:center;gap:9px;">
-                <div style="width:30px;height:30px;background:#18181b;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                <div style="width:28px;height:28px;background:#18181b;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 </div>
                 <div>
-                    <div style="font-size:10.5px;font-weight:700;color:#18181b;line-height:1.2;">Cora Intelligence</div>
-                    <div style="font-size:9px;color:#a1a1aa;font-weight:500;margin-top:1px;">AI Co-Founder · Daily Brief</div>
+                    <div style="font-size:11px;font-weight:800;color:#18181b;line-height:1.2;">Cora Intelligence</div>
+                    <div style="font-size:9.5px;color:#71717a;font-weight:500;">AI Co-Founder · Executive Brief</div>
                 </div>
             </div>
-            <span style="font-size:8px;font-weight:700;color:#71717a;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:5px;padding:2px 8px;letter-spacing:0.03em;white-space:nowrap;"><?php echo esc_html( $_cora_spl_badge ); ?></span>
+            <span style="font-size:9px;font-weight:700;color:#18181b;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:6px;padding:3px 9px;letter-spacing:0.02em;white-space:nowrap;"><?php echo esc_html( $_cora_spl_badge ); ?></span>
         </div>
-        <!-- Insight text -->
-        <p style="font-size:13px;line-height:1.65;color:#27272a;font-weight:500;margin:0 0 14px 0;"><?php echo esc_html( $_cora_splash_text ); ?></p>
-        <!-- Footer -->
-        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:11px;border-top:1px solid #f0f0f0;">
-            <div style="display:flex;align-items:center;gap:5px;">
-                <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;animation:cora-pulse-dot 2s ease-in-out infinite;"></span>
-                <span style="font-size:9px;color:#a1a1aa;font-weight:600;">Workspace active</span>
+
+        <!-- Decision Directive Banner -->
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:#fafafa;border:1px solid #f4f4f5;border-radius:12px;margin-bottom:12px;">
+            <div style="width:34px;height:34px;background:#ffffff;border:1px solid #e4e4e7;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+                <?php echo $_cora_spl_icon; ?>
             </div>
-            <?php if ( $_cora_splash_leads > 0 ) : ?>
-            <span style="font-size:9px;color:#a1a1aa;font-weight:600;"><?php echo intval( $_cora_splash_leads ); ?> leads in pipeline</span>
-            <?php endif; ?>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:12.5px;font-weight:700;color:#18181b;line-height:1.35;"><?php echo esc_html( $_cora_spl_title ); ?></div>
+                <div style="font-size:11px;color:#71717a;line-height:1.45;margin-top:3px;"><?php echo esc_html( $_cora_splash_text ); ?></div>
+            </div>
+        </div>
+
+        <!-- Decision Metrics & KPI Snapshot -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+            <div style="padding:8px 12px;background:#ffffff;border:1px solid #e4e4e7;border-radius:10px;text-align:left;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;"><?php echo esc_html( $_cora_spl_label1 ); ?></div>
+                <div style="font-size:14px;font-weight:800;color:#18181b;font-family:'JetBrains Mono',monospace;margin-top:2px;"><?php echo esc_html( $_cora_spl_metric1 ); ?></div>
+            </div>
+            <div style="padding:8px 12px;background:#ffffff;border:1px solid #e4e4e7;border-radius:10px;text-align:left;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;"><?php echo esc_html( $_cora_spl_label2 ); ?></div>
+                <div style="font-size:14px;font-weight:800;color:#18181b;font-family:'JetBrains Mono',monospace;margin-top:2px;"><?php echo esc_html( $_cora_spl_metric2 ); ?></div>
+            </div>
+        </div>
+
+        <!-- Footer Bar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid #f4f4f5;">
+            <div style="display:flex;align-items:center;gap:6px;">
+                <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;animation:cora-pulse-dot 2s ease-in-out infinite;"></span>
+                <span style="font-size:9.5px;color:#71717a;font-weight:600;">Workspace Active</span>
+            </div>
+            <span style="font-size:9.5px;color:#a1a1aa;font-weight:600;font-family:'JetBrains Mono',monospace;">RAG v3.4</span>
         </div>
     </div>
 
     <!-- Progress bar -->
-    <div style="width:100%;max-width:340px;height:2px;background:#f4f4f5;border-radius:2px;overflow:hidden;position:relative;margin-top:24px;">
+    <div style="width:100%;max-width:380px;height:2px;background:#f4f4f5;border-radius:2px;overflow:hidden;position:relative;margin-top:22px;">
         <div class="cora-splash-progress-bar" style="position:absolute;top:0;left:0;height:100%;width:64px;background:#18181b;border-radius:2px;"></div>
     </div>
 </div>
