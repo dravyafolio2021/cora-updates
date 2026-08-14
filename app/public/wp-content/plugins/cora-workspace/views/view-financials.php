@@ -198,14 +198,19 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             background: #ffffff;
             border-left: 1px solid #e4e4e7;
             z-index: 9999;
-            transform: translateX(100%);
-            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(110%);
+            visibility: hidden;
+            pointer-events: none;
+            box-shadow: none;
+            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s, box-shadow 0.32s;
             display: flex;
             flex-direction: column;
-            box-shadow: -10px 0 40px rgba(9, 9, 11, 0.08);
         }
         .cora-slide-drawer.open {
             transform: translateX(0);
+            visibility: visible;
+            pointer-events: auto;
+            box-shadow: -10px 0 40px rgba(9, 9, 11, 0.08);
         }
         .cora-mono-num {
             font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -1511,18 +1516,28 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
     /* ── Tab Switcher Controller ── */
     window.coraSwitchFinTab = function(tabId) {
-        document.querySelectorAll('.cora-fin-tab-panel').forEach(el => el.classList.add('hidden'));
+        const cleanId = tabId.startsWith('tab-') ? tabId : 'tab-' + tabId;
+        const shortId = tabId.replace(/^tab-/, '');
+
+        // Hide all tab panels
+        document.querySelectorAll('.cora-fin-tab-panel').forEach(el => {
+            el.classList.add('hidden');
+        });
+
+        // Deactivate all tab pill buttons
         document.querySelectorAll('.cora-fin-pill-tab').forEach(el => {
             el.classList.remove('active', 'bg-zinc-950', 'text-white');
             el.classList.add('text-zinc-600');
         });
 
-        const targetPanel = document.getElementById(tabId);
+        // Show target panel
+        const targetPanel = document.getElementById(cleanId) || document.getElementById(shortId);
         if (targetPanel) {
             targetPanel.classList.remove('hidden');
         }
 
-        const targetBtn = document.getElementById('tab-btn-' + tabId);
+        // Activate target button
+        const targetBtn = document.getElementById('tab-btn-' + shortId) || document.getElementById('tab-btn-' + cleanId);
         if (targetBtn) {
             targetBtn.classList.add('active', 'bg-zinc-950', 'text-white');
             targetBtn.classList.remove('text-zinc-600');
