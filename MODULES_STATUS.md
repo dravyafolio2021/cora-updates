@@ -9,7 +9,7 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v3.4.43) | `cora-workspace.php`, `view-settings-suite.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v3.4.45) | `cora-workspace.php`, `view-settings-suite.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
 | **Email Management** | `feature/email-management` | 🟢 Merged to Main | `views/view-emails.php`, `cora-workspace.php` | Email Module Agent |
 | **File Manager** | `feature/document-studio-vault` | 🟢 Merged to Main | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
@@ -22,7 +22,7 @@
 | **Frontend Module** | `feature/frontend-module` | 🟢 Merged to Main | `cora-frontend/index.html`, `CORA_PLATFORM_ONBOARDING_ONE_PAGER.md` | Frontend Module Agent |
 | **Public Docs Portal** | `main` | 🟢 Merged to Main | `views/view-public-docs*.php`, `includes/docs-engine.php` | Docs Portal Agent |
 | **PWA Module** | `main` | 🟢 Merged to Main | `admin-dashboard.php`, `cora-service-worker.js`, `cora-manifest.json` | PWA Module Agent |
-| **Finance Module** | `feature/finance-ai-cofounder` | 🟢 Merged to Main (v3.4.44) | `views/view-financials.php`, `cora-workspace.php` | Finance AI Co-founder Agent |
+| **Finance Module** | `feature/finance-ai-cofounder` | 🟢 Merged to Main (v3.4.45) | `views/view-financials.php`, `cora-workspace.php` | Finance AI Co-founder Agent |
 <!-- MODULE_ROWS_END -->
 
 ---
@@ -44,13 +44,13 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Latest Commit**: `ba604be0` — `feat(finance): rebuild Cora Finance as an AI Co-founder with proactive monitoring, briefing & action drawers (v3.4.44)`
-- **Platform Version**: `3.4.44`
+- **Latest Commit**: `ba604be0` — `feat(finance): workspace-level tenant isolation, dynamic data bridge, and clean empty states (v3.4.45)`
+- **Platform Version**: `3.4.45`
 - **Health**: 100% Operational & Clean Base. All feature branches merged. PHP lint verified ✅.
 
 <!-- BRANCH_LOGS_START -->
 ### `feature/finance-ai-cofounder` (Merged Branch)
-- **Status**: 🟢 Merged to `main` (Aug 15, 2026) — Rebuild Finance as an AI Co-founder (v3.4.44): Proactive background monitoring, dynamic "Cora's Take" briefing, 4 snapshot metrics, "Needs Your Attention" action cards, Money In (Receivables & 1-click AI follow-ups), Money Out (Recurring subscriptions & cost intelligence), Client Profitability matrix, Project Feasibility deal simulator, 30/60/90-Day Cash Flow Forecast, GST/Tax reserve estimates, Chart.js cashflow & profitability visualizations, dynamic customizable categories, URL tab synchronization, and Ask Cora context-aware AI assistant.
+- **Status**: 🟢 Merged to `main` (Aug 15, 2026) — Workspace-level Tenant Isolation & Clean Empty States (v3.4.45): Replaced legacy mock data fallbacks with genuine tenant-scoped database queries (`agency_id = %d`), added clean empty states for new tenants across all tabs, dynamic JS data bridge for live Chart.js visualizations, and dynamic customizable categories.
 - **Main Touchpoint**: `views/view-financials.php`, `cora-workspace.php`, `updates/cora-workspace.zip`.
 
 ### `feature/frontend-module` (Merged Branch)

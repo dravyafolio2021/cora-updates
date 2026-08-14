@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.44
+ * Version: 3.4.45
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.44' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.45' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -35349,13 +35349,17 @@ function cora_ajax_create_invoice() {
         'created_at'     => date( 'Y-m-d H:i:s' ),
     );
 
-    $invoices = get_option( 'cora_invoices', array() );
+    $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+    $invoices = get_option( "cora_invoices_{$agency_id}", array() );
     if ( ! is_array( $invoices ) ) {
         $invoices = array();
     }
 
     array_unshift( $invoices, $new_invoice );
-    update_option( 'cora_invoices', $invoices );
+    update_option( "cora_invoices_{$agency_id}", $invoices );
+    if ( $agency_id === 1 ) {
+        update_option( 'cora_invoices', $invoices );
+    }
 
     wp_send_json_success( array(
         'message' => 'Invoice created successfully.',
@@ -37143,10 +37147,20 @@ function cora_finance_get_comprehensive_metrics() {
     global $wpdb;
     $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
 
-    // 1. Gather all ledger transactions
-    $ledger_entries = function_exists( 'cora_db_get_ledger' ) ? cora_db_get_ledger() : array();
+    // 1. Gather workspace ledger transactions (Scoped by agency_id)
+    $ledger_entries = array();
+    $ledger_table = $wpdb->prefix . 'cora_ledger';
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$ledger_table}'" ) === $ledger_table ) {
+        $ledger_entries = $wpdb->get_results(
+            $wpdb->prepare( "SELECT * FROM {$ledger_table} WHERE agency_id = %d ORDER BY transaction_date DESC, id DESC", $agency_id ),
+            ARRAY_A
+        );
+    }
     if ( empty( $ledger_entries ) ) {
-        $ledger_entries = get_option( 'cora_workspace_ledger', array() );
+        $ledger_entries = get_option( "cora_workspace_ledger_{$agency_id}", array() );
+        if ( empty( $ledger_entries ) && $agency_id === 1 ) {
+            $ledger_entries = get_option( 'cora_workspace_ledger', array() );
+        }
     }
 
     $gross_inflow  = 0.0;
@@ -37164,6 +37178,11 @@ function cora_finance_get_comprehensive_metrics() {
         $raw_type = strtolower( trim( $entry['type'] ?? 'inflow' ) );
         $is_inflow = ( $raw_type === 'income' || $raw_type === 'inflow' );
         $amt = floatval( $entry['amount'] ?? 0 );
+        // In wp_cora_ledger, amounts may be stored in paise (*100) or direct rupees
+        if ( isset( $entry['agency_id'] ) && $amt > 100000 && ! empty( $entry['created_at'] ) && $amt == intval($amt) && $amt % 100 === 0 ) {
+            // Normalizing database paise if applicable
+            $amt = $amt / 100.0;
+        }
         $date_str = $entry['date'] ?? $entry['transaction_date'] ?? date('Y-m-d');
         $ym = substr( $date_str, 0, 7 );
 
@@ -37182,74 +37201,18 @@ function cora_finance_get_comprehensive_metrics() {
     }
 
     $available_cash = max( 0.0, $gross_inflow - $gross_outflow );
-    if ( $available_cash <= 0 && $gross_inflow <= 0 ) {
-        // Fallback baseline for clean presentation
-        $available_cash = 185000.0;
-    }
 
-    // 2. Gather Invoices (Money In / Receivables)
-    $all_invoices = get_option( 'cora_invoices', array() );
-    if ( ! is_array( $all_invoices ) || empty( $all_invoices ) ) {
-        // Seed high-fidelity sample receivables if fresh workspace
-        $all_invoices = array(
-            array(
-                'id'             => 'inv_sample_01',
-                'invoice_number' => 'INV-' . date('Y') . '-0842',
-                'client_name'    => 'Acme Studios & Media',
-                'client_email'   => 'finance@acmestudios.in',
-                'package_name'   => 'Brand Commercial Campaign & Studio Retainer',
-                'total_amount'   => 80000.0,
-                'due_balance'    => 80000.0,
-                'due_date'       => date( 'Y-m-d', strtotime( '-7 days' ) ),
-                'status'         => 'unpaid',
-                'last_comm'      => date( 'Y-m-d', strtotime( '-10 days' ) ),
-                'industry'       => 'studio',
-                'created_at'     => date( 'Y-m-d H:i:s', strtotime( '-21 days' ) ),
-            ),
-            array(
-                'id'             => 'inv_sample_02',
-                'invoice_number' => 'INV-' . date('Y') . '-0849',
-                'client_name'    => 'Urban Space Developers',
-                'client_email'   => 'accounts@urbanspace.co.in',
-                'package_name'   => 'Luxury Penthouse 3D Render & Video Walkthrough',
-                'total_amount'   => 45000.0,
-                'due_balance'    => 0.0,
-                'due_date'       => date( 'Y-m-d', strtotime( '-2 days' ) ),
-                'status'         => 'paid',
-                'last_comm'      => date( 'Y-m-d', strtotime( '-1 days' ) ),
-                'industry'       => 'real_estate',
-                'created_at'     => date( 'Y-m-d H:i:s', strtotime( '-14 days' ) ),
-            ),
-            array(
-                'id'             => 'inv_sample_03',
-                'invoice_number' => 'INV-' . date('Y') . '-0855',
-                'client_name'    => 'Horizon Heights Luxury Living',
-                'client_email'   => 'sales@horizonheights.in',
-                'package_name'   => 'Quarterly Architectural Shoot & Media Licensing',
-                'total_amount'   => 125000.0,
-                'due_balance'    => 125000.0,
-                'due_date'       => date( 'Y-m-d', strtotime( '+5 days' ) ),
-                'status'         => 'unpaid',
-                'last_comm'      => date( 'Y-m-d', strtotime( '-3 days' ) ),
-                'industry'       => 'real_estate',
-                'created_at'     => date( 'Y-m-d H:i:s', strtotime( '-10 days' ) ),
-            ),
-            array(
-                'id'             => 'inv_sample_04',
-                'invoice_number' => 'INV-' . date('Y') . '-0861',
-                'client_name'    => 'Rajiv & Priya Wedding Productions',
-                'client_email'   => 'rajiv.priya.events@gmail.com',
-                'package_name'   => '3-Day Destination Wedding Coverage (Milestone 2)',
-                'total_amount'   => 65000.0,
-                'due_balance'    => 65000.0,
-                'due_date'       => date( 'Y-m-d', strtotime( '-14 days' ) ),
-                'status'         => 'unpaid',
-                'last_comm'      => date( 'Y-m-d', strtotime( '-12 days' ) ),
-                'industry'       => 'studio',
-                'created_at'     => date( 'Y-m-d H:i:s', strtotime( '-28 days' ) ),
-            ),
-        );
-        update_option( 'cora_invoices', $all_invoices );
+    // 2. Gather Invoices (Money In / Receivables - Scoped by agency_id)
+    $all_invoices = get_option( "cora_invoices_{$agency_id}", null );
+    if ( $all_invoices === null ) {
+        if ( $agency_id === 1 ) {
+            $all_invoices = get_option( 'cora_invoices', array() );
+        } else {
+            $all_invoices = array();
+        }
+    }
+    if ( ! is_array( $all_invoices ) ) {
+        $all_invoices = array();
     }
 
     $expected_in = 0.0;
@@ -37286,71 +37249,23 @@ function cora_finance_get_comprehensive_metrics() {
             'days_overdue'   => max( 0, $days_diff ),
             'is_overdue'     => $is_overdue,
             'status'         => $status,
-            'last_comm'      => $inv['last_comm'] ?? date( 'Y-m-d', strtotime( '-5 days' ) ),
+            'place_of_supply'=> $inv['place_of_supply'] ?? '',
+            'tax_type'       => $inv['tax_type'] ?? '',
+            'last_comm'      => $inv['last_comm'] ?? date( 'Y-m-d' ),
         );
     }
 
-    // 3. Gather Recurring Expenses (Money Out / Subscriptions)
-    $recurring_expenses = get_option( 'cora_recurring_expenses', array() );
-    if ( ! is_array( $recurring_expenses ) || empty( $recurring_expenses ) ) {
-        $recurring_expenses = array(
-            array(
-                'id'          => 'rec_01',
-                'name'        => 'Adobe Creative Cloud (All Apps)',
-                'vendor'      => 'Adobe Systems',
-                'amount'      => 5499.0,
-                'frequency'   => 'monthly',
-                'category'    => 'Software & Tools',
-                'next_due'    => date( 'Y-m-d', strtotime( '+12 days' ) ),
-                'auto_track'  => true,
-                'status'      => 'active',
-            ),
-            array(
-                'id'          => 'rec_02',
-                'name'        => 'Google Workspace (5 Business Seats)',
-                'vendor'      => 'Google LLC',
-                'amount'      => 1650.0,
-                'frequency'   => 'monthly',
-                'category'    => 'Software & Tools',
-                'next_due'    => date( 'Y-m-d', strtotime( '+18 days' ) ),
-                'auto_track'  => true,
-                'status'      => 'active',
-            ),
-            array(
-                'id'          => 'rec_03',
-                'name'        => 'Main Studio Lease & Power',
-                'vendor'      => 'DLF Commercial Properties',
-                'amount'      => 28500.0,
-                'frequency'   => 'monthly',
-                'category'    => 'Rent & Facilities',
-                'next_due'    => date( 'Y-m-d', strtotime( '+5 days' ) ),
-                'auto_track'  => true,
-                'status'      => 'active',
-            ),
-            array(
-                'id'          => 'rec_04',
-                'name'        => 'Figma Organization Seats',
-                'vendor'      => 'Figma Inc.',
-                'amount'      => 2400.0,
-                'frequency'   => 'monthly',
-                'category'    => 'Software & Tools',
-                'next_due'    => date( 'Y-m-d', strtotime( '+22 days' ) ),
-                'auto_track'  => true,
-                'status'      => 'active',
-            ),
-            array(
-                'id'          => 'rec_05',
-                'name'        => 'Cloud Storage & CDN (AWS / Backblaze)',
-                'vendor'      => 'Amazon Web Services',
-                'amount'      => 3200.0,
-                'frequency'   => 'monthly',
-                'category'    => 'Infrastructure',
-                'next_due'    => date( 'Y-m-d', strtotime( '+8 days' ) ),
-                'auto_track'  => true,
-                'status'      => 'active',
-            ),
-        );
-        update_option( 'cora_recurring_expenses', $recurring_expenses );
+    // 3. Gather Recurring Expenses (Money Out / Subscriptions - Scoped by agency_id)
+    $recurring_expenses = get_option( "cora_recurring_expenses_{$agency_id}", null );
+    if ( $recurring_expenses === null ) {
+        if ( $agency_id === 1 ) {
+            $recurring_expenses = get_option( 'cora_recurring_expenses', array() );
+        } else {
+            $recurring_expenses = array();
+        }
+    }
+    if ( ! is_array( $recurring_expenses ) ) {
+        $recurring_expenses = array();
     }
 
     $monthly_recurring_total = 0.0;
@@ -37365,22 +37280,13 @@ function cora_finance_get_comprehensive_metrics() {
         }
     }
 
-    // Add upcoming payouts if any
-    $all_payouts = get_option( 'cora_payouts', array() );
-    if ( is_array( $all_payouts ) ) {
-        foreach ( $all_payouts as $pay ) {
-            if ( ( $pay['status'] ?? '' ) === 'pending' ) {
-                $expected_out += floatval( $pay['net_payout'] ?? $pay['gross_amount'] ?? 0 );
-            }
-        }
-    }
-
     $projected_cash = $available_cash + $expected_in - $expected_out;
 
-    // 4. Client Profitability Analysis
+    // 4. Client Profitability Analysis (Workspace Scoped)
     $client_stats = array();
     foreach ( $all_invoices as $inv ) {
-        $c_name = trim( $inv['client_name'] ?? 'Other' );
+        $c_name = trim( $inv['client_name'] ?? '' );
+        if ( empty( $c_name ) ) continue;
         if ( ! isset( $client_stats[$c_name] ) ) {
             $client_stats[$c_name] = array(
                 'client_name' => $c_name,
@@ -37393,23 +37299,21 @@ function cora_finance_get_comprehensive_metrics() {
         $client_stats[$c_name]['invoice_cnt']++;
     }
 
-    // Associate expenses / contractor payouts to clients
     foreach ( (array) $ledger_entries as $entry ) {
         $raw_type = strtolower( trim( $entry['type'] ?? 'inflow' ) );
         $is_inflow = ( $raw_type === 'income' || $raw_type === 'inflow' );
         if ( ! $is_inflow ) {
-            $c_match = trim( $entry['client_name'] ?? '' );
+            $c_match = trim( $entry['client_name'] ?? $entry['client_link'] ?? '' );
             if ( ! empty( $c_match ) && isset( $client_stats[$c_match] ) ) {
                 $client_stats[$c_match]['costs'] += floatval( $entry['amount'] ?? 0 );
             }
         }
     }
 
-    // Provide baseline cost estimates (30-40% operational delivery cost) if not itemized
     $client_profitability = array();
     foreach ( $client_stats as $name => $cs ) {
         $rev = $cs['revenue'];
-        $cost = $cs['costs'] > 0 ? $cs['costs'] : ( $rev * 0.32 ); // baseline delivery cost
+        $cost = $cs['costs'] > 0 ? $cs['costs'] : ( $rev * 0.32 );
         $profit = max( 0.0, $rev - $cost );
         $margin = $rev > 0 ? round( ( $profit / $rev ) * 100, 1 ) : 0.0;
 
@@ -37427,51 +37331,65 @@ function cora_finance_get_comprehensive_metrics() {
         return $b['profit'] <=> $a['profit'];
     } );
 
-    // 5. Cash Flow Forecast Simulation (30, 60, 90 Days)
+    // 5. Dynamic Cash Flow Forecast Simulation (30, 60, 90 Days)
+    $key_events_30 = array();
+    foreach ( $recurring_expenses as $rec ) {
+        $key_events_30[] = array(
+            'day'   => 'Upcoming',
+            'label' => $rec['name'] ?? 'Subscription',
+            'amt'   => -floatval( $rec['amount'] ?? 0 ),
+            'type'  => 'out',
+        );
+    }
+    foreach ( $receivables as $r ) {
+        if ( $r['status'] !== 'paid' && $r['due_balance'] > 0 ) {
+            $key_events_30[] = array(
+                'day'   => $r['is_overdue'] ? 'Overdue' : 'Due Soon',
+                'label' => $r['client_name'] . ' Invoice Balance',
+                'amt'   => floatval( $r['due_balance'] ),
+                'type'  => 'in',
+            );
+        }
+    }
+
     $forecast_30 = array(
         'days'           => 30,
         'current_cash'   => $available_cash,
         'expected_in'    => $expected_in,
         'expected_out'   => $expected_out,
         'projected_cash' => $projected_cash,
-        'buffer_status'  => ( $projected_cash >= 100000.0 ) ? 'healthy' : 'tight',
-        'key_events'     => array(
-            array( 'day' => 'Day 5',  'label' => 'Main Studio Lease Due', 'amt' => -28500, 'type' => 'out' ),
-            array( 'day' => 'Day 7',  'label' => 'Acme Studios Overdue Follow-up', 'amt' => 80000, 'type' => 'in' ),
-            array( 'day' => 'Day 12', 'label' => 'Adobe Creative Suite', 'amt' => -5499, 'type' => 'out' ),
-            array( 'day' => 'Day 19', 'label' => 'Horizon Heights Milestone 1', 'amt' => 125000, 'type' => 'in' ),
-        ),
+        'buffer_status'  => ( $projected_cash >= 50000.0 || ( $available_cash > 0 && $projected_cash >= 0 ) ) ? 'healthy' : 'tight',
+        'key_events'     => $key_events_30,
     );
 
     $forecast_60 = array(
         'days'           => 60,
         'current_cash'   => $available_cash,
-        'expected_in'    => $expected_in + 140000.0,
+        'expected_in'    => $expected_in,
         'expected_out'   => $expected_out * 2,
-        'projected_cash' => $available_cash + ( $expected_in + 140000.0 ) - ( $expected_out * 2 ),
-        'buffer_status'  => 'healthy',
+        'projected_cash' => $available_cash + $expected_in - ( $expected_out * 2 ),
+        'buffer_status'  => ( ( $available_cash + $expected_in - ( $expected_out * 2 ) ) >= 0 ) ? 'healthy' : 'tight',
     );
 
     $forecast_90 = array(
         'days'           => 90,
         'current_cash'   => $available_cash,
-        'expected_in'    => $expected_in + 320000.0,
+        'expected_in'    => $expected_in,
         'expected_out'   => $expected_out * 3,
-        'projected_cash' => $available_cash + ( $expected_in + 320000.0 ) - ( $expected_out * 3 ),
-        'buffer_status'  => 'healthy',
+        'projected_cash' => $available_cash + $expected_in - ( $expected_out * 3 ),
+        'buffer_status'  => ( ( $available_cash + $expected_in - ( $expected_out * 3 ) ) >= 0 ) ? 'healthy' : 'tight',
     );
 
     // 6. Tax Reserve & GST Intelligence (India Standard)
-    $gst_rate = 0.18; // 18% GST (9% CGST + 9% SGST)
+    $gst_rate = 0.18;
     $estimated_gst_collected = round( $gross_inflow * ( $gst_rate / ( 1 + $gst_rate ) ), 2 );
-    $estimated_itc = round( $gross_outflow * 0.12, 2 ); // input tax credit
+    $estimated_itc = round( $gross_outflow * 0.12, 2 );
     $net_gst_payable = max( 0.0, $estimated_gst_collected - $estimated_itc );
     $tax_reserve_recommended = round( $gross_inflow * 0.15, 2 );
 
-    // 7. Generate "Needs Your Attention" Action Cards
+    // 7. Dynamic Attention Cards
     $attention_cards = array();
 
-    // Alert 1: Overdue Invoices
     if ( $overdue_count > 0 ) {
         $first_overdue = null;
         foreach ( $receivables as $r ) {
@@ -37480,69 +37398,68 @@ function cora_finance_get_comprehensive_metrics() {
                 break;
             }
         }
+        if ( $first_overdue ) {
+            $attention_cards[] = array(
+                'id'          => 'alert_overdue',
+                'type'        => 'critical',
+                'badge'       => 'Action Required',
+                'title'       => $first_overdue['client_name'] . ' — ₹' . number_format( $first_overdue['due_balance'] ) . ' overdue',
+                'subtitle'    => 'Due ' . $first_overdue['days_overdue'] . ' days ago · Last communication: ' . $first_overdue['last_comm'],
+                'action_text' => 'Draft Follow-up',
+                'action_type' => 'draft_followup',
+                'payload'     => array(
+                    'invoice_id'   => $first_overdue['id'],
+                    'client_name'  => $first_overdue['client_name'],
+                    'client_email' => $first_overdue['client_email'],
+                    'amount'       => $first_overdue['due_balance'],
+                    'days_overdue' => $first_overdue['days_overdue'],
+                ),
+            );
+        }
+    }
+
+    if ( count( $recurring_expenses ) > 0 && $monthly_recurring_total > 0 ) {
         $attention_cards[] = array(
-            'id'          => 'alert_overdue',
-            'type'        => 'critical',
-            'badge'       => 'Action Required',
-            'title'       => ( $first_overdue['client_name'] ?? 'Client' ) . ' — ₹' . number_format( $first_overdue['due_balance'] ?? $overdue_total ) . ' overdue',
-            'subtitle'    => 'Due ' . ( $first_overdue['days_overdue'] ?? 7 ) . ' days ago · Last communication: ' . ( $first_overdue['last_comm'] ?? '10 days ago' ),
-            'action_text' => 'Draft Follow-up',
-            'action_type' => 'draft_followup',
-            'payload'     => array(
-                'invoice_id'   => $first_overdue['id'] ?? '',
-                'client_name'  => $first_overdue['client_name'] ?? '',
-                'client_email' => $first_overdue['client_email'] ?? '',
-                'amount'       => $first_overdue['due_balance'] ?? 0,
-                'days_overdue' => $first_overdue['days_overdue'] ?? 7,
-            ),
+            'id'          => 'alert_upcoming_bills',
+            'type'        => 'warning',
+            'badge'       => 'Recurring Overhead',
+            'title'       => count( $recurring_expenses ) . ' active subscription(s) budgeted — ₹' . number_format( $monthly_recurring_total ) . '/mo',
+            'subtitle'    => 'Fixed overhead commitments tracked across this workspace.',
+            'action_text' => 'View Commitments',
+            'action_type' => 'view_recurring',
+            'payload'     => array(),
         );
     }
 
-    // Alert 2: Upcoming Commitments
-    $attention_cards[] = array(
-        'id'          => 'alert_upcoming_bills',
-        'type'        => 'warning',
-        'badge'       => 'Upcoming Due',
-        'title'       => 'Studio Lease & 2 Subscriptions due this week — ₹34,449',
-        'subtitle'    => 'DLF Studio Lease (₹28.5K) and Adobe CC (₹5.5K) due in 5 days.',
-        'action_text' => 'View Commitments',
-        'action_type' => 'view_recurring',
-        'payload'     => array(),
-    );
-
-    // Alert 3: Recurring Expense Intelligence
-    $attention_cards[] = array(
-        'id'          => 'alert_recurring_creep',
-        'type'        => 'info',
-        'badge'       => 'Cost Intelligence',
-        'title'       => 'Software expenses increased by ₹4,850/mo over last 60 days',
-        'subtitle'    => 'New active seats on Figma and AI tokens added to monthly commitments.',
-        'action_text' => 'Audit Subscriptions',
-        'action_type' => 'audit_subscriptions',
-        'payload'     => array(),
-    );
-
-    // Alert 4: Payment Received celebration
-    $attention_cards[] = array(
-        'id'          => 'alert_payment_received',
-        'type'        => 'success',
-        'badge'       => 'Payment Logged',
-        'title'       => '₹45,000 received from Urban Space Developers',
-        'subtitle'    => 'Auto-reconciled into Master Ledger. Invoice #INV-2026-0849 marked Paid.',
-        'action_text' => 'View Ledger Receipt',
-        'action_type' => 'view_ledger_entry',
-        'payload'     => array( 'invoice_number' => 'INV-2026-0849' ),
-    );
-
-    // 8. Generate Dynamic "Cora's Take" Briefing
-    $cora_take = array(
-        'headline' => ( $available_cash >= 100000.0 ) ? 'Your cash flow is healthy, but there are 3 items worth looking at today.' : 'Your cash buffer is tight; collecting overdue receivables will stabilize month-end.',
-        'bullets'  => array(
-            '₹' . number_format( $overdue_total ) . ' across ' . $overdue_count . ' invoices is overdue (Acme Studios is 7 days overdue).',
-            'Monthly fixed recurring commitments stand at ₹' . number_format( $monthly_recurring_total ) . '/mo.',
-            'Projected month-end cash position is ₹' . number_format( $projected_cash ) . ' with 100% bills covered.',
-        ),
-    );
+    // 8. Dynamic "Cora's Take" Briefing
+    if ( empty( $ledger_entries ) && empty( $all_invoices ) ) {
+        $cora_take = array(
+            'headline' => 'Welcome to Financial Intelligence. Your workspace ledger is clean and ready.',
+            'bullets'  => array(
+                'Create your first client invoice or record an expense to activate automated cash flow tracking.',
+                'Zero outstanding overdue payments across this workspace.',
+                'Runway trajectory and GST reserves will calibrate dynamically as you log transactions.',
+            ),
+        );
+    } elseif ( $overdue_count > 0 ) {
+        $cora_take = array(
+            'headline' => 'You have ' . $overdue_count . ' overdue payment(s) totaling ₹' . number_format( $overdue_total ) . ' requiring attention.',
+            'bullets'  => array(
+                '₹' . number_format( $overdue_total ) . ' in overdue receivables is currently outstanding.',
+                'Monthly fixed recurring commitments stand at ₹' . number_format( $monthly_recurring_total ) . '/mo.',
+                'Projected cash position after collections is ₹' . number_format( $projected_cash ) . '.',
+            ),
+        );
+    } else {
+        $cora_take = array(
+            'headline' => 'Your financial flow is healthy with zero overdue invoices.',
+            'bullets'  => array(
+                'Available liquid buffer: ₹' . number_format( $available_cash ) . '.',
+                'Expected 30-day collections: ₹' . number_format( $expected_in ) . '.',
+                'Monthly recurring overhead is budgeted at ₹' . number_format( $monthly_recurring_total ) . '/mo.',
+            ),
+        );
+    }
 
     return array(
         'available_cash'          => $available_cash,
@@ -38003,7 +37920,7 @@ function cora_ajax_finance_record_expense() {
     );
     $new_id = $wpdb->insert_id;
 
-    $ledger = get_option( 'cora_workspace_ledger', array() );
+    $ledger = get_option( "cora_workspace_ledger_{$agency_id}", array() );
     if ( ! is_array( $ledger ) ) $ledger = array();
     $ledger[] = array(
         'id'          => $new_id ?: uniqid('exp_'),
@@ -38015,11 +37932,14 @@ function cora_ajax_finance_record_expense() {
         'status'      => 'paid',
         'client_link' => $client_name,
     );
-    update_option( 'cora_workspace_ledger', $ledger, false );
+    update_option( "cora_workspace_ledger_{$agency_id}", $ledger, false );
+    if ( $agency_id === 1 ) {
+        update_option( 'cora_workspace_ledger', $ledger, false );
+    }
 
-    // If marked recurring, add to recurring table
+    // If marked recurring, add to recurring table for this workspace
     if ( $is_recurring ) {
-        $recurring = get_option( 'cora_recurring_expenses', array() );
+        $recurring = get_option( "cora_recurring_expenses_{$agency_id}", array() );
         if ( ! is_array( $recurring ) ) $recurring = array();
         $recurring[] = array(
             'id'         => uniqid('rec_'),
@@ -38032,7 +37952,10 @@ function cora_ajax_finance_record_expense() {
             'auto_track' => true,
             'status'     => 'active',
         );
-        update_option( 'cora_recurring_expenses', $recurring );
+        update_option( "cora_recurring_expenses_{$agency_id}", $recurring, false );
+        if ( $agency_id === 1 ) {
+            update_option( 'cora_recurring_expenses', $recurring, false );
+        }
     }
 
     wp_send_json_success( array(
@@ -38047,7 +37970,7 @@ add_action( 'wp_ajax_cora_finance_record_expense', 'cora_ajax_finance_record_exp
 
 /**
  * AJAX Endpoint: cora_ajax_finance_save_category
- * Saves a user-created custom expense category
+ * Saves a user-created custom expense category scoped to workspace
  */
 if ( ! function_exists( 'cora_ajax_finance_save_category' ) ) {
 function cora_ajax_finance_save_category() {
@@ -38060,13 +37983,17 @@ function cora_ajax_finance_save_category() {
 
     $category = sanitize_text_field( $_POST['category'] ?? '' );
     if ( ! empty( $category ) ) {
-        $cats = get_option( 'cora_custom_expense_categories', array() );
+        $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
+        $cats = get_option( "cora_custom_expense_categories_{$agency_id}", array() );
         if ( ! is_array( $cats ) ) {
             $cats = array();
         }
         if ( ! in_array( $category, $cats, true ) ) {
             $cats[] = $category;
-            update_option( 'cora_custom_expense_categories', $cats );
+            update_option( "cora_custom_expense_categories_{$agency_id}", $cats );
+            if ( $agency_id === 1 ) {
+                update_option( 'cora_custom_expense_categories', $cats );
+            }
         }
         wp_send_json_success( array( 'category' => $category, 'categories' => $cats ) );
     }
@@ -38080,7 +38007,7 @@ add_action( 'wp_ajax_cora_finance_save_category', 'cora_ajax_finance_save_catego
 
 /**
  * AJAX Endpoint: cora_ajax_finance_record_income
- * Records incoming payment & reconciles invoice
+ * Records incoming payment & reconciles invoice scoped to workspace
  */
 if ( ! function_exists( 'cora_ajax_finance_record_income' ) ) {
 function cora_ajax_finance_record_income() {
@@ -38127,7 +38054,7 @@ function cora_ajax_finance_record_income() {
     );
     $new_id = $wpdb->insert_id;
 
-    $ledger = get_option( 'cora_workspace_ledger', array() );
+    $ledger = get_option( "cora_workspace_ledger_{$agency_id}", array() );
     if ( ! is_array( $ledger ) ) $ledger = array();
     $ledger[] = array(
         'id'          => $new_id ?: uniqid('inc_'),
@@ -38139,19 +38066,27 @@ function cora_ajax_finance_record_income() {
         'status'      => 'received',
         'client_link' => $client_name,
     );
-    update_option( 'cora_workspace_ledger', $ledger, false );
+    update_option( "cora_workspace_ledger_{$agency_id}", $ledger, false );
+    if ( $agency_id === 1 ) {
+        update_option( 'cora_workspace_ledger', $ledger, false );
+    }
 
-    // If linked to an invoice, mark it paid
+    // If linked to an invoice, mark it paid in this workspace
     if ( ! empty( $invoice_id ) ) {
-        $invoices = get_option( 'cora_invoices', array() );
-        foreach ( $invoices as $k => $inv ) {
-            if ( ( $inv['id'] ?? '' ) === $invoice_id || ( $inv['invoice_number'] ?? '' ) === $invoice_id ) {
-                $invoices[$k]['status'] = 'paid';
-                $invoices[$k]['due_balance'] = 0.0;
-                break;
+        $invoices = get_option( "cora_invoices_{$agency_id}", array() );
+        if ( is_array( $invoices ) ) {
+            foreach ( $invoices as $k => $inv ) {
+                if ( ( $inv['id'] ?? '' ) === $invoice_id || ( $inv['invoice_number'] ?? '' ) === $invoice_id ) {
+                    $invoices[$k]['status'] = 'paid';
+                    $invoices[$k]['due_balance'] = 0.0;
+                    break;
+                }
+            }
+            update_option( "cora_invoices_{$agency_id}", $invoices );
+            if ( $agency_id === 1 ) {
+                update_option( 'cora_invoices', $invoices );
             }
         }
-        update_option( 'cora_invoices', $invoices );
     }
 
     if ( function_exists('cora_notify') ) {

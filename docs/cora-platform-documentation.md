@@ -369,20 +369,28 @@ Users can customize In-App, Push, and Email delivery frequency independently for
 
 ---
 
-## Section 10: Finance AI Co-founder & Financial Intelligence System (v3.4.44)
+## Section 10: Finance AI Co-founder & Financial Intelligence System (v3.4.45)
 
-Starting in **version 3.4.44**, the Financial Overview module has been completely rebuilt from a traditional static ledger into an **AI Financial Co-founder** designed specifically for solo founders, creative agencies, and service businesses.
+Starting in **version 3.4.45**, the Financial Overview module features strict **multi-tenant workspace isolation** (`agency_id = %d`), zero platform-wide dummy mock data fallbacks, dynamic client-side Chart.js bridging, and Notion-style clean empty states for new tenants.
 
 ```
 +-----------------------------------------------------------------------------------+
 |                           CORA FINANCIAL AI CO-FOUNDER                            |
-|  [ Watch Background ] -> [ Detect Risks ] -> [ Explain Why ] -> [ Prepare Action ] |
+|  [ Tenant Isolation ] -> [ Real Ledger Math ] -> [ Dynamic Charts ] -> [ 1-Click Action ] |
 +-----------------------------------------------------------------------------------+
 ```
 
 ---
 
-### 10.1 Core Philosophy & Interaction Model
+### 10.1 Multi-Tenant Data Isolation & Clean Empty States
+* **Workspace Scoping (`agency_id`)**: All ledger transactions, client invoices, recurring subscriptions, custom categories, and tax estimates are strictly bound to the active workspace's database records and tenant option keys (`cora_invoices_{agency_id}`, `cora_workspace_ledger_{agency_id}`, `cora_recurring_expenses_{agency_id}`, `cora_custom_expense_categories_{agency_id}`).
+* **Zero Artificial Defaults**: Fresh workspaces load with exact `₹0` baseline figures, zero synthetic invoices, and zero artificial subscriptions.
+* **Clean Empty States**: Unpopulated workspaces render intuitive, Notion-style zero-state cards with contextual onboarding guidance and direct 1-click action triggers (Draft GST Invoice, Log Expense, Add Subscription, Simulate Prospective Deal).
+* **Dynamic JavaScript Data Bridge**: A dedicated runtime data payload (`window.coraFinanceInitialData`) feeds live numbers directly to Chart.js line and doughnut charts, ensuring smooth rendering across all workspace states.
+
+---
+
+### 10.2 Core Philosophy & Interaction Model
 Instead of forcing founders to manage bookkeeping inside a complex accounting ledger, Cora proactively:
 1. **Watches** all bank inflows, receivables aging, GST tax reserves, and recurring commitments in the background.
 2. **Explains** the financial impact in plain English (runway, tax liabilities, top-heavy revenue concentration).
