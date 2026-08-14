@@ -10093,6 +10093,14 @@ jQuery(document).ready(function($) {
                     }
                 }
             });
+            
+            // Trigger log/event re-render if switching to audit or pulse
+            if (tabKey === 'audit' && typeof filterLogs === 'function') {
+                filterLogs();
+            }
+            if ((tabKey === 'pulse' || tabKey === 'activity' || tabKey === 'activity-timeline') && typeof window.coraFilterPulseEvents === 'function') {
+                window.coraFilterPulseEvents();
+            }
         }
         
         // Update sidebar navigation active classes
