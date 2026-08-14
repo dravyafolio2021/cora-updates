@@ -9,7 +9,7 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v3.4.28) | `cora-workspace.php`, `view-settings-suite.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v3.4.43) | `cora-workspace.php`, `view-settings-suite.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
 | **Email Management** | `feature/email-management` | 🟢 Merged to Main | `views/view-emails.php`, `cora-workspace.php` | Email Module Agent |
 | **File Manager** | `feature/document-studio-vault` | 🟢 Merged to Main | `views/view-vault.php`, `cora-workspace.php` | Dedicated Vault Agent |
@@ -19,7 +19,7 @@
 | **Content Module** | `feature/content-ai-copilot` | 🟢 Merged to Main | `views/view-content-suite.php` | Content Module Agent |
 | **Content Module v2** | `feature/content-module-v2` | 🟢 Merged to Main | `views/view-content-suite.php`, `admin-dashboard.php` | Content Editor Agent |
 | **Lead Management** | `feature/lead-management` | 🟢 Merged to Main | `views/view-leads.php`, `cora-workspace.php`, `admin-dashboard.php` | Lead Suite Agent |
-| **Frontend Module** | `feature/frontend-module` | 🟡 Active Work | `cora-frontend/*`, `cora-workspace.php` | Frontend Module Agent |
+| **Frontend Module** | `feature/frontend-module` | 🟢 Merged to Main | `cora-frontend/index.html`, `CORA_PLATFORM_ONBOARDING_ONE_PAGER.md` | Frontend Module Agent |
 | **Public Docs Portal** | `main` | 🟢 Merged to Main | `views/view-public-docs*.php`, `includes/docs-engine.php` | Docs Portal Agent |
 | **PWA Module** | `main` | 🟢 Merged to Main | `admin-dashboard.php`, `cora-service-worker.js`, `cora-manifest.json` | PWA Module Agent |
 | **Content Editor v3** | `main` | 🟢 Merged to Main | `views/view-content-suite.php` | Content Editor Agent |
@@ -44,14 +44,14 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Latest Commit**: `0010f4d5` — `docs: update task list tracker and local testing ajax logs`
-- **Platform Version**: `3.4.0`
-- **Health**: 100% Operational & Clean Base.
+- **Latest Commit**: `c4dc176b` — `feat(whatsapp): integrate Meta WhatsApp Cloud API gateway, 24h cost optimizer & settings tester (v3.4.43)`
+- **Platform Version**: `3.4.43`
+- **Health**: 100% Operational & Clean Base. All feature branches merged. PHP lint verified ✅.
 
 <!-- BRANCH_LOGS_START -->
-### `feature/frontend-module` (Active Branch)
-- **Status**: 🟡 Active — Frontend Module: Lovable Sync Integration and Marketing Frontend.
-- **Main Touchpoint**: `cora-frontend/index.html`, `cora-workspace.php`.
+### `feature/frontend-module` (Merged Branch)
+- **Status**: 🟢 Merged to `main` (Aug 14, 2026) — Marketing Frontend Landing Page: High-converting single-section hero with monochromatic design, floating feature pills, cursor parallax dashboard preview, scroll-reveal animations, right-sliding Contact Drawer, custom Toast engine, and responsive mobile layout. Platform onboarding one-pager (`CORA_PLATFORM_ONBOARDING_ONE_PAGER.md`) added for AI agent review.
+- **Main Touchpoint**: `cora-frontend/index.html`, `CORA_PLATFORM_ONBOARDING_ONE_PAGER.md`.
 
 ### `feature/studio-module` (Active Branch)
 - **Status**: 🟡 Active — Studio Features, Studio Booking & Management, Equipment & Crew Integration, and Studio Suite workflows.
@@ -115,13 +115,23 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| v3.4.43 | Aug 14, 2026 | Meta WhatsApp Cloud API gateway, 24h cost optimizer, settings tester; marketing landing page shipped |
+| v3.4.42 | Aug 14, 2026 | Media mobile storage strip horizontal margin & padding fix |
+| v3.4.41 | Aug 14, 2026 | Media storage indicator mobile optimization; in-dev sidebar items hidden |
+| v3.4.40 | Aug 14, 2026 | Avatar online status indicator dot anchored bottom-right with SaaS-standard contrast border |
+| v3.4.39 | Aug 14, 2026 | Version bump and manifest update |
+| v3.4.38 | Aug 14, 2026 | Full workspace storage footprint computation including all media assets, documents, and generated variants |
+| v3.4.37 | Aug 14, 2026 | Media layout void spacing fix; storage scope scoped to genuine workspace media |
+| v3.4.36 | Aug 14, 2026 | Real-time workspace storage usage analytics in media library header |
+| v3.4.35 | Aug 14, 2026 | Disabled state and click guards enforced on all system-locked inputs and permissions matrix rows |
+| v3.4.34 | Aug 14, 2026 | Strict single workspace owner policy with transfer ownership workflow; Platform Super Admin badge for Shruti |
 | v3.4.28 | Aug 14, 2026 | Mobile documentation responsive layout overhaul, left navigation sliding drawer transition, command palette styling fixes |
-| v3.4.0 | Aug 12, 2026 | Sticky docked toolbar, collapsible AI assistant, slash hint, landscape auto-rotate lock, left sidebar segment tabs in media editor |
-| v3.3.9 | Aug 11, 2026 | Document outline & metrics functional, atomic deploy backup fix |
-| v3.3.7 | Aug 10, 2026 | Mobile quick action bar, horizontal scroll prevention |
-| v3.3.3 | Aug 10, 2026 | PWA onboarding wizard, premium loading splash, portrait lock with landscape shield |
-| v3.3.1 | Aug 9, 2026 | Calendar day number persistence fix |
-| v3.3.0 | Aug 9, 2026 | Platform version bump, landscape shield overlay |
+| v3.4.0  | Aug 12, 2026 | Sticky docked toolbar, collapsible AI assistant, slash hint, landscape auto-rotate lock, left sidebar segment tabs in media editor |
+| v3.3.9  | Aug 11, 2026 | Document outline & metrics functional, atomic deploy backup fix |
+| v3.3.7  | Aug 10, 2026 | Mobile quick action bar, horizontal scroll prevention |
+| v3.3.3  | Aug 10, 2026 | PWA onboarding wizard, premium loading splash, portrait lock with landscape shield |
+| v3.3.1  | Aug 9, 2026  | Calendar day number persistence fix |
+| v3.3.0  | Aug 9, 2026  | Platform version bump, landscape shield overlay |
 | v3.2.101 | Aug 8, 2026 | AI Playground embedded inline in docs portal |
 | v3.2.88 | Aug 7, 2026 | Content Suite complete 7-tab structural overhaul |
 | v3.2.83 | Aug 6, 2026 | Dark mode completely removed platform-wide |
