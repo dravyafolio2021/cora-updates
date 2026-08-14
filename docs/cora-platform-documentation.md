@@ -369,33 +369,99 @@ Users can customize In-App, Push, and Email delivery frequency independently for
 
 ---
 
-### 9.5 Developer API Reference
+## Section 10: Finance AI Co-founder & Financial Intelligence System (v3.4.44)
 
-#### Central Dispatcher: `cora_notify()`
-```php
-cora_notify(
-    string $event_key,       // e.g., 'lead_created', 'booking_created', 'doc_signed'
-    int|array|string $target, // User ID, array of user IDs, or 'agency_owners'
-    array $payload = array(
-        'title'      => 'New Lead Captured',
-        'body'       => 'Inquiry from Dravya Bansal entered your pipeline.',
-        'action_url' => home_url( '/workspace/dashboard?sub_page=leads' ),
-        'category'   => 'CRM & Leads',
-        'urgent'     => false,
-    )
-);
+Starting in **version 3.4.44**, the Financial Overview module has been completely rebuilt from a traditional static ledger into an **AI Financial Co-founder** designed specifically for solo founders, creative agencies, and service businesses.
+
 ```
-
-#### Preferences Helpers:
-```php
-// Retrieve parsed preferences with fallbacks
-$prefs = cora_get_user_notification_prefs( $user_id );
-
-// Persist sanitized preferences
-cora_save_user_notification_prefs( $user_id, $_POST );
++-----------------------------------------------------------------------------------+
+|                           CORA FINANCIAL AI CO-FOUNDER                            |
+|  [ Watch Background ] -> [ Detect Risks ] -> [ Explain Why ] -> [ Prepare Action ] |
++-----------------------------------------------------------------------------------+
 ```
 
 ---
 
-*Cora Platform v3.4.38 — Last updated: August 14, 2026.*
+### 10.1 Core Philosophy & Interaction Model
+Instead of forcing founders to manage bookkeeping inside a complex accounting ledger, Cora proactively:
+1. **Watches** all bank inflows, receivables aging, GST tax reserves, and recurring commitments in the background.
+2. **Explains** the financial impact in plain English (runway, tax liabilities, top-heavy revenue concentration).
+3. **Prepares and Executes** proactive next actions (1-click client payment reminders, 3-step GST invoices linked to E-Sign contracts, deal margin stress testing).
+
+---
+
+### 10.2 Sub-Tab Navigation & Dynamic URL Synchronization
+The Financial module is partitioned into 6 focused sub-tabs. All tabs dynamically synchronize their active state with browser history (`?tab=fin-*` and `#fin-*`), ensuring that page refreshes and direct links preserve the exact view and re-render interactive Chart.js canvases:
+
+| Tab ID | Tab Title | Core Utility |
+| :--- | :--- | :--- |
+| `fin-home` | **Overview** | Executive morning briefing, 4 snapshot metrics, attention cards, 6-month historical & 90-day predictive trajectory chart. |
+| `fin-receivables` | **Receivables** | Aging buckets (Overdue, Due Soon, Paid), state-level GST classifications, 1-click AI payment reminders. |
+| `fin-expenses` | **Money Out** | Outflow ledger, recurring software & lease subscriptions, annual run-rate forecasts. |
+| `fin-profitability` | **Profitability** | Client margin matrix (70%+ high-tier), revenue concentration doughnut chart, Deal Simulator trigger. |
+| `fin-forecast` | **Forecast** | 30/60/90-Day predictive cash trajectories, seasonal warnings, and runway indicators. |
+| `fin-tax` | **Tax & GST** | Output CGST/SGST/IGST breakdown, Input Tax Credit (ITC) offsets, net GST payable, quarterly advance tax reserve calculator. |
+
+---
+
+### 10.3 4 Snapshot Financial Pillars & Morning Briefing
+* **Available Cash**: Net liquid working capital computed atomically from master ledger inflows minus outflows.
+* **Expected In (30 Days)**: Sum of all pending and overdue client receivables due within the next 30 days.
+* **Expected Out (30 Days)**: Projected recurring software commitments, studio leases, contractor payouts, and verified tax reserves.
+* **Projected 30-Day Buffer & Runway**: Net liquidity after expected collections and committed payouts, accompanied by total months of operational runway.
+* **Dynamic "Cora's Take" Briefing**: An actionable natural-language summary comparing current cash buffer against monthly burn rate, highlighting overdue receivables, and warning against single-client revenue concentration (>40%).
+
+---
+
+### 10.4 Action-Oriented Attention Cards & 1-Click Reminders
+When invoices become overdue or subscriptions approach renewal, Cora surfaces proactive action cards at the top of the dashboard:
+* **Overdue Receivable Follow-Up**: Clicking **"Remind Client"** opens a right-sliding drawer (`#cora-fin-followup-drawer`) with 3 pre-drafted tone templates (*Polite Check-in*, *Firm Professional*, *Urgent Final Notice*).
+* **Multi-Channel Dispatch**: Founders can send the reminder directly via **Email** or copy a **WhatsApp Direct** link with invoice reference and payment terms pre-formatted.
+
+---
+
+### 10.5 Indian GST Multi-Step Dynamic Invoice Creator
+The invoice creator operates as a 3-step right-sliding drawer (`#cora-fin-invoice-drawer`):
+* **Step 1 (Client & Place of Supply)**: 1-click CRM lead auto-fill (`wp_cora_leads`), client billing address, GSTIN, and dynamic Place of Supply state picker that auto-detects Intra-State (CGST 9% + SGST 9%) vs Inter-State (IGST 18%).
+* **Step 2 (Line Items & SAC Codes)**: Dynamic item rows with industry-standard Service Accounting Codes (`998386` Commercial Photography, `998314` Video Post-Production), unit rates, quantities, and live GST math breakdown.
+* **Step 3 (Terms & Vault E-Sign Linking)**: Milestone payment schedule configuration and 1-click integration with the **Document Vault** to automatically bind legal agreements and E-Sign contracts to invoice balances.
+
+---
+
+### 10.6 Dynamic User-Customizable Categories System
+Categories are fully customizable rather than rigid:
+* **Inline Add Option**: Selecting `+ Add Custom Category...` or clicking `+ Custom` in Expense and Subscription drawers displays an inline creation field.
+* **Workspace Persistence**: New categories are dynamically injected into DOM selectors across drawers and permanently saved to `cora_custom_expense_categories` via `cora_ajax_finance_save_category`.
+
+---
+
+### 10.7 Deal Feasibility Simulator ("Should I Take This Project?")
+The Deal Simulator drawer (`#cora-fin-sim-drawer`) allows solo founders to stress-test prospective client quotes before committing:
+* Calculates quoted revenue minus direct subcontractor fees, equipment rentals, travel/food logistics, and mandatory 18% GST tax reserves.
+* Evaluates calculated net margin against agency target thresholds (e.g. 45%+) and delivers an instant AI Feasibility Verdict (**High Margin Go** 🟢, **Moderate Margin Review** 🟡, or **Low Margin Warning** 🔴).
+
+---
+
+### 10.8 Ask Cora Financial Intelligence Copilot
+* **Desktop & Tablet**: A persistent floating pill positioned cleanly above the workspace footer, which smoothly expands into a Claude Cream styled (`#FBFaf7`) financial advisory window.
+* **Pre-Baked Prompts**: Instant 1-click queries (*"How much can I safely withdraw as owner pay?"*, *"Who owes me money and is past due?"*, *"Can I afford a ₹1.5L camera gear upgrade?"*, *"What is my estimated GST liability this quarter?"*).
+* **Responsive Mobile Isolation**: The floating copilot bar is cleanly hidden on mobile viewports (`< 1024px`) to yield to the global mobile AI search bar without visual stacking.
+
+---
+
+### 10.9 Financial Developer API Reference
+
+| AJAX Action | HTTP Parameters | Response / Behavior |
+| :--- | :--- | :--- |
+| `cora_ajax_finance_ask_cora` | `security`, `query` | Context-aware AI financial advisory response with optional direct action chips. |
+| `cora_ajax_finance_record_expense` | `security`, `description`, `amount`, `category`, `vendor`, `date`, `is_recurring` | Writes outflow to `wp_cora_ledger` and registers subscription if marked recurring. |
+| `cora_ajax_finance_record_income` | `security`, `client_name`, `amount`, `date`, `invoice_id` | Writes inflow to `wp_cora_ledger` and marks linked invoice balance as paid. |
+| `cora_ajax_finance_save_category` | `security`, `category` | Saves custom category to `cora_custom_expense_categories` workspace options. |
+| `cora_ajax_finance_send_reminder` | `security`, `invoice_id`, `recipient_email`, `tone`, `message` | Dispatches monochromatic payment reminder email via `wp_mail()`. |
+| `cora_ajax_finance_export_pack` | `security`, `period`, `include_invoices`, `include_expenses` | Generates a consolidated ZIP package with GST CSV ledgers for external CA audit. |
+
+---
+
+*Cora Platform v3.4.44 — Last updated: August 15, 2026.*
+
 
