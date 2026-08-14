@@ -1278,24 +1278,33 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-zinc-100 pt-4">
                     <div class="relative">
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <label class="!mb-0 text-zinc-400 ">WhatsApp Cloud API Token</label>
-                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-400 border border-zinc-200 ">
-                                <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                Coming Soon
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="!mb-0 text-zinc-700 font-bold text-xs flex items-center gap-1.5">
+                                WhatsApp Cloud API Token (Bearer)
+                                <span class="text-zinc-400 font-normal" title="Permanent System User Token from Meta Business Manager">(Permanent Token)</span>
+                            </label>
+                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/50">
+                                <span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Graph v20.0
                             </span>
                         </div>
-                        <input type="text" disabled placeholder="EAAW..." class="bg-zinc-50 text-zinc-300 cursor-not-allowed border-zinc-200 placeholder:text-zinc-300 ">
+                        <?php $wa_token = get_option('cora_whatsapp_api_token', ''); ?>
+                        <div class="relative flex items-center">
+                            <input type="password" id="cora-whatsapp-token-input" name="cora_whatsapp_api_token" value="<?php echo esc_attr( $wa_token ); ?>" placeholder="EAAB..." class="w-full bg-white text-zinc-900 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-mono pr-10 focus:border-zinc-450 focus:outline-none">
+                            <button type="button" onclick="var inp = document.getElementById('cora-whatsapp-token-input'); inp.type = inp.type === 'password' ? 'text' : 'password';" class="absolute right-2 text-zinc-400 hover:text-zinc-700 p-1 border-none bg-transparent cursor-pointer select-none">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-zinc-400 mt-1">From Meta Business Manager &rarr; System Users &rarr; WhatsApp Business Assets.</p>
                     </div>
                     <div class="relative">
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <label class="!mb-0 text-zinc-400 ">WhatsApp Business Phone ID</label>
-                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-400 border border-zinc-200 ">
-                                <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                Coming Soon
-                            </span>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="!mb-0 text-zinc-700 font-bold text-xs">WhatsApp Business Phone ID</label>
+                            <span class="text-[10px] text-zinc-400 font-mono">Recipient: E.164</span>
                         </div>
-                        <input type="text" disabled placeholder="e.g. 1093847291039" class="bg-zinc-50 text-zinc-300 cursor-not-allowed border-zinc-200 placeholder:text-zinc-300 ">
+                        <?php $wa_phone_id = get_option('cora_whatsapp_phone_number_id', ''); ?>
+                        <input type="text" name="cora_whatsapp_phone_number_id" value="<?php echo esc_attr( $wa_phone_id ); ?>" placeholder="e.g. 1093847291039" class="w-full bg-white text-zinc-900 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-mono focus:border-zinc-450 focus:outline-none">
+                        <p class="text-[10px] text-zinc-400 mt-1">From Meta WhatsApp Manager &rarr; Phone Numbers &rarr; Phone Number ID.</p>
                     </div>
                 </div> <!-- close Grid 2 -->
 
@@ -1309,15 +1318,19 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         $current_user_id = get_current_user_id();
         $notif_prefs = function_exists('cora_get_user_notification_prefs') ? cora_get_user_notification_prefs( $current_user_id ) : array();
         
-        $global_inapp = ! empty( $notif_prefs['global_inapp'] ?? 1 );
-        $global_push  = ! empty( $notif_prefs['global_push'] ?? 1 );
-        $global_email = ! empty( $notif_prefs['global_email'] ?? 1 );
+        $global_inapp     = ! empty( $notif_prefs['global_inapp'] ?? 1 );
+        $global_push      = ! empty( $notif_prefs['global_push'] ?? 1 );
+        $global_whatsapp  = ! empty( $notif_prefs['global_whatsapp'] ?? 1 );
+        $global_email     = ! empty( $notif_prefs['global_email'] ?? 1 );
         $global_email_schedule = sanitize_text_field( $notif_prefs['global_email_schedule'] ?? 'instant' );
-        $dnd_enabled  = ! empty( $notif_prefs['dnd_enabled'] ?? 0 );
-        $dnd_start    = sanitize_text_field( $notif_prefs['dnd_start'] ?? '22:00' );
-        $dnd_end      = sanitize_text_field( $notif_prefs['dnd_end'] ?? '08:00' );
-        $custom_email = sanitize_email( $notif_prefs['custom_email'] ?? '' );
-        $triggers_cfg = $notif_prefs['triggers'] ?? array();
+        $dnd_enabled      = ! empty( $notif_prefs['dnd_enabled'] ?? 0 );
+        $dnd_start        = sanitize_text_field( $notif_prefs['dnd_start'] ?? '22:00' );
+        $dnd_end          = sanitize_text_field( $notif_prefs['dnd_end'] ?? '08:00' );
+        $custom_email     = sanitize_email( $notif_prefs['custom_email'] ?? '' );
+        $custom_whatsapp  = sanitize_text_field( $notif_prefs['custom_whatsapp'] ?? get_user_meta( $current_user_id, 'cora_user_phone', true ) );
+        $triggers_cfg     = $notif_prefs['triggers'] ?? array();
+
+        $wa_configured = ! empty( get_option('cora_whatsapp_api_token') ) && ! empty( get_option('cora_whatsapp_phone_number_id') );
         ?>
         <div id="cora-settings-panel-notifications" class="cora-settings-panel space-y-6 max-w-4xl <?php echo $active_tab === 'notifications' ? '' : 'hidden'; ?>">
 
@@ -1329,20 +1342,20 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-800"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                             Notification Channels &amp; Delivery Settings
                         </h3>
-                        <p class="text-xs text-zinc-500 m-0">Control global delivery channels, quiet hours (DND), and email digest scheduling.</p>
+                        <p class="text-xs text-zinc-500 m-0">Control global delivery channels (In-App, Push, WhatsApp, Email), quiet hours (DND), and schedules.</p>
                     </div>
                     <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
                     </span>
                 </div>
                 <div class="cora-shopify-card-body pt-4 space-y-5">
-                    <!-- Master Channel Toggles -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                    <!-- Master Channel Toggles: 4 Core Channels -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                         <!-- In-App Bell -->
                         <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50/60 flex flex-col justify-between space-y-4">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
-                                    <span class="text-xs font-bold text-zinc-900 block">In-App Notification Bell</span>
+                                    <span class="text-xs font-bold text-zinc-900 block">In-App Notification</span>
                                     <span class="text-[11px] text-zinc-500 block leading-tight mt-1">Top-bar bell counter &amp; activity drawer alerts.</span>
                                 </div>
                                 <span class="w-2.5 h-2.5 rounded-full <?php echo $global_inapp ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-0.5"></span>
@@ -1373,10 +1386,33 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                     <input type="checkbox" name="cora_notif_global_push" value="1" <?php checked( $global_push ); ?>>
                                     <span class="cora-slider"></span>
                                 </label>
-                                <button type="button" onclick="coraRequestPushSubscription()" class="text-[10px] font-bold text-zinc-800 bg-white border border-zinc-200 hover:bg-zinc-100 px-2.5 py-1 rounded-lg transition-all shadow-3xs cursor-pointer active:scale-95 flex items-center gap-1">
+                                <button type="button" onclick="coraRequestPushSubscription()" class="text-[10px] font-bold text-zinc-800 bg-white border border-zinc-200 hover:bg-zinc-100 px-2 py-1 rounded-lg transition-all shadow-3xs cursor-pointer active:scale-95 flex items-center gap-1">
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path></svg>
-                                    Sync Device
+                                    Sync
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- WhatsApp Cloud Alerts -->
+                        <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50/60 flex flex-col justify-between space-y-4">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="text-xs font-bold text-zinc-900 block">WhatsApp Alerts</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold <?php echo $wa_configured ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'; ?>">
+                                            <?php echo $wa_configured ? 'Meta Connected' : 'Setup API'; ?>
+                                        </span>
+                                    </div>
+                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-1">Official Meta Cloud API utility alerts &amp; briefs.</span>
+                                </div>
+                                <span class="w-2.5 h-2.5 rounded-full <?php echo ( $global_whatsapp && $wa_configured ) ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-0.5"></span>
+                            </div>
+                            <div class="flex items-center justify-between pt-1">
+                                <span class="text-xs font-medium text-zinc-600">Active</span>
+                                <label class="cora-switch">
+                                    <input type="checkbox" name="cora_notif_global_whatsapp" value="1" <?php checked( $global_whatsapp ); ?>>
+                                    <span class="cora-slider"></span>
+                                </label>
                             </div>
                         </div>
 
@@ -1384,7 +1420,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50/60 flex flex-col justify-between space-y-4">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
-                                    <span class="text-xs font-bold text-zinc-900 block">Email Notifications</span>
+                                    <span class="text-xs font-bold text-zinc-900 block">Email Alerts</span>
                                     <span class="text-[11px] text-zinc-500 block leading-tight mt-1">Branded monochromatic HTML transaction alerts.</span>
                                 </div>
                                 <span class="w-2.5 h-2.5 rounded-full <?php echo $global_email ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-0.5"></span>
@@ -1399,27 +1435,37 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </div>
                     </div>
 
-                    <!-- Email Periodicity & Recipient Settings -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-zinc-100">
+                    <!-- Destination & Schedule Settings -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-zinc-100">
                         <div>
-                            <label class="flex items-center gap-1.5 text-xs font-bold text-zinc-800 mb-1.5" title="Default delivery schedule for transactional and summary emails.">
-                                Default Email Delivery Mode
+                            <label class="flex items-center gap-1.5 text-xs font-bold text-zinc-800 mb-1.5" title="Your WhatsApp phone number for receiving automated alerts.">
+                                Recipient WhatsApp Number
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                             </label>
-                            <select name="cora_notif_global_email_schedule" class="w-full text-xs py-2 px-3 rounded-xl border border-zinc-200 bg-white font-medium text-zinc-800">
-                                <option value="instant" <?php selected( $global_email_schedule, 'instant' ); ?>>Instant (Send immediately as events occur)</option>
-                                <option value="daily" <?php selected( $global_email_schedule, 'daily' ); ?>>Daily Morning Digest (09:00 AM)</option>
-                                <option value="weekly" <?php selected( $global_email_schedule, 'weekly' ); ?>>Weekly Digest (Monday 09:00 AM)</option>
-                            </select>
-                            <span class="text-[11px] text-zinc-400 mt-1 block">Digest modes consolidate non-critical events into a clean summary email.</span>
+                            <input type="text" name="cora_notif_custom_whatsapp" value="<?php echo esc_attr( $custom_whatsapp ); ?>" placeholder="+91 98765 43210" class="w-full text-xs py-2 px-3 rounded-xl border border-zinc-200 bg-white text-zinc-800 font-mono">
+                            <span class="text-[11px] text-zinc-400 mt-1 block">Format: +91 9876543210 or 10-digit number.</span>
                         </div>
+
                         <div>
                             <label class="flex items-center gap-1.5 text-xs font-bold text-zinc-800 mb-1.5" title="Optional custom recipient email. Leave blank to use your user profile email.">
-                                Custom Recipient Email (Optional)
+                                Recipient Email Address
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                             </label>
                             <input type="email" name="cora_notif_custom_email" value="<?php echo esc_attr( $custom_email ); ?>" placeholder="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>" class="w-full text-xs py-2 px-3 rounded-xl border border-zinc-200 bg-white text-zinc-800">
                             <span class="text-[11px] text-zinc-400 mt-1 block">Defaults to: <?php echo esc_html( wp_get_current_user()->user_email ); ?></span>
+                        </div>
+
+                        <div>
+                            <label class="flex items-center gap-1.5 text-xs font-bold text-zinc-800 mb-1.5" title="Default delivery schedule for transactional and summary emails.">
+                                Email Digest Schedule
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            </label>
+                            <select name="cora_notif_global_email_schedule" class="w-full text-xs py-2 px-3 rounded-xl border border-zinc-200 bg-white font-medium text-zinc-800">
+                                <option value="instant" <?php selected( $global_email_schedule, 'instant' ); ?>>Instant (Send immediately)</option>
+                                <option value="daily" <?php selected( $global_email_schedule, 'daily' ); ?>>Daily Morning Digest (09:00 AM)</option>
+                                <option value="weekly" <?php selected( $global_email_schedule, 'weekly' ); ?>>Weekly Digest (Mon 09:00 AM)</option>
+                            </select>
+                            <span class="text-[11px] text-zinc-400 mt-1 block">Consolidates alerts into a summary digest.</span>
                         </div>
                     </div>
 
@@ -1432,7 +1478,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 </div>
                                 <div>
                                     <span class="text-xs font-bold text-zinc-900 block">Quiet Hours (Do Not Disturb)</span>
-                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5">Defer push and email notifications during off-hours (urgent security alerts bypass DND).</span>
+                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5">Defer push, WhatsApp, and email notifications during off-hours (critical alerts bypass DND).</span>
                                 </div>
                             </div>
                             <label class="cora-switch">
@@ -1526,7 +1572,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-800"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                             Event Triggers &amp; Channel Routing Matrix
                         </h3>
-                        <p class="text-xs text-zinc-500 m-0">Fine-tune in-app badges, browser push notifications, and email delivery frequency per event.</p>
+                        <p class="text-xs text-zinc-500 m-0">Fine-tune in-app badges, browser push, WhatsApp alerts, and email delivery frequency per event.</p>
                     </div>
                     <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
@@ -1534,11 +1580,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
 
                 <div class="cora-shopify-card-body pt-4 space-y-6">
-                    <!-- Matrix Table Header -->
+                    <!-- Matrix Table Header: 4 Channels -->
                     <div class="cora-notif-matrix-header">
                         <div class="cora-col-info">Trigger Event</div>
                         <div class="cora-col-toggle">In-App</div>
                         <div class="cora-col-toggle">Web Push</div>
+                        <div class="cora-col-toggle">WhatsApp</div>
                         <div class="cora-col-select">Email Delivery</div>
                     </div>
 
@@ -1551,9 +1598,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                             <div class="space-y-2">
                                 <?php foreach ( $mod_info['items'] as $item_key => $item_info ) : 
-                                    $item_inapp = isset( $triggers_cfg[ $item_key ]['inapp'] ) ? ! empty( $triggers_cfg[ $item_key ]['inapp'] ) : true;
-                                    $item_push  = isset( $triggers_cfg[ $item_key ]['push'] )  ? ! empty( $triggers_cfg[ $item_key ]['push'] )  : true;
-                                    $item_email = isset( $triggers_cfg[ $item_key ]['email'] ) ? sanitize_text_field( $triggers_cfg[ $item_key ]['email'] ) : $item_info['default_email'];
+                                    $item_inapp    = isset( $triggers_cfg[ $item_key ]['inapp'] ) ? ! empty( $triggers_cfg[ $item_key ]['inapp'] ) : true;
+                                    $item_push     = isset( $triggers_cfg[ $item_key ]['push'] )  ? ! empty( $triggers_cfg[ $item_key ]['push'] )  : true;
+                                    $item_whatsapp = isset( $triggers_cfg[ $item_key ]['whatsapp'] ) ? ! empty( $triggers_cfg[ $item_key ]['whatsapp'] ) : ( $item_info['default_email'] === 'instant' ? 1 : 0 );
+                                    $item_email    = isset( $triggers_cfg[ $item_key ]['email'] ) ? sanitize_text_field( $triggers_cfg[ $item_key ]['email'] ) : $item_info['default_email'];
                                 ?>
                                     <div class="cora-notif-matrix-row">
                                         <!-- Event Details -->
@@ -1574,6 +1622,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                         <div class="cora-col-toggle">
                                             <label class="cora-switch" title="Toggle Web Push Notification">
                                                 <input type="checkbox" name="notif_push_<?php echo esc_attr( $item_key ); ?>" value="1" <?php checked( $item_push ); ?>>
+                                                <span class="cora-slider"></span>
+                                            </label>
+                                        </div>
+
+                                        <!-- WhatsApp Switch -->
+                                        <div class="cora-col-toggle">
+                                            <label class="cora-switch" title="Toggle WhatsApp Notification">
+                                                <input type="checkbox" name="notif_whatsapp_<?php echo esc_attr( $item_key ); ?>" value="1" <?php checked( $item_whatsapp ); ?>>
                                                 <span class="cora-slider"></span>
                                             </label>
                                         </div>
@@ -1610,29 +1666,35 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </span>
                 </div>
                 <div class="cora-shopify-card-body pt-4 space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                         <!-- Test In-App -->
-                        <button type="button" onclick="coraSendTestChannelNotification('inapp')" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded-xl text-xs border border-zinc-200 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                        <button type="button" onclick="coraSendTestChannelNotification('inapp')" class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded-xl text-xs border border-zinc-200 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                            Test In-App Bell
+                            Test Bell
                         </button>
 
                         <!-- Test Push -->
-                        <button type="button" onclick="coraSendTestChannelNotification('push')" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded-xl text-xs border border-zinc-200 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                        <button type="button" onclick="coraSendTestChannelNotification('push')" class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded-xl text-xs border border-zinc-200 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
-                            Test Web Push
+                            Test Push
+                        </button>
+
+                        <!-- Test WhatsApp -->
+                        <button type="button" onclick="coraSendTestChannelNotification('whatsapp')" class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded-xl text-xs border border-zinc-200 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                            Test WhatsApp
                         </button>
 
                         <!-- Test Email -->
-                        <button type="button" onclick="coraSendTestChannelNotification('email')" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded-xl text-xs border border-zinc-200 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                        <button type="button" onclick="coraSendTestChannelNotification('email')" class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded-xl text-xs border border-zinc-200 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                            Test HTML Email
+                            Test Email
                         </button>
 
                         <!-- Run Digest -->
-                        <button type="button" onclick="coraTriggerDigestRun()" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                        <button type="button" onclick="coraTriggerDigestRun()" class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                            Process Digest Now
+                            Process Digest
                         </button>
                     </div>
 
@@ -1641,8 +1703,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span class="font-medium">All notification routers active. Triggers will be delivered per matrix rules.</span>
                         </div>
-                        <div class="text-[11px] text-zinc-400 font-mono">
-                            VAPID Web Push: <span class="text-zinc-700 font-semibold">ES256 RFC8292</span>
+                        <div class="text-[11px] text-zinc-400 font-mono flex items-center gap-3">
+                            <span>VAPID Web Push: <strong class="text-zinc-700 font-semibold">ES256</strong></span>
+                            <span>Meta WhatsApp: <strong class="text-zinc-700 font-semibold">Graph v20.0</strong></span>
                         </div>
                     </div>
                 </div>
@@ -1679,19 +1742,19 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     background-color: #fafafa;
                 }
                 .cora-col-info {
-                    flex: 1 1 50%;
+                    flex: 1 1 42%;
                     min-width: 0;
-                    padding-right: 16px;
+                    padding-right: 14px;
                 }
                 .cora-col-toggle {
-                    flex: 0 0 13%;
+                    flex: 0 0 10%;
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     text-align: center;
                 }
                 .cora-col-select {
-                    flex: 0 0 24%;
+                    flex: 0 0 28%;
                     display: flex;
                     justify-content: flex-end;
                     align-items: center;

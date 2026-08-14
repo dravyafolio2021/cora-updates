@@ -23981,31 +23981,141 @@ function cora_get_default_notification_prefs() {
         'dnd_start'              => '22:00',
         'dnd_end'                => '08:00',
         'custom_email'           => '',
+        'global_whatsapp'        => 1,
+        'custom_whatsapp'        => '',
         'triggers'               => array(
-            'lead_created'           => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'lead_status_changed'    => array( 'inapp' => 1, 'push' => 1, 'email' => 'daily' ),
-            'lead_reassigned'        => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'lead_followup_reminder' => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'booking_created'        => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'booking_rescheduled'    => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'booking_reminder'       => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'crew_assigned'          => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'invoice_created'        => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'payment_received'       => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'invoice_overdue'        => array( 'inapp' => 1, 'push' => 1, 'email' => 'daily' ),
-            'financial_summary'      => array( 'inapp' => 1, 'push' => 0, 'email' => 'weekly' ),
-            'doc_sent_sign'          => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'doc_viewed'             => array( 'inapp' => 1, 'push' => 0, 'email' => 'daily' ),
-            'doc_signed'             => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'doc_expiring'           => array( 'inapp' => 1, 'push' => 1, 'email' => 'daily' ),
-            'team_member_joined'     => array( 'inapp' => 1, 'push' => 0, 'email' => 'daily' ),
-            'shift_assigned'         => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'attendance_reminder'    => array( 'inapp' => 1, 'push' => 1, 'email' => 'never' ),
-            'role_changed'           => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'security_login'         => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
-            'backup_completed'       => array( 'inapp' => 1, 'push' => 0, 'email' => 'weekly' ),
-            'ai_quota_alert'         => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'lead_created'           => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'lead_status_changed'    => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 0, 'email' => 'daily' ),
+            'lead_reassigned'        => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'lead_followup_reminder' => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'booking_created'        => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'booking_rescheduled'    => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'booking_reminder'       => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'crew_assigned'          => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'invoice_created'        => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 0, 'email' => 'instant' ),
+            'payment_received'       => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'invoice_overdue'        => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'daily' ),
+            'financial_summary'      => array( 'inapp' => 1, 'push' => 0, 'whatsapp' => 0, 'email' => 'weekly' ),
+            'doc_sent_sign'          => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'doc_viewed'             => array( 'inapp' => 1, 'push' => 0, 'whatsapp' => 0, 'email' => 'daily' ),
+            'doc_signed'             => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'doc_expiring'           => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 0, 'email' => 'daily' ),
+            'team_member_joined'     => array( 'inapp' => 1, 'push' => 0, 'whatsapp' => 0, 'email' => 'daily' ),
+            'shift_assigned'         => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'attendance_reminder'    => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'never' ),
+            'role_changed'           => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 0, 'email' => 'instant' ),
+            'security_login'         => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
+            'backup_completed'       => array( 'inapp' => 1, 'push' => 0, 'whatsapp' => 0, 'email' => 'weekly' ),
+            'ai_quota_alert'         => array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' ),
         ),
+    );
+}
+}
+
+/**
+ * Format & normalize phone number for Meta WhatsApp Cloud API (E.164 without leading plus)
+ */
+if ( ! function_exists( 'cora_format_whatsapp_phone' ) ) {
+function cora_format_whatsapp_phone( $phone ) {
+    if ( empty( $phone ) ) {
+        return '';
+    }
+    // Strip non-digits
+    $clean = preg_replace( '/[^0-9]/', '', (string) $phone );
+    if ( empty( $clean ) ) {
+        return '';
+    }
+    // If standard 10-digit Indian mobile (starts with 6, 7, 8, 9), prefix with 91
+    if ( strlen( $clean ) === 10 && preg_match( '/^[6-9]/', $clean ) ) {
+        $clean = '91' . $clean;
+    } elseif ( strlen( $clean ) === 11 && str_starts_with( $clean, '0' ) ) {
+        // Leading 0 (e.g. 09876543210 -> 919876543210)
+        $clean = '91' . substr( $clean, 1 );
+    }
+    return $clean;
+}
+}
+
+/**
+ * Meta Official WhatsApp Cloud API Dispatcher (Graph API v20.0)
+ */
+if ( ! function_exists( 'cora_send_whatsapp_message' ) ) {
+function cora_send_whatsapp_message( $to_phone, $message_text, $template_data = null, $options = array() ) {
+    $clean_phone = cora_format_whatsapp_phone( $to_phone );
+    if ( empty( $clean_phone ) ) {
+        return array( 'success' => false, 'error' => 'Invalid or missing recipient WhatsApp phone number.' );
+    }
+
+    $api_token = get_option( 'cora_whatsapp_api_token', '' );
+    $phone_id  = get_option( 'cora_whatsapp_phone_number_id', '' );
+
+    if ( empty( $api_token ) || empty( $phone_id ) ) {
+        // Fallback to constants or user meta if set
+        if ( defined( 'CORA_WHATSAPP_TOKEN' ) && defined( 'CORA_WHATSAPP_PHONE_ID' ) ) {
+            $api_token = CORA_WHATSAPP_TOKEN;
+            $phone_id  = CORA_WHATSAPP_PHONE_ID;
+        } else {
+            return array( 'success' => false, 'error' => 'WhatsApp Cloud API credentials not configured in Workspace Settings.' );
+        }
+    }
+
+    $endpoint = "https://graph.facebook.com/v20.0/{$phone_id}/messages";
+
+    if ( ! empty( $template_data ) && is_array( $template_data ) ) {
+        $body_payload = array(
+            'messaging_product' => 'whatsapp',
+            'recipient_type'    => 'individual',
+            'to'                => $clean_phone,
+            'type'              => 'template',
+            'template'          => $template_data,
+        );
+    } else {
+        $body_payload = array(
+            'messaging_product' => 'whatsapp',
+            'recipient_type'    => 'individual',
+            'to'                => $clean_phone,
+            'type'              => 'text',
+            'text'              => array(
+                'preview_url' => true,
+                'body'        => (string) $message_text,
+            ),
+        );
+    }
+
+    $response = wp_remote_post( $endpoint, array(
+        'method'      => 'POST',
+        'timeout'     => 15,
+        'redirection' => 5,
+        'httpversion' => '1.1',
+        'headers'     => array(
+            'Authorization' => 'Bearer ' . $api_token,
+            'Content-Type'  => 'application/json',
+            'Accept'        => 'application/json',
+        ),
+        'body'        => wp_json_encode( $body_payload ),
+    ) );
+
+    if ( is_wp_error( $response ) ) {
+        return array( 'success' => false, 'error' => $response->get_error_message() );
+    }
+
+    $code = wp_remote_retrieve_response_code( $response );
+    $body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+    if ( $code >= 200 && $code < 300 && ! empty( $body['messages'][0]['id'] ) ) {
+        return array(
+            'success'    => true,
+            'message_id' => $body['messages'][0]['id'],
+            'recipient'  => $clean_phone,
+        );
+    }
+
+    $err_msg = $body['error']['message'] ?? ( 'Meta Graph API returned HTTP status ' . $code );
+    return array(
+        'success' => false,
+        'error'   => $err_msg,
+        'code'    => $code,
+        'details' => $body['error'] ?? array(),
     );
 }
 }
@@ -24043,12 +24153,14 @@ function cora_save_user_notification_prefs( $user_id, $raw_data ) {
     $prefs = array(
         'global_inapp'          => ! empty( $raw_data['cora_notif_global_inapp'] ?? $raw_data['global_inapp'] ) ? 1 : 0,
         'global_push'           => ! empty( $raw_data['cora_notif_global_push'] ?? $raw_data['global_push'] ) ? 1 : 0,
+        'global_whatsapp'       => ! empty( $raw_data['cora_notif_global_whatsapp'] ?? $raw_data['global_whatsapp'] ) ? 1 : 0,
         'global_email'          => ! empty( $raw_data['cora_notif_global_email'] ?? $raw_data['global_email'] ) ? 1 : 0,
         'global_email_schedule' => in_array( $raw_data['cora_notif_global_email_schedule'] ?? $raw_data['global_email_schedule'] ?? 'instant', array( 'instant', 'daily', 'weekly' ), true ) ? sanitize_text_field( $raw_data['cora_notif_global_email_schedule'] ?? $raw_data['global_email_schedule'] ) : 'instant',
         'dnd_enabled'           => ! empty( $raw_data['cora_notif_dnd_enabled'] ?? $raw_data['dnd_enabled'] ) ? 1 : 0,
         'dnd_start'             => sanitize_text_field( $raw_data['cora_notif_dnd_start'] ?? $raw_data['dnd_start'] ?? '22:00' ),
         'dnd_end'               => sanitize_text_field( $raw_data['cora_notif_dnd_end'] ?? $raw_data['dnd_end'] ?? '08:00' ),
         'custom_email'          => sanitize_email( $raw_data['cora_notif_custom_email'] ?? $raw_data['custom_email'] ?? '' ),
+        'custom_whatsapp'       => sanitize_text_field( $raw_data['cora_notif_custom_whatsapp'] ?? $raw_data['custom_whatsapp'] ?? '' ),
         'triggers'              => array(),
     );
 
@@ -24067,6 +24179,13 @@ function cora_save_user_notification_prefs( $user_id, $raw_data ) {
             $push_val = ! empty( $raw_data['triggers'][ $trigger_key ]['push'] ) ? 1 : 0;
         }
 
+        $whatsapp_val = $trigger_def['whatsapp'] ?? 1;
+        if ( isset( $raw_data[ "notif_whatsapp_{$trigger_key}" ] ) ) {
+            $whatsapp_val = ! empty( $raw_data[ "notif_whatsapp_{$trigger_key}" ] ) ? 1 : 0;
+        } elseif ( isset( $raw_data['triggers'][ $trigger_key ]['whatsapp'] ) ) {
+            $whatsapp_val = ! empty( $raw_data['triggers'][ $trigger_key ]['whatsapp'] ) ? 1 : 0;
+        }
+
         $email_val = $trigger_def['email'];
         if ( isset( $raw_data[ "notif_email_{$trigger_key}" ] ) ) {
             $email_val = sanitize_text_field( $raw_data[ "notif_email_{$trigger_key}" ] );
@@ -24079,13 +24198,17 @@ function cora_save_user_notification_prefs( $user_id, $raw_data ) {
         }
 
         $prefs['triggers'][ $trigger_key ] = array(
-            'inapp' => $inapp_val,
-            'push'  => $push_val,
-            'email' => $email_val,
+            'inapp'    => $inapp_val,
+            'push'     => $push_val,
+            'whatsapp' => $whatsapp_val,
+            'email'    => $email_val,
         );
     }
 
     update_user_meta( $user_id, 'cora_notification_preferences', $prefs );
+    if ( ! empty( $prefs['custom_whatsapp'] ) ) {
+        update_user_meta( $user_id, 'cora_user_phone', $prefs['custom_whatsapp'] );
+    }
     return $prefs;
 }
 }
@@ -24308,11 +24431,11 @@ function cora_notify( $event_key, $targets, $payload = array(), $options = array
         $user_ids[] = get_current_user_id() ?: 1;
     }
 
-    $summary = array( 'inapp' => 0, 'push' => 0, 'email' => 0, 'queued' => 0 );
+    $summary = array( 'inapp' => 0, 'push' => 0, 'whatsapp' => 0, 'email' => 0, 'queued' => 0 );
 
     foreach ( $user_ids as $uid ) {
         $prefs = cora_get_user_notification_prefs( $uid );
-        $trigger_pref = $prefs['triggers'][ $event_key ] ?? array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' );
+        $trigger_pref = $prefs['triggers'][ $event_key ] ?? array( 'inapp' => 1, 'push' => 1, 'whatsapp' => 1, 'email' => 'instant' );
         $in_dnd = cora_is_user_in_quiet_hours( $uid, $prefs );
 
         // 1. IN-APP BELL
@@ -24333,7 +24456,24 @@ function cora_notify( $event_key, $targets, $payload = array(), $options = array
             }
         }
 
-        // 3. EMAIL
+        // 3. WHATSAPP CLOUD API (Official Meta API)
+        if ( ! empty( $prefs['global_whatsapp'] ) && ! empty( $trigger_pref['whatsapp'] ) ) {
+            if ( ! $in_dnd || $urgent ) {
+                $target_phone = ! empty( $prefs['custom_whatsapp'] ) ? $prefs['custom_whatsapp'] : get_user_meta( $uid, 'cora_user_phone', true );
+                if ( empty( $target_phone ) ) {
+                    $target_phone = get_user_meta( $uid, 'cora_user_whatsapp', true ) ?: get_user_meta( $uid, 'billing_phone', true );
+                }
+                if ( ! empty( $target_phone ) ) {
+                    $wa_msg = "*[{$category}] {$title}*\n\n{$body}\n\n🔗 View: " . esc_url( $action_url );
+                    $wa_res = cora_send_whatsapp_message( $target_phone, $wa_msg );
+                    if ( ! empty( $wa_res['success'] ) ) {
+                        $summary['whatsapp']++;
+                    }
+                }
+            }
+        }
+
+        // 4. EMAIL
         if ( ! empty( $prefs['global_email'] ) ) {
             $email_mode = $trigger_pref['email'] ?? 'instant';
             if ( $prefs['global_email_schedule'] === 'daily' && $email_mode !== 'never' && ! $urgent ) {
@@ -24423,6 +24563,32 @@ function cora_ajax_send_test_notification_channel() {
             }
         } else {
             wp_send_json_error( array( 'message' => 'PWA push subsystem unavailable.' ) );
+        }
+    } elseif ( $channel === 'whatsapp' ) {
+        $prefs = cora_get_user_notification_prefs( $user_id );
+        $target_phone = ! empty( $prefs['custom_whatsapp'] ) ? $prefs['custom_whatsapp'] : get_user_meta( $user_id, 'cora_user_phone', true );
+        if ( empty( $target_phone ) ) {
+            $target_phone = get_user_meta( $user_id, 'cora_user_whatsapp', true ) ?: get_user_meta( $user_id, 'billing_phone', true );
+        }
+
+        if ( empty( $target_phone ) ) {
+            wp_send_json_error( array( 'message' => 'Please enter your WhatsApp Phone Number in settings first.' ) );
+        }
+
+        $api_token = get_option( 'cora_whatsapp_api_token', '' );
+        $phone_id  = get_option( 'cora_whatsapp_phone_number_id', '' );
+
+        if ( empty( $api_token ) || empty( $phone_id ) ) {
+            wp_send_json_error( array( 'message' => 'Meta WhatsApp Cloud API Token or Phone Number ID not configured in Branding & APIs.' ) );
+        }
+
+        $wa_msg = "*[Cora Workspace Live Diagnostics]*\n\nHello " . esc_html( $user_obj->display_name ) . ",\nYour Meta WhatsApp Cloud API alert router is functioning properly at {$now_str}.\n\n🔗 Dashboard: " . esc_url( home_url( '/workspace/dashboard' ) );
+        $wa_res = cora_send_whatsapp_message( $target_phone, $wa_msg );
+
+        if ( ! empty( $wa_res['success'] ) ) {
+            wp_send_json_success( array( 'message' => "Test WhatsApp message sent to {$target_phone}!" ) );
+        } else {
+            wp_send_json_error( array( 'message' => 'WhatsApp dispatch error: ' . ( $wa_res['error'] ?? 'Unknown error' ) ) );
         }
     } elseif ( $channel === 'email' ) {
         $sent = cora_send_monochromatic_notification_email(
