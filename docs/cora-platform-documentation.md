@@ -276,4 +276,126 @@ All queries filter by `agency_id`. Owner roles see all branches; branch-level ro
 
 ---
 
-*Cora Platform v3.4.28 — Last updated: August 14, 2026.*
+## Section 9: Notification Management System & Event Trigger Engine (v3.4.38)
+
+The Notification Management Module (`settings-suite?settings_tab=notifications`) provides centralized, studio-grade notification preference controls, multi-channel routing, quiet hours enforcement, automated email digests, and real-time event triggers across the Cora Platform.
+
+```
++-------------------------------------------------------------------------+
+|                        Workspace Event Trigger                          |
+|         (e.g., Lead Created, Shoot Booked, Invoice Paid, E-Sign)         |
++------------------------------------+------------------------------------+
+                                     |
+                                     v
+                        [ cora_notify() Dispatcher ]
+                                     |
+         +---------------------------+---------------------------+
+         |                           |                           |
+         v                           v                           v
+  [ In-App Bell ]            [ Web Push (PWA) ]          [ Email Routing ]
+  • wp_cora_notifications    • VAPID ES256 Push          • User preference check
+  • Topbar count badge       • Lock-screen alert         • Instant: wp_mail()
+  • Slide drawer history     • DND Quiet Hours check     • Digest: Daily / Weekly
+                                                         • WP-Cron hourly batch
+```
+
+---
+
+### 9.1 Multi-Channel Delivery Infrastructure
+
+1. **In-App Notification Bell Channel**:
+   * Stored canonically in the database table `{$wpdb->prefix}cora_notifications` with legacy fallback support.
+   * Real-time unread badge counter in the topbar and dedicated slide-out notification drawer.
+   * Supports one-click "Mark as Read" and "Clear All".
+
+2. **Web Push Notifications (PWA VAPID ES256)**:
+   * Native browser and lock-screen alerts using Web Push API standards (RFC 8292).
+   * Cryptographic ES256 authentication using local OpenSSL VAPID key pairs.
+   * Device subscription sync status indicator (`Active & Subscribed`, `Ready / Not Synced`, `Unsupported`).
+
+3. **Monochromatic Transactional HTML Email Channel**:
+   * High-contrast Notion/Claude-style responsive HTML email template generator (`cora_send_monochromatic_notification_email`).
+   * Clean typography, metadata category badge, body text formatting, direct workspace action CTA button, and notification management footer links.
+   * Dispatched natively via `wp_mail()` with whitelabel sender headers.
+
+---
+
+### 9.2 Granular Trigger & Channel Routing Matrix
+
+Users can customize In-App, Push, and Email delivery frequency independently for every workspace trigger:
+
+| Category | Trigger Event | Trigger Key | Default Channels | Default Email Mode |
+| :--- | :--- | :--- | :--- | :--- |
+| **CRM & Leads** | New Lead Captured | `lead_created` | In-App, Push, Email | Instant |
+| | Pipeline Stage Changed | `lead_status_changed` | In-App, Push | Daily Digest |
+| | Lead Reassigned to User | `lead_reassigned` | In-App, Push, Email | Instant |
+| | Follow-up Reminder Due | `lead_followup_reminder` | In-App, Push, Email | Instant |
+| **Bookings** | New Shoot Scheduled | `booking_created` | In-App, Push, Email | Instant |
+| | Booking Rescheduled | `booking_rescheduled` | In-App, Push, Email | Instant |
+| | 24h & 1h Shoot Reminder | `booking_reminder` | In-App, Push, Email | Instant |
+| | Crew / Photographer Assigned | `crew_assigned` | In-App, Push, Email | Instant |
+| **Financials** | New Invoice Issued | `invoice_created` | In-App, Push, Email | Instant |
+| | Payment Logged & Cleared | `payment_received` | In-App, Push, Email | Instant |
+| | Overdue Invoice Alert | `invoice_overdue` | In-App, Push | Daily Digest |
+| | Revenue & Tax GST Digest | `financial_summary` | In-App, Email | Weekly Digest |
+| **Document Vault** | Document Sent for E-Sign | `doc_sent_sign` | In-App, Push, Email | Instant |
+| | Agreement Viewed by Client | `doc_viewed` | In-App | Daily Digest |
+| | Document Fully Executed | `doc_signed` | In-App, Push, Email | Instant |
+| | Agreement Expiring Soon | `doc_expiring` | In-App, Push | Daily Digest |
+| **Team & Shifts** | Team Member Joined | `team_member_joined` | In-App | Daily Digest |
+| | Shift / Roster Assigned | `shift_assigned` | In-App, Push, Email | Instant |
+| | Attendance Punch Reminder | `attendance_reminder` | In-App, Push | Never |
+| | Role / Permission Changed | `role_changed` | In-App, Push, Email | Instant |
+| **Security & System** | New Device Login Detected | `security_login` | In-App, Push, Email | Instant (Urgent) |
+| | System Backup Completed | `backup_completed` | In-App | Weekly Digest |
+| | AI Token Quota Alert | `ai_quota_alert` | In-App, Push, Email | Instant (Urgent) |
+
+---
+
+### 9.3 Periodicity & Digest Engine
+
+* **Instant Mode**: Real-time delivery via `wp_mail()` immediately when an event occurs.
+* **Daily Digest Mode**: Non-urgent notifications are queued in `cora_notification_digest_queue` and dispatched as a consolidated morning briefing at 09:00 AM local time.
+* **Weekly Digest Mode**: Queued events are compiled and delivered every Monday morning at 09:00 AM.
+* **WP-Cron Execution**: Handled automatically by the hourly cron job `cora_cron_notification_digest_hook`.
+
+---
+
+### 9.4 Quiet Hours & Do Not Disturb (DND)
+
+* Users can set customized quiet hours (e.g. `22:00` to `08:00`).
+* During active quiet hours, non-urgent Web Push notifications and instant emails are held and queued for morning delivery.
+* Critical security and high-priority payment alerts (`urgent => true`) automatically bypass DND rules.
+
+---
+
+### 9.5 Developer API Reference
+
+#### Central Dispatcher: `cora_notify()`
+```php
+cora_notify(
+    string $event_key,       // e.g., 'lead_created', 'booking_created', 'doc_signed'
+    int|array|string $target, // User ID, array of user IDs, or 'agency_owners'
+    array $payload = array(
+        'title'      => 'New Lead Captured',
+        'body'       => 'Inquiry from Dravya Bansal entered your pipeline.',
+        'action_url' => home_url( '/workspace/dashboard?sub_page=leads' ),
+        'category'   => 'CRM & Leads',
+        'urgent'     => false,
+    )
+);
+```
+
+#### Preferences Helpers:
+```php
+// Retrieve parsed preferences with fallbacks
+$prefs = cora_get_user_notification_prefs( $user_id );
+
+// Persist sanitized preferences
+cora_save_user_notification_prefs( $user_id, $_POST );
+```
+
+---
+
+*Cora Platform v3.4.38 — Last updated: August 14, 2026.*
+

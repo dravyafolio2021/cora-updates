@@ -10351,8 +10351,13 @@ function cora_ajax_save_booking() {
         array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s')
     );
 
-    // Trigger PWA Push Notification to owner and agency members
-    cora_pwa_notify_agency( $agency_id, 'New Booking Confirmed', "Booking for {$name} ({$type}) at {$location} has been created.", home_url( '/workspace/showings_bookings' ) );
+    // Dispatch unified multi-channel notification (In-App, Push, Email)
+    cora_notify( 'booking_created', 'agency_owners', array(
+        'title'      => "New Booking Confirmed: {$name}",
+        'body'       => "Booking for {$name} ({$type}) at {$location} on {$showing_dt} has been scheduled.",
+        'action_url' => home_url( '/workspace/dashboard?sub_page=bookings' ),
+        'category'   => 'Bookings & Calendar',
+    ) );
 
     $clients = get_option( 'cora_workspace_clients', array() );
     if ( ! is_array( $clients ) ) {
@@ -10684,6 +10689,24 @@ function cora_ajax_save_transaction() {
     }
 
     update_option( 'cora_workspace_ledger', $transactions , false );
+
+    // Trigger financial notifications
+    if ( ! $updated ) {
+        cora_notify( 'invoice_created', 'agency_owners', array(
+            'title'      => 'New Financial Entry: ' . $description,
+            'body'       => "Transaction for {$amount} ({$category}, {$status}) recorded in workspace ledger.",
+            'action_url' => home_url( '/workspace/dashboard?sub_page=financials' ),
+            'category'   => 'Invoices & Financials',
+        ) );
+    } elseif ( strtolower( $status ) === 'paid' || strtolower( $status ) === 'completed' ) {
+        cora_notify( 'payment_received', 'agency_owners', array(
+            'title'      => 'Payment Recorded: ' . $description,
+            'body'       => "Payment of {$amount} has been marked as {$status}.",
+            'action_url' => home_url( '/workspace/dashboard?sub_page=financials' ),
+            'category'   => 'Invoices & Financials',
+        ) );
+    }
+
     wp_send_json_success( $new_tx );
 }
 }
@@ -14838,6 +14861,17 @@ function cora_ajax_save_attendance() {
         
         $logs[] = $new_log;
         update_option( 'cora_workspace_attendance_logs', $logs );
+
+        // Dispatch attendance notification to user
+        $punch_type = sanitize_text_field( $new_log['type'] ?? 'Punch' );
+        $punch_time = sanitize_text_field( $new_log['time'] ?? current_time( 'g:i A' ) );
+        cora_notify( 'attendance_reminder', get_current_user_id(), array(
+            'title'      => "Attendance {$punch_type} Recorded",
+            'body'       => "Your {$punch_type} was successfully logged at {$punch_time}.",
+            'action_url' => home_url( '/workspace/dashboard?sub_page=attendance' ),
+            'category'   => 'Attendance',
+        ) );
+
         wp_send_json_success( array( 'message' => 'Attendance logged successfully', 'logs' => $logs ) );
     }
     
@@ -16309,6 +16343,11 @@ function cora_ajax_save_system_settings_suite() {
     wp_clear_scheduled_hook( 'cora_workspace_backup_cron' );
     if ( $schedule !== 'manual' ) {
         wp_schedule_event( time() + HOUR_IN_SECONDS, $schedule, 'cora_workspace_backup_cron' );
+    }
+
+    // Save user notification preferences if posted
+    if ( isset( $_POST['cora_notif_global_inapp'] ) || isset( $_POST['cora_notif_global_email'] ) || isset( $_POST['cora_notif_global_push'] ) ) {
+        cora_save_user_notification_prefs( get_current_user_id(), $_POST );
     }
 
     cora_log_activity( 'Permissions', 'Updated global workspace and system settings.' );
@@ -23926,6 +23965,484 @@ function cora_ajax_clear_all_notifs() {
 }
 }
 add_action( 'wp_ajax_cora_ajax_clear_all_notifs', 'cora_ajax_clear_all_notifs' );
+
+// ═══════════════════════════════════════════════════════════════
+// NOTIFICATION MANAGEMENT ENGINE (MULTI-CHANNEL DISPATCHER & DIGEST)
+// ═══════════════════════════════════════════════════════════════
+
+if ( ! function_exists( 'cora_get_default_notification_prefs' ) ) {
+function cora_get_default_notification_prefs() {
+    return array(
+        'global_inapp'           => 1,
+        'global_push'            => 1,
+        'global_email'           => 1,
+        'global_email_schedule'  => 'instant', // 'instant', 'daily', 'weekly'
+        'dnd_enabled'            => 0,
+        'dnd_start'              => '22:00',
+        'dnd_end'                => '08:00',
+        'custom_email'           => '',
+        'triggers'               => array(
+            'lead_created'           => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'lead_status_changed'    => array( 'inapp' => 1, 'push' => 1, 'email' => 'daily' ),
+            'lead_reassigned'        => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'lead_followup_reminder' => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'booking_created'        => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'booking_rescheduled'    => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'booking_reminder'       => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'crew_assigned'          => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'invoice_created'        => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'payment_received'       => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'invoice_overdue'        => array( 'inapp' => 1, 'push' => 1, 'email' => 'daily' ),
+            'financial_summary'      => array( 'inapp' => 1, 'push' => 0, 'email' => 'weekly' ),
+            'doc_sent_sign'          => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'doc_viewed'             => array( 'inapp' => 1, 'push' => 0, 'email' => 'daily' ),
+            'doc_signed'             => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'doc_expiring'           => array( 'inapp' => 1, 'push' => 1, 'email' => 'daily' ),
+            'team_member_joined'     => array( 'inapp' => 1, 'push' => 0, 'email' => 'daily' ),
+            'shift_assigned'         => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'attendance_reminder'    => array( 'inapp' => 1, 'push' => 1, 'email' => 'never' ),
+            'role_changed'           => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'security_login'         => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+            'backup_completed'       => array( 'inapp' => 1, 'push' => 0, 'email' => 'weekly' ),
+            'ai_quota_alert'         => array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' ),
+        ),
+    );
+}
+}
+
+if ( ! function_exists( 'cora_get_user_notification_prefs' ) ) {
+function cora_get_user_notification_prefs( $user_id = null ) {
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+    $defaults = cora_get_default_notification_prefs();
+    if ( ! $user_id ) {
+        return $defaults;
+    }
+    $saved = get_user_meta( $user_id, 'cora_notification_preferences', true );
+    if ( ! is_array( $saved ) ) {
+        return $defaults;
+    }
+    
+    // Deep merge triggers
+    $merged = wp_parse_args( $saved, $defaults );
+    if ( isset( $saved['triggers'] ) && is_array( $saved['triggers'] ) ) {
+        foreach ( $defaults['triggers'] as $k => $def_trig ) {
+            if ( isset( $saved['triggers'][$k] ) && is_array( $saved['triggers'][$k] ) ) {
+                $merged['triggers'][$k] = wp_parse_args( $saved['triggers'][$k], $def_trig );
+            }
+        }
+    }
+    return $merged;
+}
+}
+
+if ( ! function_exists( 'cora_save_user_notification_prefs' ) ) {
+function cora_save_user_notification_prefs( $user_id, $raw_data ) {
+    $defaults = cora_get_default_notification_prefs();
+    $prefs = array(
+        'global_inapp'          => ! empty( $raw_data['cora_notif_global_inapp'] ?? $raw_data['global_inapp'] ) ? 1 : 0,
+        'global_push'           => ! empty( $raw_data['cora_notif_global_push'] ?? $raw_data['global_push'] ) ? 1 : 0,
+        'global_email'          => ! empty( $raw_data['cora_notif_global_email'] ?? $raw_data['global_email'] ) ? 1 : 0,
+        'global_email_schedule' => in_array( $raw_data['cora_notif_global_email_schedule'] ?? $raw_data['global_email_schedule'] ?? 'instant', array( 'instant', 'daily', 'weekly' ), true ) ? sanitize_text_field( $raw_data['cora_notif_global_email_schedule'] ?? $raw_data['global_email_schedule'] ) : 'instant',
+        'dnd_enabled'           => ! empty( $raw_data['cora_notif_dnd_enabled'] ?? $raw_data['dnd_enabled'] ) ? 1 : 0,
+        'dnd_start'             => sanitize_text_field( $raw_data['cora_notif_dnd_start'] ?? $raw_data['dnd_start'] ?? '22:00' ),
+        'dnd_end'               => sanitize_text_field( $raw_data['cora_notif_dnd_end'] ?? $raw_data['dnd_end'] ?? '08:00' ),
+        'custom_email'          => sanitize_email( $raw_data['cora_notif_custom_email'] ?? $raw_data['custom_email'] ?? '' ),
+        'triggers'              => array(),
+    );
+
+    foreach ( $defaults['triggers'] as $trigger_key => $trigger_def ) {
+        $inapp_val = isset( $raw_data[ "notif_inapp_{$trigger_key}" ] ) ? ( ! empty( $raw_data[ "notif_inapp_{$trigger_key}" ] ) ? 1 : 0 ) : ( isset( $raw_data['triggers'][ $trigger_key ]['inapp'] ) ? ( ! empty( $raw_data['triggers'][ $trigger_key ]['inapp'] ) ? 1 : 0 ) : $trigger_def['inapp'] );
+        $push_val  = isset( $raw_data[ "notif_push_{$trigger_key}" ] )  ? ( ! empty( $raw_data[ "notif_push_{$trigger_key}" ] ) ? 1 : 0 )  : ( isset( $raw_data['triggers'][ $trigger_key ]['push'] )  ? ( ! empty( $raw_data['triggers'][ $trigger_key ]['push'] )  : 0 )  : $trigger_def['push'] );
+        $email_val = isset( $raw_data[ "notif_email_{$trigger_key}" ] ) ? sanitize_text_field( $raw_data[ "notif_email_{$trigger_key}" ] ) : ( $raw_data['triggers'][ $trigger_key ]['email'] ?? $trigger_def['email'] );
+        
+        if ( ! in_array( $email_val, array( 'instant', 'daily', 'weekly', 'never' ), true ) ) {
+            $email_val = $trigger_def['email'];
+        }
+
+        $prefs['triggers'][ $trigger_key ] = array(
+            'inapp' => $inapp_val,
+            'push'  => $push_val,
+            'email' => $email_val,
+        );
+    }
+
+    update_user_meta( $user_id, 'cora_notification_preferences', $prefs );
+    return $prefs;
+}
+}
+
+if ( ! function_exists( 'cora_is_user_in_quiet_hours' ) ) {
+function cora_is_user_in_quiet_hours( $user_id, $prefs = null ) {
+    if ( ! $prefs ) {
+        $prefs = cora_get_user_notification_prefs( $user_id );
+    }
+    if ( empty( $prefs['dnd_enabled'] ) ) {
+        return false;
+    }
+    $start = $prefs['dnd_start'] ?? '22:00';
+    $end   = $prefs['dnd_end'] ?? '08:00';
+    $now_time = current_time( 'H:i' );
+
+    if ( $start < $end ) {
+        return ( $now_time >= $start && $now_time <= $end );
+    } else {
+        // Crosses midnight e.g. 22:00 to 08:00
+        return ( $now_time >= $start || $now_time <= $end );
+    }
+}
+}
+
+if ( ! function_exists( 'cora_send_monochromatic_notification_email' ) ) {
+function cora_send_monochromatic_notification_email( $to, $subject, $title, $body, $action_url = '', $action_text = 'View in Workspace', $category = 'Notification' ) {
+    $site_title = get_option( 'blogname', 'Cora Workspace' );
+    $workspace_url = home_url( '/workspace/dashboard' );
+    $settings_url  = home_url( '/workspace/settings-suite?settings_tab=notifications' );
+
+    $html = '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>' . esc_html( $subject ) . '</title>
+<style>
+body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; color: #18181b; }
+.wrapper { width: 100%; max-width: 600px; margin: 30px auto; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.header { padding: 24px 32px; border-bottom: 1px solid #f4f4f5; background: #ffffff; }
+.logo { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; color: #09090b; text-decoration: none; }
+.badge { display: inline-block; padding: 3px 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #f4f4f5; color: #52525b; border-radius: 9999px; }
+.content { padding: 36px 32px; }
+.title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: #09090b; margin: 0 0 16px 0; line-height: 1.3; }
+.body-text { font-size: 14px; line-height: 1.6; color: #3f3f46; margin: 0 0 28px 0; }
+.btn { display: inline-block; padding: 11px 22px; font-size: 13px; font-weight: 700; color: #ffffff !important; background: #09090b; border-radius: 10px; text-decoration: none; }
+.footer { padding: 24px 32px; background: #fafafa; border-top: 1px solid #f4f4f5; font-size: 11px; color: #71717a; text-align: center; }
+.footer a { color: #52525b; text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td align="left"><a href="' . esc_url( $workspace_url ) . '" class="logo">' . esc_html( $site_title ) . '</a></td>
+                <td align="right"><span class="badge">' . esc_html( $category ) . '</span></td>
+            </tr>
+        </table>
+    </div>
+    <div class="content">
+        <h1 class="title">' . esc_html( $title ) . '</h1>
+        <div class="body-text">' . nl2br( esc_html( $body ) ) . '</div>';
+    
+    if ( ! empty( $action_url ) ) {
+        $html .= '<div style="margin-top: 24px;"><a href="' . esc_url( $action_url ) . '" class="btn">' . esc_html( $action_text ) . ' &rarr;</a></div>';
+    }
+
+    $html .= '</div>
+    <div class="footer">
+        <p style="margin: 0 0 8px 0;">This transactional notification was generated by ' . esc_html( $site_title ) . '.</p>
+        <p style="margin: 0;"><a href="' . esc_url( $settings_url ) . '">Manage Notification Preferences</a> &bull; <a href="' . esc_url( $workspace_url ) . '">Workspace Dashboard</a></p>
+    </div>
+</div>
+</body>
+</html>';
+
+    $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+    return @wp_mail( $to, $subject, $html, $headers );
+}
+}
+
+if ( ! function_exists( 'cora_enqueue_notification_digest' ) ) {
+function cora_enqueue_notification_digest( $user_id, $email, $event_key, $title, $body, $action_url, $category, $digest_type = 'daily' ) {
+    $queue = get_option( 'cora_notification_digest_queue', array() );
+    if ( ! is_array( $queue ) ) {
+        $queue = array();
+    }
+
+    $queue[] = array(
+        'id'          => uniqid( 'dig_' ),
+        'user_id'     => intval( $user_id ),
+        'email'       => sanitize_email( $email ),
+        'event_key'   => sanitize_key( $event_key ),
+        'title'       => sanitize_text_field( $title ),
+        'body'        => sanitize_text_field( $body ),
+        'action_url'  => esc_url_raw( $action_url ),
+        'category'    => sanitize_text_field( $category ),
+        'digest_type' => in_array( $digest_type, array( 'daily', 'weekly' ), true ) ? $digest_type : 'daily',
+        'created_at'  => time(),
+    );
+
+    if ( count( $queue ) > 1000 ) {
+        $queue = array_slice( $queue, -1000 );
+    }
+
+    update_option( 'cora_notification_digest_queue', $queue, false );
+}
+}
+
+if ( ! function_exists( 'cora_cron_process_notification_digests' ) ) {
+function cora_cron_process_notification_digests() {
+    $queue = get_option( 'cora_notification_digest_queue', array() );
+    if ( empty( $queue ) || ! is_array( $queue ) ) {
+        return array( 'processed' => 0 );
+    }
+
+    $now = time();
+    $current_day = date( 'l', $now );
+    $current_hour = (int) date( 'H', $now );
+
+    $grouped = array();
+    $remaining_queue = array();
+    $processed_count = 0;
+
+    foreach ( $queue as $item ) {
+        $uid  = $item['user_id'];
+        $type = $item['digest_type'] ?? 'daily';
+        
+        $should_send = false;
+        if ( $type === 'daily' ) {
+            if ( $current_hour >= 9 || ( $now - ( $item['created_at'] ?? 0 ) >= 86400 ) ) {
+                $should_send = true;
+            }
+        } elseif ( $type === 'weekly' ) {
+            if ( $current_day === 'Monday' || ( $now - ( $item['created_at'] ?? 0 ) >= 7 * 86400 ) ) {
+                $should_send = true;
+            }
+        }
+
+        if ( $should_send ) {
+            $grouped[ $uid ][ $type ][] = $item;
+        } else {
+            $remaining_queue[] = $item;
+        }
+    }
+
+    foreach ( $grouped as $uid => $types ) {
+        foreach ( $types as $type => $items ) {
+            if ( empty( $items ) ) continue;
+            $email = $items[0]['email'];
+            $period_label = ( $type === 'weekly' ) ? 'Weekly Workspace Digest' : 'Daily Morning Digest';
+            $subject = "Cora " . $period_label . " (" . count( $items ) . " updates)";
+
+            $body_lines = array();
+            foreach ( $items as $it ) {
+                $body_lines[] = "• [" . esc_html( $it['category'] ) . "] " . esc_html( $it['title'] ) . ": " . esc_html( $it['body'] );
+            }
+            $body = "Here is your consolidated summary of recent workspace activity:\n\n" . implode( "\n\n", $body_lines );
+
+            cora_send_monochromatic_notification_email( $email, $subject, $period_label, $body, home_url( '/workspace/dashboard' ), 'Open Workspace Dashboard', $period_label );
+            $processed_count += count( $items );
+        }
+    }
+
+    update_option( 'cora_notification_digest_queue', $remaining_queue, false );
+    return array( 'processed' => $processed_count );
+}
+}
+add_action( 'cora_cron_notification_digest_hook', 'cora_cron_process_notification_digests' );
+
+// Register Hourly Cron for Notification Digests
+if ( ! wp_next_scheduled( 'cora_cron_notification_digest_hook' ) ) {
+    wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'cora_cron_notification_digest_hook' );
+}
+
+/**
+ * Unified Notification Dispatcher
+ */
+if ( ! function_exists( 'cora_notify' ) ) {
+function cora_notify( $event_key, $targets, $payload = array(), $options = array() ) {
+    $title      = sanitize_text_field( $payload['title'] ?? 'Workspace Update' );
+    $body       = sanitize_text_field( $payload['body'] ?? '' );
+    $action_url = esc_url_raw( $payload['action_url'] ?? home_url( '/workspace/dashboard' ) );
+    $category   = sanitize_text_field( $payload['category'] ?? 'Alert' );
+    $urgent     = ! empty( $payload['urgent'] );
+
+    $user_ids = array();
+    if ( is_numeric( $targets ) ) {
+        $user_ids[] = intval( $targets );
+    } elseif ( is_array( $targets ) ) {
+        $user_ids = array_map( 'intval', $targets );
+    } elseif ( is_string( $targets ) ) {
+        if ( $targets === 'all_admins' || $targets === 'agency_owners' ) {
+            $users = get_users( array( 'role__in' => array( 'administrator', 'cora_workspace_owner', 'cora_manager' ) ) );
+            foreach ( $users as $u ) {
+                $user_ids[] = $u->ID;
+            }
+        } else {
+            $users = get_users( array(
+                'meta_query' => array(
+                    array(
+                        'key'     => 'cora_agency_id',
+                        'value'   => function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $targets ) : $targets,
+                        'compare' => 'IN'
+                    )
+                )
+            ) );
+            foreach ( $users as $u ) {
+                $user_ids[] = $u->ID;
+            }
+        }
+    }
+
+    $user_ids = array_unique( array_filter( $user_ids ) );
+    if ( empty( $user_ids ) ) {
+        $user_ids[] = get_current_user_id() ?: 1;
+    }
+
+    $summary = array( 'inapp' => 0, 'push' => 0, 'email' => 0, 'queued' => 0 );
+
+    foreach ( $user_ids as $uid ) {
+        $prefs = cora_get_user_notification_prefs( $uid );
+        $trigger_pref = $prefs['triggers'][ $event_key ] ?? array( 'inapp' => 1, 'push' => 1, 'email' => 'instant' );
+        $in_dnd = cora_is_user_in_quiet_hours( $uid, $prefs );
+
+        // 1. IN-APP BELL
+        if ( ! empty( $prefs['global_inapp'] ) && ! empty( $trigger_pref['inapp'] ) ) {
+            cora_add_notification( $uid, $title, $body, $action_url );
+            $summary['inapp']++;
+        }
+
+        // 2. WEB PUSH (PWA VAPID)
+        if ( ! empty( $prefs['global_push'] ) && ! empty( $trigger_pref['push'] ) ) {
+            if ( ! $in_dnd || $urgent ) {
+                if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
+                    $sent = cora_pwa_send_push_notification( $uid, $title, $body, $action_url );
+                    if ( $sent ) {
+                        $summary['push']++;
+                    }
+                }
+            }
+        }
+
+        // 3. EMAIL
+        if ( ! empty( $prefs['global_email'] ) ) {
+            $email_mode = $trigger_pref['email'] ?? 'instant';
+            if ( $prefs['global_email_schedule'] === 'daily' && $email_mode !== 'never' && ! $urgent ) {
+                $email_mode = 'daily';
+            } elseif ( $prefs['global_email_schedule'] === 'weekly' && $email_mode !== 'never' && ! $urgent ) {
+                $email_mode = 'weekly';
+            }
+
+            $user_obj = get_userdata( $uid );
+            $target_email = ! empty( $prefs['custom_email'] ) ? $prefs['custom_email'] : ( $user_obj ? $user_obj->user_email : '' );
+
+            if ( ! empty( $target_email ) && is_email( $target_email ) ) {
+                if ( $email_mode === 'instant' || $urgent ) {
+                    if ( ! $in_dnd || $urgent ) {
+                        cora_send_monochromatic_notification_email( $target_email, $title, $title, $body, $action_url, 'View in Workspace', $category );
+                        $summary['email']++;
+                    } else {
+                        cora_enqueue_notification_digest( $uid, $target_email, $event_key, $title, $body, $action_url, $category, 'daily' );
+                        $summary['queued']++;
+                    }
+                } elseif ( $email_mode === 'daily' || $email_mode === 'weekly' ) {
+                    cora_enqueue_notification_digest( $uid, $target_email, $event_key, $title, $body, $action_url, $category, $email_mode );
+                    $summary['queued']++;
+                }
+            }
+        }
+    }
+
+    return $summary;
+}
+}
+
+// ── AJAX HANDLERS: NOTIFICATION PREFERENCES & TESTING ──────────────────────
+
+if ( ! function_exists( 'cora_ajax_save_notification_preferences' ) ) {
+function cora_ajax_save_notification_preferences() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $user_id = get_current_user_id();
+    if ( ! $user_id ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
+    }
+
+    $raw_data = $_POST;
+    $prefs = cora_save_user_notification_prefs( $user_id, $raw_data );
+    wp_send_json_success( array(
+        'message' => 'Notification preferences updated successfully.',
+        'prefs'   => $prefs,
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_save_notification_preferences', 'cora_ajax_save_notification_preferences' );
+
+if ( ! function_exists( 'cora_ajax_send_test_notification_channel' ) ) {
+function cora_ajax_send_test_notification_channel() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $user_id = get_current_user_id();
+    if ( ! $user_id ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
+    }
+
+    $channel = sanitize_text_field( $_POST['channel'] ?? 'inapp' );
+    $user_obj = get_userdata( $user_id );
+    $target_email = $user_obj ? $user_obj->user_email : '';
+
+    $now_str = current_time( 'g:i A' );
+
+    if ( $channel === 'inapp' ) {
+        cora_add_notification(
+            $user_id,
+            'Test Notification Bell Alert',
+            "This is a simulated in-app notification delivered at {$now_str}.",
+            home_url( '/workspace/settings-suite?settings_tab=notifications' )
+        );
+        wp_send_json_success( array( 'message' => 'In-app notification sent! Check the topbar bell.' ) );
+    } elseif ( $channel === 'push' ) {
+        if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
+            $sent = cora_pwa_send_push_notification(
+                $user_id,
+                'Cora Web Push Live Test',
+                "VAPID push delivered successfully at {$now_str}!",
+                home_url( '/workspace/dashboard' )
+            );
+            if ( $sent ) {
+                wp_send_json_success( array( 'message' => 'Test Web Push dispatched to your device!' ) );
+            } else {
+                wp_send_json_error( array( 'message' => 'Push failed. Please click "Sync Device" to enable web push.' ) );
+            }
+        } else {
+            wp_send_json_error( array( 'message' => 'PWA push subsystem unavailable.' ) );
+        }
+    } elseif ( $channel === 'email' ) {
+        $sent = cora_send_monochromatic_notification_email(
+            $target_email,
+            'Cora Email Notification Live Test',
+            'Test Notification Delivered',
+            "Hello " . esc_html( $user_obj->display_name ) . ",\n\nYour transactional email routing is functioning properly. Notifications will be delivered to {$target_email} based on your matrix rules.",
+            home_url( '/workspace/settings-suite?settings_tab=notifications' ),
+            'Review Notification Settings',
+            'Live Diagnostics'
+        );
+        if ( $sent ) {
+            wp_send_json_success( array( 'message' => "Test email dispatched to {$target_email}!" ) );
+        } else {
+            wp_send_json_success( array( 'message' => "Test email triggered via wp_mail to {$target_email}." ) );
+        }
+    }
+
+    wp_send_json_error( array( 'message' => 'Invalid channel.' ) );
+}
+}
+add_action( 'wp_ajax_cora_send_test_notification_channel', 'cora_ajax_send_test_notification_channel' );
+
+if ( ! function_exists( 'cora_ajax_trigger_digest_run' ) ) {
+function cora_ajax_trigger_digest_run() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $user_id = get_current_user_id();
+    if ( ! $user_id || ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
+    }
+
+    $res = cora_cron_process_notification_digests();
+    wp_send_json_success( array(
+        'message' => "Digest queue processed successfully. {$res['processed']} items dispatched.",
+        'details' => $res,
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_trigger_digest_run', 'cora_ajax_trigger_digest_run' );
 
 if ( ! function_exists( 'cora_validate_password' ) ) {
 function cora_validate_password( $password ) {
@@ -34920,6 +35437,25 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
             cora_log_lead_assignment_change( $lead_id, $assigned_to_param );
         }
 
+        // Trigger lead notifications
+        if ( ! empty( $is_new ) ) {
+            cora_notify( 'lead_created', 'agency_owners', array(
+                'title'      => 'New Lead Captured: ' . $names,
+                'body'       => "Inquiry from {$names} ({$city}, {$price}) has entered the lead funnel.",
+                'action_url' => home_url( '/workspace/dashboard?sub_page=leads' ),
+                'category'   => 'CRM & Leads',
+            ) );
+        }
+
+        if ( ! empty( $assigned_to_param ) && intval( $assigned_to_param ) > 0 && ( ! empty( $is_new ) || $old_assigned_to !== $assigned_to_param ) ) {
+            cora_notify( 'lead_reassigned', intval( $assigned_to_param ), array(
+                'title'      => 'Lead Assigned to You: ' . $names,
+                'body'       => "You have been assigned to follow up with {$names} ({$city}).",
+                'action_url' => home_url( '/workspace/dashboard?sub_page=leads' ),
+                'category'   => 'CRM & Leads',
+            ) );
+        }
+
         wp_send_json_success( array(
             'message' => 'Lead deal saved successfully.',
             'lead_id' => $lead_id,
@@ -38155,6 +38691,16 @@ function cora_ajax_sign_document() {
 
     if ($found) {
         update_option('cora_documents', $docs);
+
+        // Dispatch E-Sign completed notification
+        $doc_title = ! empty( $d['title'] ) ? $d['title'] : 'Agreement';
+        cora_notify( 'doc_signed', 'agency_owners', array(
+            'title'      => 'Document E-Signed: ' . $doc_title,
+            'body'       => "Digital signature recorded for {$signer_name} ({$signer_email}) on {$doc_title}.",
+            'action_url' => home_url( '/workspace/dashboard?sub_page=vault' ),
+            'category'   => 'Document Vault',
+        ) );
+
         wp_send_json_success('Document e-signed successfully!');
     } else {
         wp_send_json_error('Document not found.');

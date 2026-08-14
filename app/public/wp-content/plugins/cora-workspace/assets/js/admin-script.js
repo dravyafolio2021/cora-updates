@@ -12455,3 +12455,110 @@ jQuery(document).ready(function($) {
 
     // Call the checker on load
     checkWorkspaceVersion();
+
+    // ═══════════════════════════════════════════════════════════════
+    // NOTIFICATION MANAGEMENT FRONTEND HANDLERS
+    // ═══════════════════════════════════════════════════════════════
+
+    window.coraSendTestChannelNotification = function(channel) {
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+
+        if (window.coraShowToast) {
+            window.coraShowToast(`Dispatching test ${channel} payload...`, 'info');
+        }
+
+        $.ajax({
+            url: ajaxUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'cora_send_test_notification_channel',
+                security: nonce,
+                channel: channel
+            },
+            success: function(res) {
+                if (res.success) {
+                    if (window.coraShowToast) {
+                        window.coraShowToast(res.data.message || 'Notification dispatched successfully!', 'success');
+                    }
+                } else {
+                    if (window.coraShowToast) {
+                        window.coraShowToast(res.data.message || 'Failed to dispatch test notification.', 'error');
+                    }
+                }
+            },
+            error: function() {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Network error while triggering test notification.', 'error');
+                }
+            }
+        });
+    };
+
+    window.coraTriggerDigestRun = function() {
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+
+        if (window.coraShowToast) {
+            window.coraShowToast('Processing notification digest queue...', 'info');
+        }
+
+        $.ajax({
+            url: ajaxUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'cora_trigger_digest_run',
+                security: nonce
+            },
+            success: function(res) {
+                if (res.success) {
+                    if (window.coraShowToast) {
+                        window.coraShowToast(res.data.message || 'Digest queue processed successfully!', 'success');
+                    }
+                } else {
+                    if (window.coraShowToast) {
+                        window.coraShowToast(res.data.message || 'Failed to process digest queue.', 'error');
+                    }
+                }
+            },
+            error: function() {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Server error while processing digest queue.', 'error');
+                }
+            }
+        });
+    };
+
+    window.coraCheckPwaPushStatus = function() {
+        const $pill = $('#cora-notif-pwa-status-pill');
+        if (!$pill.length) return;
+
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            $pill.text('Unsupported').removeClass('bg-zinc-200 bg-emerald-100 bg-amber-100 text-zinc-700 text-emerald-800 text-amber-800')
+                 .addClass('bg-zinc-100 text-zinc-500');
+            return;
+        }
+
+        navigator.serviceWorker.ready.then(function(reg) {
+            reg.pushManager.getSubscription().then(function(sub) {
+                if (sub) {
+                    $pill.text('Active & Subscribed').removeClass('bg-zinc-200 bg-zinc-100 bg-amber-100 text-zinc-700 text-zinc-500 text-amber-800')
+                         .addClass('bg-emerald-100 text-emerald-800');
+                } else {
+                    $pill.text('Ready / Not Synced').removeClass('bg-zinc-200 bg-zinc-100 bg-emerald-100 text-zinc-700 text-zinc-500 text-emerald-800')
+                         .addClass('bg-amber-100 text-amber-800');
+                }
+            }).catch(function() {
+                $pill.text('Disabled').addClass('bg-zinc-100 text-zinc-500');
+            });
+        }).catch(function() {
+            $pill.text('Ready').addClass('bg-zinc-100 text-zinc-600');
+        });
+    };
+
+    // Auto-check push status on settings load
+    $(document).ready(function() {
+        window.coraCheckPwaPushStatus();
+    });

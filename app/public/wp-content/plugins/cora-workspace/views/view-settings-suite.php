@@ -68,6 +68,11 @@ $cora_settings_tabs = array(
         'desc'  => 'Favicon, logos, integrations',
         'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
     ),
+    'notifications' => array(
+        'label' => 'Notifications',
+        'desc'  => 'Push, email & event triggers',
+        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>'
+    ),
     'reading'    => array(
         'label' => 'Content & SEO',
         'desc'  => 'Pages, writing, URLs & indexing',
@@ -1298,6 +1303,349 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div> <!-- close cora-shopify-card-body -->
             </div> <!-- close cora-shopify-card -->
         </div> <!-- close cora-settings-panel-brand -->
+
+        <!-- TAB: NOTIFICATION MANAGEMENT & EVENT TRIGGERS -->
+        <?php
+        $current_user_id = get_current_user_id();
+        $notif_prefs = function_exists('cora_get_user_notification_prefs') ? cora_get_user_notification_prefs( $current_user_id ) : array();
+        
+        $global_inapp = ! empty( $notif_prefs['global_inapp'] ?? 1 );
+        $global_push  = ! empty( $notif_prefs['global_push'] ?? 1 );
+        $global_email = ! empty( $notif_prefs['global_email'] ?? 1 );
+        $global_email_schedule = sanitize_text_field( $notif_prefs['global_email_schedule'] ?? 'instant' );
+        $dnd_enabled  = ! empty( $notif_prefs['dnd_enabled'] ?? 0 );
+        $dnd_start    = sanitize_text_field( $notif_prefs['dnd_start'] ?? '22:00' );
+        $dnd_end      = sanitize_text_field( $notif_prefs['dnd_end'] ?? '08:00' );
+        $custom_email = sanitize_email( $notif_prefs['custom_email'] ?? '' );
+        $triggers_cfg = $notif_prefs['triggers'] ?? array();
+        ?>
+        <div id="cora-settings-panel-notifications" class="cora-settings-panel space-y-6 max-w-4xl <?php echo $active_tab === 'notifications' ? '' : 'hidden'; ?>">
+
+            <!-- Card 1: Master Channels & Delivery Schedule -->
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 m-0 flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-800"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                            Notification Channels &amp; Delivery Settings
+                        </h3>
+                        <p class="text-xs text-zinc-500 m-0">Control global delivery channels, quiet hours (DND), and email digest scheduling.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
+                </div>
+                <div class="cora-shopify-card-body pt-4 space-y-5">
+                    <!-- Master Channel Toggles -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                        <!-- In-App Bell -->
+                        <div class="p-3.5 rounded-xl border border-zinc-200/80 bg-zinc-50/50 flex flex-col justify-between space-y-3">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <span class="text-xs font-bold text-zinc-900 block">In-App Notification Bell</span>
+                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5">Top-bar bell counter &amp; activity drawer alerts.</span>
+                                </div>
+                                <span class="w-2 h-2 rounded-full <?php echo $global_inapp ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-1"></span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" name="cora_notif_global_inapp" value="1" <?php checked( $global_inapp ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
+                                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                <span class="ml-2 text-[11px] font-semibold text-zinc-700">Enabled</span>
+                            </label>
+                        </div>
+
+                        <!-- Web Push (PWA) -->
+                        <div class="p-3.5 rounded-xl border border-zinc-200/80 bg-zinc-50/50 flex flex-col justify-between space-y-3">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-xs font-bold text-zinc-900 block">Web Push (PWA)</span>
+                                        <span id="cora-notif-pwa-status-pill" class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-200 text-zinc-700">Checking...</span>
+                                    </div>
+                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5">Instant desktop &amp; mobile lock-screen alerts.</span>
+                                </div>
+                                <span class="w-2 h-2 rounded-full <?php echo $global_push ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-1"></span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <label class="relative inline-flex items-center cursor-pointer select-none">
+                                    <input type="checkbox" name="cora_notif_global_push" value="1" <?php checked( $global_push ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
+                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                    <span class="ml-2 text-[11px] font-semibold text-zinc-700">Enabled</span>
+                                </label>
+                                <button type="button" onclick="coraRequestPushSubscription()" class="text-[10px] font-bold text-zinc-900 bg-white border border-zinc-200 hover:bg-zinc-100 px-2 py-1 rounded-lg transition-colors shadow-3xs cursor-pointer">
+                                    Sync Device
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Email Notifications -->
+                        <div class="p-3.5 rounded-xl border border-zinc-200/80 bg-zinc-50/50 flex flex-col justify-between space-y-3">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <span class="text-xs font-bold text-zinc-900 block">Email Notifications</span>
+                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5">Branded monochromatic HTML transaction alerts.</span>
+                                </div>
+                                <span class="w-2 h-2 rounded-full <?php echo $global_email ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-1"></span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" name="cora_notif_global_email" value="1" <?php checked( $global_email ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
+                                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                                <span class="ml-2 text-[11px] font-semibold text-zinc-700">Enabled</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Email Periodicity & Recipient Settings -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 border-t border-zinc-100">
+                        <div>
+                            <label class="flex items-center gap-1.5" title="Default delivery schedule for transactional and summary emails.">
+                                Default Email Delivery Mode
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            </label>
+                            <select name="cora_notif_global_email_schedule" onchange="coraMarkSettingsDirty()">
+                                <option value="instant" <?php selected( $global_email_schedule, 'instant' ); ?>>Instant (Send immediately as events occur)</option>
+                                <option value="daily" <?php selected( $global_email_schedule, 'daily' ); ?>>Daily Morning Digest (09:00 AM)</option>
+                                <option value="weekly" <?php selected( $global_email_schedule, 'weekly' ); ?>>Weekly Digest (Monday 09:00 AM)</option>
+                            </select>
+                            <span class="text-[11px] text-zinc-400 mt-1 block">Digest modes consolidate non-critical events into a clean summary email.</span>
+                        </div>
+                        <div>
+                            <label class="flex items-center gap-1.5" title="Optional custom recipient email. Leave blank to use your user profile email.">
+                                Custom Recipient Email (Optional)
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            </label>
+                            <input type="email" name="cora_notif_custom_email" value="<?php echo esc_attr( $custom_email ); ?>" placeholder="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>" onchange="coraMarkSettingsDirty()">
+                            <span class="text-[11px] text-zinc-400 mt-1 block">Defaults to: <?php echo esc_html( wp_get_current_user()->user_email ); ?></span>
+                        </div>
+                    </div>
+
+                    <!-- Quiet Hours / Do Not Disturb (DND) -->
+                    <div class="p-3.5 rounded-xl border border-zinc-200/80 bg-zinc-50/50 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                                <div>
+                                    <span class="text-xs font-bold text-zinc-900 block">Quiet Hours (Do Not Disturb)</span>
+                                    <span class="text-[11px] text-zinc-500 block leading-tight">Defer push and email notifications during off-hours (urgent security alerts bypass DND).</span>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" name="cora_notif_dnd_enabled" value="1" <?php checked( $dnd_enabled ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
+                                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-200/50">
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider !mb-1">Quiet Hours Start</label>
+                                <input type="time" name="cora_notif_dnd_start" value="<?php echo esc_attr( $dnd_start ); ?>" class="!py-1.5 text-xs" onchange="coraMarkSettingsDirty()">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider !mb-1">Quiet Hours End</label>
+                                <input type="time" name="cora_notif_dnd_end" value="<?php echo esc_attr( $dnd_end ); ?>" class="!py-1.5 text-xs" onchange="coraMarkSettingsDirty()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Granular Trigger & Channel Routing Matrix -->
+            <?php
+            $modules_triggers = array(
+                'crm_leads' => array(
+                    'title' => 'CRM, Contacts & Leads',
+                    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+                    'items' => array(
+                        'lead_created'           => array( 'label' => 'New Lead Captured', 'desc' => 'Instant alert when a lead submits inquiry, form, or WhatsApp message.', 'default_email' => 'instant' ),
+                        'lead_status_changed'    => array( 'label' => 'Lead Pipeline Stage Changed', 'desc' => 'Status transitions (Negotiating, Contract Sent, Closed Won).', 'default_email' => 'daily' ),
+                        'lead_reassigned'        => array( 'label' => 'Lead Assigned to Agent/User', 'desc' => 'Notification sent when a lead is delegated to you.', 'default_email' => 'instant' ),
+                        'lead_followup_reminder' => array( 'label' => 'Follow-up Call / Task Reminder', 'desc' => 'Reminder when scheduled follow-up or viewing time is due.', 'default_email' => 'instant' ),
+                    )
+                ),
+                'bookings_calendar' => array(
+                    'title' => 'Bookings & Shoot Calendar',
+                    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+                    'items' => array(
+                        'booking_created'        => array( 'label' => 'New Shoot / Booking Scheduled', 'desc' => 'Client or team confirms a new photography/real estate booking slot.', 'default_email' => 'instant' ),
+                        'booking_rescheduled'    => array( 'label' => 'Booking Rescheduled / Modified', 'desc' => 'Date, location, or call-time updated by client or manager.', 'default_email' => 'instant' ),
+                        'booking_reminder'       => array( 'label' => '24h & 1h Shoot Reminder', 'desc' => 'Automated call-time briefing before scheduled shoot begins.', 'default_email' => 'instant' ),
+                        'crew_assigned'          => array( 'label' => 'Crew / Photographer Assigned', 'desc' => 'You are assigned as primary photographer, drone pilot, or assistant.', 'default_email' => 'instant' ),
+                    )
+                ),
+                'invoices_finance' => array(
+                    'title' => 'Invoices & Financials',
+                    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>',
+                    'items' => array(
+                        'invoice_created'        => array( 'label' => 'New Invoice Issued', 'desc' => 'Invoice or retainer quote generated for client agreement.', 'default_email' => 'instant' ),
+                        'payment_received'       => array( 'label' => 'Payment Cleared & Logged', 'desc' => 'Client settles milestone, retainer, or final shoot invoice.', 'default_email' => 'instant' ),
+                        'invoice_overdue'        => array( 'label' => 'Overdue Invoice Alert', 'desc' => 'Invoice passes payment due date without full settlement.', 'default_email' => 'daily' ),
+                        'financial_summary'      => array( 'label' => 'Weekly Revenue & GST Digest', 'desc' => 'Summary of gross revenue, SGST/CGST breakdown, and cash inflows.', 'default_email' => 'weekly' ),
+                    )
+                ),
+                'vault_esign' => array(
+                    'title' => 'Document Vault & E-Signatures',
+                    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>',
+                    'items' => array(
+                        'doc_sent_sign'          => array( 'label' => 'Document Dispatched for E-Sign', 'desc' => 'Agreement sent to client or broker for digital signature.', 'default_email' => 'instant' ),
+                        'doc_viewed'             => array( 'label' => 'Agreement Opened & Viewed', 'desc' => 'Client accesses the secure verification signing link.', 'default_email' => 'daily' ),
+                        'doc_signed'             => array( 'label' => 'Document Fully Executed & Signed', 'desc' => 'All parties have signed; legal tamper-proof certificate generated.', 'default_email' => 'instant' ),
+                        'doc_expiring'           => array( 'label' => 'Agreement Expiring Alert', 'desc' => 'Document signature deadline approaching in 7 days.', 'default_email' => 'daily' ),
+                    )
+                ),
+                'team_attendance' => array(
+                    'title' => 'Team, Shifts & Attendance',
+                    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
+                    'items' => array(
+                        'team_member_joined'     => array( 'label' => 'New Team Member Joined', 'desc' => 'Invited user accepts email invite and completes workspace onboarding.', 'default_email' => 'daily' ),
+                        'shift_assigned'         => array( 'label' => 'Roster / Shift Assigned', 'desc' => 'New studio or field shift added to your schedule.', 'default_email' => 'instant' ),
+                        'attendance_reminder'    => array( 'label' => 'Punch-in & Punch-out Reminder', 'desc' => 'Daily prompt to log attendance and session hours.', 'default_email' => 'never' ),
+                        'role_changed'           => array( 'label' => 'Role / Permission Level Updated', 'desc' => 'Your workspace permission capabilities have been modified.', 'default_email' => 'instant' ),
+                    )
+                ),
+                'security_system' => array(
+                    'title' => 'Security, Backups & AI Quota',
+                    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>',
+                    'items' => array(
+                        'security_login'         => array( 'label' => 'New Device / IP Login Detected', 'desc' => 'Sign-in from an unrecognized browser or geographic location.', 'default_email' => 'instant' ),
+                        'backup_completed'       => array( 'label' => 'Automated Backup Completed', 'desc' => 'Confirmation of scheduled database and media vault backup.', 'default_email' => 'weekly' ),
+                        'ai_quota_alert'         => array( 'label' => 'AI Token / API Usage Threshold', 'desc' => 'Workspace approaches 85% of monthly Gemini/OpenAI token quota.', 'default_email' => 'instant' ),
+                    )
+                ),
+            );
+            ?>
+
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 m-0 flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-800"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                            Event Triggers &amp; Channel Routing Matrix
+                        </h3>
+                        <p class="text-xs text-zinc-500 m-0">Fine-tune in-app badges, browser push notifications, and email delivery frequency per event.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
+                </div>
+
+                <div class="cora-shopify-card-body pt-4 space-y-6">
+                    <!-- Matrix Table Header Hint -->
+                    <div class="hidden sm:grid grid-cols-12 gap-3 px-3 py-2 bg-zinc-100/70 rounded-xl text-[11px] font-bold text-zinc-600 uppercase tracking-wider">
+                        <div class="col-span-6">Trigger Event</div>
+                        <div class="col-span-2 text-center">In-App</div>
+                        <div class="col-span-2 text-center">Web Push</div>
+                        <div class="col-span-2 text-right pr-2">Email Frequency</div>
+                    </div>
+
+                    <?php foreach ( $modules_triggers as $mod_key => $mod_info ) : ?>
+                        <div class="space-y-2.5">
+                            <div class="flex items-center gap-2 px-1 text-xs font-bold text-zinc-800 border-b border-zinc-100 pb-1.5">
+                                <span class="text-zinc-500"><?php echo $mod_info['icon']; ?></span>
+                                <span><?php echo esc_html( $mod_info['title'] ); ?></span>
+                            </div>
+
+                            <div class="space-y-2">
+                                <?php foreach ( $mod_info['items'] as $item_key => $item_info ) : 
+                                    $item_inapp = isset( $triggers_cfg[ $item_key ]['inapp'] ) ? ! empty( $triggers_cfg[ $item_key ]['inapp'] ) : true;
+                                    $item_push  = isset( $triggers_cfg[ $item_key ]['push'] )  ? ! empty( $triggers_cfg[ $item_key ]['push'] )  : true;
+                                    $item_email = isset( $triggers_cfg[ $item_key ]['email'] ) ? sanitize_text_field( $triggers_cfg[ $item_key ]['email'] ) : $item_info['default_email'];
+                                ?>
+                                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3 rounded-xl border border-zinc-200/60 hover:border-zinc-300 bg-white items-center transition-colors">
+                                        <!-- Event Details -->
+                                        <div class="sm:col-span-6 min-w-0">
+                                            <span class="text-xs font-bold text-zinc-900 block truncate"><?php echo esc_html( $item_info['label'] ); ?></span>
+                                            <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5"><?php echo esc_html( $item_info['desc'] ); ?></span>
+                                        </div>
+
+                                        <!-- In-App Checkbox -->
+                                        <div class="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-100">
+                                            <span class="sm:hidden text-xs font-medium text-zinc-600">In-App Alert</span>
+                                            <label class="relative inline-flex items-center cursor-pointer select-none">
+                                                <input type="checkbox" name="notif_inapp_<?php echo esc_attr( $item_key ); ?>" value="1" <?php checked( $item_inapp ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
+                                                <div class="w-8 h-4.5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-900"></div>
+                                            </label>
+                                        </div>
+
+                                        <!-- Web Push Checkbox -->
+                                        <div class="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2">
+                                            <span class="sm:hidden text-xs font-medium text-zinc-600">Web Push</span>
+                                            <label class="relative inline-flex items-center cursor-pointer select-none">
+                                                <input type="checkbox" name="notif_push_<?php echo esc_attr( $item_key ); ?>" value="1" <?php checked( $item_push ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
+                                                <div class="w-8 h-4.5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-900"></div>
+                                            </label>
+                                        </div>
+
+                                        <!-- Email Delivery Dropdown -->
+                                        <div class="sm:col-span-2 flex items-center justify-between sm:justify-end gap-2">
+                                            <span class="sm:hidden text-xs font-medium text-zinc-600">Email Delivery</span>
+                                            <select name="notif_email_<?php echo esc_attr( $item_key ); ?>" class="!py-1 !px-2 !text-[11px] !rounded-lg !w-full sm:!w-auto font-medium" onchange="coraMarkSettingsDirty()">
+                                                <option value="instant" <?php selected( $item_email, 'instant' ); ?>>Instant</option>
+                                                <option value="daily" <?php selected( $item_email, 'daily' ); ?>>Daily Digest</option>
+                                                <option value="weekly" <?php selected( $item_email, 'weekly' ); ?>>Weekly Digest</option>
+                                                <option value="never" <?php selected( $item_email, 'never' ); ?>>Off (Never)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Card 3: Live Testing & Channel Diagnostics -->
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 m-0 flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-800"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            Live Diagnostics &amp; Channel Testing
+                        </h3>
+                        <p class="text-xs text-zinc-500 m-0">Send instant simulated payloads across all active channels to verify connectivity.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
+                </div>
+                <div class="cora-shopify-card-body pt-4 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                        <!-- Test In-App -->
+                        <button type="button" onclick="coraSendTestChannelNotification('inapp')" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded-xl text-xs border border-zinc-200 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                            Test In-App Bell
+                        </button>
+
+                        <!-- Test Push -->
+                        <button type="button" onclick="coraSendTestChannelNotification('push')" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded-xl text-xs border border-zinc-200 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                            Test Web Push
+                        </button>
+
+                        <!-- Test Email -->
+                        <button type="button" onclick="coraSendTestChannelNotification('email')" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white hover:bg-zinc-50 text-zinc-800 font-bold rounded-xl text-xs border border-zinc-200 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            Test HTML Email
+                        </button>
+
+                        <!-- Run Digest -->
+                        <button type="button" onclick="coraTriggerDigestRun()" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            Process Digest Now
+                        </button>
+                    </div>
+
+                    <div class="p-3 bg-zinc-50 rounded-xl border border-zinc-150 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-zinc-600">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="font-medium">All notification routers active. Triggers will be delivered per matrix rules.</span>
+                        </div>
+                        <div class="text-[11px] text-zinc-400 font-mono">
+                            VAPID Web Push: <span class="text-zinc-700 font-semibold">ES256 RFC8292</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- close cora-settings-panel-notifications -->
 
         <!-- TAB 5: READING & SEO SETTINGS -->
         <div id="cora-settings-panel-reading" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'reading' ? '' : 'hidden'; ?>">
