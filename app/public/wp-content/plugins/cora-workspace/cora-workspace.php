@@ -19096,12 +19096,19 @@ function cora_ajax_media_library_get_activity() {
 }
 add_action( 'wp_ajax_cora_media_library_get_activity', 'cora_ajax_media_library_get_activity' );
 
-if ( ! function_exists( 'cora_get_workspace_storage_usage_bytes' ) ) {
-function cora_get_workspace_storage_usage_bytes() {
+if ( ! function_exists( 'cora_get_workspace_storage_details' ) ) {
+function cora_get_workspace_storage_details() {
     global $wpdb;
     $total_bytes = 0;
+    $breakdown   = array(
+        'images'    => 0,
+        'videos'    => 0,
+        'documents' => 0,
+        'audio'     => 0,
+        'variants'  => 0,
+        'other'     => 0,
+    );
     
-    // Multi-Tenancy & Data Isolation on attachments
     $agency_id = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'super';
     
     if ( $agency_id !== 'super' && ! empty( $agency_id ) ) {
@@ -19125,12 +19132,61 @@ function cora_get_workspace_storage_usage_bytes() {
         foreach ( $post_ids as $pid ) {
             $path = get_attached_file( $pid );
             if ( $path && file_exists( $path ) ) {
-                $total_bytes += filesize( $path );
+                $file_sz = filesize( $path );
+                $total_bytes += $file_sz;
+                
+                $mime = get_post_mime_type( $pid );
+                $cat  = function_exists( 'cora_media_mime_category' ) ? cora_media_mime_category( $mime ) : 'document';
+                if ( $cat === 'image' ) {
+                    $breakdown['images'] += $file_sz;
+                } elseif ( $cat === 'video' ) {
+                    $breakdown['videos'] += $file_sz;
+                } elseif ( $cat === 'audio' ) {
+                    $breakdown['audio'] += $file_sz;
+                } elseif ( $cat === 'document' ) {
+                    $breakdown['documents'] += $file_sz;
+                } else {
+                    $breakdown['other'] += $file_sz;
+                }
+                
+                $dir = dirname( $path );
+                // Add generated responsive image variants & WebP conversions
+                $meta = wp_get_attachment_metadata( $pid );
+                if ( ! empty( $meta['sizes'] ) && is_array( $meta['sizes'] ) ) {
+                    foreach ( $meta['sizes'] as $size_info ) {
+                        if ( ! empty( $size_info['file'] ) ) {
+                            $thumb_path = $dir . '/' . $size_info['file'];
+                            if ( file_exists( $thumb_path ) ) {
+                                $var_sz = filesize( $thumb_path );
+                                $total_bytes += $var_sz;
+                                $breakdown['variants'] += $var_sz;
+                            }
+                        }
+                    }
+                }
+                
+                // Add backup/original uncompressed files
+                $extra = get_post_meta( $pid, '_cora_media_extra', true );
+                if ( ! empty( $extra['original_file'] ) && file_exists( $extra['original_file'] ) ) {
+                    $orig_sz = filesize( $extra['original_file'] );
+                    $total_bytes += $orig_sz;
+                    $breakdown['variants'] += $orig_sz;
+                }
             }
         }
     }
     
-    return $total_bytes;
+    return array(
+        'total_bytes' => $total_bytes,
+        'breakdown'   => $breakdown,
+    );
+}
+}
+
+if ( ! function_exists( 'cora_get_workspace_storage_usage_bytes' ) ) {
+function cora_get_workspace_storage_usage_bytes() {
+    $details = cora_get_workspace_storage_details();
+    return $details['total_bytes'];
 }
 }
 
@@ -19146,15 +19202,24 @@ function cora_get_workspace_storage_limit_bytes() {
 if ( ! function_exists( 'cora_ajax_media_library_get_storage' ) ) {
 function cora_ajax_media_library_get_storage() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    $total_bytes = cora_get_workspace_storage_usage_bytes();
+    $details     = cora_get_workspace_storage_details();
+    $total_bytes = $details['total_bytes'];
     $limit_bytes = cora_get_workspace_storage_limit_bytes();
     $pct = $limit_bytes > 0 ? round( ( $total_bytes / $limit_bytes ) * 100, 1 ) : 0;
+    
+    $breakdown_human = array();
+    foreach ( $details['breakdown'] as $k => $v ) {
+        $breakdown_human[ $k ] = cora_media_human_size( $v );
+    }
+
     wp_send_json_success( array(
-        'total_human' => cora_media_human_size( $total_bytes ),
-        'limit_human' => cora_media_human_size( $limit_bytes ),
-        'percent_used'=> $pct,
-        'total_bytes' => $total_bytes,
-        'limit_bytes' => $limit_bytes,
+        'total_human'     => cora_media_human_size( $total_bytes ),
+        'limit_human'     => cora_media_human_size( $limit_bytes ),
+        'percent_used'    => $pct,
+        'total_bytes'     => $total_bytes,
+        'limit_bytes'     => $limit_bytes,
+        'breakdown_bytes' => $details['breakdown'],
+        'breakdown_human' => $breakdown_human,
     ) );
 }
 }

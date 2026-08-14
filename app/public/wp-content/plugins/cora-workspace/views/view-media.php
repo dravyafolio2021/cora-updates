@@ -820,20 +820,41 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             </div>
 
             <!-- Hover / Click Detailed Analytics Popover Card -->
-            <div id="cm-storage-analytics-card" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:240px;background:#fff;border:1px solid #e4e4e7;border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:9999;pointer-events:auto;text-align:left;">
+            <div id="cm-storage-analytics-card" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:260px;background:#fff;border:1px solid #e4e4e7;border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:9999;pointer-events:auto;text-align:left;">
                 <div style="font-size:11px;font-weight:700;color:#18181b;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
                     <span class="flex items-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
                         Workspace Storage
                     </span>
-                    <span id="cm-sa-pct-text" style="color:<?php echo esc_attr( $initial_stroke_color ); ?>;font-weight:700;"><?php echo esc_html( $initial_pct ); ?>% Used</span>
+                    <span id="cm-sa-pct-text" style="color:<?php echo esc_attr( $initial_stroke_color ); ?>;font-weight:700;font-size:10px;"><?php echo esc_html( $initial_pct ); ?>% Used</span>
                 </div>
                 <div style="font-size:10.5px;color:#71717a;margin-bottom:6px" id="cm-sa-human"><?php echo esc_html( $initial_total_human ); ?> used of <?php echo esc_html( $initial_limit_human ); ?></div>
-                <div style="height:6px;width:100%;background:#f4f4f5;border-radius:99px;overflow:hidden;margin-bottom:8px">
+                <div style="height:6px;width:100%;background:#f4f4f5;border-radius:99px;overflow:hidden;margin-bottom:10px">
                     <div id="cm-sa-bar" style="height:100%;width:<?php echo esc_attr( $initial_pct ); ?>%;background:<?php echo esc_attr( $initial_stroke_color ); ?>;border-radius:99px;transition:width .3s ease"></div>
                 </div>
-                <div style="font-size:10px;color:#52525b;display:flex;justify-content:space-between;border-top:1px solid #f4f4f5;padding-top:6px;">
-                    <span>Available:</span>
+
+                <!-- Storage Categories Breakdown -->
+                <div class="space-y-1.5 pt-2 border-t border-zinc-100 text-[10px] text-zinc-600" id="cm-sa-breakdown">
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Photos &amp; Images</span>
+                        <strong class="text-zinc-900" id="cm-sa-bd-images">—</strong>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Documents &amp; Files</span>
+                        <strong class="text-zinc-900" id="cm-sa-bd-docs">—</strong>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> Videos &amp; Audio</span>
+                        <strong class="text-zinc-900" id="cm-sa-bd-media">—</strong>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Thumbnails &amp; Variants</span>
+                        <strong class="text-zinc-900" id="cm-sa-bd-variants">—</strong>
+                    </div>
+                </div>
+
+                <div style="font-size:10px;color:#52525b;display:flex;justify-content:space-between;border-top:1px solid #f4f4f5;padding-top:8px;margin-top:8px;">
+                    <span>Available Free Space:</span>
                     <strong id="cm-sa-free" style="color:#09090b"><?php echo esc_html( $initial_free_human ); ?></strong>
                 </div>
             </div>
@@ -3376,6 +3397,23 @@ window.cmLoadStorage = function() {
             } else {
                 saFree.textContent = '—';
             }
+        }
+
+        if (d.breakdown_human) {
+            var bdImages = document.getElementById('cm-sa-bd-images');
+            if (bdImages) bdImages.textContent = d.breakdown_human.images || '0 B';
+            
+            var bdDocs = document.getElementById('cm-sa-bd-docs');
+            if (bdDocs) bdDocs.textContent = d.breakdown_human.documents || '0 B';
+            
+            var bdMedia = document.getElementById('cm-sa-bd-media');
+            if (bdMedia) {
+                var mediaBytes = (d.breakdown_bytes ? ((d.breakdown_bytes.videos || 0) + (d.breakdown_bytes.audio || 0)) : 0);
+                bdMedia.textContent = cmFormatBytes(mediaBytes);
+            }
+            
+            var bdVar = document.getElementById('cm-sa-bd-variants');
+            if (bdVar) bdVar.textContent = d.breakdown_human.variants || '0 B';
         }
 
         var wrap = document.getElementById('cm-storage-wrap');
