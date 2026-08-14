@@ -19098,13 +19098,38 @@ add_action( 'wp_ajax_cora_media_library_get_activity', 'cora_ajax_media_library_
 
 if ( ! function_exists( 'cora_get_workspace_storage_usage_bytes' ) ) {
 function cora_get_workspace_storage_usage_bytes() {
-    $upload_dir  = wp_upload_dir();
-    $base        = $upload_dir['basedir'];
+    global $wpdb;
     $total_bytes = 0;
-    if ( is_dir( $base ) ) {
-        $it = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base, FilesystemIterator::SKIP_DOTS ) );
-        foreach ( $it as $f ) { if ( $f->isFile() ) $total_bytes += $f->getSize(); }
+    
+    // Multi-Tenancy & Data Isolation on attachments
+    $agency_id = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'super';
+    
+    if ( $agency_id !== 'super' && ! empty( $agency_id ) ) {
+        $agency_ids   = function_exists( 'cora_get_agency_identifiers' ) ? cora_get_agency_identifiers( $agency_id ) : array( $agency_id );
+        $placeholders = implode( ',', array_fill( 0, count( $agency_ids ), '%s' ) );
+        
+        $post_ids = $wpdb->get_col( $wpdb->prepare(
+            "SELECT p.ID FROM {$wpdb->posts} p
+             LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = 'cora_agency_id'
+             WHERE p.post_type = 'attachment' AND p.post_status = 'inherit'
+             AND (pm.meta_value IN ($placeholders) OR pm.meta_value IS NULL)",
+            $agency_ids
+        ) );
+    } else {
+        $post_ids = $wpdb->get_col(
+            "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_status = 'inherit'"
+        );
     }
+    
+    if ( ! empty( $post_ids ) ) {
+        foreach ( $post_ids as $pid ) {
+            $path = get_attached_file( $pid );
+            if ( $path && file_exists( $path ) ) {
+                $total_bytes += filesize( $path );
+            }
+        }
+    }
+    
     return $total_bytes;
 }
 }

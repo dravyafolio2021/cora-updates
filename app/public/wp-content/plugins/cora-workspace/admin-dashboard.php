@@ -4084,13 +4084,20 @@ if ( $_cora_splash_leads > 0 ) {
                 <!-- Quota Metrics Section -->
                 <div class="px-2 py-2.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-3 select-none">
                     <!-- Storage Quota -->
+                    <?php
+                    $storage_used_b = function_exists( 'cora_get_workspace_storage_usage_bytes' ) ? cora_get_workspace_storage_usage_bytes() : 0;
+                    $storage_limit_b = function_exists( 'cora_get_workspace_storage_limit_bytes' ) ? cora_get_workspace_storage_limit_bytes() : ( 5 * 1024 * 1024 * 1024 );
+                    $storage_pct = $storage_limit_b > 0 ? min( 100, round( ( $storage_used_b / $storage_limit_b ) * 100, 1 ) ) : 0;
+                    $storage_used_str = function_exists( 'cora_media_human_size' ) ? cora_media_human_size( $storage_used_b ) : size_format( $storage_used_b );
+                    $storage_limit_str = function_exists( 'cora_media_human_size' ) ? cora_media_human_size( $storage_limit_b ) : '5 GB';
+                    ?>
                     <div class="space-y-1">
                         <div class="flex items-center justify-between text-[10px] font-bold text-zinc-500">
                             <span>Storage Usage</span>
-                            <span>4.2 GB of 10 GB (42%)</span>
+                            <span><?php echo esc_html( $storage_used_str ); ?> of <?php echo esc_html( $storage_limit_str ); ?> (<?php echo esc_html( $storage_pct ); ?>%)</span>
                         </div>
                         <div class="w-full h-1.5 bg-zinc-200 rounded-full overflow-hidden">
-                            <div class="bg-zinc-900 h-full rounded-full" style="width: 42%;"></div>
+                            <div class="bg-zinc-900 h-full rounded-full" style="width: <?php echo esc_attr( $storage_pct ); ?>%;"></div>
                         </div>
                     </div>
 
