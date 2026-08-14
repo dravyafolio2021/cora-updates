@@ -3471,16 +3471,16 @@ if ( $_cora_splash_leads > 0 ) {
             <!-- User Profile Widget -->
             <div class="relative shrink-0">
                 <div onclick="window.coraToggleProfilePopover(event);" class="cora-header-profile-btn flex items-center gap-2 cursor-pointer transition-all select-none shrink-0">
-                    <div class="relative w-8 h-8 rounded-full flex items-center justify-center shrink-0 leading-none">
+                    <div class="relative w-8 h-8 shrink-0">
                         <?php if ( $current_user_avatar ) : ?>
-                            <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0 select-none border border-zinc-700/60" alt="<?php echo esc_attr($cora_display_name); ?>" />
+                            <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0 select-none border border-zinc-700/60 block" alt="<?php echo esc_attr($cora_display_name); ?>" />
                         <?php else : ?>
                             <div class="w-8 h-8 rounded-full bg-white text-zinc-950 font-bold text-sm flex items-center justify-center shrink-0 leading-none">
                                 <?php echo esc_html($cora_initials); ?>
                             </div>
                         <?php endif; ?>
-                        <!-- Status dot -->
-                        <span id="cora-desktop-profile-status-dot" class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border border-[#09090b] bg-zinc-500 transition-colors"></span>
+                        <!-- Status dot (Anchored at bottom-right corner) -->
+                        <span id="cora-desktop-profile-status-dot" class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-zinc-950 bg-zinc-500 transition-colors pointer-events-none" style="position:absolute !important; bottom:-1px !important; right:-1px !important; z-index:10 !important;"></span>
                     </div>
                     <span class="text-white font-semibold text-sm truncate max-w-[100px] hidden md:inline"><?php echo esc_html($cora_display_name); ?></span>
                 </div>
@@ -3492,13 +3492,16 @@ if ( $_cora_splash_leads > 0 ) {
         <div id="cora-header-profile-popover" class="hidden fixed top-[56px] right-4 w-64 bg-white border border-zinc-200 rounded-2xl shadow-xl p-4 z-[9990] gap-2.5 animate-in fade-in slide-in-from-top-2 duration-150 select-none" style="flex-direction:column;">
             <!-- User Profile Header -->
             <div class="flex items-center gap-3 px-1 select-none">
-                <?php if ( $current_user_avatar ) : ?>
-                    <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-10 h-10 rounded-full object-cover shrink-0 select-none border border-zinc-200/60" alt="<?php echo esc_attr($current_user_display_name); ?>" />
-                <?php else : ?>
-                    <div class="w-10 h-10 rounded-full bg-zinc-200 text-zinc-700 flex items-center justify-center font-bold text-sm uppercase shrink-0 select-none">
-                        <?php echo esc_html(substr($current_user_display_name, 0, 2)); ?>
-                    </div>
-                <?php endif; ?>
+                <div class="relative w-10 h-10 shrink-0">
+                    <?php if ( $current_user_avatar ) : ?>
+                        <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-10 h-10 rounded-full object-cover shrink-0 select-none border border-zinc-200/60 block" alt="<?php echo esc_attr($current_user_display_name); ?>" />
+                    <?php else : ?>
+                        <div class="w-10 h-10 rounded-full bg-zinc-200 text-zinc-700 flex items-center justify-center font-bold text-sm uppercase shrink-0 select-none">
+                            <?php echo esc_html(substr($current_user_display_name, 0, 2)); ?>
+                        </div>
+                    <?php endif; ?>
+                    <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white bg-emerald-500 pointer-events-none" style="position:absolute !important; bottom:0 !important; right:0 !important; z-index:10 !important;"></span>
+                </div>
                 <div class="flex flex-col min-w-0 leading-tight">
                     <span class="text-sm font-bold text-zinc-900 truncate"><?php echo esc_html($current_user_display_name); ?></span>
                     <span class="text-[11px] text-zinc-500 truncate"><?php echo esc_html($current_wp_user->exists() ? $current_wp_user->user_email : 'dravya.shs@gmail.com'); ?></span>
@@ -3612,16 +3615,16 @@ if ( $_cora_splash_leads > 0 ) {
                     <span id="cora-mobile-notif-badge" class="<?php echo $cora_unread_count > 0 ? '' : 'hidden'; ?> absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full border border-[#09090b]"></span>
                 </button>
                 <div onclick="window.coraToggleProfilePopover(event);" class="cora-header-profile-btn flex items-center cursor-pointer shrink-0">
-                    <div class="relative w-7 h-7 rounded-full flex items-center justify-center shrink-0 leading-none">
+                    <div class="relative w-7 h-7 shrink-0">
                         <?php if ( $current_user_avatar ) : ?>
-                            <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-7 h-7 rounded-full object-cover shrink-0 select-none border border-zinc-700/60" alt="<?php echo esc_attr($cora_display_name); ?>" />
+                            <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-7 h-7 rounded-full object-cover shrink-0 select-none border border-zinc-700/60 block" alt="<?php echo esc_attr($cora_display_name); ?>" />
                         <?php else : ?>
                             <div class="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center font-bold text-[11px] shrink-0 leading-none">
                                 <?php echo esc_html($cora_initials); ?>
                             </div>
                         <?php endif; ?>
-                        <!-- Status dot -->
-                        <span id="cora-mobile-profile-status-dot" class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[#09090b] bg-zinc-500 transition-colors"></span>
+                        <!-- Status dot (Anchored at bottom-right corner) -->
+                        <span id="cora-mobile-profile-status-dot" class="absolute bottom-0 right-0 w-2 h-2 rounded-full border-2 border-zinc-950 bg-zinc-500 transition-colors pointer-events-none" style="position:absolute !important; bottom:-1px !important; right:-1px !important; z-index:10 !important;"></span>
                     </div>
                 </div>
             </div>
@@ -3959,16 +3962,20 @@ if ( $_cora_splash_leads > 0 ) {
             <div id="cora-profile-popover" class="hidden absolute bottom-20 left-4 right-4 max-h-[360px] overflow-y-auto bg-white border border-zinc-200 rounded-2xl shadow-xl p-4 z-[70] flex flex-col gap-2.5 animate-in fade-in slide-in-from-bottom-2 duration-150 select-none">
                 <!-- User Profile Header -->
                 <div class="flex items-center gap-3 px-1 select-none">
-                    <?php if ( $current_user_avatar ) : ?>
-                        <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-10 h-10 rounded-full object-cover shrink-0 select-none border border-zinc-200/60" alt="<?php echo esc_attr($current_user_display_name); ?>" />
-                    <?php else : ?>
-                        <div class="w-10 h-10 rounded-full bg-zinc-200 text-zinc-700 flex items-center justify-center font-bold text-sm uppercase shrink-0 select-none">
-                            <?php 
-                            $pop_initials = ( cora_is_real_shruti() || ( $current_wp_user->exists() && $current_wp_user->user_login === 'cora_admin' ) ) ? 'S' : substr($current_user_display_name, 0, 2);
-                            echo esc_html($pop_initials); 
-                            ?>
-                        </div>
-                    <?php endif; ?>
+                    <div class="relative w-10 h-10 shrink-0">
+                        <?php if ( $current_user_avatar ) : ?>
+                            <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-10 h-10 rounded-full object-cover shrink-0 select-none border border-zinc-200/60 block" alt="<?php echo esc_attr($current_user_display_name); ?>" />
+                        <?php else : ?>
+                            <div class="w-10 h-10 rounded-full bg-zinc-200 text-zinc-700 flex items-center justify-center font-bold text-sm uppercase shrink-0 select-none">
+                                <?php 
+                                $pop_initials = ( cora_is_real_shruti() || ( $current_wp_user->exists() && $current_wp_user->user_login === 'cora_admin' ) ) ? 'S' : substr($current_user_display_name, 0, 2);
+                                echo esc_html($pop_initials); 
+                                ?>
+                            </div>
+                        <?php endif; ?>
+                        <!-- Status dot anchored at bottom-right -->
+                        <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white bg-emerald-500 pointer-events-none" style="position:absolute !important; bottom:0 !important; right:0 !important; z-index:10 !important;"></span>
+                    </div>
                     <div class="flex flex-col min-w-0 leading-tight">
                         <span class="text-sm font-bold text-zinc-900 truncate"><?php echo esc_html(( cora_is_real_shruti() || ( $current_wp_user->exists() && $current_wp_user->user_login === 'cora_admin' ) ) ? 'Shruti' : $current_user_display_name); ?></span>
                         <span class="text-[11px] text-zinc-500 truncate"><?php echo esc_html($current_wp_user->exists() ? $current_wp_user->user_email : 'dravya.shs@gmail.com'); ?></span>
@@ -4243,13 +4250,17 @@ if ( $_cora_splash_leads > 0 ) {
                     <span class="cora-feedback-btn-text">Feedback</span>
                 </button>
                 <div class="flex items-center gap-3 min-w-0">
-                    <?php if ( $current_user_avatar ) : ?>
-                        <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0 select-none border border-zinc-200/60" alt="<?php echo esc_attr($current_user_display_name); ?>" />
-                    <?php else : ?>
-                        <div class="w-8 h-8 rounded-full bg-zinc-200 text-zinc-700 flex items-center justify-center font-bold text-xs uppercase shrink-0 select-none">
-                            <?php echo esc_html( $is_shruti_user ? 'S' : substr($current_user_display_name, 0, 2) ); ?>
-                        </div>
-                    <?php endif; ?>
+                    <div class="relative w-8 h-8 shrink-0">
+                        <?php if ( $current_user_avatar ) : ?>
+                            <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-8 h-8 rounded-full object-cover shrink-0 select-none border border-zinc-200/60 block" alt="<?php echo esc_attr($current_user_display_name); ?>" />
+                        <?php else : ?>
+                            <div class="w-8 h-8 rounded-full bg-zinc-200 text-zinc-700 flex items-center justify-center font-bold text-xs uppercase shrink-0 select-none">
+                                <?php echo esc_html( $is_shruti_user ? 'S' : substr($current_user_display_name, 0, 2) ); ?>
+                            </div>
+                        <?php endif; ?>
+                        <!-- Status dot anchored at bottom-right -->
+                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white bg-emerald-500 pointer-events-none" style="position:absolute !important; bottom:-1px !important; right:-1px !important; z-index:10 !important;"></span>
+                    </div>
                     <div class="cora-user-info flex flex-col min-w-0">
                         <span class="cora-user-name text-xs font-semibold text-zinc-900 truncate leading-tight"><?php echo esc_html($current_user_display_name); ?></span>
                         <span class="cora-user-role text-[10px] text-zinc-400 font-medium truncate"><?php echo esc_html($current_user_role_label); ?></span>
