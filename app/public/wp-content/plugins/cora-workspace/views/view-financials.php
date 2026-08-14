@@ -136,6 +136,26 @@ if ( empty( $client_profits ) ) {
     );
 }
 
+// User-customizable expense categories
+$custom_categories = get_option( 'cora_custom_expense_categories', array() );
+if ( ! is_array( $custom_categories ) ) {
+    $custom_categories = array();
+}
+$default_categories = array(
+    'Gear & Tech',
+    'Studio Ops & Rent',
+    'Software & Tools',
+    'Food & Travel',
+    'Marketing & Ads',
+    'Contractor & Crew',
+    'Props & Set Design',
+    'Post-Production & VFX',
+    'Legal & Professional Fees',
+    'Other Operational',
+);
+$all_expense_categories = array_values( array_unique( array_merge( $default_categories, $custom_categories ) ) );
+
+
 // Standardized Page Header
 $financials_header_args = array(
     'title'            => 'Financial Intelligence',
@@ -1508,16 +1528,24 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
         <div class="grid grid-cols-2 gap-3">
             <div class="space-y-1">
-                <label class="text-[10px] font-bold text-zinc-400 uppercase">Category</label>
-                <select id="exp-category" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none font-semibold">
-                    <option value="Gear & Tech">Gear &amp; Tech</option>
-                    <option value="Studio Ops & Rent">Studio Ops &amp; Rent</option>
-                    <option value="Software & Tools">Software &amp; Tools</option>
-                    <option value="Food & Travel">Food &amp; Travel</option>
-                    <option value="Marketing & Ads">Marketing &amp; Ads</option>
-                    <option value="Contractor & Crew">Contractor &amp; Crew Payouts</option>
-                    <option value="Other">Other Operational</option>
+                <div class="flex items-center justify-between">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase">Category</label>
+                    <button type="button" onclick="window.coraPromptCustomCategory('exp-category')" class="text-[10px] font-bold text-zinc-900 hover:underline cursor-pointer border-0 bg-transparent flex items-center gap-0.5">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Custom</span>
+                    </button>
+                </div>
+                <select id="exp-category" onchange="window.coraCheckCustomCategory(this)" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none font-semibold">
+                    <?php foreach ( $all_expense_categories as $cat ) : ?>
+                        <option value="<?php echo esc_attr( $cat ); ?>"><?php echo esc_html( $cat ); ?></option>
+                    <?php endforeach; ?>
+                    <option value="__ADD_NEW__">+ Add Custom Category...</option>
                 </select>
+                <div id="exp-category-custom-box" class="hidden mt-1.5 flex items-center gap-1.5">
+                    <input type="text" id="exp-category-custom-input" placeholder="Custom category..." class="flex-1 bg-white border border-zinc-300 rounded-lg px-2.5 py-1 text-xs text-zinc-900 focus:outline-none font-medium">
+                    <button type="button" onclick="window.coraSaveCustomCategory('exp-category')" class="px-2 py-1 rounded-lg text-xs font-bold bg-zinc-950 text-white cursor-pointer border-0">Add</button>
+                    <button type="button" onclick="window.coraCancelCustomCategory('exp-category')" class="px-1.5 py-1 rounded-lg text-xs font-semibold text-zinc-500 hover:bg-zinc-100 cursor-pointer border-0">✕</button>
+                </div>
             </div>
             <div class="space-y-1">
                 <label class="text-[10px] font-bold text-zinc-400 uppercase">Payment Mode</label>
@@ -1707,14 +1735,24 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <div class="space-y-1">
-            <label class="text-[10px] font-bold text-zinc-400 uppercase">Category</label>
-            <select id="sub-category" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none font-semibold">
-                <option value="Software & Tools">Software &amp; Tools</option>
-                <option value="Rent & Facilities">Rent &amp; Facilities</option>
-                <option value="Infrastructure">Infrastructure</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Other">Other Overhead</option>
+            <div class="flex items-center justify-between">
+                <label class="text-[10px] font-bold text-zinc-400 uppercase">Category</label>
+                <button type="button" onclick="window.coraPromptCustomCategory('sub-category')" class="text-[10px] font-bold text-zinc-900 hover:underline cursor-pointer border-0 bg-transparent flex items-center gap-0.5">
+                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Custom</span>
+                </button>
+            </div>
+            <select id="sub-category" onchange="window.coraCheckCustomCategory(this)" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none font-semibold">
+                <?php foreach ( $all_expense_categories as $cat ) : ?>
+                    <option value="<?php echo esc_attr( $cat ); ?>"><?php echo esc_html( $cat ); ?></option>
+                <?php endforeach; ?>
+                <option value="__ADD_NEW__">+ Add Custom Category...</option>
             </select>
+            <div id="sub-category-custom-box" class="hidden mt-1.5 flex items-center gap-1.5">
+                <input type="text" id="sub-category-custom-input" placeholder="Custom category..." class="flex-1 bg-white border border-zinc-300 rounded-lg px-2.5 py-1 text-xs text-zinc-900 focus:outline-none font-medium">
+                <button type="button" onclick="window.coraSaveCustomCategory('sub-category')" class="px-2 py-1 rounded-lg text-xs font-bold bg-zinc-950 text-white cursor-pointer border-0">Add</button>
+                <button type="button" onclick="window.coraCancelCustomCategory('sub-category')" class="px-1.5 py-1 rounded-lg text-xs font-semibold text-zinc-500 hover:bg-zinc-100 cursor-pointer border-0">✕</button>
+            </div>
         </div>
 
         <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2 shrink-0">
@@ -2041,6 +2079,79 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             if (contact.name) document.getElementById('inv-client-name').value = contact.name;
             if (contact.email) document.getElementById('inv-client-email').value = contact.email;
         } catch(e) {}
+    };
+
+    /* ── Custom Categories Controller ── */
+    window.coraCheckCustomCategory = function(selectEl) {
+        const targetId = selectEl.id;
+        const box = document.getElementById(targetId + '-custom-box');
+        const input = document.getElementById(targetId + '-custom-input');
+        if (selectEl.value === '__ADD_NEW__') {
+            if (box) box.classList.remove('hidden');
+            if (input) { input.value = ''; input.focus(); }
+        } else {
+            if (box) box.classList.add('hidden');
+        }
+    };
+
+    window.coraPromptCustomCategory = function(selectId) {
+        const box = document.getElementById(selectId + '-custom-box');
+        const input = document.getElementById(selectId + '-custom-input');
+        if (box) box.classList.remove('hidden');
+        if (input) { input.value = ''; input.focus(); }
+    };
+
+    window.coraSaveCustomCategory = function(selectId) {
+        const input = document.getElementById(selectId + '-custom-input');
+        const val = (input ? input.value : '').trim();
+        if (!val) return;
+
+        ['exp-category', 'sub-category'].forEach(id => {
+            const sel = document.getElementById(id);
+            if (sel) {
+                let exists = false;
+                for (let i = 0; i < sel.options.length; i++) {
+                    if (sel.options[i].value.toLowerCase() === val.toLowerCase()) {
+                        exists = true;
+                        sel.selectedIndex = i;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    const newOpt = document.createElement('option');
+                    newOpt.value = val;
+                    newOpt.innerText = val;
+                    // insert before "+ Add Custom Category..."
+                    sel.insertBefore(newOpt, sel.lastElementChild);
+                    sel.value = val;
+                }
+            }
+        });
+
+        const box = document.getElementById(selectId + '-custom-box');
+        if (box) box.classList.add('hidden');
+
+        // Persist to workspace options via AJAX
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                action: 'cora_ajax_finance_save_category',
+                security: nonce,
+                category: val
+            })
+        });
+
+        if (window.coraShowToast) window.coraShowToast(`Category "${val}" saved.`, 'success');
+    };
+
+    window.coraCancelCustomCategory = function(selectId) {
+        const select = document.getElementById(selectId);
+        const box = document.getElementById(selectId + '-custom-box');
+        if (box) box.classList.add('hidden');
+        if (select && select.value === '__ADD_NEW__') {
+            select.selectedIndex = 0;
+        }
     };
 
     /* ── Add Line Item Row ── */

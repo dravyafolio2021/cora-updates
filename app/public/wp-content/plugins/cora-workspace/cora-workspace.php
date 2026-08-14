@@ -38045,6 +38045,38 @@ function cora_ajax_finance_record_expense() {
 add_action( 'wp_ajax_cora_ajax_finance_record_expense', 'cora_ajax_finance_record_expense' );
 add_action( 'wp_ajax_cora_finance_record_expense', 'cora_ajax_finance_record_expense' );
 
+/**
+ * AJAX Endpoint: cora_ajax_finance_save_category
+ * Saves a user-created custom expense category
+ */
+if ( ! function_exists( 'cora_ajax_finance_save_category' ) ) {
+function cora_ajax_finance_save_category() {
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized.' ), 403 );
+        }
+    }
+
+    $category = sanitize_text_field( $_POST['category'] ?? '' );
+    if ( ! empty( $category ) ) {
+        $cats = get_option( 'cora_custom_expense_categories', array() );
+        if ( ! is_array( $cats ) ) {
+            $cats = array();
+        }
+        if ( ! in_array( $category, $cats, true ) ) {
+            $cats[] = $category;
+            update_option( 'cora_custom_expense_categories', $cats );
+        }
+        wp_send_json_success( array( 'category' => $category, 'categories' => $cats ) );
+    }
+    wp_send_json_error( array( 'message' => 'Invalid category name.' ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_finance_save_category', 'cora_ajax_finance_save_category' );
+add_action( 'wp_ajax_cora_finance_save_category', 'cora_ajax_finance_save_category' );
+
+
 
 /**
  * AJAX Endpoint: cora_ajax_finance_record_income
