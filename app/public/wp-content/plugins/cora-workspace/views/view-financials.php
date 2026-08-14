@@ -3,7 +3,14 @@
  * Cora Workspace — Financial Intelligence & AI Co-founder (v3.4.44)
  * 
  * Rebuilt as a proactive AI Co-founder for solo founders & creative studios.
- * Includes floating bottom Ask Cora Copilot and rich, pre-populated tabs.
+ * Featuring:
+ * - Clean tab navigation without scrollbars
+ * - Floating bottom Ask Cora Copilot & Claude Cream popover
+ * - Dynamic multi-step Indian GST Invoice Creator (CRM & Document Vault integrated)
+ * - Multi-step Expense Logger (ITC & TDS compliant)
+ * - Interactive Deal Feasibility Simulator
+ * - Chart.js interactive cash flow & profitability charts
+ * - Rock-solid drawer & popover opening/closing controllers
  *
  * @package CoraWorkspace
  * @version 3.4.44
@@ -12,6 +19,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+
+global $wpdb;
 
 // Fetch comprehensive financial intelligence metrics
 $metrics = function_exists( 'cora_finance_get_comprehensive_metrics' ) ? cora_finance_get_comprehensive_metrics() : array();
@@ -28,8 +37,14 @@ $gross_outflow  = $metrics['gross_outflow'] ?? 85000.0;
 $receivables    = $metrics['receivables'] ?? array();
 $recurring_list = $metrics['recurring_expenses'] ?? array();
 $client_profits = $metrics['client_profitability'] ?? array();
-$attention_cards= $metrics['attention_cards'] ?? array();
 $cora_take      = $metrics['cora_take'] ?? array();
+
+// Fetch CRM Leads/Clients for intercompatible invoice generation
+$leads_table = $wpdb->prefix . 'cora_leads';
+$crm_contacts = array();
+if ( $wpdb->get_var( "SHOW TABLES LIKE '{$leads_table}'" ) === $leads_table ) {
+    $crm_contacts = $wpdb->get_results( "SELECT id, name, email, phone FROM {$leads_table} ORDER BY id DESC LIMIT 50", ARRAY_A ) ?: array();
+}
 
 // Fallback robust pre-population if empty
 if ( empty( $receivables ) ) {
@@ -46,6 +61,8 @@ if ( empty( $receivables ) ) {
             'days_overdue'   => 7,
             'is_overdue'     => true,
             'status'         => 'unpaid',
+            'place_of_supply'=> 'Maharashtra (27)',
+            'tax_type'       => 'IGST (18%)',
             'last_comm'      => date( 'Y-m-d', strtotime( '-10 days' ) ),
         ),
         array(
@@ -60,6 +77,8 @@ if ( empty( $receivables ) ) {
             'days_overdue'   => 0,
             'is_overdue'     => false,
             'status'         => 'paid',
+            'place_of_supply'=> 'Delhi (07)',
+            'tax_type'       => 'CGST (9%) + SGST (9%)',
             'last_comm'      => date( 'Y-m-d', strtotime( '-1 days' ) ),
         ),
         array(
@@ -74,6 +93,8 @@ if ( empty( $receivables ) ) {
             'days_overdue'   => 0,
             'is_overdue'     => false,
             'status'         => 'unpaid',
+            'place_of_supply'=> 'Karnataka (29)',
+            'tax_type'       => 'IGST (18%)',
             'last_comm'      => date( 'Y-m-d', strtotime( '-3 days' ) ),
         ),
         array(
@@ -88,6 +109,8 @@ if ( empty( $receivables ) ) {
             'days_overdue'   => 14,
             'is_overdue'     => true,
             'status'         => 'unpaid',
+            'place_of_supply'=> 'Delhi (07)',
+            'tax_type'       => 'CGST (9%) + SGST (9%)',
             'last_comm'      => date( 'Y-m-d', strtotime( '-12 days' ) ),
         ),
     );
@@ -160,6 +183,18 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             background-color: #f4f4f5;
             color: #18181b;
         }
+
+        /* ── Hide Horizontal Scrollbar Cleanly ── */
+        .cora-no-scrollbar {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+        }
+        .cora-no-scrollbar::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
         .cora-pulse-dot {
             width: 8px;
             height: 8px;
@@ -173,19 +208,23 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
+
+        /* ── Zero Bleed Slide Drawer & Backdrop ── */
         .cora-drawer-backdrop {
             position: fixed;
             inset: 0;
-            background: rgba(9, 9, 11, 0.45);
+            background: rgba(9, 9, 11, 0.5);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             z-index: 9998;
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.28s ease;
+            transition: opacity 0.28s ease, visibility 0.28s;
         }
         .cora-drawer-backdrop.active {
             opacity: 1;
+            visibility: visible;
             pointer-events: auto;
         }
         .cora-slide-drawer {
@@ -194,7 +233,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             right: 0;
             bottom: 0;
             width: 100%;
-            max-width: 520px;
+            max-width: 580px;
             background: #ffffff;
             border-left: 1px solid #e4e4e7;
             z-index: 9999;
@@ -202,7 +241,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             visibility: hidden;
             pointer-events: none;
             box-shadow: none;
-            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s, box-shadow 0.32s;
+            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s;
             display: flex;
             flex-direction: column;
         }
@@ -210,7 +249,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             transform: translateX(0);
             visibility: visible;
             pointer-events: auto;
-            box-shadow: -10px 0 40px rgba(9, 9, 11, 0.08);
+            box-shadow: -12px 0 45px rgba(9, 9, 11, 0.12);
         }
         .cora-mono-num {
             font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -275,73 +314,78 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         }
     </style>
 
-    <!-- ══ QUICK ACTION POPOVER ══ -->
-    <div class="hidden">
-        <div id="cora-fin-action-popover" class="absolute mt-2 w-64 bg-white rounded-2xl border border-zinc-200 shadow-2xl z-50 p-1.5 space-y-1 animate-fade-in select-none">
-            <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenCopilot();" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-zinc-900 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-                <span class="w-6 h-6 rounded-lg bg-zinc-950 text-white flex items-center justify-center shrink-0 text-xs">✨</span>
-                <div>
-                    <div class="font-bold">Ask Cora AI Copilot</div>
-                    <div class="text-[10px] text-zinc-500 font-normal">Context-aware financial Q&amp;A</div>
-                </div>
-            </button>
-            <div class="h-px bg-zinc-100 my-1"></div>
-            <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('create-invoice');" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                <span>Draft Client Invoice</span>
-            </button>
-            <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('record-income');" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg>
-                <span>Record Received Payment</span>
-            </button>
-            <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('add-expense');" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 12 16 16 12"></polyline><line x1="12" y1="8" x2="12" y2="16"></line></svg>
-                <span>Add Expense / Scan Receipt</span>
-            </button>
-            <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('project-sim');" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-                <span>Evaluate Project Deal</span>
-            </button>
-            <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('subscriptions');" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                <span>Manage Subscriptions</span>
-            </button>
-            <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('accountant-pack');" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>Export Accountant Pack</span>
-            </button>
+    <!-- ══ QUICK ACTION DROPDOWN POPOVER (Flush & Aligned Under Button) ══ -->
+    <div id="cora-fin-action-popover" class="fixed bg-white rounded-2xl border border-zinc-200 shadow-2xl z-[9995] p-2 space-y-1 hidden select-none w-72" style="top: 0; right: 0;">
+        <div class="px-3 py-2 text-[10px] font-bold text-zinc-400 uppercase tracking-wider border-b border-zinc-100">
+            Quick Financial Actions
         </div>
+        <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('create-invoice');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
+            <span class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-900 shrink-0 font-bold text-xs">📄</span>
+            <div>
+                <div class="font-bold text-zinc-950">Draft Client GST Invoice</div>
+                <div class="text-[10px] text-zinc-500 font-normal">State tax &amp; Vault contract link</div>
+            </div>
+        </button>
+        <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('record-income');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
+            <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 font-bold text-xs">💳</span>
+            <div>
+                <div class="font-bold text-zinc-950">Record Received Payment</div>
+                <div class="text-[10px] text-zinc-500 font-normal">Reconcile open receivables</div>
+            </div>
+        </button>
+        <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('add-expense');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
+            <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 font-bold text-xs">⚡</span>
+            <div>
+                <div class="font-bold text-zinc-950">Log Business Expense</div>
+                <div class="text-[10px] text-zinc-500 font-normal">Track ITC &amp; vendor TDS</div>
+            </div>
+        </button>
+        <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('project-sim');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
+            <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 font-bold text-xs">📊</span>
+            <div>
+                <div class="font-bold text-zinc-950">Evaluate Project Deal</div>
+                <div class="text-[10px] text-zinc-500 font-normal">"Should I take this deal?" AI simulator</div>
+            </div>
+        </button>
+        <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('subscriptions');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
+            <span class="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 font-bold text-xs">🔄</span>
+            <div>
+                <div class="font-bold text-zinc-950">Manage Subscriptions</div>
+                <div class="text-[10px] text-zinc-500 font-normal">Track monthly recurring costs</div>
+            </div>
+        </button>
+        <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('accountant-pack');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
+            <span class="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 font-bold text-xs">📦</span>
+            <div>
+                <div class="font-bold text-zinc-950">Export Accountant Pack</div>
+                <div class="text-[10px] text-zinc-500 font-normal">Download CA-ready CSV &amp; PDF</div>
+            </div>
+        </button>
     </div>
 
-    <!-- ══ SUB-NAVIGATION TABS (6 Fully Pre-Populated Panels) ══ -->
-    <div class="flex items-center justify-between border-b border-zinc-200 pb-3 gap-2 overflow-x-auto select-none">
-        <div class="flex items-center gap-1.5 shrink-0">
-            <button type="button" onclick="window.coraSwitchFinTab('fin-home')" id="tab-btn-fin-home" class="cora-fin-pill-tab active px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white cursor-pointer">
+    <!-- ══ SUB-NAVIGATION TABS (Zero Scrollbar, Clean & Minimal) ══ -->
+    <div class="border-b border-zinc-200 pb-3 select-none">
+        <div class="flex items-center gap-1.5 overflow-x-auto cora-no-scrollbar py-0.5">
+            <button type="button" onclick="window.coraSwitchFinTab('fin-home')" id="tab-btn-fin-home" class="cora-fin-pill-tab active px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white cursor-pointer shrink-0 border-0">
                 Overview &amp; AI Briefing
             </button>
-            <button type="button" onclick="window.coraSwitchFinTab('fin-receivables')" id="tab-btn-fin-receivables" class="cora-fin-pill-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer flex items-center gap-1.5">
+            <button type="button" onclick="window.coraSwitchFinTab('fin-receivables')" id="tab-btn-fin-receivables" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0 flex items-center gap-1.5">
                 <span>Money In (Receivables)</span>
                 <?php if ( $overdue_count > 0 ) : ?>
                     <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700"><?php echo $overdue_count; ?></span>
                 <?php endif; ?>
             </button>
-            <button type="button" onclick="window.coraSwitchFinTab('fin-expenses')" id="tab-btn-fin-expenses" class="cora-fin-pill-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer">
+            <button type="button" onclick="window.coraSwitchFinTab('fin-expenses')" id="tab-btn-fin-expenses" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0">
                 Money Out &amp; Subscriptions
             </button>
-            <button type="button" onclick="window.coraSwitchFinTab('fin-profitability')" id="tab-btn-fin-profitability" class="cora-fin-pill-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer">
+            <button type="button" onclick="window.coraSwitchFinTab('fin-profitability')" id="tab-btn-fin-profitability" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0">
                 Profitability &amp; Clients
             </button>
-            <button type="button" onclick="window.coraSwitchFinTab('fin-forecast')" id="tab-btn-fin-forecast" class="cora-fin-pill-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer">
+            <button type="button" onclick="window.coraSwitchFinTab('fin-forecast')" id="tab-btn-fin-forecast" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0">
                 Cash Flow Forecast
             </button>
-            <button type="button" onclick="window.coraSwitchFinTab('fin-tax')" id="tab-btn-fin-tax" class="cora-fin-pill-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer">
+            <button type="button" onclick="window.coraSwitchFinTab('fin-tax')" id="tab-btn-fin-tax" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0">
                 Tax &amp; GST Estimates
-            </button>
-        </div>
-
-        <div class="flex items-center gap-2 shrink-0">
-            <button type="button" onclick="window.coraOpenCopilot()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 flex items-center gap-1.5 cursor-pointer border-0 transition-colors">
-                <span>✨ Ask Cora</span>
             </button>
         </div>
     </div>
@@ -367,7 +411,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             </span>
                         </div>
                         <p class="text-xs text-zinc-400 font-medium mt-0.5" id="cora-take-headline">
-                            <?php echo esc_html( $cora_take['headline'] ?? 'Your cash flow is healthy, but there are 3 things worth looking at today.' ); ?>
+                            <?php echo esc_html( $cora_take['headline'] ?? 'Your cash buffer is healthy; collecting overdue receivables will optimize month-end position.' ); ?>
                         </p>
                     </div>
                 </div>
@@ -462,7 +506,25 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
         </div>
 
-        <!-- 3. "NEEDS YOUR ATTENTION" ACTION CARDS -->
+        <!-- 3. INTERACTIVE CHART: 6-Month Cash Flow & Runway Trajectory -->
+        <div class="cora-fin-card p-5 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 pb-3">
+                <div>
+                    <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Cash Flow &amp; Runway Trajectory</h3>
+                    <p class="text-[11px] text-zinc-500">Historical inflows vs recurring costs &amp; 90-day predictive forecast</p>
+                </div>
+                <div class="flex items-center gap-3 text-xs font-semibold text-zinc-600">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-zinc-950 inline-block"></span> Inflows</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-zinc-400 inline-block"></span> Outflows</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Net Cash</span>
+                </div>
+            </div>
+            <div class="h-64 w-full relative">
+                <canvas id="cora-fin-cashflow-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- 4. "NEEDS YOUR ATTENTION" ACTION CARDS -->
         <div class="space-y-3">
             <div class="flex items-center justify-between">
                 <div>
@@ -580,12 +642,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <h2 class="text-base font-bold text-zinc-950">Receivables &amp; Collections</h2>
-                <p class="text-xs text-zinc-500 font-medium">Track who owes you money and send AI-drafted payment reminders.</p>
+                <p class="text-xs text-zinc-500 font-medium">Track who owes you money, state-level GST classifications, and send AI-drafted payment reminders.</p>
             </div>
             <div class="flex items-center gap-2">
                 <button type="button" onclick="window.coraOpenDrawer('create-invoice')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>Create Invoice</span>
+                    <span>+ New Client Invoice</span>
                 </button>
             </div>
         </div>
@@ -626,6 +688,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <tr>
                             <th class="py-3 px-4">Invoice #</th>
                             <th class="py-3 px-4">Client &amp; Service</th>
+                            <th class="py-3 px-4">Place of Supply / Tax</th>
                             <th class="py-3 px-4">Due Date &amp; Aging</th>
                             <th class="py-3 px-4">Amount</th>
                             <th class="py-3 px-4">Status</th>
@@ -643,6 +706,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <td class="py-3.5 px-4">
                                 <div class="font-bold text-zinc-950"><?php echo esc_html( $r['client_name'] ); ?></div>
                                 <div class="text-[11px] text-zinc-500"><?php echo esc_html( $r['package_name'] ); ?></div>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <div class="text-zinc-900 font-semibold"><?php echo esc_html( $r['place_of_supply'] ?? 'Delhi (07)' ); ?></div>
+                                <div class="text-[10px] text-zinc-500"><?php echo esc_html( $r['tax_type'] ?? 'CGST (9%) + SGST (9%)' ); ?></div>
                             </td>
                             <td class="py-3.5 px-4">
                                 <div class="text-zinc-800 font-semibold"><?php echo esc_html( $r['due_date'] ); ?></div>
@@ -786,58 +853,76 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </p>
         </div>
 
-        <!-- Client Profitability Table -->
-        <div class="cora-fin-card overflow-hidden">
-            <div class="p-4 border-b border-zinc-100 flex items-center justify-between">
-                <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Client Profitability Ranking</h3>
-                <span class="text-[11px] text-zinc-400 font-medium">Ranked by Net Margin</span>
+        <!-- Profitability Breakdown Chart & Table Container -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            
+            <!-- Donut Chart: Revenue Concentration by Client -->
+            <div class="cora-fin-card p-5 space-y-3 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Revenue Distribution</h3>
+                    <p class="text-[11px] text-zinc-500">Client concentration &amp; risk</p>
+                </div>
+                <div class="h-52 w-full relative flex items-center justify-center">
+                    <canvas id="cora-fin-profit-chart"></canvas>
+                </div>
+                <div class="text-[10px] text-zinc-500 text-center font-medium">
+                    Top 2 clients represent 72% of total revenue.
+                </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs divide-y divide-zinc-200">
-                    <thead class="bg-zinc-50 text-zinc-500 font-bold text-[10px] uppercase tracking-wider">
-                        <tr>
-                            <th class="py-3 px-4">Client Name</th>
-                            <th class="py-3 px-4">Gross Revenue</th>
-                            <th class="py-3 px-4">Direct Costs</th>
-                            <th class="py-3 px-4">Net Profit</th>
-                            <th class="py-3 px-4">Net Margin</th>
-                            <th class="py-3 px-4 text-right">Tier</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-100 font-medium">
-                        <?php foreach ( $client_profits as $cp ) : ?>
-                        <tr class="hover:bg-zinc-50/80 transition-colors">
-                            <td class="py-3.5 px-4 font-bold text-zinc-950">
-                                <?php echo esc_html( $cp['client_name'] ); ?>
-                            </td>
-                            <td class="py-3.5 px-4 font-mono font-bold">
-                                ₹<?php echo number_format( $cp['revenue'] ); ?>
-                            </td>
-                            <td class="py-3.5 px-4 font-mono text-zinc-500">
-                                ₹<?php echo number_format( $cp['costs'] ); ?>
-                            </td>
-                            <td class="py-3.5 px-4 font-mono font-bold text-emerald-700">
-                                ₹<?php echo number_format( $cp['profit'] ); ?>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold text-zinc-900"><?php echo $cp['margin']; ?>%</span>
-                                    <div class="w-16 h-1.5 rounded-full bg-zinc-100 overflow-hidden">
-                                        <div class="h-full bg-zinc-900 rounded-full" style="width: <?php echo min(100, $cp['margin']); ?>%;"></div>
+
+            <!-- Client Profitability Table -->
+            <div class="cora-fin-card overflow-hidden lg:col-span-2">
+                <div class="p-4 border-b border-zinc-100 flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Client Margin Ranking</h3>
+                    <span class="text-[11px] text-zinc-400 font-medium">Ranked by Net Margin</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs divide-y divide-zinc-200">
+                        <thead class="bg-zinc-50 text-zinc-500 font-bold text-[10px] uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Client Name</th>
+                                <th class="py-3 px-4">Revenue</th>
+                                <th class="py-3 px-4">Costs</th>
+                                <th class="py-3 px-4">Net Profit</th>
+                                <th class="py-3 px-4">Margin</th>
+                                <th class="py-3 px-4 text-right">Tier</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100 font-medium">
+                            <?php foreach ( $client_profits as $cp ) : ?>
+                            <tr class="hover:bg-zinc-50/80 transition-colors">
+                                <td class="py-3.5 px-4 font-bold text-zinc-950">
+                                    <?php echo esc_html( $cp['client_name'] ); ?>
+                                </td>
+                                <td class="py-3.5 px-4 font-mono font-bold">
+                                    ₹<?php echo number_format( $cp['revenue'] ); ?>
+                                </td>
+                                <td class="py-3.5 px-4 font-mono text-zinc-500">
+                                    ₹<?php echo number_format( $cp['costs'] ); ?>
+                                </td>
+                                <td class="py-3.5 px-4 font-mono font-bold text-emerald-700">
+                                    ₹<?php echo number_format( $cp['profit'] ); ?>
+                                </td>
+                                <td class="py-3.5 px-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-zinc-900"><?php echo $cp['margin']; ?>%</span>
+                                        <div class="w-14 h-1.5 rounded-full bg-zinc-100 overflow-hidden">
+                                            <div class="h-full bg-zinc-900 rounded-full" style="width: <?php echo min(100, $cp['margin']); ?>%;"></div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="py-3.5 px-4 text-right">
-                                <?php if ( ! empty( $cp['is_top_tier'] ) ) : ?>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">★ High Profit</span>
-                                <?php else : ?>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 text-zinc-700">Standard</span>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                                </td>
+                                <td class="py-3.5 px-4 text-right">
+                                    <?php if ( ! empty( $cp['is_top_tier'] ) ) : ?>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">★ High Profit</span>
+                                    <?php else : ?>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 text-zinc-700">Standard</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -1141,19 +1226,212 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 
 <!-- ════════════════════════════════════════════════════════
-     SLIDE DRAWERS (Zero native alerts, 100% Cora standard)
+     SLIDE DRAWERS (Multi-step, Indian GST & Intercompatible)
      ════════════════════════════════════════════════════════ -->
 
 <div id="cora-fin-drawer-backdrop" class="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()"></div>
 
-<!-- DRAWER: PAYMENT FOLLOW-UP DRAFT -->
+<!-- 1. MULTI-STEP DYNAMIC GST INVOICE CREATOR (Intercompatible with CRM & Document Vault) -->
+<div id="cora-drawer-create-invoice" class="cora-slide-drawer">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+        <div>
+            <div class="flex items-center gap-2">
+                <h3 class="text-sm font-bold text-zinc-950">Create Dynamic GST Invoice</h3>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-200 text-zinc-800" id="inv-step-badge">Step 1 of 3</span>
+            </div>
+            <p class="text-[11px] text-zinc-500">Intercompatible with CRM Leads &amp; Document Vault</p>
+        </div>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
+    </div>
+
+    <!-- Stepper Navigation -->
+    <div class="flex border-b border-zinc-200 bg-zinc-100/60 text-xs font-semibold select-none">
+        <button type="button" onclick="window.coraGoInvStep(1)" id="inv-nav-1" class="flex-1 py-2.5 text-center border-b-2 border-zinc-950 text-zinc-950 font-bold bg-white">1. Client &amp; State</button>
+        <button type="button" onclick="window.coraGoInvStep(2)" id="inv-nav-2" class="flex-1 py-2.5 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800">2. Items &amp; GST</button>
+        <button type="button" onclick="window.coraGoInvStep(3)" id="inv-nav-3" class="flex-1 py-2.5 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800">3. Vault &amp; Terms</button>
+    </div>
+
+    <form onsubmit="window.coraSubmitInvoice(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
+        
+        <!-- STEP 1: CLIENT & PLACE OF SUPPLY -->
+        <div id="inv-step-1" class="space-y-4">
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-zinc-400 uppercase">Select From CRM Leads / Clients</label>
+                <select id="inv-crm-select" onchange="window.coraSelectCrmContact(this.value)" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none font-semibold">
+                    <option value="">-- Or enter custom client details below --</option>
+                    <?php foreach ( $crm_contacts as $c ) : ?>
+                        <option value="<?php echo esc_attr( json_encode( $c ) ); ?>">
+                            <?php echo esc_html( $c['name'] . ' (' . ($c['email'] ?: $c['phone']) . ')' ); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-zinc-400 uppercase">Client / Business Name</label>
+                <input type="text" id="inv-client-name" placeholder="e.g. Acme Studios & Media Pvt Ltd" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase">Client Email</label>
+                    <input type="email" id="inv-client-email" placeholder="finance@acmestudios.in" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase">Client GSTIN (Optional)</label>
+                    <input type="text" id="inv-client-gstin" placeholder="07AAAAA0000A1Z5" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 font-mono focus:outline-none uppercase">
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-zinc-400 uppercase">Place of Supply (State)</label>
+                <select id="inv-place-of-supply" onchange="window.coraRecalcInvoiceGST()" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none font-semibold">
+                    <option value="07_Delhi" selected>Delhi (07) — Intra-State (CGST 9% + SGST 9%)</option>
+                    <option value="27_Maharashtra">Maharashtra (27) — Inter-State (IGST 18%)</option>
+                    <option value="29_Karnataka">Karnataka (29) — Inter-State (IGST 18%)</option>
+                    <option value="33_TamilNadu">Tamil Nadu (33) — Inter-State (IGST 18%)</option>
+                    <option value="36_Telangana">Telangana (36) — Inter-State (IGST 18%)</option>
+                    <option value="24_Gujarat">Gujarat (24) — Inter-State (IGST 18%)</option>
+                    <option value="09_UttarPradesh">Uttar Pradesh (09) — Inter-State (IGST 18%)</option>
+                    <option value="08_Rajasthan">Rajasthan (08) — Inter-State (IGST 18%)</option>
+                    <option value="19_WestBengal">West Bengal (19) — Inter-State (IGST 18%)</option>
+                    <option value="06_Haryana">Haryana (06) — Inter-State (IGST 18%)</option>
+                    <option value="03_Punjab">Punjab (03) — Inter-State (IGST 18%)</option>
+                    <option value="32_Kerala">Kerala (32) — Inter-State (IGST 18%)</option>
+                </select>
+                <div class="text-[10px] text-zinc-500" id="inv-tax-mode-badge">Tax Mode: Intra-State (CGST 9% + SGST 9%)</div>
+            </div>
+
+            <div class="pt-4 flex justify-end">
+                <button type="button" onclick="window.coraGoInvStep(2)" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0">
+                    Next: Line Items &amp; GST →
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 2: LINE ITEMS & GST BREAKDOWN -->
+        <div id="inv-step-2" class="space-y-4 hidden">
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-zinc-400 uppercase">Package / Project Title</label>
+                <input type="text" id="inv-package-name" placeholder="e.g. Commercial Brand Video &amp; Studio Retainer" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase">Line Items (SAC Codes)</label>
+                    <button type="button" onclick="window.coraAddInvoiceItemRow()" class="text-xs font-bold text-zinc-900 hover:underline cursor-pointer border-0 bg-transparent">+ Add Item</button>
+                </div>
+                <div id="inv-items-container" class="space-y-2">
+                    <div class="inv-item-row p-3 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
+                        <input type="text" class="inv-item-desc w-full bg-white border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-900" placeholder="Item description" value="Commercial Shoot &amp; Media Production">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-[9px] text-zinc-400 uppercase font-bold">SAC Code</label>
+                                <input type="text" class="inv-item-sac w-full bg-white border border-zinc-200 rounded-lg px-2 py-1 text-xs font-mono" value="998386">
+                            </div>
+                            <div>
+                                <label class="text-[9px] text-zinc-400 uppercase font-bold">Qty</label>
+                                <input type="number" class="inv-item-qty w-full bg-white border border-zinc-200 rounded-lg px-2 py-1 text-xs font-mono" value="1" oninput="window.coraRecalcInvoiceGST()">
+                            </div>
+                            <div>
+                                <label class="text-[9px] text-zinc-400 uppercase font-bold">Rate (₹)</label>
+                                <input type="number" class="inv-item-rate w-full bg-white border border-zinc-200 rounded-lg px-2 py-1 text-xs font-mono font-bold" value="75000" oninput="window.coraRecalcInvoiceGST()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time GST Math Summary Box -->
+            <div class="p-4 rounded-xl bg-zinc-900 text-white space-y-2 text-xs">
+                <div class="flex items-center justify-between text-zinc-300">
+                    <span>Taxable Subtotal:</span>
+                    <span class="font-mono font-bold" id="inv-calc-subtotal">₹75,000</span>
+                </div>
+                <div class="flex items-center justify-between text-zinc-300" id="inv-calc-cgst-row">
+                    <span>CGST (9%):</span>
+                    <span class="font-mono" id="inv-calc-cgst">₹6,750</span>
+                </div>
+                <div class="flex items-center justify-between text-zinc-300" id="inv-calc-sgst-row">
+                    <span>SGST (9%):</span>
+                    <span class="font-mono" id="inv-calc-sgst">₹6,750</span>
+                </div>
+                <div class="flex items-center justify-between text-zinc-300 hidden" id="inv-calc-igst-row">
+                    <span>IGST (18%):</span>
+                    <span class="font-mono" id="inv-calc-igst">₹13,500</span>
+                </div>
+                <div class="pt-2 border-t border-zinc-800 flex items-center justify-between font-bold text-sm text-emerald-400">
+                    <span>Total Invoice Value:</span>
+                    <span class="font-mono font-extrabold" id="inv-calc-grand-total">₹88,500</span>
+                </div>
+            </div>
+
+            <div class="pt-4 flex items-center justify-between">
+                <button type="button" onclick="window.coraGoInvStep(1)" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
+                    ← Back
+                </button>
+                <button type="button" onclick="window.coraGoInvStep(3)" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0">
+                    Next: Vault &amp; Terms →
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 3: PAYMENT TERMS & DOCUMENT VAULT INTEGRATION -->
+        <div id="inv-step-3" class="space-y-4 hidden">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase">Payment Due Date</label>
+                    <input type="date" id="inv-due-date" value="<?php echo date('Y-m-d', strtotime('+14 days')); ?>" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase">Milestone Split</label>
+                    <select id="inv-milestone-split" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none font-semibold">
+                        <option value="100">100% Full Payment</option>
+                        <option value="50_50">50% Advance / 50% Delivery</option>
+                        <option value="40_30_30">40% Booking / 30% Shoot / 30% Delivery</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="inv-vault-link" checked class="w-4 h-4 rounded border-zinc-300">
+                    <label for="inv-vault-link" class="text-xs font-bold text-zinc-900 cursor-pointer">
+                        Link with Document Vault (E-Sign Contract)
+                    </label>
+                </div>
+                <p class="text-[11px] text-zinc-500 leading-relaxed pl-6">
+                    Automatically generates a client-facing E-Sign Contract blueprint in the Document Vault with these invoice terms embedded.
+                </p>
+            </div>
+
+            <div class="pt-4 flex items-center justify-between border-t border-zinc-200">
+                <button type="button" onclick="window.coraGoInvStep(2)" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
+                    ← Back
+                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="window.coraCloseAllDrawers()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
+                        Cancel
+                    </button>
+                    <button type="submit" id="btn-save-invoice" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0">
+                        Generate &amp; Publish Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<!-- 2. DRAWER: PAYMENT FOLLOW-UP DRAFT -->
 <div id="cora-drawer-followup" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">AI Payment Follow-up</h3>
             <p class="text-[11px] text-zinc-500">Drafted based on past client communication context</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-7 h-7 rounded-lg hover:bg-zinc-200 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
     </div>
 
     <form onsubmit="window.coraSendFollowUp(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1195,14 +1473,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- DRAWER: ADD EXPENSE -->
+<!-- 3. DRAWER: RECORD EXPENSE (Indian Tax & ITC Compliant) -->
 <div id="cora-drawer-add-expense" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">Record Business Expense</h3>
-            <p class="text-[11px] text-zinc-500">Fast logging with auto-categorization</p>
+            <p class="text-[11px] text-zinc-500">Track Input Tax Credit (ITC) and contractor TDS</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-7 h-7 rounded-lg hover:bg-zinc-200 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
     </div>
 
     <form onsubmit="window.coraSubmitExpense(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1222,24 +1500,43 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
         </div>
 
-        <div class="space-y-1">
-            <label class="text-[10px] font-bold text-zinc-400 uppercase">Category</label>
-            <select id="exp-category" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none font-semibold">
-                <option value="Gear & Tech">Gear &amp; Tech</option>
-                <option value="Studio Ops & Rent">Studio Ops &amp; Rent</option>
-                <option value="Software & Tools">Software &amp; Tools</option>
-                <option value="Food & Travel">Food &amp; Travel</option>
-                <option value="Marketing & Ads">Marketing &amp; Ads</option>
-                <option value="Contractor & Crew">Contractor &amp; Crew Payouts</option>
-                <option value="Other">Other Operational</option>
-            </select>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-zinc-400 uppercase">Category</label>
+                <select id="exp-category" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none font-semibold">
+                    <option value="Gear & Tech">Gear &amp; Tech</option>
+                    <option value="Studio Ops & Rent">Studio Ops &amp; Rent</option>
+                    <option value="Software & Tools">Software &amp; Tools</option>
+                    <option value="Food & Travel">Food &amp; Travel</option>
+                    <option value="Marketing & Ads">Marketing &amp; Ads</option>
+                    <option value="Contractor & Crew">Contractor &amp; Crew Payouts</option>
+                    <option value="Other">Other Operational</option>
+                </select>
+            </div>
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-zinc-400 uppercase">Payment Mode</label>
+                <select id="exp-mode" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none font-semibold">
+                    <option value="UPI">UPI / QR</option>
+                    <option value="Bank NEFT/RTGS">Bank Transfer (NEFT/RTGS)</option>
+                    <option value="Corporate Card">Corporate Card</option>
+                    <option value="Cash">Cash / Petty</option>
+                </select>
+            </div>
         </div>
 
-        <div class="flex items-center gap-2 p-3 rounded-xl bg-zinc-50 border border-zinc-200">
-            <input type="checkbox" id="exp-is-recurring" class="w-4 h-4 rounded border-zinc-300">
-            <label for="exp-is-recurring" class="text-xs font-semibold text-zinc-800 cursor-pointer">
-                Track as recurring monthly subscription
-            </label>
+        <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="exp-itc-claimable" checked class="w-4 h-4 rounded border-zinc-300">
+                <label for="exp-itc-claimable" class="text-xs font-semibold text-zinc-800 cursor-pointer">
+                    Eligible for Input Tax Credit (ITC)
+                </label>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="exp-is-recurring" class="w-4 h-4 rounded border-zinc-300">
+                <label for="exp-is-recurring" class="text-xs font-semibold text-zinc-800 cursor-pointer">
+                    Track as recurring monthly subscription
+                </label>
+            </div>
         </div>
 
         <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2">
@@ -1254,63 +1551,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- DRAWER: CREATE INVOICE -->
-<div id="cora-drawer-create-invoice" class="cora-slide-drawer">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
-        <div>
-            <h3 class="text-sm font-bold text-zinc-950">Draft Client Invoice</h3>
-            <p class="text-[11px] text-zinc-500">Auto GST calculation &amp; client link</p>
-        </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-7 h-7 rounded-lg hover:bg-zinc-200 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
-    </div>
-
-    <form onsubmit="window.coraSubmitInvoice(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
-        <div class="space-y-1">
-            <label class="text-[10px] font-bold text-zinc-400 uppercase">Client Name</label>
-            <input type="text" id="inv-client-name" placeholder="e.g. Acme Studios, Rajiv Sharma" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
-        </div>
-
-        <div class="space-y-1">
-            <label class="text-[10px] font-bold text-zinc-400 uppercase">Client Email</label>
-            <input type="email" id="inv-client-email" placeholder="client@company.com" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
-        </div>
-
-        <div class="space-y-1">
-            <label class="text-[10px] font-bold text-zinc-400 uppercase">Package / Service Title</label>
-            <input type="text" id="inv-package-name" placeholder="e.g. Wedding Photography Retainer, 3D Architectural Renders" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-            <div class="space-y-1">
-                <label class="text-[10px] font-bold text-zinc-400 uppercase">Total Amount (₹)</label>
-                <input type="number" step="any" id="inv-total-amount" placeholder="75000" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 font-mono font-bold focus:outline-none">
-            </div>
-            <div class="space-y-1">
-                <label class="text-[10px] font-bold text-zinc-400 uppercase">Due Date</label>
-                <input type="date" id="inv-due-date" value="<?php echo date('Y-m-d', strtotime('+14 days')); ?>" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
-            </div>
-        </div>
-
-        <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2">
-            <button type="button" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
-                Cancel
-            </button>
-            <button type="submit" id="btn-save-invoice" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0">
-                Create Invoice
-            </button>
-        </div>
-    </form>
-</div>
-
-
-<!-- DRAWER: RECORD INCOME -->
+<!-- 4. DRAWER: RECORD INCOME -->
 <div id="cora-drawer-record-income" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">Record Received Payment</h3>
             <p class="text-[11px] text-zinc-500">Logs cash inflow and reconciles open invoices</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-7 h-7 rounded-lg hover:bg-zinc-200 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
     </div>
 
     <form onsubmit="window.coraSubmitIncome(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1355,14 +1603,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- DRAWER: DEAL SIMULATOR -->
+<!-- 5. DRAWER: DEAL SIMULATOR (Indian Taxes & Overhead) -->
 <div id="cora-drawer-project-sim" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">Deal Feasibility Simulator</h3>
-            <p class="text-[11px] text-zinc-500">"Should I take this project?" AI calculation</p>
+            <p class="text-[11px] text-zinc-500">"Should I take this project?" Indian tax &amp; margin calculation</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-7 h-7 rounded-lg hover:bg-zinc-200 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
     </div>
 
     <div class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1414,14 +1662,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- DRAWER: SUBSCRIPTIONS -->
+<!-- 6. DRAWER: SUBSCRIPTIONS -->
 <div id="cora-drawer-subscriptions" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">Add Recurring Commitment</h3>
             <p class="text-[11px] text-zinc-500">Track recurring software, studio leases, or vendor contracts</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-7 h-7 rounded-lg hover:bg-zinc-200 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
     </div>
 
     <form onsubmit="window.coraSubmitSubscription(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1468,14 +1716,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- DRAWER: ACCOUNTANT PACK -->
+<!-- 7. DRAWER: ACCOUNTANT PACK -->
 <div id="cora-drawer-accountant-pack" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">Export Accountant Pack</h3>
             <p class="text-[11px] text-zinc-500">Ready for CA review, GST filing, and bookkeeping</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-7 h-7 rounded-lg hover:bg-zinc-200 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
     </div>
 
     <div class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1505,7 +1753,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 
 <!-- ════════════════════════════════════════════════════════
-     CLIENT-SIDE CONTROLLERS
+     CLIENT-SIDE CONTROLLERS & CHARTS ENGINE
      ════════════════════════════════════════════════════════ -->
 <script>
 (function() {
@@ -1513,6 +1761,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
     const ajaxUrl = '<?php echo esc_url( admin_url( "admin-ajax.php" ) ); ?>';
     const nonce   = '<?php echo esc_js( wp_create_nonce( "cora_ajax_nonce" ) ); ?>';
+
+    let cashflowChart = null;
+    let profitChart = null;
 
     /* ── Tab Switcher Controller ── */
     window.coraSwitchFinTab = function(tabId) {
@@ -1541,6 +1792,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         if (targetBtn) {
             targetBtn.classList.add('active', 'bg-zinc-950', 'text-white');
             targetBtn.classList.remove('text-zinc-600');
+        }
+
+        // Re-render charts when switching to tabs containing charts
+        if (cleanId === 'tab-fin-home' || cleanId === 'tab-fin-forecast') {
+            setTimeout(initCashflowChart, 60);
+        } else if (cleanId === 'tab-fin-profitability') {
+            setTimeout(initProfitChart, 60);
         }
     };
 
@@ -1675,53 +1933,33 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         }
     };
 
-    // Allow Enter key to submit inside the copilot input
-    document.addEventListener('DOMContentLoaded', function() {
-        const inp = document.getElementById('cora-fin-copilot-chat-input');
-        if (inp) {
-            inp.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    window.coraSendCopilotChat();
-                }
-            });
-        }
-    });
-
-    /* ── Popover Controller ── */
+    /* ── Popover Controller (Precise Alignment Under Button) ── */
     window.toggleFinancialActionMenu = function(e) {
         if (e && e.stopPropagation) e.stopPropagation();
         const popover = document.getElementById('cora-fin-action-popover');
         if (!popover) return;
         
-        const isHidden = popover.parentElement.classList.contains('hidden');
+        const isHidden = popover.classList.contains('hidden');
         if (isHidden) {
-            popover.parentElement.classList.remove('hidden');
+            popover.classList.remove('hidden');
             const targetBtn = e ? e.currentTarget : null;
             if (targetBtn) {
                 const rect = targetBtn.getBoundingClientRect();
-                popover.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+                popover.style.top = (rect.bottom + 8) + 'px';
                 popover.style.right = (window.innerWidth - rect.right) + 'px';
-                popover.style.position = 'absolute';
+                popover.style.left = 'auto';
             }
         } else {
-            popover.parentElement.classList.add('hidden');
+            popover.classList.add('hidden');
         }
     };
 
     window.coraCloseFinPopover = function() {
         const popover = document.getElementById('cora-fin-action-popover');
-        if (popover && popover.parentElement) {
-            popover.parentElement.classList.add('hidden');
+        if (popover) {
+            popover.classList.add('hidden');
         }
     };
-
-    document.addEventListener('click', function(e) {
-        const pop = document.getElementById('cora-fin-action-popover');
-        if (pop && !pop.contains(e.target)) {
-            window.coraCloseFinPopover();
-        }
-    });
 
     /* ── Slide Drawers Controller ── */
     window.coraOpenDrawer = function(drawerId) {
@@ -1736,6 +1974,134 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         const backdrop = document.getElementById('cora-fin-drawer-backdrop');
         if (backdrop) backdrop.classList.remove('active');
         document.querySelectorAll('.cora-slide-drawer').forEach(d => d.classList.remove('open'));
+    };
+
+    // Global Key Listener for Escape & Clicks
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            window.coraCloseAllDrawers();
+            window.coraCloseFinPopover();
+            window.coraCloseCopilot();
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        const pop = document.getElementById('cora-fin-action-popover');
+        if (pop && !pop.contains(e.target) && !e.target.closest('[onclick*="toggleFinancialActionMenu"]')) {
+            window.coraCloseFinPopover();
+        }
+    });
+
+    /* ── Multi-Step Invoice Stepper ── */
+    window.coraGoInvStep = function(stepNum) {
+        [1, 2, 3].forEach(s => {
+            const stepEl = document.getElementById('inv-step-' + s);
+            const navEl = document.getElementById('inv-nav-' + s);
+            if (stepEl) {
+                if (s === stepNum) {
+                    stepEl.classList.remove('hidden');
+                } else {
+                    stepEl.classList.add('hidden');
+                }
+            }
+            if (navEl) {
+                if (s === stepNum) {
+                    navEl.className = 'flex-1 py-2.5 text-center border-b-2 border-zinc-950 text-zinc-950 font-bold bg-white';
+                } else {
+                    navEl.className = 'flex-1 py-2.5 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800';
+                }
+            }
+        });
+
+        const badge = document.getElementById('inv-step-badge');
+        if (badge) badge.innerText = `Step ${stepNum} of 3`;
+    };
+
+    /* ── CRM Contact Auto-fill ── */
+    window.coraSelectCrmContact = function(jsonVal) {
+        if (!jsonVal) return;
+        try {
+            const contact = JSON.parse(jsonVal);
+            if (contact.name) document.getElementById('inv-client-name').value = contact.name;
+            if (contact.email) document.getElementById('inv-client-email').value = contact.email;
+        } catch(e) {}
+    };
+
+    /* ── Add Line Item Row ── */
+    window.coraAddInvoiceItemRow = function() {
+        const container = document.getElementById('inv-items-container');
+        if (!container) return;
+        const row = document.createElement('div');
+        row.className = 'inv-item-row p-3 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2';
+        row.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+                <input type="text" class="inv-item-desc w-full bg-white border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-900" placeholder="Item description" value="Video Post-Production & Color Grading">
+                <button type="button" onclick="this.closest('.inv-item-row').remove(); window.coraRecalcInvoiceGST();" class="text-xs text-red-500 hover:text-red-700 cursor-pointer font-bold border-0 bg-transparent">✕</button>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+                <div>
+                    <label class="text-[9px] text-zinc-400 uppercase font-bold">SAC Code</label>
+                    <input type="text" class="inv-item-sac w-full bg-white border border-zinc-200 rounded-lg px-2 py-1 text-xs font-mono" value="998314">
+                </div>
+                <div>
+                    <label class="text-[9px] text-zinc-400 uppercase font-bold">Qty</label>
+                    <input type="number" class="inv-item-qty w-full bg-white border border-zinc-200 rounded-lg px-2 py-1 text-xs font-mono" value="1" oninput="window.coraRecalcInvoiceGST()">
+                </div>
+                <div>
+                    <label class="text-[9px] text-zinc-400 uppercase font-bold">Rate (₹)</label>
+                    <input type="number" class="inv-item-rate w-full bg-white border border-zinc-200 rounded-lg px-2 py-1 text-xs font-mono font-bold" value="25000" oninput="window.coraRecalcInvoiceGST()">
+                </div>
+            </div>
+        `;
+        container.appendChild(row);
+        window.coraRecalcInvoiceGST();
+    };
+
+    /* ── Recalculate Invoice GST & Tax Mode ── */
+    window.coraRecalcInvoiceGST = function() {
+        const stateVal = document.getElementById('inv-place-of-supply').value || '';
+        const isIntraState = stateVal.startsWith('07_'); // 07 is Delhi base
+
+        const taxBadge = document.getElementById('inv-tax-mode-badge');
+        const cgstRow = document.getElementById('inv-calc-cgst-row');
+        const sgstRow = document.getElementById('inv-calc-sgst-row');
+        const igstRow = document.getElementById('inv-calc-igst-row');
+
+        if (isIntraState) {
+            if (taxBadge) taxBadge.innerText = 'Tax Mode: Intra-State (CGST 9% + SGST 9%)';
+            if (cgstRow) cgstRow.classList.remove('hidden');
+            if (sgstRow) sgstRow.classList.remove('hidden');
+            if (igstRow) igstRow.classList.add('hidden');
+        } else {
+            if (taxBadge) taxBadge.innerText = 'Tax Mode: Inter-State (IGST 18%)';
+            if (cgstRow) cgstRow.classList.add('hidden');
+            if (sgstRow) sgstRow.classList.remove('hidden');
+            if (igstRow) igstRow.classList.remove('hidden');
+        }
+
+        let subtotal = 0;
+        document.querySelectorAll('.inv-item-row').forEach(row => {
+            const qty = parseFloat(row.querySelector('.inv-item-qty')?.value) || 0;
+            const rate = parseFloat(row.querySelector('.inv-item-rate')?.value) || 0;
+            subtotal += (qty * rate);
+        });
+
+        const taxAmount = subtotal * 0.18;
+        const cgst = subtotal * 0.09;
+        const sgst = subtotal * 0.09;
+        const grandTotal = subtotal + taxAmount;
+
+        const subEl = document.getElementById('inv-calc-subtotal');
+        const cgstEl = document.getElementById('inv-calc-cgst');
+        const sgstEl = document.getElementById('inv-calc-sgst');
+        const igstEl = document.getElementById('inv-calc-igst');
+        const totalEl = document.getElementById('inv-calc-grand-total');
+
+        if (subEl) subEl.innerText = '₹' + subtotal.toLocaleString('en-IN');
+        if (cgstEl) cgstEl.innerText = '₹' + cgst.toLocaleString('en-IN');
+        if (sgstEl) sgstEl.innerText = '₹' + sgst.toLocaleString('en-IN');
+        if (igstEl) igstEl.innerText = '₹' + taxAmount.toLocaleString('en-IN');
+        if (totalEl) totalEl.innerText = '₹' + grandTotal.toLocaleString('en-IN');
     };
 
     /* ── Filter Receivables ── */
@@ -1878,6 +2244,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         const btn = document.getElementById('btn-save-invoice');
         if (btn) { btn.disabled = true; btn.innerText = 'Creating…'; }
 
+        let subtotal = 0;
+        document.querySelectorAll('.inv-item-row').forEach(row => {
+            const qty = parseFloat(row.querySelector('.inv-item-qty')?.value) || 0;
+            const rate = parseFloat(row.querySelector('.inv-item-rate')?.value) || 0;
+            subtotal += (qty * rate);
+        });
+        const grandTotal = subtotal * 1.18;
+
         fetch(ajaxUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1887,16 +2261,18 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 client_name: document.getElementById('inv-client-name').value,
                 client_email: document.getElementById('inv-client-email').value,
                 package_name: document.getElementById('inv-package-name').value,
-                total_amount: document.getElementById('inv-total-amount').value,
+                total_amount: grandTotal || 75000,
                 due_date: document.getElementById('inv-due-date').value,
+                place_of_supply: document.getElementById('inv-place-of-supply').value,
+                link_vault: document.getElementById('inv-vault-link').checked ? '1' : '0'
             })
         })
         .then(r => r.json())
         .then(res => {
-            if (btn) { btn.disabled = false; btn.innerText = 'Create Invoice'; }
+            if (btn) { btn.disabled = false; btn.innerText = 'Generate & Publish Invoice'; }
             if (res.success) {
                 window.coraCloseAllDrawers();
-                if (window.coraShowToast) window.coraShowToast('Invoice created and added to Receivables.', 'success');
+                if (window.coraShowToast) window.coraShowToast('GST Invoice published and linked to Document Vault.', 'success');
                 setTimeout(() => location.reload(), 700);
             }
         });
@@ -2050,6 +2426,143 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         if (window.coraShowToast) window.coraShowToast('Refreshing financial intelligence metrics...', 'info');
         setTimeout(() => location.reload(), 400);
     };
+
+    /* ── Initialize Charts (Chart.js Monochromatic Engine) ── */
+    function initCashflowChart() {
+        const canvas = document.getElementById('cora-fin-cashflow-chart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        if (cashflowChart) {
+            cashflowChart.destroy();
+        }
+
+        const ctx = canvas.getContext('2d');
+        const months = ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug (Now)', 'Sep (Proj)', 'Oct (Proj)'];
+        const inflows = [190000, 220000, 245000, 210000, 280000, 270000, 310000, 340000];
+        const outflows = [65000, 72000, 68000, 75000, 82000, 85000, 78000, 80000];
+        const netCash = [125000, 148000, 177000, 135000, 198000, 185000, 413751, 673751];
+
+        cashflowChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Projected Net Cash Position',
+                        data: netCash,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#10b981'
+                    },
+                    {
+                        label: 'Monthly Inflows',
+                        data: inflows,
+                        borderColor: '#09090b',
+                        borderWidth: 2,
+                        tension: 0.35,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#09090b'
+                    },
+                    {
+                        label: 'Operating Outflows',
+                        data: outflows,
+                        borderColor: '#a1a1aa',
+                        borderWidth: 1.5,
+                        borderDash: [4, 4],
+                        tension: 0.35,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#a1a1aa'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#09090b',
+                        titleFont: { size: 11, weight: 'bold' },
+                        bodyFont: { size: 11 },
+                        padding: 10,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(c) {
+                                return c.dataset.label + ': ₹' + c.raw.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 10 }, color: '#71717a' }
+                    },
+                    y: {
+                        grid: { color: '#f4f4f5' },
+                        ticks: {
+                            font: { size: 10 },
+                            color: '#71717a',
+                            callback: function(v) { return '₹' + (v >= 100000 ? (v/100000).toFixed(1) + 'L' : v/1000 + 'k'); }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function initProfitChart() {
+        const canvas = document.getElementById('cora-fin-profit-chart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        if (profitChart) {
+            profitChart.destroy();
+        }
+
+        const ctx = canvas.getContext('2d');
+        profitChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Horizon Heights', 'Acme Studios', 'Urban Space', 'Rajiv & Priya Wedding'],
+                datasets: [{
+                    data: [125000, 80000, 45000, 65000],
+                    backgroundColor: ['#09090b', '#3f3f46', '#71717a', '#a1a1aa'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '72%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#09090b',
+                        callbacks: {
+                            label: function(c) {
+                                return c.label + ': ₹' + c.raw.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Initialize Chart.js on boot
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(initCashflowChart, 150);
+    });
+
+    // Fallback if DOM already loaded
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(initCashflowChart, 150);
+    }
 
 })();
 </script>
