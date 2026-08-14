@@ -4,6 +4,7 @@
  * 
  * Rebuilt as a proactive AI Co-founder for solo founders & creative studios.
  * Featuring:
+ * - 100% Vector SVG Iconography across all actions, drawers, copilot, and badges (Zero Emojis)
  * - Native Cora platform drawer architecture (window.coraShowSideDrawer / window.coraCloseAllDrawers)
  * - Clean tab navigation without scrollbars
  * - Floating bottom Ask Cora Copilot & Claude Cream popover
@@ -278,42 +279,54 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             Quick Financial Actions
         </div>
         <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('create-invoice');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-            <span class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-900 shrink-0 font-bold text-xs">📄</span>
+            <span class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </span>
             <div>
                 <div class="font-bold text-zinc-950">Draft Client GST Invoice</div>
                 <div class="text-[10px] text-zinc-500 font-normal">State tax &amp; Vault contract link</div>
             </div>
         </button>
         <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('record-income');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-            <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 font-bold text-xs">💳</span>
+            <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+            </span>
             <div>
                 <div class="font-bold text-zinc-950">Record Received Payment</div>
                 <div class="text-[10px] text-zinc-500 font-normal">Reconcile open receivables</div>
             </div>
         </button>
         <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('add-expense');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-            <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 font-bold text-xs">⚡</span>
+            <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </span>
             <div>
                 <div class="font-bold text-zinc-950">Log Business Expense</div>
                 <div class="text-[10px] text-zinc-500 font-normal">Track ITC &amp; vendor TDS</div>
             </div>
         </button>
         <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('project-sim');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-            <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 font-bold text-xs">📊</span>
+            <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </span>
             <div>
                 <div class="font-bold text-zinc-950">Evaluate Project Deal</div>
                 <div class="text-[10px] text-zinc-500 font-normal">"Should I take this deal?" AI simulator</div>
             </div>
         </button>
         <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('subscriptions');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-            <span class="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 font-bold text-xs">🔄</span>
+            <span class="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            </span>
             <div>
                 <div class="font-bold text-zinc-950">Manage Subscriptions</div>
                 <div class="text-[10px] text-zinc-500 font-normal">Track monthly recurring costs</div>
             </div>
         </button>
         <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('accountant-pack');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-            <span class="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 font-bold text-xs">📦</span>
+            <span class="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </span>
             <div>
                 <div class="font-bold text-zinc-950">Export Accountant Pack</div>
                 <div class="text-[10px] text-zinc-500 font-normal">Download CA-ready CSV &amp; PDF</div>
@@ -358,8 +371,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div class="bg-zinc-950 text-white rounded-2xl p-5 md:p-6 shadow-md border-0 relative overflow-hidden">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-800 text-white flex items-center justify-center font-extrabold text-base shrink-0">
-                        ✨
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 text-white flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"></path></svg>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
@@ -376,6 +389,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                 <div class="flex items-center gap-2">
                     <button type="button" onclick="window.coraOpenCopilot()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer border-0 flex items-center gap-1.5 shadow-sm">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                         <span>Ask Cora Anything</span>
                     </button>
                     <button type="button" onclick="window.coraRefreshFinancials()" class="w-8 h-8 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center cursor-pointer border-0 transition-all" title="Refresh Live Data">
@@ -422,7 +436,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
                 <div class="flex items-center justify-between">
                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Expected In</span>
-                    <span class="w-6 h-6 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs">↑</span>
+                    <span class="w-6 h-6 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                    </span>
                 </div>
                 <div>
                     <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $expected_in ); ?></div>
@@ -437,7 +453,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
                 <div class="flex items-center justify-between">
                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Expected Out</span>
-                    <span class="w-6 h-6 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs">↓</span>
+                    <span class="w-6 h-6 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                    </span>
                 </div>
                 <div>
                     <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $expected_out ); ?></div>
@@ -452,7 +470,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="cora-fin-card p-4 flex flex-col justify-between gap-3 bg-zinc-900 text-white border-zinc-900">
                 <div class="flex items-center justify-between">
                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Projected Cash</span>
-                    <span class="w-6 h-6 rounded-lg bg-zinc-800 text-emerald-400 flex items-center justify-center font-bold text-xs">★</span>
+                    <span class="w-6 h-6 rounded-lg bg-zinc-800 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </span>
                 </div>
                 <div>
                     <div class="text-2xl font-extrabold text-white cora-mono-num">₹<?php echo number_format( $projected_cash ); ?></div>
@@ -512,8 +532,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
                     <div class="pt-2 border-t border-zinc-100 flex items-center justify-between gap-2">
                         <button type="button" onclick="window.coraDraftFollowUp('inv_sample_01')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 transition-colors cursor-pointer border-0 flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                             <span>Draft Follow-up</span>
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </button>
                         <button type="button" onclick="window.coraSwitchFinTab('fin-receivables')" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
                             Review Invoices
@@ -696,8 +716,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <td class="py-3.5 px-4 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
                                     <?php if ( ! $is_paid ) : ?>
-                                        <button type="button" onclick="window.coraDraftFollowUp('<?php echo esc_js( $r['id'] ); ?>')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0" title="Draft AI Payment Follow-up">
-                                            ✨ Remind
+                                        <button type="button" onclick="window.coraDraftFollowUp('<?php echo esc_js( $r['id'] ); ?>')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1" title="Draft AI Payment Follow-up">
+                                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                            <span>Remind</span>
                                         </button>
                                         <button type="button" onclick="window.coraMarkInvoicePaid('<?php echo esc_js( $r['id'] ); ?>')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0" title="Mark Paid">
                                             Mark Paid
@@ -729,7 +750,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
             <div class="flex items-center gap-2">
                 <button type="button" onclick="window.coraOpenDrawer('add-expense')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
-                    <span>+ Log Expense</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Log Expense</span>
                 </button>
                 <button type="button" onclick="window.coraOpenDrawer('subscriptions')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 cursor-pointer border-0">
                     + Add Subscription
@@ -796,7 +818,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
             <div class="flex items-center gap-2">
                 <button type="button" onclick="window.coraOpenDrawer('project-sim')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
-                    <span>✨ Simulate Project Deal</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <span>Simulate Project Deal</span>
                 </button>
             </div>
         </div>
@@ -804,7 +827,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <!-- AI Profitability Explanation Card -->
         <div class="cora-fin-card p-5 bg-zinc-50 border-zinc-200 space-y-2">
             <div class="flex items-center gap-2 text-xs font-bold text-zinc-950">
-                <span>✨ Cora's Profitability Analysis</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"></path></svg>
+                <span>Cora's Profitability Analysis</span>
             </div>
             <p class="text-xs text-zinc-700 leading-relaxed font-medium">
                 Your business generated <strong>₹<?php echo number_format( $gross_inflow ); ?></strong> with an estimated net margin of <strong>35.0%</strong>. Your top 2 clients (<span class="font-bold">Horizon Heights</span> and <span class="font-bold">Acme Studios</span>) generate 72% of all studio earnings. Direct delivery costs average 32% of project quoted revenue.
@@ -871,7 +895,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 </td>
                                 <td class="py-3.5 px-4 text-right">
                                     <?php if ( ! empty( $cp['is_top_tier'] ) ) : ?>
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">★ High Profit</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 inline-flex items-center gap-1">
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                            <span>High Margin</span>
+                                        </span>
                                     <?php else : ?>
                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 text-zinc-700">Standard</span>
                                     <?php endif; ?>
@@ -930,7 +957,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="cora-fin-card p-4 bg-zinc-900 text-white">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase">4. Projected Balance</span>
                 <div class="text-xl font-extrabold text-emerald-400 cora-mono-num mt-1" id="fc-val-proj">₹<?php echo number_format( $projected_cash ); ?></div>
-                <div class="text-[10px] text-emerald-300 mt-0.5">★ Healthy Operating Buffer</div>
+                <div class="text-[10px] text-emerald-300 mt-0.5 flex items-center gap-1">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Healthy Operating Buffer</span>
+                </div>
             </div>
         </div>
 
@@ -983,15 +1013,18 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <p class="text-xs text-zinc-500 font-medium">Automated GST estimates and tax reserve calculations for Indian service businesses.</p>
             </div>
             <div class="flex items-center gap-2">
-                <button type="button" onclick="window.coraOpenDrawer('accountant-pack')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 shadow-xs">
-                    Export Accountant Pack
+                <button type="button" onclick="window.coraOpenDrawer('accountant-pack')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 shadow-xs flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Export Accountant Pack</span>
                 </button>
             </div>
         </div>
 
         <!-- Disclaimer Banner -->
         <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200/70 text-xs text-amber-900 flex items-start gap-2.5">
-            <span class="text-amber-600 font-bold">ℹ️</span>
+            <span class="text-amber-600 font-bold shrink-0 mt-0.5">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </span>
             <div>
                 <strong>Estimated Tax Reserve: ₹40,500</strong>
                 <p class="text-[11px] text-amber-800 mt-0.5">Calculated based on recorded workspace invoices and ledger expenses. Please confirm with your Chartered Accountant before filing.</p>
@@ -1023,7 +1056,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 <!-- ════════════════════════════════════════════════════════
      FLOATING BOTTOM "ASK CORA" BAR & EXPANDED MODAL
-     (Exactly matches user specification & Claude Cream Theme)
+     (Matches user specification & Claude Cream Theme)
      ════════════════════════════════════════════════════════ -->
 
 <div id="cora-fin-copilot-container">
@@ -1050,7 +1083,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
                 </div>
 
-                <button type="button" onclick="window.coraCloseCopilot()" class="w-6 h-6 rounded-md hover:bg-zinc-200/70 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
+                <button type="button" onclick="window.coraCloseCopilot()" class="w-7 h-7 rounded-lg hover:bg-zinc-200/70 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm" title="Close">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
 
             <!-- Window Content: 2-Column Split -->
@@ -1061,20 +1096,28 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div>
                         <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Quick Actions</div>
                         <div class="grid grid-cols-2 gap-2">
-                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('create-invoice');" class="flex items-center gap-2 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
-                                <span>📄</span>
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('create-invoice');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
+                                <span class="w-6 h-6 rounded-md bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                </span>
                                 <span>Create Invoice</span>
                             </button>
-                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('record-income');" class="flex items-center gap-2 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
-                                <span>💳</span>
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('record-income');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
+                                <span class="w-6 h-6 rounded-md bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                                </span>
                                 <span>Record Payment</span>
                             </button>
-                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('project-sim');" class="flex items-center gap-2 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
-                                <span>📊</span>
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('project-sim');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
+                                <span class="w-6 h-6 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                </span>
                                 <span>Deal Simulator</span>
                             </button>
-                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('add-expense');" class="flex items-center gap-2 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
-                                <span>⚡</span>
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('add-expense');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
+                                <span class="w-6 h-6 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                </span>
                                 <span>Add Expense</span>
                             </button>
                         </div>
@@ -1197,7 +1240,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
             <p class="text-[11px] text-zinc-500">Intercompatible with CRM Leads &amp; Document Vault</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold" title="Close Drawer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
 
     <!-- Stepper Navigation -->
@@ -1387,7 +1432,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <h3 class="text-sm font-bold text-zinc-950">AI Payment Follow-up</h3>
             <p class="text-[11px] text-zinc-500">Drafted based on past client communication context</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold" title="Close Drawer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
 
     <form onsubmit="window.coraSendFollowUp(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1422,6 +1469,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 Cancel
             </button>
             <button type="submit" id="btn-send-followup" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 <span>Send Follow-up Email</span>
             </button>
         </div>
@@ -1436,7 +1484,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <h3 class="text-sm font-bold text-zinc-950">Record Business Expense</h3>
             <p class="text-[11px] text-zinc-500">Track Input Tax Credit (ITC) and contractor TDS</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold" title="Close Drawer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
 
     <form onsubmit="window.coraSubmitExpense(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1514,7 +1564,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <h3 class="text-sm font-bold text-zinc-950">Record Received Payment</h3>
             <p class="text-[11px] text-zinc-500">Logs cash inflow and reconciles open invoices</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold" title="Close Drawer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
 
     <form onsubmit="window.coraSubmitIncome(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1566,7 +1618,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <h3 class="text-sm font-bold text-zinc-950">Deal Feasibility Simulator</h3>
             <p class="text-[11px] text-zinc-500">"Should I take this project?" Indian tax &amp; margin calculation</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold" title="Close Drawer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
 
     <div class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1611,8 +1665,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
         </div>
 
-        <div id="sim-ai-verdict" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200/60 text-xs text-emerald-900 font-medium">
-            ✅ <strong>High Margin Deal (Go)</strong>: At a 50.0% margin, this project comfortably exceeds your studio's target threshold of 45%.
+        <div id="sim-ai-verdict" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200/60 text-xs text-emerald-900 font-medium flex items-center gap-2">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-700 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <div><strong>High Margin Deal (Go)</strong>: At a 50.0% margin, this project comfortably exceeds your studio's target threshold of 45%.</div>
         </div>
     </div>
 </aside>
@@ -1625,7 +1680,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <h3 class="text-sm font-bold text-zinc-950">Add Recurring Commitment</h3>
             <p class="text-[11px] text-zinc-500">Track recurring software, studio leases, or vendor contracts</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold" title="Close Drawer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
 
     <form onsubmit="window.coraSubmitSubscription(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1679,7 +1736,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <h3 class="text-sm font-bold text-zinc-950">Export Accountant Pack</h3>
             <p class="text-[11px] text-zinc-500">Ready for CA review, GST filing, and bookkeeping</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold" title="Close Drawer">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
 
     <div class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1697,10 +1756,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <label class="text-[10px] font-bold text-zinc-400 uppercase">Export Format</label>
             <div class="grid grid-cols-2 gap-2">
                 <button type="button" onclick="window.coraExportData('csv')" class="p-3 rounded-xl border border-zinc-300 hover:border-zinc-900 bg-white font-bold text-xs text-zinc-900 flex items-center justify-center gap-2 cursor-pointer shadow-xs">
-                    <span>📄 Download CSV</span>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Download CSV</span>
                 </button>
                 <button type="button" onclick="window.print()" class="p-3 rounded-xl border border-zinc-300 hover:border-zinc-900 bg-white font-bold text-xs text-zinc-900 flex items-center justify-center gap-2 cursor-pointer shadow-xs">
-                    <span>🖨️ Print Report</span>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    <span>Print Report</span>
                 </button>
             </div>
         </div>
@@ -1991,7 +2052,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         row.innerHTML = `
             <div class="flex items-center justify-between gap-2">
                 <input type="text" class="inv-item-desc w-full bg-white border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-900" placeholder="Item description" value="Video Post-Production & Color Grading">
-                <button type="button" onclick="this.closest('.inv-item-row').remove(); window.coraRecalcInvoiceGST();" class="text-xs text-red-500 hover:text-red-700 cursor-pointer font-bold border-0 bg-transparent">✕</button>
+                <button type="button" onclick="this.closest('.inv-item-row').remove(); window.coraRecalcInvoiceGST();" class="text-xs text-zinc-400 hover:text-zinc-900 cursor-pointer border-0 bg-transparent flex items-center justify-center p-1" title="Remove Item">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
             <div class="grid grid-cols-3 gap-2">
                 <div>
@@ -2280,14 +2343,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         const verdictBox = document.getElementById('sim-ai-verdict');
         if (verdictBox) {
             if (margin >= 50) {
-                verdictBox.className = 'p-3.5 rounded-xl bg-emerald-50 border border-emerald-200/60 text-xs text-emerald-900 font-medium';
-                verdictBox.innerHTML = `✅ <strong>High Margin Deal (Go)</strong>: At ${margin}% margin (₹${profit.toLocaleString('en-IN')} profit), this project is highly profitable.`;
+                verdictBox.className = 'p-3.5 rounded-xl bg-emerald-50 border border-emerald-200/60 text-xs text-emerald-900 font-medium flex items-center gap-2';
+                verdictBox.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-700 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg><div><strong>High Margin Deal (Go)</strong>: At ${margin}% margin (₹${profit.toLocaleString('en-IN')} profit), this project is highly profitable.</div>`;
             } else if (margin >= 30) {
-                verdictBox.className = 'p-3.5 rounded-xl bg-amber-50 border border-amber-200/60 text-xs text-amber-900 font-medium';
-                verdictBox.innerHTML = `⚠️ <strong>Moderate Margin (Caution)</strong>: ${margin}% margin. Consider adding a 10% buffer on gear or crew day rates.`;
+                verdictBox.className = 'p-3.5 rounded-xl bg-amber-50 border border-amber-200/60 text-xs text-amber-900 font-medium flex items-center gap-2';
+                verdictBox.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="text-amber-700 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg><div><strong>Moderate Margin (Caution)</strong>: ${margin}% margin. Consider adding a 10% buffer on gear or crew day rates.</div>`;
             } else {
-                verdictBox.className = 'p-3.5 rounded-xl bg-red-50 border border-red-200/60 text-xs text-red-900 font-medium';
-                verdictBox.innerHTML = `🛑 <strong>Low Margin Risk (Re-evaluate)</strong>: ${margin}% margin leaves little buffer for studio overhead or scope revisions.`;
+                verdictBox.className = 'p-3.5 rounded-xl bg-red-50 border border-red-200/60 text-xs text-red-900 font-medium flex items-center gap-2';
+                verdictBox.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" class="text-red-700 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg><div><strong>Low Margin Risk (Re-evaluate)</strong>: ${margin}% margin leaves little buffer for studio overhead or scope revisions.</div>`;
             }
         }
     };
