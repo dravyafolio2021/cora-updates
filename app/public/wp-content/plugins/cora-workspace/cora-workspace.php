@@ -24053,9 +24053,26 @@ function cora_save_user_notification_prefs( $user_id, $raw_data ) {
     );
 
     foreach ( $defaults['triggers'] as $trigger_key => $trigger_def ) {
-        $inapp_val = isset( $raw_data[ "notif_inapp_{$trigger_key}" ] ) ? ( ! empty( $raw_data[ "notif_inapp_{$trigger_key}" ] ) ? 1 : 0 ) : ( isset( $raw_data['triggers'][ $trigger_key ]['inapp'] ) ? ( ! empty( $raw_data['triggers'][ $trigger_key ]['inapp'] ) ? 1 : 0 ) : $trigger_def['inapp'] );
-        $push_val  = isset( $raw_data[ "notif_push_{$trigger_key}" ] )  ? ( ! empty( $raw_data[ "notif_push_{$trigger_key}" ] ) ? 1 : 0 )  : ( isset( $raw_data['triggers'][ $trigger_key ]['push'] )  ? ( ! empty( $raw_data['triggers'][ $trigger_key ]['push'] )  : 0 )  : $trigger_def['push'] );
-        $email_val = isset( $raw_data[ "notif_email_{$trigger_key}" ] ) ? sanitize_text_field( $raw_data[ "notif_email_{$trigger_key}" ] ) : ( $raw_data['triggers'][ $trigger_key ]['email'] ?? $trigger_def['email'] );
+        $inapp_val = $trigger_def['inapp'];
+        if ( isset( $raw_data[ "notif_inapp_{$trigger_key}" ] ) ) {
+            $inapp_val = ! empty( $raw_data[ "notif_inapp_{$trigger_key}" ] ) ? 1 : 0;
+        } elseif ( isset( $raw_data['triggers'][ $trigger_key ]['inapp'] ) ) {
+            $inapp_val = ! empty( $raw_data['triggers'][ $trigger_key ]['inapp'] ) ? 1 : 0;
+        }
+
+        $push_val = $trigger_def['push'];
+        if ( isset( $raw_data[ "notif_push_{$trigger_key}" ] ) ) {
+            $push_val = ! empty( $raw_data[ "notif_push_{$trigger_key}" ] ) ? 1 : 0;
+        } elseif ( isset( $raw_data['triggers'][ $trigger_key ]['push'] ) ) {
+            $push_val = ! empty( $raw_data['triggers'][ $trigger_key ]['push'] ) ? 1 : 0;
+        }
+
+        $email_val = $trigger_def['email'];
+        if ( isset( $raw_data[ "notif_email_{$trigger_key}" ] ) ) {
+            $email_val = sanitize_text_field( $raw_data[ "notif_email_{$trigger_key}" ] );
+        } elseif ( isset( $raw_data['triggers'][ $trigger_key ]['email'] ) ) {
+            $email_val = sanitize_text_field( $raw_data['triggers'][ $trigger_key ]['email'] );
+        }
         
         if ( ! in_array( $email_val, array( 'instant', 'daily', 'weekly', 'never' ), true ) ) {
             $email_val = $trigger_def['email'];
@@ -24181,7 +24198,7 @@ function cora_enqueue_notification_digest( $user_id, $email, $event_key, $title,
 }
 
 if ( ! function_exists( 'cora_cron_process_notification_digests' ) ) {
-function cora_cron_process_notification_digests() {
+function cora_cron_process_notification_digests( $force = false ) {
     $queue = get_option( 'cora_notification_digest_queue', array() );
     if ( empty( $queue ) || ! is_array( $queue ) ) {
         return array( 'processed' => 0 );
@@ -24200,7 +24217,9 @@ function cora_cron_process_notification_digests() {
         $type = $item['digest_type'] ?? 'daily';
         
         $should_send = false;
-        if ( $type === 'daily' ) {
+        if ( $force ) {
+            $should_send = true;
+        } elseif ( $type === 'daily' ) {
             if ( $current_hour >= 9 || ( $now - ( $item['created_at'] ?? 0 ) >= 86400 ) ) {
                 $should_send = true;
             }
@@ -24435,7 +24454,7 @@ function cora_ajax_trigger_digest_run() {
         wp_send_json_error( array( 'message' => 'Unauthorized access.' ) );
     }
 
-    $res = cora_cron_process_notification_digests();
+    $res = cora_cron_process_notification_digests( true );
     wp_send_json_success( array(
         'message' => "Digest queue processed successfully. {$res['processed']} items dispatched.",
         'details' => $res,
