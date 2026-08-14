@@ -805,8 +805,8 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 
         ob_start();
         ?>
-        <!-- Real-Time Workspace Storage Usage Pill -->
-        <div class="cm-h-storage cm-storage-healthy flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50 hover:bg-zinc-100 transition-all cursor-pointer select-none text-zinc-700 shadow-2xs relative shrink-0" id="cm-storage-wrap" onmouseenter="cmShowStorageAnalytics(true)" onmouseleave="cmShowStorageAnalytics(false)" onclick="cmToggleStorageAnalytics(event)" title="Workspace Real-Time Storage Usage">
+        <!-- Real-Time Workspace Storage Usage Pill (Desktop Header) -->
+        <div class="cm-h-storage cm-storage-healthy hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50 hover:bg-zinc-100 transition-all cursor-pointer select-none text-zinc-700 shadow-2xs relative shrink-0" id="cm-storage-wrap" onmouseenter="cmShowStorageAnalytics(true)" onmouseleave="cmShowStorageAnalytics(false)" onclick="cmToggleStorageAnalytics(event)" title="Workspace Real-Time Storage Usage">
             <svg class="cm-storage-ring-svg shrink-0" width="22" height="22" viewBox="0 0 36 36">
                 <path class="cm-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#e4e4e7" stroke-width="3.5" fill="none"/>
                 <path id="cm-ring-fill" class="cm-ring-fill" stroke-dasharray="<?php echo esc_attr( $initial_pct ); ?>, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="<?php echo esc_attr( $initial_stroke_color ); ?>" stroke-width="4" fill="none" stroke-linecap="round"/>
@@ -896,6 +896,25 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             cora_render_workspace_header( $media_header_args );
         }
         ?>
+    </div>
+
+    <!-- Mobile-Optimized Real-Time Storage Strip (Clean placement below header on mobile) -->
+    <div class="sm:hidden flex items-center justify-between px-3 py-2 bg-zinc-50 border border-zinc-200/80 rounded-xl mb-3 cursor-pointer select-none transition-colors hover:bg-zinc-100/80 relative" id="cm-storage-wrap-mob" onclick="cmToggleStorageAnalytics(event)" title="Click to view workspace storage breakdown">
+        <div class="flex items-center gap-2.5 min-w-0">
+            <svg class="cm-storage-ring-svg shrink-0" width="20" height="20" viewBox="0 0 36 36">
+                <path class="cm-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#e4e4e7" stroke-width="3.5" fill="none"/>
+                <path id="cm-ring-fill-mob" class="cm-ring-fill" stroke-dasharray="<?php echo esc_attr( $initial_pct ); ?>, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="<?php echo esc_attr( $initial_stroke_color ); ?>" stroke-width="4" fill="none" stroke-linecap="round"/>
+            </svg>
+            <div class="flex items-center gap-1.5 min-w-0 text-xs text-zinc-700 font-medium truncate">
+                <span class="text-zinc-500">Storage:</span>
+                <span class="font-bold text-zinc-900" id="cm-storage-human-mob"><?php echo esc_html( $initial_total_human ); ?></span>
+                <span class="text-[10.5px] text-zinc-500 font-semibold" id="cm-storage-pct-mob">(<?php echo esc_html( $initial_pct ); ?>%)</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-1 text-[11px] font-semibold text-zinc-500 shrink-0">
+            <span>Breakdown</span>
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
     </div>
 
     <!-- ─── TOOLBAR (search + filters) ─────────────────────────── -->
@@ -3323,13 +3342,35 @@ window.cmToggleStorageAnalytics = function(e) {
     var card = document.getElementById('cm-storage-analytics-card');
     if (!card) return;
     window._cmStorageAnalyticsPinned = !window._cmStorageAnalyticsPinned;
+
+    if (window.innerWidth < 640) {
+        var mobWrap = document.getElementById('cm-storage-wrap-mob');
+        if (mobWrap && card.parentNode !== mobWrap) {
+            mobWrap.appendChild(card);
+            card.style.top = 'calc(100% + 6px)';
+            card.style.right = '0';
+            card.style.left = 'auto';
+        }
+    } else {
+        var deskWrap = document.getElementById('cm-storage-wrap');
+        if (deskWrap && card.parentNode !== deskWrap) {
+            deskWrap.appendChild(card);
+            card.style.top = 'calc(100% + 8px)';
+            card.style.right = '0';
+            card.style.left = 'auto';
+        }
+    }
+
     card.style.display = window._cmStorageAnalyticsPinned ? 'block' : 'none';
 };
 
 document.addEventListener('click', function(e) {
-    var wrap = document.getElementById('cm-storage-wrap');
+    var deskWrap = document.getElementById('cm-storage-wrap');
+    var mobWrap = document.getElementById('cm-storage-wrap-mob');
     var card = document.getElementById('cm-storage-analytics-card');
-    if (card && wrap && !wrap.contains(e.target)) {
+    var inDesk = deskWrap && deskWrap.contains(e.target);
+    var inMob = mobWrap && mobWrap.contains(e.target);
+    if (card && !inDesk && !inMob) {
         window._cmStorageAnalyticsPinned = false;
         card.style.display = 'none';
     }
@@ -3365,12 +3406,21 @@ window.cmLoadStorage = function() {
             ringFill.setAttribute('stroke-dasharray', p + ', 100');
             ringFill.setAttribute('stroke', strokeColor);
         }
+        var ringFillMob = document.getElementById('cm-ring-fill-mob');
+        if (ringFillMob) {
+            ringFillMob.setAttribute('stroke-dasharray', p + ', 100');
+            ringFillMob.setAttribute('stroke', strokeColor);
+        }
 
         var storageHuman = document.getElementById('cm-storage-human');
         if (storageHuman) storageHuman.textContent = d.total_human || '0 B';
+        var storageHumanMob = document.getElementById('cm-storage-human-mob');
+        if (storageHumanMob) storageHumanMob.textContent = d.total_human || '0 B';
 
         var storagePct = document.getElementById('cm-storage-pct');
         if (storagePct) storagePct.textContent = '(' + formattedPct + ')';
+        var storagePctMob = document.getElementById('cm-storage-pct-mob');
+        if (storagePctMob) storagePctMob.textContent = '(' + formattedPct + ')';
 
         var saPctText = document.getElementById('cm-sa-pct-text');
         if (saPctText) {
