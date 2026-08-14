@@ -1339,70 +1339,74 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <!-- Master Channel Toggles -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
                         <!-- In-App Bell -->
-                        <div class="p-3.5 rounded-xl border border-zinc-200/80 bg-zinc-50/50 flex flex-col justify-between space-y-3">
+                        <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50/60 flex flex-col justify-between space-y-4">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
                                     <span class="text-xs font-bold text-zinc-900 block">In-App Notification Bell</span>
-                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5">Top-bar bell counter &amp; activity drawer alerts.</span>
+                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-1">Top-bar bell counter &amp; activity drawer alerts.</span>
                                 </div>
-                                <span class="w-2 h-2 rounded-full <?php echo $global_inapp ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-1"></span>
+                                <span class="w-2.5 h-2.5 rounded-full <?php echo $global_inapp ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-0.5"></span>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer select-none">
-                                <input type="checkbox" name="cora_notif_global_inapp" value="1" <?php checked( $global_inapp ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
-                                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
-                                <span class="ml-2 text-[11px] font-semibold text-zinc-700">Enabled</span>
-                            </label>
+                            <div class="flex items-center justify-between pt-1">
+                                <span class="text-xs font-medium text-zinc-600">Active</span>
+                                <label class="cora-switch">
+                                    <input type="checkbox" name="cora_notif_global_inapp" value="1" <?php checked( $global_inapp ); ?>>
+                                    <span class="cora-slider"></span>
+                                </label>
+                            </div>
                         </div>
 
                         <!-- Web Push (PWA) -->
-                        <div class="p-3.5 rounded-xl border border-zinc-200/80 bg-zinc-50/50 flex flex-col justify-between space-y-3">
+                        <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50/60 flex flex-col justify-between space-y-4">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
-                                    <div class="flex items-center gap-1.5">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="text-xs font-bold text-zinc-900 block">Web Push (PWA)</span>
-                                        <span id="cora-notif-pwa-status-pill" class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-200 text-zinc-700">Checking...</span>
+                                        <span id="cora-notif-pwa-status-pill" class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-200 text-zinc-700">Checking...</span>
                                     </div>
-                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5">Instant desktop &amp; mobile lock-screen alerts.</span>
+                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-1">Instant desktop &amp; mobile lock-screen alerts.</span>
                                 </div>
-                                <span class="w-2 h-2 rounded-full <?php echo $global_push ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-1"></span>
+                                <span class="w-2.5 h-2.5 rounded-full <?php echo $global_push ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-0.5"></span>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <label class="relative inline-flex items-center cursor-pointer select-none">
-                                    <input type="checkbox" name="cora_notif_global_push" value="1" <?php checked( $global_push ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
-                                    <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
-                                    <span class="ml-2 text-[11px] font-semibold text-zinc-700">Enabled</span>
+                            <div class="flex items-center justify-between pt-1">
+                                <label class="cora-switch">
+                                    <input type="checkbox" name="cora_notif_global_push" value="1" <?php checked( $global_push ); ?>>
+                                    <span class="cora-slider"></span>
                                 </label>
-                                <button type="button" onclick="coraRequestPushSubscription()" class="text-[10px] font-bold text-zinc-900 bg-white border border-zinc-200 hover:bg-zinc-100 px-2 py-1 rounded-lg transition-colors shadow-3xs cursor-pointer">
+                                <button type="button" onclick="coraRequestPushSubscription()" class="text-[10px] font-bold text-zinc-800 bg-white border border-zinc-200 hover:bg-zinc-100 px-2.5 py-1 rounded-lg transition-all shadow-3xs cursor-pointer active:scale-95 flex items-center gap-1">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path></svg>
                                     Sync Device
                                 </button>
                             </div>
                         </div>
 
                         <!-- Email Notifications -->
-                        <div class="p-3.5 rounded-xl border border-zinc-200/80 bg-zinc-50/50 flex flex-col justify-between space-y-3">
+                        <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50/60 flex flex-col justify-between space-y-4">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
                                     <span class="text-xs font-bold text-zinc-900 block">Email Notifications</span>
-                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5">Branded monochromatic HTML transaction alerts.</span>
+                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-1">Branded monochromatic HTML transaction alerts.</span>
                                 </div>
-                                <span class="w-2 h-2 rounded-full <?php echo $global_email ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-1"></span>
+                                <span class="w-2.5 h-2.5 rounded-full <?php echo $global_email ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-0.5"></span>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer select-none">
-                                <input type="checkbox" name="cora_notif_global_email" value="1" <?php checked( $global_email ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
-                                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
-                                <span class="ml-2 text-[11px] font-semibold text-zinc-700">Enabled</span>
-                            </label>
+                            <div class="flex items-center justify-between pt-1">
+                                <span class="text-xs font-medium text-zinc-600">Active</span>
+                                <label class="cora-switch">
+                                    <input type="checkbox" name="cora_notif_global_email" value="1" <?php checked( $global_email ); ?>>
+                                    <span class="cora-slider"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Email Periodicity & Recipient Settings -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 border-t border-zinc-100">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-zinc-100">
                         <div>
-                            <label class="flex items-center gap-1.5" title="Default delivery schedule for transactional and summary emails.">
+                            <label class="flex items-center gap-1.5 text-xs font-bold text-zinc-800 mb-1.5" title="Default delivery schedule for transactional and summary emails.">
                                 Default Email Delivery Mode
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                             </label>
-                            <select name="cora_notif_global_email_schedule" onchange="coraMarkSettingsDirty()">
+                            <select name="cora_notif_global_email_schedule" class="w-full text-xs py-2 px-3 rounded-xl border border-zinc-200 bg-white font-medium text-zinc-800">
                                 <option value="instant" <?php selected( $global_email_schedule, 'instant' ); ?>>Instant (Send immediately as events occur)</option>
                                 <option value="daily" <?php selected( $global_email_schedule, 'daily' ); ?>>Daily Morning Digest (09:00 AM)</option>
                                 <option value="weekly" <?php selected( $global_email_schedule, 'weekly' ); ?>>Weekly Digest (Monday 09:00 AM)</option>
@@ -1410,38 +1414,40 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <span class="text-[11px] text-zinc-400 mt-1 block">Digest modes consolidate non-critical events into a clean summary email.</span>
                         </div>
                         <div>
-                            <label class="flex items-center gap-1.5" title="Optional custom recipient email. Leave blank to use your user profile email.">
+                            <label class="flex items-center gap-1.5 text-xs font-bold text-zinc-800 mb-1.5" title="Optional custom recipient email. Leave blank to use your user profile email.">
                                 Custom Recipient Email (Optional)
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                             </label>
-                            <input type="email" name="cora_notif_custom_email" value="<?php echo esc_attr( $custom_email ); ?>" placeholder="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>" onchange="coraMarkSettingsDirty()">
+                            <input type="email" name="cora_notif_custom_email" value="<?php echo esc_attr( $custom_email ); ?>" placeholder="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>" class="w-full text-xs py-2 px-3 rounded-xl border border-zinc-200 bg-white text-zinc-800">
                             <span class="text-[11px] text-zinc-400 mt-1 block">Defaults to: <?php echo esc_html( wp_get_current_user()->user_email ); ?></span>
                         </div>
                     </div>
 
                     <!-- Quiet Hours / Do Not Disturb (DND) -->
-                    <div class="p-3.5 rounded-xl border border-zinc-200/80 bg-zinc-50/50 space-y-3">
+                    <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50/60 space-y-3">
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-7 h-7 rounded-lg bg-zinc-200/80 flex items-center justify-center text-zinc-700">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                                </div>
                                 <div>
                                     <span class="text-xs font-bold text-zinc-900 block">Quiet Hours (Do Not Disturb)</span>
-                                    <span class="text-[11px] text-zinc-500 block leading-tight">Defer push and email notifications during off-hours (urgent security alerts bypass DND).</span>
+                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5">Defer push and email notifications during off-hours (urgent security alerts bypass DND).</span>
                                 </div>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer select-none">
-                                <input type="checkbox" name="cora_notif_dnd_enabled" value="1" <?php checked( $dnd_enabled ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
-                                <div class="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-900"></div>
+                            <label class="cora-switch">
+                                <input type="checkbox" name="cora_notif_dnd_enabled" value="1" <?php checked( $dnd_enabled ); ?>>
+                                <span class="cora-slider"></span>
                             </label>
                         </div>
-                        <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-200/50">
+                        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-zinc-200/60">
                             <div>
-                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider !mb-1">Quiet Hours Start</label>
-                                <input type="time" name="cora_notif_dnd_start" value="<?php echo esc_attr( $dnd_start ); ?>" class="!py-1.5 text-xs" onchange="coraMarkSettingsDirty()">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Quiet Hours Start</label>
+                                <input type="time" name="cora_notif_dnd_start" value="<?php echo esc_attr( $dnd_start ); ?>" class="w-full text-xs py-1.5 px-2.5 rounded-lg border border-zinc-200 bg-white">
                             </div>
                             <div>
-                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider !mb-1">Quiet Hours End</label>
-                                <input type="time" name="cora_notif_dnd_end" value="<?php echo esc_attr( $dnd_end ); ?>" class="!py-1.5 text-xs" onchange="coraMarkSettingsDirty()">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Quiet Hours End</label>
+                                <input type="time" name="cora_notif_dnd_end" value="<?php echo esc_attr( $dnd_end ); ?>" class="w-full text-xs py-1.5 px-2.5 rounded-lg border border-zinc-200 bg-white">
                             </div>
                         </div>
                     </div>
@@ -1529,11 +1535,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                 <div class="cora-shopify-card-body pt-4 space-y-6">
                     <!-- Matrix Table Header Hint -->
-                    <div class="hidden sm:grid grid-cols-12 gap-3 px-3 py-2 bg-zinc-100/70 rounded-xl text-[11px] font-bold text-zinc-600 uppercase tracking-wider">
+                    <div class="hidden sm:grid grid-cols-12 gap-3 px-4 py-2.5 bg-zinc-100/80 rounded-xl text-[11px] font-bold text-zinc-600 uppercase tracking-wider items-center">
                         <div class="col-span-6">Trigger Event</div>
                         <div class="col-span-2 text-center">In-App</div>
                         <div class="col-span-2 text-center">Web Push</div>
-                        <div class="col-span-2 text-right pr-2">Email Frequency</div>
+                        <div class="col-span-2 text-center">Email Frequency</div>
                     </div>
 
                     <?php foreach ( $modules_triggers as $mod_key => $mod_info ) : ?>
@@ -1549,35 +1555,35 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                     $item_push  = isset( $triggers_cfg[ $item_key ]['push'] )  ? ! empty( $triggers_cfg[ $item_key ]['push'] )  : true;
                                     $item_email = isset( $triggers_cfg[ $item_key ]['email'] ) ? sanitize_text_field( $triggers_cfg[ $item_key ]['email'] ) : $item_info['default_email'];
                                 ?>
-                                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3 rounded-xl border border-zinc-200/60 hover:border-zinc-300 bg-white items-center transition-colors">
-                                        <!-- Event Details -->
-                                        <div class="sm:col-span-6 min-w-0">
-                                            <span class="text-xs font-bold text-zinc-900 block truncate"><?php echo esc_html( $item_info['label'] ); ?></span>
+                                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-xl border border-zinc-200/80 hover:border-zinc-300 bg-white items-center transition-colors">
+                                        <!-- Event Details: Column 1 to 6 (No Truncation) -->
+                                        <div class="sm:col-span-6 pr-2">
+                                            <span class="text-xs font-bold text-zinc-900 block leading-snug"><?php echo esc_html( $item_info['label'] ); ?></span>
                                             <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5"><?php echo esc_html( $item_info['desc'] ); ?></span>
                                         </div>
 
-                                        <!-- In-App Checkbox -->
+                                        <!-- In-App Switch: Column 7 to 8 -->
                                         <div class="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-100">
                                             <span class="sm:hidden text-xs font-medium text-zinc-600">In-App Alert</span>
-                                            <label class="relative inline-flex items-center cursor-pointer select-none">
-                                                <input type="checkbox" name="notif_inapp_<?php echo esc_attr( $item_key ); ?>" value="1" <?php checked( $item_inapp ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
-                                                <div class="w-8 h-4.5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-900"></div>
+                                            <label class="cora-switch">
+                                                <input type="checkbox" name="notif_inapp_<?php echo esc_attr( $item_key ); ?>" value="1" <?php checked( $item_inapp ); ?>>
+                                                <span class="cora-slider"></span>
                                             </label>
                                         </div>
 
-                                        <!-- Web Push Checkbox -->
+                                        <!-- Web Push Switch: Column 9 to 10 -->
                                         <div class="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2">
                                             <span class="sm:hidden text-xs font-medium text-zinc-600">Web Push</span>
-                                            <label class="relative inline-flex items-center cursor-pointer select-none">
-                                                <input type="checkbox" name="notif_push_<?php echo esc_attr( $item_key ); ?>" value="1" <?php checked( $item_push ); ?> class="sr-only peer" onchange="coraMarkSettingsDirty()">
-                                                <div class="w-8 h-4.5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-900"></div>
+                                            <label class="cora-switch">
+                                                <input type="checkbox" name="notif_push_<?php echo esc_attr( $item_key ); ?>" value="1" <?php checked( $item_push ); ?>>
+                                                <span class="cora-slider"></span>
                                             </label>
                                         </div>
 
-                                        <!-- Email Delivery Dropdown -->
-                                        <div class="sm:col-span-2 flex items-center justify-between sm:justify-end gap-2">
+                                        <!-- Email Delivery Dropdown: Column 11 to 12 -->
+                                        <div class="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2">
                                             <span class="sm:hidden text-xs font-medium text-zinc-600">Email Delivery</span>
-                                            <select name="notif_email_<?php echo esc_attr( $item_key ); ?>" class="!py-1 !px-2 !text-[11px] !rounded-lg !w-full sm:!w-auto font-medium" onchange="coraMarkSettingsDirty()">
+                                            <select name="notif_email_<?php echo esc_attr( $item_key ); ?>" class="!py-1.5 !px-2 !text-[11px] !rounded-lg !w-full font-medium border border-zinc-200 bg-white text-zinc-800 cursor-pointer">
                                                 <option value="instant" <?php selected( $item_email, 'instant' ); ?>>Instant</option>
                                                 <option value="daily" <?php selected( $item_email, 'daily' ); ?>>Daily Digest</option>
                                                 <option value="weekly" <?php selected( $item_email, 'weekly' ); ?>>Weekly Digest</option>
@@ -1644,6 +1650,53 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
                 </div>
             </div>
+
+            <!-- Scoped CSS for Switches and Matrix layout -->
+            <style>
+                .cora-switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 36px;
+                    height: 20px;
+                    flex-shrink: 0;
+                    margin: 0;
+                    cursor: pointer;
+                }
+                .cora-switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                    position: absolute;
+                }
+                .cora-slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    background-color: #e4e4e7;
+                    transition: .2s cubic-bezier(0.4, 0, 0.2, 1);
+                    border-radius: 20px;
+                }
+                .cora-slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 14px;
+                    width: 14px;
+                    left: 3px;
+                    bottom: 3px;
+                    background-color: white;
+                    transition: .2s cubic-bezier(0.4, 0, 0.2, 1);
+                    border-radius: 50%;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+                }
+                .cora-switch input:checked + .cora-slider {
+                    background-color: #18181b;
+                }
+                .cora-switch input:checked + .cora-slider:before {
+                    transform: translateX(16px);
+                }
+            </style>
+
+        </div> <!-- close cora-settings-panel-notifications -->
 
         </div> <!-- close cora-settings-panel-notifications -->
 

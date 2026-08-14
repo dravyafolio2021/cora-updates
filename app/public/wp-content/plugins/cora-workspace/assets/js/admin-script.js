@@ -12460,6 +12460,90 @@ jQuery(document).ready(function($) {
     // NOTIFICATION MANAGEMENT FRONTEND HANDLERS
     // ═══════════════════════════════════════════════════════════════
 
+    window.coraMarkSettingsDirty = function() {
+        if (typeof coraAutoSave !== 'undefined' && coraAutoSave.markDirty) {
+            coraAutoSave.markDirty();
+        }
+    };
+
+    window.coraRequestPushSubscription = function() {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            if (window.coraShowToast) {
+                window.coraShowToast('Web push is not supported in this browser.', 'error');
+            }
+            return;
+        }
+
+        if (window.coraShowToast) {
+            window.coraShowToast('Requesting browser notification permission...', 'info');
+        }
+
+        Notification.requestPermission().then(function(permission) {
+            if (permission !== 'granted') {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Notification permission was denied or dismissed.', 'warning');
+                }
+                window.coraCheckPwaPushStatus();
+                return;
+            }
+
+            navigator.serviceWorker.ready.then(function(registration) {
+                if (!window.coraPwaVapidPublicKey) {
+                    if (window.coraShowToast) {
+                        window.coraShowToast('VAPID public key not loaded. Please reload the page.', 'error');
+                    }
+                    return;
+                }
+
+                function urlB64ToUint8Array(base64String) {
+                    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+                    const rawData = window.atob(base64);
+                    const outputArray = new Uint8Array(rawData.length);
+                    for (let i = 0; i < rawData.length; ++i) {
+                        outputArray[i] = rawData.charCodeAt(i);
+                    }
+                    return outputArray;
+                }
+
+                const applicationServerKey = urlB64ToUint8Array(window.coraPwaVapidPublicKey);
+                registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: applicationServerKey
+                }).then(function(subscription) {
+                    const pwaNonce = window.coraPwaNonce || ((typeof coraREData !== 'undefined') ? coraREData.ajaxNonce : '');
+                    fetch('/wp-json/cora-pwa/v1/save-subscription', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': pwaNonce
+                        },
+                        body: JSON.stringify(subscription)
+                    }).then(function(res) { return res.json(); }).then(function(resData) {
+                        if (resData.success) {
+                            if (window.coraShowToast) {
+                                window.coraShowToast('Device synced & web push notifications enabled!', 'success');
+                            }
+                            window.coraCheckPwaPushStatus();
+                        } else {
+                            if (window.coraShowToast) {
+                                window.coraShowToast(resData.message || 'Failed to register push subscription.', 'error');
+                            }
+                        }
+                    }).catch(function() {
+                        if (window.coraShowToast) {
+                            window.coraShowToast('Failed to save subscription coordinates on server.', 'error');
+                        }
+                    });
+                }).catch(function(err) {
+                    if (window.coraShowToast) {
+                        window.coraShowToast('Push subscription failed: ' + (err.message || err), 'error');
+                    }
+                });
+            });
+        });
+    };
+
     window.coraSendTestChannelNotification = function(channel) {
         const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
         const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
