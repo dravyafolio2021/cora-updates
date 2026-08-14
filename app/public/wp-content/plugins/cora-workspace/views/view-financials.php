@@ -41,6 +41,13 @@ $recurring_list = is_array( $metrics['recurring_expenses'] ?? null ) ? $metrics[
 $client_profits = is_array( $metrics['client_profitability'] ?? null ) ? $metrics['client_profitability'] : array();
 $cora_take      = is_array( $metrics['cora_take'] ?? null ) ? $metrics['cora_take'] : array();
 $attention_cards= is_array( $metrics['attention_cards'] ?? null ) ? $metrics['attention_cards'] : array();
+$gst_data       = is_array( $metrics['gst_intelligence'] ?? null ) ? $metrics['gst_intelligence'] : array(
+    'gst_collected'      => 0.0,
+    'itc_credit'         => 0.0,
+    'net_gst_payable'    => 0.0,
+    'tax_reserve_target' => 0.0,
+);
+$forecast_events= is_array( $metrics['forecast_30']['key_events'] ?? null ) ? $metrics['forecast_30']['key_events'] : array();
 
 // Fetch CRM Leads/Clients for intercompatible invoice generation
 $leads_table = $wpdb->prefix . 'cora_leads';
@@ -1042,36 +1049,26 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <!-- Key Timeline Events -->
         <div class="cora-fin-card p-5 space-y-4">
             <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Projected Cash Timeline Events</h3>
-            <div class="space-y-2 text-xs">
-                <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-50 border border-zinc-100">
-                    <div class="flex items-center gap-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-200 text-zinc-800">Day 5</span>
-                        <span class="font-bold text-zinc-900">DLF Main Studio Lease Due</span>
-                    </div>
-                    <span class="font-mono font-bold text-amber-700">-₹28,500</span>
+            <?php if ( empty( $forecast_events ) ) : ?>
+                <div class="p-8 text-center bg-zinc-50/50 rounded-xl border border-zinc-100 space-y-2">
+                    <p class="text-xs font-semibold text-zinc-700">No upcoming payment events or scheduled renewals</p>
+                    <p class="text-[11px] text-zinc-400">Add client invoices or recurring subscriptions to forecast cash movement milestones.</p>
                 </div>
-                <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-50 border border-zinc-100">
-                    <div class="flex items-center gap-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Day 7</span>
-                        <span class="font-bold text-zinc-900">Acme Studios Overdue Invoice Expected</span>
+            <?php else : ?>
+                <div class="space-y-2 text-xs">
+                    <?php foreach ( $forecast_events as $fe ) : ?>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-50 border border-zinc-100">
+                        <div class="flex items-center gap-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold <?php echo $fe['type'] === 'in' ? 'bg-emerald-100 text-emerald-800' : 'bg-zinc-200 text-zinc-800'; ?>"><?php echo esc_html( $fe['day'] ); ?></span>
+                            <span class="font-bold text-zinc-900"><?php echo esc_html( $fe['label'] ); ?></span>
+                        </div>
+                        <span class="font-mono font-bold <?php echo $fe['type'] === 'in' ? 'text-emerald-700' : 'text-amber-700'; ?>">
+                            <?php echo ( $fe['amt'] >= 0 ? '+' : '' ) . '₹' . number_format( abs( $fe['amt'] ) ); ?>
+                        </span>
                     </div>
-                    <span class="font-mono font-bold text-emerald-700">+₹80,000</span>
+                    <?php endforeach; ?>
                 </div>
-                <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-50 border border-zinc-100">
-                    <div class="flex items-center gap-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-200 text-zinc-800">Day 12</span>
-                        <span class="font-bold text-zinc-900">Adobe Creative Cloud Renewal</span>
-                    </div>
-                    <span class="font-mono font-bold text-amber-700">-₹5,499</span>
-                </div>
-                <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-50 border border-zinc-100">
-                    <div class="flex items-center gap-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Day 19</span>
-                        <span class="font-bold text-zinc-900">Horizon Heights Milestone 1 Settlement</span>
-                    </div>
-                    <span class="font-mono font-bold text-emerald-700">+₹1,25,000</span>
-                </div>
-            </div>
+            <?php endif; ?>
         </div>
 
     </div>
@@ -1101,7 +1098,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             </span>
             <div>
-                <strong>Estimated Tax Reserve: ₹40,500</strong>
+                <strong>Estimated Tax Reserve: ₹<?php echo number_format( floatval( $gst_data['tax_reserve_target'] ?? 0 ) ); ?></strong>
                 <p class="text-[11px] text-amber-800 mt-0.5">Calculated based on recorded workspace invoices and ledger expenses. Please confirm with your Chartered Accountant before filing.</p>
             </div>
         </div>
@@ -1109,17 +1106,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             <div class="cora-fin-card p-4">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase">GST Collected (18%)</span>
-                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num mt-1">₹41,186</div>
+                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num mt-1">₹<?php echo number_format( floatval( $gst_data['gst_collected'] ?? 0 ) ); ?></div>
                 <div class="text-[10px] text-zinc-500 mt-0.5">9% CGST + 9% SGST on billings</div>
             </div>
             <div class="cora-fin-card p-4">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase">Input Tax Credit (ITC)</span>
-                <div class="text-xl font-extrabold text-emerald-700 cora-mono-num mt-1">₹10,200</div>
+                <div class="text-xl font-extrabold text-emerald-700 cora-mono-num mt-1">₹<?php echo number_format( floatval( $gst_data['itc_credit'] ?? 0 ) ); ?></div>
                 <div class="text-[10px] text-zinc-500 mt-0.5">Estimated on eligible business expenses</div>
             </div>
             <div class="cora-fin-card p-4">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase">Net GST Payable</span>
-                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num mt-1">₹30,986</div>
+                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num mt-1">₹<?php echo number_format( floatval( $gst_data['net_gst_payable'] ?? 0 ) ); ?></div>
                 <div class="text-[10px] text-zinc-500 mt-0.5">Quarterly tax reserve recommended</div>
             </div>
         </div>
