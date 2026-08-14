@@ -847,6 +847,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <button id="cm-bulk-btn" onclick="cmToggleBulk()" class="cm-hbtn">Select</button>
             <input type="file" id="cm-file-input" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" style="display:none" onchange="cmHandleFiles(this.files)">
         </div>
+    </div>
 
     <!-- ─── TOOLBAR (search + filters) ─────────────────────────── -->
     <div id="cm-toolbar">
