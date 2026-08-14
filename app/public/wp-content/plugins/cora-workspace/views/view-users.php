@@ -799,22 +799,22 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     </thead>
                     <tbody class="divide-y divide-zinc-200/60 bg-white ">
                         <!-- Super Admin / Owner Row (Locked) -->
-                        <tr class="group hover:bg-zinc-50/70 transition-colors cora-matrix-row border-b border-zinc-100 " data-role="cora_super_admin" data-locked="true">
-                            <td class="px-4 py-3 sticky left-0 z-10 bg-white group-hover:bg-zinc-50/70 transition-colors shadow-[1px_0_0_0_rgba(0,0,0,0.06)] (255,255,255,0.08)] whitespace-nowrap">
+                        <tr class="group hover:bg-zinc-50/70 transition-colors cora-matrix-row border-b border-zinc-100 bg-zinc-50/40" data-role="cora_shruti" data-locked="true">
+                            <td class="px-4 py-3 sticky left-0 z-10 bg-zinc-50/90 group-hover:bg-zinc-50 transition-colors shadow-[1px_0_0_0_rgba(0,0,0,0.06)] whitespace-nowrap">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-bold text-xs text-zinc-900 cora-role-title-text">Super Admin</span>
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-wide uppercase bg-zinc-50 text-zinc-400 border border-zinc-200/80 whitespace-nowrap select-none">
+                                    <span class="font-bold text-xs text-zinc-900 cora-role-title-text">Platform Super Admin</span>
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium tracking-wide uppercase bg-zinc-100 text-zinc-500 border border-zinc-200/80 whitespace-nowrap select-none">
                                         <svg class="w-2.5 h-2.5 text-zinc-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                         System Locked
                                     </span>
                                 </div>
                             </td>
                             <?php foreach ( $matrix_columns as $col_key => $col_lbl ) : ?>
-                                <td class="text-center py-2 px-4 border-r last:border-r-0 border-zinc-100 text-zinc-400 relative">
-                                    <div class="flex items-center justify-center" title="Full Access Locked">
-                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                <td class="text-center py-2 px-4 border-r last:border-r-0 border-zinc-100 text-zinc-400 relative cursor-not-allowed bg-zinc-50/20" title="Full Access (System Locked)">
+                                    <div class="flex items-center justify-center opacity-40 cursor-not-allowed pointer-events-none">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0 text-zinc-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                                     </div>
-                                    <input type="checkbox" checked disabled data-feature="<?php echo esc_attr($col_key); ?>" class="cora-permission-checkbox absolute opacity-[0.01] w-[1px] h-[1px] cursor-not-allowed pointer-events-none" style="left:0; top:0; z-index:100;">
+                                    <input type="checkbox" checked="checked" disabled="disabled" aria-disabled="true" data-feature="<?php echo esc_attr($col_key); ?>" class="cora-permission-checkbox absolute opacity-[0.01] w-[1px] h-[1px] cursor-not-allowed pointer-events-none" style="left:0; top:0; z-index:100;">
                                 </td>
                             <?php endforeach; ?>
                         </tr>
@@ -4265,6 +4265,12 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
         var $badge = $(this);
         var $cell = $badge.parent();
+        if ($cell.closest('[data-locked="true"]').length || $cell.data('locked')) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('🔒 Platform Super Admin permissions are system-locked and cannot be modified.', 'info');
+            }
+            return;
+        }
         var role = $cell.data('role');
         var feature = $cell.data('feature');
         var currentLevel = $cell.data('level') || 'none';
@@ -5869,6 +5875,27 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             performForce();
         }
     };
+
+    // Enforce HTML disabled attribute & pointer-events prevention on all locked inputs
+    function coraEnforceLockedInputs() {
+        $('[data-locked="true"] input, [data-locked="true"] select, [data-locked="true"] textarea, .cora-locked input, .cora-locked select, .cora-locked textarea, [disabled]').each(function() {
+            $(this).prop('disabled', true).attr('disabled', 'disabled').attr('aria-disabled', 'true');
+        });
+    }
+
+    $(document).on('click', '[data-locked="true"] input, [data-locked="true"] select, [data-locked="true"] button:not(.cora-drawer-close), .cora-locked input, .cora-locked select, .cora-locked button', function(e) {
+        if ($(this).hasClass('cora-drawer-close')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('🔒 This option is system-locked and cannot be modified.', 'info');
+        }
+        return false;
+    });
+
+    $(document).ready(function() {
+        coraEnforceLockedInputs();
+    });
 
     $('#cora-user-punch-in-btn').on('click', function() { logUserPunch('in'); });
     $('#cora-user-punch-out-btn').on('click', function() { logUserPunch('out'); });
