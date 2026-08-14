@@ -332,7 +332,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:hidden">
             <?php foreach ( $users as $u ) :
                 $u_role = ! empty( $u->roles ) ? $u->roles[0] : 'subscriber';
-                $u_role_lbl = isset( $role_labels[$u_role] ) ? $role_labels[$u_role] : $u_role;
+                $is_super_admin_user = ( $u->ID == 1 || $u->user_login === 'cora' || $u->user_login === 'cora_admin' || $u->user_email === 'admin@cora.local' || $u->user_email === 'dravya.shs@gmail.com' || in_array( $u_role, array( 'administrator', 'cora_shruti' ), true ) );
+                if ( $is_super_admin_user ) {
+                    $u_role_lbl = 'Platform Super Admin';
+                } else {
+                    $u_role_lbl = isset( $role_labels[$u_role] ) ? $role_labels[$u_role] : $u_role;
+                }
                 $u_branch_id = get_user_meta( $u->ID, 'cora_branch_id', true );
                 $norm_u_branch_key = 'branch_' . cora_normalize_branch_id( $u_branch_id );
                 $u_branch_lbl = isset( $agency_branches[$norm_u_branch_key] ) ? $agency_branches[$norm_u_branch_key]['name'] : '—';
@@ -460,7 +465,12 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <tbody class="divide-y divide-zinc-100 ">
                         <?php foreach ( $users as $u ) :
                             $u_role = ! empty( $u->roles ) ? $u->roles[0] : 'subscriber';
-                            $u_role_lbl = isset( $role_labels[$u_role] ) ? $role_labels[$u_role] : $u_role;
+                            $is_super_admin_user = ( $u->ID == 1 || $u->user_login === 'cora' || $u->user_login === 'cora_admin' || $u->user_email === 'admin@cora.local' || $u->user_email === 'dravya.shs@gmail.com' || in_array( $u_role, array( 'administrator', 'cora_shruti' ), true ) );
+                            if ( $is_super_admin_user ) {
+                                $u_role_lbl = 'Platform Super Admin';
+                            } else {
+                                $u_role_lbl = isset( $role_labels[$u_role] ) ? $role_labels[$u_role] : $u_role;
+                            }
                             $u_branch_id = get_user_meta( $u->ID, 'cora_branch_id', true );
                             $norm_u_branch_key = 'branch_' . cora_normalize_branch_id( $u_branch_id );
                             $u_branch_lbl = isset( $agency_branches[$norm_u_branch_key] ) ? $agency_branches[$norm_u_branch_key]['name'] : '—';
@@ -2357,7 +2367,7 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                     
                     <div>
                         <label class="block text-xs font-bold text-zinc-800 mb-1.5">Operational Role</label>
-                        <select id="edit-role" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
+                        <select id="edit-role" onchange="if(typeof handleEditRoleChange==='function')handleEditRoleChange(this.value)" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                             <?php
                             $all_roles_map = cora_get_all_roles();
                             if ( ! cora_is_real_shruti() ) {
@@ -2368,6 +2378,9 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                             }
                             ?>
                         </select>
+                        <div id="single-owner-notice" class="hidden mt-2 p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-[10px] text-zinc-600">
+                            <span class="font-bold text-zinc-900">Single Workspace Owner Policy:</span> Each workspace has exactly 1 Workspace Owner. Saving will transfer workspace ownership to this member.
+                        </div>
                     </div>
                     
                     <div>
@@ -3591,6 +3604,9 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         $('#edit-display-name').val(user.name || '');
         $('#edit-phone').val(user.phone || '');
         $('#edit-role').val(user.role || '');
+        if (typeof window.handleEditRoleChange === 'function') {
+            window.handleEditRoleChange(user.role || '');
+        }
         $('#edit-branch').val(user.branch || '');
         $('#edit-bio').val(user.bio || '');
         $('#edit-commission-split').val(user.split || '70/30');
@@ -3737,6 +3753,18 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             'pointer-events': 'auto'
         });
     }
+    function handleEditRoleChange(role) {
+        if (role === 'cora_super_admin' || role === 'cora_workspace_owner') {
+            if (currentEditingUser && (currentEditingUser.role !== 'cora_super_admin' && currentEditingUser.role !== 'cora_workspace_owner')) {
+                $('#single-owner-notice').removeClass('hidden');
+            } else {
+                $('#single-owner-notice').addClass('hidden');
+            }
+        } else {
+            $('#single-owner-notice').addClass('hidden');
+        }
+    }
+    window.handleEditRoleChange = handleEditRoleChange;
     window.openEditUserDrawer = openEditUserDrawer;
     window.coraOpenEditUserDrawer = openEditUserDrawer;
     window.closeEditUserDrawer = closeEditUserDrawer;

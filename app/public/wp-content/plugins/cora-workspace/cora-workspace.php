@@ -2259,8 +2259,8 @@ function cora_get_all_roles() {
     $module = Cora_Module_Registry::get_module( $active_industry );
     
     $roles = array(
-        'administrator'       => 'Super Admin',
-        'cora_shruti'         => 'Owner (Shruti)',
+        'administrator'       => 'Platform Super Admin',
+        'cora_shruti'         => 'Platform Super Admin',
         'cora_super_admin'    => 'Workspace Owner',
         'cora_branch_manager' => 'Branch Manager',
         'cora_viewer'         => 'Viewer'
@@ -23490,7 +23490,23 @@ function cora_ajax_save_user_changes() {
         update_user_meta( $target_user_id, 'cora_profile_banner_url', $banner_url );
     }
 
-    // Save Role
+    // Save Role & Enforce Single Workspace Owner Policy
+    if ( in_array( $target_role, array( 'cora_super_admin', 'cora_workspace_owner', 'cora_studio_owner', 'cora_re_broker_owner' ), true ) ) {
+        $target_agency = get_user_meta( $target_user_id, 'cora_agency_id', true );
+        if ( ! empty( $target_agency ) && $target_agency !== 'super' ) {
+            $other_owners = get_users( array(
+                'meta_key'   => 'cora_agency_id',
+                'meta_value' => $target_agency,
+                'exclude'    => array( $target_user_id, 1 ),
+            ) );
+            foreach ( $other_owners as $oo ) {
+                $oo_role = ! empty( $oo->roles ) ? $oo->roles[0] : '';
+                if ( in_array( $oo_role, array( 'cora_super_admin', 'cora_workspace_owner', 'cora_studio_owner', 'cora_re_broker_owner' ), true ) ) {
+                    $oo->set_role( 'cora_manager' );
+                }
+            }
+        }
+    }
     $target_user->set_role( $target_role );
 
     // Save Branch and Status
