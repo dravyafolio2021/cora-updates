@@ -52,11 +52,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
          LAYER 1: AI MORNING / AFTERNOON EXECUTIVE BRIEFING
          ════════════════════════════════════════════════════════ -->
     <div class="p-4 sm:p-6 rounded-2xl border border-zinc-200/80 shadow-2xs relative overflow-hidden" style="background-color: #FBFaf7;">
-        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
-            <div class="space-y-1.5 sm:space-y-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+            <div class="space-y-1 sm:space-y-1.5">
                 <div class="flex items-center gap-2 flex-wrap">
-                    <span class="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shrink-0">C</span>
-                    <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">Cora Executive Briefing</span>
+                    <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px] sm:text-xs shrink-0">C</span>
+                    <span class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-zinc-600">Cora Executive Briefing</span>
                     
                     <!-- Live Pulse Status Indicator -->
                     <?php if ( $pulse_status === 'optimal' ) : ?>
@@ -75,35 +75,38 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <span><?php echo esc_html( $pulse_status_text ); ?></span>
                         </span>
                     <?php endif; ?>
+
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/90 border border-zinc-200/80 text-zinc-700">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Workspace #<?php echo esc_html( $agency_id ); ?></span>
+                    </span>
                 </div>
-                <h2 class="text-base sm:text-xl font-bold text-zinc-950 tracking-tight">
+
+                <h2 class="text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
                     <?php echo esc_html( $greeting ); ?>, <?php echo esc_html( $user_name ); ?> 👋
                 </h2>
-                <p class="text-xs text-zinc-600 font-medium leading-relaxed">Here is what changed across your business since you were last here.</p>
-            </div>
-
-            <div class="flex items-center gap-2 shrink-0 self-start">
-                <div class="inline-flex items-center gap-1.5 bg-white/80 border border-zinc-200 px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold text-zinc-800">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
-                    <span>Workspace #<?php echo esc_html( $agency_id ); ?></span>
-                </div>
+                <p class="text-xs text-zinc-600 font-medium leading-normal">Here is what changed across your business since you were last here.</p>
             </div>
         </div>
 
-        <!-- Briefing Highlights -->
-        <div class="mt-3.5 pt-3.5 border-t border-zinc-200/70 grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3">
-            <?php foreach ( $briefing_bullets as $bullet ) : ?>
-            <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/75 border border-zinc-200/60 text-xs text-zinc-700">
-                <span class="text-zinc-900 font-bold shrink-0 mt-0.5">•</span>
-                <div class="leading-relaxed">
-                    <?php 
-                    // Parse markdown bold tags safely
-                    $formatted = preg_replace( '/\*\*(.*?)\*\*/', '<strong class="font-bold text-zinc-950">$1</strong>', esc_html( $bullet ) );
-                    echo $formatted; 
-                    ?>
+        <!-- Briefing Highlights (Unified Single Container on Mobile, Clean Grid on Desktop) -->
+        <div class="mt-3.5 pt-3 border-t border-zinc-200/70">
+            <div class="bg-white/80 rounded-xl border border-zinc-200/80 divide-y divide-zinc-100 sm:divide-y-0 sm:border-0 sm:bg-transparent sm:grid sm:grid-cols-3 sm:gap-3 overflow-hidden">
+                <?php foreach ( $briefing_bullets as $bullet ) : ?>
+                <div class="p-3 sm:rounded-xl sm:bg-white/80 sm:border sm:border-zinc-200/80 flex items-start gap-2.5 text-xs text-zinc-700 leading-relaxed">
+                    <span class="w-4 h-4 rounded-full bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-[9px] shrink-0 mt-0.5">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </span>
+                    <div class="flex-1">
+                        <?php 
+                        // Parse markdown bold tags safely
+                        $formatted = preg_replace( '/\*\*(.*?)\*\*/', '<strong class="font-bold text-zinc-950">$1</strong>', esc_html( $bullet ) );
+                        echo $formatted; 
+                        ?>
+                    </div>
                 </div>
+                <?php endforeach; ?>
             </div>
-            <?php endforeach; ?>
         </div>
     </div>
 
