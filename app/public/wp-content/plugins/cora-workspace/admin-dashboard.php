@@ -205,6 +205,16 @@ $cora_gbp_tokens        = ( $sub_page === 'gbp' ) ? get_option( 'cora_gbp_tokens
 $cora_gbp_is_authenticated = ! empty( $cora_gbp_tokens['access_token'] );
 $cora_gbp_connected_via = $cora_gbp_profile['connected_via'] ?? '';
 
+// WhatsApp Cloud API Gateway variables
+$cora_wa_settings       = class_exists( 'Cora_WhatsApp_Gateway' ) ? Cora_WhatsApp_Gateway::instance()->get_settings() : array();
+$cora_wa_is_configured  = ! empty( $cora_wa_settings['is_configured'] );
+$cora_wa_phone_id       = $cora_wa_settings['phone_number_id'] ?? '';
+$cora_wa_waba_id        = $cora_wa_settings['waba_id'] ?? '';
+$cora_wa_access_token   = $cora_wa_settings['access_token'] ?? '';
+$cora_wa_verify_token   = $cora_wa_settings['verify_token'] ?? '';
+$cora_wa_webhook_url    = $cora_wa_settings['webhook_url'] ?? rest_url( 'cora/v1/whatsapp/webhook' );
+$cora_wa_cached_status  = get_transient( 'cora_wa_connection_status' );
+
 // AI model display label for sidebar
 $cora_active_ai_model = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
 
@@ -6374,35 +6384,365 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                     </script>
                 </div>
 
-                <!-- ═══ SECTION 2: WhatsApp Gateway (Coming Soon) ═══ -->
-                <div class="bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden relative" onclick="if(event.target.tagName !== 'INPUT') window.coraShowToast('WhatsApp integration is coming soon. This feature is currently under development.')">
+                <!-- ═══ SECTION 2: Meta WhatsApp Cloud API Gateway ═══ -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden" id="cora-wa-settings-card">
                     <div class="px-5 pt-5 pb-4 border-b border-zinc-100">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 opacity-50">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600">
                                         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-sm font-bold text-zinc-500">WhatsApp Autopilot</h3>
-                                    <p class="text-[11px] text-zinc-400 mt-0.5">Auto-send booking confirmations and photo links to clients via WhatsApp.</p>
+                                    <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">
+                                        WhatsApp Cloud API Gateway
+                                        <span class="text-[9.5px] px-2 py-0.5 rounded-full font-semibold bg-zinc-100 text-zinc-600 border border-zinc-200">24h Smart Cost Optimizer</span>
+                                    </h3>
+                                    <p class="text-[11px] text-zinc-500 mt-0.5">Direct Meta WhatsApp Business Cloud API integration with automatic 24-hour customer service window tracking.</p>
                                 </div>
                             </div>
-                            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 shrink-0">Coming Soon</span>
+                            <div class="flex items-center gap-2">
+                                <span id="cora-wa-status-badge" class="text-[9px] border px-2.5 py-1 rounded-full font-bold inline-flex items-center gap-1 <?php echo $cora_wa_is_configured ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-zinc-100 text-zinc-500 border-zinc-200'; ?>">
+                                    <span class="w-1.5 h-1.5 rounded-full <?php echo $cora_wa_is_configured ? 'bg-emerald-500' : 'bg-zinc-400'; ?>"></span>
+                                    <span id="cora-wa-status-text"><?php echo $cora_wa_is_configured ? 'Configured' : 'Not Set'; ?></span>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="p-5 space-y-4 opacity-40 pointer-events-none select-none">
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">WhatsApp Phone Number ID</label>
-                            <input type="text" disabled class="w-full border border-zinc-200 rounded-lg px-3 py-2.5 text-sm bg-zinc-50 text-zinc-400 cursor-not-allowed" placeholder="Your WhatsApp Business Phone ID">
+
+                    <div class="p-5 space-y-4">
+                        <!-- Credentials Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
+                                    <span>Phone Number ID <span class="text-rose-500">*</span></span>
+                                    <span class="text-[9.5px] font-normal lowercase text-zinc-400">from Meta App &gt; WhatsApp</span>
+                                </label>
+                                <input type="text" id="cora-wa-phone-id" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none font-mono text-zinc-800 placeholder:font-sans placeholder:text-zinc-300 transition-all" value="<?php echo esc_attr( $cora_wa_phone_id ); ?>" placeholder="e.g. 104928374928102">
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
+                                    <span>WABA ID (Account ID)</span>
+                                    <span class="text-[9.5px] font-normal lowercase text-zinc-400">WhatsApp Business Account ID</span>
+                                </label>
+                                <input type="text" id="cora-wa-waba-id" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none font-mono text-zinc-800 placeholder:font-sans placeholder:text-zinc-300 transition-all" value="<?php echo esc_attr( $cora_wa_waba_id ); ?>" placeholder="e.g. 103948291048201">
+                            </div>
                         </div>
+
+                        <!-- Access Token with Eye Toggle -->
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Access Token</label>
-                            <input type="password" disabled class="w-full border border-zinc-200 rounded-lg px-3 py-2.5 text-sm bg-zinc-50 text-zinc-400 cursor-not-allowed" placeholder="••••••••••••••••••••">
+                            <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
+                                <span>System User / Permanent Access Token <span class="text-rose-500">*</span></span>
+                                <span class="text-[9.5px] font-normal lowercase text-zinc-400">EAAG... (with whatsapp_business_messaging scope)</span>
+                            </label>
+                            <div class="relative">
+                                <input type="password" id="cora-wa-access-token" class="w-full border border-zinc-200 rounded-lg pl-3 pr-10 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none font-mono text-zinc-800 placeholder:font-sans placeholder:text-zinc-300 transition-all" value="<?php echo esc_attr( $cora_wa_access_token ); ?>" placeholder="Paste your Meta System User Access Token">
+                                <button type="button" onclick="coraToggleWaTokenVisibility()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 transition-colors p-1" title="Toggle Visibility">
+                                    <svg id="cora-wa-eye-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Webhook Setup Banner for Meta Developers -->
+                        <div class="p-3.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-2.5 text-left">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-zinc-900 flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                    Meta Webhook Configuration (Inbound Messages &amp; Free 24h Window Resets)
+                                </span>
+                                <span class="text-[9px] font-semibold text-zinc-500">Live Endpoint</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                <div>
+                                    <div class="text-[9.5px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Callback URL</div>
+                                    <div class="flex items-center gap-1.5 bg-white border border-zinc-200 rounded-lg px-2.5 py-1.5">
+                                        <input type="text" readonly id="cora-wa-webhook-url" class="text-[11px] font-mono text-zinc-700 bg-transparent border-none outline-none w-full select-all truncate" value="<?php echo esc_attr( $cora_wa_webhook_url ); ?>">
+                                        <button type="button" onclick="coraCopyText('cora-wa-webhook-url', 'Webhook Callback URL copied to clipboard!')" class="text-xs font-semibold text-zinc-600 hover:text-zinc-950 shrink-0 px-1.5 py-0.5 hover:bg-zinc-100 rounded transition-colors">Copy</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-[9.5px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Verify Token</div>
+                                    <div class="flex items-center gap-1.5 bg-white border border-zinc-200 rounded-lg px-2.5 py-1.5">
+                                        <input type="text" id="cora-wa-verify-token" class="text-[11px] font-mono text-zinc-700 bg-transparent border-none outline-none w-full select-all truncate" value="<?php echo esc_attr( $cora_wa_verify_token ); ?>">
+                                        <button type="button" onclick="coraCopyText('cora-wa-verify-token', 'Verify Token copied to clipboard!')" class="text-xs font-semibold text-zinc-600 hover:text-zinc-950 shrink-0 px-1.5 py-0.5 hover:bg-zinc-100 rounded transition-colors">Copy</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-zinc-400 leading-relaxed pt-0.5">
+                                In your <strong>Meta App Dashboard &gt; WhatsApp &gt; Configuration &gt; Webhook</strong>, paste the Callback URL and Verify Token, then subscribe to the <code>messages</code> field.
+                            </p>
+                        </div>
+
+                        <!-- 24-Hour Smart Cost Explainer Strip -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 px-3 py-2 bg-emerald-50/60 border border-emerald-200/60 rounded-xl text-[11px] text-emerald-950">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
+                                <span><strong>24-Hour Free Window Autopilot:</strong> When a customer messages your WhatsApp, Cora automatically unlocks 24 hours of unlimited free session messages ($0 Meta fees).</span>
+                            </div>
+                            <span class="text-[9.5px] font-bold uppercase tracking-wider text-emerald-800 shrink-0 bg-emerald-100/80 px-2 py-0.5 rounded-md">Cost Optimizer Active</span>
+                        </div>
+
+                        <!-- Action Controls Row -->
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-100">
+                            <div class="flex items-center gap-2">
+                                <button type="button" id="cora-wa-test-btn" onclick="coraVerifyWhatsAppConnection()" class="px-3 py-2 rounded-lg border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300 text-xs font-semibold transition-all inline-flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                    <span id="cora-wa-test-label">Verify Connection</span>
+                                </button>
+                                <button type="button" onclick="coraOpenWhatsAppTestModal()" class="px-3 py-2 rounded-lg border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300 text-xs font-semibold transition-all inline-flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                    <span>Send Test Message…</span>
+                                </button>
+                            </div>
+                            <button type="button" id="cora-wa-save-btn" onclick="coraSaveWhatsAppCredentials()" class="px-4 py-2 rounded-lg bg-zinc-900 hover:bg-black text-white text-xs font-semibold transition-all shadow-2xs inline-flex items-center gap-1.5">
+                                <svg id="cora-wa-save-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                <span id="cora-wa-save-label">Save Credentials</span>
+                            </button>
                         </div>
                     </div>
                 </div>
+
+                <!-- ═══ WhatsApp Live Test Modal / Drawer ═══ -->
+                <div id="cora-wa-test-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;padding:16px;">
+                    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-md overflow-hidden text-left" onclick="event.stopPropagation()">
+                        <div class="px-5 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                </div>
+                                <h3 class="text-sm font-bold text-zinc-900">Send WhatsApp Test Message</h3>
+                            </div>
+                            <button type="button" onclick="coraCloseWhatsAppTestModal()" class="text-zinc-400 hover:text-zinc-700 p-1 rounded-md transition-colors">✕</button>
+                        </div>
+
+                        <div class="p-5 space-y-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Recipient Mobile Number <span class="text-rose-500">*</span></label>
+                                <input type="text" id="cora-wa-test-phone" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none font-mono text-zinc-900 placeholder:font-sans placeholder:text-zinc-300" placeholder="+91 98765 43210" oninput="coraCheckTestPhoneWindow(this.value)">
+                                <p class="text-[10px] text-zinc-400 mt-1">Include country code (e.g. 91 for India, 1 for US/Canada). If using a Meta test number, make sure this recipient is added to your verified test recipient list.</p>
+                            </div>
+
+                            <!-- 24-hour Window Status Indicator for Target Number -->
+                            <div id="cora-wa-test-window-box" class="p-2.5 bg-zinc-50 border border-zinc-200/80 rounded-xl flex items-center justify-between text-[11px]">
+                                <span class="text-zinc-500">24-Hour Window Status:</span>
+                                <span id="cora-wa-test-window-badge" class="font-bold text-zinc-700">Enter number above</span>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Message Preview / Custom Text</label>
+                                <textarea id="cora-wa-test-body" rows="3" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs bg-white focus:border-zinc-400 focus:outline-none text-zinc-800 placeholder:text-zinc-300 leading-relaxed font-sans" placeholder="✨ Cora Workspace WhatsApp Test: Your connection is live and active!"></textarea>
+                            </div>
+
+                            <div class="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
+                                <button type="button" onclick="coraCloseWhatsAppTestModal()" class="px-3 py-2 rounded-lg border border-zinc-200 text-zinc-600 hover:bg-zinc-50 text-xs font-semibold transition-colors">Cancel</button>
+                                <button type="button" id="cora-wa-send-test-btn" onclick="coraSendWhatsAppTestMessage()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-all shadow-2xs inline-flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                    <span id="cora-wa-send-test-label">Send Message</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                window.coraToggleWaTokenVisibility = function() {
+                    var input = document.getElementById('cora-wa-access-token');
+                    if (!input) return;
+                    input.type = input.type === 'password' ? 'text' : 'password';
+                };
+
+                window.coraCopyText = function(elementId, toastMsg) {
+                    var el = document.getElementById(elementId);
+                    if (!el) return;
+                    var text = el.value || el.innerText;
+                    navigator.clipboard.writeText(text).then(function() {
+                        if (window.coraShowToast) window.coraShowToast(toastMsg || 'Copied to clipboard!', 'success');
+                    }).catch(function() {
+                        if (window.coraShowToast) window.coraShowToast('Copied: ' + text, 'info');
+                    });
+                };
+
+                window.coraSaveWhatsAppCredentials = function() {
+                    var phoneId     = (document.getElementById('cora-wa-phone-id') || {}).value || '';
+                    var wabaId      = (document.getElementById('cora-wa-waba-id') || {}).value || '';
+                    var token       = (document.getElementById('cora-wa-access-token') || {}).value || '';
+                    var verifyToken = (document.getElementById('cora-wa-verify-token') || {}).value || '';
+                    var saveBtn     = document.getElementById('cora-wa-save-btn');
+                    var saveLabel   = document.getElementById('cora-wa-save-label');
+
+                    if (!phoneId.trim() || !token.trim()) {
+                        if (window.coraShowToast) window.coraShowToast('Please provide both Phone Number ID and Access Token.', 'error');
+                        return;
+                    }
+
+                    if (saveBtn) saveBtn.disabled = true;
+                    if (saveLabel) saveLabel.textContent = 'Saving…';
+
+                    jQuery.ajax({
+                        url: coraREData.ajaxUrl,
+                        type: 'POST',
+                        data: {
+                            action: 'cora_whatsapp_save_settings',
+                            nonce: coraREData.ajaxNonce,
+                            phone_number_id: phoneId,
+                            waba_id: wabaId,
+                            access_token: token,
+                            verify_token: verifyToken,
+                            enabled: '1'
+                        },
+                        success: function(r) {
+                            if (saveBtn) saveBtn.disabled = false;
+                            if (saveLabel) saveLabel.textContent = 'Save Credentials';
+
+                            if (r.success) {
+                                if (window.coraShowToast) window.coraShowToast(r.data.message || 'WhatsApp credentials saved successfully!', 'success');
+                                var badge = document.getElementById('cora-wa-status-badge');
+                                var text = document.getElementById('cora-wa-status-text');
+                                if (badge && text) {
+                                    badge.className = 'text-[9px] border px-2.5 py-1 rounded-full font-bold inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border-emerald-200';
+                                    text.textContent = 'Configured';
+                                }
+                            } else {
+                                if (window.coraShowToast) window.coraShowToast((r.data && r.data.message) ? r.data.message : 'Error saving credentials.', 'error');
+                            }
+                        },
+                        error: function() {
+                            if (saveBtn) saveBtn.disabled = false;
+                            if (saveLabel) saveLabel.textContent = 'Save Credentials';
+                            if (window.coraShowToast) window.coraShowToast('Network error while saving WhatsApp settings.', 'error');
+                        }
+                    });
+                };
+
+                window.coraVerifyWhatsAppConnection = function() {
+                    var testBtn   = document.getElementById('cora-wa-test-btn');
+                    var testLabel = document.getElementById('cora-wa-test-label');
+
+                    if (testBtn) testBtn.disabled = true;
+                    if (testLabel) testLabel.textContent = 'Testing…';
+
+                    jQuery.ajax({
+                        url: coraREData.ajaxUrl,
+                        type: 'POST',
+                        data: {
+                            action: 'cora_whatsapp_test_connection',
+                            nonce: coraREData.ajaxNonce
+                        },
+                        success: function(r) {
+                            if (testBtn) testBtn.disabled = false;
+                            if (testLabel) testLabel.textContent = 'Verify Connection';
+
+                            if (r.success && r.data) {
+                                var name = r.data.verified_name || 'WhatsApp Business';
+                                var phone = r.data.display_phone_number || '';
+                                var rating = r.data.quality_rating || 'GREEN';
+                                if (window.coraShowToast) window.coraShowToast('Connected to ' + name + (phone ? ' (' + phone + ')' : '') + ' • Quality: ' + rating, 'success');
+                                
+                                var badge = document.getElementById('cora-wa-status-badge');
+                                var text = document.getElementById('cora-wa-status-text');
+                                if (badge && text) {
+                                    badge.className = 'text-[9px] border px-2.5 py-1 rounded-full font-bold inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border-emerald-200';
+                                    text.textContent = phone ? 'Connected (' + phone + ')' : 'Connected 🟢';
+                                }
+                            } else {
+                                if (window.coraShowToast) window.coraShowToast('Meta Connection Error: ' + ((r.data && r.data.message) ? r.data.message : 'Invalid Token or Phone ID'), 'error');
+                            }
+                        },
+                        error: function() {
+                            if (testBtn) testBtn.disabled = false;
+                            if (testLabel) testLabel.textContent = 'Verify Connection';
+                            if (window.coraShowToast) window.coraShowToast('Network error while verifying WhatsApp connection.', 'error');
+                        }
+                    });
+                };
+
+                window.coraOpenWhatsAppTestModal = function() {
+                    var modal = document.getElementById('cora-wa-test-modal');
+                    if (modal) modal.style.display = 'flex';
+                };
+
+                window.coraCloseWhatsAppTestModal = function() {
+                    var modal = document.getElementById('cora-wa-test-modal');
+                    if (modal) modal.style.display = 'none';
+                };
+
+                window.coraCheckTestPhoneWindow = function(phone) {
+                    if (!phone || phone.length < 8) {
+                        var badge = document.getElementById('cora-wa-test-window-badge');
+                        if (badge) { badge.className = 'font-bold text-zinc-500'; badge.textContent = 'Enter number above'; }
+                        return;
+                    }
+
+                    jQuery.ajax({
+                        url: coraREData.ajaxUrl,
+                        type: 'POST',
+                        data: {
+                            action: 'cora_whatsapp_get_status',
+                            nonce: coraREData.ajaxNonce,
+                            phone: phone
+                        },
+                        success: function(r) {
+                            if (r.success && r.data && r.data.session_window) {
+                                var sw = r.data.session_window;
+                                var badge = document.getElementById('cora-wa-test-window-badge');
+                                if (badge) {
+                                    if (sw.active) {
+                                        badge.className = 'font-bold text-emerald-600';
+                                        badge.textContent = '🟢 Active (' + sw.remaining_human + ' - Free Tier)';
+                                    } else {
+                                        badge.className = 'font-bold text-amber-600';
+                                        badge.textContent = '🟡 Expired (Template / Re-engagement)';
+                                    }
+                                }
+                            }
+                        }
+                    });
+                };
+
+                window.coraSendWhatsAppTestMessage = function() {
+                    var phone = (document.getElementById('cora-wa-test-phone') || {}).value || '';
+                    var body  = (document.getElementById('cora-wa-test-body') || {}).value || '';
+                    var btn   = document.getElementById('cora-wa-send-test-btn');
+                    var label = document.getElementById('cora-wa-send-test-label');
+
+                    if (!phone.trim()) {
+                        if (window.coraShowToast) window.coraShowToast('Please enter a recipient mobile number.', 'error');
+                        return;
+                    }
+
+                    if (btn) btn.disabled = true;
+                    if (label) label.textContent = 'Sending…';
+
+                    jQuery.ajax({
+                        url: coraREData.ajaxUrl,
+                        type: 'POST',
+                        data: {
+                            action: 'cora_whatsapp_send_test',
+                            nonce: coraREData.ajaxNonce,
+                            recipient_phone: phone,
+                            custom_message: body
+                        },
+                        success: function(r) {
+                            if (btn) btn.disabled = false;
+                            if (label) label.textContent = 'Send Message';
+
+                            if (r.success) {
+                                if (window.coraShowToast) window.coraShowToast(r.data.message || 'WhatsApp message sent successfully!', 'success');
+                                coraCloseWhatsAppTestModal();
+                            } else {
+                                if (window.coraShowToast) window.coraShowToast((r.data && r.data.message) ? r.data.message : 'Failed to send message.', 'error');
+                            }
+                        },
+                        error: function() {
+                            if (btn) btn.disabled = false;
+                            if (label) label.textContent = 'Send Message';
+                            if (window.coraShowToast) window.coraShowToast('Network error while dispatching test message.', 'error');
+                        }
+                    });
+                };
+                </script>
 
                 <!-- ═══ SECTION 3: Google Business Profile ═══ -->
                 <div class="bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden">

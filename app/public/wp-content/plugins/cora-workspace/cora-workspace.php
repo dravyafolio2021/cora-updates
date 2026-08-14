@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.42
+ * Version: 3.4.43
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -16,7 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CORA_WORKSPACE_VERSION', '3.4.42' );
+if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
+    define( 'CORA_WORKSPACE_VERSION', '3.4.43' );
+}
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
@@ -137,6 +139,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/docs-engine.php';
 
 // ── Workspace Header Widget ────────────────────────────────────────────────
 require_once plugin_dir_path( __FILE__ ) . 'includes/workspace-header.php';
+
+// ── WhatsApp Cloud API Gateway ─────────────────────────────────────────────
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-whatsapp-gateway.php';
 
 
 /**
@@ -3757,7 +3762,91 @@ add_action( 'rest_api_init', function () {
         'callback'            => 'cora_rest_get_form_audit_log',
         'permission_callback' => 'cora_forms_rest_permission_check',
     ) );
+
+    // WhatsApp Cloud API Inbound Webhook (Verification & Event Ingestion)
+    register_rest_route( 'cora/v1', '/whatsapp/webhook', array(
+        array(
+            'methods'             => 'GET',
+            'callback'            => 'cora_rest_whatsapp_webhook_verify',
+            'permission_callback' => '__return_true',
+        ),
+        array(
+            'methods'             => 'POST',
+            'callback'            => 'cora_rest_whatsapp_webhook_receive',
+            'permission_callback' => '__return_true',
+        ),
+    ) );
 } );
+
+if ( ! function_exists( 'cora_rest_whatsapp_webhook_verify' ) ) {
+function cora_rest_whatsapp_webhook_verify( $request ) {
+    $mode         = $request->get_param( 'hub_mode' ) ?: ( $_GET['hub_mode'] ?? ( $_GET['hub.mode'] ?? '' ) );
+    $verify_token = $request->get_param( 'hub_verify_token' ) ?: ( $_GET['hub_verify_token'] ?? ( $_GET['hub.verify_token'] ?? '' ) );
+    $challenge    = $request->get_param( 'hub_challenge' ) ?: ( $_GET['hub_challenge'] ?? ( $_GET['hub.challenge'] ?? '' ) );
+
+    if ( class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+        $settings = Cora_WhatsApp_Gateway::instance()->get_settings();
+        $expected_token = $settings['verify_token'];
+
+        if ( 'subscribe' === $mode && $verify_token === $expected_token ) {
+            header( 'Content-Type: text/plain; charset=utf-8' );
+            echo $challenge;
+            exit;
+        }
+    }
+
+    return new WP_REST_Response( array( 'error' => 'Verification token mismatch' ), 403 );
+}
+}
+
+if ( ! function_exists( 'cora_rest_whatsapp_webhook_receive' ) ) {
+function cora_rest_whatsapp_webhook_receive( $request ) {
+    $body = $request->get_json_params();
+    if ( empty( $body ) ) {
+        $body = json_decode( file_get_contents( 'php://input' ), true );
+    }
+
+    if ( ! empty( $body['entry'] ) && is_array( $body['entry'] ) && class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+        $gateway = Cora_WhatsApp_Gateway::instance();
+
+        foreach ( $body['entry'] as $entry ) {
+            if ( empty( $entry['changes'] ) || ! is_array( $entry['changes'] ) ) {
+                continue;
+            }
+
+            foreach ( $entry['changes'] as $change ) {
+                $val = $change['value'] ?? array();
+
+                // Process Inbound Messages (Resets 24-Hour Free Service Window!)
+                if ( ! empty( $val['messages'] ) && is_array( $val['messages'] ) ) {
+                    foreach ( $val['messages'] as $msg ) {
+                        $from = $msg['from'] ?? '';
+                        $msg_type = $msg['type'] ?? 'text';
+                        $msg_body = '';
+                        if ( 'text' === $msg_type && isset( $msg['text']['body'] ) ) {
+                            $msg_body = $msg['text']['body'];
+                        } elseif ( 'interactive' === $msg_type ) {
+                            $msg_body = $msg['interactive']['button_reply']['title'] ?? ( $msg['interactive']['list_reply']['title'] ?? 'Interactive reply' );
+                        } elseif ( 'button' === $msg_type ) {
+                            $msg_body = $msg['button']['text'] ?? 'Button click';
+                        }
+
+                        if ( ! empty( $from ) ) {
+                            $gateway->record_inbound_message( $from, array(
+                                'body' => $msg_body,
+                                'type' => $msg_type,
+                                'id'   => $msg['id'] ?? '',
+                            ) );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return new WP_REST_Response( array( 'status' => 'EVENT_RECEIVED' ), 200 );
+}
+}
 
 if ( ! function_exists( 'cora_forms_rest_permission_check' ) ) {
 function cora_forms_rest_permission_check() {
@@ -13899,6 +13988,116 @@ function cora_ajax_gbp_save_keys() {
 }
 }
 add_action( 'wp_ajax_cora_gbp_save_keys', 'cora_ajax_gbp_save_keys' );
+
+// ── WhatsApp Cloud API AJAX Handlers ─────────────────────────────────────────
+
+// AJAX: Save WhatsApp Settings
+add_action( 'wp_ajax_cora_whatsapp_save_settings', 'cora_ajax_whatsapp_save_settings' );
+if ( ! function_exists( 'cora_ajax_whatsapp_save_settings' ) ) {
+function cora_ajax_whatsapp_save_settings() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    }
+
+    $phone_number_id = sanitize_text_field( $_POST['phone_number_id'] ?? '' );
+    $waba_id         = sanitize_text_field( $_POST['waba_id'] ?? '' );
+    $access_token    = sanitize_text_field( $_POST['access_token'] ?? '' );
+    $verify_token    = sanitize_text_field( $_POST['verify_token'] ?? '' );
+    $enabled         = isset( $_POST['enabled'] ) ? ( $_POST['enabled'] === '1' || $_POST['enabled'] === 'true' ) : true;
+
+    if ( class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+        Cora_WhatsApp_Gateway::instance()->save_settings( $phone_number_id, $waba_id, $access_token, $verify_token, $enabled );
+        wp_send_json_success( array(
+            'message'  => 'WhatsApp credentials saved successfully.',
+            'settings' => Cora_WhatsApp_Gateway::instance()->get_settings(),
+        ) );
+    }
+
+    wp_send_json_error( array( 'message' => 'WhatsApp gateway module not loaded.' ) );
+}
+}
+
+// AJAX: Test WhatsApp Connection
+add_action( 'wp_ajax_cora_whatsapp_test_connection', 'cora_ajax_whatsapp_test_connection' );
+if ( ! function_exists( 'cora_ajax_whatsapp_test_connection' ) ) {
+function cora_ajax_whatsapp_test_connection() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    }
+
+    if ( class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+        $res = Cora_WhatsApp_Gateway::instance()->verify_connection();
+        if ( $res['success'] ) {
+            wp_send_json_success( $res['data'] );
+        } else {
+            wp_send_json_error( array( 'message' => $res['error'] ?? 'Connection verification failed.' ) );
+        }
+    }
+
+    wp_send_json_error( array( 'message' => 'WhatsApp gateway module not loaded.' ) );
+}
+}
+
+// AJAX: Send WhatsApp Live Test Message
+add_action( 'wp_ajax_cora_whatsapp_send_test', 'cora_ajax_whatsapp_send_test' );
+if ( ! function_exists( 'cora_ajax_whatsapp_send_test' ) ) {
+function cora_ajax_whatsapp_send_test() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    }
+
+    $recipient_phone = sanitize_text_field( $_POST['recipient_phone'] ?? '' );
+    $custom_message  = sanitize_textarea_field( $_POST['custom_message'] ?? '' );
+
+    if ( empty( $recipient_phone ) ) {
+        wp_send_json_error( array( 'message' => 'Please enter a recipient mobile number.' ) );
+    }
+
+    if ( class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+        $res = Cora_WhatsApp_Gateway::instance()->send_test_message( $recipient_phone, $custom_message );
+        if ( $res['success'] ) {
+            wp_send_json_success( array(
+                'message'    => 'Test message dispatched successfully via Meta Cloud API!',
+                'message_id' => $res['message_id'] ?? '',
+            ) );
+        } else {
+            wp_send_json_error( array(
+                'message'        => $res['error'] ?? 'Failed to send WhatsApp message.',
+                'window_expired' => ! empty( $res['window_expired'] ),
+                'raw'            => $res['raw'] ?? array(),
+            ) );
+        }
+    }
+
+    wp_send_json_error( array( 'message' => 'WhatsApp gateway module not loaded.' ) );
+}
+}
+
+// AJAX: Get WhatsApp Status & 24h Window Telemetry
+add_action( 'wp_ajax_cora_whatsapp_get_status', 'cora_ajax_whatsapp_get_status' );
+if ( ! function_exists( 'cora_ajax_whatsapp_get_status' ) ) {
+function cora_ajax_whatsapp_get_status() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+    }
+
+    if ( class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+        $gateway  = Cora_WhatsApp_Gateway::instance();
+        $settings = $gateway->get_settings();
+        $phone    = sanitize_text_field( $_POST['phone'] ?? '' );
+        $window   = ! empty( $phone ) ? $gateway->get_session_window( $phone ) : null;
+        $recent   = get_option( 'cora_wa_recent_inbound', array() );
+
+        wp_send_json_success( array(
+            'settings'       => $settings,
+            'session_window' => $window,
+            'recent_inbound' => is_array( $recent ) ? array_slice( $recent, 0, 10 ) : array(),
+        ) );
+    }
+
+    wp_send_json_error( array( 'message' => 'WhatsApp gateway module not loaded.' ) );
+}
+}
 
 if ( ! function_exists( 'cora_ajax_save_pagespeed_settings' ) ) {
 function cora_ajax_save_pagespeed_settings() {
