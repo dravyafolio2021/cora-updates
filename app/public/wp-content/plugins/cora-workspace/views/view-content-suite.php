@@ -849,8 +849,6 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
 <!-- PANEL: Content Library -->
 <div id="panel-ct-library" class="cora-ct-panel hidden pt-2">
@@ -1425,7 +1423,6 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                 </tbody>
             </table>
         </div>
-    </div>
     </div>
 </div>
 
