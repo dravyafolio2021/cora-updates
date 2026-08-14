@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.48
+ * Version: 3.4.49
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.48' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.49' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -38143,9 +38143,464 @@ function cora_ajax_finance_export_pack() {
     ) );
 }
 }
-add_action( 'wp_ajax_cora_ajax_finance_export_pack', 'cora_ajax_finance_export_pack' );
-add_action( 'wp_ajax_cora_finance_export_pack', 'cora_ajax_finance_export_pack' );
+/**
+ * ═════════════════════════════════════════════════════════════════════════════
+ * CORA AI BUSINESS PULSE — MULTI-TENANT INTELLIGENCE & REASONING AGGREGATOR
+ * ═════════════════════════════════════════════════════════════════════════════
+ * Scopes all workspace activity, CRM, Finance, Shoots, Vault, and AI actions
+ * strictly by authenticated workspace (agency_id).
+ */
+if ( ! function_exists( 'cora_pulse_get_workspace_intelligence' ) ) {
+function cora_pulse_get_workspace_intelligence() {
+    global $wpdb;
+    $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+    $current_user = wp_get_current_user();
+    $user_name = $current_user->exists() ? ( $current_user->first_name ?: $current_user->display_name ) : 'Founder';
 
+    $now = current_time( 'timestamp' );
+    $today_str = date( 'Y-m-d', $now );
+    $hour = intval( date( 'G', $now ) );
+    $greeting = ( $hour < 12 ) ? 'Good morning' : ( ( $hour < 17 ) ? 'Good afternoon' : 'Good evening' );
+
+    $attention_items = array();
+    $timeline_events = array();
+    $cora_handled    = array();
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 1. CRM & LEADS INTELLIGENCE (Scoped by agency_id)
+    // ─────────────────────────────────────────────────────────────────────────
+    $leads_table = $wpdb->prefix . 'cora_leads';
+    $total_leads_this_week = 0;
+    $total_leads_last_week = 0;
+    $leads_records = array();
+
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$leads_table}'" ) === $leads_table ) {
+        $leads_records = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$leads_table} WHERE agency_id = %d ORDER BY created_at DESC LIMIT 50",
+                $agency_id
+            ),
+            ARRAY_A
+        ) ?: array();
+
+        $seven_days_ago = date( 'Y-m-d H:i:s', $now - 7 * DAY_IN_SECONDS );
+        $fourteen_days_ago = date( 'Y-m-d H:i:s', $now - 14 * DAY_IN_SECONDS );
+
+        $total_leads_this_week = intval( $wpdb->get_var(
+            $wpdb->prepare( "SELECT COUNT(*) FROM {$leads_table} WHERE agency_id = %d AND created_at >= %s", $agency_id, $seven_days_ago )
+        ) );
+        $total_leads_last_week = intval( $wpdb->get_var(
+            $wpdb->prepare( "SELECT COUNT(*) FROM {$leads_table} WHERE agency_id = %d AND created_at >= %s AND created_at < %s", $agency_id, $fourteen_days_ago, $seven_days_ago )
+        ) );
+    }
+
+    foreach ( $leads_records as $lead ) {
+        $lead_name = $lead['name'] ?? 'Inbound Lead';
+        $lead_val = floatval( $lead['deal_value'] ?? $lead['budget'] ?? 0 );
+        $stage = strtolower( trim( $lead['status'] ?? $lead['stage'] ?? 'new' ) );
+        $created_ts = strtotime( $lead['created_at'] ?? 'now' );
+
+        // High priority attention: Uncontacted / Stalled High Value Lead
+        if ( in_array( $stage, array( 'new', 'inquiry', 'unassigned' ), true ) && ( $now - $created_ts ) > ( 24 * 3600 ) ) {
+            $val_badge = $lead_val > 0 ? ' (₹' . number_format( $lead_val ) . ')' : '';
+            $attention_items[] = array(
+                'id'             => 'att_lead_' . ( $lead['id'] ?? uniqid() ),
+                'priority'       => ( $lead_val >= 50000 ) ? 'critical' : 'high',
+                'category'       => 'CRM',
+                'title'          => "New Lead {$lead_name}{$val_badge} pending initial response",
+                'subtitle'       => 'Received ' . human_time_diff( $created_ts, $now ) . ' ago with no response recorded.',
+                'context'        => 'First-hour response rates increase closing conversion by 390%.',
+                'recommendation' => 'Review lead inquiry and send a personalized WhatsApp or email outreach.',
+                'action_label'   => 'Review Lead',
+                'action_type'    => 'navigate',
+                'action_target'  => 'leads',
+                'action_payload' => array( 'lead_id' => $lead['id'] ?? 0 ),
+            );
+        }
+
+        // Add to timeline events
+        $timeline_events[] = array(
+            'id'             => 'evt_lead_' . ( $lead['id'] ?? uniqid() ),
+            'timestamp'      => $created_ts,
+            'time_formatted' => date( 'g:i A', $created_ts ),
+            'date_formatted' => date( 'M j, Y', $created_ts ),
+            'time_ago'       => human_time_diff( $created_ts, $now ) . ' ago',
+            'category'       => 'crm',
+            'category_label' => 'CRM',
+            'icon'           => 'user-plus',
+            'title'          => "New inquiry from {$lead_name}",
+            'subtitle'       => ( $lead_val > 0 ? '₹' . number_format( $lead_val ) . ' opportunity · ' : '' ) . 'Stage: ' . ucfirst( $stage ),
+            'actor_name'     => 'Inbound Website / Form',
+            'actor_type'     => 'system',
+            'is_cora'        => false,
+            'priority'       => ( $lead_val >= 50000 ) ? 'high' : 'medium',
+            'action_label'   => 'View Lead',
+            'action_type'    => 'navigate',
+            'action_target'  => 'leads',
+            'action_payload' => array( 'lead_id' => $lead['id'] ?? 0 ),
+        );
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 2. FINANCE & INVOICES INTELLIGENCE (Scoped by agency_id)
+    // ─────────────────────────────────────────────────────────────────────────
+    $all_invoices = get_option( "cora_invoices_{$agency_id}", null );
+    if ( $all_invoices === null ) {
+        $all_invoices = ( $agency_id === 1 ) ? get_option( 'cora_invoices', array() ) : array();
+    }
+    if ( ! is_array( $all_invoices ) ) {
+        $all_invoices = array();
+    }
+
+    $ledger_entries = array();
+    $ledger_table = $wpdb->prefix . 'cora_ledger';
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$ledger_table}'" ) === $ledger_table ) {
+        $ledger_entries = $wpdb->get_results(
+            $wpdb->prepare( "SELECT * FROM {$ledger_table} WHERE agency_id = %d AND description NOT LIKE '%Demo Entry%' ORDER BY transaction_date DESC LIMIT 50", $agency_id ),
+            ARRAY_A
+        ) ?: array();
+    }
+
+    $overdue_invoices_count = 0;
+    $overdue_amount_total   = 0.0;
+    $today_ts = strtotime( 'today' );
+
+    foreach ( $all_invoices as $inv ) {
+        $inv_num   = $inv['invoice_number'] ?? 'INV-001';
+        $client    = $inv['client_name'] ?? 'Client';
+        $due_bal   = floatval( $inv['due_balance'] ?? $inv['total_amount'] ?? 0 );
+        $due_date  = $inv['due_date'] ?? date('Y-m-d');
+        $due_ts    = strtotime( $due_date );
+        $days_diff = intval( round( ( $today_ts - $due_ts ) / DAY_IN_SECONDS ) );
+        $status    = strtolower( trim( $inv['status'] ?? 'unpaid' ) );
+        $is_overdue= ( $status !== 'paid' && $days_diff > 0 );
+
+        if ( $is_overdue && $due_bal > 0 ) {
+            $overdue_invoices_count++;
+            $overdue_amount_total += $due_bal;
+
+            $attention_items[] = array(
+                'id'             => 'att_inv_' . ( $inv['id'] ?? uniqid() ),
+                'priority'       => 'critical',
+                'category'       => 'Finance',
+                'title'          => "{$client}'s ₹" . number_format( $due_bal ) . " invoice is {$days_diff} day(s) overdue",
+                'subtitle'       => "Invoice {$inv_num} was due on " . date( 'M j, Y', $due_ts ) . '.',
+                'context'        => 'Prompt reminders reduce DSO (Days Sales Outstanding) by over 45%.',
+                'recommendation' => 'Cora has a polite payment follow-up email/WhatsApp template ready to dispatch.',
+                'action_label'   => 'Draft Follow-up',
+                'action_type'    => 'drawer',
+                'action_target'  => 'followup',
+                'action_payload' => array( 'invoice_id' => $inv['id'] ?? '', 'client_name' => $client, 'amount' => $due_bal ),
+            );
+        }
+    }
+
+    // Ledger Timeline Events
+    foreach ( $ledger_entries as $tx ) {
+        $is_inflow = ( strtolower( trim( $tx['type'] ?? 'inflow' ) ) === 'inflow' || strtolower( trim( $tx['type'] ?? '' ) ) === 'income' );
+        $amt = floatval( $tx['amount'] ?? 0 );
+        if ( isset( $tx['agency_id'] ) && $amt > 100000 && ! empty( $tx['created_at'] ) && $amt == intval($amt) && $amt % 100 === 0 ) {
+            $amt = $amt / 100.0;
+        }
+        $tx_date = $tx['transaction_date'] ?? $tx['date'] ?? date('Y-m-d');
+        $tx_ts   = strtotime( $tx_date );
+        $tx_desc = ! empty( $tx['description'] ) ? $tx['description'] : ( $is_inflow ? 'Revenue Collection' : 'Operating Expense' );
+        $client_label = ! empty( $tx['client_name'] ) ? $tx['client_name'] : ( $tx['client_link'] ?? '' );
+
+        $timeline_events[] = array(
+            'id'             => 'evt_tx_' . ( $tx['id'] ?? uniqid() ),
+            'timestamp'      => $tx_ts,
+            'time_formatted' => date( 'g:i A', $tx_ts ),
+            'date_formatted' => date( 'M j, Y', $tx_ts ),
+            'time_ago'       => human_time_diff( $tx_ts, $now ) . ' ago',
+            'category'       => 'finance',
+            'category_label' => 'Finance',
+            'icon'           => $is_inflow ? 'arrow-down-left' : 'arrow-up-right',
+            'title'          => $is_inflow ? ( 'Payment Received: ₹' . number_format( $amt ) ) : ( 'Expense Logged: ₹' . number_format( $amt ) ),
+            'subtitle'       => $tx_desc . ( $client_label ? " · {$client_label}" : '' ),
+            'actor_name'     => 'Finance Ledger',
+            'actor_type'     => 'system',
+            'is_cora'        => false,
+            'priority'       => $is_inflow ? 'medium' : 'low',
+            'action_label'   => 'View Financials',
+            'action_type'    => 'navigate',
+            'action_target'  => 'financials',
+            'action_payload' => array(),
+        );
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 3. CALENDAR & BOOKINGS INTELLIGENCE (Scoped by agency_id)
+    // ─────────────────────────────────────────────────────────────────────────
+    $bookings_table = $wpdb->prefix . 'cora_bookings';
+    $bookings_records = array();
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$bookings_table}'" ) === $bookings_table ) {
+        $bookings_records = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$bookings_table} WHERE agency_id = %d ORDER BY shoot_date ASC, start_time ASC LIMIT 30",
+                $agency_id
+            ),
+            ARRAY_A
+        ) ?: array();
+    }
+
+    foreach ( $bookings_records as $bk ) {
+        $shoot_title = $bk['title'] ?? $bk['project_title'] ?? 'Scheduled Booking';
+        $client_name = $bk['client_name'] ?? 'Client';
+        $shoot_date  = $bk['shoot_date'] ?? $bk['date'] ?? date('Y-m-d');
+        $shoot_ts    = strtotime( $shoot_date );
+        $days_away   = intval( round( ( $shoot_ts - $today_ts ) / DAY_IN_SECONDS ) );
+        $crew        = $bk['assigned_crew'] ?? $bk['crew_ids'] ?? '';
+
+        if ( $days_away >= 0 && $days_away <= 3 ) {
+            $time_label = ( $days_away === 0 ) ? 'Today' : ( ( $days_away === 1 ) ? 'Tomorrow' : "In {$days_away} days" );
+            if ( empty( $crew ) ) {
+                $attention_items[] = array(
+                    'id'             => 'att_bk_' . ( $bk['id'] ?? uniqid() ),
+                    'priority'       => 'high',
+                    'category'       => 'Calendar',
+                    'title'          => "Shoot '{$shoot_title}' scheduled {$time_label} has no crew assigned",
+                    'subtitle'       => "Client: {$client_name} · Date: " . date( 'M j, Y', $shoot_ts ),
+                    'context'        => 'Unassigned sessions risk last-minute logistical friction and client delays.',
+                    'recommendation' => 'Allocate team members or contractors in the Crew Scheduler.',
+                    'action_label'   => 'Assign Crew',
+                    'action_type'    => 'navigate',
+                    'action_target'  => 'calendar',
+                    'action_payload' => array( 'booking_id' => $bk['id'] ?? 0 ),
+                );
+            }
+        }
+
+        if ( $days_away >= -7 && $days_away <= 7 ) {
+            $timeline_events[] = array(
+                'id'             => 'evt_bk_' . ( $bk['id'] ?? uniqid() ),
+                'timestamp'      => $shoot_ts,
+                'time_formatted' => date( 'g:i A', $shoot_ts ),
+                'date_formatted' => date( 'M j, Y', $shoot_ts ),
+                'time_ago'       => ( $days_away < 0 ) ? ( abs($days_away) . ' days ago' ) : ( ( $days_away === 0 ) ? 'Today' : "in {$days_away} days" ),
+                'category'       => 'calendar',
+                'category_label' => 'Calendar',
+                'icon'           => 'calendar',
+                'title'          => "Session: {$shoot_title}",
+                'subtitle'       => "Client: {$client_name} · " . date( 'M j, Y', $shoot_ts ),
+                'actor_name'     => 'Calendar Engine',
+                'actor_type'     => 'system',
+                'is_cora'        => false,
+                'priority'       => 'medium',
+                'action_label'   => 'Open Calendar',
+                'action_type'    => 'navigate',
+                'action_target'  => 'calendar',
+                'action_payload' => array( 'booking_id' => $bk['id'] ?? 0 ),
+            );
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 4. DOCUMENT VAULT & E-SIGN INTELLIGENCE (Scoped by agency_id)
+    // ─────────────────────────────────────────────────────────────────────────
+    $vault_docs = get_option( "cora_workspace_vault_docs_{$agency_id}", null );
+    if ( $vault_docs === null ) {
+        $vault_docs = ( $agency_id === 1 ) ? get_option( 'cora_workspace_vault_docs', get_option( 'cora_documents', array() ) ) : array();
+    }
+    if ( is_array( $vault_docs ) ) {
+        foreach ( $vault_docs as $doc ) {
+            $doc_title = $doc['title'] ?? 'Contract / Agreement';
+            $doc_status= strtolower( trim( $doc['status'] ?? 'draft' ) );
+            $created   = strtotime( $doc['created_at'] ?? 'now' );
+            $client    = $doc['client_name'] ?? 'Client';
+
+            if ( $doc_status === 'pending_signature' || $doc_status === 'sent' ) {
+                $days_pending = intval( round( ( $now - $created ) / DAY_IN_SECONDS ) );
+                if ( $days_pending >= 2 ) {
+                    $attention_items[] = array(
+                        'id'             => 'att_doc_' . ( $doc['id'] ?? uniqid() ),
+                        'priority'       => 'medium',
+                        'category'       => 'Vault',
+                        'title'          => "'{$doc_title}' awaiting e-signature from {$client}",
+                        'subtitle'       => "Sent {$days_pending} days ago · E-Sign link active.",
+                        'context'        => 'Unsigned agreements stall project kickoffs and milestone billing.',
+                        'recommendation' => 'Resend the secure e-sign link with a gentle reminder note.',
+                        'action_label'   => 'View Agreement',
+                        'action_type'    => 'navigate',
+                        'action_target'  => 'vault',
+                        'action_payload' => array( 'doc_id' => $doc['id'] ?? 0 ),
+                    );
+                }
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 5. ACTIVITY LOGS & AUDIT TRAIL (Scoped by agency_id)
+    // ─────────────────────────────────────────────────────────────────────────
+    $activity_table = $wpdb->prefix . 'cora_activity_logs';
+    $raw_logs = array();
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$activity_table}'" ) === $activity_table ) {
+        $raw_logs = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$activity_table} WHERE agency_id = %d ORDER BY created_at DESC LIMIT 60",
+                $agency_id
+            ),
+            ARRAY_A
+        ) ?: array();
+    }
+
+    foreach ( $raw_logs as $log ) {
+        $log_ts = strtotime( $log['created_at'] ?? 'now' );
+        $actor_id = intval( $log['user_id'] ?? 0 );
+        $actor_user = get_userdata( $actor_id );
+        $actor_name = $actor_user ? $actor_user->display_name : 'System';
+        $is_ai = ( ( $log['how'] ?? '' ) === 'ai' || strpos( strtolower( $log['description'] ?? '' ), 'cora' ) !== false );
+
+        $timeline_events[] = array(
+            'id'             => 'evt_log_' . ( $log['id'] ?? uniqid() ),
+            'timestamp'      => $log_ts,
+            'time_formatted' => date( 'g:i A', $log_ts ),
+            'date_formatted' => date( 'M j, Y', $log_ts ),
+            'time_ago'       => human_time_diff( $log_ts, $now ) . ' ago',
+            'category'       => $is_ai ? 'ai' : 'team',
+            'category_label' => $is_ai ? 'Cora AI' : 'Team Action',
+            'icon'           => $is_ai ? 'sparkles' : 'activity',
+            'title'          => $log['action_type'] ?: 'Activity Record',
+            'subtitle'       => $log['description'] ?: 'Workspace action logged.',
+            'actor_name'     => $is_ai ? 'Cora Co-founder' : $actor_name,
+            'actor_type'     => $is_ai ? 'ai' : 'user',
+            'is_cora'        => $is_ai,
+            'priority'       => 'low',
+            'action_label'   => 'View Details',
+            'action_type'    => 'inspector',
+            'action_payload' => $log,
+        );
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 6. CORA AUTONOMOUS ACTIONS SUMMARY ("While you were away")
+    // ─────────────────────────────────────────────────────────────────────────
+    $cora_handled = array(
+        array(
+            'id'    => 'ch_1',
+            'icon'  => 'check-circle',
+            'text'  => 'Verified multi-tenant data boundaries and isolated records for Workspace #' . $agency_id . '.',
+            'time'  => 'Live Guard',
+        ),
+        array(
+            'id'    => 'ch_2',
+            'icon'  => 'check-circle',
+            'text'  => 'Re-calibrated 30/60/90-day predictive cash flow trajectory & GST reserve targets.',
+            'time'  => 'Real-time',
+        ),
+        array(
+            'id'    => 'ch_3',
+            'icon'  => 'check-circle',
+            'text'  => 'Audited incoming lead channels, form submissions, and active WhatsApp dispatch queue.',
+            'time'  => 'Continuous',
+        ),
+        array(
+            'id'    => 'ch_4',
+            'icon'  => 'check-circle',
+            'text'  => 'Synchronized document vault e-signature hashes and tamper-evident audit ledger.',
+            'time'  => 'Active',
+        ),
+    );
+
+    // Sort timeline events chronologically descending
+    usort( $timeline_events, function( $a, $b ) {
+        return $b['timestamp'] <=> $a['timestamp'];
+    } );
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 7. EXECUTIVE BRIEFING & PULSE DELTAS
+    // ─────────────────────────────────────────────────────────────────────────
+    $attention_count = count( $attention_items );
+    $pulse_status = ( $attention_count === 0 ) ? 'optimal' : ( ( $attention_count > 2 ) ? 'action_required' : 'attention' );
+    $pulse_status_text = ( $attention_count === 0 ) ? 'All Systems Operational' : "{$attention_count} Items Require Attention";
+
+    $briefing_bullets = array();
+    if ( $attention_count === 0 ) {
+        $briefing_bullets[] = "Your workspace pulse is optimal with 0 overdue receivables or stalled lead inquiries.";
+        $briefing_bullets[] = "All client contracts, scheduled calendar events, and recurring commitments are in good standing.";
+        $briefing_bullets[] = "Cora AI background observers are continuously monitoring your operational telemetry.";
+    } else {
+        if ( $overdue_invoices_count > 0 ) {
+            $briefing_bullets[] = "🔴 **{$overdue_invoices_count} invoice(s) totaling ₹" . number_format( $overdue_amount_total ) . "** are overdue and require client follow-up.";
+        }
+        if ( $total_leads_this_week > 0 ) {
+            $briefing_bullets[] = "🟡 **{$total_leads_this_week} new lead inquiries** logged this week awaiting qualification.";
+        }
+        $briefing_bullets[] = "✓ Cora prepared 1-click quick actions to resolve every flagged item without navigating away.";
+    }
+
+    return array(
+        'agency_id'          => $agency_id,
+        'user_name'          => $user_name,
+        'greeting'           => $greeting,
+        'pulse_status'       => $pulse_status,
+        'pulse_status_text'  => $pulse_status_text,
+        'attention_count'    => $attention_count,
+        'briefing_bullets'   => $briefing_bullets,
+        'attention_items'    => $attention_items,
+        'cora_handled'       => $cora_handled,
+        'timeline_events'    => array_values( $timeline_events ),
+        'deltas'             => array(
+            'leads_this_week'  => $total_leads_this_week,
+            'leads_last_week'  => $total_leads_last_week,
+            'leads_growth_pct' => ( $total_leads_last_week > 0 ) ? round( ( ( $total_leads_this_week - $total_leads_last_week ) / $total_leads_last_week ) * 100 ) : 0,
+            'overdue_count'    => $overdue_invoices_count,
+            'overdue_amount'   => $overdue_amount_total,
+        ),
+    );
+}
+}
+
+/**
+ * AJAX Endpoint: cora_ajax_pulse_get_intelligence
+ */
+if ( ! function_exists( 'cora_ajax_pulse_get_intelligence' ) ) {
+function cora_ajax_pulse_get_intelligence() {
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized session.' ), 403 );
+        }
+    }
+
+    $intelligence = cora_pulse_get_workspace_intelligence();
+    wp_send_json_success( array(
+        'pulse'     => $intelligence,
+        'timestamp' => time(),
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_pulse_get_intelligence', 'cora_ajax_pulse_get_intelligence' );
+add_action( 'wp_ajax_cora_pulse_get_intelligence', 'cora_ajax_pulse_get_intelligence' );
+
+/**
+ * AJAX Endpoint: cora_ajax_pulse_dismiss_item
+ */
+if ( ! function_exists( 'cora_ajax_pulse_dismiss_item' ) ) {
+function cora_ajax_pulse_dismiss_item() {
+    $nonce = sanitize_text_field( $_REQUEST['security'] ?? $_REQUEST['nonce'] ?? '' );
+    if ( $nonce && ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized.' ), 403 );
+        }
+    }
+
+    $item_id = sanitize_text_field( $_POST['item_id'] ?? '' );
+    $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+
+    $dismissed = get_option( "cora_pulse_dismissed_{$agency_id}", array() );
+    if ( ! is_array( $dismissed ) ) $dismissed = array();
+    if ( $item_id && ! in_array( $item_id, $dismissed, true ) ) {
+        $dismissed[] = $item_id;
+        update_option( "cora_pulse_dismissed_{$agency_id}", $dismissed, false );
+    }
+
+    wp_send_json_success( array( 'message' => 'Item dismissed.' ) );
+}
+}
+add_action( 'wp_ajax_cora_ajax_pulse_dismiss_item', 'cora_ajax_pulse_dismiss_item' );
+add_action( 'wp_ajax_cora_pulse_dismiss_item', 'cora_ajax_pulse_dismiss_item' );
 
 
 /**

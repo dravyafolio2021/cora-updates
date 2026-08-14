@@ -7113,8 +7113,15 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
             </section>
             <?php endif; ?>
 
-            <!-- SECTION: MULTI-DAY EVENT TIMELINE -->
-            <?php if ( $sub_page === 'event_timeline' || $sub_page === 'event-timeline' || $sub_page === 'multi-day-timeline' || $sub_page === 'activity-timeline' ) : ?>
+            <!-- SECTION: CORA AI BUSINESS PULSE & ACTIVITY TIMELINE -->
+            <?php if ( $sub_page === 'activity-timeline' || $sub_page === 'business-pulse' || $sub_page === 'pulse' ) : ?>
+            <section id="cora-page-activity-timeline" class="cora-page-section cora-active">
+                <?php include CORA_WORKSPACE_PATH . 'views/view-activity-timeline.php'; ?>
+            </section>
+            <?php endif; ?>
+
+            <!-- SECTION: MULTI-DAY EVENT & TOUR PLANNER -->
+            <?php if ( $sub_page === 'event_timeline' || $sub_page === 'event-timeline' || $sub_page === 'multi-day-timeline' ) : ?>
             <section id="cora-page-event-timeline" class="cora-page-section cora-active">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-event-timeline.php'; ?>
             </section>
