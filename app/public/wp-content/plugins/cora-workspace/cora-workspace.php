@@ -18594,10 +18594,53 @@ if ( ! function_exists( 'cora_ajax_media_library_get_folders' ) ) {
 function cora_ajax_media_library_get_folders() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
 
+    // Ensure clean default folders exist if empty
+    $existing = get_terms( array( 'taxonomy' => 'cora_media_folder', 'hide_empty' => false ) );
+    $valid_existing = 0;
+    if ( ! is_wp_error( $existing ) && ! empty( $existing ) ) {
+        foreach ( $existing as $et ) {
+            if ( strpos( $et->name, 'Automated Test' ) === false ) {
+                $valid_existing++;
+            }
+        }
+    }
+
+    if ( $valid_existing === 0 ) {
+        $industry = get_option( 'cora_workspace_industry', 'photography_studio' );
+        $defaults = array(
+            array( 'name' => 'Client Shoots', 'color' => '#18181b' ),
+            array( 'name' => 'Portfolios & Showcase', 'color' => '#3b82f6' ),
+            array( 'name' => 'Marketing & Social', 'color' => '#10b981' ),
+            array( 'name' => 'Contracts & Documents', 'color' => '#8b5cf6' ),
+            array( 'name' => 'Raw & Unedited', 'color' => '#f59e0b' ),
+        );
+        if ( $industry === 'real_estate' ) {
+            $defaults = array(
+                array( 'name' => 'Property Listings', 'color' => '#18181b' ),
+                array( 'name' => 'Floor Plans & Blueprints', 'color' => '#3b82f6' ),
+                array( 'name' => 'Site Photos & Virtual Tours', 'color' => '#10b981' ),
+                array( 'name' => 'Agreements & KYC', 'color' => '#8b5cf6' ),
+                array( 'name' => 'Marketing & Brochures', 'color' => '#f59e0b' ),
+            );
+        }
+        foreach ( $defaults as $def ) {
+            if ( ! term_exists( $def['name'], 'cora_media_folder' ) ) {
+                $res = wp_insert_term( $def['name'], 'cora_media_folder' );
+                if ( ! is_wp_error( $res ) ) {
+                    update_term_meta( $res['term_id'], 'cora_folder_color', $def['color'] );
+                }
+            }
+        }
+    }
+
     $terms  = get_terms( array( 'taxonomy' => 'cora_media_folder', 'hide_empty' => false, 'parent' => 0 ) );
     $result = array();
     if ( ! is_wp_error( $terms ) ) {
         foreach ( $terms as $t ) {
+            // Ignore automated test artifact folders
+            if ( strpos( $t->name, 'Automated Test' ) !== false || in_array( $t->name, array( 'Test', 'efsdew', 'reasda' ) ) ) {
+                continue;
+            }
             $color = get_term_meta( $t->term_id, 'cora_folder_color', true ) ?: '#3b82f6';
             // Count attachments directly assigned to this parent folder term
             $parent_objs = get_objects_in_term( $t->term_id, 'cora_media_folder' );
@@ -18607,17 +18650,17 @@ function cora_ajax_media_library_get_folders() {
             $ch = array();
             if ( ! is_wp_error( $children ) ) {
                 foreach ( $children as $c ) {
+                    if ( strpos( $c->name, 'Automated Test' ) !== false ) continue;
                     $child_color = get_term_meta( $c->term_id, 'cora_folder_color', true ) ?: '#3b82f6';
                     $child_objs = get_objects_in_term( $c->term_id, 'cora_media_folder' );
                     $child_count = is_array( $child_objs ) ? count( $child_objs ) : 0;
                     $ch[] = array( 'id' => $c->term_id, 'name' => $c->name, 'count' => $child_count, 'color' => $child_color );
-                    // Folders with children can roll up their count or show only direct count. Let's roll child count into parent for better UX
                     $folder_count += $child_count;
                 }
             }
             $result[] = array(
                 'id'        => $t->term_id,
-                'name'      => $t->name,
+                'name'      => html_entity_decode( $t->name, ENT_QUOTES, 'UTF-8' ),
                 'count'     => $folder_count,
                 'is_system' => false,
                 'color'     => $color,

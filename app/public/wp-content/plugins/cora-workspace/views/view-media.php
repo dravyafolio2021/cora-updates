@@ -1084,7 +1084,11 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
                 <?php foreach ($all_doc_types as $dt): ?><option value="<?php echo esc_attr($dt); ?>"><?php echo esc_html($dt); ?></option><?php endforeach; ?>
             </select>
         </div>
-        <div class="cm-field"><label>Move to Folder</label><select id="cm-d-folder"><option value="">— No folder —</option></select></div>
+        <div class="cm-field">
+            <label>Move to Folder</label>
+            <div id="cm-d-folder-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+            <select id="cm-d-folder" style="display:none"><option value="">— No folder —</option></select>
+        </div>
         <div class="cm-field"><label>Link to Record</label>
             <select id="cm-d-record"><option value="">— None —</option>
                 <optgroup label="Properties"><?php foreach ($listings as $l): ?><option value="property:<?php echo esc_attr($l['id']??''); ?>"><?php echo esc_html($l['title']??($l['property_name']??'Listing')); ?></option><?php endforeach; ?></optgroup>
@@ -2009,17 +2013,58 @@ window.cmOpenDetail = function(f) {
     document.getElementById('cm-d-desc').value    = f.description || '';
     document.getElementById('cm-d-doctype').value = f.doc_type || '';
 
-    // Folder dropdown
+    // Folder dropdown & Quick Selection Chips
     var fs = document.getElementById('cm-d-folder');
-    fs.innerHTML = '<option value="">— No folder —</option>';
-    CM.folders.forEach(function(fo) {
-        var o = document.createElement('option'); o.value = fo.id; o.textContent = fo.name;
-        if (fo.id == f.folder_id) o.selected = true; fs.appendChild(o);
-        (fo.children || []).forEach(function(s) {
-            var so = document.createElement('option'); so.value = s.id; so.textContent = '  ↳ ' + s.name;
-            if (s.id == f.folder_id) so.selected = true; fs.appendChild(so);
+    var fc = document.getElementById('cm-d-folder-chips');
+    if (fs) {
+        fs.innerHTML = '<option value="">— No folder —</option>';
+        if (fc) fc.innerHTML = '';
+
+        var createChip = function(id, name, color, isSub) {
+            var isSelected = (id == (f.folder_id || ''));
+            if (!id && !f.folder_id) isSelected = true;
+            var chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'cm-d-fchip' + (isSelected ? ' active' : '');
+            chip.style.cssText = 'display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s ease;user-select:none;border:1px solid ' + (isSelected ? '#09090b' : '#e4e4e7') + ';background:' + (isSelected ? '#09090b' : '#fff') + ';color:' + (isSelected ? '#fff' : '#3f3f46') + ';';
+            
+            var dot = id ? '<span style="width:7px;height:7px;border-radius:99px;background:' + (color || '#3b82f6') + ';flex-shrink:0"></span>' : '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" style="flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+            var prefix = isSub ? '<span style="color:#a1a1aa;font-size:10px">↳</span> ' : '';
+            chip.innerHTML = dot + prefix + '<span>' + esc(name) + '</span>';
+            
+            chip.onclick = function() {
+                fs.value = id;
+                if (fc) {
+                    fc.querySelectorAll('.cm-d-fchip').forEach(function(c) {
+                        c.classList.remove('active');
+                        c.style.border = '1px solid #e4e4e7';
+                        c.style.background = '#fff';
+                        c.style.color = '#3f3f46';
+                    });
+                    chip.classList.add('active');
+                    chip.style.border = '1px solid #09090b';
+                    chip.style.background = '#09090b';
+                    chip.style.color = '#fff';
+                }
+            };
+            if (fc) fc.appendChild(chip);
+        };
+
+        // Default: No folder chip
+        createChip('', 'No folder', null, false);
+
+        CM.folders.forEach(function(fo) {
+            var o = document.createElement('option'); o.value = fo.id; o.textContent = fo.name;
+            if (fo.id == f.folder_id) o.selected = true; fs.appendChild(o);
+            createChip(fo.id, fo.name, fo.color, false);
+
+            (fo.children || []).forEach(function(s) {
+                var so = document.createElement('option'); so.value = s.id; so.textContent = '  ↳ ' + s.name;
+                if (s.id == f.folder_id) so.selected = true; fs.appendChild(so);
+                createChip(s.id, s.name, s.color, true);
+            });
         });
-    });
+    }
 
     // Record link
     var rs = document.getElementById('cm-d-record'); rs.selectedIndex = 0;
