@@ -20,7 +20,7 @@ if (typeof window.coraREData === 'undefined') {
 <?php
 
 $active_tab = isset( $_GET['settings_tab'] ) ? sanitize_text_field( $_GET['settings_tab'] ) : 'general';
-if ( in_array( $active_tab, array( 'activity', 'activity-timeline', 'activity-logs', 'timeline', 'pulse' ) ) ) {
+if ( in_array( $active_tab, array( 'activity', 'activity-timeline', 'activity-logs', 'timeline', 'pulse', 'audit' ) ) ) {
     $active_tab = 'pulse';
 }
 // Only fetch real, human-created published pages — exclude WP auto-generated/system pages
@@ -92,11 +92,6 @@ $cora_settings_tabs = array(
         'label' => 'Git Sync',
         'desc'  => 'Lovable & GitHub Integrations',
         'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M18 15V9a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4v6"></path><circle cx="12" cy="5" r="1"></circle></svg>'
-    ),
-    'audit'      => array(
-        'label' => 'Audit & Logs',
-        'desc'  => 'System activity & cost analysis',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
     ),
     'onboarding' => array(
         'label' => 'User Onboarding',
@@ -436,9 +431,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 <!-- Settings Sidebar Grid Layout -->
-<div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-6">
-    <!-- Left Column: Navigation Sidebar (Hidden on Mobile) -->
-    <div class="hidden lg:block lg:col-span-1 space-y-1.5 pb-20">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-6 items-start">
+    <!-- Left Column: Navigation Sidebar (Sticky with Independent Scroll) -->
+    <div class="hidden lg:block lg:col-span-1 sticky top-6 max-h-[calc(100vh-80px)] overflow-y-auto cora-no-scrollbar space-y-1.5 pb-8 pr-1">
         <?php
         foreach ( $tabs as $tab_key => $tab ) :
             $is_active = ( $active_tab === $tab_key );
