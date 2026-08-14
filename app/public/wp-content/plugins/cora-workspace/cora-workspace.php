@@ -18573,10 +18573,17 @@ add_action( 'wp_ajax_cora_media_library_update', 'cora_ajax_media_library_update
 if ( ! function_exists( 'cora_ajax_media_library_delete' ) ) {
 function cora_ajax_media_library_delete() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! current_user_can( 'delete_posts' ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! cora_is_workspace_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'delete_posts' ) ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    }
 
-    $ids = array_map( 'intval', (array) ( $_POST['ids'] ?? array() ) );
-    if ( empty( $ids ) ) wp_send_json_error( array( 'message' => 'No IDs.' ) );
+    $raw_ids = $_POST['ids'] ?? ( $_POST['attachment_ids'] ?? array() );
+    if ( is_string( $raw_ids ) ) {
+        $raw_ids = explode( ',', $raw_ids );
+    }
+    $ids = array_map( 'intval', (array) $raw_ids );
+    $ids = array_filter( $ids );
+    if ( empty( $ids ) ) wp_send_json_error( array( 'message' => 'No IDs provided.' ) );
 
     $deleted = 0;
     foreach ( $ids as $id ) {
@@ -18586,6 +18593,7 @@ function cora_ajax_media_library_delete() {
 }
 }
 add_action( 'wp_ajax_cora_media_library_delete', 'cora_ajax_media_library_delete' );
+add_action( 'wp_ajax_cora_media_library_bulk_delete', 'cora_ajax_media_library_delete' );
 
 /**
  * AJAX: Get folders (with children)
@@ -18776,17 +18784,28 @@ add_action( 'wp_ajax_cora_media_library_rename_folder', 'cora_ajax_media_library
 if ( ! function_exists( 'cora_ajax_media_library_delete_folder' ) ) {
 function cora_ajax_media_library_delete_folder() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_posts' ) ) ) wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    if ( ! is_user_logged_in() || ( ! cora_is_super_owner() && ! cora_is_workspace_owner() && ! current_user_can( 'upload_files' ) && ! current_user_can( 'manage_options' ) && ! current_user_can( 'edit_posts' ) ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    }
 
-    $id = intval( $_POST['folder_id'] ?? ($_POST['term_id'] ?? 0) );
-    if ( ! $id ) wp_send_json_error( array( 'message' => 'Invalid folder ID.' ) );
+    $raw_ids = $_POST['term_ids'] ?? ( $_POST['folder_ids'] ?? ( $_POST['folder_id'] ?? ( $_POST['term_id'] ?? array() ) ) );
+    if ( is_string( $raw_ids ) ) {
+        $raw_ids = explode( ',', $raw_ids );
+    }
+    $ids = array_map( 'intval', (array) $raw_ids );
+    $ids = array_filter( $ids );
+    if ( empty( $ids ) ) wp_send_json_error( array( 'message' => 'Invalid folder ID.' ) );
 
-    $r = wp_delete_term( $id, 'cora_media_folder' );
-    if ( is_wp_error( $r ) ) wp_send_json_error( array( 'message' => $r->get_error_message() ) );
-    wp_send_json_success( array( 'message' => 'Folder deleted.' ) );
+    $deleted = 0;
+    foreach ( $ids as $id ) {
+        $r = wp_delete_term( $id, 'cora_media_folder' );
+        if ( ! is_wp_error( $r ) ) $deleted++;
+    }
+    wp_send_json_success( array( 'message' => 'Deleted ' . $deleted . ' folder(s).' ) );
 }
 }
 add_action( 'wp_ajax_cora_media_library_delete_folder', 'cora_ajax_media_library_delete_folder' );
+add_action( 'wp_ajax_cora_media_library_bulk_delete_folders', 'cora_ajax_media_library_delete_folder' );
 
 
 /**

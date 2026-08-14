@@ -2821,54 +2821,130 @@ window.cmUpdateBulkCounter = window.cmBulkCt = function() {
 };
 
 window.cmBulkMove = function() {
-    var fid=document.getElementById('cm-bulk-folder').value; if(!fid||!CM.selIds.length){coraShowToast('Select files and a destination folder.');return;}
-    $.ajax({url:coraREData.ajaxUrl,type:'POST',data:{action:'cora_media_library_move',nonce:coraREData.ajaxNonce,attachment_ids:CM.selIds,folder_id:fid},
-    success:function(r){if(r.success){coraShowToast(r.data.message);CM.selIds=[];cmLoadFiles();cmLoadFolders();}else coraShowToast('Move failed.');}});
-};
-
-window.cmBulkDeleteFolders = function() {
-    if (!CM.selFolderIds.length) {
-        coraShowToast('Select folders first.');
+    var fid = document.getElementById('cm-bulk-folder').value;
+    if (!fid) {
+        coraShowToast('Select a destination folder.');
         return;
     }
-    var count = CM.selFolderIds.length;
-    document.getElementById('cm-confirm-title').textContent = 'Delete ' + count + ' folder' + (count > 1 ? 's' : '') + '?';
-    document.getElementById('cm-confirm-desc').textContent = 'This will permanently remove the selected folder(s). Files inside will become unorganized.';
-    document.getElementById('cm-confirm-modal').classList.add('open');
-    CM.confirmCb = function() {
-        var ids = CM.selFolderIds.slice();
-        var done = 0;
-        coraShowToast('Deleting folders...');
-        ids.forEach(function(id) {
+    if (!CM.selIds.length && !CM.selFolderIds.length) {
+        coraShowToast('Select files or folders to move.');
+        return;
+    }
+    var totalOps = (CM.selIds.length ? 1 : 0) + (CM.selFolderIds.length ? 1 : 0);
+    var doneOps = 0;
+    var checkDone = function() {
+        doneOps++;
+        if (doneOps >= totalOps) {
+            coraShowToast('Moved successfully.');
+            CM.selIds = [];
+            CM.selFolderIds = [];
+            cmLoadFiles();
+            cmLoadFolders();
+            cmUpdateBulkCounter();
+        }
+    };
+
+    if (CM.selIds.length > 0) {
+        $.ajax({
+            url: coraREData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'cora_media_library_move',
+                nonce: coraREData.ajaxNonce,
+                attachment_ids: CM.selIds,
+                folder_id: fid
+            },
+            success: function(r) {
+                checkDone();
+            },
+            error: function() {
+                checkDone();
+            }
+        });
+    }
+
+    if (CM.selFolderIds.length > 0) {
+        var fDone = 0;
+        CM.selFolderIds.forEach(function(folderId) {
             $.ajax({
                 url: coraREData.ajaxUrl,
                 type: 'POST',
-                data: { action: 'cora_media_library_delete_folder', nonce: coraREData.ajaxNonce, term_id: id },
+                data: {
+                    action: 'cora_media_library_rename_folder',
+                    nonce: coraREData.ajaxNonce,
+                    term_id: folderId,
+                    parent_id: fid
+                },
                 complete: function() {
-                    done++;
-                    if (done === ids.length) {
-                        CM.selFolderIds = [];
-                        coraShowToast('Folder(s) deleted.');
-                        cmLoadFolders();
-                        cmLoadFiles();
-                        cmUpdateBulkCounter();
+                    fDone++;
+                    if (fDone >= CM.selFolderIds.length) {
+                        checkDone();
                     }
                 }
             });
         });
-    };
+    }
 };
 
 window.cmBulkDelete = function() {
-    if (CM.selFolderIds.length > 0) {
-        cmBulkDeleteFolders();
+    var fCount = (CM.selFolderIds || []).length;
+    var aCount = (CM.selIds || []).length;
+    if (!fCount && !aCount) {
+        coraShowToast('Select items or folders to delete.');
+        return;
     }
-    if (CM.selIds.length > 0) {
-        cmDeletePrompt(CM.selIds.slice());
-    }
-    if (!CM.selFolderIds.length && !CM.selIds.length) {
-        coraShowToast('Select items to delete.');
-    }
+    var parts = [];
+    if (fCount > 0) parts.push(fCount + ' folder' + (fCount > 1 ? 's' : ''));
+    if (aCount > 0) parts.push(aCount + ' file' + (aCount > 1 ? 's' : ''));
+    
+    var titleEl = document.getElementById('cm-confirm-title');
+    var descEl = document.getElementById('cm-confirm-desc');
+    var modalEl = document.getElementById('cm-confirm-modal');
+    if (titleEl) titleEl.textContent = 'Delete ' + parts.join(' and ') + '?';
+    if (descEl) descEl.textContent = 'This will permanently remove the selected ' + (fCount && aCount ? 'folders and files' : (fCount ? 'folders' : 'files')) + '. This cannot be undone.';
+    if (modalEl) modalEl.classList.add('open');
+
+    CM.confirmCb = function() {
+        var folderIds = (CM.selFolderIds || []).slice();
+        var fileIds = (CM.selIds || []).slice();
+        coraShowToast('Deleting selected items...');
+        
+        var totalOps = (folderIds.length ? 1 : 0) + (fileIds.length ? 1 : 0);
+        var completedOps = 0;
+        var checkDone = function() {
+            completedOps++;
+            if (completedOps >= totalOps) {
+                CM.selFolderIds = [];
+                CM.selIds = [];
+                coraShowToast('Selected items deleted.');
+                cmLoadFolders();
+                cmLoadFiles();
+                cmUpdateBulkCounter();
+            }
+        };
+
+        if (folderIds.length > 0) {
+            $.ajax({
+                url: coraREData.ajaxUrl,
+                type: 'POST',
+                data: { action: 'cora_media_library_bulk_delete_folders', nonce: coraREData.ajaxNonce, folder_ids: folderIds },
+                complete: function() {
+                    checkDone();
+                }
+            });
+        }
+
+        if (fileIds.length > 0) {
+            $.ajax({
+                url: coraREData.ajaxUrl,
+                type: 'POST',
+                data: { action: 'cora_media_library_bulk_delete', nonce: coraREData.ajaxNonce, attachment_ids: fileIds },
+                complete: function() {
+                    checkDone();
+                }
+            });
+        }
+    };
 };
 
 window.cmBulkColorFolders = function(color) {
