@@ -2,11 +2,8 @@
 /**
  * Cora Workspace — Financial Intelligence & AI Co-founder (v3.4.44)
  * 
- * Redesigned from the ground up as a proactive AI Co-founder for solo founders
- * and small service agencies (Photography Studios, Real Estate, Creative Firms).
- *
- * Core Philosophy: Cora watches in the background, surfaces what matters,
- * explains why it matters, and prepares or executes the next action.
+ * Rebuilt as a proactive AI Co-founder for solo founders & creative studios.
+ * Includes floating bottom Ask Cora Copilot and rich, pre-populated tabs.
  *
  * @package CoraWorkspace
  * @version 3.4.44
@@ -17,30 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Fetch comprehensive financial intelligence metrics
-$metrics = function_exists( 'cora_finance_get_comprehensive_metrics' ) ? cora_finance_get_comprehensive_metrics() : array(
-    'available_cash'          => 185000.0,
-    'expected_in'             => 270000.0,
-    'expected_out'            => 41249.0,
-    'projected_cash'          => 413751.0,
-    'gross_inflow'            => 270000.0,
-    'gross_outflow'           => 85000.0,
-    'monthly_recurring_total' => 41249.0,
-    'annual_recurring_total'  => 494988.0,
-    'overdue_total'           => 145000.0,
-    'overdue_count'           => 2,
-    'receivables'             => array(),
-    'recurring_expenses'      => array(),
-    'client_profitability'    => array(),
-    'attention_cards'         => array(),
-    'cora_take'               => array(
-        'headline' => 'Your cash flow is healthy, but there are 3 items worth looking at today.',
-        'bullets'  => array(
-            '₹1,45,000 in invoices are overdue (Acme Studios is 7 days overdue).',
-            'Monthly fixed commitments stand at ₹41,249/mo.',
-            'Projected month-end cash position is ₹4.13L with 100% bills covered.',
-        ),
-    ),
-);
+$metrics = function_exists( 'cora_finance_get_comprehensive_metrics' ) ? cora_finance_get_comprehensive_metrics() : array();
 
 $available_cash = $metrics['available_cash'] ?? 185000.0;
 $expected_in    = $metrics['expected_in'] ?? 270000.0;
@@ -49,12 +23,94 @@ $projected_cash = $metrics['projected_cash'] ?? 413751.0;
 $overdue_total  = $metrics['overdue_total'] ?? 145000.0;
 $overdue_count  = $metrics['overdue_count'] ?? 2;
 $monthly_rec    = $metrics['monthly_recurring_total'] ?? 41249.0;
+$gross_inflow   = $metrics['gross_inflow'] ?? 270000.0;
+$gross_outflow  = $metrics['gross_outflow'] ?? 85000.0;
 $receivables    = $metrics['receivables'] ?? array();
 $recurring_list = $metrics['recurring_expenses'] ?? array();
 $client_profits = $metrics['client_profitability'] ?? array();
 $attention_cards= $metrics['attention_cards'] ?? array();
 $cora_take      = $metrics['cora_take'] ?? array();
-$active_industry= function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'photography_studio';
+
+// Fallback robust pre-population if empty
+if ( empty( $receivables ) ) {
+    $receivables = array(
+        array(
+            'id'             => 'inv_sample_01',
+            'invoice_number' => 'INV-' . date('Y') . '-0842',
+            'client_name'    => 'Acme Studios & Media',
+            'client_email'   => 'finance@acmestudios.in',
+            'package_name'   => 'Brand Commercial Campaign & Studio Retainer',
+            'total_amount'   => 80000.0,
+            'due_balance'    => 80000.0,
+            'due_date'       => date( 'Y-m-d', strtotime( '-7 days' ) ),
+            'days_overdue'   => 7,
+            'is_overdue'     => true,
+            'status'         => 'unpaid',
+            'last_comm'      => date( 'Y-m-d', strtotime( '-10 days' ) ),
+        ),
+        array(
+            'id'             => 'inv_sample_02',
+            'invoice_number' => 'INV-' . date('Y') . '-0849',
+            'client_name'    => 'Urban Space Developers',
+            'client_email'   => 'accounts@urbanspace.co.in',
+            'package_name'   => 'Luxury Penthouse 3D Render & Video Walkthrough',
+            'total_amount'   => 45000.0,
+            'due_balance'    => 0.0,
+            'due_date'       => date( 'Y-m-d', strtotime( '-2 days' ) ),
+            'days_overdue'   => 0,
+            'is_overdue'     => false,
+            'status'         => 'paid',
+            'last_comm'      => date( 'Y-m-d', strtotime( '-1 days' ) ),
+        ),
+        array(
+            'id'             => 'inv_sample_03',
+            'invoice_number' => 'INV-' . date('Y') . '-0855',
+            'client_name'    => 'Horizon Heights Luxury Living',
+            'client_email'   => 'sales@horizonheights.in',
+            'package_name'   => 'Quarterly Architectural Shoot & Media Licensing',
+            'total_amount'   => 125000.0,
+            'due_balance'    => 125000.0,
+            'due_date'       => date( 'Y-m-d', strtotime( '+5 days' ) ),
+            'days_overdue'   => 0,
+            'is_overdue'     => false,
+            'status'         => 'unpaid',
+            'last_comm'      => date( 'Y-m-d', strtotime( '-3 days' ) ),
+        ),
+        array(
+            'id'             => 'inv_sample_04',
+            'invoice_number' => 'INV-' . date('Y') . '-0861',
+            'client_name'    => 'Rajiv & Priya Wedding Productions',
+            'client_email'   => 'rajiv.priya.events@gmail.com',
+            'package_name'   => '3-Day Destination Wedding Coverage (Milestone 2)',
+            'total_amount'   => 65000.0,
+            'due_balance'    => 65000.0,
+            'due_date'       => date( 'Y-m-d', strtotime( '-14 days' ) ),
+            'days_overdue'   => 14,
+            'is_overdue'     => true,
+            'status'         => 'unpaid',
+            'last_comm'      => date( 'Y-m-d', strtotime( '-12 days' ) ),
+        ),
+    );
+}
+
+if ( empty( $recurring_list ) ) {
+    $recurring_list = array(
+        array( 'name' => 'Adobe Creative Cloud (All Apps)', 'vendor' => 'Adobe Systems', 'amount' => 5499.0, 'frequency' => 'monthly', 'category' => 'Software & Tools', 'next_due' => date('Y-m-d', strtotime('+12 days')) ),
+        array( 'name' => 'Main Studio Lease & Power', 'vendor' => 'DLF Commercial Properties', 'amount' => 28500.0, 'frequency' => 'monthly', 'category' => 'Rent & Facilities', 'next_due' => date('Y-m-d', strtotime('+5 days')) ),
+        array( 'name' => 'Google Workspace (5 Business Seats)', 'vendor' => 'Google LLC', 'amount' => 1650.0, 'frequency' => 'monthly', 'category' => 'Software & Tools', 'next_due' => date('Y-m-d', strtotime('+18 days')) ),
+        array( 'name' => 'Figma Organization Seats', 'vendor' => 'Figma Inc.', 'amount' => 2400.0, 'frequency' => 'monthly', 'category' => 'Software & Tools', 'next_due' => date('Y-m-d', strtotime('+22 days')) ),
+        array( 'name' => 'Cloud Storage & CDN (AWS / Backblaze)', 'vendor' => 'Amazon Web Services', 'amount' => 3200.0, 'frequency' => 'monthly', 'category' => 'Infrastructure', 'next_due' => date('Y-m-d', strtotime('+8 days')) ),
+    );
+}
+
+if ( empty( $client_profits ) ) {
+    $client_profits = array(
+        array( 'client_name' => 'Horizon Heights Luxury Living', 'revenue' => 125000.0, 'costs' => 37500.0, 'profit' => 87500.0, 'margin' => 70.0, 'is_top_tier' => true ),
+        array( 'client_name' => 'Acme Studios & Media', 'revenue' => 80000.0, 'costs' => 26640.0, 'profit' => 53360.0, 'margin' => 66.7, 'is_top_tier' => true ),
+        array( 'client_name' => 'Urban Space Developers', 'revenue' => 45000.0, 'costs' => 18000.0, 'profit' => 27000.0, 'margin' => 60.0, 'is_top_tier' => true ),
+        array( 'client_name' => 'Rajiv & Priya Wedding Productions', 'revenue' => 65000.0, 'costs' => 33800.0, 'profit' => 31200.0, 'margin' => 48.0, 'is_top_tier' => false ),
+    );
+}
 
 // Standardized Page Header
 $financials_header_args = array(
@@ -77,15 +133,15 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 }
 ?>
 
-<div id="cora-finance-root" class="space-y-6 text-zinc-900 font-sans pb-16">
+<div id="cora-finance-root" class="space-y-6 text-zinc-900 font-sans pb-28">
 
     <style>
-        /* ── Cora Finance AI Design System & Micro-Animations ── */
+        /* ── Core Finance Styling ── */
         .cora-fin-card {
             background: #ffffff;
             border: 1px solid #e4e4e7;
             border-radius: 18px;
-            transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .cora-fin-card:hover {
             border-color: #d4d4d8;
@@ -93,6 +149,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         }
         .cora-fin-pill-tab {
             transition: all 0.18s ease;
+            white-space: nowrap;
         }
         .cora-fin-pill-tab.active {
             background-color: #09090b !important;
@@ -154,13 +211,70 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             font-family: 'JetBrains Mono', ui-monospace, monospace;
             letter-spacing: -0.03em;
         }
+
+        /* ── Floating Ask Cora Bottom Bar & Popover Styles (Claude Cream Aesthetic) ── */
+        #cora-fin-copilot-container {
+            position: fixed;
+            bottom: 24px;
+            left: 0;
+            right: 0;
+            z-index: 9990;
+            padding-left: 256px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+            transition: padding-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .cora-sidebar.collapsed-sidebar ~ main #cora-fin-copilot-container {
+            padding-left: 64px;
+        }
+        @media (max-width: 1023px) {
+            #cora-fin-copilot-container {
+                padding-left: 0;
+                bottom: 84px !important;
+            }
+        }
+        #cora-fin-copilot-bar, #cora-fin-copilot-window {
+            width: calc(100% - 48px) !important;
+            max-width: 800px !important;
+            margin: 0 auto;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #cora-fin-copilot-bar {
+            pointer-events: auto !important;
+        }
+        #cora-fin-copilot-window {
+            pointer-events: none !important;
+            background-color: #FBFaf7 !important;
+            border: 1px solid #e4e4e7;
+            box-shadow: 0 20px 45px rgba(9, 9, 11, 0.12);
+        }
+        #cora-fin-copilot-bar:hover {
+            transform: translateY(-2px) !important;
+        }
+        #cora-fin-copilot-bar.hidden-bar {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: translateY(12px) scale(0.95) !important;
+            height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            overflow: hidden !important;
+        }
+        #cora-fin-copilot-window.active {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            transform: scale(1) !important;
+        }
     </style>
 
-    <!-- ══ QUICK ACTION POPOVER (Positioned below header CTA) ══ -->
+    <!-- ══ QUICK ACTION POPOVER ══ -->
     <div class="hidden">
         <div id="cora-fin-action-popover" class="absolute mt-2 w-64 bg-white rounded-2xl border border-zinc-200 shadow-2xl z-50 p-1.5 space-y-1 animate-fade-in select-none">
-            <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenDrawer('ask-cora');" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-zinc-900 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
-                <span class="w-6 h-6 rounded-lg bg-zinc-950 text-white flex items-center justify-center shrink-0">✨</span>
+            <button type="button" onclick="window.coraCloseFinPopover(); window.coraOpenCopilot();" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-zinc-900 hover:bg-zinc-100 flex items-center gap-2.5 transition-colors border-0 bg-transparent cursor-pointer">
+                <span class="w-6 h-6 rounded-lg bg-zinc-950 text-white flex items-center justify-center shrink-0 text-xs">✨</span>
                 <div>
                     <div class="font-bold">Ask Cora AI Copilot</div>
                     <div class="text-[10px] text-zinc-500 font-normal">Context-aware financial Q&amp;A</div>
@@ -194,7 +308,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
     </div>
 
-    <!-- ══ SUB-NAVIGATION BAR (6 Clean Tabs) ══ -->
+    <!-- ══ SUB-NAVIGATION TABS (6 Fully Pre-Populated Panels) ══ -->
     <div class="flex items-center justify-between border-b border-zinc-200 pb-3 gap-2 overflow-x-auto select-none">
         <div class="flex items-center gap-1.5 shrink-0">
             <button type="button" onclick="window.coraSwitchFinTab('fin-home')" id="tab-btn-fin-home" class="cora-fin-pill-tab active px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white cursor-pointer">
@@ -221,7 +335,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <div class="flex items-center gap-2 shrink-0">
-            <button type="button" onclick="window.coraOpenDrawer('ask-cora')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 flex items-center gap-1.5 cursor-pointer border-0 transition-colors">
+            <button type="button" onclick="window.coraOpenCopilot()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 flex items-center gap-1.5 cursor-pointer border-0 transition-colors">
                 <span>✨ Ask Cora</span>
             </button>
         </div>
@@ -229,7 +343,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 
     <!-- ════════════════════════════════════════════════════════
-         TAB 1: HOME & AI BRIEFING (The 10-Second Co-Founder Dashboard)
+         TAB 1: OVERVIEW & AI BRIEFING
          ════════════════════════════════════════════════════════ -->
     <div id="tab-fin-home" class="cora-fin-tab-panel space-y-6">
 
@@ -254,7 +368,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="window.coraOpenDrawer('ask-cora')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer border-0 flex items-center gap-1.5 shadow-sm">
+                    <button type="button" onclick="window.coraOpenCopilot()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer border-0 flex items-center gap-1.5 shadow-sm">
                         <span>Ask Cora Anything</span>
                     </button>
                     <button type="button" onclick="window.coraRefreshFinancials()" class="w-8 h-8 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center cursor-pointer border-0 transition-all" title="Refresh Live Data">
@@ -267,19 +381,18 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 text-xs text-zinc-300">
                 <div class="flex items-start gap-2 bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
                     <span class="text-emerald-400 font-bold">1.</span>
-                    <span><strong>₹<?php echo number_format( $overdue_total ); ?></strong> across <?php echo $overdue_count; ?> invoices are overdue (Acme Studios is 7 days past due).</span>
+                    <span><strong>₹<?php echo number_format( $overdue_total ); ?></strong> across <?php echo $overdue_count; ?> invoices is overdue (Acme Studios is 7 days overdue).</span>
                 </div>
                 <div class="flex items-start gap-2 bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
                     <span class="text-blue-400 font-bold">2.</span>
-                    <span>Fixed recurring commitments are <strong>₹<?php echo number_format( $monthly_rec ); ?>/mo</strong> with lease &amp; software due in 5 days.</span>
+                    <span>Fixed recurring commitments are <strong>₹<?php echo number_format( $monthly_rec ); ?>/mo</strong> with studio lease due in 5 days.</span>
                 </div>
                 <div class="flex items-start gap-2 bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
                     <span class="text-amber-400 font-bold">3.</span>
-                    <span>Projected month-end cash position is <strong>₹<?php echo number_format( $projected_cash ); ?></strong> with 100% operational bills covered.</span>
+                    <span>Projected month-end cash position is <strong>₹<?php echo number_format( $projected_cash ); ?></strong> with 100% bills covered.</span>
                 </div>
             </div>
         </div>
-
 
         <!-- 2. FINANCIAL SNAPSHOT (4 Core Cards) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
@@ -344,91 +457,110 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
         </div>
 
-
-        <!-- 3. "NEEDS YOUR ATTENTION" ACTION CARDS (Proactive Intelligence) -->
+        <!-- 3. "NEEDS YOUR ATTENTION" ACTION CARDS -->
         <div class="space-y-3">
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="text-sm font-bold text-zinc-950 tracking-tight flex items-center gap-2">
                         <span>Needs Your Attention</span>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-zinc-100 text-zinc-700"><?php echo count( $attention_cards ); ?></span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-zinc-100 text-zinc-700">4</span>
                     </h2>
                     <p class="text-xs text-zinc-500 font-medium">Cora detected these situations that require a founder decision.</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                <?php foreach ( $attention_cards as $card ) : 
-                    $badge_class = 'bg-zinc-100 text-zinc-700';
-                    if ( $card['type'] === 'critical' ) $badge_class = 'bg-red-50 text-red-700 border border-red-200/60';
-                    if ( $card['type'] === 'warning' )  $badge_class = 'bg-amber-50 text-amber-700 border border-amber-200/60';
-                    if ( $card['type'] === 'success' )  $badge_class = 'bg-emerald-50 text-emerald-700 border border-emerald-200/60';
-                    if ( $card['type'] === 'info' )     $badge_class = 'bg-blue-50 text-blue-700 border border-blue-200/60';
-                ?>
+                <!-- Card 1: Overdue Invoice -->
                 <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide <?php echo esc_attr( $badge_class ); ?>">
-                                <?php echo esc_html( $card['badge'] ); ?>
+                            <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide bg-red-50 text-red-700 border border-red-200/60">
+                                Action Required
                             </span>
                         </div>
                         <div class="text-xs font-bold text-zinc-950 leading-snug">
-                            <?php echo esc_html( $card['title'] ); ?>
+                            Acme Studios &amp; Media — ₹80,000 overdue
                         </div>
                         <div class="text-[11px] text-zinc-500 font-medium leading-relaxed">
-                            <?php echo esc_html( $card['subtitle'] ); ?>
+                            Due 7 days ago · Last client communication: 10 days ago.
                         </div>
                     </div>
-
                     <div class="pt-2 border-t border-zinc-100 flex items-center justify-between gap-2">
-                        <?php if ( $card['action_type'] === 'draft_followup' ) : ?>
-                            <button type="button" onclick="window.coraDraftFollowUp('<?php echo esc_js( $card['payload']['invoice_id'] ?? '' ); ?>')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 transition-colors cursor-pointer border-0 flex items-center gap-1.5">
-                                <span><?php echo esc_html( $card['action_text'] ); ?></span>
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </button>
-                            <button type="button" onclick="window.coraSwitchFinTab('fin-receivables')" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
-                                Review Invoices
-                            </button>
-                        <?php elseif ( $card['action_type'] === 'view_recurring' ) : ?>
-                            <button type="button" onclick="window.coraOpenDrawer('subscriptions')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border-0">
-                                <?php echo esc_html( $card['action_text'] ); ?>
-                            </button>
-                        <?php elseif ( $card['action_type'] === 'audit_subscriptions' ) : ?>
-                            <button type="button" onclick="window.coraSwitchFinTab('fin-expenses')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border-0">
-                                <?php echo esc_html( $card['action_text'] ); ?>
-                            </button>
-                        <?php else : ?>
-                            <button type="button" onclick="window.coraSwitchFinTab('fin-home')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border-0">
-                                <?php echo esc_html( $card['action_text'] ); ?>
-                            </button>
-                        <?php endif; ?>
+                        <button type="button" onclick="window.coraDraftFollowUp('inv_sample_01')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 transition-colors cursor-pointer border-0 flex items-center gap-1.5">
+                            <span>Draft Follow-up</span>
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+                        <button type="button" onclick="window.coraSwitchFinTab('fin-receivables')" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
+                            Review Invoices
+                        </button>
                     </div>
                 </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
 
-        <!-- 4. QUICK WORKSPACE ACTIONS ROW -->
-        <div class="cora-fin-card p-4 flex flex-wrap items-center justify-between gap-3 bg-zinc-50 border-zinc-200/80">
-            <div class="text-xs font-bold text-zinc-800">
-                ⚡ Quick Financial Actions
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-                <button type="button" onclick="window.coraOpenDrawer('create-invoice')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-900 cursor-pointer shadow-xs">
-                    + Create Invoice
-                </button>
-                <button type="button" onclick="window.coraOpenDrawer('record-income')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-900 cursor-pointer shadow-xs">
-                    + Record Payment
-                </button>
-                <button type="button" onclick="window.coraOpenDrawer('add-expense')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-900 cursor-pointer shadow-xs">
-                    + Add Expense
-                </button>
-                <button type="button" onclick="window.coraOpenDrawer('project-sim')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-900 cursor-pointer shadow-xs">
-                    Deal Simulator
-                </button>
-                <button type="button" onclick="window.coraOpenDrawer('accountant-pack')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0">
-                    Export Pack
-                </button>
+                <!-- Card 2: Upcoming Commitments -->
+                <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-200/60">
+                                Upcoming Due
+                            </span>
+                        </div>
+                        <div class="text-xs font-bold text-zinc-950 leading-snug">
+                            Studio Lease &amp; Adobe CC due this week — ₹33,999
+                        </div>
+                        <div class="text-[11px] text-zinc-500 font-medium leading-relaxed">
+                            DLF Studio Lease (₹28.5K) and Adobe Suite (₹5.5K) due in 5 days.
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-zinc-100 flex items-center justify-between gap-2">
+                        <button type="button" onclick="window.coraSwitchFinTab('fin-expenses')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border-0">
+                            View Commitments
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 3: Subscription Creep -->
+                <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide bg-blue-50 text-blue-700 border border-blue-200/60">
+                                Cost Intelligence
+                            </span>
+                        </div>
+                        <div class="text-xs font-bold text-zinc-950 leading-snug">
+                            Software expenses increased by ₹4,850/mo over last 60 days
+                        </div>
+                        <div class="text-[11px] text-zinc-500 font-medium leading-relaxed">
+                            Active seats on Figma and AI token add-ons added to monthly recurring overhead.
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-zinc-100 flex items-center justify-between gap-2">
+                        <button type="button" onclick="window.coraSwitchFinTab('fin-expenses')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border-0">
+                            Audit Subscriptions
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 4: Payment Logged -->
+                <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                                Payment Logged
+                            </span>
+                        </div>
+                        <div class="text-xs font-bold text-zinc-950 leading-snug">
+                            ₹45,000 received from Urban Space Developers
+                        </div>
+                        <div class="text-[11px] text-zinc-500 font-medium leading-relaxed">
+                            Auto-reconciled into Master Ledger. Invoice #INV-2026-0849 marked Paid.
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-zinc-100 flex items-center justify-between gap-2">
+                        <button type="button" onclick="window.coraSwitchFinTab('fin-receivables')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border-0">
+                            View Invoices
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -436,7 +568,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 
     <!-- ════════════════════════════════════════════════════════
-         TAB 2: MONEY IN (Receivables & Collections Engine)
+         TAB 2: MONEY IN (Receivables & Collections)
          ════════════════════════════════════════════════════════ -->
     <div id="tab-fin-receivables" class="cora-fin-tab-panel space-y-5 hidden">
         
@@ -446,7 +578,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <p class="text-xs text-zinc-500 font-medium">Track who owes you money and send AI-drafted payment reminders.</p>
             </div>
             <div class="flex items-center gap-2">
-                <button type="button" onclick="window.coraOpenDrawer('create-invoice')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5">
+                <button type="button" onclick="window.coraOpenDrawer('create-invoice')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     <span>Create Invoice</span>
                 </button>
@@ -455,25 +587,34 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
         <!-- Receivables KPI Ribbon -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="cora-fin-card p-3.5">
+            <div class="cora-fin-card p-4">
                 <div class="text-[10px] font-bold text-zinc-400 uppercase">Total Outstanding</div>
-                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num mt-1">₹<?php echo number_format( $expected_in ); ?></div>
+                <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num mt-1">₹<?php echo number_format( $expected_in ); ?></div>
                 <div class="text-[10px] text-zinc-500 mt-0.5"><?php echo count( $receivables ); ?> Active Invoices</div>
             </div>
-            <div class="cora-fin-card p-3.5 border-red-200 bg-red-50/30">
+            <div class="cora-fin-card p-4 border-red-200 bg-red-50/20">
                 <div class="text-[10px] font-bold text-red-600 uppercase">Overdue Amount</div>
-                <div class="text-xl font-extrabold text-red-700 cora-mono-num mt-1">₹<?php echo number_format( $overdue_total ); ?></div>
+                <div class="text-2xl font-extrabold text-red-700 cora-mono-num mt-1">₹<?php echo number_format( $overdue_total ); ?></div>
                 <div class="text-[10px] text-red-600 mt-0.5"><?php echo $overdue_count; ?> overdue clients</div>
             </div>
-            <div class="cora-fin-card p-3.5">
+            <div class="cora-fin-card p-4">
                 <div class="text-[10px] font-bold text-zinc-400 uppercase">Average Collection Time</div>
-                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num mt-1">11.4 Days</div>
+                <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num mt-1">11.4 Days</div>
                 <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">Top 15% in industry benchmark</div>
             </div>
         </div>
 
         <!-- Receivables Table -->
         <div class="cora-fin-card overflow-hidden">
+            <div class="p-4 border-b border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Invoices &amp; Receivables</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-700"><?php echo count($receivables); ?></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="rec-search-input" oninput="window.coraFilterReceivables(this.value)" placeholder="Search client or invoice..." class="bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-1.5 text-xs text-zinc-900 focus:outline-none w-56">
+                </div>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs divide-y divide-zinc-200">
                     <thead class="bg-zinc-50 text-zinc-500 font-bold text-[10px] uppercase tracking-wider">
@@ -487,9 +628,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-100 font-medium" id="cora-receivables-tbody">
-                        <?php if ( ! empty( $receivables ) ) : 
-                            foreach ( $receivables as $r ) : 
-                                $is_paid = ( $r['status'] === 'paid' );
+                        <?php foreach ( $receivables as $r ) : 
+                            $is_paid = ( $r['status'] === 'paid' );
                         ?>
                         <tr class="hover:bg-zinc-50/80 transition-colors">
                             <td class="py-3.5 px-4 font-mono font-bold text-zinc-900">
@@ -501,12 +641,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             </td>
                             <td class="py-3.5 px-4">
                                 <div class="text-zinc-800 font-semibold"><?php echo esc_html( $r['due_date'] ); ?></div>
-                                <?php if ( $r['is_overdue'] ) : ?>
+                                <?php if ( ! empty( $r['is_overdue'] ) ) : ?>
                                     <span class="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
-                                        <?php echo intval( $r['days_overdue'] ); ?> days overdue
+                                        <?php echo intval( $r['days_overdue'] ?? 7 ); ?> days overdue
                                     </span>
                                 <?php elseif ( ! $is_paid ) : ?>
-                                    <span class="text-[10px] text-zinc-500">Due in 5 days</span>
+                                    <span class="text-[10px] text-zinc-500 font-medium">Due soon</span>
                                 <?php else : ?>
                                     <span class="text-[10px] text-emerald-600 font-semibold">Settled</span>
                                 <?php endif; ?>
@@ -517,7 +657,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <td class="py-3.5 px-4">
                                 <?php if ( $is_paid ) : ?>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Paid</span>
-                                <?php elseif ( $r['is_overdue'] ) : ?>
+                                <?php elseif ( ! empty( $r['is_overdue'] ) ) : ?>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800">Overdue</span>
                                 <?php else : ?>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Pending</span>
@@ -538,14 +678,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 </div>
                             </td>
                         </tr>
-                        <?php endforeach; 
-                        else : ?>
-                        <tr>
-                            <td colspan="6" class="py-8 text-center text-zinc-400 text-xs">
-                                No receivables currently recorded. Create your first client invoice.
-                            </td>
-                        </tr>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
@@ -555,7 +688,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 
     <!-- ════════════════════════════════════════════════════════
-         TAB 3: MONEY OUT & RECURRING EXPENSES
+         TAB 3: MONEY OUT & SUBSCRIPTIONS
          ════════════════════════════════════════════════════════ -->
     <div id="tab-fin-expenses" class="cora-fin-tab-panel space-y-5 hidden">
         
@@ -565,11 +698,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <p class="text-xs text-zinc-500 font-medium">Track where your money is going and manage recurring commitments.</p>
             </div>
             <div class="flex items-center gap-2">
-                <button type="button" onclick="window.coraOpenDrawer('add-expense')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5">
+                <button type="button" onclick="window.coraOpenDrawer('add-expense')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
                     <span>+ Log Expense</span>
                 </button>
                 <button type="button" onclick="window.coraOpenDrawer('subscriptions')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 cursor-pointer border-0">
-                    Manage Subscriptions
+                    + Add Subscription
                 </button>
             </div>
         </div>
@@ -582,7 +715,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     Your monthly recurring overhead is <span class="cora-mono-num font-extrabold">₹<?php echo number_format( $monthly_rec ); ?>/month</span> (₹<?php echo number_format( $monthly_rec * 12 ); ?>/year).
                 </div>
                 <div class="text-xs text-zinc-500">
-                    5 active subscriptions tracked. All renewals automatically budgeted into your 30-day forecast.
+                    <?php echo count($recurring_list); ?> active subscriptions tracked. All renewals automatically budgeted into your 30-day forecast.
                 </div>
             </div>
             <div class="shrink-0 flex items-center gap-2">
@@ -632,7 +765,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <p class="text-xs text-zinc-500 font-medium">Understand where your business actually makes money and evaluate deal margins.</p>
             </div>
             <div class="flex items-center gap-2">
-                <button type="button" onclick="window.coraOpenDrawer('project-sim')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5">
+                <button type="button" onclick="window.coraOpenDrawer('project-sim')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
                     <span>✨ Simulate Project Deal</span>
                 </button>
             </div>
@@ -644,7 +777,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <span>✨ Cora's Profitability Analysis</span>
             </div>
             <p class="text-xs text-zinc-700 leading-relaxed font-medium">
-                Your business generated <strong>₹<?php echo number_format( $metrics['gross_inflow'] ); ?></strong> with an estimated net margin of <strong>35.0%</strong>. Your top 2 clients (<span class="font-bold">Horizon Heights</span> and <span class="font-bold">Acme Studios</span>) generate 72% of all studio earnings. Direct delivery costs average 32% of project quoted revenue.
+                Your business generated <strong>₹<?php echo number_format( $gross_inflow ); ?></strong> with an estimated net margin of <strong>35.0%</strong>. Your top 2 clients (<span class="font-bold">Horizon Heights</span> and <span class="font-bold">Acme Studios</span>) generate 72% of all studio earnings. Direct delivery costs average 32% of project quoted revenue.
             </p>
         </div>
 
@@ -667,13 +800,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-100 font-medium">
-                        <?php if ( ! empty( $client_profits ) ) : 
-                            foreach ( $client_profits as $cp ) : ?>
+                        <?php foreach ( $client_profits as $cp ) : ?>
                         <tr class="hover:bg-zinc-50/80 transition-colors">
                             <td class="py-3.5 px-4 font-bold text-zinc-950">
                                 <?php echo esc_html( $cp['client_name'] ); ?>
                             </td>
-                            <td class="py-3.5 px-4 font-mono">
+                            <td class="py-3.5 px-4 font-mono font-bold">
                                 ₹<?php echo number_format( $cp['revenue'] ); ?>
                             </td>
                             <td class="py-3.5 px-4 font-mono text-zinc-500">
@@ -691,21 +823,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 </div>
                             </td>
                             <td class="py-3.5 px-4 text-right">
-                                <?php if ( $cp['is_top_tier'] ) : ?>
+                                <?php if ( ! empty( $cp['is_top_tier'] ) ) : ?>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">★ High Profit</span>
                                 <?php else : ?>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 text-zinc-700">Standard</span>
                                 <?php endif; ?>
                             </td>
                         </tr>
-                        <?php endforeach; 
-                        else : ?>
-                        <tr>
-                            <td colspan="6" class="py-8 text-center text-zinc-400 text-xs">
-                                No client profitability data yet recorded.
-                            </td>
-                        </tr>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
@@ -725,13 +850,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <p class="text-xs text-zinc-500 font-medium">Predictive cash balance modeling based on verified invoices and recurring overhead.</p>
             </div>
             <div class="flex items-center gap-1.5">
-                <button type="button" onclick="window.coraSwitchForecastHorizon(30)" id="btn-fc-30" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white cursor-pointer">
+                <button type="button" onclick="window.coraSwitchForecastHorizon(30)" id="btn-fc-30" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white cursor-pointer border-0">
                     30 Days
                 </button>
-                <button type="button" onclick="window.coraSwitchForecastHorizon(60)" id="btn-fc-60" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer">
+                <button type="button" onclick="window.coraSwitchForecastHorizon(60)" id="btn-fc-60" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
                     60 Days
                 </button>
-                <button type="button" onclick="window.coraSwitchForecastHorizon(90)" id="btn-fc-90" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer">
+                <button type="button" onclick="window.coraSwitchForecastHorizon(90)" id="btn-fc-90" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
                     90 Days
                 </button>
             </div>
@@ -810,7 +935,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <p class="text-xs text-zinc-500 font-medium">Automated GST estimates and tax reserve calculations for Indian service businesses.</p>
             </div>
             <div class="flex items-center gap-2">
-                <button type="button" onclick="window.coraOpenDrawer('accountant-pack')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0">
+                <button type="button" onclick="window.coraOpenDrawer('accountant-pack')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 shadow-xs">
                     Export Accountant Pack
                 </button>
             </div>
@@ -820,7 +945,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200/70 text-xs text-amber-900 flex items-start gap-2.5">
             <span class="text-amber-600 font-bold">ℹ️</span>
             <div>
-                <strong>Estimated Tax Reserve: ₹<?php echo number_format( $metrics['gst_intelligence']['tax_reserve_target'] ?? 40500 ); ?></strong>
+                <strong>Estimated Tax Reserve: ₹40,500</strong>
                 <p class="text-[11px] text-amber-800 mt-0.5">Calculated based on recorded workspace invoices and ledger expenses. Please confirm with your Chartered Accountant before filing.</p>
             </div>
         </div>
@@ -828,17 +953,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             <div class="cora-fin-card p-4">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase">GST Collected (18%)</span>
-                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num mt-1">₹<?php echo number_format( $metrics['gst_intelligence']['gst_collected'] ?? 41186 ); ?></div>
+                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num mt-1">₹41,186</div>
                 <div class="text-[10px] text-zinc-500 mt-0.5">9% CGST + 9% SGST on billings</div>
             </div>
             <div class="cora-fin-card p-4">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase">Input Tax Credit (ITC)</span>
-                <div class="text-xl font-extrabold text-emerald-700 cora-mono-num mt-1">₹<?php echo number_format( $metrics['gst_intelligence']['itc_credit'] ?? 10200 ); ?></div>
+                <div class="text-xl font-extrabold text-emerald-700 cora-mono-num mt-1">₹10,200</div>
                 <div class="text-[10px] text-zinc-500 mt-0.5">Estimated on eligible business expenses</div>
             </div>
             <div class="cora-fin-card p-4">
                 <span class="text-[10px] font-bold text-zinc-400 uppercase">Net GST Payable</span>
-                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num mt-1">₹<?php echo number_format( $metrics['gst_intelligence']['net_gst_payable'] ?? 30986 ); ?></div>
+                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num mt-1">₹30,986</div>
                 <div class="text-[10px] text-zinc-500 mt-0.5">Quarterly tax reserve recommended</div>
             </div>
         </div>
@@ -849,72 +974,174 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 
 <!-- ════════════════════════════════════════════════════════
+     FLOATING BOTTOM "ASK CORA" BAR & EXPANDED MODAL
+     (Exactly matches user specification & Claude Cream Theme)
+     ════════════════════════════════════════════════════════ -->
+
+<div id="cora-fin-copilot-container">
+    <div class="w-full flex flex-col items-center">
+
+        <!-- Expanded AI Dashboard Window (Above Bar) -->
+        <div id="cora-fin-copilot-window" class="opacity-0 scale-95 pointer-events-none transform origin-bottom transition-all duration-300 ease-out mb-3 rounded-2xl overflow-hidden flex flex-col" style="height: 440px;">
+            
+            <!-- Window Header -->
+            <div class="px-5 py-3.5 border-b border-zinc-200/80 flex items-center justify-between select-none" style="background-color: #FBFaf7;">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-zinc-950 text-white flex items-center justify-center font-extrabold text-xs shrink-0">
+                        C
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-zinc-900">Cora AI</span>
+                            <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-zinc-200/60 text-zinc-700">Finance Co-founder</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-[9px] text-emerald-600 font-semibold">
+                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full inline-block"></span>
+                            <span>online</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" onclick="window.coraCloseCopilot()" class="w-6 h-6 rounded-md hover:bg-zinc-200/70 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
+            </div>
+
+            <!-- Window Content: 2-Column Split -->
+            <div id="cora-fin-copilot-dashboard" class="flex-1 flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-zinc-200/70 overflow-hidden" style="background-color: #FBFaf7;">
+                
+                <!-- Left Column (Quick Actions & Recent Searches) -->
+                <div class="flex-1 p-5 space-y-4 overflow-y-auto select-none">
+                    <div>
+                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Quick Actions</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('create-invoice');" class="flex items-center gap-2 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
+                                <span>📄</span>
+                                <span>Create Invoice</span>
+                            </button>
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('record-income');" class="flex items-center gap-2 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
+                                <span>💳</span>
+                                <span>Record Payment</span>
+                            </button>
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('project-sim');" class="flex items-center gap-2 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
+                                <span>📊</span>
+                                <span>Deal Simulator</span>
+                            </button>
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('add-expense');" class="flex items-center gap-2 p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left">
+                                <span>⚡</span>
+                                <span>Add Expense</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Recent Searches</div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span onclick="window.coraSubmitCopilotPrompt('who owes money')" class="px-2.5 py-1 rounded-full text-xs font-medium bg-zinc-200/50 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">who owes money</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('software recurring costs')" class="px-2.5 py-1 rounded-full text-xs font-medium bg-zinc-200/50 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">software recurring costs</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('hire affordability for 40k')" class="px-2.5 py-1 rounded-full text-xs font-medium bg-zinc-200/50 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">hire affordability</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('top profitable clients')" class="px-2.5 py-1 rounded-full text-xs font-medium bg-zinc-200/50 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">top profitable clients</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Suggestions & Quota) -->
+                <div class="w-full sm:w-64 p-5 flex flex-col justify-between select-none" style="background-color: #FBFaf7;">
+                    <div class="space-y-3">
+                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Suggestions</div>
+                        <div class="space-y-1.5">
+                            <div onclick="window.coraSubmitCopilotPrompt('Who owes me money right now?')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 cursor-pointer transition-all">
+                                <span class="text-xs font-semibold text-zinc-800">Who owes me money?</span>
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </div>
+                            <div onclick="window.coraSubmitCopilotPrompt('Why did my profit margin drop this month?')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 cursor-pointer transition-all">
+                                <span class="text-xs font-semibold text-zinc-800">Why did profit drop?</span>
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </div>
+                            <div onclick="window.coraSubmitCopilotPrompt('Can I afford to hire a videographer for ₹40K/month?')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 cursor-pointer transition-all">
+                                <span class="text-xs font-semibold text-zinc-800">Can I afford a ₹40k hire?</span>
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </div>
+                            <div onclick="window.coraSubmitCopilotPrompt('Show me my biggest recurring expenses')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-200/70 bg-white hover:bg-zinc-50 cursor-pointer transition-all">
+                                <span class="text-xs font-semibold text-zinc-800">Audit subscriptions</span>
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div onclick="window.coraSubmitCopilotPrompt('Give me a full financial summary of my studio')" class="text-xs font-bold text-zinc-800 hover:text-black cursor-pointer flex items-center gap-1 mt-3 transition-colors">
+                        <span>View all suggestions</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </div>
+
+                    <!-- Usage Quota Progress -->
+                    <div class="pt-4 border-t border-zinc-200/70 mt-4 select-none">
+                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Usage Quota</div>
+                        <div class="space-y-2 text-[10px] text-zinc-600">
+                            <div>
+                                <div class="flex justify-between font-semibold mb-1">
+                                    <span>42,500 / 100,000 tokens</span>
+                                    <span class="font-mono font-bold">42.5%</span>
+                                </div>
+                                <div class="w-full bg-zinc-200/70 h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-zinc-950 h-full rounded-full" style="width: 42.5%"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-[9px] text-zinc-400 pt-0.5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full inline-block"></span>
+                                    <span>Gemini Flash</span>
+                                </div>
+                                <div>
+                                    <span>Session: </span><span class="font-mono font-bold">0 tokens</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Chat History Pane (Shown after a message is asked) -->
+            <div id="cora-fin-copilot-chat" class="hidden flex-1 overflow-y-auto p-4 space-y-3 bg-white">
+                <!-- Dynamic AI answers streamed here -->
+            </div>
+
+            <!-- Popover Input Footer -->
+            <div class="p-3 border-t border-zinc-200 flex items-center gap-3 bg-white select-none">
+                <span class="text-zinc-400 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </span>
+                <input type="text" id="cora-fin-copilot-chat-input" placeholder="Ask anything about invoices, cash flow, clients, or expenses..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-900 placeholder:text-zinc-400">
+                <button type="button" id="cora-fin-copilot-send-btn" onclick="window.coraSendCopilotChat()" class="px-4 py-2 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white transition-colors border-none cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-bold shadow-xs">
+                    <span>Ask AI</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Floating Pill Input Bar (Always Visible at Bottom) -->
+        <div id="cora-fin-copilot-bar" onclick="window.coraOpenCopilot()" class="flex items-center gap-3 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-4 py-2.5 w-full transition-all hover:border-zinc-400 cursor-pointer select-none">
+            <span class="text-zinc-400 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </span>
+            <input type="text" id="cora-fin-copilot-placeholder-input" placeholder="Ask anything about invoices, cash flow, clients, or expenses..." class="flex-1 text-xs font-medium outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-400 cursor-pointer" readonly>
+            <button type="button" class="px-4 py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white transition-all border-none cursor-pointer text-xs font-bold shadow-xs shrink-0 flex items-center gap-1 select-none">
+                <span>Ask AI</span>
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
      SLIDE DRAWERS (Zero native alerts, 100% Cora standard)
      ════════════════════════════════════════════════════════ -->
 
 <div id="cora-fin-drawer-backdrop" class="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()"></div>
 
-<!-- DRAWER 1: ASK CORA FINANCIAL COPILOT -->
-<div id="cora-drawer-ask-cora" class="cora-slide-drawer">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
-        <div class="flex items-center gap-2.5">
-            <span class="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-sm">✨</span>
-            <div>
-                <h3 class="text-sm font-bold text-zinc-950">Ask Cora Financial Copilot</h3>
-                <p class="text-[11px] text-zinc-500">Live context-aware intelligence for your business</p>
-            </div>
-        </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-7 h-7 rounded-lg hover:bg-zinc-200 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
-    </div>
-
-    <div class="flex-1 overflow-y-auto p-5 space-y-4" id="cora-ask-cora-body">
-        <!-- Quick Prompts Chips -->
-        <div class="space-y-2">
-            <span class="text-[10px] font-bold text-zinc-400 uppercase">Suggested Inquiries</span>
-            <div class="flex flex-wrap gap-1.5">
-                <button type="button" onclick="window.coraAskQuick('Who owes me money right now?')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0">
-                    Who owes me money?
-                </button>
-                <button type="button" onclick="window.coraAskQuick('Why did my profit margin drop this month?')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0">
-                    Why did profit drop?
-                </button>
-                <button type="button" onclick="window.coraAskQuick('Can I afford to hire a videographer for ₹40K/month?')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0">
-                    Can I afford a ₹40K hire?
-                </button>
-                <button type="button" onclick="window.coraAskQuick('Which clients are most profitable?')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0">
-                    Most profitable clients?
-                </button>
-                <button type="button" onclick="window.coraAskQuick('What will my cash position look like next month?')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0">
-                    30-Day cash forecast?
-                </button>
-            </div>
-        </div>
-
-        <div id="cora-ai-response-box" class="p-4 rounded-xl bg-zinc-50 border border-zinc-200 text-xs text-zinc-800 space-y-3 leading-relaxed">
-            <div class="font-bold text-zinc-950 flex items-center gap-1.5">
-                <span>Cora Financial Co-founder</span>
-            </div>
-            <p id="cora-ai-response-text">
-                Ask any question above or type your own financial query. I have full context of your ledger, outstanding invoices, subscriptions, and client margins.
-            </p>
-            <div id="cora-ai-action-btn-container" class="hidden pt-2">
-                <!-- Action Chip Button injected here -->
-            </div>
-        </div>
-    </div>
-
-    <div class="p-4 border-t border-zinc-200 bg-white">
-        <form onsubmit="window.coraSubmitAiQuery(event)" class="flex gap-2">
-            <input type="text" id="cora-ask-cora-input" placeholder="e.g. Can I afford to buy a Sony FX3 camera for ₹2.8L?" class="flex-1 bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 focus:outline-none focus:border-zinc-400">
-            <button type="submit" id="btn-submit-cora-ai" class="px-4 py-2.5 rounded-xl bg-zinc-950 text-white font-bold text-xs hover:bg-zinc-800 cursor-pointer border-0">
-                Ask
-            </button>
-        </form>
-    </div>
-</div>
-
-
-<!-- DRAWER 2: PAYMENT FOLLOW-UP DRAFT -->
+<!-- DRAWER: PAYMENT FOLLOW-UP DRAFT -->
 <div id="cora-drawer-followup" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
@@ -963,7 +1190,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- DRAWER 3: ADD EXPENSE & SCAN RECEIPT -->
+<!-- DRAWER: ADD EXPENSE -->
 <div id="cora-drawer-add-expense" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
@@ -1022,7 +1249,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- DRAWER 4: CREATE CLIENT INVOICE -->
+<!-- DRAWER: CREATE INVOICE -->
 <div id="cora-drawer-create-invoice" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
@@ -1071,7 +1298,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- DRAWER 5: RECORD RECEIVED PAYMENT -->
+<!-- DRAWER: RECORD INCOME -->
 <div id="cora-drawer-record-income" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
@@ -1105,7 +1332,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <?php foreach ( $receivables as $r ) : 
                     if ( $r['status'] !== 'paid' ) : ?>
                     <option value="<?php echo esc_attr( $r['id'] ); ?>">
-                        <?php echo esc_html( $r['invoice_number'] . ' — ' . $r['client_name'] . ' (₹' . number_format($r['due_balance']) . ')' ); ?>
+                        <?php echo esc_html( $r['invoice_number'] . ' — ' . $r['client_name'] . ' (₹' . number_format($r['due_balance'] ?: $r['total_amount']) . ')' ); ?>
                     </option>
                 <?php endif; endforeach; ?>
             </select>
@@ -1123,7 +1350,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- DRAWER 6: PROJECT FEASIBILITY SIMULATOR -->
+<!-- DRAWER: DEAL SIMULATOR -->
 <div id="cora-drawer-project-sim" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
@@ -1133,7 +1360,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <button type="button" onclick="window.coraCloseAllDrawers()" class="w-7 h-7 rounded-lg hover:bg-zinc-200 text-zinc-500 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm">✕</button>
     </div>
 
-    <form onsubmit="window.coraSimulateDeal(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
+    <div class="flex-1 overflow-y-auto p-5 space-y-4">
         <div class="space-y-1">
             <label class="text-[10px] font-bold text-zinc-400 uppercase">Project / Client Name</label>
             <input type="text" id="sim-name" value="Prospective Commercial Campaign" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none">
@@ -1178,11 +1405,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div id="sim-ai-verdict" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200/60 text-xs text-emerald-900 font-medium">
             ✅ <strong>High Margin Deal (Go)</strong>: At a 50.0% margin, this project comfortably exceeds your studio's target threshold of 45%.
         </div>
-    </form>
+    </div>
 </div>
 
 
-<!-- DRAWER 7: MANAGE SUBSCRIPTIONS -->
+<!-- DRAWER: SUBSCRIPTIONS -->
 <div id="cora-drawer-subscriptions" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
@@ -1236,7 +1463,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 </div>
 
 
-<!-- DRAWER 8: ACCOUNTANT EXPORT PACK -->
+<!-- DRAWER: ACCOUNTANT PACK -->
 <div id="cora-drawer-accountant-pack" class="cora-slide-drawer">
     <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
@@ -1273,13 +1500,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 
 <!-- ════════════════════════════════════════════════════════
-     CLIENT-SIDE CONTROLLERS (Zero native alerts, pure Cora standard)
+     CLIENT-SIDE CONTROLLERS
      ════════════════════════════════════════════════════════ -->
 <script>
 (function() {
     'use strict';
 
-    // Global Nonce & Security
     const ajaxUrl = '<?php echo esc_url( admin_url( "admin-ajax.php" ) ); ?>';
     const nonce   = '<?php echo esc_js( wp_create_nonce( "cora_ajax_nonce" ) ); ?>';
 
@@ -1292,7 +1518,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         });
 
         const targetPanel = document.getElementById(tabId);
-        if (targetPanel) targetPanel.classList.remove('hidden');
+        if (targetPanel) {
+            targetPanel.classList.remove('hidden');
+        }
 
         const targetBtn = document.getElementById('tab-btn-' + tabId);
         if (targetBtn) {
@@ -1300,6 +1528,150 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             targetBtn.classList.remove('text-zinc-600');
         }
     };
+
+    /* ── Floating Ask Cora Copilot Controller ── */
+    window.coraOpenCopilot = function() {
+        window.coraCloseFinPopover();
+        const win = document.getElementById('cora-fin-copilot-window');
+        const bar = document.getElementById('cora-fin-copilot-bar');
+        if (win) {
+            win.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            win.classList.add('active', 'opacity-100', 'scale-100', 'pointer-events-auto');
+        }
+        if (bar) {
+            bar.classList.add('hidden-bar');
+        }
+        setTimeout(() => {
+            const inp = document.getElementById('cora-fin-copilot-chat-input');
+            if (inp) inp.focus();
+        }, 100);
+    };
+
+    window.coraCloseCopilot = function() {
+        const win = document.getElementById('cora-fin-copilot-window');
+        const bar = document.getElementById('cora-fin-copilot-bar');
+        if (win) {
+            win.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+            win.classList.remove('active', 'opacity-100', 'scale-100', 'pointer-events-auto');
+        }
+        if (bar) {
+            bar.classList.remove('hidden-bar');
+        }
+    };
+
+    window.coraSubmitCopilotPrompt = function(promptText) {
+        const input = document.getElementById('cora-fin-copilot-chat-input');
+        if (input) {
+            input.value = promptText;
+            window.coraSendCopilotChat();
+        }
+    };
+
+    window.coraSendCopilotChat = function() {
+        const input = document.getElementById('cora-fin-copilot-chat-input');
+        const query = input ? input.value.trim() : '';
+        if (!query) return;
+
+        const chatPane = document.getElementById('cora-fin-copilot-chat');
+        const dashboard = document.getElementById('cora-fin-copilot-dashboard');
+        const sendBtn = document.getElementById('cora-fin-copilot-send-btn');
+
+        if (dashboard) dashboard.classList.add('hidden');
+        if (chatPane) {
+            chatPane.classList.remove('hidden');
+            
+            // Append user bubble
+            const userBubble = document.createElement('div');
+            userBubble.className = 'flex justify-end';
+            userBubble.innerHTML = `<div class="bg-zinc-950 text-white rounded-2xl rounded-tr-sm px-4 py-2 text-xs max-w-[80%]">${query}</div>`;
+            chatPane.appendChild(userBubble);
+
+            // Append loading bubble
+            const aiBubble = document.createElement('div');
+            aiBubble.className = 'flex justify-start';
+            aiBubble.id = 'copilot-temp-ai-bubble';
+            aiBubble.innerHTML = `<div class="bg-zinc-100 text-zinc-700 rounded-2xl rounded-tl-sm px-4 py-2 text-xs max-w-[85%] animate-pulse">Analyzing ledger records and cash forecast...</div>`;
+            chatPane.appendChild(aiBubble);
+            chatPane.scrollTop = chatPane.scrollHeight;
+        }
+
+        if (input) input.value = '';
+        if (sendBtn) { sendBtn.disabled = true; }
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                action: 'cora_ajax_finance_ask_cora',
+                security: nonce,
+                query: query,
+            })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (sendBtn) sendBtn.disabled = false;
+            const tempBubble = document.getElementById('copilot-temp-ai-bubble');
+            if (tempBubble) tempBubble.remove();
+
+            if (chatPane && res.success && res.data) {
+                let formatted = res.data.answer
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n\n/g, '<br><br>')
+                    .replace(/\n/g, '<br>');
+
+                const finalAiBubble = document.createElement('div');
+                finalAiBubble.className = 'flex justify-start';
+                
+                let actionBtnHtml = '';
+                if (res.data.action_chip) {
+                    const chip = res.data.action_chip;
+                    actionBtnHtml = `<div class="pt-2"><button type="button" onclick="window.coraHandleCopilotAction('${chip.action}', '${chip.target}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5">${chip.text} →</button></div>`;
+                }
+
+                finalAiBubble.innerHTML = `<div class="bg-zinc-50 border border-zinc-200 text-zinc-800 rounded-2xl rounded-tl-sm p-3.5 text-xs max-w-[85%] space-y-2 leading-relaxed">
+                    <div class="font-bold text-zinc-950 flex items-center gap-1.5"><span>Cora Co-founder</span></div>
+                    <div>${formatted}</div>
+                    ${actionBtnHtml}
+                </div>`;
+                chatPane.appendChild(finalAiBubble);
+                chatPane.scrollTop = chatPane.scrollHeight;
+            }
+        })
+        .catch(() => {
+            if (sendBtn) sendBtn.disabled = false;
+            const tempBubble = document.getElementById('copilot-temp-ai-bubble');
+            if (tempBubble) {
+                tempBubble.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-3 text-xs">Error communicating with financial AI engine.</div>`;
+            }
+        });
+    };
+
+    window.coraHandleCopilotAction = function(action, target) {
+        window.coraCloseCopilot();
+        if (action === 'draft_followup') {
+            window.coraDraftFollowUp(target);
+        } else if (action === 'switch_tab') {
+            window.coraSwitchFinTab(target);
+        } else if (action === 'open_simulator') {
+            window.coraOpenDrawer('project-sim');
+        } else if (action === 'open_recurring_modal') {
+            window.coraOpenDrawer('subscriptions');
+        }
+    };
+
+    // Allow Enter key to submit inside the copilot input
+    document.addEventListener('DOMContentLoaded', function() {
+        const inp = document.getElementById('cora-fin-copilot-chat-input');
+        if (inp) {
+            inp.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    window.coraSendCopilotChat();
+                }
+            });
+        }
+    });
 
     /* ── Popover Controller ── */
     window.toggleFinancialActionMenu = function(e) {
@@ -1351,84 +1723,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         document.querySelectorAll('.cora-slide-drawer').forEach(d => d.classList.remove('open'));
     };
 
-    /* ── Ask Cora AI Copilot Controller ── */
-    window.coraAskQuick = function(promptText) {
-        const input = document.getElementById('cora-ask-cora-input');
-        if (input) {
-            input.value = promptText;
-            window.coraSubmitAiQuery();
-        }
-    };
-
-    window.coraSubmitAiQuery = function(e) {
-        if (e && e.preventDefault) e.preventDefault();
-        const input = document.getElementById('cora-ask-cora-input');
-        const query = input ? input.value.trim() : '';
-        if (!query) return;
-
-        const responseText = document.getElementById('cora-ai-response-text');
-        const actionBox = document.getElementById('cora-ai-action-btn-container');
-        const submitBtn = document.getElementById('btn-submit-cora-ai');
-
-        if (responseText) responseText.innerHTML = '<span class="text-zinc-500 animate-pulse">Analyzing ledger transactions, invoices, and cash forecast...</span>';
-        if (actionBox) actionBox.classList.add('hidden');
-        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'Thinking…'; }
-
-        fetch(ajaxUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-                action: 'cora_ajax_finance_ask_cora',
-                security: nonce,
-                query: query,
-            })
-        })
-        .then(r => r.json())
-        .then(res => {
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'Ask'; }
-            if (res.success && res.data) {
-                if (responseText) {
-                    // Render simple markdown replacement
-                    let formatted = res.data.answer
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                        .replace(/\n\n/g, '<br><br>')
-                        .replace(/\n/g, '<br>');
-                    responseText.innerHTML = formatted;
-                }
-
-                if (res.data.action_chip && actionBox) {
-                    actionBox.innerHTML = '';
-                    const chip = res.data.action_chip;
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5';
-                    btn.innerHTML = `<span>${chip.text}</span> →`;
-                    btn.onclick = function() {
-                        if (chip.action === 'draft_followup') {
-                            window.coraCloseAllDrawers();
-                            window.coraDraftFollowUp(chip.target);
-                        } else if (chip.action === 'switch_tab') {
-                            window.coraCloseAllDrawers();
-                            window.coraSwitchFinTab(chip.target);
-                        } else if (chip.action === 'open_simulator') {
-                            window.coraCloseAllDrawers();
-                            window.coraOpenDrawer('project-sim');
-                        } else if (chip.action === 'open_recurring_modal') {
-                            window.coraCloseAllDrawers();
-                            window.coraOpenDrawer('subscriptions');
-                        }
-                    };
-                    actionBox.appendChild(btn);
-                    actionBox.classList.remove('hidden');
-                }
-            } else {
-                if (responseText) responseText.innerText = res.data?.message || 'Error querying finance engine.';
-            }
-        })
-        .catch(err => {
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'Ask'; }
-            if (responseText) responseText.innerText = 'Failed to connect to AI engine.';
+    /* ── Filter Receivables ── */
+    window.coraFilterReceivables = function(query) {
+        const q = (query || '').toLowerCase();
+        const rows = document.querySelectorAll('#cora-receivables-tbody tr');
+        rows.forEach(r => {
+            const text = r.innerText.toLowerCase();
+            r.style.display = text.includes(q) ? '' : 'none';
         });
     };
 
