@@ -28,8 +28,20 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 }
 
 /* ─── Top header bar ─────────────────────────────────────────────────────── */
-#cm-header { flex-shrink:0; border-bottom:1px solid #e4e4e7; background:#fff; }
-#cm-header-top { display:flex; align-items:center; gap:10px; padding:11px 18px; flex-wrap:wrap; }
+#cm-header {
+    flex-shrink: 0;
+    background: #fff;
+    padding: 20px 24px 0 24px;
+    box-sizing: border-box;
+    width: 100%;
+}
+@media (max-width: 1024px) {
+    #cm-header { padding: 16px 20px 0 20px; }
+}
+@media (max-width: 640px) {
+    #cm-header { padding: 12px 16px 0 16px; }
+}
+#cm-header-top { display:flex; align-items:center; gap:10px; padding:11px 0; flex-wrap:wrap; }
 .cm-h-title { font-size:15px; font-weight:800; color:#09090b; letter-spacing:-.02em; }
 .cm-h-subtitle { font-size:11px; color:#a1a1aa; font-weight:500; }
 .cm-h-sep { flex:1; }
@@ -51,10 +63,18 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 
 /* ─── Dedicated Folders Section ────────────────────────────────────────── */
 #cm-folders-section {
-    padding: 16px 20px 14px;
+    padding: 16px 24px;
     border-bottom: 1px solid #f4f4f5;
     background: #fff;
     flex-shrink: 0;
+    box-sizing: border-box;
+    width: 100%;
+}
+@media (max-width: 1024px) {
+    #cm-folders-section { padding: 14px 20px; }
+}
+@media (max-width: 640px) {
+    #cm-folders-section { padding: 12px 16px; }
 }
 .cm-folders-header {
     display: flex;
@@ -228,7 +248,24 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 }
 
 /* ─── Toolbar (search + filters) ────────────────────────────────────────── */
-#cm-toolbar { display:flex; align-items:center; gap:8px; padding:8px 20px 14px; border-bottom:1px solid #f4f4f5; flex-wrap:wrap; flex-shrink:0; background:#fff; }
+#cm-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 24px 16px;
+    border-bottom: 1px solid #f4f4f5;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    background: #fff;
+    box-sizing: border-box;
+    width: 100%;
+}
+@media (max-width: 1024px) {
+    #cm-toolbar { padding: 0 20px 14px; }
+}
+@media (max-width: 640px) {
+    #cm-toolbar { padding: 0 16px 12px; }
+}
 .cm-search-wrap { position:relative; flex:1; min-width:160px; max-width:320px; }
 .cm-search-wrap svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); pointer-events:none; color:#a1a1aa; }
 .cm-search { width:100%; border:1px solid #e4e4e7; border-radius:8px; padding:6px 10px 6px 30px; font-size:12px; background:#fafafa; outline:none; box-sizing:border-box; }
@@ -283,7 +320,15 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     flex: 1;
     overflow: visible !important;
     height: auto !important;
-    padding: 20px 22px;
+    padding: 20px 24px;
+    box-sizing: border-box;
+    width: 100%;
+}
+@media (max-width: 1024px) {
+    #cm-canvas { padding: 16px 20px; }
+}
+@media (max-width: 640px) {
+    #cm-canvas { padding: 12px 16px; }
 }
 #cm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
 .cm-cell { position:relative; border:1px solid #e4e4e7; border-radius:12px; overflow:hidden; cursor:pointer; transition:all .18s ease; background:#fafafa; }
