@@ -27,73 +27,54 @@ $deltas            = is_array( $pulse_data['deltas'] ?? null ) ? $pulse_data['de
 // Standardized Page Header Arguments
 $activity_header_args = array(
     'title'            => 'Business Pulse',
-    'description'      => 'AI-powered business intelligence & real-time operational telemetry for Workspace #' . $agency_id . '.',
+    'description'      => 'Cora continuously observes activity across this workspace, highlights what matters, and turns activity into action.',
     'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>',
     'ai_stack'         => true,
     'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
     'cta'              => array(
-        'text'        => 'Refresh Pulse',
+        'text'        => 'Live Refresh',
         'mobile_text' => 'Refresh',
         'onclick'     => "window.coraRefreshPulse()",
         'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>',
         'visible'     => true,
+        'class'       => '!bg-white hover:!bg-zinc-50 !text-zinc-800 !border-zinc-200 hover:!border-zinc-300 border shadow-2xs',
     ),
 );
+
+if ( function_exists( 'cora_render_workspace_header' ) ) {
+    cora_render_workspace_header( $activity_header_args );
+}
 ?>
 
 <div id="cora-business-pulse-module" class="cora-pulse-container space-y-6 max-w-full font-sans pb-16">
 
     <!-- ════════════════════════════════════════════════════════
-         SECTION 1: UNIFIED HEADER
-         ════════════════════════════════════════════════════════ -->
-    <div class="cora-pulse-header flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-200/80">
-        <div>
-            <div class="flex items-center gap-2.5">
-                <h1 class="text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">Business Pulse</h1>
-                
-                <!-- Live Pulse Status Indicator -->
-                <?php if ( $pulse_status === 'optimal' ) : ?>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span><?php echo esc_html( $pulse_status_text ); ?></span>
-                    </span>
-                <?php elseif ( $pulse_status === 'attention' ) : ?>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/60">
-                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                        <span><?php echo esc_html( $pulse_status_text ); ?></span>
-                    </span>
-                <?php else : ?>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200/60">
-                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                        <span><?php echo esc_html( $pulse_status_text ); ?></span>
-                    </span>
-                <?php endif; ?>
-            </div>
-            <p class="text-xs text-zinc-500 mt-1">Cora continuously observes activity across this workspace, highlights what matters, and turns activity into action.</p>
-        </div>
-
-        <div class="flex items-center gap-2 shrink-0">
-            <button type="button" onclick="window.coraRefreshPulse()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-zinc-50 text-zinc-800 border border-zinc-200 shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                <span>Live Refresh</span>
-            </button>
-            <button type="button" onclick="coraNavigateTo('settings-suite')" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 border border-transparent transition-all cursor-pointer flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                <span>Workspace Settings</span>
-            </button>
-        </div>
-    </div>
-
-
-    <!-- ════════════════════════════════════════════════════════
          LAYER 1: AI MORNING / AFTERNOON EXECUTIVE BRIEFING
          ════════════════════════════════════════════════════════ -->
     <div class="p-5 sm:p-6 rounded-2xl border border-zinc-200/80 shadow-xs relative overflow-hidden" style="background-color: #FBFaf7;">
-        <div class="flex items-start justify-between gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div class="space-y-2">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     <span class="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shrink-0">C</span>
                     <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">Cora Executive Briefing</span>
+                    
+                    <!-- Live Pulse Status Indicator -->
+                    <?php if ( $pulse_status === 'optimal' ) : ?>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 ml-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span><?php echo esc_html( $pulse_status_text ); ?></span>
+                        </span>
+                    <?php elseif ( $pulse_status === 'attention' ) : ?>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/60 ml-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span><?php echo esc_html( $pulse_status_text ); ?></span>
+                        </span>
+                    <?php else : ?>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200/60 ml-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+                            <span><?php echo esc_html( $pulse_status_text ); ?></span>
+                        </span>
+                    <?php endif; ?>
                 </div>
                 <h2 class="text-lg sm:text-xl font-bold text-zinc-950 tracking-tight">
                     <?php echo esc_html( $greeting ); ?>, <?php echo esc_html( $user_name ); ?> 👋
@@ -101,9 +82,24 @@ $activity_header_args = array(
                 <p class="text-xs text-zinc-600 font-medium">Here is what changed across your business since you were last here.</p>
             </div>
 
-            <div class="hidden sm:flex items-center gap-1.5 bg-white/80 border border-zinc-200 px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-zinc-800">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
-                <span>Workspace #<?php echo esc_html( $agency_id ); ?></span>
+            <div class="flex items-center gap-2 shrink-0">
+                <!-- AI Stack Badges -->
+                <div class="flex items-center -space-x-1.5 bg-white/90 border border-zinc-200/80 px-2.5 py-1.5 rounded-xl shadow-2xs">
+                    <!-- ChatGPT -->
+                    <span class="w-5 h-5 rounded-full bg-emerald-50 text-emerald-700 border border-white flex items-center justify-center text-[10px] font-bold" title="OpenAI GPT-4o">✦</span>
+                    <!-- Gemini -->
+                    <span class="w-5 h-5 rounded-full bg-blue-50 text-blue-700 border border-white flex items-center justify-center text-[10px] font-bold" title="Google Gemini 2.0">✧</span>
+                    <!-- Claude -->
+                    <span class="w-5 h-5 rounded-full bg-amber-50 text-amber-800 border border-white flex items-center justify-center text-[10px] font-bold" title="Anthropic Claude 3.5">✳</span>
+                    <!-- Cora Core -->
+                    <span class="w-5 h-5 rounded-full bg-zinc-950 text-white border border-white flex items-center justify-center text-[9px] font-bold" title="Cora Business Intelligence">C</span>
+                    <span class="text-[10px] font-mono font-bold text-zinc-700 ml-2">Pulse Active</span>
+                </div>
+
+                <div class="hidden sm:flex items-center gap-1.5 bg-white/80 border border-zinc-200 px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-zinc-800">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                    <span>Workspace #<?php echo esc_html( $agency_id ); ?></span>
+                </div>
             </div>
         </div>
 

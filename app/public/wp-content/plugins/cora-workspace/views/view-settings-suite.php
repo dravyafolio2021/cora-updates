@@ -53,6 +53,11 @@ $cora_settings_tabs = array(
         'desc'  => 'Workspace details & identity',
         'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
     ),
+    'pulse'      => array(
+        'label' => 'Business Pulse',
+        'desc'  => 'AI Activity Intelligence & Telemetry',
+        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>'
+    ),
     'pwd-policy' => array(
         'label' => 'Password Policy',
         'desc'  => 'Enforce security parameters',
@@ -454,6 +459,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     <div class="lg:col-span-3 pb-24">
         <form id="cora-settings-suite-form" onsubmit="event.preventDefault(); coraSaveSystemSettingsSuite();" class="space-y-6">
             <input type="hidden" name="active_tab" value="<?php echo esc_attr( $active_tab ); ?>">
+
+        <!-- TAB: BUSINESS PULSE (AI ACTIVITY INTELLIGENCE) -->
+        <div id="cora-settings-panel-pulse" class="cora-settings-panel space-y-6 max-w-full <?php echo ( $active_tab === 'pulse' || $active_tab === 'activity' || $active_tab === 'activity-timeline' ) ? '' : 'hidden'; ?>">
+            <?php include CORA_WORKSPACE_PATH . 'views/view-activity-timeline.php'; ?>
+        </div>
 
         <!-- TAB 1: GENERAL SETTINGS -->
         <div id="cora-settings-panel-general" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'general' ? '' : 'hidden'; ?>">
