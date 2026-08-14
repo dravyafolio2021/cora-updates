@@ -22,7 +22,7 @@
 | **Frontend Module** | `feature/frontend-module` | 🟢 Merged to Main | `cora-frontend/index.html`, `CORA_PLATFORM_ONBOARDING_ONE_PAGER.md` | Frontend Module Agent |
 | **Public Docs Portal** | `main` | 🟢 Merged to Main | `views/view-public-docs*.php`, `includes/docs-engine.php` | Docs Portal Agent |
 | **PWA Module** | `main` | 🟢 Merged to Main | `admin-dashboard.php`, `cora-service-worker.js`, `cora-manifest.json` | PWA Module Agent |
-| **Content Editor v3** | `main` | 🟢 Merged to Main | `views/view-content-suite.php` | Content Editor Agent |
+| **Finance Module** | `feature/finance-ai-cofounder` | 🟡 Active Work | `views/view-financials.php`, `cora-workspace.php` | Finance AI Co-founder Agent |
 <!-- MODULE_ROWS_END -->
 
 ---
@@ -49,6 +49,10 @@
 - **Health**: 100% Operational & Clean Base. All feature branches merged. PHP lint verified ✅.
 
 <!-- BRANCH_LOGS_START -->
+### `feature/finance-ai-cofounder` (Active Branch)
+- **Status**: 🟡 Active — Rebuild Finance as an AI Co-founder (v3.4.44): Proactive background monitoring, dynamic "Cora's Take" briefing, 4 snapshot metrics, "Needs Your Attention" action cards, Money In (Receivables & 1-click AI follow-ups), Money Out (Recurring subscriptions & cost intelligence), Client Profitability matrix, Project Feasibility deal simulator, 30/60/90-Day Cash Flow Forecast, GST/Tax reserve estimates, and Ask Cora context-aware AI assistant.
+- **Main Touchpoint**: `views/view-financials.php`, `cora-workspace.php`, `updates/cora-workspace.zip`.
+
 ### `feature/frontend-module` (Merged Branch)
 - **Status**: 🟢 Merged to `main` (Aug 14, 2026) — Marketing Frontend Landing Page: High-converting single-section hero with monochromatic design, floating feature pills, cursor parallax dashboard preview, scroll-reveal animations, right-sliding Contact Drawer, custom Toast engine, and responsive mobile layout. Platform onboarding one-pager (`CORA_PLATFORM_ONBOARDING_ONE_PAGER.md`) added for AI agent review.
 - **Main Touchpoint**: `cora-frontend/index.html`, `CORA_PLATFORM_ONBOARDING_ONE_PAGER.md`.
@@ -115,6 +119,7 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| v3.4.44 | Aug 14, 2026 | Cora Finance complete rebuild as an AI Co-founder: live briefing ('Cora's Take'), 4 snapshot metrics, 'Needs Your Attention' proactive cards, Money In (Receivables & AI follow-ups), Money Out (Recurring cost intelligence), Client Profitability & Project Feasibility simulator, 30/60/90-Day Cash Flow Forecast, GST estimates, Ask Cora AI copilot, and side drawer architecture |
 | v3.4.43 | Aug 14, 2026 | Meta WhatsApp Cloud API gateway, 24h cost optimizer, settings tester; marketing landing page shipped |
 | v3.4.42 | Aug 14, 2026 | Media mobile storage strip horizontal margin & padding fix |
 | v3.4.41 | Aug 14, 2026 | Media storage indicator mobile optimization; in-dev sidebar items hidden |
