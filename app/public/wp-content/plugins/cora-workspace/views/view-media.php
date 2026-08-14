@@ -898,8 +898,8 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         ?>
     </div>
 
-    <!-- Mobile-Optimized Real-Time Storage Strip (Clean placement below header on mobile) -->
-    <div class="sm:hidden flex items-center justify-between px-3 py-2 bg-zinc-50 border border-zinc-200/80 rounded-xl mb-3 cursor-pointer select-none transition-colors hover:bg-zinc-100/80 relative" id="cm-storage-wrap-mob" onclick="cmToggleStorageAnalytics(event)" title="Click to view workspace storage breakdown">
+    <!-- Mobile-Optimized Real-Time Storage Strip (Aligned with toolbar horizontal padding) -->
+    <div class="sm:hidden flex items-center justify-between mx-4 px-3.5 py-2.5 bg-zinc-50 border border-zinc-200/80 rounded-xl mb-3 cursor-pointer select-none transition-colors hover:bg-zinc-100/80 relative shadow-2xs" id="cm-storage-wrap-mob" onclick="cmToggleStorageAnalytics(event)" title="Click to view workspace storage breakdown">
         <div class="flex items-center gap-2.5 min-w-0">
             <svg class="cm-storage-ring-svg shrink-0" width="20" height="20" viewBox="0 0 36 36">
                 <path class="cm-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#e4e4e7" stroke-width="3.5" fill="none"/>
