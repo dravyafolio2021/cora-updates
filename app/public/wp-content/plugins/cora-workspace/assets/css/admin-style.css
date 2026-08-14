@@ -299,21 +299,27 @@ body,
     color-scheme: only light !important;
 }
 
-/* Content Suite Horizontal Padding */
+/* Content Suite Horizontal Padding (Flush Alignment) */
 .cora-ct-panel {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 @media (min-width: 640px) {
     .cora-ct-panel {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 }
 @media (min-width: 1024px) {
     .cora-ct-panel {
-        padding-left: 2rem !important; /* 32px horizontal padding */
-        padding-right: 2rem !important; /* 32px horizontal padding */
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 }
 
