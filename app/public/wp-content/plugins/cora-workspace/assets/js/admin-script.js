@@ -380,11 +380,13 @@ jQuery(document).ready(function($) {
     });
 
     window.coraCloseAllDrawers = function() {
-        $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"]').addClass('collapsed translate-x-full');
-        $('#cora-media-library-drawer, #cora-ai-tone-drawer, #cora-email-template-drawer, #cora-email-detail-drawer, #cora-smtp-test-drawer, #email-detail-drawer').addClass('translate-x-full pointer-events-none');
+        $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"], .cora-slide-drawer, [id^="cora-drawer-"]').removeClass('open').addClass('collapsed translate-x-full pointer-events-none');
+        $('#cora-media-library-drawer, #cora-ai-tone-drawer, #cora-email-template-drawer, #cora-email-detail-drawer, #cora-smtp-test-drawer, #email-detail-drawer, #cora-drawer-followup, #cora-drawer-create-invoice, #cora-drawer-add-expense, #cora-drawer-record-income, #cora-drawer-project-sim, #cora-drawer-subscriptions, #cora-drawer-accountant-pack').removeClass('open').addClass('translate-x-full pointer-events-none');
         const bd = document.getElementById('cora-drawer-backdrop');
-        if(bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; bd.style.display = ''; }
-        $('.cora-tour-backdrop').removeClass('active').addClass('hidden').css({'pointer-events': 'none', 'display': 'none'});
+        if(bd) { bd.classList.add('hidden'); bd.classList.remove('active'); bd.style.pointerEvents = 'none'; bd.style.display = 'none'; }
+        const fbd = document.getElementById('cora-fin-drawer-backdrop');
+        if(fbd) { fbd.classList.add('hidden'); fbd.classList.remove('active'); fbd.style.pointerEvents = 'none'; fbd.style.display = 'none'; }
+        $('.cora-drawer-backdrop, .cora-tour-backdrop').removeClass('active').addClass('hidden').css({'pointer-events': 'none', 'display': 'none'});
         $('.cora-tour-highlight').removeClass('cora-tour-highlight');
         $('body').removeClass('cora-drawer-open overflow-hidden');
         $('.cora-bottom-drawer').removeClass('cora-drawer-open');

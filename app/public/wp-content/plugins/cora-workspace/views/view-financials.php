@@ -1966,14 +1966,43 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         window.coraCloseFinPopover();
         const backdrop = document.getElementById('cora-fin-drawer-backdrop');
         const drawer = document.getElementById('cora-drawer-' + drawerId);
-        if (backdrop) backdrop.classList.add('active');
-        if (drawer) drawer.classList.add('open');
+        if (backdrop) {
+            backdrop.style.display = 'block';
+            backdrop.style.visibility = 'visible';
+            backdrop.style.pointerEvents = 'auto';
+            backdrop.classList.add('active');
+            backdrop.classList.remove('hidden');
+        }
+        if (drawer) {
+            drawer.style.visibility = 'visible';
+            drawer.style.pointerEvents = 'auto';
+            drawer.classList.add('open');
+            drawer.classList.remove('pointer-events-none', 'collapsed', 'translate-x-full');
+        }
     };
 
     window.coraCloseAllDrawers = function() {
         const backdrop = document.getElementById('cora-fin-drawer-backdrop');
-        if (backdrop) backdrop.classList.remove('active');
-        document.querySelectorAll('.cora-slide-drawer').forEach(d => d.classList.remove('open'));
+        if (backdrop) {
+            backdrop.classList.remove('active');
+            backdrop.classList.add('hidden');
+            backdrop.style.display = 'none';
+            backdrop.style.visibility = 'hidden';
+            backdrop.style.pointerEvents = 'none';
+        }
+        const gBackdrop = document.getElementById('cora-drawer-backdrop');
+        if (gBackdrop) {
+            gBackdrop.classList.remove('active');
+            gBackdrop.classList.add('hidden');
+            gBackdrop.style.display = 'none';
+            gBackdrop.style.pointerEvents = 'none';
+        }
+        document.querySelectorAll('.cora-slide-drawer, aside[id$="-drawer"], div[id$="-drawer"]').forEach(d => {
+            d.classList.remove('open');
+            d.classList.add('pointer-events-none', 'collapsed', 'translate-x-full');
+            d.style.visibility = 'hidden';
+            d.style.pointerEvents = 'none';
+        });
     };
 
     // Global Key Listener for Escape & Clicks
