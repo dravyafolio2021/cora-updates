@@ -1534,17 +1534,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
 
                 <div class="cora-shopify-card-body pt-4 space-y-6">
-                    <!-- Matrix Table Header Hint -->
-                    <div class="hidden sm:grid grid-cols-12 gap-3 px-4 py-2.5 bg-zinc-100/80 rounded-xl text-[11px] font-bold text-zinc-600 uppercase tracking-wider items-center">
-                        <div class="col-span-6">Trigger Event</div>
-                        <div class="col-span-2 text-center">In-App</div>
-                        <div class="col-span-2 text-center">Web Push</div>
-                        <div class="col-span-2 text-center">Email Frequency</div>
+                    <!-- Matrix Table Header -->
+                    <div class="cora-notif-matrix-header">
+                        <div class="cora-col-info">Trigger Event</div>
+                        <div class="cora-col-toggle">In-App</div>
+                        <div class="cora-col-toggle">Web Push</div>
+                        <div class="cora-col-select">Email Delivery</div>
                     </div>
 
                     <?php foreach ( $modules_triggers as $mod_key => $mod_info ) : ?>
                         <div class="space-y-2.5">
-                            <div class="flex items-center gap-2 px-1 text-xs font-bold text-zinc-800 border-b border-zinc-100 pb-1.5">
+                            <div class="flex items-center gap-2 px-1 text-xs font-bold text-zinc-800 border-b border-zinc-100 pb-1.5 pt-1">
                                 <span class="text-zinc-500"><?php echo $mod_info['icon']; ?></span>
                                 <span><?php echo esc_html( $mod_info['title'] ); ?></span>
                             </div>
@@ -1555,35 +1555,32 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                     $item_push  = isset( $triggers_cfg[ $item_key ]['push'] )  ? ! empty( $triggers_cfg[ $item_key ]['push'] )  : true;
                                     $item_email = isset( $triggers_cfg[ $item_key ]['email'] ) ? sanitize_text_field( $triggers_cfg[ $item_key ]['email'] ) : $item_info['default_email'];
                                 ?>
-                                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-xl border border-zinc-200/80 hover:border-zinc-300 bg-white items-center transition-colors">
-                                        <!-- Event Details: Column 1 to 6 (No Truncation) -->
-                                        <div class="sm:col-span-6 pr-2">
-                                            <span class="text-xs font-bold text-zinc-900 block leading-snug"><?php echo esc_html( $item_info['label'] ); ?></span>
-                                            <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5"><?php echo esc_html( $item_info['desc'] ); ?></span>
+                                    <div class="cora-notif-matrix-row">
+                                        <!-- Event Details -->
+                                        <div class="cora-col-info">
+                                            <span class="cora-notif-row-title"><?php echo esc_html( $item_info['label'] ); ?></span>
+                                            <span class="cora-notif-row-desc"><?php echo esc_html( $item_info['desc'] ); ?></span>
                                         </div>
 
-                                        <!-- In-App Switch: Column 7 to 8 -->
-                                        <div class="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-100">
-                                            <span class="sm:hidden text-xs font-medium text-zinc-600">In-App Alert</span>
-                                            <label class="cora-switch">
+                                        <!-- In-App Switch -->
+                                        <div class="cora-col-toggle">
+                                            <label class="cora-switch" title="Toggle In-App Notification">
                                                 <input type="checkbox" name="notif_inapp_<?php echo esc_attr( $item_key ); ?>" value="1" <?php checked( $item_inapp ); ?>>
                                                 <span class="cora-slider"></span>
                                             </label>
                                         </div>
 
-                                        <!-- Web Push Switch: Column 9 to 10 -->
-                                        <div class="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2">
-                                            <span class="sm:hidden text-xs font-medium text-zinc-600">Web Push</span>
-                                            <label class="cora-switch">
+                                        <!-- Web Push Switch -->
+                                        <div class="cora-col-toggle">
+                                            <label class="cora-switch" title="Toggle Web Push Notification">
                                                 <input type="checkbox" name="notif_push_<?php echo esc_attr( $item_key ); ?>" value="1" <?php checked( $item_push ); ?>>
                                                 <span class="cora-slider"></span>
                                             </label>
                                         </div>
 
-                                        <!-- Email Delivery Dropdown: Column 11 to 12 -->
-                                        <div class="sm:col-span-2 flex items-center justify-between sm:justify-center gap-2">
-                                            <span class="sm:hidden text-xs font-medium text-zinc-600">Email Delivery</span>
-                                            <select name="notif_email_<?php echo esc_attr( $item_key ); ?>" class="!py-1.5 !px-2 !text-[11px] !rounded-lg !w-full font-medium border border-zinc-200 bg-white text-zinc-800 cursor-pointer">
+                                        <!-- Email Delivery Dropdown -->
+                                        <div class="cora-col-select">
+                                            <select name="notif_email_<?php echo esc_attr( $item_key ); ?>" class="cora-notif-select">
                                                 <option value="instant" <?php selected( $item_email, 'instant' ); ?>>Instant</option>
                                                 <option value="daily" <?php selected( $item_email, 'daily' ); ?>>Daily Digest</option>
                                                 <option value="weekly" <?php selected( $item_email, 'weekly' ); ?>>Weekly Digest</option>
@@ -1651,8 +1648,87 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
             </div>
 
-            <!-- Scoped CSS for Switches and Matrix layout -->
+            <!-- Scoped CSS for Switches, Sliders and Flex Matrix -->
             <style>
+                .cora-notif-matrix-header {
+                    display: flex;
+                    align-items: center;
+                    padding: 9px 16px;
+                    background: #f4f4f5;
+                    border-radius: 10px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    color: #52525b;
+                    margin-bottom: 12px;
+                }
+                .cora-notif-matrix-row {
+                    display: flex;
+                    align-items: center;
+                    padding: 12px 16px;
+                    background: #ffffff;
+                    border: 1px solid #e4e4e7;
+                    border-radius: 12px;
+                    margin-bottom: 8px;
+                    transition: border-color 0.15s, background-color 0.15s;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+                }
+                .cora-notif-matrix-row:hover {
+                    border-color: #d4d4d8;
+                    background-color: #fafafa;
+                }
+                .cora-col-info {
+                    flex: 1 1 50%;
+                    min-width: 0;
+                    padding-right: 16px;
+                }
+                .cora-col-toggle {
+                    flex: 0 0 13%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                }
+                .cora-col-select {
+                    flex: 0 0 24%;
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    text-align: right;
+                }
+                .cora-notif-row-title {
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #18181b;
+                    line-height: 1.35;
+                }
+                .cora-notif-row-desc {
+                    display: block;
+                    font-size: 11px;
+                    color: #71717a;
+                    line-height: 1.35;
+                    margin-top: 2px;
+                }
+                .cora-notif-select {
+                    width: 100%;
+                    max-width: 135px;
+                    height: 32px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    color: #18181b;
+                    background-color: #ffffff;
+                    border: 1px solid #e4e4e7;
+                    border-radius: 8px;
+                    padding: 0 8px;
+                    cursor: pointer;
+                    outline: none;
+                    transition: border-color 0.15s;
+                }
+                .cora-notif-select:focus {
+                    border-color: #18181b;
+                }
                 .cora-switch {
                     position: relative;
                     display: inline-block;
