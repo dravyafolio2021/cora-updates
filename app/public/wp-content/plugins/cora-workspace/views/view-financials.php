@@ -4,13 +4,13 @@
  * 
  * Rebuilt as a proactive AI Co-founder for solo founders & creative studios.
  * Featuring:
+ * - Native Cora platform drawer architecture (window.coraShowSideDrawer / window.coraCloseAllDrawers)
  * - Clean tab navigation without scrollbars
  * - Floating bottom Ask Cora Copilot & Claude Cream popover
  * - Dynamic multi-step Indian GST Invoice Creator (CRM & Document Vault integrated)
  * - Multi-step Expense Logger (ITC & TDS compliant)
  * - Interactive Deal Feasibility Simulator
  * - Chart.js interactive cash flow & profitability charts
- * - Rock-solid drawer & popover opening/closing controllers
  *
  * @package CoraWorkspace
  * @version 3.4.44
@@ -209,48 +209,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        /* ── Zero Bleed Slide Drawer & Backdrop ── */
-        .cora-drawer-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(9, 9, 11, 0.5);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 9998;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity 0.28s ease, visibility 0.28s;
-        }
-        .cora-drawer-backdrop.active {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-        }
-        .cora-slide-drawer {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            max-width: 580px;
-            background: #ffffff;
-            border-left: 1px solid #e4e4e7;
-            z-index: 9999;
-            transform: translateX(110%);
-            visibility: hidden;
-            pointer-events: none;
-            box-shadow: none;
-            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s;
-            display: flex;
-            flex-direction: column;
-        }
-        .cora-slide-drawer.open {
-            transform: translateX(0);
-            visibility: visible;
-            pointer-events: auto;
-            box-shadow: -12px 0 45px rgba(9, 9, 11, 0.12);
-        }
         .cora-mono-num {
             font-family: 'JetBrains Mono', ui-monospace, monospace;
             letter-spacing: -0.03em;
@@ -262,7 +220,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             bottom: 24px;
             left: 0;
             right: 0;
-            z-index: 9990;
+            z-index: 9980;
             padding-left: 256px;
             display: flex;
             flex-direction: column;
@@ -1226,14 +1184,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 
 <!-- ════════════════════════════════════════════════════════
-     SLIDE DRAWERS (Multi-step, Indian GST & Intercompatible)
+     SLIDE DRAWERS (Cora Native Standard - IDs ending in -drawer)
      ════════════════════════════════════════════════════════ -->
 
-<div id="cora-fin-drawer-backdrop" class="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()"></div>
-
-<!-- 1. MULTI-STEP DYNAMIC GST INVOICE CREATOR (Intercompatible with CRM & Document Vault) -->
-<div id="cora-drawer-create-invoice" class="cora-slide-drawer">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+<!-- 1. MULTI-STEP DYNAMIC GST INVOICE CREATOR -->
+<aside id="cora-fin-invoice-drawer" class="cora-side-drawer fixed top-0 right-0 w-full sm:w-[560px] max-w-full h-full bg-white shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 flex flex-col font-sans overflow-hidden hidden collapsed">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
         <div>
             <div class="flex items-center gap-2">
                 <h3 class="text-sm font-bold text-zinc-950">Create Dynamic GST Invoice</h3>
@@ -1241,14 +1197,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
             <p class="text-[11px] text-zinc-500">Intercompatible with CRM Leads &amp; Document Vault</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
     </div>
 
     <!-- Stepper Navigation -->
-    <div class="flex border-b border-zinc-200 bg-zinc-100/60 text-xs font-semibold select-none">
-        <button type="button" onclick="window.coraGoInvStep(1)" id="inv-nav-1" class="flex-1 py-2.5 text-center border-b-2 border-zinc-950 text-zinc-950 font-bold bg-white">1. Client &amp; State</button>
-        <button type="button" onclick="window.coraGoInvStep(2)" id="inv-nav-2" class="flex-1 py-2.5 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800">2. Items &amp; GST</button>
-        <button type="button" onclick="window.coraGoInvStep(3)" id="inv-nav-3" class="flex-1 py-2.5 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800">3. Vault &amp; Terms</button>
+    <div class="flex border-b border-zinc-200 bg-zinc-100/60 text-xs font-semibold select-none shrink-0">
+        <button type="button" onclick="window.coraGoInvStep(1)" id="inv-nav-1" class="flex-1 py-2.5 text-center border-b-2 border-zinc-950 text-zinc-950 font-bold bg-white cursor-pointer">1. Client &amp; State</button>
+        <button type="button" onclick="window.coraGoInvStep(2)" id="inv-nav-2" class="flex-1 py-2.5 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 cursor-pointer">2. Items &amp; GST</button>
+        <button type="button" onclick="window.coraGoInvStep(3)" id="inv-nav-3" class="flex-1 py-2.5 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 cursor-pointer">3. Vault &amp; Terms</button>
     </div>
 
     <form onsubmit="window.coraSubmitInvoice(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1421,17 +1377,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
     </form>
-</div>
+</aside>
 
 
 <!-- 2. DRAWER: PAYMENT FOLLOW-UP DRAFT -->
-<div id="cora-drawer-followup" class="cora-slide-drawer">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+<aside id="cora-fin-followup-drawer" class="cora-side-drawer fixed top-0 right-0 w-full sm:w-[560px] max-w-full h-full bg-white shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 flex flex-col font-sans overflow-hidden hidden collapsed">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">AI Payment Follow-up</h3>
             <p class="text-[11px] text-zinc-500">Drafted based on past client communication context</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
     </div>
 
     <form onsubmit="window.coraSendFollowUp(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1461,7 +1417,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <textarea id="followup-body" rows="8" required class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs text-zinc-900 focus:outline-none leading-relaxed"></textarea>
         </div>
 
-        <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2">
+        <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2 shrink-0">
             <button type="button" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
                 Cancel
             </button>
@@ -1470,17 +1426,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </button>
         </div>
     </form>
-</div>
+</aside>
 
 
 <!-- 3. DRAWER: RECORD EXPENSE (Indian Tax & ITC Compliant) -->
-<div id="cora-drawer-add-expense" class="cora-slide-drawer">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+<aside id="cora-fin-expense-drawer" class="cora-side-drawer fixed top-0 right-0 w-full sm:w-[560px] max-w-full h-full bg-white shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 flex flex-col font-sans overflow-hidden hidden collapsed">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">Record Business Expense</h3>
             <p class="text-[11px] text-zinc-500">Track Input Tax Credit (ITC) and contractor TDS</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
     </div>
 
     <form onsubmit="window.coraSubmitExpense(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1539,7 +1495,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
         </div>
 
-        <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2">
+        <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2 shrink-0">
             <button type="button" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
                 Cancel
             </button>
@@ -1548,17 +1504,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </button>
         </div>
     </form>
-</div>
+</aside>
 
 
 <!-- 4. DRAWER: RECORD INCOME -->
-<div id="cora-drawer-record-income" class="cora-slide-drawer">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+<aside id="cora-fin-income-drawer" class="cora-side-drawer fixed top-0 right-0 w-full sm:w-[560px] max-w-full h-full bg-white shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 flex flex-col font-sans overflow-hidden hidden collapsed">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">Record Received Payment</h3>
             <p class="text-[11px] text-zinc-500">Logs cash inflow and reconciles open invoices</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
     </div>
 
     <form onsubmit="window.coraSubmitIncome(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1591,7 +1547,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </select>
         </div>
 
-        <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2">
+        <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2 shrink-0">
             <button type="button" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
                 Cancel
             </button>
@@ -1600,17 +1556,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </button>
         </div>
     </form>
-</div>
+</aside>
 
 
 <!-- 5. DRAWER: DEAL SIMULATOR (Indian Taxes & Overhead) -->
-<div id="cora-drawer-project-sim" class="cora-slide-drawer">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+<aside id="cora-fin-sim-drawer" class="cora-side-drawer fixed top-0 right-0 w-full sm:w-[560px] max-w-full h-full bg-white shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 flex flex-col font-sans overflow-hidden hidden collapsed">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">Deal Feasibility Simulator</h3>
             <p class="text-[11px] text-zinc-500">"Should I take this project?" Indian tax &amp; margin calculation</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
     </div>
 
     <div class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1659,17 +1615,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             ✅ <strong>High Margin Deal (Go)</strong>: At a 50.0% margin, this project comfortably exceeds your studio's target threshold of 45%.
         </div>
     </div>
-</div>
+</aside>
 
 
 <!-- 6. DRAWER: SUBSCRIPTIONS -->
-<div id="cora-drawer-subscriptions" class="cora-slide-drawer">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+<aside id="cora-fin-subs-drawer" class="cora-side-drawer fixed top-0 right-0 w-full sm:w-[560px] max-w-full h-full bg-white shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 flex flex-col font-sans overflow-hidden hidden collapsed">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">Add Recurring Commitment</h3>
             <p class="text-[11px] text-zinc-500">Track recurring software, studio leases, or vendor contracts</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
     </div>
 
     <form onsubmit="window.coraSubmitSubscription(event)" class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1704,7 +1660,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </select>
         </div>
 
-        <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2">
+        <div class="pt-3 border-t border-zinc-200 flex items-center justify-end gap-2 shrink-0">
             <button type="button" onclick="window.coraCloseAllDrawers()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
                 Cancel
             </button>
@@ -1713,17 +1669,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </button>
         </div>
     </form>
-</div>
+</aside>
 
 
 <!-- 7. DRAWER: ACCOUNTANT PACK -->
-<div id="cora-drawer-accountant-pack" class="cora-slide-drawer">
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+<aside id="cora-fin-accountant-drawer" class="cora-side-drawer fixed top-0 right-0 w-full sm:w-[560px] max-w-full h-full bg-white shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 flex flex-col font-sans overflow-hidden hidden collapsed">
+    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
         <div>
             <h3 class="text-sm font-bold text-zinc-950">Export Accountant Pack</h3>
             <p class="text-[11px] text-zinc-500">Ready for CA review, GST filing, and bookkeeping</p>
         </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold">✕</button>
+        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border-0 bg-transparent text-base font-bold" title="Close Drawer">✕</button>
     </div>
 
     <div class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -1749,7 +1705,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
         </div>
     </div>
-</div>
+</aside>
 
 
 <!-- ════════════════════════════════════════════════════════
@@ -1961,59 +1917,29 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         }
     };
 
-    /* ── Slide Drawers Controller ── */
-    window.coraOpenDrawer = function(drawerId) {
+    /* ── Standard Cora Platform Side Drawers Controller ── */
+    window.coraOpenDrawer = function(drawerName) {
         window.coraCloseFinPopover();
-        const backdrop = document.getElementById('cora-fin-drawer-backdrop');
-        const drawer = document.getElementById('cora-drawer-' + drawerId);
-        if (backdrop) {
-            backdrop.style.display = 'block';
-            backdrop.style.visibility = 'visible';
-            backdrop.style.pointerEvents = 'auto';
-            backdrop.classList.add('active');
-            backdrop.classList.remove('hidden');
-        }
-        if (drawer) {
-            drawer.style.visibility = 'visible';
-            drawer.style.pointerEvents = 'auto';
-            drawer.classList.add('open');
-            drawer.classList.remove('pointer-events-none', 'collapsed', 'translate-x-full');
+        const map = {
+            'create-invoice': '#cora-fin-invoice-drawer',
+            'followup': '#cora-fin-followup-drawer',
+            'add-expense': '#cora-fin-expense-drawer',
+            'record-income': '#cora-fin-income-drawer',
+            'project-sim': '#cora-fin-sim-drawer',
+            'subscriptions': '#cora-fin-subs-drawer',
+            'accountant-pack': '#cora-fin-accountant-drawer'
+        };
+        const selector = map[drawerName] || (drawerName.startsWith('#') ? drawerName : '#' + drawerName);
+        if (typeof window.coraShowSideDrawer === 'function') {
+            window.coraShowSideDrawer(selector);
+        } else {
+            $(selector).removeClass('hidden collapsed');
+            setTimeout(() => { $(selector).removeClass('translate-x-full'); }, 20);
+            $('#cora-drawer-backdrop').removeClass('hidden').css({'display': 'block', 'pointer-events': 'auto'});
         }
     };
 
-    window.coraCloseAllDrawers = function() {
-        const backdrop = document.getElementById('cora-fin-drawer-backdrop');
-        if (backdrop) {
-            backdrop.classList.remove('active');
-            backdrop.classList.add('hidden');
-            backdrop.style.display = 'none';
-            backdrop.style.visibility = 'hidden';
-            backdrop.style.pointerEvents = 'none';
-        }
-        const gBackdrop = document.getElementById('cora-drawer-backdrop');
-        if (gBackdrop) {
-            gBackdrop.classList.remove('active');
-            gBackdrop.classList.add('hidden');
-            gBackdrop.style.display = 'none';
-            gBackdrop.style.pointerEvents = 'none';
-        }
-        document.querySelectorAll('.cora-slide-drawer, aside[id$="-drawer"], div[id$="-drawer"]').forEach(d => {
-            d.classList.remove('open');
-            d.classList.add('pointer-events-none', 'collapsed', 'translate-x-full');
-            d.style.visibility = 'hidden';
-            d.style.pointerEvents = 'none';
-        });
-    };
-
-    // Global Key Listener for Escape & Clicks
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            window.coraCloseAllDrawers();
-            window.coraCloseFinPopover();
-            window.coraCloseCopilot();
-        }
-    });
-
+    // Close on click outside popover
     document.addEventListener('click', function(e) {
         const pop = document.getElementById('cora-fin-action-popover');
         if (pop && !pop.contains(e.target) && !e.target.closest('[onclick*="toggleFinancialActionMenu"]')) {
@@ -2035,9 +1961,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             }
             if (navEl) {
                 if (s === stepNum) {
-                    navEl.className = 'flex-1 py-2.5 text-center border-b-2 border-zinc-950 text-zinc-950 font-bold bg-white';
+                    navEl.className = 'flex-1 py-2.5 text-center border-b-2 border-zinc-950 text-zinc-950 font-bold bg-white cursor-pointer';
                 } else {
-                    navEl.className = 'flex-1 py-2.5 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800';
+                    navEl.className = 'flex-1 py-2.5 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 cursor-pointer';
                 }
             }
         });
@@ -2588,7 +2514,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         setTimeout(initCashflowChart, 150);
     });
 
-    // Fallback if DOM already loaded
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         setTimeout(initCashflowChart, 150);
     }
