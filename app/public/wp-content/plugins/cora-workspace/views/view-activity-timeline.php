@@ -52,8 +52,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
          LAYER 1: AI MORNING / AFTERNOON EXECUTIVE BRIEFING
          ════════════════════════════════════════════════════════ -->
     <div class="p-4 sm:p-6 rounded-2xl border border-zinc-200/80 shadow-2xs relative overflow-hidden" style="background-color: #FBFaf7;">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
-            <div class="space-y-1 sm:space-y-1.5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+            <div class="space-y-1.5 sm:space-y-2">
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px] sm:text-xs shrink-0">C</span>
                     <span class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-zinc-600">Cora Executive Briefing</span>
@@ -82,31 +82,27 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </span>
                 </div>
 
-                <h2 class="text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
-                    <?php echo esc_html( $greeting ); ?>, <?php echo esc_html( $user_name ); ?> 👋
+                <h2 class="text-base sm:text-xl font-bold text-zinc-950 tracking-tight">
+                    <?php echo esc_html( $greeting ); ?>, <?php echo esc_html( $user_name ); ?>
                 </h2>
-                <p class="text-xs text-zinc-600 font-medium leading-normal">Here is what changed across your business since you were last here.</p>
+                <p class="text-xs text-zinc-600 font-medium leading-relaxed">Here is what changed across your business since you were last here.</p>
             </div>
         </div>
 
-        <!-- Briefing Highlights (Unified Single Container on Mobile, Clean Grid on Desktop) -->
-        <div class="mt-3.5 pt-3 border-t border-zinc-200/70">
-            <div class="bg-white/80 rounded-xl border border-zinc-200/80 divide-y divide-zinc-100 sm:divide-y-0 sm:border-0 sm:bg-transparent sm:grid sm:grid-cols-3 sm:gap-3 overflow-hidden">
-                <?php foreach ( $briefing_bullets as $bullet ) : ?>
-                <div class="p-3 sm:rounded-xl sm:bg-white/80 sm:border sm:border-zinc-200/80 flex items-start gap-2.5 text-xs text-zinc-700 leading-relaxed">
-                    <span class="w-4 h-4 rounded-full bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-[9px] shrink-0 mt-0.5">
-                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </span>
-                    <div class="flex-1">
-                        <?php 
-                        // Parse markdown bold tags safely
-                        $formatted = preg_replace( '/\*\*(.*?)\*\*/', '<strong class="font-bold text-zinc-950">$1</strong>', esc_html( $bullet ) );
-                        echo $formatted; 
-                        ?>
-                    </div>
+        <!-- Briefing Highlights (Clean Modern 3-Column Card Matrix) -->
+        <div class="mt-4 pt-4 border-t border-zinc-200/70 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <?php foreach ( $briefing_bullets as $idx => $bullet ) : ?>
+            <div class="p-3.5 sm:p-4 rounded-xl bg-white border border-zinc-200/80 shadow-3xs flex items-start gap-3 text-xs text-zinc-700 hover:border-zinc-300 transition-all">
+                <span class="w-5 h-5 rounded-md bg-zinc-100 text-zinc-900 font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5"><?php echo ( $idx + 1 ); ?></span>
+                <div class="leading-relaxed flex-1">
+                    <?php 
+                    // Parse markdown bold tags safely
+                    $formatted = preg_replace( '/\*\*(.*?)\*\*/', '<strong class="font-bold text-zinc-950">$1</strong>', esc_html( $bullet ) );
+                    echo $formatted; 
+                    ?>
                 </div>
-                <?php endforeach; ?>
             </div>
+            <?php endforeach; ?>
         </div>
     </div>
 
@@ -160,7 +156,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         
                         <?php if ( ! empty( $item['recommendation'] ) ) : ?>
                         <div class="p-2.5 rounded-xl bg-zinc-50 border border-zinc-100 text-[11px] text-zinc-700 flex items-start gap-2">
-                            <span class="text-zinc-900 font-bold shrink-0">💡</span>
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 mt-0.5 text-zinc-900"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path></svg>
                             <div>
                                 <span class="font-bold text-zinc-900">Cora recommends:</span>
                                 <span><?php echo esc_html( $item['recommendation'] ); ?></span>
