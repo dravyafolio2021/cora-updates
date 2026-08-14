@@ -582,7 +582,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <input type="text" id="rec-search-input" oninput="window.coraFilterReceivables(this.value)" placeholder="Search client or invoice..." class="bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-1.5 text-xs text-zinc-900 focus:outline-none w-56">
                 </div>
             </div>
-            <div class="overflow-x-auto">
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-xs divide-y divide-zinc-200">
                     <thead class="bg-zinc-50 text-zinc-500 font-bold text-[10px] uppercase tracking-wider">
                         <tr>
@@ -654,6 +655,69 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Effortless Card Stack View (Zero Horizontal Scroll) -->
+            <div class="block md:hidden divide-y divide-zinc-100" id="cora-receivables-mobile-list">
+                <?php foreach ( $receivables as $r ) : 
+                    $is_paid = ( $r['status'] === 'paid' );
+                ?>
+                <div class="p-4 bg-white hover:bg-zinc-50/50 transition-colors cora-rec-card space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-mono text-xs font-bold text-zinc-900"><?php echo esc_html( $r['invoice_number'] ); ?></span>
+                            <span class="text-[10px] text-zinc-400">•</span>
+                            <span class="text-[10px] text-zinc-500 font-medium"><?php echo esc_html( $r['place_of_supply'] ?? 'Delhi (07)' ); ?></span>
+                        </div>
+                        <div>
+                            <?php if ( $is_paid ) : ?>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Paid</span>
+                            <?php elseif ( ! empty( $r['is_overdue'] ) ) : ?>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800">Overdue</span>
+                            <?php else : ?>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Pending</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="font-bold text-zinc-950 text-sm"><?php echo esc_html( $r['client_name'] ); ?></div>
+                        <div class="text-xs text-zinc-500 mt-0.5"><?php echo esc_html( $r['package_name'] ); ?></div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs pt-1 border-t border-zinc-100">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-zinc-500 text-[11px]">Due:</span>
+                            <span class="text-zinc-800 font-semibold text-[11px]"><?php echo esc_html( $r['due_date'] ); ?></span>
+                            <?php if ( ! empty( $r['is_overdue'] ) ) : ?>
+                                <span class="text-[9px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
+                                    <?php echo intval( $r['days_overdue'] ?? 7 ); ?>d overdue
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="font-mono font-extrabold text-sm text-zinc-950">
+                            ₹<?php echo number_format( $r['due_balance'] ?: $r['total_amount'] ); ?>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-1">
+                        <?php if ( ! $is_paid ) : ?>
+                            <button type="button" onclick="window.coraDraftFollowUp('<?php echo esc_js( $r['id'] ); ?>')" class="flex-1 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center justify-center gap-1.5 shadow-xs">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                <span>Remind Client</span>
+                            </button>
+                            <button type="button" onclick="window.coraMarkInvoicePaid('<?php echo esc_js( $r['id'] ); ?>')" class="px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0">
+                                Mark Paid
+                            </button>
+                        <?php else : ?>
+                            <span class="text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Reconciled &amp; Settled</span>
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
             </div>
         </div>
         <?php endif; ?>
@@ -814,7 +878,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Client Margin Ranking</h3>
                     <span class="text-[11px] text-zinc-400 font-medium">Ranked by Net Margin</span>
                 </div>
-                <div class="overflow-x-auto">
+                <!-- Desktop Table View -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left text-xs divide-y divide-zinc-200">
                         <thead class="bg-zinc-50 text-zinc-500 font-bold text-[10px] uppercase tracking-wider">
                             <tr>
@@ -863,6 +928,50 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Mobile Effortless Card Stack View (Zero Horizontal Scroll) -->
+                <div class="block md:hidden divide-y divide-zinc-100" id="cora-profitability-mobile-list">
+                    <?php foreach ( $client_profits as $cp ) : ?>
+                    <div class="p-4 bg-white hover:bg-zinc-50/50 transition-colors cora-profit-card space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-950 text-sm"><?php echo esc_html( $cp['client_name'] ); ?></span>
+                            <?php if ( ! empty( $cp['is_top_tier'] ) ) : ?>
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 inline-flex items-center gap-1">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span>High Margin</span>
+                                </span>
+                            <?php else : ?>
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-zinc-100 text-zinc-700">Standard</span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-zinc-50 border border-zinc-100 text-center">
+                            <div>
+                                <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Revenue</div>
+                                <div class="font-mono font-bold text-xs text-zinc-900 mt-0.5">₹<?php echo number_format( $cp['revenue'] ); ?></div>
+                            </div>
+                            <div>
+                                <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Costs</div>
+                                <div class="font-mono text-xs text-zinc-500 mt-0.5">₹<?php echo number_format( $cp['costs'] ); ?></div>
+                            </div>
+                            <div>
+                                <div class="text-[9px] font-bold text-emerald-600 uppercase tracking-wider">Net Profit</div>
+                                <div class="font-mono font-bold text-xs text-emerald-700 mt-0.5">₹<?php echo number_format( $cp['profit'] ); ?></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="text-zinc-500 font-medium">Profit Margin</span>
+                                <span class="font-bold text-zinc-900"><?php echo $cp['margin']; ?>%</span>
+                            </div>
+                            <div class="w-full h-1.5 rounded-full bg-zinc-100 overflow-hidden">
+                                <div class="h-full bg-zinc-900 rounded-full" style="width: <?php echo min(100, $cp['margin']); ?>%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
@@ -1758,7 +1867,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     let profitChart = null;
 
     /* ── Tab Switcher Controller ── */
-    window.coraSwitchFinTab = function(tabId) {
+    window.coraSwitchFinTab = function(tabId, updateUrl = true) {
+        if (!tabId) return;
         const cleanId = tabId.startsWith('tab-') ? tabId : 'tab-' + tabId;
         const shortId = tabId.replace(/^tab-/, '');
 
@@ -1787,10 +1897,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         }
 
         // Synchronize active tab in URL query param and hash so refreshing preserves the exact tab
-        if (updateUrl !== false && history.replaceState) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('tab', shortId);
-            history.replaceState(null, '', url.toString());
+        if (updateUrl !== false && window.history && window.history.replaceState) {
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', shortId);
+                window.history.replaceState(null, '', url.toString());
+            } catch(e) {}
         }
 
         // Re-render charts when switching to tabs containing charts
@@ -1800,6 +1912,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             setTimeout(initProfitChart, 60);
         }
     };
+    window.switchFinTab = window.coraSwitchFinTab;
 
     /* ── Floating Ask Cora Copilot Controller ── */
     window.coraOpenCopilot = function() {
@@ -2179,11 +2292,16 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
     /* ── Filter Receivables ── */
     window.coraFilterReceivables = function(query) {
-        const q = (query || '').toLowerCase();
+        const q = (query || '').toLowerCase().trim();
         const rows = document.querySelectorAll('#cora-receivables-tbody tr');
         rows.forEach(r => {
             const text = r.innerText.toLowerCase();
-            r.style.display = text.includes(q) ? '' : 'none';
+            r.style.display = (!q || text.includes(q)) ? '' : 'none';
+        });
+        const cards = document.querySelectorAll('.cora-rec-card');
+        cards.forEach(c => {
+            const text = c.innerText.toLowerCase();
+            c.style.display = (!q || text.includes(q)) ? '' : 'none';
         });
     };
 
