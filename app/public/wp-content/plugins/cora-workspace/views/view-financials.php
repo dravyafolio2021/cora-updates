@@ -254,8 +254,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         }
         @media (max-width: 1023px) {
             #cora-fin-copilot-container {
-                padding-left: 0;
-                bottom: 84px !important;
+                display: none !important;
+                pointer-events: none !important;
+                visibility: hidden !important;
             }
         }
         #cora-fin-copilot-bar, #cora-fin-copilot-window {
@@ -1079,7 +1080,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
      (Matches user specification & Claude Cream Theme)
      ════════════════════════════════════════════════════════ -->
 
-<div id="cora-fin-copilot-container">
+<div id="cora-fin-copilot-container" class="hidden lg:flex">
     <div class="w-full flex flex-col items-center">
 
         <!-- Expanded AI Dashboard Window (Above Bar) -->
