@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.46
+ * Version: 3.4.47
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.46' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.47' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -21221,26 +21221,9 @@ function cora_db_get_ledger() {
     $query .= " ORDER BY transaction_date DESC";
     $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
 
-    if ( empty( $rows ) && ! get_option( 'cora_ledger_seeded_demo_agency_' . $agency_id ) ) {
-        $wpdb->insert(
-            $wpdb->prefix . 'cora_ledger',
-            array(
-                'agency_id'        => $agency_id,
-                'branch_id'        => $branch_id ?: 1,
-                'type'             => 'inflow',
-                'amount'           => 1000000, // ₹10,000 in cents
-                'description'      => 'Demo Entry: Workspace Setup & Welcome Advance',
-                'lead_id'          => null,
-                'client_id'        => null,
-                'status'           => 'received',
-                'category'         => 'Inflows & Retainers',
-                'transaction_date' => date( 'Y-m-d' ),
-                'created_by'       => get_current_user_id() ?: 1,
-                'created_at'       => current_time( 'mysql' ),
-                'updated_at'       => current_time( 'mysql' )
-            )
-        );
-        update_option( 'cora_ledger_seeded_demo_agency_' . $agency_id, '1' );
+    // Clean up legacy demo entries if any exist
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_ledger'" ) === $wpdb->prefix . 'cora_ledger' ) {
+        $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_ledger WHERE description LIKE '%Demo Entry: Workspace Setup%'" );
         $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ), ARRAY_A );
     }
 
@@ -37151,8 +37134,10 @@ function cora_finance_get_comprehensive_metrics() {
     $ledger_entries = array();
     $ledger_table = $wpdb->prefix . 'cora_ledger';
     if ( $wpdb->get_var( "SHOW TABLES LIKE '{$ledger_table}'" ) === $ledger_table ) {
+        // Purge any legacy artificial demo entries
+        $wpdb->query( "DELETE FROM {$ledger_table} WHERE description LIKE '%Demo Entry: Workspace Setup%'" );
         $ledger_entries = $wpdb->get_results(
-            $wpdb->prepare( "SELECT * FROM {$ledger_table} WHERE agency_id = %d ORDER BY transaction_date DESC, id DESC", $agency_id ),
+            $wpdb->prepare( "SELECT * FROM {$ledger_table} WHERE agency_id = %d AND description NOT LIKE '%Demo Entry%' ORDER BY transaction_date DESC, id DESC", $agency_id ),
             ARRAY_A
         );
     }

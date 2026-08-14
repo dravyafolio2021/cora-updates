@@ -368,11 +368,20 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div class="text-[11px] text-zinc-500 font-medium mt-0.5">Cleared in recorded accounts</div>
                 </div>
                 <?php 
-                $burn = max( 1.0, $monthly_rec );
-                $runway_months = $available_cash > 0 ? round( $available_cash / $burn, 1 ) : 0.0;
+                if ( $monthly_rec > 0 && $available_cash > 0 ) {
+                    $runway_months = round( $available_cash / $monthly_rec, 1 );
+                    $buffer_badge_class = 'text-emerald-600 bg-emerald-50';
+                    $buffer_badge_text = "● Buffer: ~{$runway_months} Mo Safe";
+                } elseif ( $available_cash > 0 ) {
+                    $buffer_badge_class = 'text-emerald-600 bg-emerald-50';
+                    $buffer_badge_text = "● Buffer: ₹" . number_format($available_cash) . " (No burn)";
+                } else {
+                    $buffer_badge_class = 'text-zinc-500 bg-zinc-100';
+                    $buffer_badge_text = "Ready to record";
+                }
                 ?>
-                <div class="text-[10px] font-semibold <?php echo $available_cash > 0 ? 'text-emerald-600 bg-emerald-50' : 'text-zinc-500 bg-zinc-100'; ?> px-2 py-0.5 rounded-md inline-block w-fit">
-                    ● Buffer: <?php echo $available_cash > 0 ? "~{$runway_months} Months Safe" : "Ready to log"; ?>
+                <div class="text-[10px] font-semibold <?php echo $buffer_badge_class; ?> px-2 py-0.5 rounded-md inline-block w-fit">
+                    <?php echo esc_html( $buffer_badge_text ); ?>
                 </div>
             </div>
 
