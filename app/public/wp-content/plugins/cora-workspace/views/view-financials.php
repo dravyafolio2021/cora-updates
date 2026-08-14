@@ -177,7 +177,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 }
 ?>
 
-<div id="cora-finance-root" class="space-y-6 text-zinc-900 font-sans pb-28">
+<div id="cora-finance-root" class="space-y-6 text-zinc-900 font-sans pb-36 min-h-screen overflow-y-visible">
 
     <style>
         /* ── Core Finance Styling ── */
@@ -646,7 +646,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="flex items-center gap-2">
                 <button type="button" onclick="window.coraOpenDrawer('create-invoice')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>+ New Client Invoice</span>
+                    <span>New Client Invoice</span>
                 </button>
             </div>
         </div>
@@ -774,8 +774,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     <span>Log Expense</span>
                 </button>
-                <button type="button" onclick="window.coraOpenDrawer('subscriptions')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 cursor-pointer border-0">
-                    + Add Subscription
+                <button type="button" onclick="window.coraOpenDrawer('subscriptions')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 cursor-pointer border-0 flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Add Subscription</span>
                 </button>
             </div>
         </div>
@@ -792,8 +793,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
             </div>
             <div class="shrink-0 flex items-center gap-2">
-                <button type="button" onclick="window.coraOpenDrawer('subscriptions')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-900 cursor-pointer shadow-xs">
-                    + Add Subscription
+                <button type="button" onclick="window.coraOpenDrawer('subscriptions')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-900 cursor-pointer shadow-xs flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Add Subscription</span>
                 </button>
             </div>
         </div>
@@ -1850,6 +1852,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             targetBtn.classList.remove('text-zinc-600');
         }
 
+        // Synchronize active tab in URL query param and hash so refreshing preserves the exact tab
+        if (updateUrl !== false && history.replaceState) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', shortId);
+            history.replaceState(null, '', url.toString());
+        }
+
         // Re-render charts when switching to tabs containing charts
         if (cleanId === 'tab-fin-home' || cleanId === 'tab-fin-forecast') {
             setTimeout(initCashflowChart, 60);
@@ -2684,13 +2693,19 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         });
     }
 
-    // Initialize Chart.js on boot
-    document.addEventListener('DOMContentLoaded', function() {
+    // Initialize active tab from URL and charts on boot
+    function bootFinanceModule() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetTab = urlParams.get('tab') || window.location.hash.replace('#', '');
+        if (targetTab && targetTab !== 'fin-home') {
+            window.coraSwitchFinTab(targetTab, false);
+        }
         setTimeout(initCashflowChart, 150);
-    });
+    }
 
+    document.addEventListener('DOMContentLoaded', bootFinanceModule);
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(initCashflowChart, 150);
+        bootFinanceModule();
     }
 
 })();
