@@ -46,57 +46,44 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 }
 ?>
 
-<div id="cora-business-pulse-module" class="cora-pulse-container space-y-6 max-w-full font-sans pb-16">
+<div id="cora-business-pulse-module" class="cora-pulse-container space-y-5 sm:space-y-6 max-w-full font-sans pb-16">
 
     <!-- ════════════════════════════════════════════════════════
          LAYER 1: AI MORNING / AFTERNOON EXECUTIVE BRIEFING
          ════════════════════════════════════════════════════════ -->
-    <div class="p-5 sm:p-6 rounded-2xl border border-zinc-200/80 shadow-xs relative overflow-hidden" style="background-color: #FBFaf7;">
-        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-            <div class="space-y-2">
+    <div class="p-4 sm:p-6 rounded-2xl border border-zinc-200/80 shadow-2xs relative overflow-hidden" style="background-color: #FBFaf7;">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+            <div class="space-y-1.5 sm:space-y-2">
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shrink-0">C</span>
                     <span class="text-xs font-bold uppercase tracking-wider text-zinc-600">Cora Executive Briefing</span>
                     
                     <!-- Live Pulse Status Indicator -->
                     <?php if ( $pulse_status === 'optimal' ) : ?>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 ml-1">
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span><?php echo esc_html( $pulse_status_text ); ?></span>
                         </span>
                     <?php elseif ( $pulse_status === 'attention' ) : ?>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/60 ml-1">
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/60">
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                             <span><?php echo esc_html( $pulse_status_text ); ?></span>
                         </span>
                     <?php else : ?>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200/60 ml-1">
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200/60">
                             <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
                             <span><?php echo esc_html( $pulse_status_text ); ?></span>
                         </span>
                     <?php endif; ?>
                 </div>
-                <h2 class="text-lg sm:text-xl font-bold text-zinc-950 tracking-tight">
+                <h2 class="text-base sm:text-xl font-bold text-zinc-950 tracking-tight">
                     <?php echo esc_html( $greeting ); ?>, <?php echo esc_html( $user_name ); ?> 👋
                 </h2>
-                <p class="text-xs text-zinc-600 font-medium">Here is what changed across your business since you were last here.</p>
+                <p class="text-xs text-zinc-600 font-medium leading-relaxed">Here is what changed across your business since you were last here.</p>
             </div>
 
-            <div class="flex items-center gap-2 shrink-0">
-                <!-- AI Stack Badges -->
-                <div class="flex items-center -space-x-1.5 bg-white/90 border border-zinc-200/80 px-2.5 py-1.5 rounded-xl shadow-2xs">
-                    <!-- ChatGPT -->
-                    <span class="w-5 h-5 rounded-full bg-emerald-50 text-emerald-700 border border-white flex items-center justify-center text-[10px] font-bold" title="OpenAI GPT-4o">✦</span>
-                    <!-- Gemini -->
-                    <span class="w-5 h-5 rounded-full bg-blue-50 text-blue-700 border border-white flex items-center justify-center text-[10px] font-bold" title="Google Gemini 2.0">✧</span>
-                    <!-- Claude -->
-                    <span class="w-5 h-5 rounded-full bg-amber-50 text-amber-800 border border-white flex items-center justify-center text-[10px] font-bold" title="Anthropic Claude 3.5">✳</span>
-                    <!-- Cora Core -->
-                    <span class="w-5 h-5 rounded-full bg-zinc-950 text-white border border-white flex items-center justify-center text-[9px] font-bold" title="Cora Business Intelligence">C</span>
-                    <span class="text-[10px] font-mono font-bold text-zinc-700 ml-2">Pulse Active</span>
-                </div>
-
-                <div class="hidden sm:flex items-center gap-1.5 bg-white/80 border border-zinc-200 px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-zinc-800">
+            <div class="flex items-center gap-2 shrink-0 self-start">
+                <div class="inline-flex items-center gap-1.5 bg-white/80 border border-zinc-200 px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold text-zinc-800">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
                     <span>Workspace #<?php echo esc_html( $agency_id ); ?></span>
                 </div>
@@ -104,9 +91,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- Briefing Highlights -->
-        <div class="mt-4 pt-4 border-t border-zinc-200/70 grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="mt-3.5 pt-3.5 border-t border-zinc-200/70 grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3">
             <?php foreach ( $briefing_bullets as $bullet ) : ?>
-            <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/70 border border-zinc-200/60 text-xs text-zinc-700">
+            <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/75 border border-zinc-200/60 text-xs text-zinc-700">
                 <span class="text-zinc-900 font-bold shrink-0 mt-0.5">•</span>
                 <div class="leading-relaxed">
                     <?php 
@@ -125,36 +112,36 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
          LAYER 2: "NEEDS YOUR ATTENTION" (Prioritized Action Cards)
          ════════════════════════════════════════════════════════ -->
     <div class="space-y-3">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
             <div class="flex items-center gap-2">
-                <h3 class="text-sm font-bold text-zinc-950 uppercase tracking-wider">Needs Your Attention</h3>
+                <h3 class="text-xs sm:text-sm font-bold text-zinc-950 uppercase tracking-wider">Needs Your Attention</h3>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold <?php echo $attention_count > 0 ? 'bg-amber-100 text-amber-900' : 'bg-zinc-100 text-zinc-600'; ?>">
                     <?php echo $attention_count; ?>
                 </span>
             </div>
             <?php if ( $attention_count === 0 ) : ?>
-                <span class="text-xs text-emerald-600 font-medium">All clear — no critical bottlenecks</span>
+                <span class="text-[11px] sm:text-xs text-emerald-600 font-medium">All clear — no critical bottlenecks</span>
             <?php else : ?>
-                <span class="text-xs text-zinc-400 font-medium">Ranked by business urgency</span>
+                <span class="text-[11px] sm:text-xs text-zinc-400 font-medium">Ranked by business urgency</span>
             <?php endif; ?>
         </div>
 
         <?php if ( empty( $attention_items ) ) : ?>
-            <div class="p-8 text-center bg-white rounded-2xl border border-zinc-200/80 shadow-2xs space-y-2 select-none">
-                <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center font-bold text-sm">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <div class="p-6 sm:p-8 text-center bg-white rounded-2xl border border-zinc-200/80 shadow-2xs space-y-2 select-none">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center font-bold text-sm">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
-                <div class="text-sm font-bold text-zinc-900">Zero Pending Bottlenecks</div>
-                <p class="text-xs text-zinc-500 max-w-sm mx-auto">No overdue receivables, stalled leads, or unsigned contracts currently require your immediate intervention.</p>
+                <div class="text-xs sm:text-sm font-bold text-zinc-900">Zero Pending Bottlenecks</div>
+                <p class="text-xs text-zinc-500 max-w-sm mx-auto leading-relaxed">No overdue receivables, stalled leads, or unsigned contracts currently require your immediate intervention.</p>
             </div>
         <?php else : ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5" id="cora-pulse-attention-grid">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="cora-pulse-attention-grid">
                 <?php foreach ( $attention_items as $item ) : 
                     $prio = $item['priority'] ?? 'medium';
                     $prio_badge_bg = ( $prio === 'critical' ) ? 'bg-red-50 text-red-800 border-red-200' : ( ( $prio === 'high' ) ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-blue-50 text-blue-800 border-blue-200' );
                     $dot_color = ( $prio === 'critical' ) ? 'bg-red-500' : ( ( $prio === 'high' ) ? 'bg-amber-500' : 'bg-blue-500' );
                 ?>
-                <div class="p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs flex flex-col justify-between gap-3 hover:border-zinc-300 transition-all cora-pulse-card" id="card-<?php echo esc_attr( $item['id'] ); ?>">
+                <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs flex flex-col justify-between gap-3 hover:border-zinc-300 transition-all cora-pulse-card" id="card-<?php echo esc_attr( $item['id'] ); ?>">
                     <div class="space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold border <?php echo $prio_badge_bg; ?>">
@@ -162,10 +149,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 <span><?php echo esc_html( ucfirst( $item['priority'] ) ); ?> · <?php echo esc_html( $item['category'] ); ?></span>
                             </span>
 
-                            <button type="button" onclick="window.coraDismissPulseItem('<?php echo esc_attr( $item['id'] ); ?>')" class="text-zinc-400 hover:text-zinc-600 text-xs font-bold cursor-pointer border-0 bg-transparent" title="Dismiss">✕</button>
+                            <button type="button" onclick="window.coraDismissPulseItem('<?php echo esc_attr( $item['id'] ); ?>')" class="text-zinc-400 hover:text-zinc-600 text-xs font-bold cursor-pointer border-0 bg-transparent p-1" title="Dismiss">✕</button>
                         </div>
 
-                        <h4 class="text-sm font-bold text-zinc-950 leading-snug"><?php echo esc_html( $item['title'] ); ?></h4>
+                        <h4 class="text-xs sm:text-sm font-bold text-zinc-950 leading-snug"><?php echo esc_html( $item['title'] ); ?></h4>
                         <p class="text-xs text-zinc-600 leading-relaxed"><?php echo esc_html( $item['subtitle'] ); ?></p>
                         
                         <?php if ( ! empty( $item['recommendation'] ) ) : ?>
@@ -179,10 +166,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <?php endif; ?>
                     </div>
 
-                    <div class="pt-2 border-t border-zinc-100 flex items-center justify-between gap-2">
+                    <div class="pt-2.5 border-t border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <span class="text-[10px] text-zinc-400 font-medium"><?php echo esc_html( $item['context'] ?? '' ); ?></span>
                         
-                        <button type="button" onclick="window.coraExecutePulseAction(<?php echo esc_attr( json_encode( $item ) ); ?>)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 shadow-2xs shrink-0 transition-transform active:scale-97">
+                        <button type="button" onclick="window.coraExecutePulseAction(<?php echo esc_attr( json_encode( $item ) ); ?>)" class="w-full sm:w-auto px-3.5 py-2 sm:py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 shadow-2xs shrink-0 text-center transition-transform active:scale-97">
                             <?php echo esc_html( $item['action_label'] ?? 'Action' ); ?> →
                         </button>
                     </div>
@@ -197,50 +184,50 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
          LAYER 3: "WHAT CHANGED?" (Workspace Delta Analytics)
          ════════════════════════════════════════════════════════ -->
     <div class="space-y-3">
-        <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-zinc-950 uppercase tracking-wider">What Changed This Week</h3>
-            <span class="text-xs text-zinc-400 font-medium">Compared to previous 7 days</span>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <h3 class="text-xs sm:text-sm font-bold text-zinc-950 uppercase tracking-wider">What Changed This Week</h3>
+            <span class="text-[11px] sm:text-xs text-zinc-400 font-medium">Compared to previous 7 days</span>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             <!-- Metric 1: Inbound Lead Velocity -->
-            <div class="p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-1">
-                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Inbound Leads</span>
-                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num">
+            <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-1">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block truncate">Inbound Leads</span>
+                <div class="text-lg sm:text-xl font-extrabold text-zinc-950 cora-mono-num">
                     <?php echo intval( $deltas['leads_this_week'] ?? 0 ); ?>
                 </div>
-                <div class="text-[10px] <?php echo ( $deltas['leads_growth_pct'] ?? 0 ) >= 0 ? 'text-emerald-700 font-semibold' : 'text-zinc-500'; ?>">
+                <div class="text-[10px] truncate <?php echo ( $deltas['leads_growth_pct'] ?? 0 ) >= 0 ? 'text-emerald-700 font-semibold' : 'text-zinc-500'; ?>">
                     <?php echo ( $deltas['leads_growth_pct'] ?? 0 ) >= 0 ? '+' : ''; ?><?php echo intval( $deltas['leads_growth_pct'] ?? 0 ); ?>% vs last week
                 </div>
             </div>
 
             <!-- Metric 2: Overdue Invoices -->
-            <div class="p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-1">
-                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Overdue Invoices</span>
-                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num">
+            <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-1">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block truncate">Overdue Invoices</span>
+                <div class="text-lg sm:text-xl font-extrabold text-zinc-950 cora-mono-num">
                     <?php echo intval( $deltas['overdue_count'] ?? 0 ); ?>
                 </div>
-                <div class="text-[10px] <?php echo ( $deltas['overdue_count'] ?? 0 ) > 0 ? 'text-red-700 font-semibold' : 'text-emerald-700 font-semibold'; ?>">
+                <div class="text-[10px] truncate <?php echo ( $deltas['overdue_count'] ?? 0 ) > 0 ? 'text-red-700 font-semibold' : 'text-emerald-700 font-semibold'; ?>">
                     <?php echo ( $deltas['overdue_count'] ?? 0 ) > 0 ? ( '₹' . number_format( $deltas['overdue_amount'] ?? 0 ) . ' pending' ) : 'Zero overdue balance'; ?>
                 </div>
             </div>
 
             <!-- Metric 3: Workspace Activity Volume -->
-            <div class="p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-1">
-                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Logged Events</span>
-                <div class="text-xl font-extrabold text-zinc-950 cora-mono-num">
+            <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-1">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block truncate">Logged Events</span>
+                <div class="text-lg sm:text-xl font-extrabold text-zinc-950 cora-mono-num">
                     <?php echo count( $timeline_events ); ?>
                 </div>
-                <div class="text-[10px] text-zinc-500 font-medium">Audited &amp; indexed</div>
+                <div class="text-[10px] text-zinc-500 font-medium truncate">Audited &amp; indexed</div>
             </div>
 
             <!-- Metric 4: Multi-Tenant Boundary Health -->
-            <div class="p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-1">
-                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Tenant Isolation</span>
-                <div class="text-xl font-extrabold text-emerald-700 cora-mono-num">
+            <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-1">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block truncate">Tenant Isolation</span>
+                <div class="text-lg sm:text-xl font-extrabold text-emerald-700 cora-mono-num">
                     100%
                 </div>
-                <div class="text-[10px] text-emerald-700 font-semibold">Strict Workspace #<?php echo esc_html( $agency_id ); ?> Scoping</div>
+                <div class="text-[10px] text-emerald-700 font-semibold truncate">Workspace #<?php echo esc_html( $agency_id ); ?> Scoped</div>
             </div>
         </div>
     </div>
@@ -249,13 +236,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     <!-- ════════════════════════════════════════════════════════
          LAYER 4: "CORA WORKED WHILE YOU WERE AWAY" (Autonomous Actions)
          ════════════════════════════════════════════════════════ -->
-    <div class="p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-3">
+    <div class="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs space-y-3">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <span class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Cora Worked While You Were Away</span>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800">Autonomous</span>
             </div>
-            <span class="text-xs text-zinc-400">Continuous AI observers</span>
+            <span class="text-[11px] text-zinc-400 hidden sm:inline">Continuous AI observers</span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -264,7 +251,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <span class="text-emerald-700 font-bold shrink-0 mt-0.5">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </span>
-                <div class="flex-1 space-y-0.5">
+                <div class="flex-1 space-y-0.5 min-w-0">
                     <p class="text-zinc-800 font-medium leading-normal"><?php echo esc_html( $ch['text'] ); ?></p>
                     <span class="text-[10px] text-zinc-400 font-mono"><?php echo esc_html( $ch['time'] ); ?></span>
                 </div>
@@ -343,23 +330,24 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </div>
 
                         <div class="min-w-0 space-y-0.5">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-xs font-bold text-zinc-950 truncate"><?php echo esc_html( $evt['title'] ); ?></span>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-xs font-bold text-zinc-950 truncate max-w-[180px] sm:max-w-none"><?php echo esc_html( $evt['title'] ); ?></span>
                                 <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-zinc-100 text-zinc-600 uppercase tracking-wider"><?php echo esc_html( $evt['category_label'] ?? $cat ); ?></span>
                             </div>
                             <p class="text-[11px] text-zinc-500 truncate"><?php echo esc_html( $evt['subtitle'] ); ?></p>
+                            <div class="text-[10px] text-zinc-400 font-mono sm:hidden"><?php echo esc_html( $evt['time_ago'] ); ?></div>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-3 shrink-0">
+                    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
                         <div class="text-right hidden sm:block">
                             <div class="text-xs font-bold text-zinc-900"><?php echo esc_html( $evt['time_formatted'] ); ?></div>
                             <div class="text-[10px] text-zinc-400"><?php echo esc_html( $evt['time_ago'] ); ?></div>
                         </div>
 
-                        <button type="button" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-700 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 cursor-pointer shadow-2xs">
+                        <span class="px-2.5 py-1 rounded-xl text-xs font-semibold text-zinc-700 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 shadow-2xs shrink-0">
                             Inspect →
-                        </button>
+                        </span>
                     </div>
                 </div>
                 <?php endforeach; ?>
