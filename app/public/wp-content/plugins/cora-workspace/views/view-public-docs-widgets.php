@@ -14,7 +14,7 @@ $public_nonce = wp_create_nonce( 'cora_public_docs_nonce' );
 $ajax_url     = admin_url( 'admin-ajax.php' );
 ?>
 
-<aside class="w-80 shrink-0 sticky top-24 max-h-[calc(100vh-8rem)] hidden lg:flex flex-col bg-white border border-zinc-200/80 rounded-xl overflow-hidden shadow-sm font-sans" id="cora-docs-widgets-column">
+<aside class="w-80 shrink-0 sticky top-20 h-[calc(100vh-5.5rem)] hidden lg:flex flex-col bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-2xs font-sans z-30" id="cora-docs-widgets-column">
     <!-- Header -->
     <div class="px-4 py-3 border-b border-zinc-100 flex items-center justify-between select-none shrink-0 bg-white">
         <div class="flex items-center gap-2">

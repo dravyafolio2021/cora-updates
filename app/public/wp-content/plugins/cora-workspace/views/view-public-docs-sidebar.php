@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- Mobile Backdrop -->
 <div id="cora-docs-mobile-backdrop" class="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm z-40 hidden md:hidden transition-opacity opacity-0" onclick="coraToggleMobileSidebar()"></div>
 
-<aside id="cora-docs-mobile-sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-zinc-200 transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:w-64 md:border-r-0 md:bg-transparent flex-shrink-0 flex flex-col gap-5 md:sticky md:top-24 md:max-h-[calc(100vh-8rem)] h-full md:h-auto overflow-y-auto px-4 md:px-0 pt-6 md:pt-0 pr-2 pb-12 select-none shadow-2xl md:shadow-none">
+<aside id="cora-docs-mobile-sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-zinc-200 transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:w-64 md:border-r-0 md:bg-transparent flex-shrink-0 flex flex-col gap-4 md:sticky md:top-20 md:h-[calc(100vh-5.5rem)] h-full overflow-y-auto px-4 md:px-0 pt-6 md:pt-1 pr-2 pb-10 select-none shadow-2xl md:shadow-none z-30">
     
     <!-- Mobile Close Button -->
     <div class="flex items-center justify-between md:hidden mb-2 px-1.5">

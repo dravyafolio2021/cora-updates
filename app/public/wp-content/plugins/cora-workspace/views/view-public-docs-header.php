@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
-<header class="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-zinc-200/80 transition-colors duration-200 select-none">
+<header class="sticky top-0 z-50 w-full bg-white border-b border-zinc-200 select-none shadow-2xs">
     <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
         <!-- Left Section: Branding -->
         <div class="flex items-center gap-3">
