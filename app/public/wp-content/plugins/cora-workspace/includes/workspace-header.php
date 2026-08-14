@@ -245,7 +245,10 @@ function cora_render_workspace_header( $args = array() ) {
                     </button>
                     <?php endif; ?>
                 </div>
+                <?php endif; ?>
 
+                <?php if ( ! empty( $args['extra_actions_html'] ) ) : ?>
+                    <?php echo $args['extra_actions_html']; ?>
                 <?php endif; ?>
                 
                 <?php if ( ! empty( $cta['text'] ) && $cta['visible'] ) : ?>
@@ -303,6 +306,9 @@ function cora_render_workspace_header( $args = array() ) {
                 </div>
                 <?php endif; ?>
 
+                <?php if ( ! empty( $args['extra_actions_html'] ) ) : ?>
+                    <?php echo $args['extra_actions_html']; ?>
+                <?php endif; ?>
                 
                 <?php if ( ! empty( $cta['text'] ) && $cta['visible'] ) : ?>
                     <button onclick="<?php echo esc_attr( $cta['onclick'] ); ?>" class="bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95 shadow-sm flex items-center gap-1 shrink-0 <?php echo esc_attr( $cta['class'] ); ?>">

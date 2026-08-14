@@ -49,7 +49,8 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 .cm-sbar-w { height:3px; width:45px; background:#e4e4e7; border-radius:99px; overflow:hidden; }
 .cm-sbar   { height:100%; border-radius:99px; transition:width .4s; }
 
-#cm-storage-wrap { padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid #e4e4e7; background: #fff; display: inline-flex; align-items: center; gap: 6px; user-select: none; }
+#cm-storage-wrap { padding: 5px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #e4e4e7; background: #fafafa; display: inline-flex; align-items: center; gap: 8px; user-select: none; transition: all .15s ease; position: relative; }
+#cm-storage-wrap:hover { background: #f4f4f5; border-color: #d4d4d8; }
 .cm-storage-ring-svg { transform: rotate(-90deg); flex-shrink: 0; }
 .cm-ring-fill { transition: stroke-dasharray .4s ease, stroke .3s ease; }
 .cm-hbtn { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #e4e4e7; background:#fff; color:#3f3f46; transition:all .12s; white-space:nowrap; }
@@ -787,13 +788,81 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     <!-- ─── HEADER ──────────────────────────────────────────────── -->
     <div id="cm-header">
         <?php
+        $initial_total_bytes = function_exists('cora_get_workspace_storage_usage_bytes') ? cora_get_workspace_storage_usage_bytes() : 0;
+        $initial_limit_bytes = function_exists('cora_get_workspace_storage_limit_bytes') ? cora_get_workspace_storage_limit_bytes() : (5 * 1024 * 1024 * 1024);
+        $initial_pct = $initial_limit_bytes > 0 ? round( ( $initial_total_bytes / $initial_limit_bytes ) * 100, 1 ) : 0;
+        $initial_total_human = function_exists('cora_media_human_size') ? cora_media_human_size( $initial_total_bytes ) : ($initial_total_bytes . ' B');
+        $initial_limit_human = function_exists('cora_media_human_size') ? cora_media_human_size( $initial_limit_bytes ) : '5 GB';
+        $initial_free_bytes = max(0, $initial_limit_bytes - $initial_total_bytes);
+        $initial_free_human = function_exists('cora_media_human_size') ? cora_media_human_size( $initial_free_bytes ) : '5 GB';
+
+        $initial_stroke_color = '#10b981';
+        if ( $initial_pct >= 90 ) {
+            $initial_stroke_color = '#ef4444';
+        } elseif ( $initial_pct >= 70 ) {
+            $initial_stroke_color = '#f59e0b';
+        }
+
+        ob_start();
+        ?>
+        <!-- Real-Time Workspace Storage Usage Pill -->
+        <div class="cm-h-storage cm-storage-healthy flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50 hover:bg-zinc-100 transition-all cursor-pointer select-none text-zinc-700 shadow-2xs relative shrink-0" id="cm-storage-wrap" onmouseenter="cmShowStorageAnalytics(true)" onmouseleave="cmShowStorageAnalytics(false)" onclick="cmToggleStorageAnalytics(event)" title="Workspace Real-Time Storage Usage">
+            <svg class="cm-storage-ring-svg shrink-0" width="22" height="22" viewBox="0 0 36 36">
+                <path class="cm-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#e4e4e7" stroke-width="3.5" fill="none"/>
+                <path id="cm-ring-fill" class="cm-ring-fill" stroke-dasharray="<?php echo esc_attr( $initial_pct ); ?>, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="<?php echo esc_attr( $initial_stroke_color ); ?>" stroke-width="4" fill="none" stroke-linecap="round"/>
+            </svg>
+            <div class="flex flex-col text-left leading-none">
+                <div class="flex items-center gap-1">
+                    <span class="text-[11px] font-bold text-zinc-900" id="cm-storage-human"><?php echo esc_html( $initial_total_human ); ?></span>
+                    <span class="text-[10px] font-semibold text-zinc-500" id="cm-storage-pct">(<?php echo esc_html( $initial_pct ); ?>%)</span>
+                </div>
+                <span class="text-[8.5px] font-medium text-zinc-400">Storage Used</span>
+            </div>
+
+            <!-- Hover / Click Detailed Analytics Popover Card -->
+            <div id="cm-storage-analytics-card" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:240px;background:#fff;border:1px solid #e4e4e7;border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:9999;pointer-events:auto;text-align:left;">
+                <div style="font-size:11px;font-weight:700;color:#18181b;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+                    <span class="flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                        Workspace Storage
+                    </span>
+                    <span id="cm-sa-pct-text" style="color:<?php echo esc_attr( $initial_stroke_color ); ?>;font-weight:700;"><?php echo esc_html( $initial_pct ); ?>% Used</span>
+                </div>
+                <div style="font-size:10.5px;color:#71717a;margin-bottom:6px" id="cm-sa-human"><?php echo esc_html( $initial_total_human ); ?> used of <?php echo esc_html( $initial_limit_human ); ?></div>
+                <div style="height:6px;width:100%;background:#f4f4f5;border-radius:99px;overflow:hidden;margin-bottom:8px">
+                    <div id="cm-sa-bar" style="height:100%;width:<?php echo esc_attr( $initial_pct ); ?>%;background:<?php echo esc_attr( $initial_stroke_color ); ?>;border-radius:99px;transition:width .3s ease"></div>
+                </div>
+                <div style="font-size:10px;color:#52525b;display:flex;justify-content:space-between;border-top:1px solid #f4f4f5;padding-top:6px;">
+                    <span>Available:</span>
+                    <strong id="cm-sa-free" style="color:#09090b"><?php echo esc_html( $initial_free_human ); ?></strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Toggle Pill -->
+        <div class="cm-toggle hidden sm:flex shrink-0">
+            <button id="cm-btn-grid" onclick="cmSetView('grid')" class="on" title="Grid View">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+            </button>
+            <button id="cm-btn-list" onclick="cmSetView('list')" title="List View">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <!-- Hidden Bulk Action & File Input -->
+        <button id="cm-bulk-btn" onclick="cmToggleBulk()" class="cm-hbtn hidden">Select</button>
+        <input type="file" id="cm-file-input" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" style="display:none" onchange="cmHandleFiles(this.files)">
+        <?php
+        $extra_media_actions = ob_get_clean();
+
         $media_header_args = array(
-            'title'            => 'Media Library',
-            'description'      => 'Property photos, documents, floor plans, and all agency assets.',
-            'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',
-            'ai_stack'         => true,
-            'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
-            'cta'              => array(
+            'title'              => 'Media Library',
+            'description'        => 'Property photos, documents, floor plans, and all agency assets.',
+            'icon'               => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',
+            'ai_stack'           => true,
+            'extra_actions_html' => $extra_media_actions,
+            'tutorial_onclick'   => "window.open('https://www.youtube.com/@heycora', '_blank')",
+            'cta'                => array(
                 'text'        => 'Upload',
                 'mobile_text' => 'Upload',
                 'onclick'     => "document.getElementById('cm-file-input').click()",
@@ -806,43 +875,6 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             cora_render_workspace_header( $media_header_args );
         }
         ?>
-
-        <!-- Hidden elements to be relocated dynamically into standard header via JS -->
-        <div style="display:none">
-            <!-- Storage bar -->
-            <div class="cm-h-storage cm-storage-healthy" style="position:relative" id="cm-storage-wrap" onmouseenter="cmShowStorageAnalytics(true)" onmouseleave="cmShowStorageAnalytics(false)" onclick="cmToggleStorageAnalytics(event)">
-                <svg class="cm-storage-ring-svg" width="28" height="28" viewBox="0 0 36 36">
-                    <path class="cm-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#e4e4e7" stroke-width="3" fill="none"/>
-                    <path id="cm-ring-fill" class="cm-ring-fill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#10b981" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-                </svg>
-                <span id="cm-storage-pct" style="font-size:11px;font-weight:700">14.6%</span>
-
-                <!-- Hover / Click Detailed Analytics Popover Card -->
-                <div id="cm-storage-analytics-card" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:240px;background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:9999;pointer-events:none">
-                    <div style="font-size:11px;font-weight:700;color:#18181b;margin-bottom:4px;display:flex;justify-content:space-between">
-                        <span>Workspace Storage</span>
-                        <span id="cm-sa-pct-text" style="color:#10b981">14.6% Used</span>
-                    </div>
-                    <div style="font-size:10px;color:#71717a;margin-bottom:8px" id="cm-sa-human">— used of 5 GB</div>
-                    <div style="height:6px;width:100%;background:#f4f4f5;border-radius:99px;overflow:hidden;margin-bottom:8px">
-                        <div id="cm-sa-bar" style="height:100%;width:14.6%;background:#10b981;border-radius:99px"></div>
-                    </div>
-                    <div style="font-size:10px;color:#52525b;display:flex;justify-content:space-between">
-                        <span>Available:</span>
-                        <strong id="cm-sa-free" style="color:#09090b">—</strong>
-                    </div>
-                </div>
-            </div>
-
-            <!-- View toggle -->
-            <div class="cm-toggle">
-                <button id="cm-btn-grid" onclick="cmSetView('grid')" class="on" title="Grid">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
-                </button>
-                <button id="cm-btn-list" onclick="cmSetView('list')" title="List">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                </button>
-            </div>
 
             <button id="cm-bulk-btn" onclick="cmToggleBulk()" class="cm-hbtn">Select</button>
             <input type="file" id="cm-file-input" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" style="display:none" onchange="cmHandleFiles(this.files)">
@@ -3317,8 +3349,11 @@ window.cmLoadStorage = function() {
             ringFill.setAttribute('stroke', strokeColor);
         }
 
+        var storageHuman = document.getElementById('cm-storage-human');
+        if (storageHuman) storageHuman.textContent = d.total_human || '0 B';
+
         var storagePct = document.getElementById('cm-storage-pct');
-        if (storagePct) storagePct.textContent = formattedPct;
+        if (storagePct) storagePct.textContent = '(' + formattedPct + ')';
 
         var saPctText = document.getElementById('cm-sa-pct-text');
         if (saPctText) {
@@ -3359,43 +3394,6 @@ window.cmLoadStorage = function() {
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 function cmIcon(type,sz){sz=sz||22;var ic={image:'<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" stroke="#a1a1aa" stroke-width="1.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',video:'<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" stroke="#a1a1aa" stroke-width="1.5" fill="none"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg>',audio:'<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" stroke="#a1a1aa" stroke-width="1.5" fill="none"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>',document:'<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" stroke="#a1a1aa" stroke-width="1.5" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'};return ic[type]||ic.document;}
-
-// ── BOOT ──────────────────────────────────────────────────────────────────────
-document.addEventListener("DOMContentLoaded", function() {
-    const appendMediaActions = function(containerSelector) {
-        const container = document.querySelector(containerSelector);
-        if (!container) return;
-
-        // Prevent duplicate appending
-        if (container.querySelector('#cm-storage-wrap') || container.querySelector('[data-media-action="bulk"]')) return;
-
-        // Get elements from original locations
-        const storageEl = document.getElementById('cm-storage-wrap');
-        const toggleEl = document.querySelector('.cm-toggle');
-        const bulkBtn = document.getElementById('cm-bulk-btn');
-
-        const ctaBtn = container.querySelector('button:not(.group)');
-
-        if (storageEl) {
-            // Un-hide storage bar if initialized
-            storageEl.style.display = 'inline-flex';
-            if (ctaBtn) container.insertBefore(storageEl, ctaBtn);
-            else container.appendChild(storageEl);
-        }
-        if (toggleEl) {
-            if (ctaBtn) container.insertBefore(toggleEl, ctaBtn);
-            else container.appendChild(toggleEl);
-        }
-        if (bulkBtn) {
-            bulkBtn.setAttribute('data-media-action', 'bulk');
-            if (ctaBtn) container.insertBefore(bulkBtn, ctaBtn);
-            else container.appendChild(bulkBtn);
-        }
-    };
-
-    appendMediaActions('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0');
-    appendMediaActions('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0');
-});
 
 if(typeof coraREData!=='undefined'){
     if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',cmInit);
