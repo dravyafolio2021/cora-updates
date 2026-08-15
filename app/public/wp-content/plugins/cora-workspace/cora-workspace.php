@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.56
+ * Version: 3.4.57
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.56' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.57' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -24979,6 +24979,67 @@ function cora_ajax_trigger_digest_run() {
 }
 }
 add_action( 'wp_ajax_cora_trigger_digest_run', 'cora_ajax_trigger_digest_run' );
+
+/**
+ * AJAX Handler: Capture Early Access / Feature Intent Waitlist
+ */
+if ( ! function_exists( 'cora_ajax_capture_feature_intent' ) ) {
+function cora_ajax_capture_feature_intent() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $user_id   = get_current_user_id();
+    $feature   = sanitize_text_field( $_POST['feature'] ?? 'calendar' );
+    $email     = sanitize_email( $_POST['email'] ?? '' );
+    $tools     = isset( $_POST['tools'] ) ? array_map( 'sanitize_text_field', (array) $_POST['tools'] ) : array();
+    $notes     = sanitize_textarea_field( $_POST['notes'] ?? '' );
+    $agency_id = cora_get_current_user_agency_id();
+
+    if ( empty( $email ) && $user_id ) {
+        $u = get_userdata( $user_id );
+        $email = $u ? $u->user_email : '';
+    }
+
+    if ( empty( $email ) || ! is_email( $email ) ) {
+        wp_send_json_error( array( 'message' => 'Please enter a valid email address.' ) );
+    }
+
+    $waitlist_key = 'cora_feature_waitlist_' . sanitize_key( $feature );
+    $entries = get_option( $waitlist_key, array() );
+    if ( ! is_array( $entries ) ) {
+        $entries = array();
+    }
+
+    $already_registered = false;
+    foreach ( $entries as $k => $entry ) {
+        if ( isset( $entry['email'] ) && strtolower( $entry['email'] ) === strtolower( $email ) ) {
+            $entries[$k]['tools'] = array_unique( array_merge( $entry['tools'] ?? array(), $tools ) );
+            $entries[$k]['updated_at'] = current_time( 'mysql' );
+            $already_registered = true;
+            break;
+        }
+    }
+
+    if ( ! $already_registered ) {
+        $entries[] = array(
+            'user_id'    => $user_id,
+            'agency_id'  => $agency_id,
+            'feature'    => $feature,
+            'email'      => $email,
+            'tools'      => $tools,
+            'notes'      => $notes,
+            'created_at' => current_time( 'mysql' ),
+        );
+    }
+
+    update_option( $waitlist_key, $entries, false );
+
+    wp_send_json_success( array(
+        'message' => "You're on the early access waitlist for " . ucfirst( $feature ) . "! We'll notify you as soon as it goes live.",
+        'feature' => $feature,
+        'email'   => $email,
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_capture_feature_intent', 'cora_ajax_capture_feature_intent' );
 
 if ( ! function_exists( 'cora_validate_password' ) ) {
 function cora_validate_password( $password ) {
