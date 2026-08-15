@@ -90,23 +90,22 @@ $timeline_blocks = $active_timeline['blocks'] ?? array();
 $total_timelines = count( $cora_event_timelines );
 $total_blocks    = count( $timeline_blocks );
 ?>
-<?php
-$timeline_header_args = array(
-    'title'            => 'Multi-Day Tour & Event Planner',
-    'description'      => 'Organize multi-day property tours, photo shoots, and crew itineraries with live GPS tracking.',
-    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-    'ai_stack'         => true,
-    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
-    'cta'              => array(
-        'text'        => 'Add Time Block',
-        'mobile_text' => 'Add Block',
-        'onclick'     => "coraOpenAddTimelineBlockDrawer()",
-        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
-        'visible'     => true,
-    ),
-);
-
-if ( function_exists( 'cora_render_workspace_header' ) ) {
+// Only render standalone page header if directly loaded on event-timeline subpage
+if ( function_exists( 'cora_render_workspace_header' ) && ( ! isset( $sub_page ) || $sub_page === 'event-timeline' ) ) {
+    $timeline_header_args = array(
+        'title'            => 'Multi-Day Tour & Event Planner',
+        'description'      => 'Organize multi-day property tours, photo shoots, and crew itineraries with live GPS tracking.',
+        'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+        'ai_stack'         => true,
+        'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+        'cta'              => array(
+            'text'        => 'Add Time Block',
+            'mobile_text' => 'Add Block',
+            'onclick'     => "coraOpenAddTimelineBlockDrawer()",
+            'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+            'visible'     => true,
+        ),
+    );
     cora_render_workspace_header( $timeline_header_args );
 }
 ?>
@@ -529,6 +528,11 @@ window.coraCloseAllDrawers = function() {
 };
 
 document.addEventListener("DOMContentLoaded", function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var subPage = urlParams.get('sub_page');
+    // Only inject buttons into header if on the standalone Event Timeline page
+    if (subPage !== 'event-timeline' && subPage !== 'itinerary') return;
+
     const appendButtons = function(containerSelector) {
         const container = document.querySelector(containerSelector);
         if (!container) return;
@@ -566,7 +570,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
 
-    appendButtons('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0');
-    appendButtons('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0');
+    appendButtons('#cora-page-event-timeline .cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0');
+    appendButtons('#cora-page-event-timeline .cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0');
 });
 </script>

@@ -1536,8 +1536,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
 
-    appendReviewsActions('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0', false);
-    appendReviewsActions('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0', true);
+    appendReviewsActions('#cora-page-reviews .cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0', false);
+    appendReviewsActions('#cora-page-reviews .cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0', true);
 });
 </script>
 

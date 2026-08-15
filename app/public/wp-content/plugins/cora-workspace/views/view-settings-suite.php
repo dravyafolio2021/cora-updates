@@ -4066,8 +4066,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             }
         };
 
-        appendSettingsActions('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0', false);
-        appendSettingsActions('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0', true);
+        appendSettingsActions('#cora-page-settings-suite .cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0', false);
+        appendSettingsActions('#cora-page-settings-suite .cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0', true);
     });
 })(jQuery);
 </script>

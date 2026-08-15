@@ -1309,7 +1309,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
 
-    appendEmailActions('.cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0', false);
-    appendEmailActions('.cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0', true);
+    appendEmailActions('#cora-page-emails .cora-workspace-header .hidden.md\\:flex .flex.items-center.gap-3.shrink-0', false);
+    appendEmailActions('#cora-page-emails .cora-workspace-header .flex.md\\:hidden .flex.items-center.gap-2\\.5.shrink-0', true);
 });
 </script>
