@@ -1,10 +1,14 @@
 // Service worker for Cora Admin PWA
-const CACHE_NAME = 'cora-workspace-v3.3.2';
-const DYNAMIC_CACHE = 'cora-dynamic-v3.3.2';
+const CACHE_NAME = 'cora-workspace-v3.4.63';
+const DYNAMIC_CACHE = 'cora-dynamic-v3.4.63';
 const MAX_DYNAMIC_CACHE_ITEMS = 150;
 
 const URLs_TO_CACHE = [
   '/wp-content/plugins/cora-workspace/assets/pwa/manifest.json',
+  '/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png',
+  '/wp-content/plugins/cora-workspace/assets/pwa/icon_512.png',
+  '/wp-content/plugins/cora-workspace/assets/images/cora-favicon.png',
+  '/wp-content/plugins/cora-workspace/assets/images/apple-touch-icon.png',
   '/wp-content/plugins/cora-workspace/assets/css/admin-style.css',
   '/wp-content/plugins/cora-workspace/assets/js/admin-script.js',
   '/wp-content/plugins/cora-workspace/assets/js/cora-autosave-engine.js',

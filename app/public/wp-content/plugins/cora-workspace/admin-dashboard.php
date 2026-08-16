@@ -48,46 +48,54 @@ if ( isset( $_POST['cora_save_mcp_token_direct_submit'] ) && check_admin_referer
     }
 }
 
+$cora_active_workspace = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array( 'id' => 1, 'name' => 'Workspace', 'slug' => 'workspace', 'plan' => 'enterprise', 'status' => 'active' );
+
 $cora_users = array();
 if ( in_array( $sub_page, array( 'dashboard', 'bookings', 'team-roles', 'equipment', 'blogs' ) ) ) {
-    $args = array();
     $active_ws_id = isset( $cora_active_workspace['id'] ) ? $cora_active_workspace['id'] : '';
     $active_ws_slug = isset( $cora_active_workspace['slug'] ) ? $cora_active_workspace['slug'] : '';
     $agency_id_context = function_exists('cora_get_current_user_agency_id') ? cora_get_current_user_agency_id() : '';
-    
-    $meta_query = array('relation' => 'OR');
-    if ( ! empty( $active_ws_slug ) && $active_ws_slug !== 'super' ) {
-        $meta_query[] = array(
-            'key'     => 'cora_agency_id',
-            'value'   => $active_ws_slug,
-            'compare' => '='
-        );
+
+    $target_agency = ( ! empty( $active_ws_slug ) && $active_ws_slug !== 'super' ) ? $active_ws_slug : ( ( ! empty( $agency_id_context ) && $agency_id_context !== 'super' ) ? $agency_id_context : '' );
+
+    if ( ! empty( $target_agency ) ) {
+        $identifiers = function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $target_agency ) : array( $target_agency, $active_ws_id, 'agency_' . $active_ws_id );
+        $cora_users = get_users( array(
+            'meta_query' => array(
+                array(
+                    'key'     => 'cora_agency_id',
+                    'value'   => $identifiers,
+                    'compare' => 'IN'
+                )
+            ),
+            'orderby' => 'display_name',
+            'order'   => 'ASC'
+        ) );
+    } else {
+        // If on super admin view, only show team/staff users with valid roles, excluding subscribers/junk
+        $cora_users = get_users( array(
+            'role__not_in' => array( 'subscriber' ),
+            'orderby'      => 'display_name',
+            'order'        => 'ASC',
+            'number'       => 50
+        ) );
     }
-    if ( ! empty( $active_ws_id ) ) {
-        $meta_query[] = array(
-            'key'     => 'cora_agency_id',
-            'value'   => $active_ws_id,
-            'compare' => '='
-        );
-        $meta_query[] = array(
-            'key'     => 'cora_agency_id',
-            'value'   => 'agency_' . $active_ws_id,
-            'compare' => '='
-        );
+
+    // Always ensure current logged-in user is present in author/user list
+    $current_uid = get_current_user_id();
+    $found_current = false;
+    foreach ( $cora_users as $u ) {
+        if ( $u->ID == $current_uid ) {
+            $found_current = true;
+            break;
+        }
     }
-    if ( ! empty( $agency_id_context ) && $agency_id_context !== 'super' && $agency_id_context !== $active_ws_slug ) {
-        $meta_query[] = array(
-            'key'     => 'cora_agency_id',
-            'value'   => $agency_id_context,
-            'compare' => '='
-        );
+    if ( ! $found_current && $current_uid ) {
+        $curr_user_obj = get_userdata( $current_uid );
+        if ( $curr_user_obj ) {
+            array_unshift( $cora_users, $curr_user_obj );
+        }
     }
-    
-    if ( count( $meta_query ) > 1 ) {
-        $args['meta_query'] = $meta_query;
-    }
-    
-    $cora_users = get_users( $args );
 }
 $cora_workspace_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings' ) ) ) ? cora_db_get_properties() : array();
 $cora_permissions = get_option( 'cora_role_permissions', array() );
@@ -276,18 +284,60 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
     $is_studio_ind = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' || $current_industry_clean === 'photography-studio' );
 
-    $title_real_estate = get_option( 'cora_site_title_real_estate', '' );
-    $title_studio      = get_option( 'cora_site_title_studio', '' );
-    $title_custom      = get_option( 'cora_site_title_custom', '' );
-    if ( $current_industry === 'custom' ) {
-        $page_title_raw = $title_custom ?: 'Cora Workspace';
-    } else {
-        $page_title_raw = $is_studio_ind ? $title_studio : $title_real_estate;
+    // Resolve dynamic site title (matches Branding & APIs settings)
+    $workspace_site_title = get_option( 'blogname' );
+    if ( empty( $workspace_site_title ) ) {
+        $title_real_estate    = get_option( 'cora_site_title_real_estate', '' );
+        $title_studio         = get_option( 'cora_site_title_studio', '' );
+        $title_custom         = get_option( 'cora_site_title_custom', '' );
+        if ( $current_industry === 'custom' ) {
+            $workspace_site_title = $title_custom ?: 'Cora Workspace';
+        } else {
+            $workspace_site_title = $is_studio_ind ? ($title_studio ?: 'Photography Studio Workspace') : ($title_real_estate ?: 'Real Estate Workspace');
+        }
     }
-    $page_title_format = $page_title_raw ?: 'Cora';
+
+    // Friendly page names map
+    $page_names_map = array(
+        'dashboard'          => 'Dashboard',
+        'super-admin'        => 'Platform Control Center',
+        'settings'           => 'System Settings Complete Suite',
+        'settings-suite'     => 'System Settings Complete Suite',
+        'leads'              => 'Leads & CRM',
+        'financials'         => 'Financial Overview',
+        'vault'              => 'Document Vault & Invoices',
+        'media'              => 'Media Manager',
+        'files'              => 'File Manager',
+        'canvas'             => 'Canvas Site Builder',
+        'users'              => 'User & Roles',
+        'team-roles'         => 'User & Roles',
+        'calendar'           => 'Calendar & Bookings',
+        'forms'              => 'Forms & Inquiries',
+        'emails'             => 'Email Campaigns',
+        'reviews'            => 'Reviews & Feedback',
+        'review_acquisition' => 'Reviews & Feedback',
+        'gbp'                => 'Google Profile',
+        'ai-tools'           => 'AI Marketing Tools',
+        'ai-assistants'      => 'AI Assistants',
+        'pages'              => 'Pages & Content',
+        'activity-timeline'  => 'Business Pulse',
+        'pulse'              => 'Business Pulse',
+        'event-timeline'     => 'Tour & Event Planner',
+        'crew-scheduler'     => 'Crew Scheduler',
+        'attendance'         => 'Attendance Logs',
+    );
+
+    $current_sub_page_key = $sub_page ?? 'dashboard';
+    $current_page_label   = $page_names_map[ $current_sub_page_key ] ?? ucwords( str_replace( array( '-', '_' ), ' ', $current_sub_page_key ) );
+
+    // Format according to template: [Page Name] – [Site Title]
+    $page_title_format = $current_page_label . ' – ' . $workspace_site_title;
     ?>
     <link rel="icon" type="image/png" href="<?php echo esc_url( $favicon_url ); ?>" />
     <link rel="shortcut icon" id="cora-dynamic-favicon" href="<?php echo esc_url( $favicon_url ); ?>" />
+    <link rel="apple-touch-icon" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png' ); ?>" />
+    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark)" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-splash-dark.png' ); ?>" />
+    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light)" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-splash-light.png' ); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light">
     <title><?php echo esc_html( $page_title_format ); ?></title>
@@ -505,9 +555,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         .media-modal-backdrop {
             background: rgba(9, 9, 11, 0.4) !important;
             backdrop-filter: blur(4px) !important;
+            z-index: 160000 !important;
+            pointer-events: auto !important;
         }
 
         .media-modal {
+            position: fixed !important;
             background: #ffffff !important;
             border-radius: 12px !important;
             border: 1px solid #e4e4e7 !important;
@@ -517,6 +570,34 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             right: 40px !important;
             bottom: 40px !important;
             left: 40px !important;
+            width: auto !important;
+            height: auto !important;
+            z-index: 160100 !important;
+            pointer-events: auto !important;
+        }
+
+        .media-modal-content {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 100% !important;
+            background: #ffffff !important;
+            overflow: hidden !important;
+        }
+
+        .media-frame {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
         }
 
         /* Focus management - remove WP default blue outlines */
@@ -557,6 +638,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
 
         .media-frame-title {
+            position: absolute !important;
             height: 60px !important;
             border-bottom: 1px solid #f4f4f5 !important;
             background: #ffffff !important;
@@ -564,6 +646,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             right: 0 !important;
             left: 0 !important;
             box-shadow: none !important;
+            z-index: 200 !important;
         }
 
         .media-frame-title h1 {
@@ -577,11 +660,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
 
         .media-frame-menu {
+            position: absolute !important;
             background: #fafafa !important;
             border-right: 1px solid #e4e4e7 !important;
             top: 60px !important;
+            bottom: 60px !important;
             width: 200px !important;
             box-shadow: none !important;
+            z-index: 180 !important;
         }
 
         .media-menu {
@@ -612,12 +698,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
 
         .media-frame-router {
+            position: absolute !important;
             top: 60px !important;
             left: 200px !important;
+            right: 0 !important;
             height: 48px !important;
             border-bottom: 1px solid #e4e4e7 !important;
             background: #ffffff !important;
             box-shadow: none !important;
+            z-index: 190 !important;
         }
 
         .media-frame.hide-menu .media-frame-router {
@@ -659,50 +748,93 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
 
         .media-frame-content {
+            position: absolute !important;
             top: 108px !important;
             left: 200px !important;
+            right: 0 !important;
             bottom: 60px !important;
+            height: auto !important;
             background: #ffffff !important;
             border: none !important;
+            overflow: hidden !important;
         }
 
         .media-frame.hide-menu .media-frame-content {
             left: 0 !important;
         }
 
-        /* 2. Style Toolbar components cleanly */
+        /* 2. Style Attachments Browser & Toolbar */
+        .attachments-browser {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+        }
+
         .attachments-browser .media-toolbar {
-            background: transparent !important;
-            border-bottom: none !important;
-            height: 0 !important;
-            padding: 0 !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 52px !important;
+            background: #ffffff !important;
+            border-bottom: 1px solid #f4f4f5 !important;
+            padding: 8px 24px !important;
             margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            z-index: 50 !important;
             box-shadow: none !important;
             overflow: visible !important;
         }
 
+        .media-frame:not(.hide-sidebar) .attachments-browser .media-toolbar {
+            right: 350px !important;
+        }
+
         .attachments-browser .media-toolbar-secondary {
-            position: absolute !important;
-            bottom: -60px !important;
-            left: 24px !important;
-            z-index: 10000 !important;
-            height: 60px !important;
+            position: relative !important;
+            bottom: auto !important;
+            left: auto !important;
+            height: auto !important;
             display: flex !important;
             align-items: center !important;
             gap: 8px !important;
+            z-index: 10 !important;
         }
         
         .attachments-browser .media-toolbar-primary {
-            position: absolute !important;
-            top: -108px !important;
-            right: 60px !important;
-            z-index: 10000 !important;
-            height: 60px !important;
+            position: relative !important;
+            top: auto !important;
+            right: auto !important;
+            height: auto !important;
             display: flex !important;
             align-items: center !important;
+            gap: 8px !important;
+            z-index: 10 !important;
         }
 
-        /* Hide bulky text labels inside media toolbar to align with modern SaaS headers */
+        .attachments-browser .attachments-wrapper {
+            position: absolute !important;
+            top: 52px !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            padding: 16px 24px !important;
+        }
+
+        .media-frame:not(.hide-sidebar) .attachments-browser .attachments-wrapper {
+            right: 350px !important;
+        }
+
+        /* Hide bulky text labels inside media toolbar */
         .media-toolbar label,
         .media-search-input-label {
             display: none !important;
@@ -3044,110 +3176,22 @@ if ( $_cora_splash_leads > 0 ) {
     $_cora_spl_icon     = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 12 12 16 12 13 16 13 16 11 12 11 12 8"></polygon></svg>';
 }
 ?>
-<!-- Cora AI Co-Founder Insight Splash Screen -->
-<div id="cora-app-splash-screen" style="position:fixed;inset:0;background:#ffffff;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:1;transition:opacity 0.4s cubic-bezier(0.25,1,0.5,1),transform 0.4s cubic-bezier(0.25,1,0.5,1);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;user-select:none;padding:32px 24px;">
-
-    <!-- Brand mark -->
-    <div style="display:flex;flex-direction:column;align-items:center;gap:11px;margin-bottom:24px;">
-        <div class="cora-splash-logo-card" style="width:52px;height:52px;background:#18181b;color:#fff;border-radius:15px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(24,24,27,0.12);">
-            <svg width="22" height="22" viewBox="0 0 14 14" fill="none">
-                <rect x="3" y="3" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-1" style="transform:scale(0);opacity:0;"/>
-                <rect x="7.5" y="3" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-2" style="transform:scale(0);opacity:0;"/>
-                <rect x="3" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-3" style="transform:scale(0);opacity:0;"/>
-                <rect x="7.5" y="7.5" width="3.5" height="3.5" rx="1" fill="currentColor" class="cora-splash-dot dot-4" style="transform:scale(0);opacity:0;"/>
-            </svg>
-        </div>
-        <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:#52525b;">CORA WORKSPACE</div>
-    </div>
-
-    <!-- Visual, Decision-Oriented AI Co-Founder Briefing Card -->
-    <div class="cora-splash-insight-card" style="width:100%;max-width:380px;background:#ffffff;border:1px solid #e4e4e7;border-radius:18px;padding:20px 22px;box-shadow:0 6px 20px rgba(0,0,0,0.03);opacity:0;transform:translateY(10px);">
-        
-        <!-- Header row with Category Badge -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="display:flex;align-items:center;gap:9px;">
-                <div style="width:28px;height:28px;background:#18181b;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                </div>
-                <div>
-                    <div style="font-size:11px;font-weight:800;color:#18181b;line-height:1.2;">Cora Intelligence</div>
-                    <div style="font-size:9.5px;color:#71717a;font-weight:500;">AI Co-Founder · Executive Brief</div>
-                </div>
-            </div>
-            <span style="font-size:9px;font-weight:700;color:#18181b;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:6px;padding:3px 9px;letter-spacing:0.02em;white-space:nowrap;"><?php echo esc_html( $_cora_spl_badge ); ?></span>
-        </div>
-
-        <!-- Decision Directive Banner -->
-        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:#fafafa;border:1px solid #f4f4f5;border-radius:12px;margin-bottom:12px;">
-            <div style="width:34px;height:34px;background:#ffffff;border:1px solid #e4e4e7;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,0.02);">
-                <?php echo $_cora_spl_icon; ?>
-            </div>
-            <div style="flex:1;min-width:0;">
-                <div style="font-size:12.5px;font-weight:700;color:#18181b;line-height:1.35;"><?php echo esc_html( $_cora_spl_title ); ?></div>
-                <div style="font-size:11px;color:#71717a;line-height:1.45;margin-top:3px;"><?php echo esc_html( $_cora_splash_text ); ?></div>
-            </div>
-        </div>
-
-        <!-- Decision Metrics & KPI Snapshot -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-            <div style="padding:8px 12px;background:#ffffff;border:1px solid #e4e4e7;border-radius:10px;text-align:left;">
-                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;"><?php echo esc_html( $_cora_spl_label1 ); ?></div>
-                <div style="font-size:14px;font-weight:800;color:#18181b;font-family:'JetBrains Mono',monospace;margin-top:2px;"><?php echo esc_html( $_cora_spl_metric1 ); ?></div>
-            </div>
-            <div style="padding:8px 12px;background:#ffffff;border:1px solid #e4e4e7;border-radius:10px;text-align:left;">
-                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;"><?php echo esc_html( $_cora_spl_label2 ); ?></div>
-                <div style="font-size:14px;font-weight:800;color:#18181b;font-family:'JetBrains Mono',monospace;margin-top:2px;"><?php echo esc_html( $_cora_spl_metric2 ); ?></div>
-            </div>
-        </div>
-
-        <!-- Footer Bar -->
-        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid #f4f4f5;">
-            <div style="display:flex;align-items:center;gap:6px;">
-                <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;animation:cora-pulse-dot 2s ease-in-out infinite;"></span>
-                <span style="font-size:9.5px;color:#71717a;font-weight:600;">Workspace Active</span>
-            </div>
-            <span style="font-size:9.5px;color:#a1a1aa;font-weight:600;font-family:'JetBrains Mono',monospace;">RAG v3.4</span>
-        </div>
-    </div>
-
-    <!-- Progress bar -->
-    <div style="width:100%;max-width:380px;height:2px;background:#f4f4f5;border-radius:2px;overflow:hidden;position:relative;margin-top:22px;">
-        <div class="cora-splash-progress-bar" style="position:absolute;top:0;left:0;height:100%;width:64px;background:#18181b;border-radius:2px;"></div>
+<!-- Cora Official Brand Splash Screen -->
+<div id="cora-app-splash-screen" style="position:fixed;inset:0;background:#000000;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:1;transition:opacity 0.4s cubic-bezier(0.25,1,0.5,1),transform 0.4s cubic-bezier(0.25,1,0.5,1);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;user-select:none;overflow:hidden;">
+    <div id="cora-splash-bg" style="position:absolute;inset:0;background:url('<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-splash-dark.png' ); ?>') center center / contain no-repeat; background-color: #000000;"></div>
+    
+    <!-- Spinner Loader at Bottom -->
+    <div style="position:absolute;bottom:42px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;z-index:2;">
+        <div style="width:26px;height:26px;border:2.5px solid rgba(255,255,255,0.18);border-top-color:#ffffff;border-radius:50%;animation:cora-splash-spin 0.75s linear infinite;"></div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.65);font-family:'Inter',sans-serif;">LOADING...</div>
     </div>
 </div>
 
 <style>
-    @keyframes cora-reveal-dot {
-        0%   { transform: scale(0); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
+    @keyframes cora-splash-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
-    .cora-splash-dot { transform-origin: center; animation: cora-reveal-dot 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-    .cora-splash-dot.dot-1 { animation-delay: 0.05s; }
-    .cora-splash-dot.dot-2 { animation-delay: 0.15s; }
-    .cora-splash-dot.dot-3 { animation-delay: 0.25s; }
-    .cora-splash-dot.dot-4 { animation-delay: 0.35s; }
-
-    @keyframes cora-splash-pulse {
-        0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(24,24,27,0.14); }
-        50%       { transform: scale(0.94); box-shadow: 0 4px 14px rgba(24,24,27,0.07); }
-    }
-    .cora-splash-logo-card { animation: cora-splash-pulse 2.4s ease-in-out infinite; animation-delay: 0.5s; }
-
-    @keyframes cora-splash-slide-bar {
-        0%   { left: -70px; }
-        100% { left: 110%;  }
-    }
-    .cora-splash-progress-bar { animation: cora-splash-slide-bar 1.4s cubic-bezier(0.65,0,0.35,1) infinite; }
-
-    @keyframes cora-pulse-dot {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50%       { opacity: 0.4; transform: scale(0.7); }
-    }
-    @keyframes cora-insight-fadein {
-        0%   { opacity: 0; transform: translateY(10px); }
-        100% { opacity: 1; transform: translateY(0);    }
-    }
-    .cora-splash-insight-card { animation: cora-insight-fadein 0.55s cubic-bezier(0.25,1,0.5,1) 0.3s forwards; }
 </style>
 
 <script>
@@ -3420,17 +3464,8 @@ if ( $_cora_splash_leads > 0 ) {
                     <line x1="3" y1="18" x2="21" y2="18"></line>
                 </svg>
             </button>
-            <div onclick="if(typeof window.coraNavigateTo==='function'){window.coraNavigateTo('dashboard');}" class="flex items-center gap-2 select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
-                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" stroke-width="1.8"></polygon>
-                    <path d="M12 7v10M8 12h8" opacity="0.5"></path>
-                    <circle cx="12" cy="12" r="3.5" stroke-width="1.5"></circle>
-                    <circle cx="12" cy="7" r="1" fill="currentColor"></circle>
-                    <circle cx="12" cy="17" r="1" fill="currentColor"></circle>
-                    <circle cx="8" cy="12" r="1" fill="currentColor"></circle>
-                    <circle cx="16" cy="12" r="1" fill="currentColor"></circle>
-                </svg>
-                <span class="text-base font-black tracking-tight text-white">cora</span>
+            <div onclick="if(typeof window.coraNavigateTo==='function'){window.coraNavigateTo('dashboard');}" class="flex items-center select-none shrink-0 cursor-pointer hover:opacity-85 transition-opacity">
+                <span class="text-base font-bold text-white font-sans" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; letter-spacing: -0.01em !important;">CORA</span>
             </div>
             <?php
             $update = cora_check_workspace_update_available();
@@ -3608,7 +3643,7 @@ if ( $_cora_splash_leads > 0 ) {
         
         <div class="flex lg:hidden w-full items-center justify-between bg-transparent py-0.5" style="gap: 10px !important;">
             <div onclick="if(typeof window.coraNavigateTo==='function'){window.coraNavigateTo('dashboard');}" class="flex items-center cursor-pointer select-none shrink-0 hover:opacity-85 transition-opacity pr-1.5">
-                <span class="tracking-normal font-black text-[13px] text-white">CORA</span>
+                <span class="tracking-tight font-bold text-[13px] text-white" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; letter-spacing: -0.01em !important;">CORA</span>
             </div>
 
             <div onclick="window.coraOpenCommandPalette();" class="mx-2 flex items-center justify-between text-zinc-400 text-xs cursor-pointer" style="max-width: 280px; height: 32px; background-color: #343434e3; border-radius: 8px; border: none; padding: 0 10px; flex: 1;">
@@ -3653,24 +3688,18 @@ if ( $_cora_splash_leads > 0 ) {
         $cora_ws_slug           = ! empty( $cora_active_workspace['slug'] ) ? $cora_active_workspace['slug'] : 'workspace';
         $cora_ws_initial        = ! empty( $cora_ws_name ) ? strtoupper( substr( $cora_ws_name, 0, 1 ) ) : 'C';
         
+        // Dynamic domain host resolution (e.g. cora.local in test, app.heycora.in in production)
+        $cora_display_host = ! empty( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( $_SERVER['HTTP_HOST'] ) : 'app.heycora.in';
+
         $sidebar_brand_logo = get_option( 'cora_brand_logo_url', '' );
-        $sidebar_brand_title = get_option( 'cora_sidebar_title', '' );
-        if ( empty( $sidebar_brand_title ) || strtolower( $sidebar_brand_title ) === 'cora' || strtolower( $sidebar_brand_title ) === 'cora real estate' ) {
-            $user_agency = get_user_meta( get_current_user_id(), 'cora_workspace_agency_name', true );
-            if ( ! empty( $cora_ws_name ) && strtolower( $cora_ws_name ) !== 'workspace' && strtolower( $cora_ws_name ) !== 'apex realty group' && strtolower( $cora_ws_name ) !== 'cora real estate' ) {
-                $sidebar_brand_title = $cora_ws_name;
-            } elseif ( ! empty( $user_agency ) ) {
-                $sidebar_brand_title = $user_agency;
-            } else {
-                $sidebar_brand_title = ! empty( $cora_ws_name ) ? $cora_ws_name : 'Cora Workspace';
-            }
-        }
+        $saved_sidebar_title = get_option( 'cora_sidebar_title', '' );
+        $sidebar_brand_title = ( ! empty( $saved_sidebar_title ) && strtolower( $saved_sidebar_title ) !== 'cora' ) ? $saved_sidebar_title : $cora_ws_name;
         ?>
         <div class="cora-sidebar-top-container flex items-center justify-between gap-2 px-3 pt-2.5 pb-2 shrink-0 select-none">
             <!-- Workspace Switcher Card + Dropdown -->
             <div class="relative flex-1 min-w-0">
                 <!-- Trigger Card -->
-                <div class="cora-workspace-card flex items-center justify-between gap-2 px-2.5 py-1.5 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-lg cursor-pointer transition-all select-none" onclick="event.stopPropagation(); if($('.cora-sidebar').hasClass('collapsed-sidebar')){ window.coraToggleSidebarCollapse(); } else { $('#cora-workspace-popover').toggleClass('hidden'); $('#cora-profile-popover').addClass('hidden'); }">
+                <div class="cora-workspace-card flex items-center justify-between gap-2 px-2.5 py-1.5 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-lg cursor-pointer transition-all select-none" onclick="window.coraToggleWorkspacePopover(event)">
                     <div class="flex items-center gap-2 min-w-0">
                         <?php if ( ! empty( $sidebar_brand_logo ) ) : ?>
                         <div class="w-6 h-6 rounded flex items-center justify-center shrink-0">
@@ -3698,8 +3727,8 @@ if ( $_cora_splash_leads > 0 ) {
                             <div class="flex flex-col min-w-0 flex-1 leading-tight">
                                 <span class="text-xs font-bold text-zinc-900 truncate"><?php echo esc_html( $cora_ws_name ); ?></span>
                                 <div class="flex items-center gap-1 min-w-0 mt-0.5">
-                                    <span class="text-[10px] font-mono text-zinc-400 truncate">app.heycora.in/<?php echo esc_html( $cora_ws_slug ); ?></span>
-                                    <a href="https://app.heycora.in/<?php echo esc_html( $cora_ws_slug ); ?>" target="_blank" class="text-zinc-400 hover:text-zinc-650 shrink-0 select-none" onclick="event.stopPropagation();">
+                                    <span class="text-[10px] font-mono text-zinc-400 truncate"><?php echo esc_html( $cora_display_host ); ?>/<?php echo esc_html( $cora_ws_slug ); ?></span>
+                                    <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug ) ); ?>" target="_blank" class="text-zinc-400 hover:text-zinc-650 shrink-0 select-none" onclick="event.stopPropagation();">
                                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                     </a>
                                 </div>
@@ -3777,14 +3806,14 @@ if ( $_cora_splash_leads > 0 ) {
                                     </div>
                                     <div class="flex flex-col min-w-0 flex-1 leading-tight">
                                         <span class="text-[11px] font-semibold text-zinc-900 truncate"><?php echo esc_html( $ws_item_name ); ?></span>
-                                        <span class="text-[9px] text-zinc-400 font-mono truncate">app.heycora.in/<?php echo esc_html( $ws_item_slug ); ?></span>
+                                        <span class="text-[9px] text-zinc-400 font-mono truncate"><?php echo esc_html( $cora_display_host ); ?>/<?php echo esc_html( $ws_item_slug ); ?></span>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1 shrink-0 ml-1">
                                     <?php if ( $is_current ) : ?>
                                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-900 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                     <?php endif; ?>
-                                    <button type="button" class="p-0.5 hover:bg-zinc-200 rounded text-zinc-400 hover:text-zinc-755 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" onclick="event.stopPropagation(); window.coraToggleEditWorkspaceDrawer(true, <?php echo intval( $ws_item['id'] ); ?>, '<?php echo esc_js( $ws_item_name ); ?>', '<?php echo esc_js( $ws_item_slug ); ?>', '<?php echo esc_js( $ws_item_plan ); ?>', '<?php echo esc_js( $ws_item_email ); ?>', '<?php echo esc_js( $ws_item_status ); ?>');">
+                                    <button type="button" class="p-0.5 hover:bg-zinc-200 rounded text-zinc-400 hover:text-zinc-755 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" onclick="event.stopPropagation(); window.coraToggleEditWorkspaceDrawer(true, <?php echo intval( $ws_item['id'] ?? 0 ); ?>, '<?php echo esc_js( $ws_item_name ); ?>', '<?php echo esc_js( $ws_item_slug ); ?>', '<?php echo esc_js( $ws_item_plan ); ?>', '<?php echo esc_js( $ws_item_email ); ?>', '<?php echo esc_js( $ws_item_status ); ?>');">
                                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                     </button>
                                 </div>
@@ -4251,7 +4280,7 @@ if ( $_cora_splash_leads > 0 ) {
             }
             $current_user_avatar = $current_wp_user->exists() ? get_user_meta( $current_wp_user->ID, 'cora_avatar_url', true ) : '';
             ?>
-            <div class="cora-user-footer px-4 py-3 flex items-center justify-between border-t border-zinc-200/50 hover:bg-zinc-100/50 transition-colors duration-200 cursor-pointer relative z-[60]" onclick="event.stopPropagation(); $('#cora-profile-popover').toggleClass('hidden'); $('#cora-sidebar-notif-popover').addClass('hidden'); $('#cora-workspace-popover').addClass('hidden');">
+            <div class="cora-user-footer px-4 py-3 flex items-center justify-between border-t border-zinc-200/50 hover:bg-zinc-100/50 transition-colors duration-200 cursor-pointer relative z-[60]" onclick="window.coraToggleSidebarProfilePopover(event)">
                 <!-- Dynamic Feedback Pill (Sticky Arc) inside profile footer -->
                 <button type="button" id="cora-feedback-trigger" class="absolute -top-2.5 right-14 h-5 px-2.5 flex items-center justify-center gap-1.5 text-[9px] font-bold shadow-2xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer z-[65]" onclick="window.coraOpenFeedbackDrawer(event)">
                     <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" class="shrink-0 text-white">
@@ -4278,7 +4307,7 @@ if ( $_cora_splash_leads > 0 ) {
                 </div>
                 
                 <!-- Notification Bell Button with badge -->
-                <div class="cora-user-inbox relative shrink-0 text-zinc-500 hover:text-black transition-all p-1.5 rounded-lg bg-zinc-200/50 hover:bg-zinc-200 cursor-pointer flex items-center justify-center" onclick="event.stopPropagation(); $('#cora-sidebar-notif-popover').toggleClass('hidden'); $('#cora-profile-popover').addClass('hidden'); $('#cora-workspace-popover').addClass('hidden');">
+                <div class="cora-user-inbox relative shrink-0 text-zinc-500 hover:text-black transition-all p-1.5 rounded-lg bg-zinc-200/50 hover:bg-zinc-200 cursor-pointer flex items-center justify-center" onclick="window.coraToggleSidebarNotifPopover(event)">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
@@ -4302,55 +4331,167 @@ if ( $_cora_splash_leads > 0 ) {
         <div class="cora-content-wrapper p-3 sm:p-5 md:p-6 max-w-full w-full flex-1 space-y-5 sm:space-y-6 min-w-0">
             <!-- CORA Global Skeleton Preloader -->
             <div id="cora-skeleton-overlay" class="hidden w-full" aria-hidden="true">
-              <!-- Dashboard skeleton -->
-              <div id="cora-skeleton-dashboard" class="cora-skeleton-instance px-4 md:px-6 py-4 w-full space-y-6">
-                <!-- KPI cards skeleton -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div class="cora-skeleton-card shadow-sm"><div class="cora-skeleton cora-skeleton-text w-16 mb-3"></div><div class="cora-skeleton cora-skeleton-title w-24 mb-2"></div><div class="cora-skeleton cora-skeleton-text w-12"></div></div>
-                  <div class="cora-skeleton-card shadow-sm"><div class="cora-skeleton cora-skeleton-text w-16 mb-3"></div><div class="cora-skeleton cora-skeleton-title w-24 mb-2"></div><div class="cora-skeleton cora-skeleton-text w-12"></div></div>
-                  <div class="cora-skeleton-card shadow-sm hidden lg:block"><div class="cora-skeleton cora-skeleton-text w-16 mb-3"></div><div class="cora-skeleton cora-skeleton-title w-24 mb-2"></div><div class="cora-skeleton cora-skeleton-text w-12"></div></div>
-                  <div class="cora-skeleton-card shadow-sm hidden lg:block"><div class="cora-skeleton cora-skeleton-text w-16 mb-3"></div><div class="cora-skeleton cora-skeleton-title w-24 mb-2"></div><div class="cora-skeleton cora-skeleton-text w-12"></div></div>
+              <!-- 1. Dashboard Skeleton Instance -->
+              <div id="cora-skeleton-dashboard" class="cora-skeleton-instance w-full space-y-6">
+                <!-- Top Header -->
+                <div class="flex items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div class="space-y-1.5">
+                    <div class="cora-skeleton w-48 h-6"></div>
+                    <div class="cora-skeleton w-72 h-3.5"></div>
+                  </div>
+                  <div class="flex gap-2">
+                    <div class="cora-skeleton cora-skeleton-btn w-28"></div>
+                    <div class="cora-skeleton cora-skeleton-btn w-32"></div>
+                  </div>
                 </div>
-                <!-- Greeting skeleton -->
-                <div class="text-center py-8 space-y-3">
-                  <div class="cora-skeleton cora-skeleton-title w-64 mx-auto mb-2" style="height:40px;border-radius:10px;"></div>
-                  <div class="cora-skeleton cora-skeleton-text w-48 mx-auto"></div>
+
+                <!-- 4-Cell KPI Strip Skeleton -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-zinc-100 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-xs overflow-hidden">
+                  <div class="p-4 space-y-2"><div class="cora-skeleton w-20 h-3"></div><div class="cora-skeleton w-28 h-6"></div><div class="cora-skeleton w-16 h-2.5"></div></div>
+                  <div class="p-4 space-y-2"><div class="cora-skeleton w-20 h-3"></div><div class="cora-skeleton w-28 h-6"></div><div class="cora-skeleton w-16 h-2.5"></div></div>
+                  <div class="p-4 space-y-2"><div class="cora-skeleton w-20 h-3"></div><div class="cora-skeleton w-28 h-6"></div><div class="cora-skeleton w-16 h-2.5"></div></div>
+                  <div class="p-4 space-y-2"><div class="cora-skeleton w-20 h-3"></div><div class="cora-skeleton w-28 h-6"></div><div class="cora-skeleton w-16 h-2.5"></div></div>
                 </div>
-                <!-- Search skeleton -->
-                <div class="max-w-2xl mx-auto"><div class="cora-skeleton w-full" style="height:52px;border-radius:9999px;"></div></div>
-                <!-- Quick actions skeleton -->
-                <div class="flex justify-center gap-3">
-                  <div class="cora-skeleton w-32" style="height:36px;border-radius:9999px;"></div>
-                  <div class="cora-skeleton w-28" style="height:36px;border-radius:9999px;"></div>
-                  <div class="cora-skeleton w-32" style="height:36px;border-radius:9999px;"></div>
-                </div>
-                <!-- Bento grid skeleton -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <div class="cora-skeleton-card shadow-sm md:col-span-2" style="min-height:280px;"><div class="cora-skeleton cora-skeleton-text w-32 mb-3"></div><div class="space-y-3"><div class="cora-skeleton cora-skeleton-text w-full"></div><div class="cora-skeleton cora-skeleton-text w-5/6"></div><div class="cora-skeleton cora-skeleton-text w-4/6"></div><div class="cora-skeleton cora-skeleton-text w-5/6"></div></div></div>
-                  <div class="cora-skeleton-card shadow-sm" style="min-height:280px;"><div class="cora-skeleton cora-skeleton-text w-24 mb-3"></div><div class="space-y-4"><div class="cora-skeleton cora-skeleton-title w-full"></div><div class="cora-skeleton cora-skeleton-title w-full"></div><div class="cora-skeleton cora-skeleton-title w-full"></div></div></div>
+
+                <!-- Bento Grid / Charts Skeleton -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div class="lg:col-span-2 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-5 space-y-4 shadow-xs" style="min-height: 320px;">
+                    <div class="flex items-center justify-between"><div class="cora-skeleton w-36 h-4"></div><div class="cora-skeleton w-20 h-3"></div></div>
+                    <div class="space-y-3 pt-2">
+                      <div class="cora-skeleton w-full h-10"></div>
+                      <div class="cora-skeleton w-full h-10"></div>
+                      <div class="cora-skeleton w-full h-10"></div>
+                      <div class="cora-skeleton w-full h-10"></div>
+                    </div>
+                  </div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-5 space-y-4 shadow-xs" style="min-height: 320px;">
+                    <div class="flex items-center justify-between"><div class="cora-skeleton w-28 h-4"></div><div class="cora-skeleton cora-skeleton-avatar w-6 h-6"></div></div>
+                    <div class="space-y-3 pt-2">
+                      <div class="cora-skeleton w-full h-8"></div>
+                      <div class="cora-skeleton w-full h-8"></div>
+                      <div class="cora-skeleton w-full h-8"></div>
+                      <div class="cora-skeleton w-full h-8"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              <!-- Generic list/table skeleton (for views like leads, bookings etc) -->
-              <div id="cora-skeleton-list" class="cora-skeleton-instance hidden px-4 md:px-6 py-4 w-full space-y-4">
-                <!-- Header -->
-                <div class="flex items-center justify-between mb-4">
-                  <div class="cora-skeleton cora-skeleton-title w-40"></div>
-                  <div class="cora-skeleton w-28" style="height:36px;border-radius:8px;"></div>
+              <!-- 2. Notion-Style Data Table Skeleton (Leads, Financials, Invoices, Users, Pages) -->
+              <div id="cora-skeleton-table" class="cora-skeleton-instance hidden w-full space-y-5">
+                <!-- Header & Toolbar -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div class="space-y-1.5">
+                    <div class="cora-skeleton w-44 h-6"></div>
+                    <div class="cora-skeleton w-64 h-3.5"></div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="cora-skeleton w-32 cora-skeleton-btn"></div>
+                    <div class="cora-skeleton w-24 cora-skeleton-btn"></div>
+                  </div>
                 </div>
-                <!-- Filter bar -->
-                <div class="flex gap-2 mb-4">
-                  <div class="cora-skeleton w-20" style="height:28px;border-radius:9999px;"></div>
-                  <div class="cora-skeleton w-24" style="height:28px;border-radius:9999px;"></div>
-                  <div class="cora-skeleton w-20" style="height:28px;border-radius:9999px;"></div>
+
+                <!-- Table Container -->
+                <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-xs overflow-hidden">
+                  <!-- Filter bar -->
+                  <div class="p-3.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                      <div class="cora-skeleton w-20 cora-skeleton-pill"></div>
+                      <div class="cora-skeleton w-24 cora-skeleton-pill"></div>
+                      <div class="cora-skeleton w-20 cora-skeleton-pill"></div>
+                    </div>
+                    <div class="cora-skeleton w-48 h-8 rounded-lg"></div>
+                  </div>
+
+                  <!-- Table Header -->
+                  <div class="grid grid-cols-12 gap-3 px-4 py-3 bg-zinc-50/60 dark:bg-zinc-800/40 border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="col-span-4"><div class="cora-skeleton w-24 h-3"></div></div>
+                    <div class="col-span-2"><div class="cora-skeleton w-16 h-3"></div></div>
+                    <div class="col-span-2"><div class="cora-skeleton w-16 h-3"></div></div>
+                    <div class="col-span-2"><div class="cora-skeleton w-16 h-3"></div></div>
+                    <div class="col-span-2 text-right"><div class="cora-skeleton w-12 h-3 ml-auto"></div></div>
+                  </div>
+
+                  <!-- Table Rows (Zero Layout Shift) -->
+                  <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    <div class="grid grid-cols-12 gap-3 px-4 py-3.5 items-center">
+                      <div class="col-span-4 flex items-center gap-2.5"><div class="cora-skeleton cora-skeleton-avatar w-7 h-7 shrink-0"></div><div class="space-y-1"><div class="cora-skeleton w-36 h-3.5"></div><div class="cora-skeleton w-24 h-2.5"></div></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-16 cora-skeleton-pill"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-20 h-3"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-16 h-3"></div></div>
+                      <div class="col-span-2 flex justify-end gap-1.5"><div class="cora-skeleton w-14 h-6 rounded-md"></div></div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 px-4 py-3.5 items-center">
+                      <div class="col-span-4 flex items-center gap-2.5"><div class="cora-skeleton cora-skeleton-avatar w-7 h-7 shrink-0"></div><div class="space-y-1"><div class="cora-skeleton w-32 h-3.5"></div><div class="cora-skeleton w-20 h-2.5"></div></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-16 cora-skeleton-pill"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-24 h-3"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-14 h-3"></div></div>
+                      <div class="col-span-2 flex justify-end gap-1.5"><div class="cora-skeleton w-14 h-6 rounded-md"></div></div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 px-4 py-3.5 items-center">
+                      <div class="col-span-4 flex items-center gap-2.5"><div class="cora-skeleton cora-skeleton-avatar w-7 h-7 shrink-0"></div><div class="space-y-1"><div class="cora-skeleton w-40 h-3.5"></div><div class="cora-skeleton w-28 h-2.5"></div></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-16 cora-skeleton-pill"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-20 h-3"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-16 h-3"></div></div>
+                      <div class="col-span-2 flex justify-end gap-1.5"><div class="cora-skeleton w-14 h-6 rounded-md"></div></div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 px-4 py-3.5 items-center">
+                      <div class="col-span-4 flex items-center gap-2.5"><div class="cora-skeleton cora-skeleton-avatar w-7 h-7 shrink-0"></div><div class="space-y-1"><div class="cora-skeleton w-28 h-3.5"></div><div class="cora-skeleton w-16 h-2.5"></div></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-16 cora-skeleton-pill"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-20 h-3"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-14 h-3"></div></div>
+                      <div class="col-span-2 flex justify-end gap-1.5"><div class="cora-skeleton w-14 h-6 rounded-md"></div></div>
+                    </div>
+                  </div>
                 </div>
-                <!-- Table rows -->
-                <div class="cora-skeleton-card shadow-sm space-y-3">
-                  <div class="flex items-center gap-3 py-2 border-b border-zinc-100"><div class="cora-skeleton w-8 h-8 rounded-full flex-shrink-0"></div><div class="flex-1 space-y-1.5"><div class="cora-skeleton cora-skeleton-text w-48"></div><div class="cora-skeleton cora-skeleton-text w-32"></div></div><div class="cora-skeleton w-16" style="height:24px;border-radius:6px;"></div></div>
-                  <div class="flex items-center gap-3 py-2 border-b border-zinc-100"><div class="cora-skeleton w-8 h-8 rounded-full flex-shrink-0"></div><div class="flex-1 space-y-1.5"><div class="cora-skeleton cora-skeleton-text w-40"></div><div class="cora-skeleton cora-skeleton-text w-28"></div></div><div class="cora-skeleton w-16" style="height:24px;border-radius:6px;"></div></div>
-                  <div class="flex items-center gap-3 py-2 border-b border-zinc-100"><div class="cora-skeleton w-8 h-8 rounded-full flex-shrink-0"></div><div class="flex-1 space-y-1.5"><div class="cora-skeleton cora-skeleton-text w-44"></div><div class="cora-skeleton cora-skeleton-text w-24"></div></div><div class="cora-skeleton w-16" style="height:24px;border-radius:6px;"></div></div>
-                  <div class="flex items-center gap-3 py-2 border-b border-zinc-100"><div class="cora-skeleton w-8 h-8 rounded-full flex-shrink-0"></div><div class="flex-1 space-y-1.5"><div class="cora-skeleton cora-skeleton-text w-36"></div><div class="cora-skeleton cora-skeleton-text w-32"></div></div><div class="cora-skeleton w-16" style="height:24px;border-radius:6px;"></div></div>
-                  <div class="flex items-center gap-3 py-2"><div class="cora-skeleton w-8 h-8 rounded-full flex-shrink-0"></div><div class="flex-1 space-y-1.5"><div class="cora-skeleton cora-skeleton-text w-44"></div><div class="cora-skeleton cora-skeleton-text w-28"></div></div><div class="cora-skeleton w-16" style="height:24px;border-radius:6px;"></div></div>
+              </div>
+
+              <!-- 3. System Settings Suite Skeleton -->
+              <div id="cora-skeleton-settings" class="cora-skeleton-instance hidden w-full space-y-6">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div class="space-y-1.5">
+                    <div class="cora-skeleton w-52 h-6"></div>
+                    <div class="cora-skeleton w-80 h-3.5"></div>
+                  </div>
+                  <div class="cora-skeleton cora-skeleton-btn w-32"></div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+                  <!-- Left 1-col nav list -->
+                  <div class="space-y-2">
+                    <div class="cora-skeleton w-full h-11 rounded-lg"></div>
+                    <div class="cora-skeleton w-full h-11 rounded-lg"></div>
+                    <div class="cora-skeleton w-full h-11 rounded-lg"></div>
+                    <div class="cora-skeleton w-full h-11 rounded-lg"></div>
+                    <div class="cora-skeleton w-full h-11 rounded-lg"></div>
+                  </div>
+
+                  <!-- Right 3-col settings panels -->
+                  <div class="lg:col-span-3 space-y-6">
+                    <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-5 space-y-4 shadow-xs">
+                      <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+                        <div class="space-y-1"><div class="cora-skeleton w-36 h-4"></div><div class="cora-skeleton w-56 h-3"></div></div>
+                        <div class="cora-skeleton w-4 h-4"></div>
+                      </div>
+                      <div class="space-y-4 pt-2">
+                        <div class="space-y-1.5"><div class="cora-skeleton w-24 h-3"></div><div class="cora-skeleton cora-skeleton-input"></div></div>
+                        <div class="space-y-1.5"><div class="cora-skeleton w-32 h-3"></div><div class="cora-skeleton cora-skeleton-input"></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. Media & Canvas Grid Skeleton -->
+              <div id="cora-skeleton-grid" class="cora-skeleton-instance hidden w-full space-y-5">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div class="space-y-1.5"><div class="cora-skeleton w-40 h-6"></div><div class="cora-skeleton w-60 h-3.5"></div></div>
+                  <div class="cora-skeleton cora-skeleton-btn w-28"></div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-3 space-y-2.5 shadow-xs"><div class="cora-skeleton w-full h-36 rounded-lg"></div><div class="cora-skeleton w-3/4 h-3.5"></div><div class="cora-skeleton w-1/2 h-2.5"></div></div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-3 space-y-2.5 shadow-xs"><div class="cora-skeleton w-full h-36 rounded-lg"></div><div class="cora-skeleton w-3/4 h-3.5"></div><div class="cora-skeleton w-1/2 h-2.5"></div></div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-3 space-y-2.5 shadow-xs"><div class="cora-skeleton w-full h-36 rounded-lg"></div><div class="cora-skeleton w-3/4 h-3.5"></div><div class="cora-skeleton w-1/2 h-2.5"></div></div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-3 space-y-2.5 shadow-xs"><div class="cora-skeleton w-full h-36 rounded-lg"></div><div class="cora-skeleton w-3/4 h-3.5"></div><div class="cora-skeleton w-1/2 h-2.5"></div></div>
                 </div>
               </div>
             </div>
@@ -5076,21 +5217,21 @@ window.coraRenderQuickActionsBar = function() {
 
         var buttonsHtml = totalItems.map(function(item) {
             if (item.isCreator) {
-                return '<button type="button" onclick="' + item.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0 my-1">' +
+                return '<button type="button" onclick="' + item.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0" style="margin:0;">' +
                     '<span class="cora-ai-gradient-pill-inner">' +
                         item.icon +
                         '<span>' + item.label + '</span>' +
                     '</span>' +
                 '</button>';
             } else {
-                return '<button onclick="' + item.onclick + '" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0 my-1">' +
+                return '<button onclick="' + item.onclick + '" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0" style="margin:0;">' +
                     item.icon +
                     ' <span>' + item.label + '</span>' +
                 '</button>';
             }
         }).join('');
 
-        bar.innerHTML = '<div class="w-full flex flex-row flex-wrap items-center justify-center gap-x-3 gap-y-3.5 px-4 py-2 my-1">' +
+        bar.innerHTML = '<div class="w-full" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; row-gap:8px; column-gap:10px; padding:6px 16px; margin:4px 0;">' +
             buttonsHtml +
         '</div>';
 
@@ -5241,7 +5382,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                             </div>
 
                             <div class="pt-4 border-t border-zinc-100 mt-3">
-                                <button onclick="coraNavigateTo('ai-assistants')" class="w-full flex items-center justify-between text-xs font-bold text-violet-655 hover:text-violet-750 transition-colors cursor-pointer group">
+                                <button onclick="window.coraToggleSidebar(true)" class="w-full flex items-center justify-between text-xs font-bold text-violet-655 hover:text-violet-750 transition-colors cursor-pointer group">
                                     <span>Consult AI Co-Founder</span>
                                     <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
                                 </button>
@@ -5357,7 +5498,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                             </div>
 
                             <div class="pt-4 border-t border-zinc-100 mt-3">
-                                <button onclick="coraNavigateTo('ai-assistants')" class="w-full flex items-center justify-between text-xs font-bold text-blue-650 hover:text-blue-750 transition-colors cursor-pointer group">
+                                <button onclick="window.coraToggleSidebar(true)" class="w-full flex items-center justify-between text-xs font-bold text-blue-650 hover:text-blue-750 transition-colors cursor-pointer group">
                                     <span>Browse Smart Actions</span>
                                     <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
                                 </button>
@@ -5808,9 +5949,22 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         <div class="cora-form-group flex flex-col gap-1.5">
                             <label class="cora-form-label text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Select Booking / Showing Context</label>
                             <select id="cora-description-showing-select" class="cora-form-input w-full border border-zinc-200 rounded-md p-2 text-sm bg-white focus:border-zinc-400 focus:outline-none transition-colors">
-                                <option value="deal-jaipur">Rohit & Sneha - Luxury Villa Sale (Jaipur)</option>
-                                <option value="maternity-delhi">Ananya Sharma - Residential Buy (Delhi)</option>
-                                <option value="product-delhi">Rajesh Kumar - Commercial Office Lease (Delhi)</option>
+                                <?php
+                                global $wpdb;
+                                $tbl_shoots = $wpdb->prefix . 'cora_shoots';
+                                $user_agency = function_exists( 'cora_get_current_agency_id' ) ? cora_get_current_agency_id() : 1;
+                                $live_shoots = array();
+                                if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $tbl_shoots ) ) === $tbl_shoots ) {
+                                    $live_shoots = $wpdb->get_results( $wpdb->prepare( "SELECT id, client_name, package_name, location FROM {$tbl_shoots} WHERE agency_id = %d ORDER BY id DESC LIMIT 15", $user_agency ) );
+                                }
+                                if ( ! empty( $live_shoots ) ) :
+                                    foreach ( $live_shoots as $ls ) :
+                                        $ctx_label = esc_html( trim( $ls->client_name . ( $ls->package_name ? ' — ' . $ls->package_name : '' ) . ( $ls->location ? ' (' . $ls->location . ')' : '' ) ) );
+                                ?>
+                                    <option value="<?php echo esc_attr( $ls->id ); ?>"><?php echo $ctx_label; ?></option>
+                                <?php endforeach; else : ?>
+                                    <option value="">No active bookings or showings found</option>
+                                <?php endif; ?>
                             </select>
                         </div>
 
@@ -12028,11 +12182,60 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
     };
 
     window.coraToggleProfilePopover = function(e) {
-        if (e) e.stopPropagation();
+        if (e && e.stopPropagation) e.stopPropagation();
         const popover = document.getElementById('cora-header-profile-popover');
         if (!popover) return;
-        const isHidden = popover.classList.contains('hidden');
+        const isHidden = popover.classList.contains('hidden') || popover.style.display === 'none';
         window.coraCloseAllPopovers('cora-header-profile-popover');
+        if (isHidden) {
+            popover.classList.remove('hidden');
+            popover.style.display = 'flex';
+        } else {
+            popover.classList.add('hidden');
+            popover.style.display = 'none';
+        }
+    };
+
+    window.coraToggleSidebarProfilePopover = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const popover = document.getElementById('cora-profile-popover');
+        if (!popover) return;
+        const isHidden = popover.classList.contains('hidden') || popover.style.display === 'none';
+        window.coraCloseAllPopovers('cora-profile-popover');
+        if (isHidden) {
+            popover.classList.remove('hidden');
+            popover.style.display = 'flex';
+        } else {
+            popover.classList.add('hidden');
+            popover.style.display = 'none';
+        }
+    };
+
+    window.coraToggleSidebarNotifPopover = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const popover = document.getElementById('cora-sidebar-notif-popover');
+        if (!popover) return;
+        const isHidden = popover.classList.contains('hidden') || popover.style.display === 'none';
+        window.coraCloseAllPopovers('cora-sidebar-notif-popover');
+        if (isHidden) {
+            popover.classList.remove('hidden');
+            popover.style.display = 'flex';
+        } else {
+            popover.classList.add('hidden');
+            popover.style.display = 'none';
+        }
+    };
+
+    window.coraToggleWorkspacePopover = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        if ($('.cora-sidebar').hasClass('collapsed-sidebar')) {
+            window.coraToggleSidebarCollapse();
+            return;
+        }
+        const popover = document.getElementById('cora-workspace-popover');
+        if (!popover) return;
+        const isHidden = popover.classList.contains('hidden') || popover.style.display === 'none';
+        window.coraCloseAllPopovers('cora-workspace-popover');
         if (isHidden) {
             popover.classList.remove('hidden');
             popover.style.display = 'flex';

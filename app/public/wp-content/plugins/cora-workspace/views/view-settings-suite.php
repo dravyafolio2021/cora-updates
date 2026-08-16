@@ -19,31 +19,112 @@ if (typeof window.coraREData === 'undefined') {
 </script>
 <?php
 
+$current_industry = function_exists('cora_get_workspace_industry') ? cora_get_workspace_industry() : ( ! empty( $_COOKIE['cora_workspace_industry'] ) ? $_COOKIE['cora_workspace_industry'] : get_option( 'cora_workspace_industry', 'real_estate' ) );
+$current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
+$is_real_estate = ( $current_industry_clean === 'real-estate' || $current_industry_clean === 'real_estate' );
+$is_studio = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' || $current_industry_clean === 'photography-studio' );
+$is_custom = ( $current_industry_clean === 'custom' );
+$enabled_custom_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
+$has_branches_feature = ( $is_real_estate || ( $is_custom && in_array( 'branches', $enabled_custom_features, true ) ) );
+
 $active_tab = isset( $_GET['settings_tab'] ) ? sanitize_text_field( $_GET['settings_tab'] ) : 'general';
 if ( in_array( $active_tab, array( 'activity', 'activity-timeline', 'activity-logs', 'timeline', 'pulse', 'audit' ) ) ) {
     $active_tab = 'pulse';
 }
-// Only fetch real, human-created published pages — exclude WP auto-generated/system pages
-$pages = get_pages( array(
-    'post_status'    => 'publish',
-    'sort_column'    => 'post_title',
-    'sort_order'     => 'ASC',
-    'exclude_tree'   => array(),
-    'meta_query'     => array(
-        array(
-            'key'     => '_wp_page_template',
-            'compare' => 'EXISTS',
-        ),
-    ),
-) );
-// Filter out WP auto-generated pages (comments, menu, etc.) by name pattern
-$pages = array_filter( $pages, function( $p ) {
-    $skip_patterns = array( ' Comments Page ', ' Menu Page ', ' Front Page ', 'Coming Soon' );
-    foreach ( $skip_patterns as $pattern ) {
-        if ( strpos( $p->post_title, $pattern ) !== false ) return false;
+if ( $active_tab === 'branches' && ! $has_branches_feature ) {
+    $active_tab = 'general';
+}
+// Only fetch pages from the active workspace's published theme (Canvas theme)
+global $wpdb;
+$tbl_themes = $wpdb->prefix . 'cora_canvas_themes';
+$tbl_pages  = $wpdb->prefix . 'cora_canvas_pages';
+
+// Resolve current workspace agency ID
+$cora_ws_ctx = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+$workspace_agency_id = ! empty( $cora_ws_ctx['agency_id'] ) ? intval( $cora_ws_ctx['agency_id'] ) : ( ! empty( $cora_ws_ctx['id'] ) ? intval( $cora_ws_ctx['id'] ) : 0 );
+
+if ( ! $workspace_agency_id ) {
+    if ( $is_studio ) {
+        $workspace_agency_id = 2;
+    } else {
+        $workspace_agency_id = 1;
     }
-    return true;
-} );
+}
+
+$pages = array();
+$active_theme = null;
+
+if ( $workspace_agency_id > 0 && $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $tbl_themes ) ) === $tbl_themes ) {
+    $active_theme = $wpdb->get_row( $wpdb->prepare(
+        "SELECT * FROM {$tbl_themes} WHERE agency_id = %d AND status = 'live' ORDER BY id DESC LIMIT 1",
+        $workspace_agency_id
+    ), ARRAY_A );
+    
+    if ( ! $active_theme ) {
+        $active_theme = $wpdb->get_row( $wpdb->prepare(
+            "SELECT * FROM {$tbl_themes} WHERE agency_id = %d ORDER BY id DESC LIMIT 1",
+            $workspace_agency_id
+        ), ARRAY_A );
+    }
+}
+
+if ( ! $active_theme && $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $tbl_themes ) ) === $tbl_themes ) {
+    $active_theme = $wpdb->get_row( "SELECT * FROM {$tbl_themes} WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+}
+
+if ( $active_theme && $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $tbl_pages ) ) === $tbl_pages ) {
+    $theme_pages = $wpdb->get_results( $wpdb->prepare(
+        "SELECT id, title, slug, wp_post_id, is_homepage FROM {$tbl_pages} WHERE theme_id = %d ORDER BY is_homepage DESC, title ASC",
+        intval( $active_theme['id'] )
+    ), ARRAY_A );
+    
+    $seen_ids = array();
+    foreach ( $theme_pages as $tp ) {
+        $page_id = ! empty( $tp['wp_post_id'] ) ? intval( $tp['wp_post_id'] ) : intval( $tp['id'] );
+        if ( in_array( $page_id, $seen_ids, true ) ) {
+            continue;
+        }
+        $seen_ids[] = $page_id;
+        
+        $p_obj = new stdClass();
+        $p_obj->ID = $page_id;
+        $p_obj->post_title = ! empty( $tp['title'] ) ? $tp['title'] : ucfirst( str_replace( '-', ' ', $tp['slug'] ) );
+        $p_obj->post_name = $tp['slug'];
+        $pages[] = $p_obj;
+    }
+}
+
+// Fallback: If no canvas pages exist, only get pages authored or assigned to this workspace agency
+if ( empty( $pages ) ) {
+    $raw_pages = get_pages( array(
+        'post_status'    => 'publish',
+        'sort_column'    => 'post_title',
+        'sort_order'     => 'ASC',
+        'meta_query'     => array(
+            array(
+                'key'     => 'cora_agency_id',
+                'value'   => function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $workspace_agency_id ) : $workspace_agency_id,
+                'compare' => 'IN'
+            )
+        )
+    ) );
+    
+    if ( ! empty( $raw_pages ) ) {
+        $skip_patterns = array( 'E2E ', 'Test', 'Comments Page', 'Menu Page', 'Front Page' );
+        foreach ( $raw_pages as $p ) {
+            $skip = false;
+            foreach ( $skip_patterns as $pattern ) {
+                if ( stripos( $p->post_title, $pattern ) !== false ) {
+                    $skip = true;
+                    break;
+                }
+            }
+            if ( ! $skip ) {
+                $pages[] = $p;
+            }
+        }
+    }
+}
 $categories = get_categories();
 $roles      = wp_roles()->get_names();
 
@@ -51,7 +132,7 @@ $cora_settings_tabs = array(
     'general'    => array(
         'label' => 'General Settings',
         'desc'  => 'Workspace details & identity',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
+        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
     ),
     'pulse'      => array(
         'label' => 'Activity Timeline & Logs',
@@ -63,56 +144,55 @@ $cora_settings_tabs = array(
         'desc'  => 'Enforce security parameters',
         'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>'
     ),
-    'branches'   => array(
+);
+
+if ( $has_branches_feature ) {
+    $cora_settings_tabs['branches'] = array(
         'label' => 'Branches',
         'desc'  => 'Brokerage physical offices',
         'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
-    ),
-    'brand'      => array(
-        'label' => 'Branding & APIs',
-        'desc'  => 'Favicon, logos, integrations',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
-    ),
-    'notifications' => array(
-        'label' => 'Notifications',
-        'desc'  => 'Push, email & event triggers',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>'
-    ),
-    'reading'    => array(
-        'label' => 'Content & SEO',
-        'desc'  => 'Pages, writing, URLs & indexing',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>'
-    ),
-    'privacy'    => array(
-        'label' => 'Privacy',
-        'desc'  => 'Compliance terms page',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
-    ),
-    'git-sync'   => array(
-        'label' => 'Git Sync',
-        'desc'  => 'Lovable & GitHub Integrations',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M18 15V9a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4v6"></path><circle cx="12" cy="5" r="1"></circle></svg>'
-    ),
-    'onboarding' => array(
-        'label' => 'User Onboarding',
-        'desc'  => 'Registration, Google OAuth & access',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>'
-    ),
-    'backup'     => array(
-        'label' => 'Backup & Recovery',
-        'desc'  => 'Local server & Google Drive exports',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>'
-    ),
-    'event-planner' => array(
-        'label' => 'Event & Tour Itineraries',
-        'desc'  => 'Multi-day shoot tours & crew schedules',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
-    ),
-    'updates'    => array(
-        'label' => 'Updates & Platform',
-        'desc'  => 'Click-to-update & GitHub sync',
-        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>'
-    )
+    );
+}
+
+$cora_settings_tabs['brand'] = array(
+    'label' => 'Branding & APIs',
+    'desc'  => 'Favicon, logos, integrations',
+    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
+);
+$cora_settings_tabs['notifications'] = array(
+    'label' => 'Notifications',
+    'desc'  => 'Push, email & event triggers',
+    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>'
+);
+$cora_settings_tabs['reading'] = array(
+    'label' => 'Content & SEO',
+    'desc'  => 'Pages, writing, URLs & indexing',
+    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>'
+);
+$cora_settings_tabs['privacy'] = array(
+    'label' => 'Privacy',
+    'desc'  => 'Compliance terms page',
+    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+);
+$cora_settings_tabs['git-sync'] = array(
+    'label' => 'Git Sync',
+    'desc'  => 'Lovable & GitHub Integrations',
+    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M18 15V9a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4v6"></path><circle cx="12" cy="5" r="1"></circle></svg>'
+);
+$cora_settings_tabs['onboarding'] = array(
+    'label' => 'User Onboarding',
+    'desc'  => 'Registration, Google OAuth & access',
+    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>'
+);
+$cora_settings_tabs['backup'] = array(
+    'label' => 'Backup & Recovery',
+    'desc'  => 'Local server & Google Drive exports',
+    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>'
+);
+$cora_settings_tabs['updates'] = array(
+    'label' => 'Updates & Platform',
+    'desc'  => 'Click-to-update & GitHub sync',
+    'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>'
 );
 ?>
 
@@ -487,13 +567,19 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         $current_industry_clean = str_replace( '_', '-', strtolower( trim( $current_industry ) ) );
                         $is_studio = ( $current_industry_clean === 'photography' || $current_industry_clean === 'studio' || $current_industry_clean === 'photography-studio' );
 
-                        $title_real_estate = get_option( 'cora_site_title_real_estate', '' );
-                        $title_studio      = get_option( 'cora_site_title_studio', '' );
-                        $active_site_title = $is_studio ? $title_studio : $title_real_estate;
+                        $active_site_title = get_option( 'blogname', '' );
+                        if ( empty( $active_site_title ) ) {
+                            $title_real_estate = get_option( 'cora_site_title_real_estate', '' );
+                            $title_studio      = get_option( 'cora_site_title_studio', '' );
+                            $active_site_title = $is_studio ? $title_studio : $title_real_estate;
+                        }
 
-                        $desc_real_estate = get_option( 'cora_tagline_real_estate', '' );
-                        $desc_studio      = get_option( 'cora_tagline_studio', '' );
-                        $active_tagline    = $is_studio ? $desc_studio : $desc_real_estate;
+                        $active_tagline = get_option( 'blogdescription', '' );
+                        if ( empty( $active_tagline ) ) {
+                            $desc_real_estate = get_option( 'cora_tagline_real_estate', '' );
+                            $desc_studio      = get_option( 'cora_tagline_studio', '' );
+                            $active_tagline   = $is_studio ? $desc_studio : $desc_real_estate;
+                        }
                         ?>
                         <input type="text" name="blogname" id="cora-site-title-input" value="<?php echo esc_attr( $active_site_title ); ?>" placeholder="Cora">
                     </div>
@@ -591,13 +677,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
 
                     <script>
-                    window.coraBrandingValues = {
-                        titleRE: <?php echo json_encode( $title_real_estate ); ?>,
-                        titleST: <?php echo json_encode( $title_studio ); ?>,
-                        descRE: <?php echo json_encode( $desc_real_estate ); ?>,
-                        descST: <?php echo json_encode( $desc_studio ); ?>
-                    };
-
                     function coraFilterRolesByIndustry(industry) {
                         if (!industry) {
                             industry = $('#cora-settings-industry-select').val() || 'real_estate';
@@ -605,22 +684,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         if (industry === 'studio' || industry === 'photography') industry = 'photography_studio';
                         
                         const select = $('#cora-default-role-select');
-                        const siteTitleInput = $('#cora-site-title-input');
-                        const taglineInput   = $('#cora-site-tagline-input');
-                        
-                        const titleRE = window.coraBrandingValues.titleRE;
-                        const titleST = window.coraBrandingValues.titleST;
-                        const descRE  = window.coraBrandingValues.descRE;
-                        const descST  = window.coraBrandingValues.descST;
-                        
-                        if (industry === 'real_estate') {
-                            if (siteTitleInput.length && (!siteTitleInput.data('user-edited'))) siteTitleInput.val(titleRE);
-                            if (taglineInput.length && (!taglineInput.data('user-edited'))) taglineInput.val(descRE);
-                        } else {
-                            if (siteTitleInput.length && (!siteTitleInput.data('user-edited'))) siteTitleInput.val(titleST);
-                            if (taglineInput.length && (!taglineInput.data('user-edited'))) taglineInput.val(descST);
-                        }
-
                         if (!select.length) return;
                         const currentVal = select.val();
 
@@ -788,6 +851,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
         </div>
 
+        <?php if ( $has_branches_feature ) : ?>
         <?php
             $agency_id = cora_get_current_user_agency_id();
             $branches  = cora_db_get_branches();
@@ -1128,6 +1192,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </script>
 
         </div>
+        <?php endif; ?>
         <!-- TAB 4: BRANDING & API KEYS -->
         <div id="cora-settings-panel-brand" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'brand' ? '' : 'hidden'; ?>">
             <!-- Card 1: Brand Assets -->
@@ -1245,7 +1310,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <label>Sidebar Brand Title</label>
                             <input type="text" name="cora_sidebar_title" value="<?php echo esc_attr( get_option('cora_sidebar_title', 'cora') ); ?>" placeholder="Cora">
                         </div>
-                        <div class="sm:col-span-2">
+                        <div>
+                            <label>System Currency Layout</label>
+                            <select name="cora_currency_format">
+                                <?php $curr_format = get_option('cora_currency_format', 'INR_LAKHS'); ?>
+                                <option value="INR_LAKHS" <?php selected( $curr_format, 'INR_LAKHS' ); ?>>Indian Rupees (Lakhs/Crores - e.g. ₹1.80 L / ₹4.50 Cr)</option>
+                                <option value="INR_STANDARD" <?php selected( $curr_format, 'INR_STANDARD' ); ?>>Indian Rupees Standard (Comma separated - e.g. ₹1,80,000)</option>
+                                <option value="USD" <?php selected( $curr_format, 'USD' ); ?>>US Dollars (Standard - e.g. $180,000)</option>
+                            </select>
+                            <p class="text-[10px] text-zinc-400 mt-1">Determines how prices are formatted in Ledger.</p>
+                        </div>
+                        <div>
                             <label>Browser Tab Title Template</label>
                             <input type="text" disabled value="[Page Name] – <?php echo esc_attr( get_option('blogname') ); ?>" class="bg-zinc-100 text-zinc-500 cursor-not-allowed">
                             <p class="text-[11px] text-zinc-400 mt-1.5">This is how your tab titles will appear across the workspace.</p>
@@ -1254,70 +1329,90 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
             </div>
 
-            <!-- Card 2: Developer Keys & API Integrations -->
+            <!-- Card 2: Developer Keys & API Integrations (Platform Root Super Admin Only) -->
+            <?php 
+            $is_super_admin = function_exists('cora_is_super_owner') && cora_is_super_owner();
+            ?>
             <div class="cora-shopify-card">
                 <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
-                    <div>
-                        <h3 class="text-sm font-semibold text-zinc-900 m-0">Third-Party Developer Keys</h3>
-                        <p class="text-xs text-zinc-500 m-0">Provide map keys and CRM notification credentials.</p>
+                    <div class="flex items-center gap-2.5">
+                        <div>
+                            <h3 class="text-sm font-semibold text-zinc-900 m-0">Third-Party Developer Keys</h3>
+                            <p class="text-xs text-zinc-500 m-0">Provide map keys and CRM notification credentials.</p>
+                        </div>
                     </div>
-                    <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                    </span>
+                    <div class="flex items-center gap-2">
+                        <?php if ( $is_super_admin ) : ?>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Super Admin
+                            </span>
+                        <?php else : ?>
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600 border border-zinc-200">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                Platform Managed
+                            </span>
+                        <?php endif; ?>
+                        <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                        </span>
+                    </div>
                 </div>
                 <div class="cora-shopify-card-body pt-4 space-y-4">
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label>Google Maps API Key</label>
-                        <?php $maps_key = get_option('cora_gbp_maps_api_key', ''); ?>
-                        <input type="password" name="cora_gbp_maps_api_key" value="<?php echo esc_attr( $maps_key ? str_repeat('•', 24) : '' ); ?>" placeholder="AIzaSy..." class="cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
-                        <p class="text-[10px] text-zinc-400 mt-1">Required for geolocating listing properties.</p>
+                <?php if ( $is_super_admin ) : ?>
+                    <!-- Editable Controls for Platform Super Admin -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label>Google Maps API Key</label>
+                            <?php $maps_key = get_option('cora_gbp_maps_api_key', ''); ?>
+                            <input type="password" name="cora_gbp_maps_api_key" value="<?php echo esc_attr( $maps_key ? str_repeat('•', 24) : '' ); ?>" placeholder="AIzaSy..." class="cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
+                            <p class="text-[10px] text-zinc-400 mt-1">Required for geolocating listing properties.</p>
+                        </div>
                     </div>
-                    <div>
-                        <label>System Currency Layout</label>
-                        <select name="cora_currency_format">
-                            <?php $curr_format = get_option('cora_currency_format', 'INR_LAKHS'); ?>
-                            <option value="INR_LAKHS" <?php selected( $curr_format, 'INR_LAKHS' ); ?>>Indian Rupees (Lakhs/Crores - e.g. ₹1.80 L / ₹4.50 Cr)</option>
-                            <option value="INR_STANDARD" <?php selected( $curr_format, 'INR_STANDARD' ); ?>>Indian Rupees Standard (Comma separated - e.g. ₹1,80,000)</option>
-                            <option value="USD" <?php selected( $curr_format, 'USD' ); ?>>US Dollars (Standard - e.g. $180,000)</option>
-                        </select>
-                        <p class="text-[10px] text-zinc-400 mt-1">Determines how prices are formatted in Ledger.</p>
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-zinc-100 pt-4">
-                    <div class="relative">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label class="!mb-0 text-zinc-700 font-bold text-xs flex items-center gap-1.5">
-                                WhatsApp Cloud API Token (Bearer)
-                                <span class="text-zinc-400 font-normal" title="Permanent System User Token from Meta Business Manager">(Permanent Token)</span>
-                            </label>
-                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/50">
-                                <span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
-                                Graph v20.0
-                            </span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-zinc-100 pt-4">
+                        <div class="relative">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="!mb-0 text-zinc-700 font-bold text-xs flex items-center gap-1.5">
+                                    WhatsApp Cloud API Token (Bearer)
+                                    <span class="text-zinc-400 font-normal" title="Permanent System User Token from Meta Business Manager">(Permanent Token)</span>
+                                </label>
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/50">
+                                    <span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Graph v20.0
+                                </span>
+                            </div>
+                            <?php $wa_token = get_option('cora_whatsapp_api_token', ''); ?>
+                            <div class="relative flex items-center">
+                                <input type="password" id="cora-whatsapp-token-input" name="cora_whatsapp_api_token" value="<?php echo esc_attr( $wa_token ); ?>" placeholder="EAAB..." class="w-full bg-white text-zinc-900 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-mono pr-10 focus:border-zinc-450 focus:outline-none">
+                                <button type="button" onclick="var inp = document.getElementById('cora-whatsapp-token-input'); inp.type = inp.type === 'password' ? 'text' : 'password';" class="absolute right-2 text-zinc-400 hover:text-zinc-700 p-1 border-none bg-transparent cursor-pointer select-none">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                            <p class="text-[10px] text-zinc-400 mt-1">From Meta Business Manager &rarr; System Users &rarr; WhatsApp Business Assets.</p>
                         </div>
-                        <?php $wa_token = get_option('cora_whatsapp_api_token', ''); ?>
-                        <div class="relative flex items-center">
-                            <input type="password" id="cora-whatsapp-token-input" name="cora_whatsapp_api_token" value="<?php echo esc_attr( $wa_token ); ?>" placeholder="EAAB..." class="w-full bg-white text-zinc-900 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-mono pr-10 focus:border-zinc-450 focus:outline-none">
-                            <button type="button" onclick="var inp = document.getElementById('cora-whatsapp-token-input'); inp.type = inp.type === 'password' ? 'text' : 'password';" class="absolute right-2 text-zinc-400 hover:text-zinc-700 p-1 border-none bg-transparent cursor-pointer select-none">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                            </button>
+                        <div class="relative">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="!mb-0 text-zinc-700 font-bold text-xs">WhatsApp Business Phone ID</label>
+                                <span class="text-[10px] text-zinc-400 font-mono">Recipient: E.164</span>
+                            </div>
+                            <?php $wa_phone_id = get_option('cora_whatsapp_phone_number_id', ''); ?>
+                            <input type="text" name="cora_whatsapp_phone_number_id" value="<?php echo esc_attr( $wa_phone_id ); ?>" placeholder="e.g. 1093847291039" class="w-full bg-white text-zinc-900 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-mono focus:border-zinc-450 focus:outline-none">
+                            <p class="text-[10px] text-zinc-400 mt-1">From Meta WhatsApp Manager &rarr; Phone Numbers &rarr; Phone Number ID.</p>
                         </div>
-                        <p class="text-[10px] text-zinc-400 mt-1">From Meta Business Manager &rarr; System Users &rarr; WhatsApp Business Assets.</p>
                     </div>
-                    <div class="relative">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label class="!mb-0 text-zinc-700 font-bold text-xs">WhatsApp Business Phone ID</label>
-                            <span class="text-[10px] text-zinc-400 font-mono">Recipient: E.164</span>
+                <?php else : ?>
+                    <!-- Locked / Platform Managed State for Workspace Level -->
+                    <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-xl flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-700 mt-0.5">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         </div>
-                        <?php $wa_phone_id = get_option('cora_whatsapp_phone_number_id', ''); ?>
-                        <input type="text" name="cora_whatsapp_phone_number_id" value="<?php echo esc_attr( $wa_phone_id ); ?>" placeholder="e.g. 1093847291039" class="w-full bg-white text-zinc-900 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-mono focus:border-zinc-450 focus:outline-none">
-                        <p class="text-[10px] text-zinc-400 mt-1">From Meta WhatsApp Manager &rarr; Phone Numbers &rarr; Phone Number ID.</p>
+                        <div class="space-y-1">
+                            <p class="text-xs font-bold text-zinc-900 m-0">Platform Root Managed Credentials</p>
+                            <p class="text-xs text-zinc-500 leading-relaxed m-0">Third-party developer API keys (Google Maps Geolocation &amp; Meta WhatsApp Cloud API) are centrally configured and managed at the Super Administrator root level. They are active for this workspace.</p>
+                        </div>
                     </div>
-                </div> <!-- close Grid 2 -->
-
+                <?php endif; ?>
 
                 </div> <!-- close cora-shopify-card-body -->
             </div> <!-- close cora-shopify-card -->
@@ -1844,8 +1939,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     transform: translateX(16px);
                 }
             </style>
-
-        </div> <!-- close cora-settings-panel-notifications -->
 
         </div> <!-- close cora-settings-panel-notifications -->
 
@@ -2670,282 +2763,294 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             $history = get_option( 'cora_workspace_backup_history', array() );
         ?>
         <!-- TAB 13: BACKUP & RECOVERY PANEL -->
-        <div id="cora-settings-panel-backup" class="cora-settings-panel space-y-6 <?php echo $active_tab === 'backup' ? '' : 'hidden'; ?>">
+        <div id="cora-settings-panel-backup" class="cora-settings-panel space-y-6 max-w-4xl <?php echo $active_tab === 'backup' ? '' : 'hidden'; ?>">
             
-            <!-- Top Metric & Status Summary Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 md:gap-4 mb-2 lg:mb-0">
-                <div class="cora-shopify-card cora-metric-card border-l-2 border-l-emerald-500 shadow-2xs">
-                    <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">System Health</div>
-                    <div class="text-sm font-bold text-emerald-600 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        100% Operational
+            <!-- Top Horizontal KPI Strip (Unified Effortless Block) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-zinc-100 border border-zinc-200 rounded-xl bg-white shadow-sm overflow-hidden">
+                <div class="p-4">
+                    <div class="flex items-center gap-1.5 mb-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></span>
+                        <span class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">System Health</span>
                     </div>
+                    <div class="text-sm font-bold text-zinc-900 leading-tight">100% Operational</div>
                     <div class="text-[10px] text-zinc-500 mt-1">24h Automation Active</div>
                 </div>
 
-                <div class="cora-shopify-card cora-metric-card border-l-2 border-l-zinc-400 shadow-2xs">
-                    <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Last Snapshot Taken</div>
-                    <div class="text-sm font-bold text-zinc-900 truncate">
-                        <?php 
-                        echo !empty($history) ? esc_html(date('M j, Y H:i', $history[0]['time'])) : 'No backups yet';
-                        ?>
+                <div class="p-4">
+                    <div class="flex items-center gap-1.5 mb-1.5">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="#71717a" stroke-width="2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <span class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Last Snapshot</span>
                     </div>
-                    <div class="text-[10px] text-zinc-500 mt-1">Full System (.zip) & SQL</div>
+                    <div class="text-sm font-bold text-zinc-900 leading-tight font-mono truncate">
+                        <?php echo !empty($history) ? esc_html(date('M j, Y H:i', $history[0]['time'])) : 'No backups yet'; ?>
+                    </div>
+                    <div class="text-[10px] text-zinc-500 mt-1">Full System & SQL</div>
                 </div>
 
-                <div class="cora-shopify-card cora-metric-card border-l-2 <?php echo $is_google_connected ? 'border-l-emerald-500' : 'border-l-zinc-400 '; ?> shadow-2xs">
-                    <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Google Drive Storage</div>
-                    <div class="text-sm font-bold text-zinc-900 flex items-center gap-1.5">
+                <div class="p-4">
+                    <div class="flex items-center gap-1.5 mb-1.5">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="#71717a" stroke-width="2" fill="none" class="shrink-0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        <span class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Google Drive</span>
+                    </div>
+                    <div class="text-sm font-bold text-zinc-900 leading-tight flex items-center gap-1.5">
                         <?php if ( $is_google_connected ) : ?>
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span class="text-emerald-600 ">Connected & Active</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                            <span>Connected</span>
                         <?php else : ?>
-                            <span class="w-2 h-2 rounded-full bg-zinc-400 "></span>
-                            <span class="text-zinc-500 ">Not Connected</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 shrink-0"></span>
+                            <span class="text-zinc-500">Not Connected</span>
                         <?php endif; ?>
                     </div>
-                    <div class="text-[10px] text-zinc-500 mt-1 truncate" title="<?php echo esc_attr($google_folder_id ?: 'Click 1-Click Connect'); ?>">Folder: <?php echo esc_html($google_folder_id ?: 'Click 1-Click Connect'); ?></div>
+                    <div class="text-[10px] text-zinc-500 mt-1 truncate" title="<?php echo esc_attr($google_folder_id ?: 'Root Drive Folder'); ?>">
+                        <?php echo esc_html($google_folder_id ? 'Folder: ' . substr($google_folder_id, 0, 12) . '...' : 'Root Drive Folder'); ?>
+                    </div>
                 </div>
 
-                <div class="cora-shopify-card cora-metric-card border-l-2 border-l-indigo-500 shadow-2xs">
-                    <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Restore Guard</div>
-                    <div class="text-sm font-bold text-indigo-600 flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        Auto Safety Point
+                <div class="p-4">
+                    <div class="flex items-center gap-1.5 mb-1.5">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="#71717a" stroke-width="2" fill="none" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <span class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Restore Guard</span>
                     </div>
+                    <div class="text-sm font-bold text-zinc-900 leading-tight">Auto Safety Point</div>
                     <div class="text-[10px] text-zinc-500 mt-1">Snapshot before restore</div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-                <!-- Left 2 Cols: Backup Configuration & System Snapshots -->
-                <div class="xl:col-span-7 space-y-6">
-                    
-                    <!-- Card 1: Full System Snapshot & Export Generator -->
-                    <div class="cora-shopify-card">
-                        <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <h3 class="text-base font-bold text-zinc-900 m-0">Full System Snapshot & Export</h3>
-                                    <span class="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">v2.1.0 Ready</span>
-                                    <!-- Info Icon with Tooltip Popover -->
-                                    <div class="relative group cursor-pointer flex shrink-0">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 hover:text-zinc-650 transition-colors"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-zinc-950 border border-zinc-850 text-white rounded-xl shadow-xl opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all z-50 text-[10px] leading-relaxed font-normal normal-case">
-                                            <span class="font-bold text-zinc-100 block mb-1">Full System Snapshot (.zip)</span>
-                                            Packages the complete database schema, row records, environment manifest, active module states, and asset indexes into a single compressed backup archive. Standard database export (.sql) exports table structures and rows only.
-                                        </div>
-                                    </div>
-                                </div>
-                                <p class="text-xs text-zinc-500 m-0">Generate full system backup archives (.zip) or lightweight database SQL files.</p>
-                            </div>
-                            <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                            </span>
+            <!-- Block 1: Snapshot & Export Creation Tiles -->
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <h3 class="text-sm font-semibold text-zinc-900 m-0">System Snapshot & Export</h3>
+                            <span class="text-[9px] font-mono font-bold text-zinc-700 bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded-full shrink-0">v2.1.0 Ready</span>
                         </div>
-                        <div class="cora-shopify-card-body pt-4 space-y-4">
-                            <div class="flex flex-wrap gap-2.5 pt-1.5">
-                                <!-- Primary: Full System Snapshot Zip Button -->
-                                <button type="button" id="cora-trigger-full-snapshot-backup" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm active:scale-97">
-                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                    Generate Full Snapshot (.zip)
-                                </button>
-    
-                                <!-- Secondary: Database Only SQL Button -->
-                                <button type="button" id="cora-trigger-manual-db-backup" class="px-4 py-2.5 bg-transparent hover:bg-zinc-50 text-zinc-800 border border-zinc-300 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
-                                    Export Database Only (.sql)
-                                </button>
-                            </div>
-                        </div> <!-- close cora-shopify-card-body -->
+                        <p class="text-xs text-zinc-500 m-0">Generate complete system archive packages (.zip) or lightweight SQL database dumps.</p>
                     </div>
-
-                    <!-- Card 2: 24h Automated Google Drive Sync -->
-                    <div class="cora-shopify-card" id="cora-google-drive-card">
-                        <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
-                            <div>
-                                <h3 class="text-base font-bold text-zinc-900 m-0">24-Hour Automated Google Drive Sync</h3>
-                                <p class="text-xs text-zinc-500 m-0">Automatically upload daily platform snapshots to your personal Google Drive.</p>
-                            </div>
-                            <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                            </span>
-                        </div>
-                        <div class="cora-shopify-card-body pt-4 space-y-4">
-
-                        <?php if ( $is_google_connected ) : ?>
-                        <!-- STATE: Fully connected -->
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-zinc-50/50 border border-zinc-150 border-l-2 border-l-emerald-500 rounded-xl gap-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
-                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="text-emerald-600 "><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                                </div>
-                                <div>
-                                    <h4 class="text-xs font-bold text-zinc-900 leading-none m-0">Google Drive — Connected</h4>
-                                    <p class="text-[10px] text-zinc-500 mt-0.5 m-0"><?php echo esc_html($google_account_email ?: 'Google Account'); ?></p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap bg-emerald-100 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connected & Active
-                                </span>
-                                <button type="button" id="cora-disconnect-google-drive" class="px-2.5 py-1 bg-white hover:bg-red-50 text-zinc-500 hover:text-red-600 text-[11px] font-semibold rounded-lg border border-zinc-200 hover:border-red-200 transition-all flex items-center gap-1.5 cursor-pointer">
-                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-                                    Disconnect
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-zinc-800 mb-0.5">Automation Schedule</label>
-                                <select name="cora_backup_schedule" style="width:100%;padding:10px 14px;font-size:13px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:10px;color:var(--text-primary);outline:none;font-family:inherit;">
-                                    <?php $schedule = get_option('cora_backup_schedule', 'daily'); ?>
-                                    <option value="daily" <?php selected($schedule, 'daily'); ?>>Every 24 Hours (Daily at 00:00 UTC)</option>
-                                    <option value="weekly" <?php selected($schedule, 'weekly'); ?>>Every 7 Days (Weekly)</option>
-                                    <option value="monthly" <?php selected($schedule, 'monthly'); ?>>Every 30 Days (Monthly)</option>
-                                    <option value="manual" <?php selected($schedule, 'manual'); ?>>Manual Only</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-zinc-800 mb-0.5">Drive Folder ID <span class="font-normal text-zinc-400">(optional)</span></label>
-                                <p class="text-[10px] text-zinc-500 mb-1.5">Leave empty to save to your Drive root folder</p>
-                                <input type="text" name="cora_backup_google_folder_id" value="<?php echo esc_attr($google_folder_id); ?>" placeholder="e.g. 1A2b3C4d5E_xyz..." class="w-full">
-                            </div>
-                        </div>
-
-                        <div class="pt-2">
-                            <label class="flex items-center gap-2.5 text-xs text-zinc-800 font-semibold cursor-pointer">
-                                <input type="checkbox" name="cora_backup_google_drive_enabled" value="1" <?php checked(get_option('cora_backup_google_drive_enabled', 1), 1); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
-                                <span>Automatically upload a 24-hour snapshot to your connected Drive</span>
-                            </label>
-                        </div>
-
-                        <div class="pt-1">
-                            <button type="button" id="cora-trigger-drive-sync-now" class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-                                Sync to Drive Now
-                            </button>
-                        </div>
-
-                        <?php elseif ( $google_has_creds ) : ?>
-                        <!-- STATE: Platform credentials configured — ready to connect -->
-                        <div class="p-5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-4">
-                            <div class="flex items-start gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center shrink-0">
-                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" class="" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-zinc-900 m-0">Connect your Google Drive</p>
-                                    <p class="text-xs text-zinc-500 mt-1 leading-relaxed">Click below and sign in with your Google account. Cora will request access to store backup snapshots in your Drive. No data is shared or read — only backups are written.</p>
-                                </div>
-                            </div>
-                            <button type="button" id="cora-connect-google-drive" class="w-full py-3 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-sm rounded-xl transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-sm">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-                                Connect with Google
-                            </button>
-                            <p class="text-[10px] text-zinc-400 text-center">You will be redirected to Google to authorise access. You can disconnect at any time.</p>
-                        </div>
-
-                        <?php else : ?>
-                        <!-- STATE: Coming Soon — platform credentials not yet configured -->
-                        <div class="p-6 flex flex-col items-center justify-center text-center space-y-3">
-                            <div class="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center">
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 "><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-zinc-900 m-0">Google Drive Sync</p>
-                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 bg-zinc-100 text-zinc-500 text-[10px] font-bold rounded-full border border-zinc-200 ">
-                                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                    Coming Soon
-                                </span>
-                                <p class="text-xs text-zinc-500 mt-2 leading-relaxed">Automated 24-hour backup uploads directly to your Google Drive will be available in the next platform update.</p>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-
-                        </div> <!-- close cora-shopify-card-body -->
-                    </div>
-
-
-
+                    <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
                 </div>
-
-                <!-- Right 1 Col: Snapshot Logs & One-Click Restore Center -->
-                <div class="xl:col-span-5 space-y-6">
-                    <div class="cora-shopify-card">
-                        <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
-                            <div class="flex items-center justify-between flex-1 pr-4">
-                                <div>
-                                    <h3 class="text-sm font-bold text-zinc-900 m-0">Backup Logs & Restore Center</h3>
-                                    <p class="text-xs text-zinc-500 m-0">Stored system restore points & archives.</p>
+                <div class="cora-shopify-card-body pt-5 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Tile A: Full System Snapshot (.zip) -->
+                        <div class="p-4 bg-zinc-50/70 border border-zinc-200 rounded-xl flex flex-col justify-between space-y-3">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-1.5">
+                                    <span class="text-xs font-bold text-zinc-900">Full System Snapshot</span>
+                                    <span class="text-[9px] font-mono font-bold text-zinc-600 bg-white border border-zinc-200 px-1.5 py-0.5 rounded">.ZIP</span>
                                 </div>
-                                <span class="text-[10px] font-mono text-zinc-500 ">cora-backups/</span>
+                                <p class="text-[11px] text-zinc-500 leading-relaxed m-0">Bundles database tables, theme templates, media manifests, and workspace configuration into a portable archive.</p>
                             </div>
-                            <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                            </span>
+                            <button type="button" id="cora-trigger-full-snapshot-backup" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-98">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                Generate Full Snapshot (.zip)
+                            </button>
                         </div>
-                        <div class="cora-shopify-card-body pt-4 space-y-4">
 
-                        <div id="cora-backups-history-list" class="space-y-3">
-                            <?php 
-                            if ( ! empty( $history ) ) :
+                        <!-- Tile B: Database Only (.sql) -->
+                        <div class="p-4 bg-zinc-50/70 border border-zinc-200 rounded-xl flex flex-col justify-between space-y-3">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-1.5">
+                                    <span class="text-xs font-bold text-zinc-900">Database Only Export</span>
+                                    <span class="text-[9px] font-mono font-bold text-zinc-600 bg-white border border-zinc-200 px-1.5 py-0.5 rounded">.SQL</span>
+                                </div>
+                                <p class="text-[11px] text-zinc-500 leading-relaxed m-0">Exports raw database table schemas and row records. Ideal for quick developer migrations and table restores.</p>
+                            </div>
+                            <button type="button" id="cora-trigger-manual-db-backup" class="w-full py-2.5 bg-white hover:bg-zinc-100 text-zinc-900 border border-zinc-250 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-98">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                                Export Database Only (.sql)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Block 2: Restore Points & Archive Registry (Notion-Style Data Block) -->
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div class="flex items-center justify-between flex-1 pr-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-semibold text-zinc-900 m-0">Backup Logs &amp; Restore Center</h3>
+                                <span class="text-[10px] font-mono text-zinc-400"><?php echo count($history); ?> total</span>
+                            </div>
+                            <p class="text-xs text-zinc-500 m-0">Manage stored restore points, download archive files, or perform 1-click rollback.</p>
+                        </div>
+                        <span class="text-[10px] font-mono text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">cora-backups/</span>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
+                </div>
+                <div class="cora-shopify-card-body p-0">
+                    <?php if ( ! empty( $history ) ) : ?>
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="border-b border-zinc-100 bg-zinc-50/50 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+                                    <th class="py-2.5 px-4">Archive / Snapshot</th>
+                                    <th class="py-2.5 px-4">Format</th>
+                                    <th class="py-2.5 px-4">Created (UTC)</th>
+                                    <th class="py-2.5 px-4">Size</th>
+                                    <th class="py-2.5 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-zinc-100">
+                                <?php 
                                 foreach ( $history as $item ) :
                                     $is_zip = ( strpos( $item['filename'], '.zip' ) !== false );
-                                    $display_name = strlen($item['filename']) > 24 ? substr($item['filename'], 0, 24) . '...' : $item['filename'];
-                            ?>
-                                <div class="cora-shopify-card !p-3.5 flex flex-col gap-3 bg-white border border-zinc-200 rounded-2xl shadow-3xs hover:border-zinc-300 transition-colors">
-                                     <!-- Row 1: File Name and Format Badge -->
-                                     <div class="flex items-center justify-between gap-2.5 min-w-0">
-                                         <div class="flex items-center gap-2 min-w-0">
-                                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                             <span class="font-bold text-xs text-zinc-850 truncate" title="<?php echo esc_attr( $item['filename'] ); ?>"><?php echo esc_html( $display_name ); ?></span>
-                                         </div>
-                                         <span class="text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200/60 shrink-0">
-                                             <?php echo $is_zip ? '.zip' : 'SQL'; ?>
-                                         </span>
-                                     </div>
- 
-                                     <!-- Row 2: Date & Size (Meta Details) -->
-                                     <div class="flex items-center justify-between text-[10px] text-zinc-500 border-t border-zinc-50 pt-2 font-medium gap-3">
-                                         <span class="whitespace-nowrap"><?php echo esc_html( date( 'M j, Y H:i', $item['time'] ) ) . ' UTC'; ?></span>
-                                         <span class="font-semibold text-zinc-650 whitespace-nowrap"><?php echo esc_html( $item['size'] ); ?></span>
-                                     </div>
- 
-                                     <!-- Row 3: Action Buttons -->
-                                     <div class="flex items-center justify-between pt-2 border-t border-zinc-100 ">
-                                         <button type="button" onclick="coraRestoreBackup('<?php echo esc_js($item['filename']); ?>')" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-[10px] rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-3xs active:scale-97">
-                                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 2v6h6"></path><path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path></svg>
-                                             Restore
-                                         </button>
-                                         <div class="flex items-center gap-1.5">
-                                             <a href="<?php echo admin_url('admin-ajax.php?action=cora_download_backup&file=' . urlencode( $item['filename'] ) . '&nonce=' . wp_create_nonce('cora_download_backup_nonce')); ?>" class="p-1.5 text-zinc-500 hover:text-zinc-850 bg-zinc-50 hover:bg-zinc-100 rounded-lg border border-zinc-200/30 transition-all" title="Download Archive">
-                                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                             </a>
-                                             <button type="button" onclick="coraDeleteBackup('<?php echo esc_js($item['filename']); ?>')" class="p-1.5 text-red-500 hover:text-red-600 bg-red-50/50 hover:bg-red-55 rounded-lg border border-red-100/30 transition-all cursor-pointer" title="Delete Log">
-                                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                             </button>
-                                         </div>
-                                     </div>
-                                </div>
-                            <?php 
-                                endforeach;
-                            else :
-                            ?>
-                                <div class="p-8 text-center flex flex-col items-center justify-center space-y-3">
-                                    <div class="w-12 h-12 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-300 ">
-                                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                    </div>
-                                    <div class="space-y-1">
-                                        <p class="font-bold text-sm text-zinc-900 m-0">No snapshots yet</p>
-                                        <p class="text-xs text-zinc-500 m-0">Generate your first backup above.</p>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        </div> <!-- close cora-shopify-card-body -->
+                                ?>
+                                <tr class="hover:bg-zinc-50/60 transition-colors">
+                                    <td class="py-3 px-4 font-semibold text-zinc-900">
+                                        <div class="flex items-center gap-2">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                            <span class="truncate max-w-[240px]" title="<?php echo esc_attr( $item['filename'] ); ?>"><?php echo esc_html( $item['filename'] ); ?></span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <span class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200">
+                                            <?php echo $is_zip ? '.zip' : 'SQL'; ?>
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-zinc-500 font-mono text-[11px]">
+                                        <?php echo esc_html( date( 'M j, Y H:i', $item['time'] ) ); ?>
+                                    </td>
+                                    <td class="py-3 px-4 text-zinc-600 font-mono text-[11px]">
+                                        <?php echo esc_html( $item['size'] ); ?>
+                                    </td>
+                                    <td class="py-3 px-4 text-right">
+                                        <div class="flex items-center justify-end gap-1.5">
+                                            <button type="button" onclick="coraRestoreBackup('<?php echo esc_js($item['filename']); ?>')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold text-[10px] rounded-md transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-97">
+                                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 2v6h6"></path><path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path></svg>
+                                                Restore
+                                            </button>
+                                            <a href="<?php echo admin_url('admin-ajax.php?action=cora_download_backup&file=' . urlencode( $item['filename'] ) . '&nonce=' . wp_create_nonce('cora_download_backup_nonce')); ?>" class="p-1 text-zinc-500 hover:text-zinc-900 bg-white hover:bg-zinc-100 rounded-md border border-zinc-200 transition-all" title="Download Archive">
+                                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                            </a>
+                                            <button type="button" onclick="coraDeleteBackup('<?php echo esc_js($item['filename']); ?>')" class="p-1 text-zinc-400 hover:text-red-600 bg-white hover:bg-red-50 rounded-md border border-zinc-200 hover:border-red-200 transition-all cursor-pointer" title="Delete Archive">
+                                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
+                    <?php else : ?>
+                    <div class="p-8 text-center flex flex-col items-center justify-center space-y-2.5">
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-400">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-xs text-zinc-900 m-0">No snapshots generated yet</p>
+                            <p class="text-[11px] text-zinc-500 mt-0.5 m-0">Click "Generate Full Snapshot" above to create your first platform restore point.</p>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Block 3: 24-Hour Automated Cloud Backup & Google Drive Sync -->
+            <div class="cora-shopify-card" id="cora-google-drive-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900 m-0">24-Hour Automated Google Drive Sync</h3>
+                        <p class="text-xs text-zinc-500 m-0">Automatically upload daily platform snapshots to your personal Google Drive account.</p>
+                    </div>
+                    <span class="cora-card-chevron text-zinc-400 transition-transform duration-200">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    </span>
+                </div>
+                <div class="cora-shopify-card-body pt-4 space-y-4">
+
+                <?php if ( $is_google_connected ) : ?>
+                    <!-- STATE: Fully connected -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center shrink-0">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="white" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-zinc-900 leading-none m-0">Google Drive Connected</h4>
+                                <p class="text-[10px] text-zinc-500 mt-1 m-0"><?php echo esc_html($google_account_email ?: 'Active Google Account'); ?></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                            </span>
+                            <button type="button" id="cora-disconnect-google-drive" class="px-2.5 py-1 bg-white hover:bg-zinc-100 text-zinc-600 hover:text-red-600 text-[10px] font-semibold rounded-lg border border-zinc-200 transition-all flex items-center gap-1 cursor-pointer">
+                                Disconnect
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-800 mb-1">Automation Schedule</label>
+                            <select name="cora_backup_schedule" class="w-full bg-white border border-zinc-250 rounded-lg px-3 py-2 text-xs text-zinc-900 outline-none focus:ring-1 focus:ring-zinc-950">
+                                <?php $schedule = get_option('cora_backup_schedule', 'daily'); ?>
+                                <option value="daily" <?php selected($schedule, 'daily'); ?>>Every 24 Hours (Daily at 00:00 UTC)</option>
+                                <option value="weekly" <?php selected($schedule, 'weekly'); ?>>Every 7 Days (Weekly)</option>
+                                <option value="monthly" <?php selected($schedule, 'monthly'); ?>>Every 30 Days (Monthly)</option>
+                                <option value="manual" <?php selected($schedule, 'manual'); ?>>Manual Only</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-800 mb-1">Drive Folder ID <span class="font-normal text-zinc-400">(optional)</span></label>
+                            <input type="text" name="cora_backup_google_folder_id" value="<?php echo esc_attr($google_folder_id); ?>" placeholder="Leave empty for Drive root" class="w-full bg-white border border-zinc-250 rounded-lg px-3 py-2 text-xs text-zinc-900 outline-none focus:ring-1 focus:ring-zinc-950">
+                        </div>
+                    </div>
+
+                    <div class="pt-1">
+                        <label class="flex items-center gap-2 text-xs text-zinc-800 font-semibold cursor-pointer">
+                            <input type="checkbox" name="cora_backup_google_drive_enabled" value="1" <?php checked(get_option('cora_backup_google_drive_enabled', 1), 1); ?> class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900">
+                            <span>Automatically upload daily snapshot to your connected Google Drive</span>
+                        </label>
+                    </div>
+
+                    <div class="pt-1">
+                        <button type="button" id="cora-trigger-drive-sync-now" class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                            Sync to Drive Now
+                        </button>
+                    </div>
+
+                <?php elseif ( $google_has_creds ) : ?>
+                    <!-- STATE: Credentials configured — ready to connect -->
+                    <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-xl space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center shrink-0">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-zinc-900 m-0">Connect Google Drive</p>
+                                <p class="text-[11px] text-zinc-500 mt-0.5 leading-relaxed">Sign in with your Google account to automatically store daily platform snapshots in your Drive.</p>
+                            </div>
+                        </div>
+                        <button type="button" id="cora-connect-google-drive" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                            Connect with Google
+                        </button>
+                    </div>
+
+                <?php else : ?>
+                    <!-- STATE: Coming Soon -->
+                    <div class="p-6 flex flex-col items-center justify-center text-center space-y-2.5">
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-zinc-900 m-0">Google Drive Cloud Sync</p>
+                            <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 bg-zinc-100 text-zinc-500 text-[9px] font-bold rounded-full border border-zinc-200">
+                                Coming Soon
+                            </span>
+                            <p class="text-[11px] text-zinc-500 mt-1.5 leading-relaxed">Automated 24-hour backup uploads directly to your Google Drive will be available in the next platform update.</p>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 </div>
             </div>
         </div>
@@ -2977,11 +3082,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             opacity: 1;
         }
         </style>
-
-        <!-- EVENT & TOUR PLANNER SETTINGS PANEL -->
-        <div id="cora-settings-panel-event-planner" class="cora-settings-panel space-y-6 max-w-full <?php echo $active_tab === 'event-planner' ? '' : 'hidden'; ?>">
-            <?php include CORA_WORKSPACE_PATH . 'views/view-event-timeline.php'; ?>
-        </div>
 
         <div id="cora-settings-panel-updates" class="cora-settings-panel space-y-6 max-w-3xl relative <?php echo $active_tab === 'updates' ? '' : 'hidden'; ?>">
             <div class="cora-shopify-card">

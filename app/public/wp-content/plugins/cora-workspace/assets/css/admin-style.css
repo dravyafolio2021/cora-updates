@@ -142,14 +142,16 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
    hidden by Cora's Tailwind resets or overflow rules.
    ===================================================================== */
 
-/* Force the media modal toolbar footer to always be visible */
+/* Force the media modal toolbar footer to always be visible and pinned at the bottom */
 .media-modal .media-frame-toolbar {
     position: absolute !important;
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
     height: 60px !important;
-    display: block !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
@@ -157,30 +159,37 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     overflow: visible !important;
     background: #ffffff !important;
     border-top: 1px solid #e4e4e7 !important;
+    padding: 0 24px !important;
+    box-sizing: border-box !important;
 }
 
-/* CRITICAL: position:relative so absolute-positioned children anchor HERE, not to .media-frame */
 .media-modal .media-frame-toolbar .media-toolbar {
-    height: 60px !important;
-    line-height: 60px !important;
-    display: block !important;
+    height: 100% !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
     position: relative !important;
     overflow: visible !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .media-modal .media-frame-toolbar .media-toolbar-primary {
-    float: right !important;
     display: flex !important;
     align-items: center !important;
-    height: 60px !important;
-    padding: 0 24px !important;
+    height: 100% !important;
+    padding: 0 !important;
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
     position: relative !important;
+    float: none !important;
 }
 
 /* Style the native WP select/action button to match Cora monochromatic design */
@@ -255,12 +264,12 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     overflow-x: hidden !important;
 }
 
-/* Fix: WP media modal must sit above Cora drawers (z-index: 99999) */
+/* Fix: WP media modal must sit above Cora drawers (z-index: 99999) and below modal content */
 .media-modal-backdrop {
-    z-index: 160100 !important;
+    z-index: 160000 !important;
 }
 .media-modal {
-    z-index: 160200 !important;
+    z-index: 160100 !important;
 }
 
 /* --- KANBAN & CALENDAR PLANNING UTILITIES --- */
@@ -440,5 +449,67 @@ body,
     color: #09090b !important;
 }
 
+/* ==========================================================================
+   CORA PERFORMANCE & ATOMIC SKELETON LOADING SYSTEM
+   GPU-accelerated, zero-layout-shift (CLS < 0.05) widget wireframes
+   ========================================================================== */
 
+@keyframes cora-skeleton-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
 
+.cora-skeleton {
+    background: linear-gradient(90deg, #f4f4f5 25%, #e4e4e7 50%, #f4f4f5 75%) !important;
+    background-size: 200% 100% !important;
+    animation: cora-skeleton-shimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+    border-radius: 6px !important;
+    display: inline-block !important;
+    transform: translateZ(0) !important;
+    will-change: background-position !important;
+}
+
+.dark .cora-skeleton {
+    background: linear-gradient(90deg, #18181b 25%, #27272a 50%, #18181b 75%) !important;
+    background-size: 200% 100% !important;
+}
+
+.cora-skeleton-avatar {
+    border-radius: 9999px !important;
+}
+
+.cora-skeleton-pill {
+    border-radius: 9999px !important;
+    height: 22px !important;
+}
+
+.cora-skeleton-btn {
+    border-radius: 8px !important;
+    height: 34px !important;
+}
+
+.cora-skeleton-input {
+    border-radius: 8px !important;
+    height: 38px !important;
+    width: 100% !important;
+}
+
+/* Smooth Fade-in Hydration */
+.cora-view-fade-in {
+    animation: coraViewFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes coraViewFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(2px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

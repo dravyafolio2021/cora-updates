@@ -24,24 +24,24 @@ $cora_handled      = is_array( $pulse_data['cora_handled'] ?? null ) ? $pulse_da
 $timeline_events   = is_array( $pulse_data['timeline_events'] ?? null ) ? $pulse_data['timeline_events'] : array();
 $deltas            = is_array( $pulse_data['deltas'] ?? null ) ? $pulse_data['deltas'] : array();
 
-// Standardized Page Header Arguments
-$activity_header_args = array(
-    'title'            => 'Business Pulse',
-    'description'      => 'Cora continuously observes activity across this workspace, highlights what matters, and turns activity into action.',
-    'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>',
-    'ai_stack'         => true,
-    'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
-    'cta'              => array(
-        'text'        => 'Live Refresh',
-        'mobile_text' => 'Refresh',
-        'onclick'     => "window.coraRefreshPulse()",
-        'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>',
-        'visible'     => true,
-        'class'       => '!bg-white hover:!bg-zinc-50 !text-zinc-800 !border-zinc-200 hover:!border-zinc-300 border shadow-2xs',
-    ),
-);
-
-if ( function_exists( 'cora_render_workspace_header' ) ) {
+// Only render standalone page header if accessed as a direct standalone page (not embedded in Settings Suite)
+$is_embedded_in_settings = isset( $cora_settings_tabs ) || ( isset( $_GET['sub_page'] ) && $_GET['sub_page'] === 'settings-suite' );
+if ( ! $is_embedded_in_settings && function_exists( 'cora_render_workspace_header' ) ) {
+    $activity_header_args = array(
+        'title'            => 'Business Pulse',
+        'description'      => 'Cora continuously observes activity across this workspace, highlights what matters, and turns activity into action.',
+        'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>',
+        'ai_stack'         => true,
+        'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
+        'cta'              => array(
+            'text'        => 'Live Refresh',
+            'mobile_text' => 'Refresh',
+            'onclick'     => "window.coraRefreshPulse()",
+            'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>',
+            'visible'     => true,
+            'class'       => '!bg-white hover:!bg-zinc-50 !text-zinc-800 !border-zinc-200 hover:!border-zinc-300 border shadow-2xs',
+        ),
+    );
     cora_render_workspace_header( $activity_header_args );
 }
 ?>

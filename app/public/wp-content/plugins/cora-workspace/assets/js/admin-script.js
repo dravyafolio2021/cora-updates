@@ -230,30 +230,49 @@ jQuery(document).ready(function($) {
         toast.data('timeout-id', tId);
     };
 
-    // 1. Navigation & Tab Switching
+    // 1. Navigation & Widget-Structured Skeleton System
     window.coraShowSkeleton = function(viewType) {
         var overlay = document.getElementById('cora-skeleton-overlay');
-        var dashSkeleton = document.getElementById('cora-skeleton-dashboard');
-        var listSkeleton = document.getElementById('cora-skeleton-list');
         if (!overlay) return;
-        
-        // Hide both first
-        if (dashSkeleton) dashSkeleton.classList.add('hidden');
-        if (listSkeleton) listSkeleton.classList.add('hidden');
-        
-        // Show appropriate skeleton
-        if (viewType === 'dashboard' || viewType === 'home' || !viewType) {
+
+        var dashSkeleton     = document.getElementById('cora-skeleton-dashboard');
+        var tableSkeleton    = document.getElementById('cora-skeleton-table');
+        var settingsSkeleton = document.getElementById('cora-skeleton-settings');
+        var gridSkeleton     = document.getElementById('cora-skeleton-grid');
+
+        // Hide all instances first
+        if (dashSkeleton)     dashSkeleton.classList.add('hidden');
+        if (tableSkeleton)    tableSkeleton.classList.add('hidden');
+        if (settingsSkeleton) settingsSkeleton.classList.add('hidden');
+        if (gridSkeleton)     gridSkeleton.classList.add('hidden');
+
+        var vt = (viewType || '').toLowerCase();
+
+        if (vt === 'dashboard' || vt === 'home' || !vt) {
             if (dashSkeleton) dashSkeleton.classList.remove('hidden');
+        } else if (vt === 'settings' || vt === 'settings-suite' || vt === 'system-settings') {
+            if (settingsSkeleton) settingsSkeleton.classList.remove('hidden');
+        } else if (vt === 'media' || vt === 'canvas' || vt === 'files' || vt === 'gallery') {
+            if (gridSkeleton) gridSkeleton.classList.remove('hidden');
         } else {
-            if (listSkeleton) listSkeleton.classList.remove('hidden');
+            // Default to Notion table skeleton (leads, financials, invoices, users, pages, etc.)
+            if (tableSkeleton) tableSkeleton.classList.remove('hidden');
         }
-        
+
         overlay.classList.remove('hidden');
     };
 
     window.coraHideSkeleton = function() {
         var overlay = document.getElementById('cora-skeleton-overlay');
         if (overlay) overlay.classList.add('hidden');
+
+        // Apply smooth fade-in hydration to the visible content wrapper
+        var wrapper = document.querySelector('.cora-content-wrapper > *:not(#cora-skeleton-overlay)');
+        if (wrapper) {
+            wrapper.classList.remove('cora-view-fade-in');
+            void wrapper.offsetWidth; // Trigger reflow
+            wrapper.classList.add('cora-view-fade-in');
+        }
     };
 
     window.coraNavigateTo = function(targetPageId) {
@@ -1230,7 +1249,7 @@ jQuery(document).ready(function($) {
     });
 
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('#cora-profile-popover, .cora-user-settings-btn, #cora-header-profile-popover, .cora-header-profile-btn, #cora-header-punch-popover, #cora-header-punch-btn, #cora-mobile-punch-popover, #cora-mobile-punch-btn, #cora-workspace-popover, .cora-workspace-card, #cora-sidebar-notif-popover, .cora-user-inbox').length) {
+        if (!$(e.target).closest('#cora-profile-popover, .cora-user-settings-btn, .cora-user-footer, #cora-header-profile-popover, .cora-header-profile-btn, #cora-header-punch-popover, #cora-header-punch-btn, #cora-mobile-punch-popover, #cora-mobile-punch-btn, #cora-workspace-popover, .cora-workspace-card, #cora-sidebar-notif-popover, .cora-user-inbox').length) {
             if (typeof window.coraCloseAllPopovers === 'function') {
                 window.coraCloseAllPopovers();
             } else {
@@ -10073,7 +10092,7 @@ jQuery(document).ready(function($) {
         // Show target settings panel
         const targetPanel = $('#cora-settings-panel-' + tabKey);
         if (targetPanel.length) {
-            targetPanel.removeClass('hidden').addClass('block');
+            targetPanel.removeClass('hidden').addClass('block cora-view-fade-in');
             
             // Accordion: Collapse all card bodies in the active panel except the first one
             var cards = targetPanel.find('.cora-shopify-card');
