@@ -413,8 +413,8 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
     <div class="cora-ai-chat-container">
         <!-- Chat Header -->
         <div class="cora-chat-header border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/40 shrink-0">
-            <!-- Left: Model selectors -->
-            <div class="flex items-center gap-2">
+            <!-- Left: Model selectors & Living Memory Badge -->
+            <div class="flex items-center gap-2 flex-wrap">
                 <div class="flex items-center gap-1.5">
                     <select id="cora-ai-provider" class="cora-ai-header-select text-xs font-bold bg-white border border-zinc-250 rounded-full px-3 py-1 outline-none cursor-pointer" onchange="coraOnProviderChange()">
                         <option value="gemini" selected>Google Gemini</option>
@@ -426,6 +426,11 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
                     
                     <select id="cora-ai-model" class="cora-ai-header-select text-xs font-semibold bg-white border border-zinc-250 rounded-full px-3 py-1 outline-none cursor-pointer"></select>
                 </div>
+
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 rounded-full text-[10px] font-bold tracking-wide">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Living Memory Active
+                </span>
             </div>
 
             <!-- Right: Settings Drawer Trigger -->
@@ -439,29 +444,29 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         <div id="cora-ai-messages" class="cora-ai-messages">
             <!-- Welcome Screen -->
             <div class="cora-ai-welcome" id="cora-ai-welcome-screen">
-                <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-800 border border-zinc-200 shadow-sm">
+                <div class="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 shadow-sm">
                     <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-zinc-900 ">Welcome to Cora AI</h3>
-                    <p class="text-xs text-zinc-500 max-w-sm mt-1">Ask questions, generate draft assets, or perform GST calculations in a few quick keystrokes.</p>
+                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Cora AI Co-Founder</h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mt-1">Autonomous workspace intelligence continuously learning from your daily leads, invoices, bookings, and tasks.</p>
                 </div>
                 <div class="cora-ai-chips">
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Draft a contract for a property sale')">
-                        <strong>Draft Contract</strong>
-                        <p class="text-zinc-400 mt-1">Draft a contract for a property sale.</p>
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Give me a full financial health breakdown with revenue, outstanding invoices, and runway analysis.')">
+                        <strong>Financial Runway Analysis</strong>
+                        <p class="text-zinc-400 mt-1">Audit revenue collected and unpaid client receivables.</p>
                     </div>
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Calculate GST for a ₹50,000 booking split between Delhi and Jaipur')">
-                        <strong>GST Split Math</strong>
-                        <p class="text-zinc-400 mt-1">Calculate GST for ₹50,000 Delhi-Jaipur split.</p>
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Summarize our active CRM lead pipeline and highlight high-priority deals requiring follow-up.')">
+                        <strong>CRM Pipeline Audit</strong>
+                        <p class="text-zinc-400 mt-1">Identify high-intent deals in the conversion window.</p>
                     </div>
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Explain the geofenced office location coordinate checking')">
-                        <strong>Geofencing Help</strong>
-                        <p class="text-zinc-400 mt-1">Explain coordinate checking bounds.</p>
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Review upcoming shoot bookings and check crew call-times and location assignments.')">
+                        <strong>Production Briefing</strong>
+                        <p class="text-zinc-400 mt-1">Check scheduled sessions, call-times, and gear rosters.</p>
                     </div>
-                    <div class="cora-ai-chip" onclick="coraUsePromptChip('How do I manage workspace API roles?')">
-                        <strong>Roles Governance</strong>
-                        <p class="text-zinc-400 mt-1">How do I manage workspace API roles?</p>
+                    <div class="cora-ai-chip" onclick="coraUsePromptChip('Search the living knowledge base for our latest commercial photography contract terms.')">
+                        <strong>Contract Knowledge Search</strong>
+                        <p class="text-zinc-400 mt-1">Query indexed vault agreements and business rules.</p>
                     </div>
                 </div>
             </div>
@@ -471,7 +476,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         <audio id="cora-ai-audio-player" style="display:none;"></audio>
 
         <div class="cora-ai-input-wrapper">
-            <input type="text" id="cora-ai-input" class="cora-ai-input" placeholder="Ask Cora AI..." onkeydown="if(event.key==='Enter') coraSendChatMessage()">
+            <input type="text" id="cora-ai-input" class="cora-ai-input" placeholder="Ask Cora AI Co-Founder about your workspace..." onkeydown="if(event.key==='Enter') coraSendChatMessage()">
             <button type="button" id="cora-ai-send-btn" class="cora-ai-btn" onclick="coraSendChatMessage()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
@@ -480,79 +485,71 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
 </div>
 
 <!-- TAB 2: MCP Developer Gateway Settings -->
-<div id="cora-ai-panel-mcp-settings" class="space-y-6 max-w-3xl" style="display:none;">
-    <!-- Developer Preview & Token Generation -->
-    <div class="bg-white border border-zinc-200 rounded-2xl p-6 shadow-xs space-y-4">
-        <div class="border-b border-zinc-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-                <h3 class="text-sm font-bold text-zinc-900 ">Model Context Protocol (MCP) AI Tools Server</h3>
-                <p class="text-xs text-zinc-500 mt-0.5">Connect your custom external AI agents directly with Cora's data schemas.</p>
-            </div>
-            <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-850 text-[9px] font-bold uppercase tracking-wider self-start sm:self-center">Beta Gateway</span>
-        </div>
-
-        <div class="p-4 border border-zinc-200 rounded-xl bg-zinc-50/50 ">
-            <p class="text-xs text-zinc-650 leading-relaxed">
-                Cora exposes an <strong>MCP tool server</strong> endpoint. By registering this gateway in your local AI platform (like Claude Desktop or Cursor), your AI assistant can query listings, create leads, check audit logs, and retrieve workspace statistics in real-time.
-            </p>
-        </div>
-
-        <!-- MCP Gateway URL -->
-        <div class="space-y-2">
-            <label class="block text-xs font-bold text-zinc-700 ">MCP Gateway Endpoint URL</label>
-            <div class="flex flex-col sm:flex-row gap-2">
-                <input type="text" id="cora-mcp-gateway-url-direct" readonly value="<?php echo esc_url( $mcp_url ); ?>" class="w-full font-mono bg-zinc-55/40 border border-zinc-200 rounded-lg text-xs px-3 py-2 outline-none">
-                <button type="button" class="w-full sm:w-auto px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraCopyToClipboardDirect('cora-mcp-gateway-url-direct')">Copy URL</button>
-            </div>
-        </div>
-
-        <!-- MCP Secure Token -->
-        <form id="cora-mcp-token-form" method="post" action="" class="space-y-4 pt-2">
-            <?php wp_nonce_field( 'cora_save_mcp_token_direct', 'cora_mcp_nonce' ); ?>
-            <div class="space-y-2">
-                <label class="block text-xs font-bold text-zinc-700 ">Secure Bearer Access Token</label>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="password" id="cora-mcp-access-token-direct" name="cora_mcp_access_token_direct" value="<?php echo esc_attr( $mcp_token ); ?>" class="w-full font-mono bg-white border border-zinc-200 rounded-lg text-xs px-3 py-2 outline-none cora-credential-input" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
-                    <div class="flex gap-2 w-full sm:w-auto shrink-0 justify-end">
-                        <button type="button" class="flex-1 sm:flex-none px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-850 font-bold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraToggleTokenVisibilityDirect()">Show</button>
-                        <button type="button" class="flex-1 sm:flex-none px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-850 font-bold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraGenerateNewMCPTokenDirect()">Regenerate</button>
-                        <button type="submit" name="cora_save_mcp_token_direct_submit" class="flex-1 sm:flex-none px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                            Save Token
-                        </button>
-                    </div>
+<div id="cora-ai-panel-mcp-settings" class="space-y-6 max-w-4xl" style="display:none;">
+    
+    <!-- Connector 1: ChatGPT Custom GPT Actions -->
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
+        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
+                    GPT
                 </div>
-                <p class="text-[10px] text-zinc-400 mt-1">Authenticate requests by sending this value in the HTTP header: <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">ChatGPT Custom GPT Connector (OpenAPI 3.1.0)</h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Connect ChatGPT directly to your workspace using Actions & Bearer Token authentication.</p>
+                </div>
             </div>
-        </form>
+            <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-wider self-start sm:self-center">OpenAPI 3.1.0</span>
+        </div>
+
+        <div class="space-y-3">
+            <div class="space-y-1.5">
+                <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">OpenAPI Schema URL</label>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="cora-mcp-openapi-url" readonly value="<?php echo esc_url( home_url( '/wp-json/cora/v1/mcp/openapi.json' ) ); ?>" class="w-full font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none text-zinc-800 dark:text-zinc-200">
+                    <button type="button" class="w-full sm:w-auto px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraCopyToClipboardDirect('cora-mcp-openapi-url')">Copy Schema URL</button>
+                    <button type="button" class="w-full sm:w-auto px-4 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0" onclick="coraFetchAndCopyOpenAPISchema()">Copy JSON Schema</button>
+                </div>
+            </div>
+
+            <!-- ChatGPT Setup Instructions Accordion -->
+            <details class="p-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950 text-xs text-zinc-650 dark:text-zinc-400 space-y-2 cursor-pointer">
+                <summary class="font-bold text-zinc-900 dark:text-zinc-100 flex items-center justify-between">
+                    <span>How to configure ChatGPT Custom GPT Actions</span>
+                    <span class="text-[10px] text-zinc-400">Expand Guide ▾</span>
+                </summary>
+                <ol class="list-decimal list-inside space-y-1.5 pt-2 text-zinc-600 dark:text-zinc-400">
+                    <li>In ChatGPT, go to <strong>Explore GPTs</strong> &rarr; <strong>Create a GPT</strong> &rarr; <strong>Configure</strong>.</li>
+                    <li>Scroll down and click <strong>Create new action</strong>.</li>
+                    <li>Click <strong>Import from URL</strong>, paste the OpenAPI Schema URL copied above, and click <strong>Import</strong>.</li>
+                    <li>Under <strong>Authentication</strong>, select <strong>API Key</strong> &rarr; Auth Type: <strong>Bearer</strong> &rarr; paste your Secure Access Token below.</li>
+                    <li>Save your GPT. You can now prompt ChatGPT: <em>"Check our workspace revenue"</em> or <em>"List my CRM leads"</em>!</li>
+                </ol>
+            </details>
+        </div>
     </div>
 
-    <!-- Configuration Example Card -->
-    <div class="bg-white border border-zinc-200 rounded-2xl p-6 shadow-xs space-y-4 mt-6">
-        <div class="border-b border-zinc-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-                <h3 class="text-sm font-bold text-zinc-900 ">Claude Desktop & Cursor Integration</h3>
-                <p class="text-xs text-zinc-500 mt-0.5">Use the local stdio bridge script to connect external AI agents to Cora.</p>
+    <!-- Connector 2: Claude Desktop, Cursor & Antigravity IDE -->
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
+        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
+                    MCP
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Claude Desktop, Cursor & Antigravity IDE</h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Native JSON-RPC 2.0 stdio / SSE bridge configuration.</p>
+                </div>
             </div>
-            <a href="<?php echo esc_url( CORA_WORKSPACE_URL . 'cora-bridge.py' ); ?>" download class="w-full sm:w-auto justify-center px-2.5 py-1.5 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-850 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1">
-                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <a href="<?php echo esc_url( CORA_WORKSPACE_URL . 'cora-bridge.py' ); ?>" download class="w-full sm:w-auto justify-center px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 Download Bridge Script
             </a>
         </div>
 
-        <div class="p-4 border border-zinc-200 rounded-xl bg-zinc-50/50 space-y-2">
-            <h4 class="text-xs font-bold text-zinc-850 ">How to Setup:</h4>
-            <ol class="list-decimal list-inside text-xs text-zinc-650 space-y-1">
-                <li>Click the button above to download the <code>cora-bridge.py</code> script.</li>
-                <li>Save the script to a stable folder on your local computer (e.g. <code>/Users/yourname/cora-bridge.py</code>).</li>
-                <li>Open your local AI client settings configuration (e.g. <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>).</li>
-                <li>Copy and paste the configuration code block below into your settings file, ensuring you replace the local script path.</li>
-            </ol>
-        </div>
-        
         <div class="space-y-2">
-            <div class="bg-zinc-900 text-zinc-100 rounded-xl p-4 font-mono text-[10px] leading-relaxed overflow-x-auto shadow-inner relative">
-                <button type="button" class="absolute top-3 right-3 px-2 py-1 bg-zinc-800 hover:bg-zinc-750 text-zinc-300 rounded text-[9px] cursor-pointer" onclick="coraCopyClaudeConfigDirect()">Copy Config</button>
+            <div class="bg-zinc-950 text-zinc-100 rounded-xl p-4 font-mono text-[11px] leading-relaxed overflow-x-auto shadow-inner relative border border-zinc-800">
+                <button type="button" class="absolute top-3 right-3 px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded text-[10px] font-bold cursor-pointer transition-colors" onclick="coraCopyClaudeConfigDirect()">Copy Config</button>
                 <pre id="cora-claude-config-code-direct"><code>{
   "mcpServers": {
     "cora-workspace": {
@@ -568,10 +565,94 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
             </div>
         </div>
     </div>
+
+    <!-- Interactive Live MCP Tool Playground -->
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
+        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center justify-between">
+            <div>
+                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Live MCP Tool Playground</h3>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Test tool execution directly against your live workspace server.</p>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold">11 Tools Online</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Select Tool</label>
+                    <select id="cora-mcp-test-tool-select" class="w-full text-xs font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 outline-none cursor-pointer" onchange="coraOnMCPToolSelectChange()">
+                        <option value="cora_get_workspace_overview">cora_get_workspace_overview (Real-time KPIs & Pulse)</option>
+                        <option value="cora_search_knowledge_base">cora_search_knowledge_base (Living Memory Search)</option>
+                        <option value="cora_query_financials">cora_query_financials (Ledger & Invoices)</option>
+                        <option value="cora_record_financial_transaction">cora_record_financial_transaction (Record Payment)</option>
+                        <option value="cora_manage_crm_leads">cora_manage_crm_leads (List & Create Deals)</option>
+                        <option value="cora_manage_bookings">cora_manage_bookings (Shoot Schedule & Sessions)</option>
+                        <option value="cora_manage_tasks">cora_manage_tasks (Client Deliverables)</option>
+                        <option value="cora_manage_documents">cora_manage_documents (Vault & E-Sign)</option>
+                        <option value="cora_manage_reviews">cora_manage_reviews (Customer Feedback)</option>
+                        <option value="cora_get_activity_pulse">cora_get_activity_pulse (Real-time Audit Log)</option>
+                        <option value="cora_ask_workspace_copilot">cora_ask_workspace_copilot (Direct AI QA)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">JSON Arguments</label>
+                    <textarea id="cora-mcp-test-tool-args" rows="5" class="w-full font-mono text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 outline-none text-zinc-800 dark:text-zinc-200">{}</textarea>
+                </div>
+
+                <button type="button" onclick="coraExecuteMCPTestTool()" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-sm">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Execute Tool Call
+                </button>
+            </div>
+
+            <div class="space-y-1.5 flex flex-col">
+                <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Live Response Payload</label>
+                <div id="cora-mcp-test-output" class="flex-1 min-h-[160px] bg-zinc-950 text-zinc-200 rounded-xl p-3 font-mono text-[11px] leading-relaxed overflow-y-auto border border-zinc-800 whitespace-pre-wrap">
+Ready to execute tool call...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Developer Token & Credentials -->
+    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
+        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-3">
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">MCP Secure Access Token</h3>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Use this token to authenticate all external AI connections.</p>
+        </div>
+
+        <form id="cora-mcp-token-form" method="post" action="" class="space-y-4">
+            <?php wp_nonce_field( 'cora_save_mcp_token_direct', 'cora_mcp_nonce' ); ?>
+            <div class="space-y-2">
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="password" id="cora-mcp-access-token-direct" name="cora_mcp_access_token_direct" value="<?php echo esc_attr( $mcp_token ); ?>" class="w-full font-mono bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs px-3 py-2 outline-none cora-credential-input text-zinc-800 dark:text-zinc-200" oncopy="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;" autocomplete="off">
+                    <div class="flex gap-2 w-full sm:w-auto shrink-0 justify-end">
+                        <button type="button" class="flex-1 sm:flex-none px-3 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraToggleTokenVisibilityDirect()">Show</button>
+                        <button type="button" class="flex-1 sm:flex-none px-3 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 font-bold text-xs rounded-lg transition-colors cursor-pointer" onclick="coraGenerateNewMCPTokenDirect()">Regenerate</button>
+                        <button type="submit" name="cora_save_mcp_token_direct_submit" class="flex-1 sm:flex-none px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            Save Token
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- TAB 3: RAG Knowledge Base -->
 <div id="cora-ai-panel-rag-settings" class="space-y-6 max-w-4xl" style="display:none;">
+    <div class="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
+        <div>
+            <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Living AI Memory & RAG Knowledge Engine</h2>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Isolated second brain automatically indexed from workspace daily flows.</p>
+        </div>
+        <button type="button" onclick="coraTriggerReindexLivingMemory(this)" class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            Re-Index Workspace Knowledge
+        </button>
+    </div>
     <?php include CORA_WORKSPACE_PATH . 'views/view-rag.php'; ?>
 </div>
 
@@ -712,6 +793,120 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         var codeText = document.getElementById("cora-claude-config-code-direct").innerText;
         navigator.clipboard.writeText(codeText);
         window.coraShowToast("Claude configuration copied to clipboard.");
+    }
+
+    // Tool argument templates
+    const coraMCPToolArgTemplates = {
+        cora_get_workspace_overview: '{}',
+        cora_search_knowledge_base: JSON.stringify({ query: 'commercial photography rates', limit: 5 }, null, 2),
+        cora_query_financials: JSON.stringify({ filter: 'all', limit: 10 }, null, 2),
+        cora_record_financial_transaction: JSON.stringify({ type: 'expense', amount: 4500, client_or_vendor: 'Studio Lighting Depot', description: 'RGB Tube Lights' }, null, 2),
+        cora_manage_crm_leads: JSON.stringify({ action: 'list', limit: 10 }, null, 2),
+        cora_manage_bookings: JSON.stringify({ action: 'list' }, null, 2),
+        cora_manage_tasks: JSON.stringify({ action: 'list' }, null, 2),
+        cora_manage_documents: JSON.stringify({ action: 'list' }, null, 2),
+        cora_manage_reviews: JSON.stringify({ action: 'list', limit: 10 }, null, 2),
+        cora_get_activity_pulse: JSON.stringify({ limit: 15 }, null, 2),
+        cora_ask_workspace_copilot: JSON.stringify({ question: 'Summarize our current pipeline and receivables status.' }, null, 2)
+    };
+
+    function coraOnMCPToolSelectChange() {
+        const select = document.getElementById('cora-mcp-test-tool-select');
+        const argsArea = document.getElementById('cora-mcp-test-tool-args');
+        if (select && argsArea) {
+            argsArea.value = coraMCPToolArgTemplates[select.value] || '{}';
+        }
+    }
+
+    async function coraExecuteMCPTestTool() {
+        const toolName = document.getElementById('cora-mcp-test-tool-select').value;
+        const argsStr = document.getElementById('cora-mcp-test-tool-args').value;
+        const outputEl = document.getElementById('cora-mcp-test-output');
+        const token = document.getElementById('cora-mcp-access-token-direct').value;
+        const mcpUrl = '<?php echo esc_url( home_url( "/wp-json/cora/v1/mcp" ) ); ?>';
+
+        let parsedArgs = {};
+        try {
+            parsedArgs = JSON.parse(argsStr || '{}');
+        } catch (err) {
+            window.coraShowToast("Invalid JSON arguments syntax.");
+            return;
+        }
+
+        outputEl.innerText = "Executing tool call '" + toolName + "'...\nConnecting to " + mcpUrl;
+
+        try {
+            const res = await fetch(mcpUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'tools/call',
+                    params: {
+                        name: toolName,
+                        arguments: parsedArgs
+                    },
+                    id: Date.now()
+                })
+            });
+
+            const data = await res.json();
+            outputEl.innerText = JSON.stringify(data, null, 2);
+            window.coraShowToast("Tool call completed.");
+        } catch (e) {
+            outputEl.innerText = "Error executing tool call:\n" + e.message;
+            window.coraShowToast("Failed to connect to MCP endpoint.");
+        }
+    }
+
+    async function coraFetchAndCopyOpenAPISchema() {
+        const url = document.getElementById('cora-mcp-openapi-url').value;
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            const jsonText = JSON.stringify(data, null, 2);
+            navigator.clipboard.writeText(jsonText);
+            window.coraShowToast("OpenAPI 3.1.0 JSON Schema copied to clipboard.");
+        } catch (e) {
+            window.coraShowToast("Could not fetch OpenAPI schema.");
+        }
+    }
+
+    function coraTriggerReindexLivingMemory(btn) {
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-spin inline-block mr-1">⟳</span> Indexing...';
+        }
+        jQuery.ajax({
+            url: typeof cora_workspace_data !== 'undefined' ? cora_workspace_data.ajax_url : '<?php echo admin_url("admin-ajax.php"); ?>',
+            type: 'POST',
+            data: {
+                action: 'cora_reindex_living_memory',
+                nonce: typeof cora_workspace_data !== 'undefined' ? cora_workspace_data.nonce : '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>'
+            },
+            success: function(resp) {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Re-Index Workspace Knowledge';
+                }
+                if (resp.success) {
+                    window.coraShowToast(resp.data.message || "Living memory re-indexed.");
+                    setTimeout(function() { location.reload(); }, 1200);
+                } else {
+                    window.coraShowToast(resp.data?.message || "Re-indexing failed.");
+                }
+            },
+            error: function() {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Re-Index Workspace Knowledge';
+                }
+                window.coraShowToast("Network error during re-indexing.");
+            }
+        });
     }
 
     // Conversation Management

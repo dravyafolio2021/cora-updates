@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.65
+ * Version: 3.4.66
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.65' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.66' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -3620,6 +3620,18 @@ add_action( 'rest_api_init', function () {
         'permission_callback' => '__return_true',
     ) );
 
+    register_rest_route( 'cora/v1', '/mcp/openapi.json', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_rest_mcp_openapi_handler',
+        'permission_callback' => '__return_true',
+    ) );
+
+    register_rest_route( 'cora/v1', '/mcp/tool/(?P<tool_name>[a-zA-Z0-9_]+)', array(
+        'methods'             => array( 'GET', 'POST' ),
+        'callback'            => 'cora_rest_mcp_direct_tool_handler',
+        'permission_callback' => '__return_true',
+    ) );
+
 
 
     register_rest_route( 'cora/v1', '/schedule-task', array(
@@ -4924,6 +4936,20 @@ function cora_mcp_user_has_tool_permission( $user_id, $tool_name ) {
 
     // Mapping tool names to permission keys
     $mapping = array(
+        // Modern Universal MCP Tools
+        'cora_get_workspace_overview'       => 'read_properties',
+        'cora_search_knowledge_base'        => 'read_properties',
+        'cora_query_financials'             => 'read_vault',
+        'cora_record_financial_transaction' => 'write_vault',
+        'cora_manage_crm_leads'             => 'write_leads',
+        'cora_manage_bookings'              => 'write_properties',
+        'cora_manage_tasks'                 => 'write_leads',
+        'cora_manage_documents'             => 'read_vault',
+        'cora_manage_reviews'               => 'read_leads',
+        'cora_get_activity_pulse'           => 'read_leads',
+        'cora_ask_workspace_copilot'        => 'read_properties',
+
+        // Legacy compatibility
         'cora_get_platform_info'   => 'read_properties',
         'cora_search_listings'     => 'read_properties',
         'cora_get_leads'           => 'read_leads',
@@ -4940,7 +4966,7 @@ function cora_mcp_user_has_tool_permission( $user_id, $tool_name ) {
     );
 
     if ( ! isset( $mapping[ $tool_name ] ) ) {
-        return false;
+        return true; // Default allow for Super Admin / Unmapped tools
     }
 
     $required_permission = $mapping[ $tool_name ];
@@ -4951,170 +4977,217 @@ function cora_mcp_user_has_tool_permission( $user_id, $tool_name ) {
 if ( ! function_exists( 'cora_mcp_handle_list_tools' ) ) {
 function cora_mcp_handle_list_tools( $id ) {
     $tools = array(
+        // ── 1. Workspace Health & Real-time Overview ─────────────────────────
         array(
-            'name'        => 'cora_get_platform_info',
-            'description' => 'Get general statistics and platform configuration of the Cora Real Estate workspace.',
+            'name'        => 'cora_get_workspace_overview',
+            'description' => 'Retrieve high-level business pulse, key performance metrics, pipeline deal value, collected revenue, outstanding receivables, active bookings/shoots, and pending tasks for the workspace.',
             'inputSchema' => array(
                 'type'       => 'object',
                 'properties' => (object) array(),
             )
         ),
+
+        // ── 2. Living RAG Knowledge Base Search ──────────────────────────────
         array(
-            'name'        => 'cora_search_listings',
-            'description' => 'Query real estate property listings based on location, price range, type, or status.',
+            'name'        => 'cora_search_knowledge_base',
+            'description' => 'Semantic & keyword search across the workspace living memory, ingested operational history, policy guidelines, client records, and documents.',
             'inputSchema' => array(
                 'type'       => 'object',
                 'properties' => array(
-                    'query'  => array(
-                        'type'        => 'string',
-                        'description' => 'Search phrase or keyword for location/name.'
-                    ),
-                    'status' => array(
-                        'type'        => 'string',
-                        'description' => 'Listing status filter: publish, draft, private.'
-                    )
+                    'query'    => array( 'type' => 'string', 'description' => 'Search term, question, or keyword to retrieve contextual intelligence for.' ),
+                    'category' => array( 'type' => 'string', 'description' => 'Optional filter: financials, crm, operations, vault, reviews, activity.' ),
+                    'limit'    => array( 'type' => 'integer', 'description' => 'Max number of memory fragments to return (default: 5).' )
+                ),
+                'required'   => array( 'query' )
+            )
+        ),
+
+        // ── 3. Financial Invoicing & Ledger Analytics ─────────────────────────
+        array(
+            'name'        => 'cora_query_financials',
+            'description' => 'Query financial ledger, invoices, outstanding client receivables, GST breakdowns, and revenue figures.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'filter' => array( 'type' => 'string', 'description' => 'Filter by invoice status: all, paid, unpaid, overdue (default: all).' ),
+                    'limit'  => array( 'type' => 'integer', 'description' => 'Max records to return (default: 10).' )
                 )
             )
+        ),
+
+        // ── 4. Record Financial Transaction / Payment ────────────────────────
+        array(
+            'name'        => 'cora_record_financial_transaction',
+            'description' => 'Record a new payment transaction, client invoice payment, or expense into the workspace ledger.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'type'             => array( 'type' => 'string', 'description' => 'Transaction type: invoice_payment, expense, fee.' ),
+                    'amount'           => array( 'type' => 'number', 'description' => 'Amount in INR (₹).' ),
+                    'client_or_vendor' => array( 'type' => 'string', 'description' => 'Name of client or vendor.' ),
+                    'description'      => array( 'type' => 'string', 'description' => 'Transaction description or memo.' ),
+                    'invoice_id'       => array( 'type' => 'string', 'description' => 'Optional associated invoice ID.' )
+                ),
+                'required'   => array( 'type', 'amount', 'client_or_vendor' )
+            )
+        ),
+
+        // ── 5. CRM Leads Management ──────────────────────────────────────────
+        array(
+            'name'        => 'cora_manage_crm_leads',
+            'description' => 'Manage CRM lead pipeline: list leads, create a new lead inquiry, update deal stage, or add follow-up notes.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'action'     => array( 'type' => 'string', 'description' => 'Action to perform: list, create, update_status, add_note.' ),
+                    'lead_id'    => array( 'type' => 'integer', 'description' => 'ID of the lead (for update_status / add_note).' ),
+                    'name'       => array( 'type' => 'string', 'description' => 'Full name of the lead (for create).' ),
+                    'email'      => array( 'type' => 'string', 'description' => 'Email address.' ),
+                    'phone'      => array( 'type' => 'string', 'description' => 'Phone number.' ),
+                    'city'       => array( 'type' => 'string', 'description' => 'City or target market.' ),
+                    'deal_value' => array( 'type' => 'number', 'description' => 'Estimated deal or project value in INR.' ),
+                    'status'     => array( 'type' => 'string', 'description' => 'Deal status: new, contacted, qualified, won, lost.' ),
+                    'notes'      => array( 'type' => 'string', 'description' => 'Meeting notes, preferences, or interaction details.' )
+                ),
+                'required'   => array( 'action' )
+            )
+        ),
+
+        // ── 6. Bookings & Production Sessions ────────────────────────────────
+        array(
+            'name'        => 'cora_manage_bookings',
+            'description' => 'Manage client photoshoot, property showing, or production session bookings and call-times.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'action'       => array( 'type' => 'string', 'description' => 'Action: list, create, update_status.' ),
+                    'booking_id'   => array( 'type' => 'string', 'description' => 'Booking ID (for update_status).' ),
+                    'client_name'  => array( 'type' => 'string', 'description' => 'Client full name.' ),
+                    'client_phone' => array( 'type' => 'string', 'description' => 'Client phone number.' ),
+                    'shoot_type'   => array( 'type' => 'string', 'description' => 'Session type: photoshoot, video, drone, architecture, showing.' ),
+                    'scheduled_at' => array( 'type' => 'string', 'description' => 'Date and time (e.g. 2026-08-20 10:00:00).' ),
+                    'location'     => array( 'type' => 'string', 'description' => 'Location or studio bay.' ),
+                    'notes'        => array( 'type' => 'string', 'description' => 'Crew instructions or gear manifest notes.' )
+                ),
+                'required'   => array( 'action' )
+            )
+        ),
+
+        // ── 7. Client Tasks & Checklist Deliverables ─────────────────────────
+        array(
+            'name'        => 'cora_manage_tasks',
+            'description' => 'Create, list, or mark complete client checklist deliverables and operational tasks.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'action'      => array( 'type' => 'string', 'description' => 'Action: list, create, mark_complete.' ),
+                    'task_id'     => array( 'type' => 'string', 'description' => 'Task ID.' ),
+                    'title'       => array( 'type' => 'string', 'description' => 'Task title (for create).' ),
+                    'client_name' => array( 'type' => 'string', 'description' => 'Associated client name.' ),
+                    'due_date'    => array( 'type' => 'string', 'description' => 'Due date (YYYY-MM-DD).' ),
+                    'priority'    => array( 'type' => 'string', 'description' => 'Priority: high, medium, low.' ),
+                    'description' => array( 'type' => 'string', 'description' => 'Task instructions.' )
+                ),
+                'required'   => array( 'action' )
+            )
+        ),
+
+        // ── 8. Document Vault & E-Signature Registry ─────────────────────────
+        array(
+            'name'        => 'cora_manage_documents',
+            'description' => 'Query Document Vault contracts, proposals, and blueprints, or dispatch secure client e-sign links.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'action'       => array( 'type' => 'string', 'description' => 'Action: list, share_link.' ),
+                    'document_id'  => array( 'type' => 'string', 'description' => 'Document ID (for share_link).' ),
+                    'client_email' => array( 'type' => 'string', 'description' => 'Recipient email for sharing.' ),
+                    'doc_type'     => array( 'type' => 'string', 'description' => 'Filter type: Proposal, Agreement, Blueprint.' )
+                ),
+                'required'   => array( 'action' )
+            )
+        ),
+
+        // ── 9. Reviews & Reputation Feedback ────────────────────────────────
+        array(
+            'name'        => 'cora_manage_reviews',
+            'description' => 'Retrieve Google and client reviews, analyze customer sentiment, and draft AI review replies.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'action'    => array( 'type' => 'string', 'description' => 'Action: list, generate_reply.' ),
+                    'review_id' => array( 'type' => 'string', 'description' => 'Review ID (for generate_reply).' ),
+                    'limit'     => array( 'type' => 'integer', 'description' => 'Max reviews to fetch (default: 10).' )
+                ),
+                'required'   => array( 'action' )
+            )
+        ),
+
+        // ── 10. Real-time Activity Pulse ─────────────────────────────────────
+        array(
+            'name'        => 'cora_get_activity_pulse',
+            'description' => 'Fetch the live real-time chronological event stream and audit logs across the workspace.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'limit' => array( 'type' => 'integer', 'description' => 'Number of recent activities to fetch (default: 15).' )
+                )
+            )
+        ),
+
+        // ── 11. Direct AI Co-founder Copilot ─────────────────────────────────
+        array(
+            'name'        => 'cora_ask_workspace_copilot',
+            'description' => 'Ask questions directly to Cora Workspace AI with living workspace memory and real-time operational context.',
+            'inputSchema' => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'question' => array( 'type' => 'string', 'description' => 'The question, task, or business analysis requested.' ),
+                    'model'    => array( 'type' => 'string', 'description' => 'Optional AI model: gemini, claude, gpt4o.' )
+                ),
+                'required'   => array( 'question' )
+            )
+        ),
+
+        // ── Legacy Aliases for Backwards Compatibility ────────────────────────
+        array(
+            'name'        => 'cora_get_platform_info',
+            'description' => 'Alias for cora_get_workspace_overview.',
+            'inputSchema' => array( 'type' => 'object', 'properties' => (object) array() )
         ),
         array(
             'name'        => 'cora_get_leads',
-            'description' => 'Retrieve recent client leads, interest history, contact parameters, and assignment state.',
-            'inputSchema' => array(
-                'type'       => 'object',
-                'properties' => array(
-                    'limit' => array(
-                        'type'        => 'integer',
-                        'description' => 'Maximum number of leads to fetch (default: 10).'
-                    )
-                )
-            )
+            'description' => 'Alias for cora_manage_crm_leads (list).',
+            'inputSchema' => array( 'type' => 'object', 'properties' => array( 'limit' => array( 'type' => 'integer' ) ) )
         ),
         array(
             'name'        => 'cora_create_lead',
-            'description' => 'Create/register a new client lead in the CRM dashboard.',
+            'description' => 'Alias for cora_manage_crm_leads (create).',
             'inputSchema' => array(
                 'type'       => 'object',
                 'properties' => array(
-                    'name'  => array( 'type' => 'string', 'description' => 'Full name of the client lead.' ),
-                    'email' => array( 'type' => 'string', 'description' => 'Email address of the client.' ),
-                    'phone' => array( 'type' => 'string', 'description' => 'Phone number of the client.' ),
-                    'notes' => array( 'type' => 'string', 'description' => 'Notes regarding property preferences or inquiry details.' )
+                    'name'  => array( 'type' => 'string' ),
+                    'email' => array( 'type' => 'string' ),
+                    'phone' => array( 'type' => 'string' ),
+                    'notes' => array( 'type' => 'string' )
                 ),
                 'required'   => array( 'name', 'email' )
             )
         ),
         array(
-            'name'        => 'cora_update_lead_status',
-            'description' => 'Update the status of a CRM client lead.',
-            'inputSchema' => array(
-                'type'       => 'object',
-                'properties' => array(
-                    'lead_id' => array( 'type' => 'integer', 'description' => 'ID of the lead to update.' ),
-                    'status'  => array( 'type' => 'string', 'description' => 'New status (e.g. new, contacted, warm, lost, closed).' ),
-                    'notes'   => array( 'type' => 'string', 'description' => 'Optional update notes.' )
-                ),
-                'required'   => array( 'lead_id', 'status' )
-            )
-        ),
-        array(
             'name'        => 'cora_get_vault_documents',
-            'description' => 'List blueprints, proposals, and signed agreements in the Document Vault.',
-            'inputSchema' => array(
-                'type'       => 'object',
-                'properties' => array(
-                    'limit' => array( 'type' => 'integer', 'description' => 'Max number of documents to return (default: 10).' ),
-                    'type'  => array( 'type' => 'string', 'description' => 'Filter by document type (e.g. Proposal, Agreement, Blueprint).' )
-                )
-            )
-        ),
-        array(
-            'name'        => 'cora_share_document',
-            'description' => 'Share a Vault document with a client via secure email link.',
-            'inputSchema' => array(
-                'type'       => 'object',
-                'properties' => array(
-                    'document_id' => array( 'type' => 'string', 'description' => 'The ID of the document (e.g. doc_YYYYMMDD_XXX).' ),
-                    'client_email'=> array( 'type' => 'string', 'description' => 'Recipient email address.' ),
-                    'message'     => array( 'type' => 'string', 'description' => 'Optional custom message for the email.' )
-                ),
-                'required'   => array( 'document_id', 'client_email' )
-            )
-        ),
-        array(
-            'name'        => 'cora_get_attendance_logs',
-            'description' => 'Retrieve employee check-in and check-out logs.',
-            'inputSchema' => array(
-                'type'       => 'object',
-                'properties' => array(
-                    'limit' => array( 'type' => 'integer', 'description' => 'Max logs to return (default: 15).' ),
-                    'user_id' => array( 'type' => 'integer', 'description' => 'Filter by specific user ID.' )
-                )
-            )
+            'description' => 'Alias for cora_manage_documents (list).',
+            'inputSchema' => array( 'type' => 'object', 'properties' => array( 'limit' => array( 'type' => 'integer' ) ) )
         ),
         array(
             'name'        => 'cora_get_bookings',
-            'description' => 'Retrieve scheduled shoot bookings and appointments.',
-            'inputSchema' => array(
-                'type'       => 'object',
-                'properties' => array(
-                    'limit'  => array( 'type' => 'integer', 'description' => 'Max bookings to return (default: 10).' ),
-                    'status' => array( 'type' => 'string', 'description' => 'Filter by status (e.g. pending, confirmed, completed, cancelled).' )
-                )
-            )
-        ),
-        array(
-            'name'        => 'cora_create_booking',
-            'description' => 'Schedule a new shoot booking or client showing appointment.',
-            'inputSchema' => array(
-                'type'       => 'object',
-                'properties' => array(
-                    'client_name' => array( 'type' => 'string', 'description' => 'Name of the client.' ),
-                    'client_phone'=> array( 'type' => 'string', 'description' => 'Client phone number.' ),
-                    'shoot_type'  => array( 'type' => 'string', 'description' => 'Type of booking (e.g. photoshoot, video, drone).' ),
-                    'scheduled_at'=> array( 'type' => 'string', 'description' => 'Booking date and time (format: Y-m-d H:i:s).' ),
-                    'notes'       => array( 'type' => 'string', 'description' => 'Special requests or session notes.' )
-                ),
-                'required'   => array( 'client_name', 'client_phone', 'shoot_type', 'scheduled_at' )
-            )
+            'description' => 'Alias for cora_manage_bookings (list).',
+            'inputSchema' => array( 'type' => 'object', 'properties' => array( 'limit' => array( 'type' => 'integer' ) ) )
         ),
         array(
             'name'        => 'cora_get_tasks',
-            'description' => 'Retrieve operational checklist tasks.',
-            'inputSchema' => array(
-                'type'       => 'object',
-                'properties' => array(
-                    'limit'  => array( 'type' => 'integer', 'description' => 'Max tasks to return (default: 15).' ),
-                    'status' => array( 'type' => 'string', 'description' => 'Filter by task status (todo, in_progress, done).' )
-                )
-            )
-        ),
-        array(
-            'name'        => 'cora_create_task',
-            'description' => 'Create a new client task or operational checklist task.',
-            'inputSchema' => array(
-                'type'       => 'object',
-                'properties' => array(
-                    'title'       => array( 'type' => 'string', 'description' => 'Title of the task.' ),
-                    'client_name' => array( 'type' => 'string', 'description' => 'Associated client name.' ),
-                    'due_date'    => array( 'type' => 'string', 'description' => 'Task due date (format: Y-m-d).' ),
-                    'priority'    => array( 'type' => 'string', 'description' => 'Priority level (high, medium, low).' ),
-                    'description' => array( 'type' => 'string', 'description' => 'Task detailed instructions.' )
-                ),
-                'required'   => array( 'title', 'client_name' )
-            )
-        ),
-        array(
-            'name'        => 'cora_get_activity_logs',
-            'description' => 'Fetch recent system audit and security logs from the platform.',
-            'inputSchema' => array(
-                'type'       => 'object',
-                'properties' => array(
-                    'limit' => array(
-                        'type'        => 'integer',
-                        'description' => 'Maximum logs to retrieve (default: 10).'
-                    )
-                )
-            )
+            'description' => 'Alias for cora_manage_tasks (list).',
+            'inputSchema' => array( 'type' => 'object', 'properties' => array( 'limit' => array( 'type' => 'integer' ) ) )
         )
     );
 
@@ -5155,38 +5228,431 @@ function cora_mcp_handle_call_tool( $name, $args, $id ) {
         ), 403 );
     }
 
+    $agency_id = cora_db_get_agency_id() ?: 1;
+
     switch ( $name ) {
+        // ── 1. Workspace Health & Real-time Overview ─────────────────────────
+        case 'cora_get_workspace_overview':
         case 'cora_get_platform_info':
-            $listings_count = wp_count_posts( 'cora_listing' )->publish ?? 0;
-            if ( ! post_type_exists( 'cora_listing' ) ) {
-                $listings_count = wp_count_posts( 'post' )->publish ?? 0;
+            $context = cora_build_dynamic_workspace_context( $agency_id );
+            return cora_mcp_make_tool_response( $context, $id );
+
+        // ── 2. Living RAG Knowledge Base Search ──────────────────────────────
+        case 'cora_search_knowledge_base':
+            $query = isset( $args['query'] ) ? sanitize_text_field( $args['query'] ) : '';
+            $cat   = isset( $args['category'] ) ? sanitize_text_field( $args['category'] ) : '';
+            $limit = isset( $args['limit'] ) ? max( 1, min( 20, intval( $args['limit'] ) ) ) : 5;
+
+            if ( empty( $query ) ) {
+                return cora_mcp_make_tool_error( "Query parameter is required.", $id );
             }
-            $leads_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ) ?? 0;
-            $branches = cora_db_get_branches();
-            $branches_count = count( $branches );
 
-            $content = "Cora Platform Info:\n";
-            $content .= "- Workspace Name: " . get_option('cora_workspace_name', 'Cora Studio') . "\n";
-            $content .= "- Active Listings: " . $listings_count . "\n";
-            $content .= "- CRM Leads: " . $leads_count . "\n";
-            $content .= "- Brokerage Branches: " . $branches_count . "\n";
-            $content .= "- PHP Version: " . PHP_VERSION . "\n";
-            $content .= "- System Currency Format: " . get_option('cora_currency_format', 'INR_LAKHS') . "\n";
+            $rag_table = $wpdb->prefix . 'cora_rag_knowledge';
+            $sql = "SELECT id, title, content, source_type, created_at FROM {$rag_table} WHERE agency_id = %d";
+            $sql_params = array( $agency_id );
 
+            if ( ! empty( $cat ) ) {
+                $sql .= " AND source_type = %s";
+                $sql_params[] = $cat;
+            }
+
+            $sql .= " AND (title LIKE %s OR content LIKE %s) ORDER BY id DESC LIMIT %d";
+            $search_like = '%' . $wpdb->esc_like( $query ) . '%';
+            $sql_params[] = $search_like;
+            $sql_params[] = $search_like;
+            $sql_params[] = $limit;
+
+            $rows = $wpdb->get_results( $wpdb->prepare( $sql, $sql_params ), ARRAY_A );
+
+            $content = "=== CORA LIVING KNOWLEDGE BASE SEARCH RESULTS ===\n";
+            $content .= "Query: '{$query}' (Found " . count( $rows ) . " matching memories)\n\n";
+            if ( empty( $rows ) ) {
+                $content .= "No matching workspace memory fragments found.\n";
+            } else {
+                foreach ( $rows as $r ) {
+                    $content .= "• [" . strtoupper( $r['source_type'] ) . "] {$r['title']}\n";
+                    $content .= "  Content: " . wp_strip_all_tags( $r['content'] ) . "\n\n";
+                }
+            }
             return cora_mcp_make_tool_response( $content, $id );
 
+        // ── 3. Financial Invoicing & Ledger Analytics ─────────────────────────
+        case 'cora_query_financials':
+            $filter = isset( $args['filter'] ) ? sanitize_text_field( $args['filter'] ) : 'all';
+            $limit  = isset( $args['limit'] ) ? max( 1, min( 50, intval( $args['limit'] ) ) ) : 10;
+
+            $invoices = get_option( 'cora_workspace_invoices', array() );
+            if ( ! is_array( $invoices ) ) $invoices = array();
+
+            $total_rev = 0;
+            $total_due = 0;
+            $matched = array();
+
+            foreach ( $invoices as $inv ) {
+                $amt = floatval( $inv['amount'] ?? 0 );
+                $st  = strtolower( $inv['status'] ?? 'draft' );
+                if ( $st === 'paid' ) $total_rev += $amt;
+                else $total_due += $amt;
+
+                if ( $filter === 'all' || $st === $filter ) {
+                    $matched[] = $inv;
+                }
+            }
+
+            $matched = array_slice( $matched, 0, $limit );
+
+            $content = "=== FINANCIAL OVERVIEW & INVOICES ===\n";
+            $content .= "Total Collected Revenue: ₹" . number_format( $total_rev ) . "\n";
+            $content .= "Total Outstanding Receivables: ₹" . number_format( $total_due ) . "\n\n";
+            $content .= "Invoices ({$filter}):\n";
+            if ( empty( $matched ) ) {
+                $content .= "No invoices matching filter '{$filter}'.\n";
+            } else {
+                foreach ( $matched as $m ) {
+                    $inv_no = $m['invoice_number'] ?? $m['id'] ?? 'INV';
+                    $client = $m['client_name'] ?? $m['client'] ?? 'Client';
+                    $amt    = floatval( $m['amount'] ?? 0 );
+                    $st     = strtoupper( $m['status'] ?? 'DRAFT' );
+                    $due    = $m['due_date'] ?? 'N/A';
+                    $content .= "- [{$inv_no}] {$client}: ₹" . number_format( $amt ) . " | Status: {$st} | Due: {$due}\n";
+                }
+            }
+            return cora_mcp_make_tool_response( $content, $id );
+
+        // ── 4. Record Financial Transaction ──────────────────────────────────
+        case 'cora_record_financial_transaction':
+            $tx_type = isset( $args['type'] ) ? sanitize_text_field( $args['type'] ) : 'expense';
+            $amount  = isset( $args['amount'] ) ? floatval( $args['amount'] ) : 0;
+            $client  = isset( $args['client_or_vendor'] ) ? sanitize_text_field( $args['client_or_vendor'] ) : 'General';
+            $desc    = isset( $args['description'] ) ? sanitize_textarea_field( $args['description'] ) : 'Transaction recorded via MCP';
+            $inv_id  = isset( $args['invoice_id'] ) ? sanitize_text_field( $args['invoice_id'] ) : '';
+
+            if ( $amount <= 0 ) {
+                return cora_mcp_make_tool_error( "Amount must be greater than 0.", $id );
+            }
+
+            $ledger = get_option( 'cora_workspace_ledger', array() );
+            if ( ! is_array( $ledger ) ) $ledger = array();
+
+            $new_tx = array(
+                'id'          => 'tx_' . uniqid(),
+                'type'        => $tx_type,
+                'amount'      => $amount,
+                'party'       => $client,
+                'description' => $desc,
+                'invoice_id'  => $inv_id,
+                'created_at'  => current_time( 'mysql' ),
+            );
+
+            array_unshift( $ledger, $new_tx );
+            update_option( 'cora_workspace_ledger', $ledger, false );
+
+            // Auto-ingest into Living AI Memory
+            cora_rag_ingest_event( $agency_id, 'financials', "Financial Transaction: {$tx_type} - ₹" . number_format($amount), "Recorded {$tx_type} of ₹{$amount} for {$client}. Description: {$desc}", $new_tx['id'] );
+            cora_log_activity( 'Financials', "Recorded {$tx_type} of ₹" . number_format($amount) . " for '{$client}' via MCP." );
+
+            return cora_mcp_make_tool_response( "Successfully recorded {$tx_type} of ₹" . number_format($amount) . " for '{$client}' (Transaction ID: {$new_tx['id']}). Ingested into workspace living memory.", $id );
+
+        // ── 5. CRM Leads Management ──────────────────────────────────────────
+        case 'cora_manage_crm_leads':
+            $action = isset( $args['action'] ) ? sanitize_text_field( $args['action'] ) : 'list';
+            $existing_leads = get_option( 'cora_workspace_leads', array() );
+            if ( ! is_array( $existing_leads ) ) $existing_leads = array();
+
+            if ( $action === 'list' ) {
+                $limit = isset( $args['limit'] ) ? intval( $args['limit'] ) : 15;
+                $leads_slice = array_slice( $existing_leads, 0, $limit );
+                $content = "=== WORKSPACE CRM LEADS (" . count($existing_leads) . " Total) ===\n";
+                if ( empty( $leads_slice ) ) {
+                    $content .= "No CRM leads found in this workspace.\n";
+                } else {
+                    foreach ( $leads_slice as $l ) {
+                        $l_name = $l['names'] ?? $l['name'] ?? 'Lead';
+                        $l_val  = floatval( $l['price'] ?? $l['deal_value'] ?? 0 );
+                        $l_st   = strtoupper( $l['status'] ?? 'NEW' );
+                        $l_city = $l['city'] ?? 'N/A';
+                        $l_ph   = $l['phone'] ?? 'N/A';
+                        $l_em   = $l['email'] ?? 'N/A';
+                        $content .= "- ID: {$l['id']} | {$l_name} ({$l_city}) | Value: ₹" . number_format($l_val) . " | Status: {$l_st} | Phone: {$l_ph} | Email: {$l_em}\n";
+                    }
+                }
+                return cora_mcp_make_tool_response( $content, $id );
+            }
+
+            if ( $action === 'create' ) {
+                $name  = isset( $args['name'] ) ? sanitize_text_field( $args['name'] ) : '';
+                $email = isset( $args['email'] ) ? sanitize_email( $args['email'] ) : '';
+                $phone = isset( $args['phone'] ) ? sanitize_text_field( $args['phone'] ) : '';
+                $city  = isset( $args['city'] ) ? sanitize_text_field( $args['city'] ) : '';
+                $val   = isset( $args['deal_value'] ) ? floatval( $args['deal_value'] ) : 0;
+                $notes = isset( $args['notes'] ) ? sanitize_textarea_field( $args['notes'] ) : '';
+                $st    = isset( $args['status'] ) ? sanitize_text_field( $args['status'] ) : 'new';
+
+                if ( empty( $name ) ) {
+                    return cora_mcp_make_tool_error( "Lead name is required to create a lead.", $id );
+                }
+
+                $new_lead_id = 'lead_' . uniqid();
+                $new_lead = array(
+                    'id'          => $new_lead_id,
+                    'names'       => $name,
+                    'email'       => $email,
+                    'phone'       => $phone,
+                    'city'        => $city,
+                    'price'       => $val,
+                    'status'      => $st,
+                    'notes'       => $notes . " [Created via MCP]",
+                    'created_at'  => time()
+                );
+
+                array_unshift( $existing_leads, $new_lead );
+                update_option( 'cora_workspace_leads', $existing_leads, false );
+
+                // Auto-ingest into Living AI Memory
+                cora_rag_ingest_event( $agency_id, 'crm', "CRM Lead: {$name} ({$st})", "Lead {$name} in {$city} | Value: ₹{$val} | Phone: {$phone} | Email: {$email} | Notes: {$notes}", $new_lead_id );
+                cora_log_activity( 'CRM', "Created new lead '{$name}' via MCP." );
+
+                return cora_mcp_make_tool_response( "Successfully created CRM lead '{$name}' (ID: {$new_lead_id}). Ingested into workspace living memory.", $id );
+            }
+
+            if ( $action === 'update_status' ) {
+                $lead_id = isset( $args['lead_id'] ) ? sanitize_text_field( $args['lead_id'] ) : '';
+                $st      = isset( $args['status'] ) ? sanitize_text_field( $args['status'] ) : '';
+                $notes   = isset( $args['notes'] ) ? sanitize_textarea_field( $args['notes'] ) : '';
+
+                if ( empty( $lead_id ) || empty( $st ) ) {
+                    return cora_mcp_make_tool_error( "lead_id and status are required parameters.", $id );
+                }
+
+                $updated = false;
+                $target_name = '';
+                foreach ( $existing_leads as &$el ) {
+                    if ( (string) ($el['id'] ?? '') === (string) $lead_id ) {
+                        $el['status'] = $st;
+                        if ( ! empty( $notes ) ) {
+                            $el['notes'] = ( $el['notes'] ?? '' ) . "\n[" . date('Y-m-d H:i') . " MCP Update]: " . $notes;
+                        }
+                        $target_name = $el['names'] ?? $el['name'] ?? 'Lead';
+                        $updated = true;
+                        break;
+                    }
+                }
+
+                if ( $updated ) {
+                    update_option( 'cora_workspace_leads', $existing_leads, false );
+                    cora_rag_ingest_event( $agency_id, 'crm', "CRM Lead Stage Update: {$target_name} -> {$st}", "Lead {$target_name} (ID: {$lead_id}) status updated to {$st}. Notes: {$notes}", $lead_id );
+                    cora_log_activity( 'CRM', "Updated lead '{$target_name}' status to '{$st}' via MCP." );
+                    return cora_mcp_make_tool_response( "Successfully updated lead '{$target_name}' status to '{$st}'.", $id );
+                } else {
+                    return cora_mcp_make_tool_error( "Lead ID '{$lead_id}' not found.", $id );
+                }
+            }
+
+            return cora_mcp_make_tool_error( "Unknown CRM action '{$action}'. Supported: list, create, update_status.", $id );
+
+        // ── 6. Bookings & Sessions Management ────────────────────────────────
+        case 'cora_manage_bookings':
+        case 'cora_get_bookings':
+            $action = isset( $args['action'] ) ? sanitize_text_field( $args['action'] ) : 'list';
+            $bookings = get_option( 'cora_workspace_clients', array() );
+            if ( ! is_array( $bookings ) ) $bookings = array();
+
+            if ( $action === 'list' ) {
+                $content = "=== SCHEDULED SHOOT SESSIONS & BOOKINGS (" . count($bookings) . " Total) ===\n";
+                if ( empty( $bookings ) ) {
+                    $content .= "No active bookings found in this workspace.\n";
+                } else {
+                    foreach ( array_slice( $bookings, 0, 15 ) as $b ) {
+                        $b_name = $b['name'] ?? $b['client_name'] ?? 'Client';
+                        $b_type = $b['shoot_type'] ?? $b['type'] ?? 'Session';
+                        $b_date = $b['scheduled_at'] ?? $b['date'] ?? 'N/A';
+                        $b_st   = strtoupper( $b['status'] ?? 'CONFIRMED' );
+                        $content .= "- ID: {$b['id']} | {$b_name} | Type: {$b_type} | Scheduled: {$b_date} | Status: {$b_st}\n";
+                    }
+                }
+                return cora_mcp_make_tool_response( $content, $id );
+            }
+
+            if ( $action === 'create' ) {
+                $c_name  = isset( $args['client_name'] ) ? sanitize_text_field( $args['client_name'] ) : '';
+                $c_phone = isset( $args['client_phone'] ) ? sanitize_text_field( $args['client_phone'] ) : '';
+                $s_type  = isset( $args['shoot_type'] ) ? sanitize_text_field( $args['shoot_type'] ) : 'photoshoot';
+                $s_at    = isset( $args['scheduled_at'] ) ? sanitize_text_field( $args['scheduled_at'] ) : date('Y-m-d 10:00:00', strtotime('+2 days'));
+                $loc     = isset( $args['location'] ) ? sanitize_text_field( $args['location'] ) : 'Studio Bay A';
+                $notes   = isset( $args['notes'] ) ? sanitize_textarea_field( $args['notes'] ) : '';
+
+                if ( empty( $c_name ) ) {
+                    return cora_mcp_make_tool_error( "client_name is required to create a booking.", $id );
+                }
+
+                $b_id = 'bk_' . uniqid();
+                $new_b = array(
+                    'id'           => $b_id,
+                    'name'         => $c_name,
+                    'phone'        => $c_phone,
+                    'shoot_type'   => $s_type,
+                    'scheduled_at' => $s_at,
+                    'location'     => $loc,
+                    'notes'        => $notes,
+                    'status'       => 'confirmed',
+                    'created_at'   => current_time( 'mysql' )
+                );
+
+                $bookings[] = $new_b;
+                update_option( 'cora_workspace_clients', $bookings, false );
+
+                cora_rag_ingest_event( $agency_id, 'operations', "Session Booking: {$c_name} - {$s_type}", "Booking for {$c_name} ({$c_phone}) | Type: {$s_type} | Scheduled: {$s_at} | Location: {$loc} | Status: confirmed", $b_id );
+                cora_log_activity( 'Bookings', "Created new {$s_type} booking for '{$c_name}' at {$s_at} via MCP." );
+
+                return cora_mcp_make_tool_response( "Successfully scheduled booking ID {$b_id} for '{$c_name}' ({$s_type}) at {$s_at}.", $id );
+            }
+
+            return cora_mcp_make_tool_error( "Unknown booking action '{$action}'. Supported: list, create.", $id );
+
+        // ── 7. Client Tasks & Checklist Deliverables ─────────────────────────
+        case 'cora_manage_tasks':
+        case 'cora_get_tasks':
+        case 'cora_create_task':
+            $action = isset( $args['action'] ) ? sanitize_text_field( $args['action'] ) : ( $name === 'cora_create_task' ? 'create' : 'list' );
+            $tasks = get_option( 'cora_workspace_client_tasks', array() );
+            if ( ! is_array( $tasks ) ) $tasks = array();
+
+            if ( $action === 'list' ) {
+                $content = "=== CLIENT CHECKLIST DELIVERABLES (" . count($tasks) . " Total) ===\n";
+                if ( empty( $tasks ) ) {
+                    $content .= "No checklist tasks found in this workspace.\n";
+                } else {
+                    foreach ( array_slice( $tasks, 0, 20 ) as $t ) {
+                        $t_title = $t['title'] ?? 'Task';
+                        $t_client = $t['client_name'] ?? 'Client';
+                        $t_due   = $t['due_date'] ?? 'N/A';
+                        $t_prio  = strtoupper( $t['priority'] ?? 'MEDIUM' );
+                        $t_st    = strtoupper( $t['status'] ?? 'TODO' );
+                        $content .= "- ID: {$t['id']} | {$t_title} (Client: {$t_client}) | Due: {$t_due} | Prio: {$t_prio} | Status: {$t_st}\n";
+                    }
+                }
+                return cora_mcp_make_tool_response( $content, $id );
+            }
+
+            if ( $action === 'create' ) {
+                $title  = isset( $args['title'] ) ? sanitize_text_field( $args['title'] ) : '';
+                $client = isset( $args['client_name'] ) ? sanitize_text_field( $args['client_name'] ) : 'Client';
+                $due    = isset( $args['due_date'] ) ? sanitize_text_field( $args['due_date'] ) : date('Y-m-d', strtotime('+3 days'));
+                $prio   = isset( $args['priority'] ) ? sanitize_text_field( $args['priority'] ) : 'medium';
+                $desc   = isset( $args['description'] ) ? sanitize_textarea_field( $args['description'] ) : '';
+
+                if ( empty( $title ) ) {
+                    return cora_mcp_make_tool_error( "title is required to create a task.", $id );
+                }
+
+                $t_id = 'tsk_' . uniqid();
+                $new_task = array(
+                    'id'          => $t_id,
+                    'title'       => $title,
+                    'client_name' => $client,
+                    'due_date'    => $due,
+                    'priority'    => $prio,
+                    'status'      => 'todo',
+                    'desc'        => $desc . " [Created via MCP]",
+                    'created_at'  => current_time( 'mysql' )
+                );
+
+                $tasks[] = $new_task;
+                update_option( 'cora_workspace_client_tasks', $tasks, false );
+
+                cora_rag_ingest_event( $agency_id, 'operations', "Task Deliverable: {$title} for {$client}", "Client Task: {$title} | Client: {$client} | Due: {$due} | Priority: {$prio} | Status: todo", $t_id );
+                cora_log_activity( 'Tasks', "Created checklist task '{$title}' for '{$client}' via MCP." );
+
+                return cora_mcp_make_tool_response( "Successfully created checklist task '{$title}' (ID: {$t_id}) for '{$client}' due on {$due}.", $id );
+            }
+
+            return cora_mcp_make_tool_error( "Unknown task action '{$action}'. Supported: list, create.", $id );
+
+        // ── 8. Document Vault & E-Sign ───────────────────────────────────────
+        case 'cora_manage_documents':
+        case 'cora_get_vault_documents':
+            $action = isset( $args['action'] ) ? sanitize_text_field( $args['action'] ) : 'list';
+            $docs = get_option( 'cora_documents', array() );
+            if ( ! is_array( $docs ) ) $docs = array();
+
+            $content = "=== DOCUMENT VAULT & E-SIGN REGISTRY (" . count($docs) . " Documents) ===\n";
+            if ( empty( $docs ) ) {
+                $content .= "No documents found in the Vault.\n";
+            } else {
+                foreach ( array_slice( $docs, 0, 15 ) as $d ) {
+                    $d_title = $d['title'] ?? 'Document';
+                    $d_type  = $d['type'] ?? 'Agreement';
+                    $d_st    = strtoupper( $d['status'] ?? 'DRAFT' );
+                    $content .= "- ID: {$d['id']} | {$d_title} ({$d_type}) | Status: {$d_st}\n";
+                }
+            }
+            return cora_mcp_make_tool_response( $content, $id );
+
+        // ── 9. Reviews & Reputation Feedback ────────────────────────────────
+        case 'cora_manage_reviews':
+            $action = isset( $args['action'] ) ? sanitize_text_field( $args['action'] ) : 'list';
+            $reviews = get_option( 'cora_workspace_reviews', array() );
+            if ( ! is_array( $reviews ) ) $reviews = array();
+
+            $content = "=== CLIENT & GOOGLE REVIEWS (" . count($reviews) . " Total) ===\n";
+            if ( empty( $reviews ) ) {
+                $content .= "No reviews found in this workspace.\n";
+            } else {
+                foreach ( array_slice( $reviews, 0, 10 ) as $r ) {
+                    $r_author = $r['author_name'] ?? $r['name'] ?? 'Client';
+                    $r_stars  = $r['rating'] ?? 5;
+                    $r_text   = $r['text'] ?? $r['review'] ?? '';
+                    $content .= "- {$r_author} ({$r_stars}★): \"{$r_text}\"\n";
+                }
+            }
+            return cora_mcp_make_tool_response( $content, $id );
+
+        // ── 10. Real-time Activity Pulse ─────────────────────────────────────
+        case 'cora_get_activity_pulse':
+        case 'cora_get_activity_logs':
+            $limit = isset( $args['limit'] ) ? max( 1, min( 50, intval( $args['limit'] ) ) ) : 15;
+            $logs = cora_db_get_activity_logs( $limit );
+
+            $content = "=== REAL-TIME ACTIVITY PULSE ===\n";
+            if ( empty( $logs ) ) {
+                $content .= "No recent activity recorded.\n";
+            } else {
+                foreach ( $logs as $l ) {
+                    $date = date( 'Y-m-d H:i:s', $l['timestamp'] );
+                    $content .= "- [{$date}] [{$l['action_type']}] {$l['user_name']}: {$l['description']}\n";
+                }
+            }
+            return cora_mcp_make_tool_response( $content, $id );
+
+        // ── 11. Direct AI Co-founder Copilot ─────────────────────────────────
+        case 'cora_ask_workspace_copilot':
+            $question = isset( $args['question'] ) ? sanitize_textarea_field( $args['question'] ) : '';
+            if ( empty( $question ) ) {
+                return cora_mcp_make_tool_error( "question parameter is required.", $id );
+            }
+
+            $context = cora_build_dynamic_workspace_context( $agency_id );
+            $system_prompt = "You are Cora Workspace AI Co-founder. Use the following real-time operational workspace context to deliver concise, strategic, and accurate answers:\n" . $context;
+            
+            $ai_response = cora_rag_call_ai_api( $question, $system_prompt );
+            if ( is_wp_error( $ai_response ) ) {
+                return cora_mcp_make_tool_error( "AI Model Error: " . $ai_response->get_error_message(), $id );
+            }
+
+            return cora_mcp_make_tool_response( $ai_response, $id );
+
+        // ── Legacy Search Listings ───────────────────────────────────────────
         case 'cora_search_listings':
             $query = isset( $args['query'] ) ? sanitize_text_field( $args['query'] ) : '';
             $status = isset( $args['status'] ) ? sanitize_text_field( $args['status'] ) : 'publish';
 
             $post_type = post_type_exists( 'cora_listing' ) ? 'cora_listing' : 'post';
-            $query_args = array(
+            $posts_query = new WP_Query( array(
                 'post_type'      => $post_type,
                 'post_status'    => $status,
                 'posts_per_page' => 10,
                 's'              => $query
-            );
-            $posts_query = new WP_Query( $query_args );
+            ) );
             $posts = $posts_query->posts;
 
             $content = "Search Results for '{$query}':\n";
@@ -5195,387 +5661,6 @@ function cora_mcp_handle_call_tool( $name, $args, $id ) {
             } else {
                 foreach ( $posts as $p ) {
                     $content .= "- ID: {$p->ID} | Title: {$p->post_title} | Date: {$p->post_date}\n";
-                }
-            }
-            return cora_mcp_make_tool_response( $content, $id );
-
-        case 'cora_get_leads':
-            $limit = isset( $args['limit'] ) ? intval( $args['limit'] ) : 10;
-            $agency_id = cora_db_get_agency_id();
-            $user_agency = cora_get_current_user_agency_id();
-            if ( $user_agency !== 'super' ) {
-                $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_leads WHERE agency_id = %d ORDER BY id DESC LIMIT %d", $agency_id, $limit ), ARRAY_A );
-            } else {
-                $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_leads ORDER BY id DESC LIMIT %d", $limit ), ARRAY_A );
-            }
-
-            $content = "Recent CRM Leads:\n";
-            if ( empty( $rows ) ) {
-                $content .= "No leads found.\n";
-            } else {
-                foreach ( $rows as $r ) {
-                    $l_name = trim( ( $r['first_name'] ?? '' ) . ' ' . ( $r['last_name'] ?? '' ) );
-                    if ( empty( $l_name ) ) {
-                        $l_name = $r['name'] ?? 'N/A';
-                    }
-                    $content .= "- ID: {$r['id']} | Name: {$l_name} | Email: {$r['email']} | Status: {$r['status']} | Notes: {$r['notes']}\n";
-                }
-            }
-            return cora_mcp_make_tool_response( $content, $id );
-
-        case 'cora_create_lead':
-            $lead_name  = isset( $args['name'] ) ? sanitize_text_field( $args['name'] ) : '';
-            $lead_email = isset( $args['email'] ) ? sanitize_email( $args['email'] ) : '';
-            $lead_phone = isset( $args['phone'] ) ? sanitize_text_field( $args['phone'] ) : '';
-            $lead_notes = isset( $args['notes'] ) ? sanitize_textarea_field( $args['notes'] ) : '';
-
-            if ( empty( $lead_name ) || empty( $lead_email ) ) {
-                return cora_mcp_make_tool_error( "Name and email are required parameters to create a lead.", $id );
-            }
-
-            $name_parts = explode( ' ', trim( $lead_name ), 2 );
-            $first_name = $name_parts[0] ?? '';
-            $last_name  = $name_parts[1] ?? '';
-
-            $agency_id = cora_db_get_agency_id();
-            $branch_id = cora_db_get_branch_id();
-
-            $success = $wpdb->insert(
-                "{$wpdb->prefix}cora_leads",
-                array(
-                    'agency_id'  => $agency_id,
-                    'branch_id'  => $branch_id,
-                    'first_name' => $first_name,
-                    'last_name'  => $last_name,
-                    'email'      => $lead_email,
-                    'phone'      => $lead_phone,
-                    'notes'      => $lead_notes,
-                    'status'     => 'new',
-                    'created_at' => current_time( 'mysql' ),
-                    'updated_at' => current_time( 'mysql' )
-                ),
-                array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
-            );
-
-            if ( $success ) {
-                $new_id = $wpdb->insert_id;
-                cora_log_activity( 'CRM', "Registered new lead '{$lead_name}' via MCP." );
-                return cora_mcp_make_tool_response( "Successfully created lead '{$lead_name}' with ID {$new_id}.", $id );
-            } else {
-                return cora_mcp_make_tool_error( "Database error occurred while trying to insert the lead.", $id );
-            }
-
-        case 'cora_update_lead_status':
-            $lead_id = isset( $args['lead_id'] ) ? intval( $args['lead_id'] ) : 0;
-            $status  = isset( $args['status'] ) ? sanitize_text_field( $args['status'] ) : '';
-            $notes   = isset( $args['notes'] ) ? sanitize_text_field( $args['notes'] ) : '';
-
-            if ( ! $lead_id || ! $status ) {
-                return cora_mcp_make_tool_error( "lead_id and status parameters are required.", $id );
-            }
-
-            $agency_id = cora_db_get_agency_id();
-            $user_agency = cora_get_current_user_agency_id();
-
-            $data = array( 'status' => $status );
-            if ( ! empty( $notes ) ) {
-                $data['notes'] = $notes;
-            }
-
-            $where = array( 'id' => $lead_id );
-            if ( $user_agency !== 'super' ) {
-                $where['agency_id'] = $agency_id;
-            }
-
-            $updated = $wpdb->update(
-                "{$wpdb->prefix}cora_leads",
-                $data,
-                $where
-            );
-
-            if ( $updated !== false ) {
-                cora_log_activity( 'CRM', "Updated lead ID {$lead_id} status to '{$status}' via MCP." );
-                return cora_mcp_make_tool_response( "Successfully updated lead ID {$lead_id} status to '{$status}'.", $id );
-            } else {
-                return cora_mcp_make_tool_error( "Failed to update lead ID {$lead_id} in the database.", $id );
-            }
-
-        case 'cora_get_vault_documents':
-            $limit = isset( $args['limit'] ) ? intval( $args['limit'] ) : 10;
-            $type  = isset( $args['type'] ) ? sanitize_text_field( $args['type'] ) : '';
-            
-            $docs = get_option( 'cora_documents', array() );
-            if ( ! is_array( $docs ) ) $docs = array();
-
-            $filtered_docs = array();
-            foreach ( $docs as $d ) {
-                if ( ! empty( $type ) && strtolower( $d['type'] ) !== strtolower( $type ) ) {
-                    continue;
-                }
-                $filtered_docs[] = $d;
-                if ( count( $filtered_docs ) >= $limit ) {
-                    break;
-                }
-            }
-
-            $content = "Vault Documents:\n";
-            if ( empty( $filtered_docs ) ) {
-                $content .= "No matching documents found.\n";
-            } else {
-                foreach ( $filtered_docs as $d ) {
-                    $content .= "- ID: {$d['id']} | Number: {$d['number']} | Title: {$d['title']} | Type: {$d['type']} | Client: {$d['client_name']} ({$d['client_email']}) | Status: {$d['status']} | Signed: " . ($d['signed'] ? 'Yes' : 'No') . "\n";
-                }
-            }
-            return cora_mcp_make_tool_response( $content, $id );
-
-        case 'cora_share_document':
-            $doc_id = isset( $args['document_id'] ) ? sanitize_text_field( $args['document_id'] ) : '';
-            $email  = isset( $args['client_email'] ) ? sanitize_email( $args['client_email'] ) : '';
-            $message = isset( $args['message'] ) ? sanitize_text_field( $args['message'] ) : '';
-
-            if ( empty( $doc_id ) || empty( $email ) ) {
-                return cora_mcp_make_tool_error( "document_id and client_email parameters are required.", $id );
-            }
-
-            $docs = get_option( 'cora_documents', array() );
-            if ( ! is_array( $docs ) ) $docs = array();
-
-            $found = false;
-            $share_hash = '';
-            $doc_title = '';
-
-            foreach ( $docs as &$d ) {
-                if ( (string)$d['id'] === (string)$doc_id ) {
-                    $found = true;
-                    $doc_title = $d['title'];
-                    
-                    if ( empty( $d['secured_shares'] ) || ! is_array( $d['secured_shares'] ) ) {
-                        $d['secured_shares'] = array();
-                    }
-
-                    foreach ( $d['secured_shares'] as $sh ) {
-                        if ( isset( $sh['email'] ) && $sh['email'] === $email ) {
-                            $share_hash = $sh['hash'];
-                            break;
-                        }
-                    }
-
-                    if ( empty( $share_hash ) ) {
-                        $share_hash = wp_hash( $doc_id . time() . uniqid() );
-                        $d['secured_shares'][] = array(
-                            'hash'        => $share_hash,
-                            'email'       => $email,
-                            'expiry_time' => 0,
-                            'created_at'  => time()
-                        );
-                    }
-                    break;
-                }
-            }
-
-            if ( ! $found ) {
-                return cora_mcp_make_tool_error( "Document not found inside the Vault.", $id );
-            }
-
-            update_option( 'cora_documents', $docs );
-
-            $share_url = home_url( '/shared-doc/' . $share_hash );
-            $subject   = "Document Review & E-Sign Request: " . $doc_title;
-            $email_msg = "Hello,\n\nYou are requested to review and sign the document '" . $doc_title . "' on Cora Workspace.\n\n" . ( $message ? "Message: " . $message . "\n\n" : "" ) . "Please open this link to proceed: " . $share_url . "\n\nBest regards,\nCora Studio Workspace";
-
-            $sent = wp_mail( $email, $subject, $email_msg );
-            if ( $sent ) {
-                cora_log_activity( 'Vault', "Shared document '{$doc_title}' to '{$email}' via MCP E-Sign." );
-                return cora_mcp_make_tool_response( "Document '{$doc_title}' successfully shared with {$email} via secure link: {$share_url}", $id );
-            } else {
-                return cora_mcp_make_tool_error( "Failed to dispatch sharing email via SMTP/wp_mail.", $id );
-            }
-
-        case 'cora_get_attendance_logs':
-            $limit   = isset( $args['limit'] ) ? intval( $args['limit'] ) : 15;
-            $user_id = isset( $args['user_id'] ) ? intval( $args['user_id'] ) : 0;
-
-            $logs = get_option( 'cora_workspace_attendance_logs', array() );
-            if ( ! is_array( $logs ) ) $logs = array();
-
-            $filtered_logs = array();
-            foreach ( array_reverse( $logs ) as $l ) {
-                if ( $user_id && isset( $l['user_id'] ) && intval( $l['user_id'] ) !== $user_id ) {
-                    continue;
-                }
-                $filtered_logs[] = $l;
-                if ( count( $filtered_logs ) >= $limit ) {
-                    break;
-                }
-            }
-
-            $content = "Recent Attendance Logs:\n";
-            if ( empty( $filtered_logs ) ) {
-                $content .= "No logs found.\n";
-            } else {
-                foreach ( $filtered_logs as $l ) {
-                    $date = isset( $l['timestamp'] ) ? date( 'Y-m-d H:i:s', $l['timestamp'] ) : 'N/A';
-                    $user_name = isset( $l['user'] ) ? $l['user'] : ( isset( $l['user_name'] ) ? $l['user_name'] : 'User' );
-                    $type_lbl = isset( $l['type'] ) ? strtoupper( $l['type'] ) : 'CHECK';
-                    $status_lbl = isset( $l['status'] ) ? $l['status'] : 'neutral';
-                    $content .= "- [{$date}] | {$type_lbl} | User: {$user_name} (ID: " . ( $l['user_id'] ?? '' ) . ") | Status: {$status_lbl} | IP: " . ( $l['ip'] ?? '' ) . " | Dist: " . ( $l['distance'] ?? '' ) . "\n";
-                }
-            }
-            return cora_mcp_make_tool_response( $content, $id );
-
-        case 'cora_get_bookings':
-            $limit  = isset( $args['limit'] ) ? intval( $args['limit'] ) : 10;
-            $status = isset( $args['status'] ) ? sanitize_text_field( $args['status'] ) : '';
-
-            $agency_id = cora_db_get_agency_id();
-            $user_agency = cora_get_current_user_agency_id();
-
-            $sql = "SELECT * FROM {$wpdb->prefix}cora_bookings";
-            $where_clauses = array();
-            $params = array();
-
-            if ( $user_agency !== 'super' ) {
-                $where_clauses[] = "agency_id = %d";
-                $params[] = $agency_id;
-            }
-
-            if ( ! empty( $status ) ) {
-                $where_clauses[] = "status = %s";
-                $params[] = $status;
-            }
-
-            if ( ! empty( $where_clauses ) ) {
-                $sql .= " WHERE " . implode( " AND ", $where_clauses );
-            }
-
-            $sql .= " ORDER BY showing_date DESC LIMIT %d";
-            $params[] = $limit;
-
-            $rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
-
-            $content = "Shoot Bookings & Showings:\n";
-            if ( empty( $rows ) ) {
-                $content .= "No bookings found.\n";
-            } else {
-                foreach ( $rows as $r ) {
-                    $content .= "- ID: {$r['id']} | Date: {$r['showing_date']} | Status: {$r['status']} | Value: " . ( $r['package_value'] ?? '0' ) . " | Notes: {$r['notes']}\n";
-                }
-            }
-            return cora_mcp_make_tool_response( $content, $id );
-
-        case 'cora_create_booking':
-            $client_name = isset( $args['client_name'] ) ? sanitize_text_field( $args['client_name'] ) : '';
-            $client_phone = isset( $args['client_phone'] ) ? sanitize_text_field( $args['client_phone'] ) : '';
-            $shoot_type = isset( $args['shoot_type'] ) ? sanitize_text_field( $args['shoot_type'] ) : '';
-            $scheduled_at = isset( $args['scheduled_at'] ) ? sanitize_text_field( $args['scheduled_at'] ) : '';
-            $notes = isset( $args['notes'] ) ? sanitize_textarea_field( $args['notes'] ) : '';
-
-            if ( empty( $client_name ) || empty( $client_phone ) || empty( $shoot_type ) || empty( $scheduled_at ) ) {
-                return cora_mcp_make_tool_error( "client_name, client_phone, shoot_type, and scheduled_at parameters are required.", $id );
-            }
-
-            $agency_id = cora_db_get_agency_id();
-            $branch_id = cora_db_get_branch_id();
-
-            $success = $wpdb->insert(
-                "{$wpdb->prefix}cora_bookings",
-                array(
-                    'agency_id'      => $agency_id,
-                    'branch_id'      => $branch_id,
-                    'showing_date'   => $scheduled_at,
-                    'status'         => 'confirmed',
-                    'deal_type'      => $shoot_type,
-                    'notes'          => $notes . " [Created via MCP. Client Phone: {$client_phone}]",
-                    'created_at'     => current_time( 'mysql' ),
-                    'updated_at'     => current_time( 'mysql' )
-                )
-            );
-
-            if ( $success ) {
-                $new_id = $wpdb->insert_id;
-                cora_log_activity( 'Bookings', "Scheduled new shoot booking ID {$new_id} for client '{$client_name}' via MCP." );
-                return cora_mcp_make_tool_response( "Successfully created and scheduled shoot booking ID {$new_id} for client '{$client_name}' at {$scheduled_at}.", $id );
-            } else {
-                return cora_mcp_make_tool_error( "Database error occurred while trying to save the booking.", $id );
-            }
-
-        case 'cora_get_tasks':
-            $limit  = isset( $args['limit'] ) ? intval( $args['limit'] ) : 15;
-            $status = isset( $args['status'] ) ? sanitize_text_field( $args['status'] ) : '';
-
-            $tasks = get_option( 'cora_workspace_client_tasks', array() );
-            if ( ! is_array( $tasks ) ) $tasks = array();
-
-            $filtered_tasks = array();
-            foreach ( $tasks as $t ) {
-                if ( ! empty( $status ) && strtolower( $t['status'] ) !== strtolower( $status ) ) {
-                    continue;
-                }
-                $filtered_tasks[] = $t;
-                if ( count( $filtered_tasks ) >= $limit ) {
-                    break;
-                }
-            }
-
-            $content = "Checklist Tasks:\n";
-            if ( empty( $filtered_tasks ) ) {
-                $content .= "No tasks found.\n";
-            } else {
-                foreach ( $filtered_tasks as $t ) {
-                    $due = $t['due_date'] ?? 'N/A';
-                    $content .= "- ID: {$t['id']} | Title: {$t['title']} | Client: {$t['client_name']} | Status: {$t['status']} | Priority: " . ( $t['priority'] ?? 'medium' ) . " | Due: {$due}\n";
-                }
-            }
-            return cora_mcp_make_tool_response( $content, $id );
-
-        case 'cora_create_task':
-            $title = isset( $args['title'] ) ? sanitize_text_field( $args['title'] ) : '';
-            $client_name = isset( $args['client_name'] ) ? sanitize_text_field( $args['client_name'] ) : '';
-            $due_date = isset( $args['due_date'] ) ? sanitize_text_field( $args['due_date'] ) : date( 'Y-m-d', strtotime( '+3 days' ) );
-            $priority = isset( $args['priority'] ) ? sanitize_text_field( $args['priority'] ) : 'medium';
-            $description = isset( $args['description'] ) ? sanitize_textarea_field( $args['description'] ) : '';
-
-            if ( empty( $title ) || empty( $client_name ) ) {
-                return cora_mcp_make_tool_error( "title and client_name parameters are required.", $id );
-            }
-
-            $tasks = get_option( 'cora_workspace_client_tasks', array() );
-            if ( ! is_array( $tasks ) ) $tasks = array();
-
-            $new_task = array(
-                'id'            => uniqid(),
-                'title'         => $title,
-                'client_id'     => 'c_' . uniqid(),
-                'client_name'   => $client_name,
-                'booking_id'    => 'b_' . uniqid(),
-                'booking_title' => 'Custom Task Project',
-                'assignee_id'   => 'u1',
-                'assignee_name' => 'Shruti (Super Admin)',
-                'deliverable_type' => 'Custom',
-                'priority'      => $priority,
-                'due_date'      => $due_date,
-                'status'        => 'todo',
-                'desc'          => $description . " [Created via MCP]",
-                'subtasks'      => array()
-            );
-
-            $tasks[] = $new_task;
-            update_option( 'cora_workspace_client_tasks', $tasks, false );
-
-            cora_log_activity( 'Tasks', "Created new checklist task '{$title}' via MCP." );
-            return cora_mcp_make_tool_response( "Successfully created checklist task '{$title}' (ID: {$new_task['id']}) for client '{$client_name}' due on {$due_date}.", $id );
-
-        case 'cora_get_activity_logs':
-            $limit = isset( $args['limit'] ) ? intval( $args['limit'] ) : 10;
-            $logs = cora_db_get_activity_logs( $limit );
-
-            $content = "Recent Activity Logs:\n";
-            if ( empty( $logs ) ) {
-                $content .= "No logs found.\n";
-            } else {
-                foreach ( $logs as $l ) {
-                    $date = date( 'Y-m-d H:i:s', $l['timestamp'] );
-                    $content .= "- [{$date}] | Category: {$l['action_type']} | User: {$l['user_name']} | Action: {$l['description']}\n";
                 }
             }
             return cora_mcp_make_tool_response( $content, $id );
@@ -5619,6 +5704,132 @@ function cora_mcp_make_tool_error( $error_msg, $id ) {
         ),
         'id'      => $id
     ), 200 );
+}
+}
+
+/**
+ * Callback: Direct OpenAPI Tool invocation for ChatGPT Custom GPT Actions
+ */
+if ( ! function_exists( 'cora_rest_mcp_direct_tool_handler' ) ) {
+function cora_rest_mcp_direct_tool_handler( $request ) {
+    $token = get_option( 'cora_mcp_access_token' );
+    $provided_token = '';
+    $auth_header = is_object( $request ) ? $request->get_header( 'Authorization' ) : '';
+    if ( ! empty( $auth_header ) && preg_match( '/Bearer\s+(.*)$/i', $auth_header, $matches ) ) {
+        $provided_token = $matches[1];
+    } elseif ( is_object( $request ) ) {
+        $provided_token = $request->get_param( 'token' );
+    }
+
+    if ( empty( $provided_token ) || ! hash_equals( $token, $provided_token ) ) {
+        return new WP_REST_Response( array( 'error' => 'Unauthorized: Invalid or missing Bearer MCP token.' ), 401 );
+    }
+
+    $tool_name = is_object( $request ) ? $request->get_param( 'tool_name' ) : '';
+    $args = is_object( $request ) ? ($request->get_json_params() ?: array()) : array();
+
+    $response = cora_mcp_handle_call_tool( $tool_name, $args, 1 );
+    $data = $response->get_data();
+
+    if ( isset( $data['error'] ) ) {
+        return new WP_REST_Response( $data['error'], 400 );
+    }
+
+    $result_text = '';
+    if ( isset( $data['result']['content'][0]['text'] ) ) {
+        $result_text = $data['result']['content'][0]['text'];
+    }
+
+    return new WP_REST_Response( array(
+        'success' => true,
+        'result'  => $result_text,
+        'raw'     => $data['result'] ?? array()
+    ), 200 );
+}
+}
+
+/**
+ * Callback: Generates live OpenAPI 3.1.0 Schema for ChatGPT Custom GPT Actions
+ */
+if ( ! function_exists( 'cora_rest_mcp_openapi_handler' ) ) {
+function cora_rest_mcp_openapi_handler( $request = null ) {
+    $tools_res = cora_mcp_handle_list_tools( 1 );
+    $tools_data = $tools_res->get_data();
+    $tools = $tools_data['result']['tools'] ?? array();
+
+    $paths = array();
+    foreach ( $tools as $t ) {
+        $op_id = $t['name'];
+        $summary = $t['description'] ?? $op_id;
+        $schema = $t['inputSchema'] ?? array( 'type' => 'object', 'properties' => (object) array() );
+
+        $paths[ '/wp-json/cora/v1/mcp/tool/' . $op_id ] = array(
+            'post' => array(
+                'operationId' => $op_id,
+                'summary'     => $summary,
+                'description' => $summary,
+                'requestBody' => array(
+                    'required' => false,
+                    'content'  => array(
+                        'application/json' => array(
+                            'schema' => $schema
+                        )
+                    )
+                ),
+                'responses'   => array(
+                    '200' => array(
+                        'description' => 'Tool execution successful',
+                        'content'     => array(
+                            'application/json' => array(
+                                'schema' => array(
+                                    'type'       => 'object',
+                                    'properties' => array(
+                                        'success' => array( 'type' => 'boolean' ),
+                                        'result'  => array( 'type' => 'string' )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    '400' => array( 'description' => 'Invalid parameters' ),
+                    '401' => array( 'description' => 'Unauthorized / Invalid Bearer token' )
+                )
+            )
+        );
+    }
+
+    $openapi = array(
+        'openapi' => '3.1.0',
+        'info'    => array(
+            'title'       => 'Cora Workspace AI Actions Gateway',
+            'description' => 'Universal Model Context Protocol API allowing ChatGPT Custom GPTs, Claude, and external AI agents to query and manage the Cora Workspace.',
+            'version'     => CORA_WORKSPACE_VERSION
+        ),
+        'servers' => array(
+            array(
+                'url'         => home_url(),
+                'description' => 'Cora Live Server'
+            )
+        ),
+        'paths'   => $paths,
+        'components' => array(
+            'securitySchemes' => array(
+                'BearerAuth' => array(
+                    'type'         => 'http',
+                    'scheme'       => 'bearer',
+                    'bearerFormat' => 'token',
+                    'description'  => 'Enter your Cora Workspace MCP Bearer Token'
+                )
+            )
+        ),
+        'security' => array(
+            array( 'BearerAuth' => array() )
+        )
+    );
+
+    $response = new WP_REST_Response( $openapi, 200 );
+    $response->header( 'Access-Control-Allow-Origin', '*' );
+    return $response;
 }
 }
 
@@ -11274,6 +11485,245 @@ function cora_ajax_delete_rag_resource() {
 }
 }
 add_action( 'wp_ajax_cora_delete_rag_resource', 'cora_ajax_delete_rag_resource' );
+
+/**
+ * Ingest a workspace event / memory fragment into the living AI knowledge base
+ */
+if ( ! function_exists( 'cora_rag_ingest_event' ) ) {
+function cora_rag_ingest_event( $agency_id, $category, $title, $content, $source_id = null ) {
+    global $wpdb;
+    if ( empty( $agency_id ) ) {
+        $agency_id = cora_db_get_agency_id() ?: 1;
+    }
+    $table = $wpdb->prefix . 'cora_rag_knowledge';
+    if ( ! cora_table_exists( $table ) ) {
+        return false;
+    }
+
+    $clean_content = strip_tags( $content );
+    $word_count    = str_word_count( $clean_content );
+    $token_count   = ceil( $word_count * 1.3 );
+
+    if ( ! empty( $source_id ) ) {
+        $existing_id = $wpdb->get_var( $wpdb->prepare(
+            "SELECT id FROM {$table} WHERE agency_id = %d AND source_type = %s AND source_id = %d LIMIT 1",
+            $agency_id, $category, intval( $source_id )
+        ) );
+        if ( $existing_id ) {
+            $wpdb->update(
+                $table,
+                array(
+                    'title'       => $title,
+                    'content'     => $content,
+                    'token_count' => $token_count,
+                    'updated_at'  => current_time( 'mysql' )
+                ),
+                array( 'id' => $existing_id ),
+                array( '%s', '%s', '%d', '%s' ),
+                array( '%d' )
+            );
+            return $existing_id;
+        }
+    }
+
+    $inserted = $wpdb->insert(
+        $table,
+        array(
+            'agency_id'   => $agency_id,
+            'title'       => $title,
+            'content'     => $content,
+            'source_type' => $category,
+            'source_id'   => $source_id ? intval( $source_id ) : null,
+            'token_count' => $token_count,
+            'created_at'  => current_time( 'mysql' ),
+            'updated_at'  => current_time( 'mysql' )
+        ),
+        array( '%d', '%s', '%s', '%s', '%d', '%d', '%s', '%s' )
+    );
+    return $inserted ? $wpdb->insert_id : false;
+}
+}
+
+/**
+ * Builds live dynamic operational intelligence context for AI models
+ */
+if ( ! function_exists( 'cora_build_dynamic_workspace_context' ) ) {
+function cora_build_dynamic_workspace_context( $agency_id = null ) {
+    global $wpdb;
+    if ( empty( $agency_id ) ) {
+        $agency_id = cora_db_get_agency_id() ?: 1;
+    }
+
+    $industry = get_option( 'cora_workspace_active_industry', 'photography_studio' );
+    $site_title = get_bloginfo( 'name' );
+
+    // 1. Leads summary
+    $leads = get_option( 'cora_workspace_leads', array() );
+    if ( ! is_array( $leads ) ) $leads = array();
+    $leads_count = count( $leads );
+    $leads_by_status = array( 'new' => 0, 'contacted' => 0, 'qualified' => 0, 'won' => 0, 'lost' => 0 );
+    $total_pipeline_val = 0;
+    foreach ( $leads as $l ) {
+        $st = strtolower( $l['status'] ?? 'new' );
+        if ( isset( $leads_by_status[$st] ) ) $leads_by_status[$st]++;
+        $total_pipeline_val += floatval( $l['price'] ?? $l['deal_value'] ?? 0 );
+    }
+
+    // 2. Financial Overview
+    $invoices = get_option( 'cora_workspace_invoices', array() );
+    if ( ! is_array( $invoices ) ) $invoices = array();
+    $total_revenue = 0;
+    $total_outstanding = 0;
+    foreach ( $invoices as $inv ) {
+        $amt = floatval( $inv['amount'] ?? 0 );
+        $st  = strtolower( $inv['status'] ?? 'draft' );
+        if ( $st === 'paid' ) $total_revenue += $amt;
+        elseif ( in_array( $st, array( 'unpaid', 'sent', 'overdue' ) ) ) $total_outstanding += $amt;
+    }
+
+    // 3. Bookings / Sessions
+    $bookings = get_option( 'cora_workspace_clients', array() );
+    if ( ! is_array( $bookings ) ) $bookings = array();
+    $active_bookings = count( $bookings );
+
+    // 4. Tasks
+    $tasks = get_option( 'cora_workspace_client_tasks', array() );
+    if ( ! is_array( $tasks ) ) $tasks = array();
+    $pending_tasks = 0;
+    foreach ( $tasks as $t ) {
+        if ( empty( $t['completed'] ) && ($t['status'] ?? '') !== 'completed' && ($t['status'] ?? '') !== 'done' ) $pending_tasks++;
+    }
+
+    // 5. Living Knowledge fragments count
+    $rag_table = $wpdb->prefix . 'cora_rag_knowledge';
+    $knowledge_fragments = 0;
+    if ( cora_table_exists( $rag_table ) ) {
+        $knowledge_fragments = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$rag_table} WHERE agency_id = %d", $agency_id ) ) );
+    }
+
+    $context = "=== WORKSPACE REAL-TIME OPERATIONAL INTELLIGENCE ===\n";
+    $context .= "Business: {$site_title} | Industry Mode: " . ucwords( str_replace( '_', ' ', $industry ) ) . " (Agency ID: {$agency_id})\n";
+    $context .= "CRM Pipeline: {$leads_count} total leads (Pipeline Value: ₹" . number_format($total_pipeline_val) . "). Breakdown: New: {$leads_by_status['new']}, Contacted: {$leads_by_status['contacted']}, Won: {$leads_by_status['won']}, Lost: {$leads_by_status['lost']}.\n";
+    $context .= "Financial Snapshot: Collected Revenue: ₹" . number_format($total_revenue) . " | Outstanding Receivables: ₹" . number_format($total_outstanding) . " across " . count($invoices) . " invoices.\n";
+    $context .= "Operations: {$active_bookings} active sessions/bookings scheduled | {$pending_tasks} pending client tasks.\n";
+    $context .= "Living AI Knowledge Base: {$knowledge_fragments} indexed domain & operational memory fragments available.\n";
+    $context .= "====================================================\n";
+
+    return $context;
+}
+}
+
+/**
+ * Re-indexes all workspace data into Living AI Memory
+ */
+if ( ! function_exists( 'cora_rag_reindex_workspace_all' ) ) {
+function cora_rag_reindex_workspace_all( $agency_id = null ) {
+    if ( empty( $agency_id ) ) {
+        $agency_id = cora_db_get_agency_id() ?: 1;
+    }
+
+    $indexed = 0;
+
+    // 1. Leads
+    $leads = get_option( 'cora_workspace_leads', array() );
+    if ( is_array( $leads ) ) {
+        foreach ( $leads as $l ) {
+            $name = $l['names'] ?? $l['name'] ?? 'Lead';
+            $st   = $l['status'] ?? 'new';
+            $city = $l['city'] ?? 'N/A';
+            $val  = floatval( $l['price'] ?? $l['deal_value'] ?? 0 );
+            $desc = "CRM Deal: {$name} | City: {$city} | Value: ₹{$val} | Phone: " . ($l['phone'] ?? 'N/A') . " | Email: " . ($l['email'] ?? 'N/A') . " | Status: {$st} | Notes: " . ($l['notes'] ?? '');
+            cora_rag_ingest_event( $agency_id, 'crm', "CRM Lead: {$name} ({$st})", $desc, $l['id'] ?? null );
+            $indexed++;
+        }
+    }
+
+    // 2. Invoices
+    $invoices = get_option( 'cora_workspace_invoices', array() );
+    if ( is_array( $invoices ) ) {
+        foreach ( $invoices as $inv ) {
+            $inv_no = $inv['invoice_number'] ?? $inv['id'] ?? 'INV';
+            $client = $inv['client_name'] ?? $inv['client'] ?? 'Client';
+            $amt    = floatval( $inv['amount'] ?? 0 );
+            $st     = $inv['status'] ?? 'draft';
+            $desc   = "Invoice {$inv_no} for {$client} | Amount: ₹{$amt} | Status: {$st} | Due Date: " . ($inv['due_date'] ?? 'N/A');
+            cora_rag_ingest_event( $agency_id, 'financials', "Invoice: {$inv_no} - ₹" . number_format($amt) . " ({$st})", $desc, $inv['id'] ?? null );
+            $indexed++;
+        }
+    }
+
+    // 3. Bookings
+    $bookings = get_option( 'cora_workspace_clients', array() );
+    if ( is_array( $bookings ) ) {
+        foreach ( $bookings as $b ) {
+            $c_name = $b['name'] ?? $b['client_name'] ?? 'Client';
+            $type   = $b['shoot_type'] ?? 'Session';
+            $date   = $b['scheduled_at'] ?? 'N/A';
+            $st     = $b['status'] ?? 'confirmed';
+            $desc   = "Booking for {$c_name} | Type: {$type} | Scheduled: {$date} | Location: " . ($b['location'] ?? 'Studio') . " | Status: {$st}";
+            cora_rag_ingest_event( $agency_id, 'operations', "Booking: {$c_name} ({$type})", $desc, $b['id'] ?? null );
+            $indexed++;
+        }
+    }
+
+    // 4. Tasks
+    $tasks = get_option( 'cora_workspace_client_tasks', array() );
+    if ( is_array( $tasks ) ) {
+        foreach ( $tasks as $t ) {
+            $title  = $t['title'] ?? 'Task';
+            $client = $t['client_name'] ?? 'Client';
+            $due    = $t['due_date'] ?? 'N/A';
+            $desc   = "Task Deliverable: {$title} | Client: {$client} | Due: {$due} | Priority: " . ($t['priority'] ?? 'medium') . " | Status: " . ($t['status'] ?? 'todo');
+            cora_rag_ingest_event( $agency_id, 'operations', "Task: {$title} ({$client})", $desc, $t['id'] ?? null );
+            $indexed++;
+        }
+    }
+
+    // 5. Vault Documents
+    $docs = get_option( 'cora_documents', array() );
+    if ( is_array( $docs ) ) {
+        foreach ( $docs as $d ) {
+            $title = $d['title'] ?? 'Document';
+            $type  = $d['type'] ?? 'Agreement';
+            $desc  = "Vault Document: {$title} | Type: {$type} | Modified: " . ($d['date'] ?? 'N/A');
+            cora_rag_ingest_event( $agency_id, 'vault', "Vault Document: {$title} ({$type})", $desc, $d['id'] ?? null );
+            $indexed++;
+        }
+    }
+
+    // 6. Reviews
+    $reviews = get_option( 'cora_workspace_reviews', array() );
+    if ( is_array( $reviews ) ) {
+        foreach ( $reviews as $r ) {
+            $author = $r['author_name'] ?? $r['name'] ?? 'Client';
+            $stars  = $r['rating'] ?? 5;
+            $text   = $r['text'] ?? $r['review'] ?? '';
+            $desc   = "Client Review by {$author} ({$stars} Stars): \"{$text}\"";
+            cora_rag_ingest_event( $agency_id, 'reviews', "Review: {$author} ({$stars}★)", $desc, $r['id'] ?? null );
+            $indexed++;
+        }
+    }
+
+    return $indexed;
+}
+}
+
+/**
+ * AJAX Endpoint: cora_ajax_reindex_living_memory
+ */
+if ( ! function_exists( 'cora_ajax_reindex_living_memory' ) ) {
+function cora_ajax_reindex_living_memory() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $agency_id = cora_db_get_agency_id() ?: 1;
+    $count = cora_rag_reindex_workspace_all( $agency_id );
+    wp_send_json_success( array(
+        'message' => "Workspace Living Memory successfully re-indexed. {$count} operational fragments compiled into AI second brain.",
+        'count'   => $count
+    ) );
+}
+add_action( 'wp_ajax_cora_ajax_reindex_living_memory', 'cora_ajax_reindex_living_memory' );
+add_action( 'wp_ajax_cora_reindex_living_memory', 'cora_ajax_reindex_living_memory' );
+}
 
 /**
  * Resolve post author agency ID helper
@@ -36231,6 +36681,12 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
                 'action_url' => home_url( '/workspace/dashboard?sub_page=leads' ),
                 'category'   => 'CRM & Leads',
             ) );
+        }
+
+        // Auto-ingest into Living AI Memory
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            $agency_id_val = ! empty( $agency_id ) ? $agency_id : cora_db_get_agency_id();
+            cora_rag_ingest_event( $agency_id_val, 'crm', "CRM Lead: {$names} ({$status})", "Lead Deal: {$names} | City: {$city} | Value: ₹{$price} | Phone: {$phone} | Email: {$email} | Status: {$status} | Notes: {$notes}", $lead_id );
         }
 
         wp_send_json_success( array(
