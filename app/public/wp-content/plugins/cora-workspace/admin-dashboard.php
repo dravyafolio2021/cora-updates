@@ -5181,42 +5181,60 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                             <span class="text-[11px] text-zinc-450 font-medium">Real-time workspace insights and summaries</span>
                                         </div>
                                     </div>
-                                    <span class="h-5 w-16 rounded-full bg-emerald-50 text-emerald-600 font-bold text-[9px] flex items-center justify-center border border-emerald-100 uppercase tracking-wider">🟢 Active</span>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-[9px] border border-emerald-200/60 uppercase tracking-wider">
+                                        <span class="relative flex h-2 w-2">
+                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                        </span>
+                                        Active
+                                    </span>
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3">
                                     <div class="p-3 rounded-xl bg-zinc-50/70 border border-zinc-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-2 min-w-0">
-                                            <span class="text-[10px] shrink-0">🟢</span>
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <span class="relative flex h-2 w-2 shrink-0">
+                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                            </span>
                                             <span class="text-xs font-bold text-zinc-800 truncate">AI Co-founder</span>
                                         </div>
-                                        <span class="text-[10px] text-zinc-455 font-bold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200">Online</span>
+                                        <span class="text-[10px] text-zinc-600 font-semibold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200 shadow-2xs">Online</span>
                                     </div>
                                     <?php if ( in_array( 'gbp', $enabled, true ) ) : ?>
                                     <div class="p-3 rounded-xl bg-zinc-50/70 border border-zinc-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-2 min-w-0">
-                                            <span class="text-[10px] shrink-0">🟢</span>
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <span class="relative flex h-2 w-2 shrink-0">
+                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                            </span>
                                             <span class="text-xs font-bold text-zinc-800 truncate">AI Marketing</span>
                                         </div>
-                                        <span class="text-[10px] text-zinc-455 font-bold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200">Monitoring</span>
+                                        <span class="text-[10px] text-zinc-600 font-semibold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200 shadow-2xs">Monitoring</span>
                                     </div>
                                     <?php endif; ?>
                                     <?php if ( in_array( 'automations', $enabled, true ) ) : ?>
                                     <div class="p-3 rounded-xl bg-zinc-50/70 border border-zinc-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-2 min-w-0">
-                                            <span class="text-[10px] shrink-0">🟢</span>
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <span class="relative flex h-2 w-2 shrink-0">
+                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                            </span>
                                             <span class="text-xs font-bold text-zinc-800 truncate">Automations</span>
                                         </div>
-                                        <span class="text-[10px] text-zinc-455 font-bold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200">Active</span>
+                                        <span class="text-[10px] text-zinc-600 font-semibold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200 shadow-2xs">Active</span>
                                     </div>
                                     <?php endif; ?>
                                     <?php if ( in_array( 'vault', $enabled, true ) ) : ?>
                                     <div class="p-3 rounded-xl bg-zinc-50/70 border border-zinc-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-2 min-w-0">
-                                            <span class="text-[10px] shrink-0">🟢</span>
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <span class="relative flex h-2 w-2 shrink-0">
+                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                            </span>
                                             <span class="text-xs font-bold text-zinc-800 truncate">Secure Vault</span>
                                         </div>
-                                        <span class="text-[10px] text-zinc-455 font-bold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200">Ready</span>
+                                        <span class="text-[10px] text-zinc-600 font-semibold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200 shadow-2xs">Ready</span>
                                     </div>
                                     <?php endif; ?>
                                 </div>
@@ -5248,11 +5266,17 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                 <div class="space-y-4 mt-2">
                                     <div class="flex items-center justify-between py-1 border-b border-zinc-100">
                                         <span class="text-xs text-zinc-500 font-bold">Active Engine</span>
-                                        <span class="text-xs font-extrabold text-zinc-800">Gemini 3.5 Flash</span>
+                                        <span class="text-xs font-extrabold text-zinc-800">Gemini 2.5 Flash</span>
                                     </div>
                                     <div class="flex items-center justify-between py-1 border-b border-zinc-100">
                                         <span class="text-xs text-zinc-500 font-bold">Latency</span>
-                                        <span class="text-xs font-extrabold text-emerald-600">🟢 142ms</span>
+                                        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-emerald-600">
+                                            <span class="relative flex h-1.5 w-1.5">
+                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                                            </span>
+                                            142ms
+                                        </span>
                                     </div>
                                     <div class="flex items-center justify-between py-1 border-b border-zinc-100">
                                         <span class="text-xs text-zinc-500 font-bold">Quota Usage</span>
@@ -6640,7 +6664,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                 var text = document.getElementById('cora-wa-status-text');
                                 if (badge && text) {
                                     badge.className = 'text-[9px] border px-2.5 py-1 rounded-full font-bold inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border-emerald-200';
-                                    text.textContent = phone ? 'Connected (' + phone + ')' : 'Connected 🟢';
+                                    text.textContent = phone ? 'Connected (' + phone + ')' : 'Connected';
                                 }
                             } else {
                                 if (window.coraShowToast) window.coraShowToast('Meta Connection Error: ' + ((r.data && r.data.message) ? r.data.message : 'Invalid Token or Phone ID'), 'error');
@@ -6686,10 +6710,10 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                 if (badge) {
                                     if (sw.active) {
                                         badge.className = 'font-bold text-emerald-600';
-                                        badge.textContent = '🟢 Active (' + sw.remaining_human + ' - Free Tier)';
+                                        badge.textContent = 'Active (' + sw.remaining_human + ' - Free Tier)';
                                     } else {
                                         badge.className = 'font-bold text-amber-600';
-                                        badge.textContent = '🟡 Expired (Template / Re-engagement)';
+                                        badge.textContent = 'Expired (Template / Re-engagement)';
                                     }
                                 }
                             }

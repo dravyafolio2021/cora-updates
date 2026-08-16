@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.60
+ * Version: 3.4.61
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.60' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.61' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -38742,12 +38742,12 @@ function cora_pulse_get_workspace_intelligence() {
         $briefing_bullets[] = "Cora AI background observers are continuously monitoring your operational telemetry.";
     } else {
         if ( $overdue_invoices_count > 0 ) {
-            $briefing_bullets[] = "🔴 **{$overdue_invoices_count} invoice(s) totaling ₹" . number_format( $overdue_amount_total ) . "** are overdue and require client follow-up.";
+            $briefing_bullets[] = "**{$overdue_invoices_count} invoice(s) totaling ₹" . number_format( $overdue_amount_total ) . "** are overdue and require client follow-up.";
         }
         if ( $total_leads_this_week > 0 ) {
-            $briefing_bullets[] = "🟡 **{$total_leads_this_week} new lead inquiries** logged this week awaiting qualification.";
+            $briefing_bullets[] = "**{$total_leads_this_week} new lead inquiries** logged this week awaiting qualification.";
         }
-        $briefing_bullets[] = "✓ Cora prepared 1-click quick actions to resolve every flagged item without navigating away.";
+        $briefing_bullets[] = "Cora prepared 1-click quick actions to resolve every flagged item without navigating away.";
     }
 
     return array(

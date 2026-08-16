@@ -427,7 +427,7 @@ class Cora_WhatsApp_Gateway {
         $time_str = current_time( 'g:i A, d M Y' );
         $text = ! empty( $custom_message )
             ? $custom_message
-            : "✨ *Cora Workspace WhatsApp Test*\n\nYour WhatsApp Business Cloud API integration is successfully connected and operating.\n\n• *Status*: Connected 🟢\n• *Timestamp*: {$time_str}\n• *Engine*: Cora Workspace Cloud Gateway\n\n_Reply to this message anytime to unlock a free 24-hour customer service window._";
+            : "*Cora Workspace WhatsApp Test*\n\nYour WhatsApp Business Cloud API integration is successfully connected and operating.\n\n• *Status*: Connected\n• *Timestamp*: {$time_str}\n• *Engine*: Cora Workspace Cloud Gateway\n\n_Reply to this message anytime to unlock a free 24-hour customer service window._";
 
         // Attempt session message
         $res = $this->send_session_message( $clean_to, $text );
