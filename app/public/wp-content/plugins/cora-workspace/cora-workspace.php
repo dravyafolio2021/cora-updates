@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.59
+ * Version: 3.4.60
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.59' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.60' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -2755,40 +2755,39 @@ Please provide concise, professional, and clear guidance for resolving user mana
         $message .= "\nPlatform: " . $platform;
     }
 
-    // Attempt 1: Gemini
-    if ( defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) && ! empty( CORA_PLATFORM_GEMINI_API_KEY ) ) {
-        $api_key  = CORA_PLATFORM_GEMINI_API_KEY;
-        $model_id = 'gemini-3.5-flash-lite';
-        $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
+    // Attempt 1: OpenRouter (Gemini 2.5 Flash)
+    if ( defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) && ! empty( CORA_PLATFORM_OPENROUTER_API_KEY ) ) {
+        $api_key  = CORA_PLATFORM_OPENROUTER_API_KEY;
+        $model_id = 'google/gemini-2.5-flash';
+        $url      = 'https://openrouter.ai/api/v1/chat/completions';
 
         $body = json_encode( array(
-            'system_instruction' => array(
-                'parts' => array( array( 'text' => $system_prompt ) )
+            'model'       => $model_id,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
             ),
-            'contents' => array(
-                array(
-                    'role'  => 'user',
-                    'parts' => array( array( 'text' => $message ) ),
-                )
-            ),
-            'generationConfig' => array(
-                'maxOutputTokens' => 1024,
-                'temperature'     => 0.7,
-            ),
+            'max_tokens'  => 1024,
+            'temperature' => 0.7,
         ) );
 
         $response = wp_remote_post( $url, array(
             'timeout' => 20,
-            'headers' => array( 'Content-Type' => 'application/json' ),
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+                'HTTP-Referer'  => 'https://heycora.in',
+                'X-Title'       => 'Cora Workspace Platform',
+            ),
             'body'    => $body,
         ) );
 
         if ( ! is_wp_error( $response ) ) {
             $code = wp_remote_retrieve_response_code( $response );
             $data = json_decode( wp_remote_retrieve_body( $response ), true );
-            if ( $code === 200 && ! empty( $data['candidates'][0]['content']['parts'][0]['text'] ) ) {
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
                 wp_send_json_success( array(
-                    'reply'    => $data['candidates'][0]['content']['parts'][0]['text'],
+                    'reply'    => $data['choices'][0]['message']['content'],
                     'provider' => 'gemini',
                 ) );
             }
@@ -11563,10 +11562,84 @@ function cora_rag_call_ai_api( $message, $system_prompt ) {
     $gemini_key_b64 = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) ? CORA_PLATFORM_GEMINI_API_KEY : '';
     $openai_key_b64 = get_option( 'cora_workspace_ai_openai_key', '' );
 
-    // Route 1: Gemini
-    if ( ! empty( $gemini_key_b64 ) && strpos( $gemini_key_b64, 'AQ.' ) === false && ( $active_model === 'gemini' || $active_model === 'cora-core-v2' || empty( $openai_key_b64 ) ) ) {
+    // Route 1: OpenRouter (Platform Gemini 2.5 Flash)
+    $openrouter_key = defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ? CORA_PLATFORM_OPENROUTER_API_KEY : '';
+    if ( ! empty( $openrouter_key ) ) {
+        $url = 'https://openrouter.ai/api/v1/chat/completions';
+        $headers = array(
+            'Authorization' => 'Bearer ' . $openrouter_key,
+            'Content-Type'  => 'application/json',
+            'HTTP-Referer'  => 'https://heycora.in',
+            'X-Title'       => 'Cora Workspace Platform'
+        );
+        $body = json_encode( array(
+            'model'       => 'google/gemini-2.5-flash',
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 1500,
+            'temperature' => 0.3,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => $headers,
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                    cora_workspace_log_ai_request();
+                }
+                return $data['choices'][0]['message']['content'];
+            }
+        }
+    }
+
+    // Route 2: Groq (Llama 3.3 70B Versatile)
+    $groq_key = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : '';
+    if ( ! empty( $groq_key ) ) {
+        $url = 'https://api.groq.com/openai/v1/chat/completions';
+        $headers = array(
+            'Authorization' => 'Bearer ' . $groq_key,
+            'Content-Type'  => 'application/json'
+        );
+        $body = json_encode( array(
+            'model'       => 'llama-3.3-70b-versatile',
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 1500,
+            'temperature' => 0.3,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => $headers,
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                    cora_workspace_log_ai_request();
+                }
+                return $data['choices'][0]['message']['content'];
+            }
+        }
+    }
+
+    // Route 3: Direct Google Gemini (if valid custom key configured)
+    if ( ! empty( $gemini_key_b64 ) && strpos( $gemini_key_b64, 'AQ.' ) === false ) {
         $api_key  = $gemini_key_b64;
-        $model_id = 'gemini-3.5-flash-lite';
+        $model_id = 'gemini-2.5-flash';
         $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
 
         $body = json_encode( array(
@@ -11603,15 +11676,15 @@ function cora_rag_call_ai_api( $message, $system_prompt ) {
         }
     }
 
-    // Route 2: OpenAI
-    if ( ! empty( $openai_key_b64 ) && ( $active_model === 'gpt-4o' || $active_model === 'openai' || empty( $gemini_key_b64 ) ) ) {
-        $api_key  = base64_decode( $openai_key_b64 );
+    // Route 4: Direct OpenAI (if custom key configured)
+    if ( ! empty( $openai_key_b64 ) ) {
+        $api_key  = ( base64_decode( $openai_key_b64, true ) !== false ) ? base64_decode( $openai_key_b64 ) : $openai_key_b64;
         $model_id = 'gpt-4o-mini';
         $url      = 'https://api.openai.com/v1/chat/completions';
 
         $body = json_encode( array(
-            'model'    => $model_id,
-            'messages' => array(
+            'model'       => $model_id,
+            'messages'    => array(
                 array( 'role' => 'system', 'content' => $system_prompt ),
                 array( 'role' => 'user',   'content' => $message ),
             ),
@@ -11625,80 +11698,6 @@ function cora_rag_call_ai_api( $message, $system_prompt ) {
                 'Authorization' => 'Bearer ' . $api_key,
                 'Content-Type'  => 'application/json',
             ),
-            'body' => $body,
-        ) );
-
-        if ( ! is_wp_error( $response ) ) {
-            $code = wp_remote_retrieve_response_code( $response );
-            $data = json_decode( wp_remote_retrieve_body( $response ), true );
-            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
-                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
-                    cora_workspace_log_ai_request();
-                }
-                return $data['choices'][0]['message']['content'];
-            }
-        }
-    }
-
-    // Route 3: OpenRouter (Fallback to real loaded key from root .env)
-    $openrouter_key = defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ? CORA_PLATFORM_OPENROUTER_API_KEY : '';
-    if ( ! empty( $openrouter_key ) && strpos( $openrouter_key, 'sk-or-v1-cbb69' ) === false ) {
-        $url = 'https://openrouter.ai/api/v1/chat/completions';
-        $headers = array(
-            'Authorization' => 'Bearer ' . $openrouter_key,
-            'Content-Type'  => 'application/json',
-            'HTTP-Referer'  => 'https://heycora.in',
-            'X-Title'       => 'Cora Workspace Platform'
-        );
-        $body = json_encode( array(
-            'model'    => 'google/gemini-2.5-flash',
-            'messages' => array(
-                array( 'role' => 'system', 'content' => $system_prompt ),
-                array( 'role' => 'user',   'content' => $message ),
-            ),
-            'max_tokens'  => 1500,
-            'temperature' => 0.3,
-        ) );
-
-        $response = wp_remote_post( $url, array(
-            'timeout' => 30,
-            'headers' => $headers,
-            'body'    => $body,
-        ) );
-
-        if ( ! is_wp_error( $response ) ) {
-            $code = wp_remote_retrieve_response_code( $response );
-            $data = json_decode( wp_remote_retrieve_body( $response ), true );
-            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
-                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
-                    cora_workspace_log_ai_request();
-                }
-                return $data['choices'][0]['message']['content'];
-            }
-        }
-    }
-
-    // Route 4: Groq (Fallback to real loaded key from root .env)
-    $groq_key = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : '';
-    if ( ! empty( $groq_key ) && strpos( $groq_key, 'gsk_ofVNE4c' ) === false ) {
-        $url = 'https://api.groq.com/openai/v1/chat/completions';
-        $headers = array(
-            'Authorization' => 'Bearer ' . $groq_key,
-            'Content-Type'  => 'application/json'
-        );
-        $body = json_encode( array(
-            'model'    => 'llama-3.3-70b-versatile',
-            'messages' => array(
-                array( 'role' => 'system', 'content' => $system_prompt ),
-                array( 'role' => 'user',   'content' => $message ),
-            ),
-            'max_tokens'  => 1500,
-            'temperature' => 0.3,
-        ) );
-
-        $response = wp_remote_post( $url, array(
-            'timeout' => 30,
-            'headers' => $headers,
             'body'    => $body,
         ) );
 
@@ -14421,13 +14420,101 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
     }
 
     $active_model   = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
+    $openrouter_key = defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ? CORA_PLATFORM_OPENROUTER_API_KEY : '';
+    $groq_key       = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : '';
     $gemini_key_b64 = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) && ! empty( CORA_PLATFORM_GEMINI_API_KEY ) ? CORA_PLATFORM_GEMINI_API_KEY : get_option( 'cora_workspace_ai_gemini_key', '' );
     $openai_key_b64 = get_option( 'cora_workspace_ai_openai_key', '' );
 
-    // ── Route 1: Gemini ──────────────────────────────────────────
-    if ( ! empty( $gemini_key_b64 ) && ( $active_model === 'gemini' || $active_model === 'cora-core-v2' || empty( $openai_key_b64 ) ) ) {
+    // ── Tier 1: Platform OpenRouter (Gemini 2.5 Flash / Fast High Accuracy) ────
+    if ( ! empty( $openrouter_key ) ) {
+        $model_id = 'google/gemini-2.5-flash';
+        $url      = 'https://openrouter.ai/api/v1/chat/completions';
+        $headers  = array(
+            'Authorization' => 'Bearer ' . $openrouter_key,
+            'Content-Type'  => 'application/json',
+            'HTTP-Referer'  => 'https://heycora.in',
+            'X-Title'       => 'Cora Workspace Platform',
+        );
+        $body = json_encode( array(
+            'model'       => $model_id,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 512,
+            'temperature' => 0.7,
+        ) );
+
+        add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
+        $response = wp_remote_post( $url, array(
+            'timeout' => 20,
+            'headers' => $headers,
+            'body'    => $body,
+        ) );
+        remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                    cora_workspace_log_ai_request();
+                }
+                wp_send_json_success( array(
+                    'reply'    => $data['choices'][0]['message']['content'],
+                    'provider' => 'gemini',
+                    'model'    => 'gemini-2.5-flash',
+                ) );
+            }
+        }
+    }
+
+    // ── Tier 2: Platform Groq (Llama 3.3 70B Versatile / Blazing Fast) ───────────
+    if ( ! empty( $groq_key ) ) {
+        $model_id = 'llama-3.3-70b-versatile';
+        $url      = 'https://api.groq.com/openai/v1/chat/completions';
+        $headers  = array(
+            'Authorization' => 'Bearer ' . $groq_key,
+            'Content-Type'  => 'application/json',
+        );
+        $body = json_encode( array(
+            'model'       => $model_id,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 512,
+            'temperature' => 0.7,
+        ) );
+
+        add_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10, 1 );
+        $response = wp_remote_post( $url, array(
+            'timeout' => 15,
+            'headers' => $headers,
+            'body'    => $body,
+        ) );
+        remove_filter( 'http_api_curl', 'cora_force_ipv4_for_ai_requests', 10 );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                    cora_workspace_log_ai_request();
+                }
+                wp_send_json_success( array(
+                    'reply'    => $data['choices'][0]['message']['content'],
+                    'provider' => 'groq',
+                    'model'    => $model_id,
+                ) );
+            }
+        }
+    }
+
+    // ── Tier 3: Direct Google Gemini (if valid key configured) ─────────────────
+    if ( ! empty( $gemini_key_b64 ) && strpos( $gemini_key_b64, 'AQ.' ) === false ) {
         $api_key  = $gemini_key_b64;
-        $model_id = 'gemini-3.5-flash-lite';
+        $model_id = 'gemini-2.5-flash';
         $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
 
         $body = json_encode( array(
@@ -14465,13 +14552,12 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
                     'model'    => $model_id,
                 ) );
             }
-            // Fall through to next provider on error
         }
     }
 
-    // ── Route 2: OpenAI ──────────────────────────────────────────
-    if ( ! empty( $openai_key_b64 ) && ( $active_model === 'gpt-4o' || $active_model === 'openai' || empty( $gemini_key_b64 ) ) ) {
-        $api_key  = base64_decode( $openai_key_b64 );
+    // ── Tier 4: Direct OpenAI (if custom key configured) ───────────────────────
+    if ( ! empty( $openai_key_b64 ) ) {
+        $api_key  = ( base64_decode( $openai_key_b64, true ) !== false ) ? base64_decode( $openai_key_b64 ) : $openai_key_b64;
         $model_id = 'gpt-4o-mini';
         $url      = 'https://api.openai.com/v1/chat/completions';
 
@@ -14510,10 +14596,10 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
         }
     }
 
-    // ── Route 3: No key / Fallback ────────────────────────────────
+    // ── Final Fallback ─────────────────────────────────────────────
     wp_send_json_error( array(
         'code'    => 'no_ai_key',
-        'message' => 'No AI provider is configured. Please add your Gemini or OpenAI API key in Workspace Settings → AI Models.',
+        'message' => 'Unable to connect to AI engine. Please verify your connection or configure an API key in Settings.',
     ) );
 }
 }
@@ -18090,12 +18176,84 @@ body {
     $ai_success = false;
     $response_text = '';
 
-    if ( ! empty( $platform_gemini_key ) && ( $active_model === 'gemini' || $active_model === 'cora-core-v2' || empty( $openai_key_b64 ) ) ) {
-        $api_key  = $platform_gemini_key;
-        $model_id = 'gemini-3.5-flash-lite';
-        $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
+    $openrouter_key = defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ? CORA_PLATFORM_OPENROUTER_API_KEY : '';
+    $groq_key       = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : '';
 
-        $system_prompt = "You are a professional web designer. Generate a beautiful, responsive real estate web page section or landing page structure using Tailwind CSS and inline tags based on the user request. You MUST output ONLY valid JSON in the format: {\"html\": \"...HTML layout with Tailwind classes...\", \"css\": \"...custom CSS overrides...\"}. Do not wrap the JSON output in markdown backticks or any other text. Keep the design minimalist, monochromatic (slate/zinc grays, warm cream background #FBFaf7, white, black), clean vector SVGs for icons, and modern layout.";
+    $system_prompt = "You are a professional web designer. Generate a beautiful, responsive real estate web page section or landing page structure using Tailwind CSS and inline tags based on the user request. You MUST output ONLY valid JSON in the format: {\"html\": \"...HTML layout with Tailwind classes...\", \"css\": \"...custom CSS overrides...\"}. Do not wrap the JSON output in markdown backticks or any other text. Keep the design minimalist, monochromatic (slate/zinc grays, warm cream background #FBFaf7, white, black), clean vector SVGs for icons, and modern layout.";
+
+    // Route 1: OpenRouter
+    if ( ! empty( $openrouter_key ) ) {
+        $model_id = 'google/gemini-2.5-flash';
+        $url      = 'https://openrouter.ai/api/v1/chat/completions';
+        $body = json_encode( array(
+            'model'       => $model_id,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => "Create layout for: " . $prompt ),
+            ),
+            'max_tokens'  => 2048,
+            'temperature' => 0.4,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $openrouter_key,
+                'Content-Type'  => 'application/json',
+                'HTTP-Referer'  => 'https://heycora.in',
+                'X-Title'       => 'Cora Workspace Platform',
+            ),
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                $response_text = $data['choices'][0]['message']['content'];
+                $ai_success = true;
+            }
+        }
+    }
+
+    // Route 2: Groq
+    if ( ! $ai_success && ! empty( $groq_key ) ) {
+        $model_id = 'llama-3.3-70b-versatile';
+        $url      = 'https://api.groq.com/openai/v1/chat/completions';
+        $body = json_encode( array(
+            'model'       => $model_id,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => "Create layout for: " . $prompt ),
+            ),
+            'max_tokens'  => 2048,
+            'temperature' => 0.4,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 30,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $groq_key,
+                'Content-Type'  => 'application/json',
+            ),
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                $response_text = $data['choices'][0]['message']['content'];
+                $ai_success = true;
+            }
+        }
+    }
+
+    // Route 3: Direct Gemini
+    if ( ! $ai_success && ! empty( $platform_gemini_key ) && strpos( $platform_gemini_key, 'AQ.' ) === false ) {
+        $api_key  = $platform_gemini_key;
+        $model_id = 'gemini-2.5-flash';
+        $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
 
         $body = json_encode( array(
             'system_instruction' => array(
@@ -18127,12 +18285,13 @@ body {
                 $ai_success = true;
             }
         }
-    } elseif ( ! empty( $openai_key_b64 ) ) {
-        $api_key  = base64_decode( $openai_key_b64 );
+    }
+
+    // Route 4: Direct OpenAI
+    if ( ! $ai_success && ! empty( $openai_key_b64 ) ) {
+        $api_key  = ( base64_decode( $openai_key_b64, true ) !== false ) ? base64_decode( $openai_key_b64 ) : $openai_key_b64;
         $model_id = 'gpt-4o-mini';
         $url      = 'https://api.openai.com/v1/chat/completions';
-
-        $system_prompt = "You are a professional web designer. Generate a beautiful, responsive real estate web page section or landing page structure using Tailwind CSS and inline tags based on the user request. You MUST output ONLY valid JSON in the format: {\"html\": \"...HTML layout with Tailwind classes...\", \"css\": \"...custom CSS overrides...\"}. Do not wrap the JSON output in markdown backticks or any other text. Keep the design minimalist, monochromatic (slate/zinc grays, warm cream background #FBFaf7, white, black), clean vector SVGs for icons, and modern layout.";
 
         $body = json_encode( array(
             'model'    => $model_id,
@@ -40200,13 +40359,97 @@ When the user asks you to perform an action, append one of the following tags at
     }
 
     $active_model   = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
+    $openrouter_key = defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ? CORA_PLATFORM_OPENROUTER_API_KEY : '';
+    $groq_key       = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : '';
     $gemini_key_b64 = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) ? CORA_PLATFORM_GEMINI_API_KEY : '';
     $openai_key_b64 = get_option( 'cora_workspace_ai_openai_key', '' );
 
-    // ── Route 1: Gemini ──
-    if ( ! empty( $gemini_key_b64 ) && ( $active_model === 'gemini' || $active_model === 'cora-core-v2' || empty( $openai_key_b64 ) ) ) {
+    // ── Route 1: OpenRouter (Platform Gemini 2.5 Flash) ──
+    if ( ! empty( $openrouter_key ) ) {
+        $model_id = 'google/gemini-2.5-flash';
+        $url      = 'https://openrouter.ai/api/v1/chat/completions';
+        $headers  = array(
+            'Authorization' => 'Bearer ' . $openrouter_key,
+            'Content-Type'  => 'application/json',
+            'HTTP-Referer'  => 'https://heycora.in',
+            'X-Title'       => 'Cora Workspace Platform',
+        );
+        $body = json_encode( array(
+            'model'       => $model_id,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 512,
+            'temperature' => 0.4,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 20,
+            'headers' => $headers,
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                    cora_workspace_log_ai_request();
+                }
+                wp_send_json_success( array(
+                    'reply'    => $data['choices'][0]['message']['content'],
+                    'provider' => 'gemini',
+                    'model'    => 'gemini-2.5-flash',
+                ) );
+            }
+        }
+    }
+
+    // ── Route 2: Groq (Llama 3.3 70B) ──
+    if ( ! empty( $groq_key ) ) {
+        $model_id = 'llama-3.3-70b-versatile';
+        $url      = 'https://api.groq.com/openai/v1/chat/completions';
+        $headers  = array(
+            'Authorization' => 'Bearer ' . $groq_key,
+            'Content-Type'  => 'application/json',
+        );
+        $body = json_encode( array(
+            'model'       => $model_id,
+            'messages'    => array(
+                array( 'role' => 'system', 'content' => $system_prompt ),
+                array( 'role' => 'user',   'content' => $message ),
+            ),
+            'max_tokens'  => 512,
+            'temperature' => 0.4,
+        ) );
+
+        $response = wp_remote_post( $url, array(
+            'timeout' => 15,
+            'headers' => $headers,
+            'body'    => $body,
+        ) );
+
+        if ( ! is_wp_error( $response ) ) {
+            $code = wp_remote_retrieve_response_code( $response );
+            $data = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
+                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+                    cora_workspace_log_ai_request();
+                }
+                wp_send_json_success( array(
+                    'reply'    => $data['choices'][0]['message']['content'],
+                    'provider' => 'groq',
+                    'model'    => $model_id,
+                ) );
+            }
+        }
+    }
+
+    // ── Route 3: Direct Gemini (if custom key configured) ──
+    if ( ! empty( $gemini_key_b64 ) && strpos( $gemini_key_b64, 'AQ.' ) === false ) {
         $api_key  = $gemini_key_b64;
-        $model_id = 'gemini-3.5-flash-lite';
+        $model_id = 'gemini-2.5-flash';
         $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model_id}:generateContent?key=" . urlencode( $api_key );
 
         $body = json_encode( array(
@@ -40247,9 +40490,9 @@ When the user asks you to perform an action, append one of the following tags at
         }
     }
 
-    // ── Route 2: OpenAI ──
-    if ( ! empty( $openai_key_b64 ) && ( $active_model === 'gpt-4o' || $active_model === 'openai' || empty( $gemini_key_b64 ) ) ) {
-        $api_key  = base64_decode( $openai_key_b64 );
+    // ── Route 4: Direct OpenAI ──
+    if ( ! empty( $openai_key_b64 ) ) {
+        $api_key  = ( base64_decode( $openai_key_b64, true ) !== false ) ? base64_decode( $openai_key_b64 ) : $openai_key_b64;
         $model_id = 'gpt-4o-mini';
         $url      = 'https://api.openai.com/v1/chat/completions';
 

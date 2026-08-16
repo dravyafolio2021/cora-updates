@@ -10797,8 +10797,8 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
             
             // Get active model provider
             const modelVal = jQuery('#cora-ai-model-selector').val() || 'cora-core-v2';
-            let provider = 'gemini';
-            let model = 'gemini-3.5-flash-lite';
+            let provider = 'openrouter';
+            let model = 'google/gemini-2.5-flash';
             
             if (modelVal === 'gpt-4o' || modelVal === 'openai') {
                 provider = 'openai';
