@@ -485,7 +485,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
 </div>
 
 <!-- TAB 2: MCP Developer Gateway Settings -->
-<div id="cora-ai-panel-mcp-settings" class="space-y-6 max-w-4xl" style="display:none;">
+<div id="cora-ai-panel-mcp-settings" class="space-y-6 w-full" style="display:none;">
     
     <!-- Connector 1: ChatGPT Custom GPT Actions -->
     <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
@@ -753,7 +753,7 @@ Ready to execute tool call...
 </div>
 
 <!-- TAB 3: RAG Knowledge Base -->
-<div id="cora-ai-panel-rag-settings" class="space-y-6 max-w-4xl" style="display:none;">
+<div id="cora-ai-panel-rag-settings" class="space-y-6 w-full" style="display:none;">
     <div class="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
         <div>
             <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Living AI Memory & RAG Knowledge Engine</h2>
