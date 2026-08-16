@@ -333,11 +333,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     // Format according to template: [Page Name] – [Site Title]
     $page_title_format = $current_page_label . ' – ' . $workspace_site_title;
     ?>
-    <link rel="icon" type="image/png" href="<?php echo esc_url( $favicon_url . '?v=' . CORA_WORKSPACE_VERSION ); ?>" />
-    <link rel="shortcut icon" id="cora-dynamic-favicon" href="<?php echo esc_url( $favicon_url . '?v=' . CORA_WORKSPACE_VERSION ); ?>" />
-    <link rel="apple-touch-icon" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark)" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-splash-dark.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light)" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-splash-light.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
+    <link rel="icon" type="image/png" sizes="64x64" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
+    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
+    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
+    <link rel="shortcut icon" id="cora-dynamic-favicon" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
+    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light">
     <title><?php echo esc_html( $page_title_format ); ?></title>
@@ -352,6 +353,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CORA">
+    <meta name="application-name" content="CORA">
     <script>
         // Global error catcher for diagnostic visibility
         window.addEventListener('error', function(e) {
@@ -3136,81 +3139,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     })();
 </script>
 
-<?php
-// ─── Splash Screen: Visual & Decision-Oriented AI Co-Founder Briefing ──────
-$_cora_leads_raw    = get_option( 'cora_workspace_leads', array() );
-$_cora_splash_leads = is_array( $_cora_leads_raw ) ? count( $_cora_leads_raw ) : 0;
-$_cora_bookings_raw = get_option( 'cora_workspace_clients', array() );
-$_cora_splash_books = is_array( $_cora_bookings_raw ) ? count( $_cora_bookings_raw ) : 0;
-$_cora_tx_raw       = get_option( 'cora_workspace_ledger', array() );
-$_cora_splash_tx    = is_array( $_cora_tx_raw ) ? count( $_cora_tx_raw ) : 0;
 
-// Dynamic Decision-Oriented Insight Engine
-if ( $_cora_splash_leads > 0 ) {
-    $_cora_spl_badge    = 'Pipeline Velocity';
-    $_cora_spl_title    = 'Prioritize Lead Conversion Window';
-    $_cora_splash_text  = 'Inquiries contacted within 24 hours convert 60% faster. Focus on high-intent deals currently active in your CRM pipeline.';
-    $_cora_spl_metric1  = $_cora_splash_leads . ' Leads';
-    $_cora_spl_label1   = 'In Funnel';
-    $_cora_spl_metric2  = 'High';
-    $_cora_spl_label2   = 'Conversion Window';
-    $_cora_spl_icon     = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>';
-} elseif ( $_cora_splash_books > 0 ) {
-    $_cora_spl_badge    = 'Studio Operations';
-    $_cora_spl_title    = 'Shoot Readiness & Crew Briefing';
-    $_cora_splash_text  = 'Scheduled showings & shoots require confirmed call-times. Ensure gear manifests and crew assignments are locked.';
-    $_cora_spl_metric1  = $_cora_splash_books . ' Sessions';
-    $_cora_spl_label1   = 'Scheduled';
-    $_cora_spl_metric2  = '100%';
-    $_cora_spl_label2   = 'Roster Ready';
-    $_cora_spl_icon     = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
-} else {
-    $_cora_spl_badge    = 'Strategic Growth';
-    $_cora_spl_title    = 'Client Acquisition & Portfolio Reach';
-    $_cora_splash_text  = 'Visual presentation is your highest-leverage closing asset. Deploy automated follow-ups to expand inbound studio inquiries.';
-    $_cora_spl_metric1  = 'Active';
-    $_cora_spl_label1   = 'System Status';
-    $_cora_spl_metric2  = 'Optimal';
-    $_cora_spl_label2   = 'AI RAG Engine';
-    $_cora_spl_icon     = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 12 12 16 12 13 16 13 16 11 12 11 12 8"></polygon></svg>';
-}
-?>
-<!-- Cora Official Brand Splash Screen -->
-<div id="cora-app-splash-screen" style="position:fixed;inset:0;background:#000000;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:1;transition:opacity 0.4s cubic-bezier(0.25,1,0.5,1),transform 0.4s cubic-bezier(0.25,1,0.5,1);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;user-select:none;overflow:hidden;">
-    <div id="cora-splash-bg" style="position:absolute;inset:0;background:url('<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-splash-dark.png' ); ?>') center center / contain no-repeat; background-color: #000000;"></div>
-    
-    <!-- Spinner Loader at Bottom -->
-    <div style="position:absolute;bottom:42px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;z-index:2;">
-        <div style="width:26px;height:26px;border:2.5px solid rgba(255,255,255,0.18);border-top-color:#ffffff;border-radius:50%;animation:cora-splash-spin 0.75s linear infinite;"></div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.65);font-family:'Inter',sans-serif;">LOADING...</div>
-    </div>
-</div>
-
-<style>
-    @keyframes cora-splash-spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-</style>
-
-<script>
-    (function() {
-        var hideSplash = function() {
-            var splash = document.getElementById('cora-app-splash-screen');
-            if (splash) {
-                splash.style.opacity = '0';
-                splash.style.transform = 'translateY(-16px)';
-                setTimeout(function() { if (splash.parentNode) splash.parentNode.removeChild(splash); }, 400);
-            }
-        };
-        if (document.readyState === 'complete') {
-            setTimeout(hideSplash, 900);
-        } else {
-            window.addEventListener('load', function() { setTimeout(hideSplash, 900); });
-            setTimeout(hideSplash, 3500);
-        }
-    })();
-</script>
 <?php if ( isset( $_COOKIE['cora_impersonator_wp_user_id'] ) ) : ?>
     <style>
         .cora-impersonation-banner {

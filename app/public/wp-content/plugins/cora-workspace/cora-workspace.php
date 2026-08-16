@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.64
+ * Version: 3.4.65
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,13 +17,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.64' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.65' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
 if ( ! defined( 'CORA_PLUGIN_FILE' ) ) {
     define( 'CORA_PLUGIN_FILE', __FILE__ );
+}
+
+// ── Ensure WordPress & PWA always resolves official CORA Wordmark icon ───────
+if ( ! function_exists( 'cora_override_site_icon_url' ) ) {
+    function cora_override_site_icon_url( $url, $size ) {
+        if ( $size >= 512 ) {
+            return CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . CORA_WORKSPACE_VERSION;
+        }
+        if ( $size >= 180 ) {
+            return CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png?v=' . CORA_WORKSPACE_VERSION;
+        }
+        return CORA_WORKSPACE_URL . 'assets/images/cora-favicon.png?v=' . CORA_WORKSPACE_VERSION;
+    }
+    add_filter( 'get_site_icon_url', 'cora_override_site_icon_url', 999, 2 );
 }
 if ( ! function_exists( 'cora_workspace_load_env_keys' ) ) {
 function cora_workspace_load_env_keys() {
