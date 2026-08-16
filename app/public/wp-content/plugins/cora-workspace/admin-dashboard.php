@@ -4919,7 +4919,7 @@ if ( $_cora_splash_leads > 0 ) {
                         </div>
                         <!-- Suggested Presets -->
                         <div class="px-6 py-4 border-b border-zinc-100">
-                            <p class="text-[10px] font-semibold text-zinc-450 uppercase tracking-wide mb-2.5">⚡ Suggested for you</p>
+                            <p class="text-[10px] font-semibold text-zinc-450 uppercase tracking-wide mb-2.5">Suggested for you</p>
                             <div id="cora-preset-pills" class="flex flex-wrap gap-1.5"></div>
                         </div>
                         <!-- Custom Form -->
@@ -5070,27 +5070,27 @@ window.coraRenderQuickActionsBar = function() {
     };
 
     if (isDesktop) {
-        // Desktop: Render in one single centered row
+        // Desktop: Render in one single centered row with wrap and generous gaps
         var activeActions = allActions.slice(0, 6);
         var totalItems = activeActions.concat([creatorBtn]);
 
         var buttonsHtml = totalItems.map(function(item) {
             if (item.isCreator) {
-                return '<button type="button" onclick="' + item.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0">' +
+                return '<button type="button" onclick="' + item.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0 my-1">' +
                     '<span class="cora-ai-gradient-pill-inner">' +
                         item.icon +
                         '<span>' + item.label + '</span>' +
                     '</span>' +
                 '</button>';
             } else {
-                return '<button onclick="' + item.onclick + '" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0">' +
+                return '<button onclick="' + item.onclick + '" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0 my-1">' +
                     item.icon +
                     ' <span>' + item.label + '</span>' +
                 '</button>';
             }
         }).join('');
 
-        bar.innerHTML = '<div class="w-full flex flex-row flex-wrap items-center justify-center gap-x-2.5 gap-y-1.5 px-4 py-0.5">' +
+        bar.innerHTML = '<div class="w-full flex flex-row flex-wrap items-center justify-center gap-x-3 gap-y-3.5 px-4 py-2 my-1">' +
             buttonsHtml +
         '</div>';
 
@@ -5116,22 +5116,22 @@ window.coraRenderQuickActionsBar = function() {
             '</button>';
         }).join('');
 
-        var creatorHtml = '<button type="button" onclick="' + creatorBtn.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0 text-[10.5px] font-bold">' +
+        var creatorHtml = '<button type="button" onclick="' + creatorBtn.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0 text-[10.5px] font-bold mt-1">' +
             '<span class="cora-ai-gradient-pill-inner px-4 py-1.5">' +
                 creatorBtn.icon +
                 '<span>' + creatorBtn.label + '</span>' +
             '</span>' +
         '</button>';
 
-        var html = '<div class="w-full flex flex-col gap-2 px-4">';
+        var html = '<div class="w-full flex flex-col gap-2.5 px-4 py-1.5">';
         
         if (row1Html) {
-            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-between gap-2">' + row1Html + '</div>';
+            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-between gap-2.5">' + row1Html + '</div>';
         }
         if (row2Html) {
-            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-center gap-2">' + row2Html + '</div>';
+            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-center gap-2.5">' + row2Html + '</div>';
         }
-        html += '<div class="w-full flex flex-row items-center justify-center mt-0.5">' + creatorHtml + '</div>';
+        html += '<div class="w-full flex flex-row items-center justify-center mt-1">' + creatorHtml + '</div>';
         html += '</div>';
 
         bar.innerHTML = html;
