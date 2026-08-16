@@ -576,14 +576,17 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
             
             <!-- Mode Switcher Tabs -->
             <div class="inline-flex p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl gap-1 text-xs font-semibold">
-                <button type="button" id="cora-mcp-mode-nl-btn" onclick="coraSetMCPPlaygroundMode('nl')" class="px-3 py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all">
-                    💬 Natural Language
+                <button type="button" id="cora-mcp-mode-nl-btn" onclick="coraSetMCPPlaygroundMode('nl')" class="px-3 py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Natural Language
                 </button>
-                <button type="button" id="cora-mcp-mode-guided-btn" onclick="coraSetMCPPlaygroundMode('guided')" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all">
-                    📋 Guided Actions
+                <button type="button" id="cora-mcp-mode-guided-btn" onclick="coraSetMCPPlaygroundMode('guided')" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    Guided Actions
                 </button>
-                <button type="button" id="cora-mcp-mode-dev-btn" onclick="coraSetMCPPlaygroundMode('dev')" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all">
-                    ⚙️ Raw JSON
+                <button type="button" id="cora-mcp-mode-dev-btn" onclick="coraSetMCPPlaygroundMode('dev')" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    Raw JSON
                 </button>
             </div>
         </div>
@@ -605,23 +608,29 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
                     <div class="space-y-1.5">
                         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Try Natural Language Prompts:</span>
                         <div class="flex flex-wrap gap-1.5">
-                            <button type="button" onclick="coraSetNLPrompt('Give me a full workspace health summary with total revenue, unpaid receivables, and active shoot bookings.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
-                                📊 Health & Revenue Snapshot
+                            <button type="button" onclick="coraSetNLPrompt('Give me a full workspace health summary with total revenue, unpaid receivables, and active shoot bookings.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                Health & Revenue Snapshot
                             </button>
-                            <button type="button" onclick="coraSetNLPrompt('Check all unpaid client receivables and show overdue invoices.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
-                                💰 Audit Unpaid Invoices
+                            <button type="button" onclick="coraSetNLPrompt('Check all unpaid client receivables and show overdue invoices.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                                Audit Unpaid Invoices
                             </button>
-                            <button type="button" onclick="coraSetNLPrompt('List all active CRM deals and highlight hot leads.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
-                                👥 High-Priority CRM Leads
+                            <button type="button" onclick="coraSetNLPrompt('List all active CRM deals and highlight hot leads.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                High-Priority CRM Leads
                             </button>
-                            <button type="button" onclick="coraSetNLPrompt('Show all upcoming shoot bookings, call-times, and locations.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
-                                📅 Upcoming Shoot Schedule
+                            <button type="button" onclick="coraSetNLPrompt('Show all upcoming shoot bookings, call-times, and locations.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                Upcoming Shoot Schedule
                             </button>
-                            <button type="button" onclick="coraSetNLPrompt('Search the living knowledge base for our latest commercial shoot contract terms.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
-                                🧠 Search Contract Terms
+                            <button type="button" onclick="coraSetNLPrompt('Search the living knowledge base for our latest commercial shoot contract terms.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                Search Contract Terms
                             </button>
-                            <button type="button" onclick="coraSetNLPrompt('Show recent workspace activity pulse and audit trail.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
-                                ⚡ Activity Stream & Audit
+                            <button type="button" onclick="coraSetNLPrompt('Show recent workspace activity pulse and audit trail.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                Activity Stream & Audit
                             </button>
                         </div>
                     </div>
@@ -637,17 +646,17 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
                     <div>
                         <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Select Human-Friendly Action</label>
                         <select id="cora-mcp-guided-tool-select" class="w-full text-xs font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 outline-none cursor-pointer text-zinc-850 dark:text-zinc-100" onchange="coraOnGuidedToolChange()">
-                            <option value="cora_get_workspace_overview">📊 Workspace Overview & KPI Snapshot</option>
-                            <option value="cora_search_knowledge_base">🧠 Search Living Memory & Documents</option>
-                            <option value="cora_query_financials">💰 Check Financials & Invoices</option>
-                            <option value="cora_record_financial_transaction">💳 Record Payment or Expense</option>
-                            <option value="cora_manage_crm_leads">👥 Manage CRM Leads & Deals</option>
-                            <option value="cora_manage_bookings">📅 Shoot Bookings & Schedule</option>
-                            <option value="cora_manage_tasks">✅ Tasks & Client Deliverables</option>
-                            <option value="cora_manage_documents">📁 Vault Documents & Contracts</option>
-                            <option value="cora_manage_reviews">⭐ Client Reviews & AI Replies</option>
-                            <option value="cora_get_activity_pulse">⚡ Real-time Activity Pulse</option>
-                            <option value="cora_ask_workspace_copilot">🤖 Ask AI Co-Founder</option>
+                            <option value="cora_get_workspace_overview">Workspace Overview & KPI Snapshot</option>
+                            <option value="cora_search_knowledge_base">Search Living Memory & Documents</option>
+                            <option value="cora_query_financials">Check Financials & Invoices</option>
+                            <option value="cora_record_financial_transaction">Record Payment or Expense</option>
+                            <option value="cora_manage_crm_leads">Manage CRM Leads & Deals</option>
+                            <option value="cora_manage_bookings">Shoot Bookings & Schedule</option>
+                            <option value="cora_manage_tasks">Tasks & Client Deliverables</option>
+                            <option value="cora_manage_documents">Vault Documents & Contracts</option>
+                            <option value="cora_manage_reviews">Client Reviews & AI Replies</option>
+                            <option value="cora_get_activity_pulse">Real-time Activity Pulse</option>
+                            <option value="cora_ask_workspace_copilot">Ask AI Co-Founder</option>
                         </select>
                     </div>
 
