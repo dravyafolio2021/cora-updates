@@ -566,49 +566,151 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         </div>
     </div>
 
-    <!-- Interactive Live MCP Tool Playground -->
+    <!-- Human-Friendly AI Action & Natural Language Command Playground -->
     <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs space-y-4">
-        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center justify-between">
+        <div class="border-b border-zinc-100 dark:border-zinc-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Live MCP Tool Playground</h3>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Test tool execution directly against your live workspace server.</p>
+                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">AI Command Center & Action Playground</h3>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Control your entire workspace using plain English natural language or guided actions.</p>
             </div>
-            <span class="px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold">11 Tools Online</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Select Tool</label>
-                    <select id="cora-mcp-test-tool-select" class="w-full text-xs font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 outline-none cursor-pointer" onchange="coraOnMCPToolSelectChange()">
-                        <option value="cora_get_workspace_overview">cora_get_workspace_overview (Real-time KPIs & Pulse)</option>
-                        <option value="cora_search_knowledge_base">cora_search_knowledge_base (Living Memory Search)</option>
-                        <option value="cora_query_financials">cora_query_financials (Ledger & Invoices)</option>
-                        <option value="cora_record_financial_transaction">cora_record_financial_transaction (Record Payment)</option>
-                        <option value="cora_manage_crm_leads">cora_manage_crm_leads (List & Create Deals)</option>
-                        <option value="cora_manage_bookings">cora_manage_bookings (Shoot Schedule & Sessions)</option>
-                        <option value="cora_manage_tasks">cora_manage_tasks (Client Deliverables)</option>
-                        <option value="cora_manage_documents">cora_manage_documents (Vault & E-Sign)</option>
-                        <option value="cora_manage_reviews">cora_manage_reviews (Customer Feedback)</option>
-                        <option value="cora_get_activity_pulse">cora_get_activity_pulse (Real-time Audit Log)</option>
-                        <option value="cora_ask_workspace_copilot">cora_ask_workspace_copilot (Direct AI QA)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">JSON Arguments</label>
-                    <textarea id="cora-mcp-test-tool-args" rows="5" class="w-full font-mono text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 outline-none text-zinc-800 dark:text-zinc-200">{}</textarea>
-                </div>
-
-                <button type="button" onclick="coraExecuteMCPTestTool()" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-sm">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                    Execute Tool Call
+            
+            <!-- Mode Switcher Tabs -->
+            <div class="inline-flex p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl gap-1 text-xs font-semibold">
+                <button type="button" id="cora-mcp-mode-nl-btn" onclick="coraSetMCPPlaygroundMode('nl')" class="px-3 py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all">
+                    💬 Natural Language
+                </button>
+                <button type="button" id="cora-mcp-mode-guided-btn" onclick="coraSetMCPPlaygroundMode('guided')" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all">
+                    📋 Guided Actions
+                </button>
+                <button type="button" id="cora-mcp-mode-dev-btn" onclick="coraSetMCPPlaygroundMode('dev')" class="px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all">
+                    ⚙️ Raw JSON
                 </button>
             </div>
+        </div>
 
-            <div class="space-y-1.5 flex flex-col">
-                <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Live Response Payload</label>
-                <div id="cora-mcp-test-output" class="flex-1 min-h-[160px] bg-zinc-950 text-zinc-200 rounded-xl p-3 font-mono text-[11px] leading-relaxed overflow-y-auto border border-zinc-800 whitespace-pre-wrap">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left Input Column -->
+            <div class="space-y-4">
+                
+                <!-- MODE 1: Natural Language Commands (Default) -->
+                <div id="cora-mcp-panel-nl" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">What would you like Cora AI to do?</label>
+                        <div class="relative">
+                            <textarea id="cora-mcp-nl-input" rows="3" class="w-full text-xs font-medium bg-zinc-50 dark:bg-zinc-950 border border-zinc-250 dark:border-zinc-800 rounded-xl p-3 outline-none text-zinc-850 dark:text-zinc-100 focus:border-zinc-900 dark:focus:border-zinc-100 transition-all placeholder:text-zinc-400" placeholder="Type in plain English, e.g.: 'Show me all unpaid invoices for this month' or 'Search for Rahul in CRM leads' or 'What are our scheduled shoots this week?'..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Quick Natural Language Suggestion Chips -->
+                    <div class="space-y-1.5">
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Try Natural Language Prompts:</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button type="button" onclick="coraSetNLPrompt('Give me a full workspace health summary with total revenue, unpaid receivables, and active shoot bookings.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
+                                📊 Health & Revenue Snapshot
+                            </button>
+                            <button type="button" onclick="coraSetNLPrompt('Check all unpaid client receivables and show overdue invoices.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
+                                💰 Audit Unpaid Invoices
+                            </button>
+                            <button type="button" onclick="coraSetNLPrompt('List all active CRM deals and highlight hot leads.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
+                                👥 High-Priority CRM Leads
+                            </button>
+                            <button type="button" onclick="coraSetNLPrompt('Show all upcoming shoot bookings, call-times, and locations.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
+                                📅 Upcoming Shoot Schedule
+                            </button>
+                            <button type="button" onclick="coraSetNLPrompt('Search the living knowledge base for our latest commercial shoot contract terms.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
+                                🧠 Search Contract Terms
+                            </button>
+                            <button type="button" onclick="coraSetNLPrompt('Show recent workspace activity pulse and audit trail.')" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer text-left">
+                                ⚡ Activity Stream & Audit
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" id="cora-mcp-run-nl-btn" onclick="coraExecuteNaturalLanguageCommand()" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        Execute Natural Language Command
+                    </button>
+                </div>
+
+                <!-- MODE 2: Guided Action Presets -->
+                <div id="cora-mcp-panel-guided" class="space-y-3" style="display: none;">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Select Human-Friendly Action</label>
+                        <select id="cora-mcp-guided-tool-select" class="w-full text-xs font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 outline-none cursor-pointer text-zinc-850 dark:text-zinc-100" onchange="coraOnGuidedToolChange()">
+                            <option value="cora_get_workspace_overview">📊 Workspace Overview & KPI Snapshot</option>
+                            <option value="cora_search_knowledge_base">🧠 Search Living Memory & Documents</option>
+                            <option value="cora_query_financials">💰 Check Financials & Invoices</option>
+                            <option value="cora_record_financial_transaction">💳 Record Payment or Expense</option>
+                            <option value="cora_manage_crm_leads">👥 Manage CRM Leads & Deals</option>
+                            <option value="cora_manage_bookings">📅 Shoot Bookings & Schedule</option>
+                            <option value="cora_manage_tasks">✅ Tasks & Client Deliverables</option>
+                            <option value="cora_manage_documents">📁 Vault Documents & Contracts</option>
+                            <option value="cora_manage_reviews">⭐ Client Reviews & AI Replies</option>
+                            <option value="cora_get_activity_pulse">⚡ Real-time Activity Pulse</option>
+                            <option value="cora_ask_workspace_copilot">🤖 Ask AI Co-Founder</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic Guided Form Fields -->
+                    <div id="cora-mcp-guided-dynamic-fields" class="space-y-2 p-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <button type="button" onclick="coraExecuteGuidedTool()" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        Run Guided Action
+                    </button>
+                </div>
+
+                <!-- MODE 3: Developer JSON Mode -->
+                <div id="cora-mcp-panel-dev" class="space-y-3" style="display: none;">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Developer Tool Schema</label>
+                        <select id="cora-mcp-test-tool-select" class="w-full text-xs font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 outline-none cursor-pointer text-zinc-850 dark:text-zinc-100" onchange="coraOnMCPToolSelectChange()">
+                            <option value="cora_get_workspace_overview">cora_get_workspace_overview</option>
+                            <option value="cora_search_knowledge_base">cora_search_knowledge_base</option>
+                            <option value="cora_query_financials">cora_query_financials</option>
+                            <option value="cora_record_financial_transaction">cora_record_financial_transaction</option>
+                            <option value="cora_manage_crm_leads">cora_manage_crm_leads</option>
+                            <option value="cora_manage_bookings">cora_manage_bookings</option>
+                            <option value="cora_manage_tasks">cora_manage_tasks</option>
+                            <option value="cora_manage_documents">cora_manage_documents</option>
+                            <option value="cora_manage_reviews">cora_manage_reviews</option>
+                            <option value="cora_get_activity_pulse">cora_get_activity_pulse</option>
+                            <option value="cora_ask_workspace_copilot">cora_ask_workspace_copilot</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">JSON Arguments</label>
+                        <textarea id="cora-mcp-test-tool-args" rows="4" class="w-full font-mono text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 outline-none text-zinc-800 dark:text-zinc-200">{}</textarea>
+                    </div>
+
+                    <button type="button" onclick="coraExecuteMCPTestTool()" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        Execute Raw Tool Call
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Right Results & Formatted Output Column -->
+            <div class="space-y-2 flex flex-col">
+                <div class="flex items-center justify-between">
+                    <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">Live Response</label>
+                    <div class="inline-flex gap-1 text-[10px] font-bold">
+                        <button type="button" id="cora-mcp-view-formatted-btn" onclick="coraSetOutputView('formatted')" class="px-2 py-0.5 bg-zinc-900 text-white rounded cursor-pointer">Formatted</button>
+                        <button type="button" id="cora-mcp-view-raw-btn" onclick="coraSetOutputView('raw')" class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded cursor-pointer">Raw JSON</button>
+                    </div>
+                </div>
+
+                <!-- Formatted Output Card -->
+                <div id="cora-mcp-formatted-output" class="flex-1 min-h-[220px] bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 rounded-2xl p-4 text-xs leading-relaxed border border-zinc-200 dark:border-zinc-800 overflow-y-auto whitespace-pre-wrap">
+Ready to run your first natural language command or guided action. Type a request on the left or select a prompt chip to begin.
+                </div>
+
+                <!-- Raw JSON Output Container -->
+                <div id="cora-mcp-test-output" class="flex-1 min-h-[220px] bg-zinc-950 text-zinc-200 rounded-2xl p-4 font-mono text-[11px] leading-relaxed overflow-y-auto border border-zinc-800 whitespace-pre-wrap" style="display: none;">
 Ready to execute tool call...
                 </div>
             </div>
@@ -795,6 +897,290 @@ Ready to execute tool call...
         window.coraShowToast("Claude configuration copied to clipboard.");
     }
 
+    // Playground Mode Management
+    let coraActiveMCPPlaygroundMode = 'nl';
+
+    function coraSetMCPPlaygroundMode(mode) {
+        coraActiveMCPPlaygroundMode = mode;
+        const panelNL = document.getElementById('cora-mcp-panel-nl');
+        const panelGuided = document.getElementById('cora-mcp-panel-guided');
+        const panelDev = document.getElementById('cora-mcp-panel-dev');
+        const btnNL = document.getElementById('cora-mcp-mode-nl-btn');
+        const btnGuided = document.getElementById('cora-mcp-mode-guided-btn');
+        const btnDev = document.getElementById('cora-mcp-mode-dev-btn');
+
+        [panelNL, panelGuided, panelDev].forEach(p => { if (p) p.style.display = 'none'; });
+        [btnNL, btnGuided, btnDev].forEach(b => {
+            if (b) {
+                b.className = 'px-3 py-1 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-all';
+            }
+        });
+
+        if (mode === 'nl') {
+            if (panelNL) panelNL.style.display = 'block';
+            if (btnNL) btnNL.className = 'px-3 py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all font-bold';
+        } else if (mode === 'guided') {
+            if (panelGuided) panelGuided.style.display = 'block';
+            if (btnGuided) btnGuided.className = 'px-3 py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all font-bold';
+            coraOnGuidedToolChange();
+        } else if (mode === 'dev') {
+            if (panelDev) panelDev.style.display = 'block';
+            if (btnDev) btnDev.className = 'px-3 py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs cursor-pointer transition-all font-bold';
+            coraOnMCPToolSelectChange();
+        }
+    }
+
+    function coraSetNLPrompt(promptText) {
+        const input = document.getElementById('cora-mcp-nl-input');
+        if (input) {
+            input.value = promptText;
+            input.focus();
+        }
+    }
+
+    function coraSetOutputView(view) {
+        const formattedBox = document.getElementById('cora-mcp-formatted-output');
+        const rawBox = document.getElementById('cora-mcp-test-output');
+        const btnFormatted = document.getElementById('cora-mcp-view-formatted-btn');
+        const btnRaw = document.getElementById('cora-mcp-view-raw-btn');
+
+        if (view === 'formatted') {
+            formattedBox.style.display = 'block';
+            rawBox.style.display = 'none';
+            btnFormatted.className = 'px-2 py-0.5 bg-zinc-900 text-white rounded cursor-pointer font-bold';
+            btnRaw.className = 'px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded cursor-pointer font-medium';
+        } else {
+            formattedBox.style.display = 'none';
+            rawBox.style.display = 'block';
+            btnFormatted.className = 'px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded cursor-pointer font-medium';
+            btnRaw.className = 'px-2 py-0.5 bg-zinc-900 text-white rounded cursor-pointer font-bold';
+        }
+    }
+
+    function coraEscapeHtml(str) {
+        return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Execute Natural Language Command
+    async function coraExecuteNaturalLanguageCommand() {
+        const promptInput = document.getElementById('cora-mcp-nl-input');
+        const query = (promptInput?.value || '').trim();
+        if (!query) {
+            window.coraShowToast("Please enter a natural language command.");
+            return;
+        }
+
+        const runBtn = document.getElementById('cora-mcp-run-nl-btn');
+        const formattedBox = document.getElementById('cora-mcp-formatted-output');
+        const rawBox = document.getElementById('cora-mcp-test-output');
+        const token = document.getElementById('cora-mcp-access-token-direct').value;
+        const mcpUrl = '<?php echo esc_url( home_url( "/wp-json/cora/v1/mcp" ) ); ?>';
+
+        if (runBtn) {
+            runBtn.disabled = true;
+            runBtn.innerHTML = '<span class="animate-spin inline-block mr-1">⟳</span> Executing command...';
+        }
+
+        formattedBox.innerHTML = '<div class="flex items-center gap-2 text-zinc-500"><span class="animate-spin text-sm">⟳</span> Analyzing request and running workspace intelligence...</div>';
+        rawBox.innerText = 'Executing natural language query: ' + query + '...';
+
+        try {
+            // Send as direct AI QA / Copilot call over MCP
+            const res = await fetch(mcpUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'tools/call',
+                    params: {
+                        name: 'cora_ask_workspace_copilot',
+                        arguments: { question: query }
+                    },
+                    id: Date.now()
+                })
+            });
+
+            const data = await res.json();
+            rawBox.innerText = JSON.stringify(data, null, 2);
+
+            if (data.result && data.result.content && data.result.content[0]) {
+                const text = data.result.content[0].text;
+                formattedBox.innerHTML = `<div class="font-sans text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap">${coraEscapeHtml(text)}</div>`;
+                window.coraShowToast("Command executed successfully.");
+            } else if (data.error) {
+                formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Error: ${coraEscapeHtml(data.error.message || 'Execution error')}</div>`;
+                window.coraShowToast("Execution error: " + (data.error.message || 'Error'));
+            } else {
+                formattedBox.innerText = JSON.stringify(data, null, 2);
+            }
+        } catch (e) {
+            formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Connection failed: ${coraEscapeHtml(e.message)}</div>`;
+            rawBox.innerText = "Network error: " + e.message;
+            window.coraShowToast("Could not connect to workspace server.");
+        } finally {
+            if (runBtn) {
+                runBtn.disabled = false;
+                runBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Execute Natural Language Command';
+            }
+        }
+    }
+
+    // Guided Tool Change Handler
+    function coraOnGuidedToolChange() {
+        const tool = document.getElementById('cora-mcp-guided-tool-select').value;
+        const container = document.getElementById('cora-mcp-guided-dynamic-fields');
+        if (!container) return;
+
+        let html = '';
+        if (tool === 'cora_get_workspace_overview') {
+            html = `<p class="text-xs text-zinc-500">Fetches real-time workspace KPIs, revenue collected, outstanding receivables aging, active shoot bookings, and pending tasks.</p>`;
+        } else if (tool === 'cora_search_knowledge_base') {
+            html = `
+                <div>
+                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Search Query or Question</label>
+                    <input type="text" id="cora-guided-search-query" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" placeholder="e.g. photography commercial terms, client cancellation policy" value="commercial photography rates">
+                </div>
+            `;
+        } else if (tool === 'cora_query_financials') {
+            html = `
+                <div>
+                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Financial Filter</label>
+                    <select id="cora-guided-fin-filter" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200">
+                        <option value="all">All Invoices & Ledger</option>
+                        <option value="unpaid">Unpaid Receivables Only</option>
+                        <option value="paid">Paid Transactions Only</option>
+                        <option value="overdue">Overdue Invoices</option>
+                    </select>
+                </div>
+            `;
+        } else if (tool === 'cora_record_financial_transaction') {
+            html = `
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Type</label>
+                        <select id="cora-guided-rec-type" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200">
+                            <option value="expense">Expense Receipt</option>
+                            <option value="payment">Invoice Payment</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Amount (₹)</label>
+                        <input type="number" id="cora-guided-rec-amount" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" value="3500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Client or Vendor Name</label>
+                    <input type="text" id="cora-guided-rec-vendor" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" placeholder="Vendor / Client" value="Camera Gear Depot">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Description / Notes</label>
+                    <input type="text" id="cora-guided-rec-desc" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" placeholder="Description" value="Studio softbox diffusers">
+                </div>
+            `;
+        } else if (tool === 'cora_manage_crm_leads') {
+            html = `
+                <div>
+                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Action</label>
+                    <select id="cora-guided-lead-action" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200">
+                        <option value="list">List Recent Leads & Deals</option>
+                        <option value="search">Search Leads</option>
+                    </select>
+                </div>
+            `;
+        } else if (tool === 'cora_manage_bookings') {
+            html = `<p class="text-xs text-zinc-500">Lists all upcoming scheduled sessions, call-times, shoot types, and location assignments.</p>`;
+        } else if (tool === 'cora_manage_tasks') {
+            html = `<p class="text-xs text-zinc-500">Lists client deliverable checklist tasks, priority flags, and deadlines.</p>`;
+        } else if (tool === 'cora_manage_documents') {
+            html = `<p class="text-xs text-zinc-500">Queries document vault for active agreements, proposals, and client e-signature status.</p>`;
+        } else if (tool === 'cora_manage_reviews') {
+            html = `<p class="text-xs text-zinc-500">Fetches Google reviews and generates automated professional replies.</p>`;
+        } else if (tool === 'cora_get_activity_pulse') {
+            html = `<p class="text-xs text-zinc-500">Retrieves real-time audit stream of all workspace actions and modifications.</p>`;
+        } else if (tool === 'cora_ask_workspace_copilot') {
+            html = `
+                <div>
+                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Your Question to AI Co-Founder</label>
+                    <input type="text" id="cora-guided-copilot-q" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" value="Summarize our current pipeline and financial cash runway.">
+                </div>
+            `;
+        }
+
+        container.innerHTML = html;
+    }
+
+    // Execute Guided Tool
+    async function coraExecuteGuidedTool() {
+        const tool = document.getElementById('cora-mcp-guided-tool-select').value;
+        const formattedBox = document.getElementById('cora-mcp-formatted-output');
+        const rawBox = document.getElementById('cora-mcp-test-output');
+        const token = document.getElementById('cora-mcp-access-token-direct').value;
+        const mcpUrl = '<?php echo esc_url( home_url( "/wp-json/cora/v1/mcp" ) ); ?>';
+
+        let args = {};
+        if (tool === 'cora_search_knowledge_base') {
+            args = { query: document.getElementById('cora-guided-search-query')?.value || 'pricing', limit: 5 };
+        } else if (tool === 'cora_query_financials') {
+            args = { filter: document.getElementById('cora-guided-fin-filter')?.value || 'all', limit: 10 };
+        } else if (tool === 'cora_record_financial_transaction') {
+            args = {
+                type: document.getElementById('cora-guided-rec-type')?.value || 'expense',
+                amount: parseFloat(document.getElementById('cora-guided-rec-amount')?.value || 0),
+                client_or_vendor: document.getElementById('cora-guided-rec-vendor')?.value || 'Vendor',
+                description: document.getElementById('cora-guided-rec-desc')?.value || ''
+            };
+        } else if (tool === 'cora_manage_crm_leads') {
+            args = { action: document.getElementById('cora-guided-lead-action')?.value || 'list', limit: 10 };
+        } else if (tool === 'cora_ask_workspace_copilot') {
+            args = { question: document.getElementById('cora-guided-copilot-q')?.value || 'Summarize workspace metrics.' };
+        } else {
+            args = { action: 'list' };
+        }
+
+        formattedBox.innerHTML = '<div class="flex items-center gap-2 text-zinc-500"><span class="animate-spin text-sm">⟳</span> Running action...</div>';
+        rawBox.innerText = 'Calling ' + tool + '...';
+
+        try {
+            const res = await fetch(mcpUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'tools/call',
+                    params: {
+                        name: tool,
+                        arguments: args
+                    },
+                    id: Date.now()
+                })
+            });
+
+            const data = await res.json();
+            rawBox.innerText = JSON.stringify(data, null, 2);
+
+            if (data.result && data.result.content && data.result.content[0]) {
+                const text = data.result.content[0].text;
+                formattedBox.innerHTML = `<div class="font-sans text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap">${coraEscapeHtml(text)}</div>`;
+                window.coraShowToast("Action completed.");
+            } else if (data.error) {
+                formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Error: ${coraEscapeHtml(data.error.message || 'Execution error')}</div>`;
+                window.coraShowToast("Action error: " + (data.error.message || 'Error'));
+            } else {
+                formattedBox.innerText = JSON.stringify(data, null, 2);
+            }
+        } catch (e) {
+            formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Connection failed: ${coraEscapeHtml(e.message)}</div>`;
+            rawBox.innerText = "Network error: " + e.message;
+            window.coraShowToast("Could not connect to workspace server.");
+        }
+    }
+
     // Tool argument templates
     const coraMCPToolArgTemplates = {
         cora_get_workspace_overview: '{}',
@@ -821,6 +1207,7 @@ Ready to execute tool call...
     async function coraExecuteMCPTestTool() {
         const toolName = document.getElementById('cora-mcp-test-tool-select').value;
         const argsStr = document.getElementById('cora-mcp-test-tool-args').value;
+        const formattedBox = document.getElementById('cora-mcp-formatted-output');
         const outputEl = document.getElementById('cora-mcp-test-output');
         const token = document.getElementById('cora-mcp-access-token-direct').value;
         const mcpUrl = '<?php echo esc_url( home_url( "/wp-json/cora/v1/mcp" ) ); ?>';
@@ -834,6 +1221,7 @@ Ready to execute tool call...
         }
 
         outputEl.innerText = "Executing tool call '" + toolName + "'...\nConnecting to " + mcpUrl;
+        formattedBox.innerHTML = '<div class="flex items-center gap-2 text-zinc-500"><span class="animate-spin text-sm">⟳</span> Executing ' + toolName + '...</div>';
 
         try {
             const res = await fetch(mcpUrl, {
@@ -855,9 +1243,15 @@ Ready to execute tool call...
 
             const data = await res.json();
             outputEl.innerText = JSON.stringify(data, null, 2);
+            if (data.result && data.result.content && data.result.content[0]) {
+                formattedBox.innerHTML = `<div class="font-sans text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap">${coraEscapeHtml(data.result.content[0].text)}</div>`;
+            } else {
+                formattedBox.innerText = JSON.stringify(data, null, 2);
+            }
             window.coraShowToast("Tool call completed.");
         } catch (e) {
             outputEl.innerText = "Error executing tool call:\n" + e.message;
+            formattedBox.innerHTML = `<div class="p-3 rounded-lg bg-red-50 text-red-700 text-xs font-medium">Connection failed: ${coraEscapeHtml(e.message)}</div>`;
             window.coraShowToast("Failed to connect to MCP endpoint.");
         }
     }
