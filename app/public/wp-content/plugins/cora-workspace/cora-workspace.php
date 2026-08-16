@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.63
+ * Version: 3.4.64
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.63' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.64' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -1090,12 +1090,13 @@ function cora_workspace_handle_workspace_route() {
     }
     if ( $path === 'cora-manifest.json' ) {
         status_header( 200 );
-        header( 'Content-Type: application/json' );
-        // Cache manifest for 1 hour, revalidate after
-        header( 'Cache-Control: public, max-age=3600, must-revalidate' );
+        header( 'Content-Type: application/json; charset=UTF-8' );
+        header( 'Cache-Control: no-cache, no-store, must-revalidate, max-age=0' );
+        header( 'Pragma: no-cache' );
+        header( 'Expires: 0' );
         $manifest = file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/manifest.json' );
-        $manifest = str_replace( '"icon_192.png"', '"' . CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png"', $manifest );
-        $manifest = str_replace( '"icon_512.png"', '"' . CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png"', $manifest );
+        $manifest = str_replace( '"icon_192.png"', '"' . CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . CORA_WORKSPACE_VERSION . '"', $manifest );
+        $manifest = str_replace( '"icon_512.png"', '"' . CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . CORA_WORKSPACE_VERSION . '"', $manifest );
         echo $manifest;
         exit;
     }

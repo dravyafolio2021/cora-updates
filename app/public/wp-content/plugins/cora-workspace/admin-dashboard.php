@@ -333,11 +333,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     // Format according to template: [Page Name] – [Site Title]
     $page_title_format = $current_page_label . ' – ' . $workspace_site_title;
     ?>
-    <link rel="icon" type="image/png" href="<?php echo esc_url( $favicon_url ); ?>" />
-    <link rel="shortcut icon" id="cora-dynamic-favicon" href="<?php echo esc_url( $favicon_url ); ?>" />
-    <link rel="apple-touch-icon" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png' ); ?>" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark)" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-splash-dark.png' ); ?>" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light)" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-splash-light.png' ); ?>" />
+    <link rel="icon" type="image/png" href="<?php echo esc_url( $favicon_url . '?v=' . CORA_WORKSPACE_VERSION ); ?>" />
+    <link rel="shortcut icon" id="cora-dynamic-favicon" href="<?php echo esc_url( $favicon_url . '?v=' . CORA_WORKSPACE_VERSION ); ?>" />
+    <link rel="apple-touch-icon" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
+    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark)" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-splash-dark.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
+    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light)" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/cora-splash-light.png?v=' . CORA_WORKSPACE_VERSION ); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light">
     <title><?php echo esc_html( $page_title_format ); ?></title>
@@ -348,11 +348,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     
     <!-- PWA Manifest & Service Worker -->
-    <link rel="manifest" href="<?php echo home_url('/cora-manifest.json'); ?>">
+    <link rel="manifest" href="<?php echo home_url('/cora-manifest.json?v=' . CORA_WORKSPACE_VERSION); ?>">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="apple-touch-icon" href="<?php echo CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png'; ?>">
     <script>
         // Global error catcher for diagnostic visibility
         window.addEventListener('error', function(e) {
