@@ -7859,51 +7859,88 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         var pop = document.getElementById('cora-sidebar-rag-popover');
         if (pop) pop.classList.toggle('hidden');
     };
+    
+    window.coraIsSmartRouting = function() {
+        return localStorage.getItem('cora_ai_smart_routing') === '1';
+    };
+
+    window.coraUpdatePopoverUI = function() {
+        var isAuto = window.coraIsSmartRouting();
+        var curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
+        
+        // Sync model cards
+        document.querySelectorAll('.cora-model-card').forEach(function(card) {
+            var modelKey = card.getAttribute('data-model');
+            var isSelected = (modelKey === curModel && !isAuto);
+            var check = card.querySelector('.cora-model-check');
+            var iconBox = card.querySelector('.cora-model-icon-box');
+            var tag = card.querySelector('.cora-model-tag');
+            
+            if (isSelected) {
+                card.className = 'cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-bold bg-zinc-950 text-white cursor-pointer transition-all shadow-xs';
+                if (check) check.classList.remove('hidden');
+                if (iconBox) iconBox.className = 'cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-800 text-white flex items-center justify-center shrink-0';
+                if (tag) tag.className = 'cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-800 text-zinc-300';
+            } else {
+                card.className = 'cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80';
+                if (check) check.classList.add('hidden');
+                if (iconBox) iconBox.className = 'cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 group-hover:bg-zinc-200 group-hover:text-zinc-950 flex items-center justify-center shrink-0 transition-colors';
+                if (tag) tag.className = 'cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500';
+            }
+        });
+
+        // Sync Smart Route Switch
+        var srSwitch = document.getElementById('cora-smart-route-switch');
+        var srKnob = document.getElementById('cora-smart-route-knob');
+        if (srSwitch && srKnob) {
+            if (isAuto) {
+                srSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-950';
+                srKnob.className = 'translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
+            } else {
+                srSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-200';
+                srKnob.className = 'translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
+            }
+        }
+
+        // Sync Auto-exec Switch
+        var isAutoExec = localStorage.getItem('cora_ai_autoexec') !== '0';
+        var aeSwitch = document.getElementById('cora-autoexec-switch');
+        var aeKnob = document.getElementById('cora-autoexec-knob');
+        if (aeSwitch && aeKnob) {
+            if (isAutoExec) {
+                aeSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-950';
+                aeKnob.className = 'translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
+            } else {
+                aeSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-200';
+                aeKnob.className = 'translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
+            }
+        }
+    };
+
     window.coraToggleAIUsagePopover = function(e) {
         if (e && e.stopPropagation) e.stopPropagation();
         var pop = document.getElementById('cora-header-ai-usage-popover');
         if (pop) {
             pop.classList.toggle('hidden');
             if (!pop.classList.contains('hidden')) {
-                var isAuto = localStorage.getItem('cora_ai_smart_routing') === '1';
-                var curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
-                
-                // Highlight active model item
-                document.querySelectorAll('.cora-popover-model-item').forEach(function(item) {
-                    var isSelected = (item.getAttribute('data-model') === curModel);
-                    var check = item.querySelector('.cora-model-check');
-                    var dot = item.querySelector('.cora-model-dot');
-                    if (isSelected) {
-                        item.classList.add('bg-zinc-100', 'text-zinc-950', 'font-bold');
-                        item.classList.remove('text-zinc-600', 'font-medium');
-                        if (check) check.classList.remove('hidden');
-                        if (dot) { dot.classList.add('bg-zinc-950'); dot.classList.remove('bg-zinc-300'); }
-                    } else {
-                        item.classList.remove('bg-zinc-100', 'text-zinc-950', 'font-bold');
-                        item.classList.add('text-zinc-600', 'font-medium');
-                        if (check) check.classList.add('hidden');
-                        if (dot) { dot.classList.remove('bg-zinc-950'); dot.classList.add('bg-zinc-300'); }
-                    }
-                });
-
-                var autoToggle = document.getElementById('cora-popover-autoroute-toggle');
-                if (autoToggle) autoToggle.checked = isAuto;
+                window.coraUpdatePopoverUI();
             }
         }
     };
+
     window.coraQuickSetModel = function(modelKey, label) {
         localStorage.setItem('cora_ai_active_model', modelKey);
         localStorage.setItem('cora_ai_smart_routing', '0');
-        var autoToggle = document.getElementById('cora-popover-autoroute-toggle');
-        if (autoToggle) autoToggle.checked = false;
         var labelEl = document.getElementById('cora-sidebar-model-label');
         if (labelEl) labelEl.innerText = label;
+        window.coraUpdatePopoverUI();
         var pop = document.getElementById('cora-header-ai-usage-popover');
         if (pop) pop.classList.add('hidden');
         if (typeof window.coraShowToast === 'function') {
             window.coraShowToast('AI model set to ' + label, 'success');
         }
     };
+
     window.coraToggleSmartRouting = function(isChecked) {
         localStorage.setItem('cora_ai_smart_routing', isChecked ? '1' : '0');
         var labelEl = document.getElementById('cora-sidebar-model-label');
@@ -7920,6 +7957,17 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
             if (typeof window.coraShowToast === 'function') {
                 window.coraShowToast('Manual model selection: ' + lbl, 'info');
             }
+        }
+        window.coraUpdatePopoverUI();
+    };
+
+    window.coraToggleAutoExec = function() {
+        var current = localStorage.getItem('cora_ai_autoexec') !== '0';
+        var next = !current;
+        localStorage.setItem('cora_ai_autoexec', next ? '1' : '0');
+        window.coraUpdatePopoverUI();
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Autonomous DB Actions: ' + (next ? 'Enabled' : 'Disabled'), 'info');
         }
     };
     </script>
@@ -7967,22 +8015,25 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                     $header_ai_stats = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 0, 'daily_limit' => 100, 'five_hour_count' => 0, 'five_hour_limit' => 30 );
                     $header_daily_pct = ( isset( $header_ai_stats['daily_limit'] ) && $header_ai_stats['daily_limit'] > 0 ) ? min( 100, round( ( $header_ai_stats['daily_count'] / $header_ai_stats['daily_limit'] ) * 100 ) ) : 0;
                     ?>
-                    <div id="cora-header-ai-usage-pill" class="relative inline-flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-full text-[9.5px] font-semibold text-zinc-600 dark:text-zinc-300 cursor-pointer select-none transition-all hover:bg-zinc-200/70 shrink-0" onclick="window.coraToggleAIUsagePopover(event)" title="Workspace AI Quota: <?php echo esc_attr( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] . ' (' . $header_daily_pct . '%)' ); ?>">
+                    <div id="cora-header-ai-usage-pill" class="relative inline-flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-full text-[9.5px] font-semibold text-zinc-600 dark:text-zinc-300 cursor-pointer select-none transition-all hover:bg-zinc-200/70 shrink-0" onclick="window.coraToggleAIUsagePopover(event)">
                         <svg viewBox="0 0 36 36" width="11" height="11" class="transform -rotate-90 shrink-0">
                             <path stroke="#e4e4e7" stroke-width="4.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             <path id="cora-header-ai-usage-ring" stroke="#18181b" stroke-width="4.5" stroke-dasharray="<?php echo esc_attr( $header_daily_pct ); ?>, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
                         <span id="cora-header-ai-usage-text" class="font-mono font-bold text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?></span>
 
-                        <!-- Attached Popover Card (Ultra-Minimal Notion/Linear Design) -->
-                        <div id="cora-header-ai-usage-popover" class="hidden absolute top-full right-0 mt-2 w-60 bg-white border border-zinc-200/90 rounded-2xl shadow-xl p-3 z-[10006] text-left cursor-default select-none" onclick="event.stopPropagation()" style="box-shadow: 0 16px 36px -8px rgba(0,0,0,0.12), 0 4px 12px -2px rgba(0,0,0,0.04);">
-                            <!-- Workspace Quota Mini Card -->
-                            <div class="px-1.5 pt-0.5 pb-2">
-                                <div class="flex items-center justify-between text-[10px] font-semibold text-zinc-400 mb-1.5">
-                                    <span class="uppercase tracking-wider">Quota</span>
-                                    <span class="font-mono text-zinc-800 font-bold"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?> reqs</span>
+                        <!-- Attached Popover Card (Complete Redesign - Linear / Raycast / Claude Minimal Aesthetic) -->
+                        <div id="cora-header-ai-usage-popover" class="hidden absolute top-full right-0 mt-2.5 w-72 bg-white/98 backdrop-blur-xl border border-zinc-200/90 rounded-2xl shadow-2xl p-3.5 z-[10006] text-left cursor-default select-none transition-all" onclick="event.stopPropagation()" style="box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.14), 0 4px 12px -2px rgba(0, 0, 0, 0.04);">
+                            <!-- Workspace Quota Section -->
+                            <div class="px-1 pt-0.5 pb-2.5">
+                                <div class="flex items-center justify-between text-[10px] font-bold text-zinc-400 mb-1.5 uppercase tracking-wider">
+                                    <span class="flex items-center gap-1 text-zinc-500 font-extrabold">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        Quota
+                                    </span>
+                                    <span class="font-mono text-zinc-900 font-extrabold"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?> <span class="text-zinc-400 font-normal">reqs</span></span>
                                 </div>
-                                <div class="w-full bg-zinc-100 rounded-full h-1 overflow-hidden">
+                                <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
                                     <div id="cora-popover-usage-bar" class="bg-zinc-950 h-full rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $header_daily_pct ); ?>%;"></div>
                                 </div>
                             </div>
@@ -7990,68 +8041,117 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                             <!-- Subtle Divider -->
                             <div class="h-px bg-zinc-100 my-1"></div>
 
-                            <!-- Models List (Clean Notion/Linear List Items) -->
-                            <div class="space-y-0.5">
-                                <div class="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-zinc-400">Foundation Model</div>
+                            <!-- Models List Matrix -->
+                            <div class="space-y-1">
+                                <div class="px-1 py-1 text-[9px] font-extrabold uppercase tracking-wider text-zinc-400">Foundation Model</div>
                                 
-                                <div onclick="window.coraQuickSetModel('gemini', 'Gemini')" class="cora-popover-model-item group flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer transition-colors" data-model="gemini">
-                                    <span class="flex items-center gap-2">
-                                        <span class="cora-model-dot w-1.5 h-1.5 rounded-full bg-zinc-300 group-hover:bg-zinc-950 transition-colors"></span>
-                                        Gemini
-                                    </span>
-                                    <svg class="cora-model-check hidden text-zinc-950" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <!-- Gemini -->
+                                <div onclick="window.coraQuickSetModel('gemini', 'Gemini')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80" data-model="gemini">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14"/></svg>
+                                        </div>
+                                        <span class="truncate">Gemini</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500 font-bold">Fast</span>
+                                        <svg class="cora-model-check hidden" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
                                 </div>
 
-                                <div onclick="window.coraQuickSetModel('gpt-4o', 'ChatGPT')" class="cora-popover-model-item group flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer transition-colors" data-model="gpt-4o">
-                                    <span class="flex items-center gap-2">
-                                        <span class="cora-model-dot w-1.5 h-1.5 rounded-full bg-zinc-300 group-hover:bg-zinc-950 transition-colors"></span>
-                                        ChatGPT
-                                    </span>
-                                    <svg class="cora-model-check hidden text-zinc-950" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <!-- ChatGPT -->
+                                <div onclick="window.coraQuickSetModel('gpt-4o', 'ChatGPT')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80" data-model="gpt-4o">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 0 0 18M3 12a9 9 0 0 0 18 0"/></svg>
+                                        </div>
+                                        <span class="truncate">ChatGPT</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500 font-bold">OpenAI</span>
+                                        <svg class="cora-model-check hidden" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
                                 </div>
 
-                                <div onclick="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude')" class="cora-popover-model-item group flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer transition-colors" data-model="claude-3-5-sonnet">
-                                    <span class="flex items-center gap-2">
-                                        <span class="cora-model-dot w-1.5 h-1.5 rounded-full bg-zinc-300 group-hover:bg-zinc-950 transition-colors"></span>
-                                        Claude
-                                    </span>
-                                    <svg class="cora-model-check hidden text-zinc-950" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <!-- Claude -->
+                                <div onclick="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80" data-model="claude-3-5-sonnet">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.5 17 14.5 18.5 21.5 12 18 5.5 21.5 7 14.5 2 9.5 9 8.5 12 2"></polygon></svg>
+                                        </div>
+                                        <span class="truncate">Claude</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500 font-bold">Anthropic</span>
+                                        <svg class="cora-model-check hidden" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
                                 </div>
 
-                                <div onclick="window.coraQuickSetModel('groq', 'Groq')" class="cora-popover-model-item group flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer transition-colors" data-model="groq">
-                                    <span class="flex items-center gap-2">
-                                        <span class="cora-model-dot w-1.5 h-1.5 rounded-full bg-zinc-300 group-hover:bg-zinc-950 transition-colors"></span>
-                                        Groq
-                                    </span>
-                                    <svg class="cora-model-check hidden text-zinc-950" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <!-- Groq -->
+                                <div onclick="window.coraQuickSetModel('groq', 'Groq')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80" data-model="groq">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                        </div>
+                                        <span class="truncate">Groq</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500 font-bold">Ultra-Fast</span>
+                                        <svg class="cora-model-check hidden" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
                                 </div>
 
-                                <div onclick="window.coraQuickSetModel('deepseek', 'DeepSeek')" class="cora-popover-model-item group flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer transition-colors" data-model="deepseek">
-                                    <span class="flex items-center gap-2">
-                                        <span class="cora-model-dot w-1.5 h-1.5 rounded-full bg-zinc-300 group-hover:bg-zinc-950 transition-colors"></span>
-                                        DeepSeek
-                                    </span>
-                                    <svg class="cora-model-check hidden text-zinc-950" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <!-- DeepSeek -->
+                                <div onclick="window.coraQuickSetModel('deepseek', 'DeepSeek')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80" data-model="deepseek">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                                        </div>
+                                        <span class="truncate">DeepSeek</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500 font-bold">Reasoning</span>
+                                        <svg class="cora-model-check hidden" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Subtle Divider -->
-                            <div class="h-px bg-zinc-100 my-1.5"></div>
+                            <div class="h-px bg-zinc-100 my-2"></div>
 
-                            <!-- Minimal Toggles -->
-                            <div class="space-y-1 px-1 py-0.5">
-                                <label class="flex items-center justify-between text-[11px] font-medium text-zinc-600 hover:text-zinc-950 cursor-pointer select-none">
+                            <!-- Custom iOS-Style Animated Preferences -->
+                            <div class="space-y-2 px-1 py-0.5">
+                                <!-- Auto-Route Switch -->
+                                <div onclick="window.coraToggleSmartRouting(!window.coraIsSmartRouting())" class="flex items-center justify-between cursor-pointer group select-none">
                                     <div class="flex items-center gap-2">
-                                        <input type="checkbox" id="cora-popover-autoroute-toggle" onchange="window.coraToggleSmartRouting(this.checked)" class="rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer w-3.5 h-3.5">
-                                        <span>Auto-route (Save tokens)</span>
+                                        <div class="w-5 h-5 rounded-md bg-zinc-100 group-hover:bg-zinc-200 text-zinc-700 flex items-center justify-center transition-colors">
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                                        </div>
+                                        <div>
+                                            <div class="text-[11.5px] font-bold text-zinc-800">Auto-Route Tasks</div>
+                                            <div class="text-[9.5px] text-zinc-400">Save tokens automatically</div>
+                                        </div>
                                     </div>
-                                </label>
-                                <label class="flex items-center justify-between text-[11px] font-medium text-zinc-600 hover:text-zinc-950 cursor-pointer select-none">
+                                    <div class="cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-200" id="cora-smart-route-switch">
+                                        <span class="translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out" id="cora-smart-route-knob"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Autonomous DB Actions Switch -->
+                                <div onclick="window.coraToggleAutoExec()" class="flex items-center justify-between cursor-pointer group select-none">
                                     <div class="flex items-center gap-2">
-                                        <input type="checkbox" id="cora-popover-autoexec-toggle" checked onchange="localStorage.setItem('cora_ai_autoexec', this.checked ? '1' : '0')" class="rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer w-3.5 h-3.5">
-                                        <span>Autonomous DB actions</span>
+                                        <div class="w-5 h-5 rounded-md bg-zinc-100 group-hover:bg-zinc-200 text-zinc-700 flex items-center justify-center transition-colors">
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                        </div>
+                                        <div>
+                                            <div class="text-[11.5px] font-bold text-zinc-800">Autonomous Actions</div>
+                                            <div class="text-[9.5px] text-zinc-400">Direct DB mutations</div>
+                                        </div>
                                     </div>
-                                </label>
+                                    <div class="cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-950" id="cora-autoexec-switch">
+                                        <span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out" id="cora-autoexec-knob"></span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
