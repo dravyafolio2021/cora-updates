@@ -1445,19 +1445,19 @@ jQuery(document).ready(function($) {
             html += `
                 <div class="group flex items-center justify-between p-2 rounded-xl text-xs ${activeBg} cursor-pointer transition-all border border-transparent hover:border-zinc-200" onclick="window.coraSwitchConversation('${chat.id}')">
                     <div class="flex items-center gap-1.5 min-w-0 flex-1">
-                        <span class="text-zinc-400 ${isPinned ? 'text-amber-500 font-bold' : ''}">
-                            ${isPinned ? '★' : '•'}
+                        <span class="${isPinned ? 'text-zinc-950 dark:text-white' : 'text-zinc-400'} shrink-0 flex items-center">
+                            ${isPinned ? `<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-2l-2-2V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v8l-2 2v2z"></path></svg>` : `<span class="w-1.5 h-1.5 rounded-full bg-zinc-300 inline-block"></span>`}
                         </span>
                         <span class="truncate flex-1 text-[11px]" id="conv-title-${chat.id}">${chat.title || 'Conversation'}</span>
                     </div>
-                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-1.5 shrink-0" onclick="event.stopPropagation()">
-                        <button type="button" onclick="window.coraTogglePinConversation('${chat.id}', event)" class="p-1 text-zinc-400 hover:text-amber-500 rounded border-0 bg-transparent cursor-pointer" title="${isPinned ? 'Unpin' : 'Pin to top'}">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="${isPinned ? 'currentColor' : 'none'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <div class="flex items-center gap-1 opacity-100 ml-1.5 shrink-0" onclick="event.stopPropagation()">
+                        <button type="button" onclick="window.coraTogglePinConversation('${chat.id}', event)" class="p-1 ${isPinned ? 'text-zinc-950 font-bold' : 'text-zinc-400 hover:text-zinc-900'} rounded border-0 bg-transparent cursor-pointer flex items-center justify-center transition-colors" title="${isPinned ? 'Unpin' : 'Pin to top'}">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="${isPinned ? 'currentColor' : 'none'}" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-2l-2-2V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v8l-2 2v2z"></path></svg>
                         </button>
-                        <button type="button" onclick="window.coraRenameConversationPrompt('${chat.id}', event)" class="p-1 text-zinc-400 hover:text-zinc-900 rounded border-0 bg-transparent cursor-pointer" title="Rename">
+                        <button type="button" onclick="window.coraRenameConversationPrompt('${chat.id}', event)" class="p-1 text-zinc-400 hover:text-zinc-900 rounded border-0 bg-transparent cursor-pointer flex items-center justify-center transition-colors" title="Rename">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                         </button>
-                        <button type="button" onclick="window.coraDeleteConversation('${chat.id}', event)" class="p-1 text-zinc-400 hover:text-red-600 rounded border-0 bg-transparent cursor-pointer" title="Delete">
+                        <button type="button" onclick="window.coraDeleteConversation('${chat.id}', event)" class="p-1 text-zinc-400 hover:text-red-600 rounded border-0 bg-transparent cursor-pointer flex items-center justify-center transition-colors" title="Delete">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
@@ -1480,9 +1480,35 @@ jQuery(document).ready(function($) {
         }
     };
 
+    // Minimal AI Usage Popover Toggle
+    window.coraToggleAIUsagePopover = function(e) {
+        if (e) e.stopPropagation();
+        const pop = $('#cora-header-ai-usage-popover');
+        if (pop.length) {
+            pop.toggleClass('hidden');
+            if (!pop.hasClass('hidden')) {
+                // Sync active model in popover
+                const curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
+                $(`input[name="cora_popover_ai_model"][value="${curModel}"]`).prop('checked', true);
+            }
+        }
+    };
+
+    window.coraQuickSetModel = function(modelKey, label) {
+        localStorage.setItem('cora_ai_active_model', modelKey);
+        $('#cora-sidebar-model-label').text(label);
+        $('#cora-header-ai-usage-popover').addClass('hidden');
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast(`AI model updated to ${label}`, 'success');
+        }
+    };
+
     $(document).on('click', function(e) {
         if (!$(e.target).closest('#cora-sidebar-conversation-toggle, #cora-sidebar-conversations-dropdown').length) {
             $('#cora-sidebar-conversations-dropdown').addClass('hidden');
+        }
+        if (!$(e.target).closest('#cora-header-ai-usage-pill, #cora-header-ai-usage-popover').length) {
+            $('#cora-header-ai-usage-popover').addClass('hidden');
         }
     });
 

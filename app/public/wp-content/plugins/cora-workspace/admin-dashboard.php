@@ -7881,21 +7881,60 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         <div id="cora-sidebar-rag-popover" class="hidden" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); width: 240px; z-index: 10000; text-align: left; pointer-events: auto;"></div>
                     </div>
 
-                    <!-- Minimal AI Usage Indicator (Workspace Global Token/Request Counter) -->
+                    <!-- Minimal AI Usage Indicator with Integrated Quick Popover -->
                     <?php
                     $header_ai_stats = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 0, 'daily_limit' => 100, 'five_hour_count' => 0, 'five_hour_limit' => 30 );
                     $header_daily_pct = ( isset( $header_ai_stats['daily_limit'] ) && $header_ai_stats['daily_limit'] > 0 ) ? min( 100, round( ( $header_ai_stats['daily_count'] / $header_ai_stats['daily_limit'] ) * 100 ) ) : 0;
                     ?>
-                    <div id="cora-header-ai-usage-pill" class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-full text-[9.5px] font-semibold text-zinc-600 dark:text-zinc-300 cursor-pointer select-none transition-all hover:bg-zinc-200/70 shrink-0" title="Workspace AI Quota: <?php echo esc_attr( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] . ' (' . $header_daily_pct . '%)' ); ?>" onclick="window.coraOpenAISettingsDrawer()">
+                    <div id="cora-header-ai-usage-pill" class="relative inline-flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-full text-[9.5px] font-semibold text-zinc-600 dark:text-zinc-300 cursor-pointer select-none transition-all hover:bg-zinc-200/70 shrink-0" onclick="window.coraToggleAIUsagePopover(event)" title="Workspace AI Quota: <?php echo esc_attr( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] . ' (' . $header_daily_pct . '%)' ); ?>">
                         <svg viewBox="0 0 36 36" width="11" height="11" class="transform -rotate-90 shrink-0">
                             <path stroke="#e4e4e7" stroke-width="4.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             <path id="cora-header-ai-usage-ring" stroke="#18181b" stroke-width="4.5" stroke-dasharray="<?php echo esc_attr( $header_daily_pct ); ?>, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
                         <span id="cora-header-ai-usage-text" class="font-mono font-bold text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?></span>
+
+                        <!-- Inline Lightweight Floating Quota Popover (Zero Dark Backdrop) -->
+                        <div id="cora-header-ai-usage-popover" class="hidden absolute top-full right-0 mt-2 w-64 bg-white border border-zinc-200 rounded-2xl shadow-xl p-3.5 z-[10006] text-left cursor-default select-none" onclick="event.stopPropagation()" style="box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04);">
+                            <div class="flex items-center justify-between border-b border-zinc-100 pb-2 mb-2.5">
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400">Workspace AI Quota</span>
+                                <span class="text-[10px] font-mono font-bold text-zinc-900" id="cora-popover-usage-ratio"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?></span>
+                            </div>
+                            
+                            <!-- Progress Bar -->
+                            <div class="w-full bg-zinc-100 rounded-full h-1.5 mb-3 overflow-hidden">
+                                <div id="cora-popover-usage-bar" class="bg-zinc-900 h-1.5 rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $header_daily_pct ); ?>%;"></div>
+                            </div>
+
+                            <!-- Model Selector -->
+                            <div class="space-y-1.5">
+                                <label class="block text-[9.5px] font-bold uppercase tracking-wider text-zinc-400">Active Foundation Model</label>
+                                <div class="space-y-1">
+                                    <label class="flex items-center justify-between p-1.5 rounded-lg border border-zinc-200 hover:border-zinc-400 bg-white cursor-pointer transition-all text-[11px] font-bold text-zinc-800">
+                                        <div class="flex items-center gap-1.5">
+                                            <input type="radio" name="cora_popover_ai_model" value="gemini" checked onchange="window.coraQuickSetModel('gemini', 'Gemini Flash')" class="text-zinc-950 focus:ring-zinc-950">
+                                            <span>Gemini 2.5 Flash</span>
+                                        </div>
+                                        <span class="text-[8.5px] font-bold px-1.5 py-0.2 bg-green-50 text-green-700 rounded-md border border-green-200">Fast</span>
+                                    </label>
+                                    <label class="flex items-center justify-between p-1.5 rounded-lg border border-zinc-200 hover:border-zinc-400 bg-white cursor-pointer transition-all text-[11px] font-bold text-zinc-800">
+                                        <div class="flex items-center gap-1.5">
+                                            <input type="radio" name="cora_popover_ai_model" value="gpt-4o" onchange="window.coraQuickSetModel('gpt-4o', 'GPT-4o')" class="text-zinc-950 focus:ring-zinc-950">
+                                            <span>GPT-4o (OpenAI)</span>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-center justify-between p-1.5 rounded-lg border border-zinc-200 hover:border-zinc-400 bg-white cursor-pointer transition-all text-[11px] font-bold text-zinc-800">
+                                        <div class="flex items-center gap-1.5">
+                                            <input type="radio" name="cora_popover_ai_model" value="claude-3-5-sonnet" onchange="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude 3.5')" class="text-zinc-950 focus:ring-zinc-950">
+                                            <span>Claude 3.5 Sonnet</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Right: Expand (90%) + Settings + Close -->
+                <!-- Right: Expand (90%) + Close -->
                 <div class="flex items-center gap-0.5 shrink-0">
                     <!-- Expand / Fullscreen Toggle Button -->
                     <button id="cora-ai-expand-btn" onclick="window.coraToggleSidebarFullscreen(event)" class="p-1 text-zinc-400 hover:text-zinc-900 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center" title="Toggle 90% Expand Mode">
@@ -7904,15 +7943,6 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                             <polyline points="9 21 3 21 3 15"></polyline>
                             <line x1="21" y1="3" x2="14" y2="10"></line>
                             <line x1="3" y1="21" x2="10" y2="14"></line>
-                        </svg>
-                    </button>
-                    <!-- Settings -->
-                    <button onclick="window.coraOpenAISettingsDrawer()" style="color: #a1a1aa; border: 0; background: transparent; padding: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#3f3f46'" onmouseout="this.style.color='#a1a1aa'" title="AI Model Settings">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
-                            <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
-                            <line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line>
-                            <line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>
                         </svg>
                     </button>
                     <!-- Close -->
