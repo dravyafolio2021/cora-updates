@@ -7900,7 +7900,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         var isAuto = window.coraIsSmartRouting();
         var curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
         
-        // Sync model cards
+        // Sync model cards with explicit solid backgrounds
         document.querySelectorAll('.cora-model-card').forEach(function(card) {
             var modelKey = card.getAttribute('data-model');
             var isSelected = (modelKey === curModel && !isAuto);
@@ -7909,15 +7909,35 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
             var tag = card.querySelector('.cora-model-tag');
             
             if (isSelected) {
-                card.className = 'cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-bold bg-zinc-950 text-white cursor-pointer transition-all shadow-xs';
+                card.className = 'cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-bold text-white cursor-pointer transition-all shadow-xs';
+                card.style.backgroundColor = '#18181b';
+                card.style.color = '#ffffff';
+                card.style.borderColor = '#18181b';
                 if (check) check.classList.remove('hidden');
-                if (iconBox) iconBox.className = 'cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-800 text-white flex items-center justify-center shrink-0';
-                if (tag) tag.className = 'cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-800 text-zinc-300';
+                if (iconBox) {
+                    iconBox.className = 'cora-model-icon-box w-6 h-6 rounded-lg text-white flex items-center justify-center shrink-0';
+                    iconBox.style.backgroundColor = '#27272a';
+                    iconBox.style.color = '#ffffff';
+                }
+                if (tag) {
+                    tag.className = 'cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md text-zinc-300 font-bold';
+                    tag.style.backgroundColor = '#27272a';
+                }
             } else {
-                card.className = 'cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80';
+                card.className = 'cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200';
+                card.style.backgroundColor = '#ffffff';
+                card.style.color = '#27272a';
+                card.style.borderColor = '#f4f4f5';
                 if (check) check.classList.add('hidden');
-                if (iconBox) iconBox.className = 'cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 group-hover:bg-zinc-200 group-hover:text-zinc-950 flex items-center justify-center shrink-0 transition-colors';
-                if (tag) tag.className = 'cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-500';
+                if (iconBox) {
+                    iconBox.className = 'cora-model-icon-box w-6 h-6 rounded-lg text-zinc-600 group-hover:text-zinc-950 flex items-center justify-center shrink-0 transition-colors';
+                    iconBox.style.backgroundColor = '#f4f4f5';
+                    iconBox.style.color = '#52525b';
+                }
+                if (tag) {
+                    tag.className = 'cora-model-tag text-[9px] font-mono px-1.5 py-0.5 rounded-md text-zinc-500 font-bold';
+                    tag.style.backgroundColor = '#f4f4f5';
+                }
             }
         });
 
@@ -7926,10 +7946,12 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         var srKnob = document.getElementById('cora-smart-route-knob');
         if (srSwitch && srKnob) {
             if (isAuto) {
-                srSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-950';
+                srSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out';
+                srSwitch.style.backgroundColor = '#18181b';
                 srKnob.className = 'translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
             } else {
-                srSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-200';
+                srSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out';
+                srSwitch.style.backgroundColor = '#e4e4e7';
                 srKnob.className = 'translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
             }
         }
@@ -7940,10 +7962,12 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         var aeKnob = document.getElementById('cora-autoexec-knob');
         if (aeSwitch && aeKnob) {
             if (isAutoExec) {
-                aeSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-950';
+                aeSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out';
+                aeSwitch.style.backgroundColor = '#18181b';
                 aeKnob.className = 'translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
             } else {
-                aeSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-200';
+                aeSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out';
+                aeSwitch.style.backgroundColor = '#e4e4e7';
                 aeKnob.className = 'translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
             }
         }
@@ -8002,6 +8026,12 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
             window.coraShowToast('Autonomous DB Actions: ' + (next ? 'Enabled' : 'Disabled'), 'info');
         }
     };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.coraUpdatePopoverUI === 'function') {
+            window.coraUpdatePopoverUI();
+        }
+    });
     </script>
 
     <!-- Collapsible Right-side AI Sidebar (Notion-AI style) -->
@@ -8059,12 +8089,12 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         </svg>
                         <span id="cora-header-ai-usage-text" class="font-mono font-bold text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?></span>
 
-                        <!-- Attached Popover Card (Complete Redesign - Linear / Raycast / Claude Minimal Aesthetic) -->
-                        <div id="cora-header-ai-usage-popover" class="hidden absolute top-full right-0 mt-2.5 w-72 bg-white/98 backdrop-blur-xl border border-zinc-200/90 rounded-2xl shadow-2xl p-3.5 z-[10006] text-left cursor-default select-none transition-all" onclick="event.stopPropagation()" style="box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.14), 0 4px 12px -2px rgba(0, 0, 0, 0.04);">
+                        <!-- Attached Popover Card (Solid Opaque Linear / Raycast / Claude Minimal Aesthetic) -->
+                        <div id="cora-header-ai-usage-popover" class="hidden absolute top-full right-0 mt-2.5 w-72 rounded-2xl shadow-2xl p-3.5 z-[10006] text-left cursor-default select-none transition-all" onclick="event.stopPropagation()" style="background-color: #ffffff !important; opacity: 1 !important; color: #18181b !important; z-index: 99999 !important; border: 1px solid #e4e4e7 !important; box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08) !important; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif !important;">
                             <!-- Workspace Quota Section -->
                             <div class="px-1 pt-0.5 pb-2.5">
                                 <div class="flex items-center justify-between text-[10px] font-bold text-zinc-400 mb-1.5 uppercase tracking-wider">
-                                    <span class="flex items-center gap-1 text-zinc-500 font-extrabold">
+                                    <span class="flex items-center gap-1 text-zinc-600 font-extrabold">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
                                         Quota
                                     </span>
@@ -8083,7 +8113,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                 <div class="px-1 py-1 text-[9px] font-extrabold uppercase tracking-wider text-zinc-400">Foundation Model</div>
                                 
                                 <!-- Gemini -->
-                                <div onclick="window.coraQuickSetModel('gemini', 'Gemini')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80" data-model="gemini">
+                                <div onclick="window.coraQuickSetModel('gemini', 'Gemini')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="gemini" style="background-color: #ffffff;">
                                     <div class="flex items-center gap-2.5 min-w-0">
                                         <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
                                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14"/></svg>
@@ -8097,7 +8127,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                 </div>
 
                                 <!-- ChatGPT -->
-                                <div onclick="window.coraQuickSetModel('gpt-4o', 'ChatGPT')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80" data-model="gpt-4o">
+                                <div onclick="window.coraQuickSetModel('gpt-4o', 'ChatGPT')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="gpt-4o" style="background-color: #ffffff;">
                                     <div class="flex items-center gap-2.5 min-w-0">
                                         <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
                                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 0 0 18M3 12a9 9 0 0 0 18 0"/></svg>
@@ -8111,7 +8141,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                 </div>
 
                                 <!-- Claude -->
-                                <div onclick="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80" data-model="claude-3-5-sonnet">
+                                <div onclick="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="claude-3-5-sonnet" style="background-color: #ffffff;">
                                     <div class="flex items-center gap-2.5 min-w-0">
                                         <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
                                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.5 17 14.5 18.5 21.5 12 18 5.5 21.5 7 14.5 2 9.5 9 8.5 12 2"></polygon></svg>
@@ -8125,7 +8155,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                 </div>
 
                                 <!-- Groq -->
-                                <div onclick="window.coraQuickSetModel('groq', 'Groq')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80" data-model="groq">
+                                <div onclick="window.coraQuickSetModel('groq', 'Groq')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="groq" style="background-color: #ffffff;">
                                     <div class="flex items-center gap-2.5 min-w-0">
                                         <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
                                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
@@ -8139,7 +8169,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                 </div>
 
                                 <!-- DeepSeek -->
-                                <div onclick="window.coraQuickSetModel('deepseek', 'DeepSeek')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 bg-white cursor-pointer transition-all border border-transparent hover:border-zinc-200/80" data-model="deepseek">
+                                <div onclick="window.coraQuickSetModel('deepseek', 'DeepSeek')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="deepseek" style="background-color: #ffffff;">
                                     <div class="flex items-center gap-2.5 min-w-0">
                                         <div class="cora-model-icon-box w-6 h-6 rounded-lg bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
                                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
@@ -8169,7 +8199,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                             <div class="text-[9.5px] text-zinc-400">Save tokens automatically</div>
                                         </div>
                                     </div>
-                                    <div class="cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-200" id="cora-smart-route-switch">
+                                    <div class="cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out" style="background-color: #e4e4e7;" id="cora-smart-route-switch">
                                         <span class="translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out" id="cora-smart-route-knob"></span>
                                     </div>
                                 </div>
@@ -8185,7 +8215,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                             <div class="text-[9.5px] text-zinc-400">Direct DB mutations</div>
                                         </div>
                                     </div>
-                                    <div class="cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-zinc-950" id="cora-autoexec-switch">
+                                    <div class="cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out" style="background-color: #18181b;" id="cora-autoexec-switch">
                                         <span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out" id="cora-autoexec-knob"></span>
                                     </div>
                                 </div>
