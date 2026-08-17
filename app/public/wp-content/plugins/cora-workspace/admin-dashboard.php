@@ -2405,24 +2405,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.14) !important;
                 border: 1px solid #e4e4e7 !important;
             }
-            #cora-mobile-floating-island.cora-island-docked .cora-ai-disclaimer {
-                display: block !important;
-                color: #71717a !important;
-                font-size: 9.5px !important;
-                font-weight: 500 !important;
-                text-align: center !important;
-                margin-top: 5px !important;
-                text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9) !important;
-            }
         }
 
-        /* Disclaimer is strictly hidden by default and ONLY shows when AI sheet is open/docked */
+        /* Disclaimer is inside #cora-ai-sidebar and only visible when sidebar is open */
         .cora-ai-disclaimer {
-            display: none !important;
-        }
-        #cora-mobile-floating-island.cora-island-docked .cora-ai-disclaimer,
-        #cora-ai-sidebar:not(.collapsed) .cora-ai-disclaimer {
-            display: block !important;
+            display: block;
+            color: #a1a1aa;
+            font-size: 10px;
+            text-align: center;
         }
 
         @media (min-width: 1024px) {
@@ -7999,6 +7989,10 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         </div>
                     </div>
                 </div>
+                <!-- Monochromatic In-Flow Safety Disclaimer -->
+                <div class="cora-ai-disclaimer text-[10px] text-zinc-400 dark:text-zinc-500 text-center select-none pt-4 pb-2 font-normal tracking-tight">
+                    Cora AI can make mistakes. Please verify important actions.
+                </div>
             </div>
         </div>
     </aside>
@@ -11821,10 +11815,6 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                     <path d="M12 2l2.4 4.86L19.8 8l-3.9 3.8 0.9 5.36L12 14.6l-4.8 2.56 0.9-5.36L4.2 8l5.4-1.14L12 2z"></path>
                 </svg>
             </button>
-        </div>
-        <!-- Safety Disclaimer as a dedicated column below the floating island card -->
-        <div class="cora-ai-disclaimer text-[9.5px] text-zinc-400 dark:text-zinc-500 text-center select-none pt-1 px-3 font-normal tracking-tight w-full drop-shadow-xs pointer-events-none">
-            Cora AI can make mistakes. Please verify important actions.
         </div>
     </div>
     </div> <!-- .flex.flex-row.flex-1.min-h-0 -->
