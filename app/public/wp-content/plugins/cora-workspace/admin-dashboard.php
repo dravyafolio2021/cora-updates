@@ -7879,6 +7879,19 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         <span id="cora-sidebar-page-context-label" class="font-bold text-zinc-900 truncate max-w-[70px] xs:max-w-[100px]">Dashboard</span>
                         <div id="cora-sidebar-rag-popover" class="hidden" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); width: 240px; z-index: 10000; text-align: left; pointer-events: auto;"></div>
                     </div>
+
+                    <!-- Minimal AI Usage Indicator (Workspace Global Token/Request Counter) -->
+                    <?php
+                    $header_ai_stats = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 0, 'daily_limit' => 100, 'five_hour_count' => 0, 'five_hour_limit' => 30 );
+                    $header_daily_pct = ( isset( $header_ai_stats['daily_limit'] ) && $header_ai_stats['daily_limit'] > 0 ) ? min( 100, round( ( $header_ai_stats['daily_count'] / $header_ai_stats['daily_limit'] ) * 100 ) ) : 0;
+                    ?>
+                    <div id="cora-header-ai-usage-pill" class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-full text-[9.5px] font-semibold text-zinc-600 dark:text-zinc-300 cursor-pointer select-none transition-all hover:bg-zinc-200/70 shrink-0" title="Workspace AI Quota: <?php echo esc_attr( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] . ' (' . $header_daily_pct . '%)' ); ?>" onclick="window.coraOpenAISettingsDrawer()">
+                        <svg viewBox="0 0 36 36" width="11" height="11" class="transform -rotate-90 shrink-0">
+                            <path stroke="#e4e4e7" stroke-width="4.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path id="cora-header-ai-usage-ring" stroke="#18181b" stroke-width="4.5" stroke-dasharray="<?php echo esc_attr( $header_daily_pct ); ?>, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <span id="cora-header-ai-usage-text" class="font-mono font-bold text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?></span>
+                    </div>
                 </div>
 
                 <!-- Right: Expand (90%) + Settings + Close -->

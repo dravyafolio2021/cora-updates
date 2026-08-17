@@ -1818,6 +1818,11 @@ jQuery(document).ready(function($) {
                         $('#cora-ai-daily-quota-bar').css('width', `${dailyPct}%`);
                         $('#cora-ai-5h-quota-text').text(`${u.five_hour_count} / ${u.five_hour_limit}`);
                         $('#cora-ai-5h-quota-bar').css('width', `${fiveHrPct}%`);
+
+                        // Update minimal header usage pill
+                        $('#cora-header-ai-usage-text').text(`${u.daily_count}/${u.daily_limit}`);
+                        $('#cora-header-ai-usage-ring').attr('stroke-dasharray', `${dailyPct}, 100`);
+                        $('#cora-header-ai-usage-pill').attr('title', `Workspace AI Quota: ${u.daily_count}/${u.daily_limit} (${dailyPct}%)`);
                     }
 
                     // Render Rich Autonomous Action Result Cards
