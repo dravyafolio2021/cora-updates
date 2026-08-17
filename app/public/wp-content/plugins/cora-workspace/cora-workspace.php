@@ -16246,41 +16246,15 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             $inv_total += floatval( $inv['total_amount'] ?? 0 );
         }
 
-                <span class="text-[9.5px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-0.5 rounded-full">Live Stats</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 pt-0.5">
-                <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
-                    <div class="text-[10px] text-zinc-400 uppercase font-semibold">CRM Leads</div>
-                    <div class="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 font-mono">' . $leads_count . '</div>
-                </div>
-                <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
-                    <div class="text-[10px] text-zinc-400 uppercase font-semibold">Financials</div>
-                    <div class="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 font-mono">₹' . number_format($inv_total) . '</div>
-                </div>
-                <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
-                    <div class="text-[10px] text-zinc-400 uppercase font-semibold">Bookings</div>
-                    <div class="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 font-mono">' . count($bookings) . '</div>
-                </div>
-                <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
-                    <div class="text-[10px] text-zinc-400 uppercase font-semibold">Live Forms</div>
-                    <div class="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 font-mono">' . $forms_count . '</div>
-                </div>
-            </div>
-        </div>';
+        $reply = "Currently you have **{$leads_count} CRM leads**, **₹" . number_format($inv_total) . "** in total invoicing, **" . count($bookings) . " bookings**, and **{$forms_count} active forms**.";
     }
-    // 13. Contextual Intelligent Conversational Fallback (Zero Rigid Canned Templates)
+    // 13. Conversational Human Co-Worker Fallback (1 crisp sentence, ZERO dumps, ZERO emojis)
     else {
-        // Query learned RAG memories if any exist for this query
-        $learned_ctx = function_exists('cora_rag_get_relevant_memories') ? cora_rag_get_relevant_memories( $agency_id, $raw_msg, 2 ) : '';
-        $mem_snippet = ! empty( $learned_ctx ) ? "\n\n**Relevant Workspace Memory:**\n" . $learned_ctx : "";
-
-        $reply = "I understand. As your AI Co-Founder, I execute business operations, manage settings, and automate workflows across your workspace.{$mem_snippet}\n\n" .
-                 "You can ask me to:\n" .
-                 "• **Manage Settings**: *\"Change site name to Apex Studio\"*, *\"Update our GSTIN\"*, or *\"Show current settings\"*\n" .
-                 "• **Create Entities**: *\"Build a client intake form\"*, *\"Add a new CRM lead\"*, or *\"Generate an invoice\"*\n" .
-                 "• **Review Operations**: *\"Give me a business telemetry briefing\"*\n\n" .
-                 "How would you like me to proceed with this?";
+        $reply = "I'm here. What would you like to build, update, or configure in your workspace?";
     }
+
+    // Strictly strip all emojis
+    $reply = cora_strip_all_emojis( $reply );
 
     // Record dynamic AI usage metrics & token consumption
     if ( function_exists( 'cora_workspace_record_ai_usage' ) ) {
