@@ -100,12 +100,14 @@ window.coraSaveAISettings = function(e) {
     localStorage.setItem('cora_ai_temperature', temp);
 
     const modelLabels = {
-        'gemini': 'Gemini Flash',
-        'gpt-4o': 'GPT-4o',
-        'claude-3-5-sonnet': 'Claude 3.5'
+        'gemini': 'Gemini',
+        'gpt-4o': 'ChatGPT',
+        'claude-3-5-sonnet': 'Claude',
+        'groq': 'Groq',
+        'deepseek': 'DeepSeek'
     };
 
-    const label = modelLabels[selectedModel] || 'Gemini Flash';
+    const label = modelLabels[selectedModel] || 'Gemini';
     const labelEl = document.getElementById('cora-sidebar-model-label');
     if (labelEl) labelEl.innerText = label;
 
@@ -117,14 +119,47 @@ window.coraSaveAISettings = function(e) {
 
 window.coraQuickSetModel = function(modelKey, label) {
     localStorage.setItem('cora_ai_active_model', modelKey);
+    localStorage.setItem('cora_ai_smart_routing', '0');
+    const autoToggle = document.getElementById('cora-popover-autoroute-toggle');
+    if (autoToggle) autoToggle.checked = false;
     const labelEl = document.getElementById('cora-sidebar-model-label');
     if (labelEl) labelEl.innerText = label;
+    const pop = document.getElementById('cora-header-ai-usage-popover');
+    if (pop) pop.classList.add('hidden');
     if (typeof window.coraShowToast === 'function') {
-        window.coraShowToast(`AI model updated to ${label}`, 'success');
+        window.coraShowToast(`AI model set to ${label}`, 'success');
+    }
+};
+
+window.coraToggleSmartRouting = function(isChecked) {
+    localStorage.setItem('cora_ai_smart_routing', isChecked ? '1' : '0');
+    const labelEl = document.getElementById('cora-sidebar-model-label');
+    if (isChecked) {
+        if (labelEl) labelEl.innerText = 'Auto (Smart)';
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Smart Routing active: Auto-routes tasks to save tokens', 'info');
+        }
+    } else {
+        const curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
+        const modelNames = { 'gemini': 'Gemini', 'gpt-4o': 'ChatGPT', 'claude-3-5-sonnet': 'Claude', 'groq': 'Groq', 'deepseek': 'DeepSeek' };
+        const lbl = modelNames[curModel] || 'Gemini';
+        if (labelEl) labelEl.innerText = lbl;
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Manual model selection: ' + lbl, 'info');
+        }
     }
 };
 
 jQuery(document).ready(function($) {
+    // Sync model label on initial load
+    const isSmartRoute = localStorage.getItem('cora_ai_smart_routing') === '1';
+    const curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
+    const modelNames = { 'gemini': 'Gemini', 'gpt-4o': 'ChatGPT', 'claude-3-5-sonnet': 'Claude', 'groq': 'Groq', 'deepseek': 'DeepSeek' };
+    const labelEl = $('#cora-sidebar-model-label');
+    if (labelEl.length) {
+        labelEl.text(isSmartRoute ? 'Auto (Smart)' : (modelNames[curModel] || 'Gemini'));
+    }
+
     if (typeof window.coraRenderPageContextPresets === 'function') {
         window.coraRenderPageContextPresets();
     }
