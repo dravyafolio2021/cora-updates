@@ -1641,6 +1641,34 @@ jQuery(document).ready(function($) {
         }
     };
 
+    window.coraRestoreRecentConversation = function() {
+        const chats = window.coraGetConversations();
+        if (!chats || chats.length === 0) {
+            return false;
+        }
+
+        // Sort by pinned first, then updatedAt descending
+        const sortedChats = [...chats].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.updatedAt || 0) - (a.updatedAt || 0));
+        
+        // Find preferred active chat (stored active id, or most recently updated chat with content)
+        const lastActiveId = localStorage.getItem('cora_active_chat_id');
+        let targetChat = sortedChats.find(c => c.id === lastActiveId && c.html && c.html.trim().length > 0);
+        if (!targetChat) {
+            targetChat = sortedChats.find(c => c.html && c.html.trim().length > 0);
+        }
+
+        if (targetChat && targetChat.html) {
+            currentConversationId = targetChat.id;
+            localStorage.setItem('cora_active_chat_id', targetChat.id);
+            $('#cora-sidebar-active-chat-title').text(targetChat.title || 'Conversation');
+            $('#cora-sidebar-chat').html(targetChat.html);
+            $('#cora-sidebar-native-integration').hide();
+            return true;
+        }
+
+        return false;
+    };
+
     window.coraRenameConversationPrompt = function(chatId, e) {
         if (e) e.stopPropagation();
         const chats = window.coraGetConversations();
@@ -1737,6 +1765,11 @@ jQuery(document).ready(function($) {
 
         if (show) {
             window.coraRenderPageContextPresets();
+            if ($('#cora-sidebar-chat .chat-bubble.user').length === 0) {
+                if (typeof window.coraRestoreRecentConversation === 'function') {
+                    window.coraRestoreRecentConversation();
+                }
+            }
             sidebar.removeClass('collapsed');
             quickBtn.addClass('bg-zinc-100 border-zinc-300');
             backdrop.removeClass('hidden');
@@ -12184,6 +12217,11 @@ jQuery(document).ready(function($) {
         if (typeof window.coraToggleSidebar === 'function') {
             window.coraToggleSidebar(true);
         }
+        if ($('#cora-sidebar-chat .chat-bubble.user').length === 0) {
+            if (typeof window.coraRestoreRecentConversation === 'function') {
+                window.coraRestoreRecentConversation();
+            }
+        }
         if (prompt && typeof window.coraExecuteAIChat === 'function') {
             window.coraExecuteAIChat(prompt);
         }
@@ -12338,13 +12376,15 @@ jQuery(document).ready(function($) {
             return true;
         });
 
-        // Welcome message based on industry & page
-        const indWelcome = welcomeMessages[activeIndustry] || welcomeMessages.custom;
-        const welcomeText = indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Co-Founder. What would you like to build or automate today?";
-        
-        const welcomeBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
-        if (welcomeBubble.length) {
-            welcomeBubble.text(welcomeText);
+        // Welcome message based on industry & page (only if no existing user chat has been loaded)
+        if ($('#cora-sidebar-chat .chat-bubble.user').length === 0) {
+            const indWelcome = welcomeMessages[activeIndustry] || welcomeMessages.custom;
+            const welcomeText = indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Co-Founder. What would you like to build or automate today?";
+            
+            const welcomeBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
+            if (welcomeBubble.length) {
+                welcomeBubble.text(welcomeText);
+            }
         }
 
         // Render Action Presets Dynamically
@@ -12475,7 +12515,12 @@ jQuery(document).ready(function($) {
             window.coraToggleIslandState(savedMode, true);
         }
 
-        // Initialize sidebar context based on current page
+        // 1. Attempt to restore recent active conversation
+        if (typeof window.coraRestoreRecentConversation === 'function') {
+            window.coraRestoreRecentConversation();
+        }
+
+        // 2. Initialize sidebar context and action presets based on current page
         window.coraInitSidebarContext();
 
         // Open the native AI sidebar ONLY when the user clicks the island input field
