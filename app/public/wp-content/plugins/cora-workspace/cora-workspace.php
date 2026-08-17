@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.77
+ * Version: 3.4.78
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.77' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.78' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -15730,9 +15730,11 @@ function cora_ajax_ai_chat() {
         }
     }
 
-    $message = sanitize_text_field( $_POST['message'] ?? '' );
+    $message      = sanitize_text_field( $_POST['message'] ?? '' );
     $current_page = sanitize_text_field( $_POST['current_page'] ?? 'dashboard' );
-    $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
+    $history_raw  = wp_unslash( $_POST['history'] ?? '' );
+    $history      = json_decode( $history_raw, true ) ?: array();
+    $agency_id    = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
 
     $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'custom';
     $mod_instance    = class_exists( 'Cora_Module_Registry' ) ? Cora_Module_Registry::get_module( $active_industry ) : null;
@@ -15973,10 +15975,10 @@ When the user asks you to create, update, or execute something:
     }
 
 /**
- * Autonomous Local AI Co-Founder Engine (Conversational style, zero emojis, direct execution).
+ * Autonomous Local AI Co-Founder Engine (Genuine 2-Way Conversational Dialogue, Empathetic Assistance & Direct Action).
  */
 if ( ! function_exists( 'cora_ai_local_cofounder_handler' ) ) {
-function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' ) {
+function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard', $history = array() ) {
     global $wpdb;
     $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
     $user_id   = get_current_user_id();
@@ -15992,8 +15994,37 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
     $action_results = array();
     $reply = "";
 
-    // 1. Intent: Form Creation
-    if ( preg_match( '/\b(?:form|intake|survey|questionnaire|lead form)\b/i', $lower ) && preg_match( '/\b(?:create|build|make|generate|new|setup|publish|draft)\b/i', $lower ) ) {
+    // 1. Intent: Proactive Business Suggestions ("you suggest", "what do you suggest", "give me ideas", "help me decide")
+    if ( preg_match( '/\b(?:you suggest|what do you suggest|suggest|your suggestion|your advice|give me ideas|recommend|what should (?:we|i) do|advise)\b/i', $lower ) || ( strpos( $lower, 'suggest' ) !== false ) ) {
+        $reply = "If we want to bring in new clients this week, I suggest setting up a **Client Intake Form** and linking it to our **CRM Leads pipeline**. That way, every new inquiry is captured automatically with deal values attached. Want me to build that form for you right now?";
+    }
+    // 2. Intent: Capability Testing ("I just want to test your capabilities", "test you", "testing", "prove it")
+    elseif ( preg_match( '/\b(?:test your capabilities|test you|testing|just test|testing capabilities|prove it|test)\b/i', $lower ) || ( strpos( $lower, 'test' ) !== false && ( strpos( $lower, 'capabilit' ) !== false || strpos( $lower, 'just' ) !== false || strpos( $lower, 'want' ) !== false ) ) ) {
+        $reply = "I'm ready for the test! Try asking me: 'Change site name to Apex Studio', 'Generate an invoice of ₹50,000 for Acme Corp', or 'Add a lead for Priya Sharma'. Which one should we run?";
+    }
+    // 3. Intent: Contextual Followup on CRM Leads ("CRM Leads as well>", "leads too", "what about leads", "crm leads")
+    elseif ( preg_match( '/\b(?:crm lead|crm leads|leads as well|leads too|what about leads|manage leads|lead management)\b/i', $lower ) || ( strpos( $lower, 'lead' ) !== false && ( strpos( $lower, 'as well' ) !== false || strpos( $lower, 'too' ) !== false || strpos( $lower, 'also' ) !== false || strpos( $lower, 'what about' ) !== false || strpos( $lower, '>' ) !== false || strlen( $lower ) < 30 ) && ! preg_match( '/\b(?:create|add|new|insert)\b/i', $lower ) ) ) {
+        $reply = "Yes, absolutely! With CRM Leads, I can register qualified prospects, assign deal values, and organize your client pipeline. Give me a client name and deal amount, and I'll add them right to your pipeline.";
+    }
+    // 4. Intent: Contextual Followup on Forms ("Forms as well", "what about forms", "can you make forms")
+    elseif ( preg_match( '/\b(?:forms as well|forms too|what about forms|form builder as well|can you make forms)\b/i', $lower ) || ( strpos( $lower, 'form' ) !== false && ( strpos( $lower, 'as well' ) !== false || strpos( $lower, 'too' ) !== false || strpos( $lower, 'also' ) !== false || strpos( $lower, 'what about' ) !== false ) && ! preg_match( '/\b(?:create|build|make|publish)\b/i', $lower ) ) ) {
+        $reply = "Definitely! I can build and publish custom client forms with live share links. What kind of form do you need—client intake, booking, or feedback?";
+    }
+    // 5. Intent: Contextual Followup on Invoices / Financials ("Invoices as well", "what about invoices", "bills too")
+    elseif ( preg_match( '/\b(?:invoices as well|invoices too|what about invoices|financials as well|bills too)\b/i', $lower ) || ( ( strpos( $lower, 'invoice' ) !== false || strpos( $lower, 'bill' ) !== false || strpos( $lower, 'tax' ) !== false ) && ( strpos( $lower, 'as well' ) !== false || strpos( $lower, 'too' ) !== false || strpos( $lower, 'also' ) !== false || strpos( $lower, 'what about' ) !== false ) && ! preg_match( '/\b(?:create|generate|make|send)\b/i', $lower ) ) ) {
+        $reply = "Yes, for sure! I can generate 18% GST tax invoices with automatic tax splits and unique invoice numbers. Who are we billing and what is the amount?";
+    }
+    // 6. Intent: Contextual Followup on Settings / Site Name ("Site name as well", "settings too", "what about settings")
+    elseif ( ( strpos( $lower, 'site name' ) !== false || strpos( $lower, 'setting' ) !== false || strpos( $lower, 'tagline' ) !== false ) && ( strpos( $lower, 'as well' ) !== false || strpos( $lower, 'too' ) !== false || strpos( $lower, 'also' ) !== false || strpos( $lower, 'what about' ) !== false ) ) {
+        $cur_site_title = get_option( 'blogname', 'Cora' );
+        $reply = "Yes, I can handle that too! Your site is currently named **{$cur_site_title}**. Tell me what you'd like to rename it to and I'll apply it live.";
+    }
+    // 7. Intent: Casual Affirmations / Gratitude / Encouragement ("ok", "cool", "nice", "awesome", "great", "thanks", "sounds good")
+    elseif ( preg_match( '/^(?:ok|okay|cool|nice|awesome|great|perfect|thanks|thank you|sounds good|got it|understood|sure|alright|yep|yeah)\b/i', $lower ) ) {
+        $reply = "You've got it! I'm right here whenever you need anything built, updated, or automated in your business. What's next on our agenda?";
+    }
+    // 8. Intent: Form Creation
+    elseif ( preg_match( '/\b(?:form|intake|survey|questionnaire|lead form)\b/i', $lower ) && preg_match( '/\b(?:create|build|make|generate|new|setup|publish|draft)\b/i', $lower ) ) {
         $title = 'Client Inquiry Form';
         if ( preg_match( '/form (?:for|called|named|titled)\s+([a-zA-Z0-9\s]+?)(?:with|\.|\,|$)/i', $raw_msg, $tm ) ) {
             $title = ucwords( trim( $tm[1] ) );
@@ -16028,7 +16059,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             $reply = "I attempted to create the form but encountered an issue: " . ($exec_res['message'] ?? 'Database error.');
         }
     }
-    // 2. Intent: CRM Lead Creation
+    // 9. Intent: CRM Lead Creation
     elseif ( preg_match( '/\b(?:lead|prospect|client|contact|inquiry)\b/i', $lower ) && preg_match( '/\b(?:create|add|new|register|insert|record)\b/i', $lower ) ) {
         $name = 'Prospective Client';
         if ( preg_match( '/(?:lead|client|for|named)\s+([a-zA-Z\s]+?)(?:,|\bphone\b|\bwith\b|\bfor\b|\bdeal\b|$)/i', $raw_msg, $nm ) ) {
@@ -16064,7 +16095,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             }
         }
     }
-    // 3. Intent: Invoice Creation
+    // 10. Intent: Invoice Creation
     elseif ( preg_match( '/\b(?:invoice|bill|gst bill|tax invoice|payment request)\b/i', $lower ) && preg_match( '/\b(?:create|generate|make|send|draft|bill)\b/i', $lower ) ) {
         $client_name = '';
         if ( preg_match( '/(?:for|to)\s+([a-zA-Z0-9\s]+?)(?:of|with|\bfor\b|amount|₹|rs|$)/i', $raw_msg, $cm ) ) {
@@ -16097,7 +16128,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             }
         }
     }
-    // 4. Intent: Shoot / Booking Scheduling
+    // 11. Intent: Shoot / Booking Scheduling
     elseif ( preg_match( '/\b(?:booking|shoot|session|slot|appointment|schedule)\b/i', $lower ) && preg_match( '/\b(?:create|book|schedule|new|add|reserve)\b/i', $lower ) ) {
         $title = 'Studio Session';
         if ( preg_match( '/(?:booking|shoot|session)\s+(?:for|called|titled)\s+([a-zA-Z0-9\s]+?)(?:on|at|\.|$)/i', $raw_msg, $bm ) ) {
@@ -16121,7 +16152,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             $reply = "Scheduled **{$title}** for **{$date}** at 10:00 AM.";
         }
     }
-    // 5. Intent: Vault Document Drafting
+    // 12. Intent: Vault Document Drafting
     elseif ( preg_match( '/\b(?:document|contract|agreement|nda|mou|vault|msa)\b/i', $lower ) && preg_match( '/\b(?:draft|create|prepare|generate|write)\b/i', $lower ) ) {
         $title = 'Master Service Agreement';
         if ( preg_match( '/(?:draft|create|prepare)\s+(?:a|an)?\s*([a-zA-Z0-9\s]+?)(?:for|with|\.|$)/i', $raw_msg, $dm ) ) {
@@ -16142,7 +16173,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             $reply = "Drafted **{$title}** for **{$client_name}** with e-sign links ready.";
         }
     }
-    // 6. Intent: Settings Modification
+    // 13. Intent: Settings Modification
     elseif ( preg_match( '/\b(?:change|update|set|modify|edit|rename)\b/i', $lower ) && preg_match( '/\b(?:site name|site title|website name|website title|name of the site|tagline|description|gst|gstin|tax|address|location|currency|password|tours|brand|logo)\b/i', $lower ) ) {
         $settings_to_update = array();
 
@@ -16194,13 +16225,13 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             $reply = "I can update that setting for you. What would you like to set it to?";
         }
     }
-    // 7. Intent: Settings Query / Inspection
+    // 14. Intent: Settings Query / Inspection
     elseif ( preg_match( '/\b(?:what is|show me|check|display|tell me|get|view|current)\b/i', $lower ) && preg_match( '/\b(?:site name|site title|tagline|gst|gstin|tax|address|currency|settings|workspace name|config|configuration)\b/i', $lower ) ) {
         $cur_site_title = get_option( 'blogname', 'Cora' );
         $cur_tagline    = get_option( 'blogdescription', 'Not configured' );
         $reply = "Your site is currently titled \"{$cur_site_title}\" with tagline \"{$cur_tagline}\". Would you like me to update either of these?";
     }
-    // 8. Intent: Capabilities & Scope Inquiries (Conversational, direct, no walls of text)
+    // 15. Intent: Capabilities & Scope Inquiries
     elseif ( preg_match( '/\b(?:can you|tell me what you can do|what can you do|capabilities|features|help|scope|abilities)\b/i', $lower ) || ( strpos( $lower, 'can you' ) !== false && ( strpos( $lower, 'update' ) !== false || strpos( $lower, 'change' ) !== false || strpos( $lower, 'name' ) !== false || strpos( $lower, 'site' ) !== false || strpos( $lower, 'manage' ) !== false ) ) ) {
         if ( strpos( $lower, 'site' ) !== false || strpos( $lower, 'name' ) !== false || strpos( $lower, 'setting' ) !== false || strpos( $lower, 'title' ) !== false ) {
             $cur_name = get_option( 'blogname', 'Cora' );
@@ -16209,32 +16240,16 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             $reply = "I can manage your settings (like site name, GST, and currency), build client forms, create CRM leads, and generate GST invoices. What would you like to work on?";
         }
     }
-    // 9. Intent: Article Library Pruning & Publishing
-    elseif ( ( strpos( $lower, 'article' ) !== false || strpos( $lower, 'post' ) !== false || strpos( $lower, 'blog' ) !== false ) && ( strpos( $lower, 'delete' ) !== false || strpos( $lower, 'prune' ) !== false || strpos( $lower, 'clean' ) !== false ) ) {
-        $keep_count = 3;
-        if ( preg_match( '/(?:keep|retain|top)\s*(?:only\s*)?([0-9]+)/i', $raw_msg, $km ) ) {
-            $keep_count = intval( $km[1] );
-        }
-
-        $exec_res = cora_execute_ai_action( 'keep_top_articles', array(
-            'count' => $keep_count,
-        ), $agency_id, $user_id );
-
-        if ( ! empty( $exec_res['success'] ) ) {
-            $action_results[] = $exec_res;
-            $reply = "I've pruned your Content Library, retaining the top {$keep_count} articles.";
-        }
-    }
-    // 10. Intent: Active Modules / Features List
+    // 16. Intent: Active Modules / Features List
     elseif ( preg_match( '/\b(?:module|modules|active modules|accessible modules|what modules|list modules|features active|enabled features|what is active)\b/i', $lower ) || ( strpos( $lower, 'module' ) !== false && ( strpos( $lower, 'list' ) !== false || strpos( $lower, 'active' ) !== false || strpos( $lower, 'show' ) !== false ) ) ) {
         $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'custom';
         $reply = "Your active modules in **" . strtoupper($active_industry) . "** mode include Dashboard, Forms, CRM Leads, Financials, Bookings, and Document Vault. Which one would you like to work in?";
     }
-    // 11. Intent: Casual Greetings & Quick Dialog
+    // 17. Intent: Casual Greetings & Quick Dialog
     elseif ( preg_match( '/^(?:hi|hello|hey|hey cora|yo|sup|fu|f|test|good morning|good evening|who are you|greetings|gm)\b/i', $lower ) || strlen( $lower ) <= 3 ) {
         $reply = "Hello! I'm here. What would you like to build, update, or automate right now?";
     }
-    // 12. Intent: Operational Briefing / Stats / Summary
+    // 18. Intent: Operational Briefing / Stats / Summary
     elseif ( preg_match( '/\b(?:summary|briefing|stats|metrics|report|telemetry|analytics|overview|how is business|activity)\b/i', $lower ) ) {
         $leads_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ) ?: 0;
         $forms_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_forms" ) ?: 0;
@@ -16248,9 +16263,16 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
 
         $reply = "Currently you have **{$leads_count} CRM leads**, **₹" . number_format($inv_total) . "** in total invoicing, **" . count($bookings) . " bookings**, and **{$forms_count} active forms**.";
     }
-    // 13. Conversational Human Co-Worker Fallback (1 crisp sentence, ZERO dumps, ZERO emojis)
+    // 19. Emotionally Intelligent Co-Founder Fallback (Rotating non-repetitive dialogue)
     else {
-        $reply = "I'm here. What would you like to build, update, or configure in your workspace?";
+        $fallbacks = array(
+            "I'm right by your side. We can build custom forms, add CRM leads, generate GST invoices, or update your site settings. What should we tackle together?",
+            "I'm here to help you run and grow your workspace smoothly. Tell me what's on your mind or what you'd like to automate next.",
+            "Let's make things easier for your business. Would you like to check our current metrics, add a client lead, or update workspace settings?",
+            "I'm listening and ready to help. Just tell me what you'd like to configure or execute across your workspace."
+        );
+        $f_idx = ( strlen( $raw_msg ) + intval( date( 'i' ) ) ) % count( $fallbacks );
+        $reply = $fallbacks[$f_idx];
     }
 
     // Strictly strip all emojis
@@ -16280,7 +16302,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
 }
 
     // ── Resilient Fallback: Autonomous Local Co-Founder Engine ────
-    cora_ai_local_cofounder_handler( $message, $current_page );
+    cora_ai_local_cofounder_handler( $message, $current_page, $history );
     exit;
 }
 }

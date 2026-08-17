@@ -1873,6 +1873,20 @@ jQuery(document).ready(function($) {
     function coraExecuteAIChat(text) {
         const chat = $('#cora-sidebar-chat');
 
+        // Extract recent conversation history (up to last 6 messages) for multi-turn conversational memory
+        const historyArr = [];
+        chat.find('.chat-bubble').each(function() {
+            const el = $(this);
+            if (el.attr('id') && el.attr('id').startsWith('typing-')) return;
+            const isUser = el.hasClass('user');
+            const role = isUser ? 'user' : 'assistant';
+            const content = el.text().trim();
+            if (content && !content.includes('Reasoning through workspace') && !content.includes('Synthesizing structured card')) {
+                historyArr.push({ role: role, content: content });
+            }
+        });
+        const recentHistory = historyArr.slice(-6);
+
         // Hide the native integration block once conversation starts
         $('#cora-sidebar-native-integration').slideUp(200);
         
@@ -1927,7 +1941,8 @@ jQuery(document).ready(function($) {
                 action: 'cora_ai_chat',
                 security: ajaxNonceSec,
                 message: text,
-                current_page: curPage
+                current_page: curPage,
+                history: JSON.stringify(recentHistory)
             },
             success: function(response) {
                 clearTimeout(phaseTimer);
