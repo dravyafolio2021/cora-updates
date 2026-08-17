@@ -1418,6 +1418,68 @@ jQuery(document).ready(function($) {
         }
     });
 
+    // AI Model Settings Drawer Controls
+    window.coraOpenAISettingsDrawer = function(e) {
+        if (e) e.stopPropagation();
+        const backdrop = $('#cora-ai-settings-backdrop');
+        const drawer = $('#cora-ai-settings-drawer');
+        if (backdrop.length && drawer.length) {
+            backdrop.removeClass('hidden');
+            drawer.css('transform', 'translateX(0)');
+            
+            // Sync values from localStorage
+            const savedModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
+            const savedTemp = localStorage.getItem('cora_ai_temperature') || '0.7';
+            $(`input[name="cora_global_ai_model"][value="${savedModel}"]`).prop('checked', true);
+            $('#cora-ai-temp-slider').val(savedTemp);
+            $('#cora-ai-temp-display').text(savedTemp);
+        } else if (typeof window.coraToggleAISettingsDrawer === 'function') {
+            window.coraToggleAISettingsDrawer(true);
+        } else {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast("AI Model: Gemini 2.5 Flash (Active)", "info");
+            }
+        }
+    };
+
+    window.coraCloseAISettingsDrawer = function(e) {
+        if (e) e.stopPropagation();
+        const backdrop = $('#cora-ai-settings-backdrop');
+        const drawer = $('#cora-ai-settings-drawer');
+        if (drawer.length) {
+            drawer.css('transform', 'translateX(100%)');
+            setTimeout(function() {
+                backdrop.addClass('hidden');
+            }, 250);
+        }
+        if (typeof window.coraToggleAISettingsDrawer === 'function') {
+            window.coraToggleAISettingsDrawer(false);
+        }
+    };
+
+    window.coraSaveAISettings = function(e) {
+        if (e) e.stopPropagation();
+        const selectedModel = $('input[name="cora_global_ai_model"]:checked').val() || 'gemini';
+        const temp = $('#cora-ai-temp-slider').val() || '0.7';
+        
+        localStorage.setItem('cora_ai_active_model', selectedModel);
+        localStorage.setItem('cora_ai_temperature', temp);
+
+        const modelLabels = {
+            'gemini': 'Gemini Flash',
+            'gpt-4o': 'GPT-4o',
+            'claude-3-5-sonnet': 'Claude 3.5'
+        };
+
+        const label = modelLabels[selectedModel] || 'Gemini Flash';
+        $('#cora-sidebar-model-label').text(label);
+
+        window.coraCloseAISettingsDrawer();
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast(`AI model updated to ${label}`, 'success');
+        }
+    };
+
     window.coraStartNewConversation = function(e) {
         if (e) e.stopPropagation();
         $('#cora-sidebar-conversations-dropdown').addClass('hidden');

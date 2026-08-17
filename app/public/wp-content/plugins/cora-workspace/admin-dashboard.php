@@ -12012,7 +12012,102 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
     });
 })();
 </script>
+<!-- Global Right-Sliding AI Model Settings Drawer -->
+<div id="cora-ai-settings-backdrop" onclick="window.coraCloseAISettingsDrawer()" class="hidden fixed inset-0 z-[99998] cursor-pointer pointer-events-auto" style="position:fixed; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);"></div>
 
+<div id="cora-ai-settings-drawer" class="fixed top-0 right-0 z-[99999] h-full w-[360px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full select-none" style="position:fixed; top:0; right:0; height:100%; width:360px; max-width:90vw; background:#ffffff; border-left:1px solid #e4e4e7; z-index:99999; display:flex; flex-direction:column; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); box-shadow:-8px 0 30px rgba(0,0,0,0.12);">
+    <!-- Drawer Header -->
+    <div class="px-5 py-4 border-b border-zinc-150 flex items-center justify-between bg-zinc-50/70 shrink-0">
+        <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-zinc-950 text-white flex items-center justify-center">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>
+                </svg>
+            </div>
+            <span class="text-xs font-bold text-zinc-900 uppercase tracking-wider">AI Model Settings</span>
+        </div>
+        <button type="button" onclick="window.coraCloseAISettingsDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Drawer Body -->
+    <div class="flex-1 p-5 overflow-y-auto space-y-5" style="overflow-y:auto; padding:20px;">
+        <!-- Active Model Selection -->
+        <div class="space-y-2">
+            <label class="block text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Active Foundation Model</label>
+            <div class="space-y-2">
+                <label class="flex items-center justify-between p-3 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white cursor-pointer transition-all">
+                    <div class="flex items-center gap-2.5">
+                        <input type="radio" name="cora_global_ai_model" value="gemini" checked class="text-zinc-950 focus:ring-zinc-950">
+                        <div>
+                            <div class="text-xs font-bold text-zinc-900">Gemini 2.5 Flash</div>
+                            <div class="text-[10px] text-zinc-400">Ultra-fast sub-second reasoning & execution</div>
+                        </div>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-green-50 text-green-700 border border-green-200">Recommended</span>
+                </label>
+                <label class="flex items-center justify-between p-3 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white cursor-pointer transition-all">
+                    <div class="flex items-center gap-2.5">
+                        <input type="radio" name="cora_global_ai_model" value="gpt-4o" class="text-zinc-950 focus:ring-zinc-950">
+                        <div>
+                            <div class="text-xs font-bold text-zinc-900">GPT-4o (OpenAI)</div>
+                            <div class="text-[10px] text-zinc-400">Creative copywriting & legal document structuring</div>
+                        </div>
+                    </div>
+                </label>
+                <label class="flex items-center justify-between p-3 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white cursor-pointer transition-all">
+                    <div class="flex items-center gap-2.5">
+                        <input type="radio" name="cora_global_ai_model" value="claude-3-5-sonnet" class="text-zinc-950 focus:ring-zinc-950">
+                        <div>
+                            <div class="text-xs font-bold text-zinc-900">Claude 3.5 Sonnet</div>
+                            <div class="text-[10px] text-zinc-400">Deep document analysis & precision reasoning</div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Temperature Slider -->
+        <div class="space-y-2 pt-3 border-t border-zinc-150">
+            <div class="flex items-center justify-between">
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Creativity (<span id="cora-ai-temp-display">0.7</span>)</label>
+                <span class="text-[10px] text-zinc-400 font-mono">Balanced</span>
+            </div>
+            <input type="range" id="cora-ai-temp-slider" min="0.1" max="1.0" step="0.1" value="0.7" oninput="document.getElementById('cora-ai-temp-display').innerText = this.value" class="w-full accent-zinc-950 cursor-pointer">
+            <div class="flex justify-between text-[9px] text-zinc-400 font-mono">
+                <span>0.1 (Strict)</span>
+                <span>0.7 (Standard)</span>
+                <span>1.0 (Creative)</span>
+            </div>
+        </div>
+
+        <!-- Autonomous Execution Permissions -->
+        <div class="space-y-2 pt-3 border-t border-zinc-150">
+            <label class="block text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Autonomous Execution</label>
+            <div class="p-3 bg-zinc-50 rounded-xl border border-zinc-200 space-y-2">
+                <label class="flex items-center justify-between cursor-pointer">
+                    <span class="text-xs font-bold text-zinc-800">Auto-execute safe database actions</span>
+                    <input type="checkbox" id="cora-ai-autoexec-toggle" checked class="rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950">
+                </label>
+                <p class="text-[10px] text-zinc-400 leading-relaxed">When enabled, Cora executes actions directly across your workspace upon your command.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drawer Footer Actions -->
+    <div class="p-4 border-t border-zinc-150 bg-zinc-50/70 flex items-center gap-2 shrink-0">
+        <button type="button" onclick="window.coraSaveAISettings()" class="flex-1 py-2.5 bg-zinc-950 hover:bg-black text-white text-xs font-bold rounded-xl transition-all cursor-pointer border-0 shadow-xs text-center">
+            Save Preferences
+        </button>
+        <button type="button" onclick="window.coraCloseAISettingsDrawer()" class="px-4 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-xs font-bold rounded-xl transition-all cursor-pointer">
+            Cancel
+        </button>
+    </div>
+</div>
 
 <?php
 wp_print_media_templates();
