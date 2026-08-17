@@ -7900,6 +7900,24 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         var isAuto = window.coraIsSmartRouting();
         var curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
         
+        // Sync Quota Ratio & Progress Bar with Header Pill
+        var headerPillText = document.getElementById('cora-header-ai-usage-text');
+        var popRatio = document.getElementById('cora-popover-usage-ratio');
+        var popBar = document.getElementById('cora-popover-usage-bar');
+        if (headerPillText && popRatio) {
+            var rawText = headerPillText.innerText.trim();
+            if (rawText) {
+                popRatio.innerHTML = rawText + ' <span class="text-zinc-400 font-normal">reqs</span>';
+                var parts = rawText.split('/');
+                if (parts.length === 2) {
+                    var cnt = parseInt(parts[0], 10) || 0;
+                    var lim = parseInt(parts[1], 10) || 100;
+                    var pct = lim > 0 ? Math.min(100, Math.round((cnt / lim) * 100)) : 0;
+                    if (popBar) popBar.style.width = pct + '%';
+                }
+            }
+        }
+        
         // Sync model cards with explicit solid backgrounds
         document.querySelectorAll('.cora-model-card').forEach(function(card) {
             var modelKey = card.getAttribute('data-model');

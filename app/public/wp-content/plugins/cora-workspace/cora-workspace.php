@@ -14766,12 +14766,37 @@ function cora_ajax_audit_pagespeed_performance() {
 add_action( 'wp_ajax_cora_audit_pagespeed_performance', 'cora_ajax_audit_pagespeed_performance' );
 
 // ═══════════════════════════════════════════════════════════════
-// AI RATE LIMITING & SECURITY HELPERS
+// AI RATE LIMITING & SECURITY HELPERS (STRICT ENFORCEMENT)
 // ═══════════════════════════════════════════════════════════════
 
 if ( ! function_exists( 'cora_workspace_check_ai_rate_limit' ) ) {
 function cora_workspace_check_ai_rate_limit() {
-    return true; // Bypass and remove all local rate limits
+    $stats = cora_workspace_get_ai_usage_stats();
+    
+    // 1. Check 5-hour rolling burst limit (30 requests)
+    if ( isset( $stats['five_hour_count'] ) && isset( $stats['five_hour_limit'] ) && $stats['five_hour_count'] >= $stats['five_hour_limit'] ) {
+        return array(
+            'allowed' => false,
+            'reason'  => 'five_hour_limit',
+            'message' => '5-hour AI request limit reached (' . $stats['five_hour_count'] . '/' . $stats['five_hour_limit'] . ' requests). Quota resets gradually as older requests age out.',
+            'stats'   => $stats,
+        );
+    }
+
+    // 2. Check 24-hour daily quota limit (100 requests)
+    if ( isset( $stats['daily_count'] ) && isset( $stats['daily_limit'] ) && $stats['daily_count'] >= $stats['daily_limit'] ) {
+        return array(
+            'allowed' => false,
+            'reason'  => 'daily_limit',
+            'message' => 'Daily AI request limit reached (' . $stats['daily_count'] . '/' . $stats['daily_limit'] . ' requests). Quota resets automatically in 24 hours.',
+            'stats'   => $stats,
+        );
+    }
+
+    return array(
+        'allowed' => true,
+        'stats'   => $stats,
+    );
 }
 }
 
@@ -15443,11 +15468,15 @@ function cora_ajax_ai_chat() {
         wp_send_json_error( 'Not authenticated.' );
     }
 
-    if ( function_exists( 'cora_workspace_check_ai_rate_limit' ) && ! cora_workspace_check_ai_rate_limit() ) {
-        wp_send_json_error( array(
-            'code'    => 'rate_limit_exceeded',
-            'message' => 'Rate limit exceeded. Please wait before making more requests.',
-        ) );
+    if ( function_exists( 'cora_workspace_check_ai_rate_limit' ) ) {
+        $rate_check = cora_workspace_check_ai_rate_limit();
+        if ( is_array( $rate_check ) && empty( $rate_check['allowed'] ) ) {
+            wp_send_json_error( array(
+                'code'     => 'rate_limit_exceeded',
+                'message'  => $rate_check['message'] ?? 'AI request limit reached. Please wait before making more requests.',
+                'ai_usage' => $rate_check['stats'] ?? ( function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 100, 'daily_limit' => 100 ) ),
+            ) );
+        }
     }
 
     $message = sanitize_text_field( $_POST['message'] ?? '' );

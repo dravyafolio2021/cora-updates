@@ -2010,8 +2010,27 @@ jQuery(document).ready(function($) {
                         });
                     }
                 } else {
+                    if (response.data && response.data.ai_usage) {
+                        const u = response.data.ai_usage;
+                        const dailyPct = u.daily_limit > 0 ? Math.min(100, Math.round((u.daily_count / u.daily_limit) * 100)) : 0;
+                        $('#cora-header-ai-usage-text').text(`${u.daily_count}/${u.daily_limit}`);
+                        $('#cora-header-ai-usage-ring').attr('stroke-dasharray', `${dailyPct}, 100`);
+                        $('#cora-popover-usage-ratio').html(`${u.daily_count}/${u.daily_limit} <span class="text-zinc-400 font-normal">reqs</span>`);
+                        $('#cora-popover-usage-bar').css('width', `${dailyPct}%`);
+                    }
                     const err = (response.data && response.data.message) ? response.data.message : 'Something went wrong. Please try again.';
-                    chat.append(`<div class="chat-bubble ai error text-red-500">${err}</div>`);
+                    chat.append(`
+                        <div class="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-800 dark:text-zinc-200 font-medium space-y-1 self-start max-w-[95%] w-full">
+                            <div class="font-bold flex items-center gap-1.5 text-zinc-950 dark:text-white">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                AI Limit Notice
+                            </div>
+                            <div class="text-zinc-600 dark:text-zinc-400">${err}</div>
+                        </div>
+                    `);
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast(err, 'error');
+                    }
                 }
                 chat.scrollTop(chat[0].scrollHeight);
                 coraPersistActiveConversation();
