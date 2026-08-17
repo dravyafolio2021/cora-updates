@@ -15984,35 +15984,32 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
         foreach ( $active_modules as $m_slug => $m_title ) {
             $m_icon = $module_icons[ $m_slug ] ?? $default_icon;
             $modules_cards .= '
-            <a href="?sub_page=' . esc_attr( $m_slug ) . '" class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-950 dark:hover:border-zinc-600 transition-all group no-underline text-inherit shadow-2xs">
-                <div class="flex items-center gap-2 min-w-0">
-                    <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 shrink-0 group-hover:bg-zinc-950 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-950 transition-colors">
+            <a href="?sub_page=' . esc_attr( $m_slug ) . '" style="display: flex; align-items: center; justify-content: space-between; padding: 7px 9px; border-radius: 10px; background-color: #ffffff; border: 1px solid #e4e4e7; text-decoration: none; color: #18181b; transition: all 0.15s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.03); min-width: 0;" onmouseover="this.style.borderColor=\'#18181b\'; this.style.backgroundColor=\'#f4f4f5\';" onmouseout="this.style.borderColor=\'#e4e4e7\'; this.style.backgroundColor=\'#ffffff\';">
+                <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
+                    <div style="width: 22px; height: 22px; border-radius: 6px; background-color: #f4f4f5; display: flex; align-items: center; justify-content: center; color: #27272a; flex-shrink: 0;">
                         ' . $m_icon . '
                     </div>
-                    <div class="min-w-0">
-                        <div class="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 truncate">' . esc_html( $m_title ) . '</div>
-                        <div class="text-[9px] text-zinc-400 font-mono">?sub_page=' . esc_html( $m_slug ) . '</div>
-                    </div>
+                    <span style="font-size: 11px; font-weight: 700; color: #18181b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' . esc_html( $m_title ) . '</span>
                 </div>
-                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white shrink-0 font-bold">→</span>
+                <span style="font-size: 10px; font-family: monospace; color: #a1a1aa; flex-shrink: 0; margin-left: 4px;">→</span>
             </a>';
         }
 
         $reply = '
-        <div class="space-y-3 w-full">
-            <div class="flex items-center justify-between pb-1.5 border-b border-zinc-200/60 dark:border-zinc-800">
-                <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Accessible Workspace Modules</span>
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 6px; border-bottom: 1px solid #f4f4f5;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="width: 6px; height: 6px; border-radius: 9999px; background-color: #10b981; display: inline-block;"></span>
+                    <span style="font-size: 11.5px; font-weight: 700; color: #18181b;">Accessible Workspace Modules</span>
                 </div>
-                <span class="text-[9.5px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-0.5 rounded-full">' . count($active_modules) . ' Active</span>
+                <span style="font-size: 9.5px; font-family: monospace; font-weight: 700; background-color: #f4f4f5; color: #52525b; padding: 2px 7px; border-radius: 9999px;">' . count($active_modules) . ' Active</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 pt-0.5">
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; width: 100%; box-sizing: border-box;">
                 ' . $modules_cards . '
             </div>
-            <div class="text-[10px] text-zinc-400 dark:text-zinc-500 pt-1.5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                <span>Industry: <strong class="text-zinc-700 dark:text-zinc-300 font-mono uppercase">' . esc_html( $active_industry ) . '</strong></span>
-                <span class="font-mono text-zinc-400">100% Isolated</span>
+            <div style="font-size: 10px; color: #a1a1aa; padding-top: 6px; border-top: 1px solid #f4f4f5; display: flex; align-items: center; justify-content: space-between;">
+                <span>Industry: <strong style="color: #27272a; font-family: monospace; text-transform: uppercase;">' . esc_html( $active_industry ) . '</strong></span>
+                <span style="font-family: monospace;">100% Isolated</span>
             </div>
         </div>';
     }
