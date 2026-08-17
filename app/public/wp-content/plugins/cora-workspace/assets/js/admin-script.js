@@ -43,6 +43,9 @@ if (typeof window.ajaxurl === 'undefined') {
 }
 
 jQuery(document).ready(function($) {
+    if (typeof window.coraRenderPageContextPresets === 'function') {
+        window.coraRenderPageContextPresets();
+    }
     // Global wp.media Select Button & Toolbar Fix
     if (typeof wp !== 'undefined' && wp.media) {
         const originalMedia = wp.media;
@@ -1055,20 +1058,499 @@ jQuery(document).ready(function($) {
         }, 1000);
     };
 
-    // 8. Collapsible Notion-AI Sidebar Controls
+    // 8. Collapsible Notion-AI Sidebar & Co-Worker Controls
+    window.CORA_PAGE_PRESETS = {
+        dashboard: {
+            name: 'Dashboard',
+            sublabel: 'Executive Overview',
+            actions: [
+                {
+                    id: 'briefing',
+                    label: 'Executive Activity Briefing',
+                    prompt: 'Summarize today\'s workspace activity, active leads, scheduled shoots, and unpaid receivables.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+                },
+                {
+                    id: 'lead',
+                    label: 'Add New CRM Lead',
+                    prompt: 'I want to add a new CRM lead.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                },
+                {
+                    id: 'invoice',
+                    label: 'Generate GST Invoice',
+                    prompt: 'I want to generate a new GST invoice.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="10" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line></svg>'
+                },
+                {
+                    id: 'booking',
+                    label: 'Schedule Studio Shoot',
+                    prompt: 'I want to schedule a new studio shoot booking.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+                },
+                {
+                    id: 'form',
+                    label: 'Build Client Inquiry Form',
+                    prompt: 'Create a client inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>'
+                }
+            ]
+        },
+        blogs: {
+            name: 'Content Suite',
+            sublabel: 'SEO & Content Library',
+            actions: [
+                {
+                    id: 'write_article',
+                    label: 'Draft High-Intent SEO Article',
+                    prompt: 'Draft a comprehensive SEO blog post outline focusing on high-ranking keywords for my agency.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
+                },
+                {
+                    id: 'prune_seo',
+                    label: 'Prune Low-Performing Drafts (Keep Top 3)',
+                    prompt: 'Delete all underperforming articles and keep only the top 3 articles with the best SEO health.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>'
+                },
+                {
+                    id: 'scan_gaps',
+                    label: 'Scan Search Keyword Opportunities',
+                    prompt: 'Scan our content library and industry search gaps to generate high-intent keyword opportunities.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>'
+                },
+                {
+                    id: 'publish_drafts',
+                    label: 'Publish All Approved Drafts',
+                    prompt: 'Publish all ready drafts in our content library to the live website.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                }
+            ]
+        },
+        financials: {
+            name: 'Financials',
+            sublabel: 'Ledger & Invoicing',
+            actions: [
+                {
+                    id: 'create_gst_inv',
+                    label: 'Create 18% GST Invoice',
+                    prompt: 'I want to generate a new GST invoice for a client.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="10" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line></svg>'
+                },
+                {
+                    id: 'record_payment',
+                    label: 'Record Client Payment Received',
+                    prompt: 'I received a client payment and want to record it in the ledger.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                },
+                {
+                    id: 'unpaid_invoices',
+                    label: 'Audit Overdue Receivables',
+                    prompt: 'Show me all unpaid invoices and total outstanding receivables.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
+                },
+                {
+                    id: 'tax_breakdown',
+                    label: 'Calculate Monthly CGST/SGST Split',
+                    prompt: 'Calculate our monthly GST liability with 9% CGST and 9% SGST breakdown.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>'
+                }
+            ]
+        },
+        leads: {
+            name: 'CRM Leads',
+            sublabel: 'Sales Pipeline',
+            actions: [
+                {
+                    id: 'add_lead',
+                    label: 'Add Qualified Prospect Lead',
+                    prompt: 'I want to add a new CRM lead.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>'
+                },
+                {
+                    id: 'clean_leads',
+                    label: 'Clean Up Test / Junk Leads',
+                    prompt: 'Clean up test leads from my CRM pipeline and show updated metrics.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>'
+                },
+                {
+                    id: 'pipeline_summary',
+                    label: 'Pipeline Value & Hot Prospects',
+                    prompt: 'Summarize our current pipeline deal value and list the top high-priority prospects.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+                },
+                {
+                    id: 'followup_email',
+                    label: 'Draft Follow-Up Proposal Email',
+                    prompt: 'Draft a professional follow-up proposal email for a qualified lead.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>'
+                }
+            ]
+        },
+        forms: {
+            name: 'Form Builder',
+            sublabel: 'Lead Capture & Intake',
+            actions: [
+                {
+                    id: 'inquiry_form',
+                    label: 'Build Client Inquiry Form',
+                    prompt: 'Create a client inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>'
+                },
+                {
+                    id: 'booking_intake',
+                    label: 'Build Shoot Booking Intake Form',
+                    prompt: 'Build a shoot booking form with Venue Location, Shoot Type, Call Time, and Special Requirements.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
+                },
+                {
+                    id: 'list_submissions',
+                    label: 'Review Form Submissions',
+                    prompt: 'Summarize recent client form submissions received across all live forms.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
+                }
+            ]
+        },
+        bookings: {
+            name: 'Studio Bookings',
+            sublabel: 'Calendar & Crew Schedules',
+            actions: [
+                {
+                    id: 'schedule_shoot',
+                    label: 'Schedule Shoot Session',
+                    prompt: 'I want to schedule a new studio shoot booking.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+                },
+                {
+                    id: 'upcoming_shoots',
+                    label: 'Review Upcoming Shoots',
+                    prompt: 'Show me all upcoming shoot bookings scheduled for this week.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'
+                },
+                {
+                    id: 'crew_assignment',
+                    label: 'Assign Photographer / Crew',
+                    prompt: 'Help me assign a lead photographer and equipment kit to an upcoming booking.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                }
+            ]
+        },
+        vault: {
+            name: 'Document Vault',
+            sublabel: 'Contracts & E-Sign',
+            actions: [
+                {
+                    id: 'draft_msa',
+                    label: 'Draft Master Service Agreement',
+                    prompt: 'I want to draft a Master Service Agreement in Document Vault.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
+                },
+                {
+                    id: 'draft_nda',
+                    label: 'Draft Non-Disclosure Agreement',
+                    prompt: 'I want to draft a standard mutual NDA in Document Vault.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>'
+                },
+                {
+                    id: 'check_signatures',
+                    label: 'Check E-Sign Status',
+                    prompt: 'Check pending e-signature status on recently sent agreements.',
+                    icon: '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
+                }
+            ]
+        }
+    };
+
+    // Helper to get active page context dynamically
+    window.coraGetActivePageContext = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let view = window.coraCurrentView || urlParams.get('sub_page') || urlParams.get('view') || urlParams.get('tab') || 'dashboard';
+        view = view.toLowerCase().replace(/[-_]/g, '');
+        if (view.includes('blog') || view.includes('content') || view.includes('article') || view.includes('seo')) return 'blogs';
+        if (view.includes('finan') || view.includes('invoice') || view.includes('ledger') || view.includes('tax')) return 'financials';
+        if (view.includes('lead') || view.includes('crm') || view.includes('pipeline') || view.includes('prospect')) return 'leads';
+        if (view.includes('form')) return 'forms';
+        if (view.includes('book') || view.includes('shoot') || view.includes('calendar')) return 'bookings';
+        if (view.includes('vault') || view.includes('doc') || view.includes('contract')) return 'vault';
+        return 'dashboard';
+    };
+
+    // Dynamically render page-aware contextual presets & update pill
+    window.coraRenderPageContextPresets = function() {
+        const ctxKey = window.coraGetActivePageContext();
+        const ctxData = window.CORA_PAGE_PRESETS[ctxKey] || window.CORA_PAGE_PRESETS['dashboard'];
+        
+        // Update top model pill page label
+        const pageLabelEl = $('#cora-sidebar-page-context-label');
+        if (pageLabelEl.length) {
+            pageLabelEl.text(ctxData.name);
+        }
+
+        const presetsContainer = $('#cora-sidebar-action-presets');
+        if (!presetsContainer.length) return;
+
+        let html = '';
+        (ctxData.actions || []).forEach(function(act) {
+            const escapedPrompt = act.prompt.replace(/'/g, "\\'");
+            html += `
+                <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('${escapedPrompt}')">
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 shrink-0">
+                            ${act.icon}
+                        </span>
+                        <span class="truncate text-left">${act.label}</span>
+                    </div>
+                    <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0 ml-1">⚡ Run</span>
+                </button>
+            `;
+        });
+
+        presetsContainer.html(html);
+    };
+
+    // 90% Screen Fullscreen / Expand Toggle
+    window.coraToggleSidebarFullscreen = function(e) {
+        if (e) e.stopPropagation();
+        const sidebar = $('#cora-ai-sidebar');
+        const icon = $('#cora-ai-expand-icon');
+        
+        sidebar.toggleClass('cora-ai-fullscreen');
+        const isFullscreen = sidebar.hasClass('cora-ai-fullscreen');
+
+        if (isFullscreen) {
+            icon.html(`
+                <polyline points="4 14 10 14 10 20"></polyline>
+                <polyline points="20 10 14 10 14 4"></polyline>
+                <line x1="14" y1="10" x2="21" y2="3"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+            `);
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast("Expanded to full-height view", "info");
+            }
+        } else {
+            icon.html(`
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+            `);
+        }
+    };
+
+    // Multi-Conversation Storage & Management System
+    const CORA_CONVS_STORAGE_KEY = 'cora_ai_chats_v1';
+    let currentConversationId = localStorage.getItem('cora_active_chat_id') || 'chat_' + Date.now();
+
+    window.coraGetConversations = function() {
+        try {
+            const raw = localStorage.getItem(CORA_CONVS_STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch(e) {
+            return [];
+        }
+    };
+
+    window.coraSaveConversations = function(chats) {
+        try {
+            localStorage.setItem(CORA_CONVS_STORAGE_KEY, JSON.stringify(chats));
+        } catch(e) {}
+    };
+
+    window.coraRenderConversationsDropdown = function() {
+        const listEl = $('#cora-sidebar-conversations-list');
+        if (!listEl.length) return;
+
+        let chats = window.coraGetConversations();
+        // Sort pinned chats to top, then descending by timestamp
+        chats.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.updatedAt || 0) - (a.updatedAt || 0));
+
+        if (chats.length === 0) {
+            listEl.html('<div class="text-[11px] text-zinc-400 text-center py-4">No previous conversations yet.</div>');
+            return;
+        }
+
+        let html = '';
+        chats.forEach(function(chat) {
+            const isActive = (chat.id === currentConversationId);
+            const isPinned = !!chat.pinned;
+            const activeBg = isActive ? 'bg-zinc-100 text-zinc-950 font-bold' : 'hover:bg-zinc-50 text-zinc-700 font-medium';
+
+            html += `
+                <div class="group flex items-center justify-between p-2 rounded-xl text-xs ${activeBg} cursor-pointer transition-all border border-transparent hover:border-zinc-200" onclick="window.coraSwitchConversation('${chat.id}')">
+                    <div class="flex items-center gap-1.5 min-w-0 flex-1">
+                        <span class="text-zinc-400 ${isPinned ? 'text-amber-500 font-bold' : ''}">
+                            ${isPinned ? '★' : '•'}
+                        </span>
+                        <span class="truncate flex-1 text-[11px]" id="conv-title-${chat.id}">${chat.title || 'Conversation'}</span>
+                    </div>
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-1.5 shrink-0" onclick="event.stopPropagation()">
+                        <button type="button" onclick="window.coraTogglePinConversation('${chat.id}', event)" class="p-1 text-zinc-400 hover:text-amber-500 rounded border-0 bg-transparent cursor-pointer" title="${isPinned ? 'Unpin' : 'Pin to top'}">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="${isPinned ? 'currentColor' : 'none'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        </button>
+                        <button type="button" onclick="window.coraRenameConversationPrompt('${chat.id}', event)" class="p-1 text-zinc-400 hover:text-zinc-900 rounded border-0 bg-transparent cursor-pointer" title="Rename">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        </button>
+                        <button type="button" onclick="window.coraDeleteConversation('${chat.id}', event)" class="p-1 text-zinc-400 hover:text-red-600 rounded border-0 bg-transparent cursor-pointer" title="Delete">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        listEl.html(html);
+    };
+
+    window.coraToggleConversationsDropdown = function(e) {
+        if (e) e.stopPropagation();
+        const dd = $('#cora-sidebar-conversations-dropdown');
+        const isHidden = dd.hasClass('hidden');
+        if (isHidden) {
+            window.coraRenderConversationsDropdown();
+            dd.removeClass('hidden');
+        } else {
+            dd.addClass('hidden');
+        }
+    };
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#cora-sidebar-conversation-toggle, #cora-sidebar-conversations-dropdown').length) {
+            $('#cora-sidebar-conversations-dropdown').addClass('hidden');
+        }
+    });
+
+    window.coraStartNewConversation = function(e) {
+        if (e) e.stopPropagation();
+        $('#cora-sidebar-conversations-dropdown').addClass('hidden');
+        currentConversationId = 'chat_' + Date.now();
+        localStorage.setItem('cora_active_chat_id', currentConversationId);
+        
+        $('#cora-sidebar-active-chat-title').text('New Conversation');
+        $('#cora-sidebar-chat').html(`
+            <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">
+                Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?
+            </div>
+        `);
+        $('#cora-sidebar-native-integration').show();
+        window.coraRenderPageContextPresets();
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast("New conversation started", "info");
+        }
+    };
+
+    window.coraSwitchConversation = function(chatId) {
+        const chats = window.coraGetConversations();
+        const target = chats.find(c => c.id === chatId);
+        if (!target) return;
+
+        currentConversationId = chatId;
+        localStorage.setItem('cora_active_chat_id', currentConversationId);
+        $('#cora-sidebar-active-chat-title').text(target.title || 'Conversation');
+        $('#cora-sidebar-conversations-dropdown').addClass('hidden');
+
+        if (target.html) {
+            $('#cora-sidebar-chat').html(target.html);
+            $('#cora-sidebar-native-integration').hide();
+        } else {
+            window.coraStartNewConversation();
+        }
+    };
+
+    window.coraRenameConversationPrompt = function(chatId, e) {
+        if (e) e.stopPropagation();
+        const chats = window.coraGetConversations();
+        const target = chats.find(c => c.id === chatId);
+        if (!target) return;
+
+        const currentTitle = target.title || 'Conversation';
+        const titleEl = $(`#conv-title-${chatId}`);
+        titleEl.html(`
+            <input type="text" value="${currentTitle.replace(/"/g, '&quot;')}" class="w-full bg-white text-zinc-900 text-[11px] px-1 py-0.5 border border-zinc-300 rounded outline-none" onkeydown="if(event.key==='Enter'){window.coraSaveRenamedTitle('${chatId}', this.value); event.stopPropagation();} if(event.key==='Escape'){window.coraRenderConversationsDropdown(); event.stopPropagation();}" onblur="window.coraSaveRenamedTitle('${chatId}', this.value)" autofocus>
+        `);
+        titleEl.find('input').focus();
+    };
+
+    window.coraSaveRenamedTitle = function(chatId, newTitle) {
+        newTitle = (newTitle || '').trim() || 'Conversation';
+        let chats = window.coraGetConversations();
+        const idx = chats.findIndex(c => c.id === chatId);
+        if (idx !== -1) {
+            chats[idx].title = newTitle;
+            window.coraSaveConversations(chats);
+            if (currentConversationId === chatId) {
+                $('#cora-sidebar-active-chat-title').text(newTitle);
+            }
+            window.coraRenderConversationsDropdown();
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast("Conversation renamed", "info");
+            }
+        }
+    };
+
+    window.coraTogglePinConversation = function(chatId, e) {
+        if (e) e.stopPropagation();
+        let chats = window.coraGetConversations();
+        const idx = chats.findIndex(c => c.id === chatId);
+        if (idx !== -1) {
+            chats[idx].pinned = !chats[idx].pinned;
+            window.coraSaveConversations(chats);
+            window.coraRenderConversationsDropdown();
+        }
+    };
+
+    window.coraDeleteConversation = function(chatId, e) {
+        if (e) e.stopPropagation();
+        let chats = window.coraGetConversations();
+        chats = chats.filter(c => c.id !== chatId);
+        window.coraSaveConversations(chats);
+
+        if (currentConversationId === chatId) {
+            window.coraStartNewConversation();
+        } else {
+            window.coraRenderConversationsDropdown();
+        }
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast("Conversation deleted", "info");
+        }
+    };
+
+    // Auto-save messages to active conversation
+    function coraPersistActiveConversation(firstUserMsg) {
+        let chats = window.coraGetConversations();
+        let idx = chats.findIndex(c => c.id === currentConversationId);
+        const chatHtml = $('#cora-sidebar-chat').html();
+
+        if (idx === -1) {
+            let autoTitle = firstUserMsg ? firstUserMsg.slice(0, 30) + (firstUserMsg.length > 30 ? '...' : '') : 'New Conversation';
+            chats.push({
+                id: currentConversationId,
+                title: autoTitle,
+                pinned: false,
+                updatedAt: Date.now(),
+                page_context: window.coraGetActivePageContext(),
+                html: chatHtml
+            });
+            $('#cora-sidebar-active-chat-title').text(autoTitle);
+        } else {
+            chats[idx].updatedAt = Date.now();
+            chats[idx].html = chatHtml;
+        }
+        window.coraSaveConversations(chats);
+    }
+
+    // Toggle Notion-AI Sidebar
     window.coraToggleSidebar = function(show) {
         const sidebar = $('#cora-ai-sidebar');
         const quickBtn = $('#cora-quick-ai-btn');
         const backdrop = $('#cora-ai-sidebar-backdrop');
         const island = $('#cora-mobile-floating-island');
         
-        // Break infinite loops/recursion from focus events by checking state first
         const isCurrentlyShown = !sidebar.hasClass('collapsed');
         if (show === isCurrentlyShown) {
             return;
         }
 
         if (show) {
+            window.coraRenderPageContextPresets();
             sidebar.removeClass('collapsed');
             quickBtn.addClass('bg-zinc-100 border-zinc-300');
             backdrop.removeClass('hidden');
@@ -1083,10 +1565,11 @@ jQuery(document).ready(function($) {
             quickBtn.removeClass('bg-zinc-100 border-zinc-300');
             backdrop.addClass('hidden');
             island.removeClass('cora-island-docked');
+            $('#cora-sidebar-conversations-dropdown').addClass('hidden');
         }
     };
 
-    // Toggle button opens the sidebar (Shopify inline style)
+    // Toggle button opens the sidebar
     $('#cora-quick-ai-btn').on('click', function(e) {
         e.preventDefault();
         const sidebar = $('#cora-ai-sidebar');
@@ -1102,22 +1585,10 @@ jQuery(document).ready(function($) {
 
     // Reset/Clear chat history to start a new conversation
     window.coraClearSidebarChat = function() {
-        if (typeof window.coraShowToast === 'function') {
-            window.coraShowToast("Starting a new conversation...", "info");
-        }
-        $('#cora-sidebar-chat').html(`
-            <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">
-                Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?
-            </div>
-        `);
-        // Show native integration block again & re-init context
-        $('#cora-sidebar-native-integration').show();
-        if (typeof window.coraInitSidebarContext === 'function') {
-            window.coraInitSidebarContext();
-        }
+        window.coraStartNewConversation();
     };
 
-    // Search bar opens the command palette modal (excluding sidebar search input container)
+    // Search bar opens the command palette modal
     $('.cora-sidebar-search').not('.cora-sidebar .cora-sidebar-search').on('click', function(e) {
         if ($(e.target).is('input')) {
             return;
@@ -1133,7 +1604,7 @@ jQuery(document).ready(function($) {
         $('#cora-sidebar-search-input').focus();
     });
 
-    // Send chat messages — reads from the native island input (sidebar has no own input)
+    // Send chat messages — reads from the native island input
     window.coraSendSidebarChatMessage = function() {
         const input = $('#cora-island-ai-input');
         const text = input.val().trim();
@@ -1158,6 +1629,7 @@ jQuery(document).ready(function($) {
         // Append User bubble
         chat.append(`<div class="chat-bubble user">${text}</div>`);
         chat.scrollTop(chat[0].scrollHeight);
+        coraPersistActiveConversation(text);
 
         // Appending typing loader
         const typingId = 'typing-' + Date.now();
@@ -1349,6 +1821,7 @@ jQuery(document).ready(function($) {
                     chat.append(`<div class="chat-bubble ai error text-red-500">${err}</div>`);
                 }
                 chat.scrollTop(chat[0].scrollHeight);
+                coraPersistActiveConversation();
             },
             error: function() {
                 $(`#${typingId}`).remove();

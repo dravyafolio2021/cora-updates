@@ -15673,7 +15673,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
         $name = 'Prospective Client';
         if ( preg_match( '/(?:lead|client|for|named)\s+([a-zA-Z\s]+?)(?:,|\bphone\b|\bwith\b|\bfor\b|\bdeal\b|$)/i', $raw_msg, $nm ) ) {
             $matched_name = trim( $nm[1] );
-            if ( strlen( $matched_name ) > 2 && ! in_array( strtolower( $matched_name ), array('a', 'an', 'the', 'new', 'lead', 'client') ) ) {
+            if ( strlen( $matched_name ) > 2 && ! in_array( strtolower( $matched_name ), array('a', 'an', 'the', 'new', 'lead', 'client', 'prospect') ) ) {
                 $name = ucwords( $matched_name );
             }
         }
@@ -15686,78 +15686,129 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             $deal_value = floatval( str_replace( ',', '', $vm[1] ) );
         }
 
-        $exec_res = cora_execute_ai_action( 'create_lead', array(
-            'name'       => $name,
-            'phone'      => $phone,
-            'deal_value' => $deal_value,
-            'notes'      => $raw_msg,
-            'status'     => 'new',
-        ), $agency_id, $user_id );
+        // Interactive Clarification: If user didn't specify prospect details, ask like a true co-worker
+        if ( ( $name === 'Prospective Client' || empty( $name ) ) && empty( $phone ) && $deal_value <= 0 ) {
+            $reply = "I'm ready to register a new prospect in your CRM Pipeline.\n\n" .
+                     "Please share the details:\n" .
+                     "• **Prospect Name** (e.g. *Rahul Sharma*)\n" .
+                     "• **Phone or Email** (e.g. *+91 98765 43210*)\n" .
+                     "• **Estimated Deal Value** (e.g. *₹1,50,000*)\n\n" .
+                     "You can reply with: *\"Add Rahul Sharma, phone +91 98765 43210, deal ₹1,50,000\"*";
+        } else {
+            $exec_res = cora_execute_ai_action( 'create_lead', array(
+                'name'       => $name,
+                'phone'      => $phone,
+                'deal_value' => $deal_value,
+                'notes'      => $raw_msg,
+                'status'     => 'new',
+            ), $agency_id, $user_id );
 
-        if ( ! empty( $exec_res['success'] ) ) {
-            $action_results[] = $exec_res;
-            $val_str = $deal_value > 0 ? " with a deal value of ₹" . number_format( $deal_value ) : "";
-            $reply = "I have added **{$name}** to your CRM Pipeline{$val_str}. The lead record is active:";
+            if ( ! empty( $exec_res['success'] ) ) {
+                $action_results[] = $exec_res;
+                $val_str = $deal_value > 0 ? " with a deal value of ₹" . number_format( $deal_value ) : "";
+                $reply = "I have added **{$name}** to your CRM Pipeline{$val_str}. The lead record is active:";
+            }
         }
     }
     // 3. Intent: Invoice Creation
     elseif ( preg_match( '/\b(?:invoice|bill|gst bill|tax invoice|payment request)\b/i', $lower ) && preg_match( '/\b(?:create|generate|make|send|draft|bill)\b/i', $lower ) ) {
-        $client_name = 'Client';
+        $client_name = '';
         if ( preg_match( '/(?:for|to)\s+([a-zA-Z0-9\s]+?)(?:of|with|\bfor\b|amount|₹|rs|$)/i', $raw_msg, $cm ) ) {
-            $client_name = ucwords( trim( $cm[1] ) );
+            $matched_client = trim( $cm[1] );
+            if ( strlen( $matched_client ) > 2 && ! in_array( strtolower( $matched_client ), array('a', 'an', 'the', 'new', 'client', 'customer') ) ) {
+                $client_name = ucwords( $matched_client );
+            }
         }
-        $amount = 50000;
+        $amount = 0;
         if ( preg_match( '/(?:₹|inr|rs\.?|amount|of)\s*([0-9,]+)/i', $raw_msg, $am ) ) {
             $amount = floatval( str_replace( ',', '', $am[1] ) );
         }
 
-        $exec_res = cora_execute_ai_action( 'create_invoice', array(
-            'client_name' => $client_name,
-            'amount'      => $amount,
-            'tax_rate'    => 18,
-        ), $agency_id, $user_id );
+        // Interactive Clarification: If user didn't specify client or amount, prompt for parameters
+        if ( empty( $client_name ) && $amount <= 0 ) {
+            $reply = "I'm ready to generate an official 18% GST Invoice.\n\n" .
+                     "Please provide:\n" .
+                     "• **Client / Business Name** (e.g. *Acme Studios*)\n" .
+                     "• **Subtotal Amount** (e.g. *₹45,000*)\n" .
+                     "• **Due Date** (default is *7 days*)\n\n" .
+                     "You can reply with: *\"Invoice Acme Studios for ₹45,000 with 18% GST\"*";
+        } else {
+            if ( empty( $client_name ) ) $client_name = 'Client';
+            if ( $amount <= 0 ) $amount = 50000;
 
-        if ( ! empty( $exec_res['success'] ) ) {
-            $action_results[] = $exec_res;
-            $reply = "Generated official GST invoice for **{$client_name}** totaling ₹" . number_format( $exec_res['data']['total_amount'] ) . " (Subtotal: ₹" . number_format($amount) . " + 18% GST).";
+            $exec_res = cora_execute_ai_action( 'create_invoice', array(
+                'client_name' => $client_name,
+                'amount'      => $amount,
+                'tax_rate'    => 18,
+            ), $agency_id, $user_id );
+
+            if ( ! empty( $exec_res['success'] ) ) {
+                $action_results[] = $exec_res;
+                $reply = "Generated official GST invoice for **{$client_name}** totaling ₹" . number_format( $exec_res['data']['total_amount'] ) . " (Subtotal: ₹" . number_format($amount) . " + 18% GST).";
+            }
         }
     }
     // 4. Intent: Booking / Photoshoot Scheduling
     elseif ( preg_match( '/\b(?:booking|shoot|schedule|appointment|showing|tour)\b/i', $lower ) && preg_match( '/\b(?:create|book|schedule|set up|new|add)\b/i', $lower ) ) {
-        $title = 'Studio Photoshoot';
+        $title = '';
         if ( preg_match( '/(?:booking|shoot|appointment|tour)\s+(?:for\s+)?([a-zA-Z0-9\s]+?)(?:for|on|at|$)/i', $raw_msg, $bm ) ) {
-            $title = ucwords( trim( $bm[1] ) );
+            $matched_title = trim( $bm[1] );
+            if ( strlen( $matched_title ) > 2 && ! in_array( strtolower( $matched_title ), array('a', 'an', 'the', 'new', 'shoot', 'booking') ) ) {
+                $title = ucwords( $matched_title );
+            }
         }
 
-        $exec_res = cora_execute_ai_action( 'create_booking', array(
-            'title'    => $title,
-            'date'     => date('Y-m-d', strtotime('+1 day')),
-            'time'     => '10:00 AM',
-            'location' => 'Main Studio A',
-            'crew'     => 'Lead Photographer',
-        ), $agency_id, $user_id );
+        // Interactive Clarification: If user didn't specify shoot context or date, prompt
+        if ( empty( $title ) && ! preg_match( '/\b(?:tomorrow|today|monday|tuesday|wednesday|thursday|friday|saturday|sunday|[0-9]{1,2}:[0-9]{2})\b/i', $raw_msg ) ) {
+            $reply = "I'm ready to schedule a new shoot booking on your Calendar.\n\n" .
+                     "Please share:\n" .
+                     "• **Shoot Title / Client** (e.g. *Ananya Wedding Pre-Shoot*)\n" .
+                     "• **Date & Call Time** (e.g. *Tomorrow at 10:00 AM*)\n" .
+                     "• **Venue / Studio** (e.g. *Main Studio A*)\n\n" .
+                     "You can reply with: *\"Schedule shoot for Ananya Wedding tomorrow at 10 AM at Studio A\"*";
+        } else {
+            if ( empty( $title ) ) $title = 'Studio Photoshoot';
+            $exec_res = cora_execute_ai_action( 'create_booking', array(
+                'title'    => $title,
+                'date'     => date('Y-m-d', strtotime('+1 day')),
+                'time'     => '10:00 AM',
+                'location' => 'Main Studio A',
+                'crew'     => 'Lead Photographer',
+            ), $agency_id, $user_id );
 
-        if ( ! empty( $exec_res['success'] ) ) {
-            $action_results[] = $exec_res;
-            $reply = "Scheduled booking **{$title}** on " . date('M j, Y', strtotime('+1 day')) . " at 10:00 AM at Main Studio A:";
+            if ( ! empty( $exec_res['success'] ) ) {
+                $action_results[] = $exec_res;
+                $reply = "Scheduled booking **{$title}** on " . date('M j, Y', strtotime('+1 day')) . " at 10:00 AM at Main Studio A:";
+            }
         }
     }
     // 5. Intent: Contract / Document Drafting
     elseif ( preg_match( '/\b(?:contract|agreement|nda|lease|msa|document|vault)\b/i', $lower ) && preg_match( '/\b(?:draft|create|make|generate|prepare)\b/i', $lower ) ) {
         $title = 'Master Service Agreement';
-        $client_name = 'Client';
+        $client_name = '';
         if ( preg_match( '/(?:for|to)\s+([a-zA-Z\s]+?)(?:\.|$)/i', $raw_msg, $dm ) ) {
-            $client_name = ucwords( trim( $dm[1] ) );
+            $matched_client = trim( $dm[1] );
+            if ( strlen( $matched_client ) > 2 && ! in_array( strtolower( $matched_client ), array('a', 'an', 'the', 'new', 'client', 'customer') ) ) {
+                $client_name = ucwords( $matched_client );
+            }
         }
 
-        $exec_res = cora_execute_ai_action( 'create_document', array(
-            'title'       => $title,
-            'client_name' => $client_name,
-        ), $agency_id, $user_id );
+        if ( empty( $client_name ) ) {
+            $reply = "I'm ready to draft a legal contract in the Document Vault.\n\n" .
+                     "Please specify:\n" .
+                     "• **Client / Party Name** (e.g. *Rajesh Kumar*)\n" .
+                     "• **Agreement Type** (e.g. *Master Service Agreement*, *NDA*, *Media License*)\n\n" .
+                     "You can reply with: *\"Draft Master Service Agreement for Rajesh Kumar\"*";
+        } else {
+            $exec_res = cora_execute_ai_action( 'create_document', array(
+                'title'       => $title,
+                'client_name' => $client_name,
+            ), $agency_id, $user_id );
 
-        if ( ! empty( $exec_res['success'] ) ) {
-            $action_results[] = $exec_res;
-            $reply = "Drafted **{$title}** for **{$client_name}** in the Document Vault with e-signature tokens generated.";
+            if ( ! empty( $exec_res['success'] ) ) {
+                $action_results[] = $exec_res;
+                $reply = "Drafted **{$title}** for **{$client_name}** in the Document Vault with e-signature tokens generated.";
+            }
         }
     }
     // 6. Intent: Article Library Pruning & Deletion

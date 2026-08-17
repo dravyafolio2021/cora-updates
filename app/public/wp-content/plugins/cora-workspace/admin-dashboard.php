@@ -2372,6 +2372,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 margin: 0 !important;
                 margin-bottom: 0 !important;
             }
+            #cora-ai-sidebar.cora-ai-fullscreen {
+                height: 90vh !important;
+                max-height: 90vh !important;
+                top: 10vh !important;
+            }
             #cora-ai-sidebar .cora-ai-sidebar-header {
                 border-top-left-radius: 20px !important;
                 border-top-right-radius: 20px !important;
@@ -2379,6 +2384,18 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             #cora-ai-sidebar .cora-ai-sidebar-body {
                 padding-bottom: 76px !important;
             }
+            }
+
+            @media (min-width: 1024px) {
+                #cora-ai-sidebar.cora-ai-fullscreen {
+                    top: 52px !important;
+                    height: calc(100vh - 52px) !important;
+                    width: 90vw !important;
+                    max-width: 90vw !important;
+                    margin: 0 auto !important;
+                    left: 5vw !important;
+                    right: 5vw !important;
+                }
             }
             
             #cora-ai-sidebar.collapsed {
@@ -7814,25 +7831,54 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
     <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 lg:top-[52px] right-0 left-0 z-[999] h-full lg:h-[calc(100vh-52px)] w-full max-w-full bg-white border-t border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
         <div class="cora-ai-sidebar-header w-full shrink-0 select-none" style="padding: 10px 16px; background: #fafafa; border-bottom: 1px solid #e4e4e7;">
             <div class="flex justify-between items-center w-full max-w-3xl mx-auto">
-                <!-- Left: New Conversation + Model Pill -->
-                <div class="flex items-center gap-2">
-                    <div class="cora-ai-sidebar-title flex items-center gap-1.5 cursor-pointer transition-colors" onclick="coraClearSidebarChat()" style="font-size: 12px; font-weight: 700; color: #27272a;">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" style="color: #52525b;">
+                <!-- Left: Conversation Selector Dropdown + Model Context Pill -->
+                <div class="flex items-center gap-2 relative">
+                    <!-- Conversation Selector Button -->
+                    <div id="cora-sidebar-conversation-toggle" class="cora-ai-sidebar-title flex items-center gap-1.5 cursor-pointer transition-colors hover:text-zinc-950 px-2 py-1 rounded-lg hover:bg-zinc-200/50" onclick="window.coraToggleConversationsDropdown(event)" style="font-size: 12px; font-weight: 700; color: #27272a;">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" style="color: #52525b;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/>
                         </svg>
-                        <span>New Conversation</span>
+                        <span id="cora-sidebar-active-chat-title" class="truncate max-w-[130px]">New Conversation</span>
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" style="color: #a1a1aa;"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
-                    <!-- Active Model Pill -->
+
+                    <!-- Conversations History Dropdown Popover -->
+                    <div id="cora-sidebar-conversations-dropdown" class="hidden absolute top-full left-0 mt-2 w-72 bg-white border border-zinc-200 rounded-2xl shadow-2xl p-2.5 z-[10005] select-none" style="backdrop-filter: blur(16px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+                        <div class="flex items-center justify-between px-2 py-1.5 border-b border-zinc-100 mb-1.5">
+                            <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-wider">Saved Chats</span>
+                            <button type="button" onclick="window.coraStartNewConversation(event)" class="text-[10px] font-bold text-zinc-950 hover:text-zinc-700 flex items-center gap-1 bg-zinc-100 hover:bg-zinc-200 px-2 py-0.5 rounded-md transition-colors cursor-pointer border-0">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                New Chat
+                            </button>
+                        </div>
+                        <div id="cora-sidebar-conversations-list" class="max-h-60 overflow-y-auto space-y-1 py-0.5">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Page-Aware Model Pill -->
                     <div id="cora-sidebar-model-pill" onclick="window.coraToggleRAGScopePopover(event)" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 9999px; font-size: 10px; font-weight: 600; color: #71717a; cursor: pointer; white-space: nowrap; position: relative;">
                         <span style="width: 5px; height: 5px; border-radius: 50%; background: #22c55e; display: inline-block;"></span>
                         <span id="cora-sidebar-model-label">Gemini 2.5 Flash</span>
+                        <span style="color: #d4d4d8;">•</span>
+                        <span id="cora-sidebar-page-context-label" class="font-bold text-zinc-800">Dashboard</span>
                         <div id="cora-sidebar-rag-popover" class="hidden" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); width: 240px; z-index: 10000; text-align: left; pointer-events: auto;"></div>
                     </div>
                 </div>
-                <!-- Right: Settings + Close -->
+
+                <!-- Right: Expand (90%) + Settings + Close -->
                 <div class="flex items-center gap-1">
-                    <button style="color: #a1a1aa; border: 0; background: transparent; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#3f3f46'" onmouseout="this.style.color='#a1a1aa'" title="AI Settings">
+                    <!-- Expand / Fullscreen Toggle Button -->
+                    <button id="cora-ai-expand-btn" onclick="window.coraToggleSidebarFullscreen(event)" class="p-1 text-zinc-400 hover:text-zinc-900 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center" title="Toggle 90% Expand Mode">
+                        <svg id="cora-ai-expand-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                    </button>
+                    <!-- Settings -->
+                    <button onclick="window.coraOpenAISettingsDrawer()" style="color: #a1a1aa; border: 0; background: transparent; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#3f3f46'" onmouseout="this.style.color='#a1a1aa'" title="AI Model Settings">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
                             <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
@@ -7840,6 +7886,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                             <line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>
                         </svg>
                     </button>
+                    <!-- Close -->
                     <button class="cora-ai-sidebar-close" onclick="coraToggleSidebar(false)" style="color: #a1a1aa; border: 0; background: transparent; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#18181b'" onmouseout="this.style.color='#a1a1aa'">
                         <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
@@ -11702,6 +11749,9 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                     <button type="button" onclick="coraSubmitIslandAI()" class="cora-island-ask-btn">
                         Ask AI
                     </button>
+                </div>
+                <div class="cora-ai-disclaimer text-[9px] text-zinc-400 text-center select-none pt-1">
+                    Cora AI can make mistakes. Please verify important actions.
                 </div>
             </div>
 
