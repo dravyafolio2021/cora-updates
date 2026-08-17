@@ -27,11 +27,125 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
     <!-- Tailwind CSS CDN -->
     <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #FAFAFA;
-            color: #09090b;
+        :root {
+            --form-bg: #FAFAFA;
+            --form-card: #FFFFFF;
+            --form-border: #E4E4E7;
+            --form-text: #09090B;
+            --form-label: #18181B;
+            --form-subtext: #71717A;
+            --form-input-bg: #FFFFFF;
+            --form-input-border: #E4E4E7;
+            --form-input-text: #09090B;
+            --form-input-placeholder: #A1A1AA;
+            --form-focus-ring: #18181B;
+            --form-choice-bg: #FFFFFF;
+            --form-choice-border: #E4E4E7;
+            --form-choice-hover: #F4F4F5;
         }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --form-bg: #09090B;
+                --form-card: #18181B;
+                --form-border: #27272A;
+                --form-text: #FAFAFA;
+                --form-label: #F4F4F5;
+                --form-subtext: #A1A1AA;
+                --form-input-bg: #27272A;
+                --form-input-border: #3F3F46;
+                --form-input-text: #FAFAFA;
+                --form-input-placeholder: #71717A;
+                --form-focus-ring: #FFFFFF;
+                --form-choice-bg: #27272A;
+                --form-choice-border: #3F3F46;
+                --form-choice-hover: #3F3F46;
+            }
+        }
+
+        .dark {
+            --form-bg: #09090B;
+            --form-card: #18181B;
+            --form-border: #27272A;
+            --form-text: #FAFAFA;
+            --form-label: #F4F4F5;
+            --form-subtext: #A1A1AA;
+            --form-input-bg: #27272A;
+            --form-input-border: #3F3F46;
+            --form-input-text: #FAFAFA;
+            --form-input-placeholder: #71717A;
+            --form-focus-ring: #FFFFFF;
+            --form-choice-bg: #27272A;
+            --form-choice-border: #3F3F46;
+            --form-choice-hover: #3F3F46;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--form-bg);
+            color: var(--form-text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .form-block-item label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--form-label) !important;
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .form-block-item input[type="text"],
+        .form-block-item input[type="email"],
+        .form-block-item input[type="tel"],
+        .form-block-item input[type="number"],
+        .form-block-item input[type="date"],
+        .form-block-item select,
+        .form-block-item textarea {
+            width: 100%;
+            background-color: var(--form-input-bg) !important;
+            border: 1px solid var(--form-input-border) !important;
+            color: var(--form-input-text) !important;
+            border-radius: 12px !important;
+            padding: 11px 14px !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            outline: none !important;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+            box-sizing: border-box;
+        }
+
+        .form-block-item input[type="date"] {
+            color-scheme: light dark;
+        }
+
+        .form-block-item input::placeholder,
+        .form-block-item textarea::placeholder {
+            color: var(--form-input-placeholder) !important;
+        }
+
+        .form-block-item input:focus,
+        .form-block-item select:focus,
+        .form-block-item textarea:focus {
+            border-color: var(--form-focus-ring) !important;
+            box-shadow: 0 0 0 1px var(--form-focus-ring) !important;
+        }
+
+        .form-choice-row {
+            background-color: var(--form-choice-bg) !important;
+            border: 1px solid var(--form-choice-border) !important;
+            color: var(--form-input-text) !important;
+        }
+        .form-choice-row:hover {
+            background-color: var(--form-choice-hover) !important;
+        }
+
+        .form-card-panel {
+            background-color: var(--form-card) !important;
+            border-color: var(--form-border) !important;
+        }
+
         <?php echo isset( $styling['custom_css'] ) ? esc_html( $styling['custom_css'] ) : ''; ?>
     </style>
 </head>
@@ -674,24 +788,23 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                         const cleanLabel = block.label || 'Input Field';
                         const fieldName = cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
                         blockDiv.id = 'field-wrapper-' + fieldName;
-                        let inputHtml = '';
- 
+                        let inputHtml;
                         if (block.type === 'long_text') {
-                            inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="Type answer..." class="w-full p-4 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 outline-none transition-all"></textarea>`;
+                            inputHtml = `<textarea name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" rows="3" placeholder="Type answer..." class="w-full p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all"></textarea>`;
                         } else if (block.type === 'dropdown') {
-                            let optsHtml = '<option value="">Choose option...</option>';
+                            let optsHtml = '<option value="" class="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100">Choose option...</option>';
                             const bChoices = block.choices || [];
                             bChoices.forEach(cOpt => {
                                 let label = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 let val = typeof cOpt === 'object' ? cOpt.label : cOpt;
-                                optsHtml += `<option value="${val}">${label}</option>`;
+                                optsHtml += `<option value="${val}" class="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100">${label}</option>`;
                             });
                             inputHtml = `
                                 <div class="relative w-full">
-                                    <select name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="w-full h-11 pl-4 pr-10 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 focus:border-zinc-400 outline-none transition-all appearance-none cursor-pointer">
+                                    <select name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="w-full h-11 pl-4 pr-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all appearance-none cursor-pointer">
                                         ${optsHtml}
                                     </select>
-                                    <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-zinc-400">
+                                    <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
                                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                     </div>
                                 </div>
@@ -703,9 +816,9 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                                 let label = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 let val = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 checkboxesHtml += `
-                                    <div class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50/50 transition-all cursor-pointer relative" onclick="const cb = this.querySelector('input'); if (event.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); }">
-                                        <input type="checkbox" name="${fieldName}[]" data-label="${cleanLabel}" data-field-name="${fieldName}" data-option-index="${cIdx}" value="${val}" class="h-4 w-4 rounded border-zinc-300 text-zinc-950 focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 cursor-pointer" />
-                                        <span class="text-xs font-semibold text-zinc-800">${label}</span>
+                                    <div class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all cursor-pointer relative" onclick="const cb = this.querySelector('input'); if (event.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); }">
+                                        <input type="checkbox" name="${fieldName}[]" data-label="${cleanLabel}" data-field-name="${fieldName}" data-option-index="${cIdx}" value="${val}" class="h-4 w-4 rounded border-zinc-300 text-zinc-950 dark:text-white focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 dark:accent-white cursor-pointer" />
+                                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">${label}</span>
                                     </div>
                                 `;
                             });
@@ -717,9 +830,9 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                                 let label = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 let val = typeof cOpt === 'object' ? cOpt.label : cOpt;
                                 radioHtml += `
-                                    <div class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50/50 transition-all cursor-pointer relative" onclick="const rb = this.querySelector('input'); rb.checked = true; rb.dispatchEvent(new Event('change', { bubbles: true }));">
-                                        <input type="radio" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" value="${val}" class="h-4 w-4 rounded-full border-zinc-300 text-zinc-950 focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 cursor-pointer" />
-                                        <span class="text-xs font-semibold text-zinc-800">${label}</span>
+                                    <div class="flex items-center gap-3 py-2.5 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all cursor-pointer relative" onclick="const rb = this.querySelector('input'); rb.checked = true; rb.dispatchEvent(new Event('change', { bubbles: true }));">
+                                        <input type="radio" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" value="${val}" class="h-4 w-4 rounded-full border-zinc-300 text-zinc-950 dark:text-white focus:ring-0 focus:ring-offset-0 focus:outline-none accent-zinc-950 dark:accent-white cursor-pointer" />
+                                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">${label}</span>
                                     </div>
                                 `;
                             });
@@ -728,20 +841,20 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                             const rows = block.rows || ['Service Quality', 'Speed of Service', 'Overall Value'];
                             const cols = block.columns || ['Poor', 'Average', 'Excellent'];
                             
-                            let matrixTableHtml = `<div class="overflow-x-auto border border-zinc-200 rounded-xl bg-white"><table class="w-full text-left border-collapse text-xs">`;
-                            matrixTableHtml += `<thead class="bg-zinc-50 border-b border-zinc-200 text-zinc-500 font-bold uppercase tracking-wider"><tr><th class="p-3"></th>`;
+                            let matrixTableHtml = `<div class="overflow-x-auto border border-zinc-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800"><table class="w-full text-left border-collapse text-xs">`;
+                            matrixTableHtml += `<thead class="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider"><tr><th class="p-3"></th>`;
                             cols.forEach(col => {
-                                matrixTableHtml += `<th class="p-3 text-center">${col}</th>`;
+                                matrixTableHtml += `<th class="p-3 text-center text-zinc-700 dark:text-zinc-300">${col}</th>`;
                             });
                             matrixTableHtml += `</tr></thead><tbody>`;
                             
                             rows.forEach((row, rIdx) => {
                                 const rowFieldName = `${fieldName}_row_${rIdx}`;
-                                matrixTableHtml += `<tr class="border-b border-zinc-100 hover:bg-zinc-50/30"><td class="p-3 font-semibold text-zinc-700">${row}</td>`;
+                                matrixTableHtml += `<tr class="border-b border-zinc-100 dark:border-zinc-700/50 hover:bg-zinc-50/50 dark:hover:bg-zinc-700/30"><td class="p-3 font-semibold text-zinc-800 dark:text-zinc-200">${row}</td>`;
                                 cols.forEach(col => {
                                     matrixTableHtml += `
                                         <td class="p-3 text-center">
-                                            <input type="radio" name="${rowFieldName}" data-label="${cleanLabel} - ${row}" data-field-name="${rowFieldName}" value="${col}" class="h-4 w-4 accent-zinc-950 cursor-pointer" />
+                                            <input type="radio" name="${rowFieldName}" data-label="${cleanLabel} - ${row}" data-field-name="${rowFieldName}" value="${col}" class="h-4 w-4 accent-zinc-950 dark:accent-white cursor-pointer" />
                                         </td>
                                     `;
                                 });
@@ -751,19 +864,19 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                             inputHtml = matrixTableHtml;
                         } else if (block.type === 'file') {
                             inputHtml = `
-                                <div class="cora-file-dropzone border border-dashed border-zinc-200 rounded-2xl py-8 px-4 bg-white flex flex-col items-center justify-center gap-3 cursor-pointer transition-all text-center relative" data-field-name="${fieldName}">
-                                    <div class="w-12 h-12 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-700 border border-zinc-200/60 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                                <div class="cora-file-dropzone border border-dashed border-zinc-200 dark:border-zinc-700 rounded-2xl py-8 px-4 bg-white dark:bg-zinc-800/60 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all text-center relative" data-field-name="${fieldName}">
+                                    <div class="w-12 h-12 rounded-full bg-zinc-50 dark:bg-zinc-700/50 flex items-center justify-center text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-600/60 shadow-xs">
                                         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>
                                     </div>
                                     <div>
-                                        <p class="text-xs font-bold text-zinc-900 dropzone-text">Drag &amp; drop an image or video</p>
-                                        <p class="text-[9.5px] text-zinc-450 mt-1">or click to browse (4 MB max)</p>
+                                        <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100 dropzone-text">Drag &amp; drop file or image</p>
+                                        <p class="text-[9.5px] text-zinc-400 dark:text-zinc-500 mt-1">or click to browse</p>
                                     </div>
                                     <input type="file" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="hidden cora-file-hidden-input" />
                                 </div>
                             `;
                         } else if (block.type === 'date') {
-                            inputHtml = `<input type="date" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="w-full h-11 px-4 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-900 focus:border-zinc-400 outline-none transition-all" />`;
+                            inputHtml = `<input type="date" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="w-full h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-400 outline-none transition-all" style="color-scheme: light dark;" />`;
                         } else if (block.type === 'slider') {
                             inputHtml = `
                                 <div class="flex items-center gap-3 w-full bg-zinc-50/50 border border-zinc-150 p-3 rounded-xl">
@@ -795,20 +908,20 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                             `;
                         } else if (block.type === 'booking') {
                             inputHtml = `
-                                <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex flex-col gap-3">
+                                <div class="border border-zinc-200 dark:border-zinc-700 rounded-2xl p-4 bg-zinc-50/50 dark:bg-zinc-800/40 flex flex-col gap-3">
                                     <div class="flex flex-col gap-1">
-                                        <span class="text-[10.5px] font-semibold text-zinc-500 mb-1">Select Date</span>
-                                        <input type="date" class="cora-booking-date w-full h-11 px-4 rounded-xl border border-zinc-200 text-xs font-semibold focus:border-zinc-400 outline-none bg-white transition-all" min="${new Date().toISOString().split('T')[0]}" />
+                                        <span class="text-[10.5px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Select Date</span>
+                                        <input type="date" class="cora-booking-date w-full h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-semibold focus:border-zinc-950 dark:focus:border-zinc-400 outline-none bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 transition-all" style="color-scheme: light dark;" min="${new Date().toISOString().split('T')[0]}" />
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <span class="text-[10.5px] font-semibold text-zinc-500 mb-1">Available Time Slots</span>
+                                        <span class="text-[10.5px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Available Time Slots</span>
                                         <div class="grid grid-cols-3 gap-2 cora-booking-slots mt-1.5">
-                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="10:00 AM">10:00 AM</button>
-                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="11:30 AM">11:30 AM</button>
-                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="01:00 PM">01:00 PM</button>
-                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="02:30 PM">02:30 PM</button>
-                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="04:00 PM">04:00 PM</button>
-                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 bg-white rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 transition-all cursor-pointer" data-time="05:30 PM">05:30 PM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all cursor-pointer" data-time="10:00 AM">10:00 AM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all cursor-pointer" data-time="11:30 AM">11:30 AM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all cursor-pointer" data-time="01:00 PM">01:00 PM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all cursor-pointer" data-time="02:30 PM">02:30 PM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all cursor-pointer" data-time="04:00 PM">04:00 PM</button>
+                                            <button type="button" class="cora-slot-btn py-2.5 px-3 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold text-center hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all cursor-pointer" data-time="05:30 PM">05:30 PM</button>
                                         </div>
                                     </div>
                                     <input type="hidden" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="cora-booking-hidden-val" ${block.required ? 'required' : ''} />
@@ -816,12 +929,12 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                             `;
                         } else if (block.type === 'address') {
                             inputHtml = `
-                                <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/20 flex flex-col gap-3 address-group">
-                                    <input type="text" class="addr-street w-full h-11 px-4 rounded-xl border border-zinc-200 text-xs font-semibold focus:border-zinc-400 outline-none bg-white transition-all" placeholder="Street Address" />
+                                <div class="border border-zinc-200 dark:border-zinc-700 rounded-2xl p-4 bg-zinc-50/50 dark:bg-zinc-800/40 flex flex-col gap-3 address-group">
+                                    <input type="text" class="addr-street w-full h-11 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-semibold focus:border-zinc-950 dark:focus:border-zinc-400 outline-none bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 transition-all" placeholder="Street Address" />
                                     <div class="grid grid-cols-3 gap-2">
-                                        <input type="text" class="addr-city text-xs p-2.5 bg-white border border-zinc-200 rounded-lg focus:border-zinc-400 outline-none" placeholder="City" />
-                                        <input type="text" class="addr-state text-xs p-2.5 bg-white border border-zinc-200 rounded-lg focus:border-zinc-400 outline-none" placeholder="State" />
-                                        <input type="text" class="addr-zip text-xs p-2.5 bg-white border border-zinc-200 rounded-lg focus:border-zinc-400 outline-none" placeholder="ZIP Code" />
+                                        <input type="text" class="addr-city text-xs p-2.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 border border-zinc-200 dark:border-zinc-700 rounded-lg focus:border-zinc-950 dark:focus:border-zinc-400 outline-none" placeholder="City" />
+                                        <input type="text" class="addr-state text-xs p-2.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 border border-zinc-200 dark:border-zinc-700 rounded-lg focus:border-zinc-950 dark:focus:border-zinc-400 outline-none" placeholder="State" />
+                                        <input type="text" class="addr-zip text-xs p-2.5 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 border border-zinc-200 dark:border-zinc-700 rounded-lg focus:border-zinc-950 dark:focus:border-zinc-400 outline-none" placeholder="ZIP Code" />
                                     </div>
                                     <input type="hidden" name="${fieldName}" data-label="${cleanLabel}" data-field-name="${fieldName}" class="cora-address-hidden-val" ${block.required ? 'required' : ''} />
                                 </div>
@@ -831,12 +944,12 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
                             let checklistHtml = `<div class="flex flex-col gap-2 w-full">`;
                             choices.forEach((c, cIdx) => {
                                 checklistHtml += `
-                                    <label class="flex items-center justify-between p-3.5 bg-white border border-zinc-200 rounded-xl text-xs font-semibold cursor-pointer hover:bg-zinc-50/50 transition-all select-none">
+                                    <label class="flex items-center justify-between p-3.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-700/60 transition-all select-none">
                                         <div class="flex items-center gap-3">
-                                            <input type="checkbox" class="cora-service-check h-4 w-4 accent-zinc-950 rounded cursor-pointer" data-price="${c.price || 0}" data-service="${c.label}" value="${c.label}" />
-                                            <span class="text-zinc-800">${c.label}</span>
+                                            <input type="checkbox" class="cora-service-check h-4 w-4 accent-zinc-950 dark:accent-white rounded cursor-pointer" data-price="${c.price || 0}" data-service="${c.label}" value="${c.label}" />
+                                            <span class="text-zinc-800 dark:text-zinc-200">${c.label}</span>
                                         </div>
-                                        <span class="text-zinc-500 font-mono">₹${c.price || 0}</span>
+                                        <span class="text-zinc-500 dark:text-zinc-400 font-mono">₹${c.price || 0}</span>
                                     </label>
                                 `;
                             });

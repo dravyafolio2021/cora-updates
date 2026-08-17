@@ -3,7 +3,7 @@
   "short_name": "CORA",
   "description": "CORA — AI Co-founder for Modern Founders",
   "start_url": "/workspace/dashboard",
-  "scope": "/",
+  "scope": "/workspace/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#000000",
