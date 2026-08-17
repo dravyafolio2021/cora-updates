@@ -12271,10 +12271,16 @@ jQuery(document).ready(function($) {
             }
         });
 
-        // Close RAG popover when clicking outside of it
+        // Close header popovers when clicking outside of them
         $(document).on('click', function(e) {
+            if (!$(e.target).closest('#cora-sidebar-conversation-toggle, #cora-sidebar-conversations-dropdown').length) {
+                $('#cora-sidebar-conversations-dropdown').addClass('hidden');
+            }
             if (!$(e.target).closest('#cora-sidebar-model-pill, #cora-sidebar-rag-popover').length) {
                 $('#cora-sidebar-rag-popover').addClass('hidden');
+            }
+            if (!$(e.target).closest('#cora-header-ai-usage-pill, #cora-header-ai-usage-popover').length) {
+                $('#cora-header-ai-usage-popover').addClass('hidden');
             }
         });
     });

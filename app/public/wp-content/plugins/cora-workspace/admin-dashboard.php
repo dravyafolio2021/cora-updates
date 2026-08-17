@@ -7843,6 +7843,46 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
     <!-- Local backdrop for AI bottom sheet sidebar (mobile/tablet only) -->
     <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden fixed inset-0 bg-black/35 z-[9960] backdrop-blur-[1px] transition-opacity duration-300 cursor-pointer lg:hidden" style="position:fixed !important; inset:0 !important; z-index:9960 !important; background:rgba(0,0,0,0.35) !important; backdrop-filter:blur(1px) !important; -webkit-backdrop-filter:blur(1px) !important;"></div>
 
+    <script>
+    window.coraToggleConversationsDropdown = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        var dd = document.getElementById('cora-sidebar-conversations-dropdown');
+        if (dd) {
+            dd.classList.toggle('hidden');
+            if (!dd.classList.contains('hidden') && typeof window.coraRenderConversationsDropdown === 'function') {
+                window.coraRenderConversationsDropdown();
+            }
+        }
+    };
+    window.coraToggleRAGScopePopover = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        var pop = document.getElementById('cora-sidebar-rag-popover');
+        if (pop) pop.classList.toggle('hidden');
+    };
+    window.coraToggleAIUsagePopover = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        var pop = document.getElementById('cora-header-ai-usage-popover');
+        if (pop) {
+            pop.classList.toggle('hidden');
+            if (!pop.classList.contains('hidden')) {
+                var curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
+                var radio = document.querySelector('input[name="cora_popover_ai_model"][value="' + curModel + '"]');
+                if (radio) radio.checked = true;
+            }
+        }
+    };
+    window.coraQuickSetModel = function(modelKey, label) {
+        localStorage.setItem('cora_ai_active_model', modelKey);
+        var labelEl = document.getElementById('cora-sidebar-model-label');
+        if (labelEl) labelEl.innerText = label;
+        var pop = document.getElementById('cora-header-ai-usage-popover');
+        if (pop) pop.classList.add('hidden');
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('AI model updated to ' + label, 'success');
+        }
+    };
+    </script>
+
     <!-- Collapsible Right-side AI Sidebar (Notion-AI style) -->
     <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 lg:top-[52px] right-0 left-0 z-[999] h-full lg:h-[calc(100vh-52px)] w-full max-w-full bg-white border-t border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
         <div class="cora-ai-sidebar-header w-full shrink-0 select-none px-3 py-2 bg-[#fafafa] border-b border-zinc-200">
@@ -7881,17 +7921,64 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         <div id="cora-sidebar-rag-popover" class="hidden" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); width: 240px; z-index: 10000; text-align: left; pointer-events: auto;"></div>
                     </div>
 
-                    <!-- Minimal AI Usage Indicator (Triggers AI Settings Drawer) -->
+                    <!-- Minimal AI Usage Indicator (Workspace Global Token/Request Counter) -->
                     <?php
                     $header_ai_stats = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 0, 'daily_limit' => 100, 'five_hour_count' => 0, 'five_hour_limit' => 30 );
                     $header_daily_pct = ( isset( $header_ai_stats['daily_limit'] ) && $header_ai_stats['daily_limit'] > 0 ) ? min( 100, round( ( $header_ai_stats['daily_count'] / $header_ai_stats['daily_limit'] ) * 100 ) ) : 0;
                     ?>
-                    <div id="cora-header-ai-usage-pill" class="relative inline-flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-full text-[9.5px] font-semibold text-zinc-600 dark:text-zinc-300 cursor-pointer select-none transition-all hover:bg-zinc-200/70 shrink-0" onclick="window.coraOpenAISettingsDrawer(event)" title="Workspace AI Quota: <?php echo esc_attr( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] . ' (' . $header_daily_pct . '%)' ); ?> - Click to Open Settings">
+                    <div id="cora-header-ai-usage-pill" class="relative inline-flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100/90 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700 rounded-full text-[9.5px] font-semibold text-zinc-600 dark:text-zinc-300 cursor-pointer select-none transition-all hover:bg-zinc-200/70 shrink-0" onclick="window.coraToggleAIUsagePopover(event)" title="Workspace AI Quota: <?php echo esc_attr( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] . ' (' . $header_daily_pct . '%)' ); ?>">
                         <svg viewBox="0 0 36 36" width="11" height="11" class="transform -rotate-90 shrink-0">
                             <path stroke="#e4e4e7" stroke-width="4.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             <path id="cora-header-ai-usage-ring" stroke="#18181b" stroke-width="4.5" stroke-dasharray="<?php echo esc_attr( $header_daily_pct ); ?>, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
                         <span id="cora-header-ai-usage-text" class="font-mono font-bold text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?></span>
+
+                        <!-- Attached Popover Card (Matches RAG and Saved Chats pattern) -->
+                        <div id="cora-header-ai-usage-popover" class="hidden absolute top-full right-0 mt-2 w-72 bg-white border border-zinc-200 rounded-2xl shadow-2xl p-4 z-[10006] text-left cursor-default select-none" onclick="event.stopPropagation()" style="box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+                            <div class="flex items-center justify-between border-b border-zinc-100 pb-2 mb-3">
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400">Workspace Quota</span>
+                                <span class="text-[10px] font-mono font-bold text-zinc-900" id="cora-popover-usage-ratio"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?> reqs</span>
+                            </div>
+                            
+                            <!-- Visual Progress Bar -->
+                            <div class="w-full bg-zinc-100 rounded-full h-1.5 mb-3.5 overflow-hidden">
+                                <div id="cora-popover-usage-bar" class="bg-zinc-900 h-1.5 rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $header_daily_pct ); ?>%;"></div>
+                            </div>
+
+                            <!-- Model Selector -->
+                            <div class="space-y-2 mb-3">
+                                <label class="block text-[10px] font-extrabold uppercase tracking-wider text-zinc-400">Foundation Model</label>
+                                <div class="space-y-1.5">
+                                    <label class="flex items-center justify-between p-2 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white cursor-pointer transition-all text-xs font-semibold text-zinc-900">
+                                        <div class="flex items-center gap-2">
+                                            <input type="radio" name="cora_popover_ai_model" value="gemini" checked onchange="window.coraQuickSetModel('gemini', 'Gemini Flash')" class="text-zinc-950 focus:ring-zinc-950">
+                                            <span>Gemini 2.5 Flash</span>
+                                        </div>
+                                        <span class="text-[9px] font-bold px-1.5 py-0.2 bg-green-50 text-green-700 rounded-md border border-green-200">Recommended</span>
+                                    </label>
+                                    <label class="flex items-center justify-between p-2 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white cursor-pointer transition-all text-xs font-semibold text-zinc-900">
+                                        <div class="flex items-center gap-2">
+                                            <input type="radio" name="cora_popover_ai_model" value="gpt-4o" onchange="window.coraQuickSetModel('gpt-4o', 'GPT-4o')" class="text-zinc-950 focus:ring-zinc-950">
+                                            <span>GPT-4o (OpenAI)</span>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-center justify-between p-2 rounded-xl border border-zinc-200 hover:border-zinc-400 bg-white cursor-pointer transition-all text-xs font-semibold text-zinc-900">
+                                        <div class="flex items-center gap-2">
+                                            <input type="radio" name="cora_popover_ai_model" value="claude-3-5-sonnet" onchange="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude 3.5')" class="text-zinc-950 focus:ring-zinc-950">
+                                            <span>Claude 3.5 Sonnet</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Autonomous Execution Checkbox -->
+                            <div class="pt-2.5 border-t border-zinc-100 flex items-center justify-between">
+                                <label class="text-[11px] font-bold text-zinc-700 cursor-pointer flex items-center gap-2">
+                                    <input type="checkbox" id="cora-popover-autoexec-toggle" checked onchange="localStorage.setItem('cora_ai_autoexec', this.checked ? '1' : '0')" class="rounded border-zinc-300 text-zinc-950 focus:ring-zinc-950">
+                                    <span>Autonomous DB Actions</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
