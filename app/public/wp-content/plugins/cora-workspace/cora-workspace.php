@@ -14785,12 +14785,36 @@ function cora_workspace_log_ai_request() {
         }
     }
 
+    $now = time();
     $usage_log = get_option( "cora_workspace_ai_usage_log_{$workspace_id}", array() );
     if ( ! is_array( $usage_log ) ) {
         $usage_log = array();
     }
-    $usage_log[] = time();
+    $usage_log[] = $now;
+    // Keep only last 1000 records to prevent bloating
+    if ( count( $usage_log ) > 1000 ) {
+        $usage_log = array_slice( $usage_log, -1000 );
+    }
     update_option( "cora_workspace_ai_usage_log_{$workspace_id}", $usage_log );
+
+    // Also sync global fallback
+    if ( $workspace_id !== 1 ) {
+        $global_log = get_option( 'cora_workspace_ai_usage_log_1', array() );
+        if ( ! is_array( $global_log ) ) {
+            $global_log = array();
+        }
+        $global_log[] = $now;
+        if ( count( $global_log ) > 1000 ) {
+            $global_log = array_slice( $global_log, -1000 );
+        }
+        update_option( 'cora_workspace_ai_usage_log_1', $global_log );
+    }
+}
+}
+
+if ( ! function_exists( 'cora_workspace_record_ai_usage' ) ) {
+function cora_workspace_record_ai_usage() {
+    cora_workspace_log_ai_request();
 }
 }
 
@@ -14805,6 +14829,9 @@ function cora_workspace_get_ai_usage_stats() {
     }
 
     $usage_log = get_option( "cora_workspace_ai_usage_log_{$workspace_id}", array() );
+    if ( ( ! is_array( $usage_log ) || empty( $usage_log ) ) && $workspace_id !== 1 ) {
+        $usage_log = get_option( 'cora_workspace_ai_usage_log_1', array() );
+    }
     if ( ! is_array( $usage_log ) ) {
         $usage_log = array();
     }

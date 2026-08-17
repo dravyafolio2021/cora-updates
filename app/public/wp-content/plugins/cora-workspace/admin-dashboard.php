@@ -8098,7 +8098,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
                                         Quota
                                     </span>
-                                    <span class="font-mono text-zinc-900 font-extrabold"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?> <span class="text-zinc-400 font-normal">reqs</span></span>
+                                    <span id="cora-popover-usage-ratio" class="font-mono text-zinc-900 font-extrabold"><?php echo esc_html( $header_ai_stats['daily_count'] . '/' . $header_ai_stats['daily_limit'] ); ?> <span class="text-zinc-400 font-normal">reqs</span></span>
                                 </div>
                                 <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
                                     <div id="cora-popover-usage-bar" class="bg-zinc-950 h-full rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $header_daily_pct ); ?>%;"></div>

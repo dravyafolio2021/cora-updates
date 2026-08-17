@@ -1875,10 +1875,12 @@ jQuery(document).ready(function($) {
                         $('#cora-ai-5h-quota-text').text(`${u.five_hour_count} / ${u.five_hour_limit}`);
                         $('#cora-ai-5h-quota-bar').css('width', `${fiveHrPct}%`);
 
-                        // Update minimal header usage pill
+                        // Update minimal header usage pill & popover card
                         $('#cora-header-ai-usage-text').text(`${u.daily_count}/${u.daily_limit}`);
                         $('#cora-header-ai-usage-ring').attr('stroke-dasharray', `${dailyPct}, 100`);
                         $('#cora-header-ai-usage-pill').attr('title', `Workspace AI Quota: ${u.daily_count}/${u.daily_limit} (${dailyPct}%)`);
+                        $('#cora-popover-usage-ratio').html(`${u.daily_count}/${u.daily_limit} <span class="text-zinc-400 font-normal">reqs</span>`);
+                        $('#cora-popover-usage-bar').css('width', `${dailyPct}%`);
                     }
 
                     // Render Rich Autonomous Action Result Cards
