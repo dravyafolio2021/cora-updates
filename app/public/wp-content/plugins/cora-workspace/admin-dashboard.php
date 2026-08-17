@@ -5873,7 +5873,8 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
             
             <!-- SECTION 2: BOOKINGS (Routed to Client Task Manager Booked Shoots View) -->
             <?php if ( $sub_page === 'bookings' ) : ?>
-                </div>
+            <section id="cora-page-bookings" class="cora-page-section cora-active space-y-6">
+                <?php include CORA_WORKSPACE_PATH . 'views/view-client-task-manager.php'; ?>
             </section>
             <?php endif; ?>
 
