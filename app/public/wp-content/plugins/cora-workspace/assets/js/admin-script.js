@@ -1805,6 +1805,37 @@ jQuery(document).ready(function($) {
         coraExecuteAIChat(promptText);
     };
 
+    // Intercept clicks on links and module tiles inside AI chat to ensure instant SPA navigation
+    $(document).on('click', '#cora-sidebar-chat a, .cora-module-tile', function(e) {
+        const href = $(this).attr('href');
+        if (href) {
+            // Check for ?sub_page=xxx or &sub_page=xxx
+            const match = href.match(/[?&]sub_page=([^&#]+)/);
+            if (match && match[1]) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo(match[1]);
+                } else {
+                    window.location.href = href;
+                }
+                return false;
+            }
+            // Check for /workspace/xxx format
+            const pathMatch = href.match(/\/workspace\/([a-zA-Z0-9_-]+)/);
+            if (pathMatch && pathMatch[1] && pathMatch[1] !== 'dashboard') {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo(pathMatch[1]);
+                } else {
+                    window.location.href = href;
+                }
+                return false;
+            }
+        }
+    });
+
     // Master execution for chat rendering and mock answers
     function coraExecuteAIChat(text) {
         const chat = $('#cora-sidebar-chat');

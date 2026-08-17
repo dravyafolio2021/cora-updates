@@ -1431,8 +1431,13 @@ function cora_workspace_handle_workspace_route() {
             wp_die( __( 'You do not have sufficient permissions to access this page.', 'cora-workspace' ) );
         }
 
-        // Parse sub-page
+        // Parse sub-page (support path segment /workspace/blogs and query param ?sub_page=blogs)
         $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : 'dashboard';
+        if ( ! empty( $_GET['sub_page'] ) ) {
+            $sub_page = sanitize_title( $_GET['sub_page'] );
+        } elseif ( ! empty( $_GET['sub'] ) ) {
+            $sub_page = sanitize_title( $_GET['sub'] );
+        }
         if ( empty( $sub_page ) ) {
             $sub_page = 'dashboard';
         }
