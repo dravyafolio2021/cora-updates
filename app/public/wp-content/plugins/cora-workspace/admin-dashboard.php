@@ -2382,20 +2382,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 border-top-right-radius: 20px !important;
             }
             #cora-ai-sidebar .cora-ai-sidebar-body {
-                padding-bottom: 76px !important;
-            }
-            }
-
-            @media (min-width: 1024px) {
-                #cora-ai-sidebar.cora-ai-fullscreen {
-                    top: 52px !important;
-                    height: calc(100vh - 52px) !important;
-                    width: 90vw !important;
-                    max-width: 90vw !important;
-                    margin: 0 auto !important;
-                    left: 5vw !important;
-                    right: 5vw !important;
-                }
+                padding-bottom: 160px !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
             }
             
             #cora-ai-sidebar.collapsed {
@@ -2406,9 +2395,45 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 display: flex !important;
             }
 
-            /* Remove island shadow when AI drawer is open */
+            /* Docked island styling when AI drawer is open */
+            #cora-mobile-floating-island.cora-island-docked {
+                bottom: 12px !important;
+                z-index: 9980 !important;
+            }
             #cora-mobile-floating-island.cora-island-docked .cora-island-card {
-                box-shadow: none !important;
+                background: #ffffff !important;
+                box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.14) !important;
+                border: 1px solid #e4e4e7 !important;
+            }
+            #cora-mobile-floating-island.cora-island-docked .cora-ai-disclaimer {
+                display: block !important;
+                color: #71717a !important;
+                font-size: 9.5px !important;
+                font-weight: 500 !important;
+                text-align: center !important;
+                margin-top: 5px !important;
+                text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+            }
+        }
+
+        /* Disclaimer is strictly hidden by default and ONLY shows when AI sheet is open/docked */
+        .cora-ai-disclaimer {
+            display: none !important;
+        }
+        #cora-mobile-floating-island.cora-island-docked .cora-ai-disclaimer,
+        #cora-ai-sidebar:not(.collapsed) .cora-ai-disclaimer {
+            display: block !important;
+        }
+
+        @media (min-width: 1024px) {
+            #cora-ai-sidebar.cora-ai-fullscreen {
+                top: 52px !important;
+                height: calc(100vh - 52px) !important;
+                width: 90vw !important;
+                max-width: 90vw !important;
+                margin: 0 auto !important;
+                left: 5vw !important;
+                right: 5vw !important;
             }
         }
 
