@@ -15509,10 +15509,14 @@ You do not merely chat; you actively TAKE ACTION to run and automate the user's 
 Workspace Industry Mode: " . strtoupper( $active_industry ) . "
 Active Modules: " . $active_modules_str . "
 
-CRITICAL DOMAIN RULES:
+CRITICAL DOMAIN & VISUAL PRESENTATION RULES:
 1. STRICT MODULE AWARENESS: You MUST only suggest actions, ask questions, and create entities for active modules (" . $active_modules_str . ").
-2. If the user is in Custom Workspace mode or an industry feature (like CRM Leads or Studio Shoots) is NOT active, DO NOT assume or inject real estate or photography terms unless the user explicitly mentions them. Focus purely on general-purpose business forms, GST invoices, documents, client workflows, and files.
-3. Keep responses crisp, professional, and zero-clutter. Adhere strictly to monochromatic visual standards (ZERO emojis).
+2. RICH COMPONENT CARDS & BLOCKS: When answering questions about modules, status, pipelines, financials, or data, NEVER output raw comma-separated walls of text or long unbroken paragraphs.
+   - ALWAYS format responses into structured Markdown cards, categorized sections with bold headers, status pills `[Active]`, and concise bullet points.
+   - For lists of modules or features, group them logically into clean blocks with direct sub_page names (e.g. `• **Forms Builder** (?sub_page=forms): Dynamic client intake & surveys`).
+   - For business metrics or briefings, present clear structured KPI summary lines.
+3. If the user is in Custom Workspace mode or an industry feature (like CRM Leads or Studio Shoots) is NOT active, DO NOT assume or inject real estate or photography terms unless the user explicitly mentions them. Focus purely on general-purpose business forms, GST invoices, documents, client workflows, and files.
+4. Keep responses crisp, professional, structured, and zero-clutter. Adhere strictly to monochromatic visual standards (ZERO emojis).
 
 === ACTION EXECUTION CAPABILITY ===
 When the user asks you to create or execute something:
@@ -15526,7 +15530,7 @@ When the user asks you to create or execute something:
 
 2. Two-Way Discussion Flow:
    - If the user\'s request is missing details (for example, \'create a form for me\'), respond in a helpful, friendly, and crisp 2-way manner: ask 1-2 focused questions (e.g. \'What is the form for, and which fields would you like to include? (e.g., Name, Email, Phone, Message)\'), and execute the moment they reply.
-   - Do NOT output long paragraphs of text. Keep your responses crisp, direct, and actionable.';
+   - Do NOT output long paragraphs of text. Keep your responses crisp, direct, and structured.';
 
     $system_prompt = $_POST['system_prompt'] ?? $default_prompt;
     $page_contexts = array(
@@ -15942,7 +15946,77 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             $reply = "Marked task as **completed** in your Client Task Manager:";
         }
     }
-    // 6. Intent: Casual Greetings & Quick Dialog (e.g. "hi", "hello", "hey", "yo", "fu", "test", "who are you")
+    // 6. Intent: Active Modules / Features List
+    elseif ( preg_match( '/\b(?:module|modules|active modules|accessible modules|what modules|list modules|features active|enabled features|what is active)\b/i', $lower ) || ( strpos( $lower, 'module' ) !== false && ( strpos( $lower, 'list' ) !== false || strpos( $lower, 'active' ) !== false || strpos( $lower, 'accessible' ) !== false || strpos( $lower, 'show' ) !== false ) ) ) {
+        $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'custom';
+        $mod_instance    = class_exists( 'Cora_Module_Registry' ) ? Cora_Module_Registry::get_module( $active_industry ) : null;
+        $active_modules  = array( 'dashboard' => 'Dashboard' );
+        if ( $mod_instance && ! cora_is_super_owner() ) {
+            $user_role_val = function_exists('cora_get_current_user_role') ? cora_get_current_user_role() : 'administrator';
+            $mod_nav = $mod_instance->get_navigation_groups( $user_role_val );
+            foreach ( $mod_nav as $grp ) {
+                if ( ! empty( $grp['items'] ) ) {
+                    foreach ( $grp['items'] as $m_key => $m_val ) {
+                        if ( function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $m_key ) ) {
+                            continue;
+                        }
+                        $active_modules[ $m_key ] = $m_val['title'];
+                    }
+                }
+            }
+        }
+
+        $module_icons = array(
+            'dashboard'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>',
+            'leads'      => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>',
+            'financials' => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="10" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line></svg>',
+            'forms'      => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>',
+            'bookings'   => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>',
+            'vault'      => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>',
+            'portfolio'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',
+            'settings'   => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+            'blogs'      => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
+        );
+
+        $default_icon = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+
+        $modules_cards = '';
+        foreach ( $active_modules as $m_slug => $m_title ) {
+            $m_icon = $module_icons[ $m_slug ] ?? $default_icon;
+            $modules_cards .= '
+            <a href="?sub_page=' . esc_attr( $m_slug ) . '" class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-950 dark:hover:border-zinc-600 transition-all group no-underline text-inherit shadow-2xs">
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 shrink-0 group-hover:bg-zinc-950 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-950 transition-colors">
+                        ' . $m_icon . '
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 truncate">' . esc_html( $m_title ) . '</div>
+                        <div class="text-[9px] text-zinc-400 font-mono">?sub_page=' . esc_html( $m_slug ) . '</div>
+                    </div>
+                </div>
+                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white shrink-0 font-bold">→</span>
+            </a>';
+        }
+
+        $reply = '
+        <div class="space-y-3 w-full">
+            <div class="flex items-center justify-between pb-1.5 border-b border-zinc-200/60 dark:border-zinc-800">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Accessible Workspace Modules</span>
+                </div>
+                <span class="text-[9.5px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-0.5 rounded-full">' . count($active_modules) . ' Active</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-0.5">
+                ' . $modules_cards . '
+            </div>
+            <div class="text-[10px] text-zinc-400 dark:text-zinc-500 pt-1.5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                <span>Industry: <strong class="text-zinc-700 dark:text-zinc-300 font-mono uppercase">' . esc_html( $active_industry ) . '</strong></span>
+                <span class="font-mono text-zinc-400">100% Isolated</span>
+            </div>
+        </div>';
+    }
+    // 7. Intent: Casual Greetings & Quick Dialog (e.g. "hi", "hello", "hey", "yo", "fu", "test", "who are you")
     elseif ( preg_match( '/^(?:hi|hello|hey|hey cora|yo|sup|fu|f|test|good morning|good evening|who are you|greetings|gm)\b/i', $lower ) || strlen( $lower ) <= 3 ) {
         $view_greetings = array(
             'dashboard'  => "Hello! I am Cora, your autonomous AI Co-Founder. I execute operations across your workspace. What would you like to build or automate right now?",
@@ -15954,7 +16028,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
         );
         $reply = $view_greetings[$current_page] ?? $view_greetings['dashboard'];
     }
-    // 7. Intent: Capabilities / Help / What can you do?
+    // 8. Intent: Capabilities / Help / What can you do?
     elseif ( preg_match( '/\b(?:help|what can you do|features|capabilities|how to use|commands|actions)\b/i', $lower ) ) {
         $reply = "Here is what I can execute directly for your workspace:\n\n" .
                  "1. **Build Forms**: *\"Create a client inquiry form with Name, Email, Phone, and Event Date\"*\n" .
@@ -15965,7 +16039,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
                  "6. **Business Briefing**: *\"Summarize today's workspace activity and financials\"*\n\n" .
                  "Tell me what you need, and I will execute it immediately.";
     }
-    // 8. Intent: Operational Briefing / Stats / Summary
+    // 9. Intent: Operational Briefing / Stats / Summary
     elseif ( preg_match( '/\b(?:summary|briefing|stats|metrics|report|telemetry|analytics|overview|how is business|activity)\b/i', $lower ) ) {
         $leads_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ) ?: 0;
         $forms_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_forms" ) ?: 0;
@@ -15977,14 +16051,36 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             $inv_total += floatval( $inv['total_amount'] ?? 0 );
         }
 
-        $reply = "Here is your operational workspace briefing:\n" .
-                 "• **CRM Pipeline**: {$leads_count} prospective leads tracked.\n" .
-                 "• **Financials**: " . count($invoices) . " invoices recorded totaling ₹" . number_format($inv_total) . ".\n" .
-                 "• **Bookings**: " . count($bookings) . " sessions scheduled.\n" .
-                 "• **Forms**: {$forms_count} live client intake forms published.\n\n" .
-                 "What action would you like to execute? You can ask me to *create a form*, *add a lead*, *generate an invoice*, or *schedule a shoot*.";
+        $reply = '
+        <div class="space-y-3 w-full">
+            <div class="flex items-center justify-between pb-1.5 border-b border-zinc-200/60 dark:border-zinc-800">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Workspace Telemetry Briefing</span>
+                </div>
+                <span class="text-[9.5px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-0.5 rounded-full">Live Stats</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-0.5">
+                <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
+                    <div class="text-[10px] text-zinc-400 uppercase font-semibold">CRM Leads</div>
+                    <div class="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 font-mono">' . $leads_count . '</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
+                    <div class="text-[10px] text-zinc-400 uppercase font-semibold">Financials</div>
+                    <div class="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 font-mono">₹' . number_format($inv_total) . '</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
+                    <div class="text-[10px] text-zinc-400 uppercase font-semibold">Bookings</div>
+                    <div class="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 font-mono">' . count($bookings) . '</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
+                    <div class="text-[10px] text-zinc-400 uppercase font-semibold">Live Forms</div>
+                    <div class="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 font-mono">' . $forms_count . '</div>
+                </div>
+            </div>
+        </div>';
     }
-    // 9. Contextual Conversational Co-Founder Response
+    // 10. Contextual Conversational Co-Founder Response
     else {
         $reply = "I understand. As your AI Co-Founder, I can execute that for you. Would you like me to:\n\n" .
                  "• **Build a Form** for client intake\n" .

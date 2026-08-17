@@ -1817,24 +1817,38 @@ jQuery(document).ready(function($) {
         chat.scrollTop(chat[0].scrollHeight);
         coraPersistActiveConversation(text);
 
-        // Appending typing loader
+        // Appending high-end reasoning thinking skeleton
         const typingId = 'typing-' + Date.now();
         chat.append(`
-            <div class="chat-bubble ai animate-pulse p-3.5 space-y-2 rounded-xl bg-zinc-50 border border-zinc-100" id="${typingId}">
-                <div class="flex items-center gap-1.5 mb-1 select-none">
-                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay: 0ms;"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay: 150ms;"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay: 300ms;"></span>
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider ml-1">Cora is thinking</span>
+            <div class="chat-bubble ai p-3.5 space-y-2.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 shadow-xs max-w-[95%] w-full transition-all" id="${typingId}">
+                <div class="flex items-center justify-between border-b border-zinc-200/60 dark:border-zinc-800/80 pb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-zinc-900 dark:bg-zinc-100"></span>
+                        </span>
+                        <span class="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 tracking-tight flex items-center gap-1.5" id="${typingId}-status">
+                            <svg class="animate-spin" viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path></svg>
+                            Reasoning through workspace schema...
+                        </span>
+                    </div>
+                    <span class="text-[9px] font-mono text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded font-semibold">Autonomous AI</span>
                 </div>
-                <div class="space-y-1.5 w-44">
-                    <div class="h-2 bg-zinc-200 rounded w-5/6"></div>
-                    <div class="h-2 bg-zinc-200 rounded w-full"></div>
-                    <div class="h-2 bg-zinc-200 rounded w-2/3"></div>
+                <div class="space-y-2 py-0.5">
+                    <div class="h-2.5 bg-gradient-to-r from-zinc-200 via-zinc-300 to-zinc-200 dark:from-zinc-800 dark:via-zinc-700 dark:to-zinc-800 rounded-full animate-pulse w-11/12"></div>
+                    <div class="h-2.5 bg-gradient-to-r from-zinc-200 via-zinc-300 to-zinc-200 dark:from-zinc-800 dark:via-zinc-700 dark:to-zinc-800 rounded-full animate-pulse w-4/5" style="animation-delay: 150ms;"></div>
+                    <div class="h-2.5 bg-gradient-to-r from-zinc-200 via-zinc-300 to-zinc-200 dark:from-zinc-800 dark:via-zinc-700 dark:to-zinc-800 rounded-full animate-pulse w-3/5" style="animation-delay: 300ms;"></div>
                 </div>
             </div>
         `);
         chat.scrollTop(chat[0].scrollHeight);
+
+        const phaseTimer = setTimeout(function() {
+            $(`#${typingId}-status`).html(`
+                <svg class="animate-spin" viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path></svg>
+                Synthesizing structured card response...
+            `);
+        }, 1100);
 
         const ajaxUrlEndpoint = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
         const ajaxNonceSec = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
@@ -1852,15 +1866,24 @@ jQuery(document).ready(function($) {
                 current_page: curPage
             },
             success: function(response) {
+                clearTimeout(phaseTimer);
                 $(`#${typingId}`).remove();
                 if (response.success && response.data) {
-                    let reply = (response.data.reply || '')
-                        .replace(/\n/g, '<br>')
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                    let rawReply = response.data.reply || '';
+                    let replyHtml = rawReply;
+
+                    // Cleanly format markdown if not already raw HTML card
+                    if (!rawReply.includes('<div') && !rawReply.includes('<table')) {
+                        replyHtml = rawReply
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                            .replace(/`([^`]+)`/g, '<code class="font-mono text-[10.5px] bg-zinc-200/80 dark:bg-zinc-800 px-1 py-0.5 rounded text-zinc-900 dark:text-zinc-100">$1</code>')
+                            .replace(/\n\n/g, '<br><br>')
+                            .replace(/\n/g, '<br>');
+                    }
                     
-                    if (reply) {
-                        chat.append(`<div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl p-4 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">${reply}</div>`);
+                    if (replyHtml) {
+                        chat.append(`<div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl p-4 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[95%] w-full">${replyHtml}</div>`);
                     }
 
                     // Dynamically update Quota Usage counters across sidebar popover & diagnostics card
