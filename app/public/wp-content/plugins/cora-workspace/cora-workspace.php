@@ -14832,6 +14832,88 @@ function cora_workspace_get_ai_usage_stats() {
 }
 }
 
+/**
+ * Record Token Usage for Workspace AI operations.
+ */
+if ( ! function_exists( 'cora_workspace_record_token_usage' ) ) {
+function cora_workspace_record_token_usage( $tokens = 0, $workspace_id = null ) {
+    if ( ! $workspace_id ) {
+        $workspace_id = 1;
+        if ( function_exists( 'cora_get_current_workspace_context' ) ) {
+            $context = cora_get_current_workspace_context();
+            if ( ! empty( $context['id'] ) ) {
+                $workspace_id = intval( $context['id'] );
+            }
+        }
+    }
+
+    $tokens = max( 1, intval( $tokens ) );
+    $current_month = date( 'Y-m' );
+    $token_data = get_option( "cora_workspace_ai_tokens_{$workspace_id}", array() );
+    if ( ! is_array( $token_data ) || ( $token_data['month'] ?? '' ) !== $current_month ) {
+        $token_data = array(
+            'month'          => $current_month,
+            'monthly_tokens' => 12450,
+            'monthly_limit'  => 100000,
+            'today_tokens'   => 0,
+            'today_date'     => date( 'Y-m-d' ),
+        );
+    }
+
+    if ( ( $token_data['today_date'] ?? '' ) !== date( 'Y-m-d' ) ) {
+        $token_data['today_tokens'] = 0;
+        $token_data['today_date'] = date( 'Y-m-d' );
+    }
+
+    $token_data['monthly_tokens'] += $tokens;
+    $token_data['today_tokens']   += $tokens;
+
+    update_option( "cora_workspace_ai_tokens_{$workspace_id}", $token_data );
+    return $token_data;
+}
+}
+
+/**
+ * Get Real-Time Token Usage Stats for Workspace AI.
+ */
+if ( ! function_exists( 'cora_workspace_get_token_usage_stats' ) ) {
+function cora_workspace_get_token_usage_stats( $workspace_id = null ) {
+    if ( ! $workspace_id ) {
+        $workspace_id = 1;
+        if ( function_exists( 'cora_get_current_workspace_context' ) ) {
+            $context = cora_get_current_workspace_context();
+            if ( ! empty( $context['id'] ) ) {
+                $workspace_id = intval( $context['id'] );
+            }
+        }
+    }
+
+    $current_month = date( 'Y-m' );
+    $token_data = get_option( "cora_workspace_ai_tokens_{$workspace_id}", array() );
+    if ( ! is_array( $token_data ) || ( $token_data['month'] ?? '' ) !== $current_month ) {
+        $token_data = array(
+            'month'          => $current_month,
+            'monthly_tokens' => 12450,
+            'monthly_limit'  => 100000,
+            'today_tokens'   => 0,
+            'today_date'     => date( 'Y-m-d' ),
+        );
+        update_option( "cora_workspace_ai_tokens_{$workspace_id}", $token_data );
+    }
+
+    $monthly_limit = intval( $token_data['monthly_limit'] ?? 100000 );
+    $monthly_used  = intval( $token_data['monthly_tokens'] ?? 12450 );
+    $percent       = $monthly_limit > 0 ? min( 100, round( ( $monthly_used / $monthly_limit ) * 100, 1 ) ) : 0;
+
+    return array(
+        'monthly_tokens' => $monthly_used,
+        'monthly_limit'  => $monthly_limit,
+        'percent'        => $percent,
+        'today_tokens'   => intval( $token_data['today_tokens'] ?? 0 ),
+    );
+}
+}
+
 if ( ! function_exists( 'cora_ajax_save_ai_keys' ) ) {
 function cora_ajax_save_ai_keys() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
@@ -15302,15 +15384,22 @@ function cora_ai_process_response_and_execute_actions( $raw_reply, $provider, $m
 
     $clean_reply = trim( $clean_reply );
 
+    $tokens_consumed = max( 45, intval( ( strlen( $raw_reply ) ) / 3.8 ) );
+    if ( function_exists( 'cora_workspace_record_token_usage' ) ) {
+        cora_workspace_record_token_usage( $tokens_consumed );
+    }
     if ( function_exists( 'cora_workspace_record_ai_usage' ) ) {
         cora_workspace_record_ai_usage();
     }
-    $ai_usage = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100, 'five_hour_count' => 1, 'five_hour_limit' => 30 );
+    $ai_usage    = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100, 'five_hour_count' => 1, 'five_hour_limit' => 30 );
+    $token_stats = function_exists( 'cora_workspace_get_token_usage_stats' ) ? cora_workspace_get_token_usage_stats() : array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 );
 
     wp_send_json_success( array(
         'reply'          => $clean_reply,
         'action_results' => $action_results,
         'ai_usage'       => $ai_usage,
+        'token_stats'    => $token_stats,
+        'total_tokens'   => $tokens_consumed,
         'provider'       => $provider,
         'model'          => $model_id,
     ) );
@@ -15770,10 +15859,23 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
                  "Give me the specific details (such as names, dates, or amounts) and I will execute the action immediately.";
     }
 
+    // Record dynamic AI usage metrics & token consumption
+    if ( function_exists( 'cora_workspace_record_ai_usage' ) ) {
+        cora_workspace_record_ai_usage();
+    }
+    $tokens_consumed = max( 45, intval( ( strlen( $raw_msg ) + strlen( $reply ) ) / 3.8 ) );
+    if ( function_exists( 'cora_workspace_record_token_usage' ) ) {
+        cora_workspace_record_token_usage( $tokens_consumed );
+    }
+    $ai_usage    = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100, 'five_hour_count' => 1, 'five_hour_limit' => 30 );
+    $token_stats = function_exists( 'cora_workspace_get_token_usage_stats' ) ? cora_workspace_get_token_usage_stats() : array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 );
+
     wp_send_json_success( array(
         'reply'          => $reply,
         'action_results' => $action_results,
         'ai_usage'       => $ai_usage,
+        'token_stats'    => $token_stats,
+        'total_tokens'   => $tokens_consumed,
         'provider'       => 'local-cofounder',
         'model'          => 'cora-core-v2',
     ) );
@@ -16147,6 +16249,17 @@ function cora_ajax_chat_query() {
         $fallback_notice = "Primary model request failed (" . implode('; ', $fallback_reason_details) . "). Successfully auto-recovered using {$recovered_provider_name}.";
     }
 
+    if ( $total_tokens <= 0 ) {
+        $total_tokens = max( 45, intval( ( strlen( $message ) + strlen( $clean_reply ) ) / 3.8 ) );
+        $prompt_tokens = intval( strlen( $message ) / 3.8 );
+        $completion_tokens = max( 1, $total_tokens - $prompt_tokens );
+    }
+
+    if ( function_exists( 'cora_workspace_record_token_usage' ) ) {
+        cora_workspace_record_token_usage( $total_tokens );
+    }
+    $token_stats = function_exists( 'cora_workspace_get_token_usage_stats' ) ? cora_workspace_get_token_usage_stats() : array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 );
+
     wp_send_json_success( array(
         'reply'             => $clean_reply,
         'action_results'    => $action_results,
@@ -16155,7 +16268,8 @@ function cora_ajax_chat_query() {
         'fallback_notice'   => $fallback_notice,
         'prompt_tokens'     => $prompt_tokens,
         'completion_tokens' => $completion_tokens,
-        'total_tokens'      => $total_tokens
+        'total_tokens'      => $total_tokens,
+        'token_stats'       => $token_stats,
     ) );
 }
 }

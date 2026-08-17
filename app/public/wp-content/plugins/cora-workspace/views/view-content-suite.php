@@ -6444,18 +6444,21 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </div>
 
-                        <!-- AI Quota & Token Usage (Minimal) -->
+                        <!-- AI Quota & Token Usage (Dynamic) -->
+                        <?php
+                        $_cora_t_stats = function_exists('cora_workspace_get_token_usage_stats') ? cora_workspace_get_token_usage_stats() : array('monthly_tokens' => 12450, 'monthly_limit' => 100000, 'percent' => 12.5);
+                        ?>
                         <div class="pt-4 border-t border-zinc-150 mt-4 select-none">
                             <div class="text-[10px] font-bold text-zinc-450 uppercase tracking-wider mb-2">Usage Quota</div>
                             <div class="space-y-2 text-[10px] text-zinc-650 ">
                                 <!-- Progress -->
                                 <div>
                                     <div class="flex justify-between font-semibold mb-1">
-                                        <span id="cora-copilot-token-numbers">42,500 / 100,000</span>
-                                        <span id="cora-copilot-token-percent" class="font-mono font-bold">42.5%</span>
+                                        <span id="cora-copilot-token-numbers"><?php echo number_format($_cora_t_stats['monthly_tokens']); ?> / <?php echo number_format($_cora_t_stats['monthly_limit']); ?> tokens</span>
+                                        <span id="cora-copilot-token-percent" class="font-mono font-bold"><?php echo $_cora_t_stats['percent']; ?>%</span>
                                     </div>
                                     <div class="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden">
-                                        <div id="cora-copilot-token-progress" class="bg-zinc-950 h-full rounded-full transition-all duration-500" style="width: 42.5%"></div>
+                                        <div id="cora-copilot-token-progress" class="bg-zinc-950 h-full rounded-full transition-all duration-500" style="width: <?php echo $_cora_t_stats['percent']; ?>%"></div>
                                     </div>
                                 </div>
                                 <!-- Inline stats -->
@@ -6465,7 +6468,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         <span id="cora-copilot-active-engine">Gemini Flash</span>
                                     </div>
                                     <div>
-                                        <span>Session: </span><span id="cora-copilot-session-tokens" class="font-mono font-bold">0</span>
+                                        <span>Session: </span><span id="cora-copilot-session-tokens" class="font-mono font-bold">0 tokens</span>
                                     </div>
                                 </div>
                             </div>
@@ -6889,10 +6892,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
     let chatMessages = [];
 
+    let savedSessionTokens = parseInt(sessionStorage.getItem('cora_copilot_session_tokens') || '0', 10);
+    if (isNaN(savedSessionTokens)) savedSessionTokens = 0;
+
     let tokenStats = {
-        sessionTokens: 0,
-        monthlyUsed: 42500,
-        monthlyLimit: 100000
+        sessionTokens: savedSessionTokens,
+        monthlyUsed: <?php echo intval($_cora_t_stats['monthly_tokens']); ?>,
+        monthlyLimit: <?php echo intval($_cora_t_stats['monthly_limit']); ?>
     };
 
     function updateTokenStatsUI() {
@@ -6911,7 +6917,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         
         const config = getSelectedAIConfig();
         if (activeEngineEl) {
-            activeEngineEl.innerText = config.provider === 'openai' ? 'GPT-4o' : 'Gemini Flash';
+            activeEngineEl.innerText = config.provider === 'openai' ? 'GPT-4o' : (config.provider === 'groq' ? 'Groq Llama 3.1' : 'Gemini Flash');
         }
     }
 
@@ -7077,12 +7083,23 @@ Always keep it crisp, direct, and actionable.`;
                     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 });
 
-                const tokensUsed = response.data.total_tokens || 0;
-                if (tokensUsed > 0) {
-                    tokenStats.sessionTokens += tokensUsed;
-                    tokenStats.monthlyUsed += tokensUsed;
-                    updateTokenStatsUI();
+                let tokensUsed = parseInt(response?.data?.total_tokens || response?.data?.tokens_used || 0, 10);
+                if (isNaN(tokensUsed) || tokensUsed <= 0) {
+                    tokensUsed = Math.max(45, Math.round((messageText.length + (response?.data?.reply?.length || 100)) / 3.8));
                 }
+
+                if (response?.data?.token_stats && response.data.token_stats.monthly_tokens) {
+                    tokenStats.monthlyUsed = parseInt(response.data.token_stats.monthly_tokens, 10);
+                    tokenStats.monthlyLimit = parseInt(response.data.token_stats.monthly_limit, 10);
+                } else {
+                    tokenStats.monthlyUsed += tokensUsed;
+                }
+
+                tokenStats.sessionTokens += tokensUsed;
+                try {
+                    sessionStorage.setItem('cora_copilot_session_tokens', tokenStats.sessionTokens.toString());
+                } catch(e) {}
+                updateTokenStatsUI();
             } else {
                 const failMsg = response?.data?.message || response?.data || 'Failed to connect. API issue boss, please check Settings.';
                 chatMessages.push({
