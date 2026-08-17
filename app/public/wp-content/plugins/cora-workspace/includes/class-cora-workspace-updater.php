@@ -44,8 +44,9 @@ class Cora_Workspace_Updater {
         $transient_key = 'cora_workspace_update_info';
         $info = get_transient( $transient_key );
 
-        // If cached info version is less than or equal to current version, force refetch
-        if ( is_array( $info ) && isset( $info['version'] ) && version_compare( $info['version'], CORA_WORKSPACE_VERSION, '<=' ) ) {
+        // Only force refetch if cached version is strictly LESS than current version (stale cache from before upgrade).
+        // When cached version equals or exceeds current, the cache is still valid — no need to re-query the server.
+        if ( is_array( $info ) && isset( $info['version'] ) && version_compare( $info['version'], CORA_WORKSPACE_VERSION, '<' ) ) {
             $force = true;
         }
 
@@ -56,7 +57,7 @@ class Cora_Workspace_Updater {
             $url = add_query_arg( 'cb', time(), $url );
 
             $response = wp_remote_get( $url, array(
-                'timeout'    => 15,
+                'timeout'    => 3,
                 'user-agent' => 'Cora-Platform-Updater/' . CORA_WORKSPACE_VERSION,
                 'sslverify'  => false
             ) );
@@ -77,8 +78,8 @@ class Cora_Workspace_Updater {
                 return false;
             }
 
-            // Cache it for 5 minutes
-            set_transient( $transient_key, $info, 5 * MINUTE_IN_SECONDS );
+            // Cache for 30 minutes (was 5 minutes — reduced frequency of remote checks)
+            set_transient( $transient_key, $info, 30 * MINUTE_IN_SECONDS );
             update_option( 'cora_workspace_last_update_check_time', current_time( 'mysql' ) );
         }
 

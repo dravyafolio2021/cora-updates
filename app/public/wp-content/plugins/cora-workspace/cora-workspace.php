@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.74
+ * Version: 3.4.75
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.74' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.75' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -18240,6 +18240,41 @@ function cora_ws_ajax_clear_cache() {
 }
 add_action( 'wp_ajax_cora_clear_cache', 'cora_ws_ajax_clear_cache' );
 add_action( 'wp_ajax_cora_clear_system_cache', 'cora_ws_ajax_clear_cache' );
+
+/**
+ * AJAX Action: Lazy-load Settings Tab Panel Content
+ * Performance optimization — heavy tabs (pulse, audit) are loaded on-demand via AJAX
+ * instead of being eagerly included in the initial page render.
+ */
+if ( ! function_exists( 'cora_ajax_lazy_load_settings_tab' ) ) {
+function cora_ajax_lazy_load_settings_tab() {
+    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+    }
+
+    $tab = isset( $_POST['tab'] ) ? sanitize_text_field( $_POST['tab'] ) : '';
+
+    $allowed_tabs = array( 'pulse', 'audit' );
+    if ( ! in_array( $tab, $allowed_tabs, true ) ) {
+        wp_send_json_error( array( 'message' => 'Invalid tab.' ) );
+    }
+
+    ob_start();
+
+    if ( $tab === 'pulse' ) {
+        include CORA_WORKSPACE_PATH . 'views/view-activity-timeline.php';
+    } elseif ( $tab === 'audit' ) {
+        include CORA_WORKSPACE_PATH . 'views/view-audit-panel.php';
+    }
+
+    $html = ob_get_clean();
+
+    wp_send_json_success( array( 'html' => $html ) );
+}
+}
+add_action( 'wp_ajax_cora_lazy_load_settings_tab', 'cora_ajax_lazy_load_settings_tab' );
 
 /**
  * AJAX Action: Save Git Sync Field

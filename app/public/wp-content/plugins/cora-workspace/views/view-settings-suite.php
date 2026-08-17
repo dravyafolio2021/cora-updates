@@ -537,7 +537,19 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
         <!-- TAB: BUSINESS PULSE (AI ACTIVITY INTELLIGENCE) -->
         <div id="cora-settings-panel-pulse" class="cora-settings-panel space-y-6 max-w-full <?php echo ( $active_tab === 'pulse' || $active_tab === 'activity' || $active_tab === 'activity-timeline' ) ? '' : 'hidden'; ?>">
-            <?php include CORA_WORKSPACE_PATH . 'views/view-activity-timeline.php'; ?>
+            <?php
+            // Performance: Only include heavy Activity Timeline when this tab is active
+            if ( in_array( $active_tab, array( 'pulse', 'activity', 'activity-timeline' ), true ) ) {
+                include CORA_WORKSPACE_PATH . 'views/view-activity-timeline.php';
+            } else {
+            ?>
+            <div id="cora-lazy-pulse-placeholder" class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center mb-3">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                </div>
+                <p class="text-xs text-zinc-500 font-medium">Loading Activity Timeline...</p>
+            </div>
+            <?php } ?>
         </div>
 
         <!-- TAB 1: GENERAL SETTINGS -->
@@ -3057,7 +3069,19 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
         <!-- TAB: AUDIT & LOGS -->
         <div id="cora-settings-panel-audit" class="cora-settings-panel space-y-6 max-w-full <?php echo $active_tab === 'audit' ? '' : 'hidden'; ?>">
-            <?php include __DIR__ . '/view-audit-panel.php'; ?>
+            <?php
+            // Performance: Only include heavy Audit Panel when this tab is active
+            if ( $active_tab === 'audit' ) {
+                include __DIR__ . '/view-audit-panel.php';
+            } else {
+            ?>
+            <div id="cora-lazy-audit-placeholder" class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center mb-3">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                </div>
+                <p class="text-xs text-zinc-500 font-medium">Loading Audit Logs...</p>
+            </div>
+            <?php } ?>
         </div>
 
         <!-- TAB: UPDATES & PLATFORM -->
@@ -3102,8 +3126,14 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <div class="cora-shopify-card-body pt-5 relative">
                     <!-- Dynamic Status Container -->
                     <?php
-                    $updater = Cora_Workspace_Updater::get_instance();
-                    $info = $updater->fetch_remote_update_info();
+                    // Performance: Only fetch remote update info when the Updates tab is active
+                    // This avoids a blocking wp_remote_get() call (up to 15s timeout) on every settings load
+                    if ( $active_tab === 'updates' ) {
+                        $updater = Cora_Workspace_Updater::get_instance();
+                        $info = $updater->fetch_remote_update_info();
+                    } else {
+                        $info = get_transient( 'cora_workspace_update_info' );
+                    }
                     $update_available = ( $info && version_compare( CORA_WORKSPACE_VERSION, $info['version'], '<' ) );
                     ?>
                     <div id="cora-updates-status-container" class="select-none mb-5">

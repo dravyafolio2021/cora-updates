@@ -11008,6 +11008,45 @@ jQuery(document).ready(function($) {
         if (targetPanel.length) {
             targetPanel.removeClass('hidden').addClass('block cora-view-fade-in');
             
+            // AJAX Lazy-Load: Fetch heavy tab content on first activation
+            var lazyTabs = { 'pulse': '#cora-lazy-pulse-placeholder', 'audit': '#cora-lazy-audit-placeholder' };
+            var lazyAlias = { 'activity': 'pulse', 'activity-timeline': 'pulse' };
+            var resolvedTab = lazyAlias[tabKey] || tabKey;
+            
+            if (lazyTabs[resolvedTab]) {
+                var placeholder = $(lazyTabs[resolvedTab]);
+                if (placeholder.length && !placeholder.hasClass('cora-lazy-loaded')) {
+                    placeholder.addClass('cora-lazy-loaded');
+                    $.post(coraREData.ajaxUrl, {
+                        action: 'cora_lazy_load_settings_tab',
+                        tab: resolvedTab,
+                        nonce: coraREData.ajaxNonce
+                    }, function(res) {
+                        if (res && res.success && res.data && res.data.html) {
+                            var parentPanel = placeholder.parent();
+                            placeholder.remove();
+                            parentPanel.html(res.data.html);
+                            
+                            // Re-trigger tab-specific initializers after content injection
+                            if (resolvedTab === 'audit' && typeof filterLogs === 'function') {
+                                filterLogs();
+                            }
+                            if (resolvedTab === 'pulse' && typeof window.coraFilterPulseEvents === 'function') {
+                                window.coraFilterPulseEvents();
+                            }
+                        } else {
+                            placeholder.removeClass('cora-lazy-loaded');
+                            placeholder.find('p').text('Failed to load. Click the tab again to retry.');
+                            placeholder.find('svg').removeClass('animate-spin');
+                        }
+                    }).fail(function() {
+                        placeholder.removeClass('cora-lazy-loaded');
+                        placeholder.find('p').text('Network error. Click the tab again to retry.');
+                        placeholder.find('svg').removeClass('animate-spin');
+                    });
+                }
+            }
+            
             // Accordion: Collapse all card bodies in the active panel except the first one
             var cards = targetPanel.find('.cora-shopify-card');
             cards.each(function(index, cardEl) {
