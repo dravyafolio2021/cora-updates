@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.75
+ * Version: 3.4.76
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.75' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.76' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -11567,6 +11567,83 @@ function cora_rag_ingest_event( $agency_id, $category, $title, $content, $source
 }
 
 /**
+ * Retrieve the most relevant learned memory fragments & settings events for active workspace RAG context
+ */
+if ( ! function_exists( 'cora_rag_get_relevant_memories' ) ) {
+function cora_rag_get_relevant_memories( $agency_id = null, $query = '', $limit = 5 ) {
+    global $wpdb;
+    if ( empty( $agency_id ) ) {
+        $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
+    }
+    $table = $wpdb->prefix . 'cora_rag_knowledge';
+    if ( ! cora_table_exists( $table ) ) {
+        return '';
+    }
+
+    $results = array();
+    $clean_query = trim( $query );
+
+    // If query has keywords, prioritize matching records
+    if ( ! empty( $clean_query ) && strlen( $clean_query ) > 2 ) {
+        $words = preg_split( '/\s+/', $clean_query );
+        $like_clauses = array();
+        $params = array( $agency_id );
+        foreach ( array_slice( $words, 0, 4 ) as $w ) {
+            $w = trim( $w );
+            if ( strlen( $w ) >= 3 && ! in_array( strtolower($w), array('the','and','for','with','this','what','can','you','how') ) ) {
+                $like_clauses[] = "(title LIKE %s OR content LIKE %s)";
+                $params[] = '%' . $wpdb->esc_like( $w ) . '%';
+                $params[] = '%' . $wpdb->esc_like( $w ) . '%';
+            }
+        }
+
+        if ( ! empty( $like_clauses ) ) {
+            $sql = "SELECT source_type, title, content, updated_at FROM {$table} WHERE agency_id = %d AND (" . implode( ' OR ', $like_clauses ) . ") ORDER BY id DESC LIMIT " . intval( $limit );
+            $results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
+        }
+    }
+
+    // Fallback or fill: Get latest memories/settings events
+    if ( count( $results ) < $limit ) {
+        $needed = $limit - count( $results );
+        $latest = $wpdb->get_results( $wpdb->prepare(
+            "SELECT source_type, title, content, updated_at FROM {$table} WHERE agency_id = %d ORDER BY id DESC LIMIT %d",
+            $agency_id, $needed
+        ), ARRAY_A );
+        if ( ! empty( $latest ) ) {
+            foreach ( $latest as $lat ) {
+                // Deduplicate
+                $found = false;
+                foreach ( $results as $r ) {
+                    if ( $r['title'] === $lat['title'] ) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if ( ! $found ) {
+                    $results[] = $lat;
+                }
+            }
+        }
+    }
+
+    if ( empty( $results ) ) {
+        return '';
+    }
+
+    $lines = array();
+    foreach ( $results as $item ) {
+        $type = strtoupper( $item['source_type'] ?? 'MEMORY' );
+        $title = $item['title'] ?? 'Fact';
+        $excerpt = wp_trim_words( strip_tags( $item['content'] ?? '' ), 24, '...' );
+        $lines[] = "• [{$type}] {$title}: {$excerpt}";
+    }
+
+    return implode( "\n", $lines );
+}
+}
+
+/**
  * Builds live dynamic operational intelligence context for AI models
  */
 if ( ! function_exists( 'cora_build_dynamic_workspace_context' ) ) {
@@ -15405,6 +15482,163 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             }
             break;
 
+        case 'update_settings':
+        case 'change_settings':
+            $allowed_keys = array(
+                'blogname'                     => 'Site Title',
+                'blogdescription'              => 'Site Tagline',
+                'cora_sidebar_title'           => 'Sidebar Brand Title',
+                'admin_email'                  => 'Administrator Email',
+                'default_role'                 => 'Default User Role',
+                'users_can_register'           => 'User Registration',
+                'cora_workspace_name'          => 'Workspace Office Name',
+                'cora_workspace_industry'      => 'Industry Mode',
+                'cora_workspace_tax_details'   => 'GSTIN / Tax ID',
+                'cora_workspace_address'       => 'Office Physical Address',
+                'cora_workspace_language'      => 'Workspace Language',
+                'cora_currency_format'         => 'Currency Format',
+                'cora_workspace_allow_tours'   => 'Interactive Tours',
+                'cora_pwd_policy_min_len'      => 'Password Minimum Length',
+                'cora_pwd_policy_numbers'      => 'Require Password Numbers',
+                'cora_pwd_policy_uppercase'    => 'Require Password Uppercase',
+                'cora_pwd_policy_special'      => 'Require Password Special Characters',
+                'cora_custom_enabled_features' => 'Custom Enabled Features',
+                'cora_brand_logo_url'          => 'Brand Logo URL',
+                'cora_brand_favicon_url'       => 'Brand Favicon URL',
+            );
+
+            $settings_input = ! empty( $args['settings'] ) && is_array( $args['settings'] ) ? $args['settings'] : $args;
+            $changed_items = array();
+            $old_values = array();
+            $new_values = array();
+
+            foreach ( $settings_input as $k => $val ) {
+                if ( ! isset( $allowed_keys[ $k ] ) ) {
+                    continue;
+                }
+
+                $old_val = get_option( $k, '' );
+                $sanitized_val = $val;
+
+                if ( in_array( $k, array( 'blogname', 'blogdescription', 'cora_sidebar_title', 'cora_workspace_name', 'cora_workspace_tax_details', 'cora_workspace_address', 'cora_workspace_language', 'cora_currency_format' ), true ) ) {
+                    $sanitized_val = sanitize_text_field( $val );
+                } elseif ( $k === 'admin_email' ) {
+                    $sanitized_val = sanitize_email( $val );
+                } elseif ( in_array( $k, array( 'users_can_register', 'cora_workspace_allow_tours', 'cora_pwd_policy_numbers', 'cora_pwd_policy_uppercase', 'cora_pwd_policy_special' ), true ) ) {
+                    $sanitized_val = ( ! empty( $val ) && $val !== '0' && $val !== 0 && $val !== 'false' ) ? 1 : 0;
+                } elseif ( $k === 'cora_pwd_policy_min_len' ) {
+                    $sanitized_val = max( 6, min( 32, intval( $val ) ) );
+                } elseif ( $k === 'cora_workspace_industry' ) {
+                    $sanitized_val = sanitize_text_field( str_replace( '-', '_', strtolower( $val ) ) );
+                    if ( ! in_array( $sanitized_val, array( 'real_estate', 'photography_studio', 'custom' ), true ) ) {
+                        $sanitized_val = 'real_estate';
+                    }
+                    setcookie( 'cora_workspace_industry', $sanitized_val, time() + ( 86400 * 30 ), COOKIEPATH, COOKIE_DOMAIN );
+                    $_COOKIE['cora_workspace_industry'] = $sanitized_val;
+                } elseif ( $k === 'cora_custom_enabled_features' ) {
+                    $sanitized_val = is_array( $val ) ? array_map( 'sanitize_text_field', $val ) : array();
+                } elseif ( in_array( $k, array( 'cora_brand_logo_url', 'cora_brand_favicon_url' ), true ) ) {
+                    $sanitized_val = esc_url_raw( $val );
+                }
+
+                update_option( $k, $sanitized_val );
+                $changed_items[ $k ] = array(
+                    'label' => $allowed_keys[ $k ],
+                    'old'   => $old_val,
+                    'new'   => $sanitized_val,
+                );
+                $old_values[ $k ] = $old_val;
+                $new_values[ $k ] = $sanitized_val;
+            }
+
+            if ( ! empty( $changed_items ) ) {
+                $result['success'] = true;
+                $summary_parts = array();
+                foreach ( $changed_items as $ci ) {
+                    $summary_parts[] = "{$ci['label']} set to '{$ci['new']}'";
+                }
+                $summary_text = implode( ', ', $summary_parts );
+                $result['message'] = "Updated workspace settings: {$summary_text}.";
+
+                // Self-Learning RAG Ingestion: Record settings update into knowledge base
+                if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                    cora_rag_ingest_event(
+                        $agency_id,
+                        'settings',
+                        "Settings Updated: " . reset( $summary_parts ),
+                        "Autonomous AI updated workspace settings:\n" . implode( "\n", array_map( function( $k, $v ) { return "• {$v['label']}: '{$v['old']}' -> '{$v['new']}'"; }, array_keys( $changed_items ), $changed_items ) ),
+                        'settings_' . time()
+                    );
+                }
+
+                $result['data'] = array(
+                    'changed'      => $changed_items,
+                    'old_values'   => $old_values,
+                    'new_values'   => $new_values,
+                    'summary'      => $summary_text,
+                    'settings_url' => home_url( '/workspace/settings-suite' ),
+                );
+            } else {
+                $result['message'] = "No valid settings recognized or permitted to update.";
+            }
+            break;
+
+        case 'propose_settings':
+            $allowed_keys = array(
+                'blogname'                     => 'Site Title',
+                'blogdescription'              => 'Site Tagline',
+                'cora_sidebar_title'           => 'Sidebar Brand Title',
+                'admin_email'                  => 'Administrator Email',
+                'default_role'                 => 'Default User Role',
+                'users_can_register'           => 'User Registration',
+                'cora_workspace_name'          => 'Workspace Office Name',
+                'cora_workspace_industry'      => 'Industry Mode',
+                'cora_workspace_tax_details'   => 'GSTIN / Tax ID',
+                'cora_workspace_address'       => 'Office Physical Address',
+                'cora_workspace_language'      => 'Workspace Language',
+                'cora_currency_format'         => 'Currency Format',
+                'cora_workspace_allow_tours'   => 'Interactive Tours',
+                'cora_pwd_policy_min_len'      => 'Password Minimum Length',
+                'cora_pwd_policy_numbers'      => 'Require Password Numbers',
+                'cora_pwd_policy_uppercase'    => 'Require Password Uppercase',
+                'cora_pwd_policy_special'      => 'Require Password Special Characters',
+                'cora_custom_enabled_features' => 'Custom Enabled Features',
+                'cora_brand_logo_url'          => 'Brand Logo URL',
+                'cora_brand_favicon_url'       => 'Brand Favicon URL',
+            );
+
+            $settings_input = ! empty( $args['settings'] ) && is_array( $args['settings'] ) ? $args['settings'] : $args;
+            $proposed_changes = array();
+            foreach ( $settings_input as $k => $val ) {
+                if ( isset( $allowed_keys[ $k ] ) ) {
+                    $current_val = get_option( $k, '' );
+                    $proposed_changes[ $k ] = array(
+                        'label'       => $allowed_keys[ $k ],
+                        'current_val' => $current_val,
+                        'new_val'     => $val,
+                    );
+                }
+            }
+
+            if ( ! empty( $proposed_changes ) ) {
+                $proposal_id = 'prop_' . wp_generate_password( 10, false );
+                set_transient( 'cora_setting_proposal_' . $proposal_id, array(
+                    'agency_id' => $agency_id,
+                    'user_id'   => $user_id,
+                    'changes'   => $settings_input,
+                ), 600 ); // valid for 10 minutes
+
+                $result['success'] = true;
+                $result['message'] = "Prepared settings change proposal.";
+                $result['data'] = array(
+                    'proposal_id' => $proposal_id,
+                    'changes'     => $proposed_changes,
+                );
+            } else {
+                $result['message'] = "No valid setting changes proposed.";
+            }
+            break;
+
         default:
             $result['message'] = "Unknown action: {$action_name}";
             break;
@@ -15486,6 +15720,7 @@ function cora_ajax_ai_chat() {
 
     $message = sanitize_text_field( $_POST['message'] ?? '' );
     $current_page = sanitize_text_field( $_POST['current_page'] ?? 'dashboard' );
+    $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
 
     $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'custom';
     $mod_instance    = class_exists( 'Cora_Module_Registry' ) ? Cora_Module_Registry::get_module( $active_industry ) : null;
@@ -15507,35 +15742,59 @@ function cora_ajax_ai_chat() {
     $active_modules_str = implode( ', ', array_values( $active_modules ) );
     $active_keys        = array_keys( $active_modules );
 
+    // Dynamic Workspace Settings & Current State
+    $cur_site_title = get_option( 'blogname', 'Cora' );
+    $cur_tagline    = get_option( 'blogdescription', '' );
+    $cur_brand      = get_option( 'cora_sidebar_title', 'CORA' );
+    $cur_gst        = get_option( 'cora_workspace_tax_details', 'Not configured' );
+    $cur_address    = get_option( 'cora_workspace_address', 'Not configured' );
+    $cur_currency   = get_option( 'cora_currency_format', 'INR_LAKHS' );
+    $cur_tours      = get_option( 'cora_workspace_allow_tours', 1 ) ? 'Enabled' : 'Disabled';
+
+    // Self-Learning RAG: Retrieve active learned memories for this query
+    $learned_memories_str = '';
+    if ( function_exists( 'cora_rag_get_relevant_memories' ) ) {
+        $learned_memories_str = cora_rag_get_relevant_memories( $agency_id, $message, 5 );
+    }
+
     $default_prompt = "You are Cora AI, the autonomous AI Co-Founder for the Cora Workspace Platform.
-You do not merely chat; you actively TAKE ACTION to run and automate the user's business.
+You do not merely chat; you actively TAKE ACTION to run, configure, and automate the user's business.
 
-[ACTIVE WORKSPACE ENVIRONMENT]
-Workspace Industry Mode: " . strtoupper( $active_industry ) . "
-Active Modules: " . $active_modules_str . "
+[ACTIVE WORKSPACE CONFIGURATION & IDENTITY]
+• Site Title: {$cur_site_title}
+• Tagline: {$cur_tagline}
+• Header/Sidebar Brand: {$cur_brand}
+• Industry Mode: " . strtoupper( $active_industry ) . "
+• Tax / GSTIN: {$cur_gst}
+• Office Address: {$cur_address}
+• Currency Format: {$cur_currency}
+• Interactive Tours: {$cur_tours}
+• Active Modules: {$active_modules_str}
 
-CRITICAL DOMAIN & VISUAL PRESENTATION RULES:
-1. STRICT MODULE AWARENESS: You MUST only suggest actions, ask questions, and create entities for active modules (" . $active_modules_str . ").
-2. RICH COMPONENT CARDS & BLOCKS: When answering questions about modules, status, pipelines, financials, or data, NEVER output raw comma-separated walls of text or long unbroken paragraphs.
+" . ( ! empty( $learned_memories_str ) ? "[LIVING RAG MEMORY & LEARNED FACTS]\n" . $learned_memories_str . "\n\n" : "" ) . "CRITICAL DOMAIN & VISUAL PRESENTATION RULES:
+1. STRICT ACCURACY & CONTEXT: Answer all inquiries directly. When asked what you can do (such as updating site name or managing settings), explain your exact autonomous capabilities clearly.
+2. RICH COMPONENT CARDS & BLOCKS: When answering questions about modules, status, pipelines, financials, or data, NEVER output raw comma-separated walls of text.
    - ALWAYS format responses into structured Markdown cards, categorized sections with bold headers, status pills `[Active]`, and concise bullet points.
-   - For lists of modules or features, group them logically into clean blocks with direct sub_page names (e.g. `• **Forms Builder** (?sub_page=forms): Dynamic client intake & surveys`).
-   - For business metrics or briefings, present clear structured KPI summary lines.
-3. If the user is in Custom Workspace mode or an industry feature (like CRM Leads or Studio Shoots) is NOT active, DO NOT assume or inject real estate or photography terms unless the user explicitly mentions them. Focus purely on general-purpose business forms, GST invoices, documents, client workflows, and files.
-4. Keep responses crisp, professional, structured, and zero-clutter. Adhere strictly to monochromatic visual standards (ZERO emojis).
+3. Keep responses crisp, professional, structured, and zero-clutter. Adhere strictly to monochromatic visual standards (ZERO emojis).
 
 === ACTION EXECUTION CAPABILITY ===
-When the user asks you to create or execute something:
+When the user asks you to create, update, or execute something:
 1. If you have enough details, IMMEDIATELY execute the action by embedding a clean JSON action block:
 " . ( in_array( 'forms', $active_keys ) || in_array( 'dashboard', $active_keys ) ? '   [ACTION:create_form]{"title":"Client Inquiry Form","fields":[{"label":"Full Name","type":"text"},{"label":"Email","type":"email"},{"label":"Phone","type":"phone"},{"label":"Message","type":"textarea"}]}[/ACTION]' . "\n" : '' ) .
 ( in_array( 'leads', $active_keys ) ? '   [ACTION:create_lead]{"name":"Rahul Sharma","phone":"9876543210","email":"rahul@example.com","deal_value":150000,"status":"new","notes":"Client inquiry"}[/ACTION]' . "\n" : '' ) .
 ( in_array( 'financials', $active_keys ) ? '   [ACTION:create_invoice]{"client_name":"Acme Corp","amount":75000,"tax_rate":18,"due_date":"2026-08-25"}[/ACTION]' . "\n" : '' ) .
 ( in_array( 'bookings', $active_keys ) ? '   [ACTION:create_booking]{"title":"Project Kickoff","date":"2026-08-22","time":"09:00 AM","location":"Main Office"}[/ACTION]' . "\n" : '' ) .
 ( in_array( 'vault', $active_keys ) ? '   [ACTION:create_document]{"title":"Master Service Agreement","client_name":"Acme Corp"}[/ACTION]' . "\n" : '' ) .
-'   [ACTION:create_task]{"title":"Review Client Proposal","priority":"high","due_date":"2026-08-20"}[/ACTION]
+'   [ACTION:update_settings]{"settings":{"blogname":"Apex Studios","blogdescription":"Premier Agency"}}[/ACTION]
+   [ACTION:propose_settings]{"settings":{"cora_workspace_tax_details":"27AAAAA1111A1Z1"}}[/ACTION]
+   [ACTION:create_task]{"title":"Review Client Proposal","priority":"high","due_date":"2026-08-20"}[/ACTION]
 
-2. Two-Way Discussion Flow:
-   - If the user\'s request is missing details (for example, \'create a form for me\'), respond in a helpful, friendly, and crisp 2-way manner: ask 1-2 focused questions (e.g. \'What is the form for, and which fields would you like to include? (e.g., Name, Email, Phone, Message)\'), and execute the moment they reply.
-   - Do NOT output long paragraphs of text. Keep your responses crisp, direct, and structured.';
+2. Autonomous Settings Management:
+   - When the user asks to change site title, tagline, GSTIN, address, currency format, password policy, or feature toggles, execute [ACTION:update_settings] or [ACTION:propose_settings].
+   - If the user asks what the site name or current settings are, use the [ACTIVE WORKSPACE CONFIGURATION & IDENTITY] provided above to answer directly.
+
+3. Two-Way Discussion Flow:
+   - If details are missing, respond in a helpful 2-way manner: ask 1-2 focused questions and execute the moment they reply.';
 
     $system_prompt = $_POST['system_prompt'] ?? $default_prompt;
     $page_contexts = array(
@@ -15813,99 +16072,177 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             }
         }
         $amount = 0;
-        if ( preg_match( '/(?:₹|inr|rs\.?|amount|of)\s*([0-9,]+)/i', $raw_msg, $am ) ) {
+        if ( preg_match( '/(?:₹|inr|rs\.?|amount of|of|value)\s*([0-9,]+)/i', $raw_msg, $am ) ) {
             $amount = floatval( str_replace( ',', '', $am[1] ) );
         }
+        $tax_rate = 18;
+        if ( preg_match( '/([0-9]+)\s*%\s*gst/i', $raw_msg, $tm ) ) {
+            $tax_rate = floatval( $tm[1] );
+        }
 
-        // Interactive Clarification: If user didn't specify client or amount, prompt for parameters
-        if ( empty( $client_name ) && $amount <= 0 ) {
-            $reply = "I'm ready to generate an official 18% GST Invoice.\n\n" .
-                     "Please provide:\n" .
+        if ( empty( $client_name ) || $amount <= 0 ) {
+            $reply = "I'm ready to generate an official GST Invoice.\n\n" .
+                     "Please specify the invoice details:\n" .
                      "• **Client / Business Name** (e.g. *Acme Studios*)\n" .
-                     "• **Subtotal Amount** (e.g. *₹45,000*)\n" .
-                     "• **Due Date** (default is *7 days*)\n\n" .
-                     "You can reply with: *\"Invoice Acme Studios for ₹45,000 with 18% GST\"*";
+                     "• **Invoice Amount** (e.g. *₹45,000*)\n" .
+                     "• **GST Rate** (e.g. *18%*)\n\n" .
+                     "You can reply with: *\"Generate invoice for Acme Studios of ₹45,000 with 18% GST\"*";
         } else {
-            if ( empty( $client_name ) ) $client_name = 'Client';
-            if ( $amount <= 0 ) $amount = 50000;
-
             $exec_res = cora_execute_ai_action( 'create_invoice', array(
                 'client_name' => $client_name,
                 'amount'      => $amount,
-                'tax_rate'    => 18,
+                'tax_rate'    => $tax_rate,
             ), $agency_id, $user_id );
 
             if ( ! empty( $exec_res['success'] ) ) {
                 $action_results[] = $exec_res;
-                $reply = "Generated official GST invoice for **{$client_name}** totaling ₹" . number_format( $exec_res['data']['total_amount'] ) . " (Subtotal: ₹" . number_format($amount) . " + 18% GST).";
+                $reply = "Generated **{$exec_res['data']['invoice_no']}** for **{$client_name}** with GST tax calculations:";
             }
         }
     }
-    // 4. Intent: Booking / Photoshoot Scheduling
-    elseif ( preg_match( '/\b(?:booking|shoot|schedule|appointment|showing|tour)\b/i', $lower ) && preg_match( '/\b(?:create|book|schedule|set up|new|add)\b/i', $lower ) ) {
-        $title = '';
-        if ( preg_match( '/(?:booking|shoot|appointment|tour)\s+(?:for\s+)?([a-zA-Z0-9\s]+?)(?:for|on|at|$)/i', $raw_msg, $bm ) ) {
-            $matched_title = trim( $bm[1] );
-            if ( strlen( $matched_title ) > 2 && ! in_array( strtolower( $matched_title ), array('a', 'an', 'the', 'new', 'shoot', 'booking') ) ) {
-                $title = ucwords( $matched_title );
-            }
+    // 4. Intent: Shoot / Booking Scheduling
+    elseif ( preg_match( '/\b(?:booking|shoot|session|slot|appointment|schedule)\b/i', $lower ) && preg_match( '/\b(?:create|book|schedule|new|add|reserve)\b/i', $lower ) ) {
+        $title = 'Studio Session';
+        if ( preg_match( '/(?:booking|shoot|session)\s+(?:for|called|titled)\s+([a-zA-Z0-9\s]+?)(?:on|at|\.|$)/i', $raw_msg, $bm ) ) {
+            $title = ucwords( trim( $bm[1] ) );
+        }
+        $date = date('Y-m-d', strtotime('+2 days'));
+        if ( preg_match( '/\b(tomorrow|next week|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i', $raw_msg, $dm ) ) {
+            $date = date('Y-m-d', strtotime($dm[1]));
+        } elseif ( preg_match( '/([0-9]{4}-[0-9]{2}-[0-9]{2})/i', $raw_msg, $dm ) ) {
+            $date = $dm[1];
         }
 
-        // Interactive Clarification: If user didn't specify shoot context or date, prompt
-        if ( empty( $title ) && ! preg_match( '/\b(?:tomorrow|today|monday|tuesday|wednesday|thursday|friday|saturday|sunday|[0-9]{1,2}:[0-9]{2})\b/i', $raw_msg ) ) {
-            $reply = "I'm ready to schedule a new shoot booking on your Calendar.\n\n" .
-                     "Please share:\n" .
-                     "• **Shoot Title / Client** (e.g. *Ananya Wedding Pre-Shoot*)\n" .
-                     "• **Date & Call Time** (e.g. *Tomorrow at 10:00 AM*)\n" .
-                     "• **Venue / Studio** (e.g. *Main Studio A*)\n\n" .
-                     "You can reply with: *\"Schedule shoot for Ananya Wedding tomorrow at 10 AM at Studio A\"*";
-        } else {
-            if ( empty( $title ) ) $title = 'Studio Photoshoot';
-            $exec_res = cora_execute_ai_action( 'create_booking', array(
-                'title'    => $title,
-                'date'     => date('Y-m-d', strtotime('+1 day')),
-                'time'     => '10:00 AM',
-                'location' => 'Main Studio A',
-                'crew'     => 'Lead Photographer',
-            ), $agency_id, $user_id );
+        $exec_res = cora_execute_ai_action( 'create_booking', array(
+            'title' => $title,
+            'date'  => $date,
+            'time'  => '10:00 AM',
+        ), $agency_id, $user_id );
 
-            if ( ! empty( $exec_res['success'] ) ) {
-                $action_results[] = $exec_res;
-                $reply = "Scheduled booking **{$title}** on " . date('M j, Y', strtotime('+1 day')) . " at 10:00 AM at Main Studio A:";
-            }
+        if ( ! empty( $exec_res['success'] ) ) {
+            $action_results[] = $exec_res;
+            $reply = "Scheduled **{$title}** for **{$date}** at 10:00 AM in your Operations Calendar:";
         }
     }
-    // 5. Intent: Contract / Document Drafting
-    elseif ( preg_match( '/\b(?:contract|agreement|nda|lease|msa|document|vault)\b/i', $lower ) && preg_match( '/\b(?:draft|create|make|generate|prepare)\b/i', $lower ) ) {
+    // 5. Intent: Vault Document Drafting
+    elseif ( preg_match( '/\b(?:document|contract|agreement|nda|mou|vault|msa)\b/i', $lower ) && preg_match( '/\b(?:draft|create|prepare|generate|write)\b/i', $lower ) ) {
         $title = 'Master Service Agreement';
-        $client_name = '';
-        if ( preg_match( '/(?:for|to)\s+([a-zA-Z\s]+?)(?:\.|$)/i', $raw_msg, $dm ) ) {
-            $matched_client = trim( $dm[1] );
-            if ( strlen( $matched_client ) > 2 && ! in_array( strtolower( $matched_client ), array('a', 'an', 'the', 'new', 'client', 'customer') ) ) {
-                $client_name = ucwords( $matched_client );
-            }
+        if ( preg_match( '/(?:draft|create|prepare)\s+(?:a|an)?\s*([a-zA-Z0-9\s]+?)(?:for|with|\.|$)/i', $raw_msg, $dm ) ) {
+            $title = ucwords( trim( $dm[1] ) );
+        }
+        $client_name = 'Corporate Client';
+        if ( preg_match( '/for\s+([a-zA-Z0-9\s]+?)(?:\.|$)/i', $raw_msg, $cm ) ) {
+            $client_name = ucwords( trim( $cm[1] ) );
         }
 
-        if ( empty( $client_name ) ) {
-            $reply = "I'm ready to draft a legal contract in the Document Vault.\n\n" .
-                     "Please specify:\n" .
-                     "• **Client / Party Name** (e.g. *Rajesh Kumar*)\n" .
-                     "• **Agreement Type** (e.g. *Master Service Agreement*, *NDA*, *Media License*)\n\n" .
-                     "You can reply with: *\"Draft Master Service Agreement for Rajesh Kumar\"*";
-        } else {
-            $exec_res = cora_execute_ai_action( 'create_document', array(
-                'title'       => $title,
-                'client_name' => $client_name,
+        $exec_res = cora_execute_ai_action( 'create_document', array(
+            'title'       => $title,
+            'client_name' => $client_name,
+        ), $agency_id, $user_id );
+
+        if ( ! empty( $exec_res['success'] ) ) {
+            $action_results[] = $exec_res;
+            $reply = "Drafted **{$title}** for **{$client_name}** in the Document Vault with e-signature tokens generated.";
+        }
+    }
+    // 6. Intent: Settings Modification (e.g. "Change site name to Apex Realty", "update gstin to 27AAAAA1111A1Z1", "turn off tours", "set currency to USD")
+    elseif ( preg_match( '/\b(?:change|update|set|modify|edit|rename)\b/i', $lower ) && preg_match( '/\b(?:site name|site title|website name|website title|name of the site|tagline|description|gst|gstin|tax|address|location|currency|password|tours|brand|logo)\b/i', $lower ) ) {
+        $settings_to_update = array();
+
+        if ( preg_match( '/(?:site name|site title|website name|website title|name of the site)\s*(?:to|as|is|=)?\s*["\']?([^"\'\.\,\n]+)["\']?/i', $raw_msg, $m_site ) ) {
+            $val = trim( $m_site[1] );
+            if ( ! empty( $val ) && strlen( $val ) > 1 ) {
+                $settings_to_update['blogname'] = ucwords( $val );
+                $settings_to_update['cora_sidebar_title'] = strtoupper( $val );
+            }
+        } elseif ( preg_match( '/(?:tagline|description|slogan)\s*(?:to|as|is|=)?\s*["\']?([^"\'\.\,\n]+)["\']?/i', $raw_msg, $m_tag ) ) {
+            $val = trim( $m_tag[1] );
+            if ( ! empty( $val ) ) {
+                $settings_to_update['blogdescription'] = $val;
+            }
+        } elseif ( preg_match( '/(?:gst|gstin|tax id|tax details)\s*(?:to|as|is|=)?\s*["\']?([0-9a-zA-Z\s\:\-]+)["\']?/i', $raw_msg, $m_gst ) ) {
+            $val = trim( $m_gst[1] );
+            if ( ! empty( $val ) ) {
+                $settings_to_update['cora_workspace_tax_details'] = strtoupper( $val );
+            }
+        } elseif ( preg_match( '/(?:address|location|office address)\s*(?:to|as|is|=)?\s*["\']?([^"\'\.\n]+)["\']?/i', $raw_msg, $m_addr ) ) {
+            $val = trim( $m_addr[1] );
+            if ( ! empty( $val ) ) {
+                $settings_to_update['cora_workspace_address'] = $val;
+            }
+        } elseif ( preg_match( '/(?:currency|currency format)\s*(?:to|as|is|=)?\s*([a-zA-Z_]+)/i', $raw_msg, $m_curr ) ) {
+            $c_raw = strtoupper( trim( $m_curr[1] ) );
+            if ( strpos( $c_raw, 'USD' ) !== false || strpos( $c_raw, 'DOLLAR' ) !== false ) $settings_to_update['cora_currency_format'] = 'USD_COMMAS';
+            elseif ( strpos( $c_raw, 'EUR' ) !== false || strpos( $c_raw, 'EURO' ) !== false ) $settings_to_update['cora_currency_format'] = 'EUR_DECIMALS';
+            elseif ( strpos( $c_raw, 'GBP' ) !== false || strpos( $c_raw, 'POUND' ) !== false ) $settings_to_update['cora_currency_format'] = 'GBP_COMMAS';
+            else $settings_to_update['cora_currency_format'] = 'INR_LAKHS';
+        } elseif ( preg_match( '/(?:tour|tours)\s*(?:off|disable|disabled|false|no|turn off)/i', $lower ) ) {
+            $settings_to_update['cora_workspace_allow_tours'] = 0;
+        } elseif ( preg_match( '/(?:tour|tours)\s*(?:on|enable|enabled|true|yes|turn on)/i', $lower ) ) {
+            $settings_to_update['cora_workspace_allow_tours'] = 1;
+        }
+
+        if ( ! empty( $settings_to_update ) ) {
+            $exec_res = cora_execute_ai_action( 'update_settings', array(
+                'settings' => $settings_to_update,
             ), $agency_id, $user_id );
 
             if ( ! empty( $exec_res['success'] ) ) {
                 $action_results[] = $exec_res;
-                $reply = "Drafted **{$title}** for **{$client_name}** in the Document Vault with e-signature tokens generated.";
+                $reply = "I have updated your workspace settings. " . $exec_res['message'];
+            } else {
+                $reply = "Attempted to update settings: " . ($exec_res['message'] ?? 'Error occurred.');
             }
+        } else {
+            $reply = "I'm ready to update your workspace settings. Please specify the new value (for example: *\"Change site name to Apex Studios\"* or *\"Set GSTIN to 27AAAAA1111A1Z1\"*).";
         }
     }
-    // 6. Intent: Article Library Pruning & Deletion
-    elseif ( ( strpos( $lower, 'article' ) !== false || strpos( $lower, 'post' ) !== false || strpos( $lower, 'blog' ) !== false || strpos( $lower, 'library' ) !== false ) && ( strpos( $lower, 'delete' ) !== false || strpos( $lower, 'remove' ) !== false || strpos( $lower, 'clean' ) !== false || strpos( $lower, 'prune' ) !== false || strpos( $lower, 'keep' ) !== false ) ) {
+    // 7. Intent: Settings Query / Inspection (e.g. "What is our site name?", "show current settings", "check GSTIN")
+    elseif ( preg_match( '/\b(?:what is|show me|check|display|tell me|get|view|current)\b/i', $lower ) && preg_match( '/\b(?:site name|site title|tagline|gst|gstin|tax|address|currency|settings|workspace name|config|configuration)\b/i', $lower ) ) {
+        $cur_site_title = get_option( 'blogname', 'Cora' );
+        $cur_tagline    = get_option( 'blogdescription', 'Not configured' );
+        $cur_brand      = get_option( 'cora_sidebar_title', 'CORA' );
+        $cur_gst        = get_option( 'cora_workspace_tax_details', 'Not set' );
+        $cur_address    = get_option( 'cora_workspace_address', 'Not set' );
+        $cur_currency   = get_option( 'cora_currency_format', 'INR_LAKHS' );
+        $cur_industry   = function_exists('cora_get_active_industry') ? cora_get_active_industry() : 'custom';
+
+        $reply = "Here are your current **Workspace Identity & Settings**:\n\n" .
+                 "• **Site Title**: `{$cur_site_title}`\n" .
+                 "• **Tagline**: `{$cur_tagline}`\n" .
+                 "• **Header Brand**: `{$cur_brand}`\n" .
+                 "• **Industry Mode**: `" . strtoupper( $cur_industry ) . "`\n" .
+                 "• **Tax / GSTIN**: `{$cur_gst}`\n" .
+                 "• **Office Address**: `{$cur_address}`\n" .
+                 "• **Currency Format**: `{$cur_currency}`\n\n" .
+                 "You can update any of these directly. For example: *\"Change site name to Apex Real Estate\"* or *\"Set GSTIN to 27AAAAA1111A1Z1\"*.";
+    }
+    // 8. Intent: Capabilities & Scope Inquiries (e.g. "what can you do", "can you update the name of the site", "tell me what you can do")
+    elseif ( preg_match( '/\b(?:can you|tell me what you can do|what can you do|capabilities|features|help|scope|abilities)\b/i', $lower ) || ( strpos( $lower, 'can you' ) !== false && ( strpos( $lower, 'update' ) !== false || strpos( $lower, 'change' ) !== false || strpos( $lower, 'name' ) !== false || strpos( $lower, 'site' ) !== false || strpos( $lower, 'manage' ) !== false ) ) ) {
+        if ( strpos( $lower, 'site' ) !== false || strpos( $lower, 'name' ) !== false || strpos( $lower, 'setting' ) !== false || strpos( $lower, 'title' ) !== false ) {
+            $cur_name = get_option( 'blogname', 'Cora' );
+            $reply = "**Yes, absolutely!** I can manage and update your site name, tagline, branding, GST details, currency format, and workspace configuration directly through chat.\n\n" .
+                     "Your current site name is **{$cur_name}**.\n\n" .
+                     "To update it, simply tell me:\n" .
+                     "• *\"Change site name to Apex Luxury Real Estate\"*\n" .
+                     "• *\"Update tagline to Premier Commercial & Residential Properties\"*\n" .
+                     "• *\"Set our GSTIN to 27AAAAA1111A1Z1\"*\n" .
+                     "• *\"Turn off interactive tours\"*\n\n" .
+                     "Tell me the new name or setting, and I will execute the update immediately.";
+        } else {
+            $reply = "I am your autonomous **AI Co-Founder**, equipped to manage and execute actions across your entire business:\n\n" .
+                     "1. **Workspace & Settings**: *\"Change site name to Apex Studio\"*, *\"Update our GSTIN to 27AAAAA1111A1Z1\"*, *\"Switch currency to USD\"*\n" .
+                     "2. **Form Builder**: *\"Create a client intake form with Name, Email, Phone, and Event Date\"*\n" .
+                     "3. **CRM Pipeline**: *\"Add a lead for Ananya Sharma, phone +91 98765 43210, deal ₹1,50,000\"*\n" .
+                     "4. **Financials & Invoicing**: *\"Generate an 18% GST invoice of ₹45,000 for Acme Studios\"*\n" .
+                     "5. **Bookings & Calendar**: *\"Schedule a shoot booking for Tomorrow at 10:00 AM\"*\n" .
+                     "6. **Document Vault**: *\"Draft a master service agreement for Rajesh Kumar\"*\n" .
+                     "7. **Business Intelligence**: *\"Summarize today's workspace activity and financials\"*\n\n" .
+                     "Tell me what you would like to execute, and I will take action directly.";
+        }
+    }
+    // 9. Intent: Article Library Pruning & Publishing
+    elseif ( ( strpos( $lower, 'article' ) !== false || strpos( $lower, 'post' ) !== false || strpos( $lower, 'blog' ) !== false ) && ( strpos( $lower, 'delete' ) !== false || strpos( $lower, 'prune' ) !== false || strpos( $lower, 'clean' ) !== false ) ) {
         $keep_count = 3;
         if ( preg_match( '/(?:keep|retain|top)\s*(?:only\s*)?([0-9]+)/i', $raw_msg, $km ) ) {
             $keep_count = intval( $km[1] );
@@ -15917,42 +16254,11 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
 
         if ( ! empty( $exec_res['success'] ) ) {
             $action_results[] = $exec_res;
-            $reply = "I have pruned your Content Library. Retained the top **{$keep_count} articles** with the highest SEO scores and deleted {$exec_res['data']['deleted_count']} lower-performing articles:";
-        } else {
-            $reply = "Attempted to prune Content Library: " . ($exec_res['message'] ?? 'Action completed.');
+            $reply = "I have pruned your Content Library. Retained the top **{$keep_count} articles** and removed lower-performing drafts:";
         }
     }
-    // 7. Intent: Article Publishing
-    elseif ( ( strpos( $lower, 'article' ) !== false || strpos( $lower, 'draft' ) !== false ) && strpos( $lower, 'publish' ) !== false ) {
-        $exec_res = cora_execute_ai_action( 'publish_articles', array(
-            'target' => 'drafts',
-        ), $agency_id, $user_id );
-
-        if ( ! empty( $exec_res['success'] ) ) {
-            $action_results[] = $exec_res;
-            $reply = "Published **{$exec_res['data']['published_count']} draft articles** to your live website:";
-        }
-    }
-    // 8. Intent: CRM Lead Cleanup
-    elseif ( ( strpos( $lower, 'lead' ) !== false || strpos( $lower, 'pipeline' ) !== false ) && ( strpos( $lower, 'clean' ) !== false || strpos( $lower, 'delete test' ) !== false || strpos( $lower, 'remove test' ) !== false ) ) {
-        $exec_res = cora_execute_ai_action( 'bulk_clean_leads', array(), $agency_id, $user_id );
-        if ( ! empty( $exec_res['success'] ) ) {
-            $action_results[] = $exec_res;
-            $reply = "Cleaned up **{$exec_res['data']['cleaned_count']} test leads** from your CRM Pipeline:";
-        }
-    }
-    // 9. Intent: Task Completion
-    elseif ( strpos( $lower, 'task' ) !== false && ( strpos( $lower, 'complete' ) !== false || strpos( $lower, 'done' ) !== false || strpos( $lower, 'finish' ) !== false ) ) {
-        $exec_res = cora_execute_ai_action( 'complete_task', array(
-            'title' => $raw_msg,
-        ), $agency_id, $user_id );
-        if ( ! empty( $exec_res['success'] ) ) {
-            $action_results[] = $exec_res;
-            $reply = "Marked task as **completed** in your Client Task Manager:";
-        }
-    }
-    // 6. Intent: Active Modules / Features List
-    elseif ( preg_match( '/\b(?:module|modules|active modules|accessible modules|what modules|list modules|features active|enabled features|what is active)\b/i', $lower ) || ( strpos( $lower, 'module' ) !== false && ( strpos( $lower, 'list' ) !== false || strpos( $lower, 'active' ) !== false || strpos( $lower, 'accessible' ) !== false || strpos( $lower, 'show' ) !== false ) ) ) {
+    // 10. Intent: Active Modules / Features List
+    elseif ( preg_match( '/\b(?:module|modules|active modules|accessible modules|what modules|list modules|features active|enabled features|what is active)\b/i', $lower ) || ( strpos( $lower, 'module' ) !== false && ( strpos( $lower, 'list' ) !== false || strpos( $lower, 'active' ) !== false || strpos( $lower, 'show' ) !== false ) ) ) {
         $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'custom';
         $mod_instance    = class_exists( 'Cora_Module_Registry' ) ? Cora_Module_Registry::get_module( $active_industry ) : null;
         $active_modules  = array( 'dashboard' => 'Dashboard' );
@@ -15979,12 +16285,11 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             'bookings'   => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>',
             'vault'      => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>',
             'portfolio'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>',
-            'settings'   => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+            'settings'   => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1-2.83 0 2 2 0 0 1-2.83 0l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
             'blogs'      => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
         );
 
         $default_icon = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-
         $active_ws = function_exists('cora_get_active_workspace') ? cora_get_active_workspace() : array();
         $ws_slug   = ! empty( $active_ws['slug'] ) ? $active_ws['slug'] : 'workspace';
 
@@ -16022,30 +16327,20 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             </div>
         </div>';
     }
-    // 7. Intent: Casual Greetings & Quick Dialog (e.g. "hi", "hello", "hey", "yo", "fu", "test", "who are you")
+    // 11. Intent: Casual Greetings & Quick Dialog
     elseif ( preg_match( '/^(?:hi|hello|hey|hey cora|yo|sup|fu|f|test|good morning|good evening|who are you|greetings|gm)\b/i', $lower ) || strlen( $lower ) <= 3 ) {
         $view_greetings = array(
-            'dashboard'  => "Hello! I am Cora, your autonomous AI Co-Founder. I execute operations across your workspace. What would you like to build or automate right now?",
+            'dashboard'  => "Hello! I am Cora, your autonomous AI Co-Founder. I execute operations and manage settings across your workspace. What would you like to build, configure, or automate right now?",
             'forms'      => "Hello! I am ready in Form Builder. Tell me what type of form you need (e.g. *Client Inquiry*, *Event Booking*, *Feedback Survey*) and I will build and publish it instantly.",
             'leads'      => "Hello! I am ready in CRM Leads. I can add qualified leads, update deal values, or prepare client agreements.",
             'financials' => "Hello! I am ready in Financials & Invoicing. I can generate 18% GST invoices, calculate tax splits, or record client payments.",
             'bookings'   => "Hello! I am ready in Bookings. I can schedule shoots, assign crew members, or reserve studio time slots.",
             'vault'      => "Hello! I am ready in Document Vault. I can draft master service agreements, client contracts, and generate e-sign links.",
+            'settings'   => "Hello! I am ready in Settings. I can update your site title, tagline, GST details, currency format, or feature toggles directly.",
         );
         $reply = $view_greetings[$current_page] ?? $view_greetings['dashboard'];
     }
-    // 8. Intent: Capabilities / Help / What can you do?
-    elseif ( preg_match( '/\b(?:help|what can you do|features|capabilities|how to use|commands|actions)\b/i', $lower ) ) {
-        $reply = "Here is what I can execute directly for your workspace:\n\n" .
-                 "1. **Build Forms**: *\"Create a client inquiry form with Name, Email, Phone, and Event Date\"*\n" .
-                 "2. **Add CRM Leads**: *\"Add a lead for Ananya Sharma, phone +91 98765 43210, deal value ₹1,50,000\"*\n" .
-                 "3. **Generate GST Invoices**: *\"Create an invoice for Acme Studios of ₹45,000 with 18% GST\"*\n" .
-                 "4. **Schedule Bookings**: *\"Schedule a studio shoot booking for Tomorrow at 10:00 AM\"*\n" .
-                 "5. **Draft Vault Contracts**: *\"Draft a master service agreement for Rajesh Kumar\"*\n" .
-                 "6. **Business Briefing**: *\"Summarize today's workspace activity and financials\"*\n\n" .
-                 "Tell me what you need, and I will execute it immediately.";
-    }
-    // 9. Intent: Operational Briefing / Stats / Summary
+    // 12. Intent: Operational Briefing / Stats / Summary
     elseif ( preg_match( '/\b(?:summary|briefing|stats|metrics|report|telemetry|analytics|overview|how is business|activity)\b/i', $lower ) ) {
         $leads_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads" ) ?: 0;
         $forms_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_forms" ) ?: 0;
@@ -16086,14 +16381,18 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
             </div>
         </div>';
     }
-    // 10. Contextual Conversational Co-Founder Response
+    // 13. Contextual Intelligent Conversational Fallback (Zero Rigid Canned Templates)
     else {
-        $reply = "I understand. As your AI Co-Founder, I can execute that for you. Would you like me to:\n\n" .
-                 "• **Build a Form** for client intake\n" .
-                 "• **Add a Lead** to your CRM Pipeline\n" .
-                 "• **Generate an Invoice** with GST calculations\n" .
-                 "• **Schedule a Shoot** or booking\n\n" .
-                 "Give me the specific details (such as names, dates, or amounts) and I will execute the action immediately.";
+        // Query learned RAG memories if any exist for this query
+        $learned_ctx = function_exists('cora_rag_get_relevant_memories') ? cora_rag_get_relevant_memories( $agency_id, $raw_msg, 2 ) : '';
+        $mem_snippet = ! empty( $learned_ctx ) ? "\n\n**Relevant Workspace Memory:**\n" . $learned_ctx : "";
+
+        $reply = "I understand. As your AI Co-Founder, I execute business operations, manage settings, and automate workflows across your workspace.{$mem_snippet}\n\n" .
+                 "You can ask me to:\n" .
+                 "• **Manage Settings**: *\"Change site name to Apex Studio\"*, *\"Update our GSTIN\"*, or *\"Show current settings\"*\n" .
+                 "• **Create Entities**: *\"Build a client intake form\"*, *\"Add a new CRM lead\"*, or *\"Generate an invoice\"*\n" .
+                 "• **Review Operations**: *\"Give me a business telemetry briefing\"*\n\n" .
+                 "How would you like me to proceed with this?";
     }
 
     // Record dynamic AI usage metrics & token consumption

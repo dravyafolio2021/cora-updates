@@ -2076,17 +2076,83 @@ jQuery(document).ready(function($) {
                                         <div class="text-[11px] text-zinc-500">Due: ${d.due_date}</div>
                                     </div>
                                 `;
-                            } else if (act.action === 'create_document') {
-                                cardHtml = `
-                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2 self-start max-w-[95%] w-full">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${d.title}</span>
-                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-800">Draft</span>
+                            } else if (act.action === 'update_settings') {
+                                const changed = d.changed || {};
+                                let changeRows = '';
+                                const oldValsEncoded = encodeURIComponent(JSON.stringify(d.old_values || {}));
+                                
+                                Object.keys(changed).forEach(function(k) {
+                                    const item = changed[k];
+                                    changeRows += `
+                                        <div class="flex items-center justify-between text-[11px] py-1 border-b border-zinc-100 dark:border-zinc-800/80 last:border-0">
+                                            <span class="text-zinc-500 dark:text-zinc-400 font-medium">${item.label || k}</span>
+                                            <span class="font-mono text-zinc-900 dark:text-zinc-100 font-bold bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-[10px]">${item.new}</span>
                                         </div>
-                                        <div class="text-[11px] text-zinc-500">Client: ${d.client_name}</div>
-                                        <a href="${d.vault_url}" class="block py-1.5 text-center bg-zinc-950 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors">
-                                            View in Document Vault
-                                        </a>
+                                    `;
+                                });
+
+                                const cardId = 'act-settings-' + Date.now();
+                                cardHtml = `
+                                    <div id="${cardId}" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-3 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Settings Updated</span>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                Applied Live
+                                            </span>
+                                        </div>
+                                        <div class="bg-zinc-50 dark:bg-zinc-950 p-2.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800 space-y-1">
+                                            ${changeRows}
+                                        </div>
+                                        <div class="flex items-center gap-2 pt-0.5">
+                                            <a href="${d.settings_url || '/workspace/settings-suite'}" class="flex-1 py-1.5 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
+                                                Open Settings Suite
+                                            </a>
+                                            <button type="button" onclick="window.coraUndoSettings && window.coraUndoSettings('${cardId}', '${oldValsEncoded}');" class="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold rounded-xl transition-colors shrink-0">
+                                                Undo
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'propose_settings') {
+                                const changes = d.changes || {};
+                                let changeRows = '';
+                                Object.keys(changes).forEach(function(k) {
+                                    const item = changes[k];
+                                    changeRows += `
+                                        <div class="flex items-center justify-between text-[11px] py-1 border-b border-zinc-100 dark:border-zinc-800/80 last:border-0">
+                                            <span class="text-zinc-500 dark:text-zinc-400 font-medium">${item.label || k}</span>
+                                            <span class="font-mono text-zinc-900 dark:text-zinc-100 font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded text-[10px]">${item.new_val}</span>
+                                        </div>
+                                    `;
+                                });
+
+                                const cardId = 'act-prop-' + (d.proposal_id || Date.now());
+                                cardHtml = `
+                                    <div id="${cardId}" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-amber-200/80 dark:border-amber-900/60 shadow-sm space-y-3 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Settings Change Confirmation</span>
+                                            </div>
+                                            <span class="text-[9px] font-mono font-bold bg-amber-50 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full">Requires Approval</span>
+                                        </div>
+                                        <div class="bg-zinc-50 dark:bg-zinc-950 p-2.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800 space-y-1">
+                                            ${changeRows}
+                                        </div>
+                                        <div class="flex items-center gap-2 pt-0.5">
+                                            <button type="button" onclick="window.coraConfirmApplySettings && window.coraConfirmApplySettings('${cardId}', '${d.proposal_id}');" class="flex-1 py-2 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
+                                                Confirm &amp; Apply
+                                            </button>
+                                            <button type="button" onclick="$('#${cardId}').fadeOut(200, function(){ $(this).remove(); }); if(window.coraShowToast) window.coraShowToast('Settings change proposal canceled.');" class="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-xs font-semibold rounded-xl transition-colors shrink-0">
+                                                Cancel
+                                            </button>
+                                        </div>
                                     </div>
                                 `;
                             }
@@ -2131,6 +2197,67 @@ jQuery(document).ready(function($) {
     }
 
     window.coraExecuteAIChat = coraExecuteAIChat;
+
+    window.coraConfirmApplySettings = function(cardId, proposalId) {
+        const ajaxUrlEndpoint = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+        const ajaxNonceSec = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+
+        if (window.coraShowToast) window.coraShowToast("Applying settings changes...");
+
+        $.post(ajaxUrlEndpoint, {
+            action: 'cora_confirm_ai_settings_proposal',
+            proposal_id: proposalId,
+            security: ajaxNonceSec
+        }, function(res) {
+            if (res && res.success) {
+                if (window.coraShowToast) window.coraShowToast(res.data.message || "Settings applied successfully!");
+                $(`#${cardId}`).replaceWith(`
+                    <div class="p-3.5 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-200 font-medium self-start max-w-[95%] w-full flex items-center justify-between">
+                        <span class="flex items-center gap-1.5 font-bold">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Settings confirmed and live.
+                        </span>
+                        <a href="/workspace/settings-suite" class="text-[11px] font-bold underline">View Suite ↗</a>
+                    </div>
+                `);
+            } else {
+                if (window.coraShowToast) window.coraShowToast((res.data && res.data.message) ? res.data.message : "Failed to apply settings proposal.", "error");
+            }
+        }).fail(function() {
+            if (window.coraShowToast) window.coraShowToast("Server error applying settings.", "error");
+        });
+    };
+
+    window.coraUndoSettings = function(cardId, oldValsEncoded) {
+        try {
+            const previous = JSON.parse(decodeURIComponent(oldValsEncoded));
+            const ajaxUrlEndpoint = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+            const ajaxNonceSec = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+
+            if (window.coraShowToast) window.coraShowToast("Reverting workspace settings...");
+
+            $.post(ajaxUrlEndpoint, {
+                action: 'cora_undo_ai_settings',
+                previous_settings: previous,
+                security: ajaxNonceSec
+            }, function(res) {
+                if (res && res.success) {
+                    if (window.coraShowToast) window.coraShowToast(res.data.message || "Settings reverted successfully!");
+                    $(`#${cardId}`).replaceWith(`
+                        <div class="p-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-700 dark:text-zinc-300 font-medium self-start max-w-[95%] w-full">
+                            ↩ Settings changes reverted.
+                        </div>
+                    `);
+                } else {
+                    if (window.coraShowToast) window.coraShowToast((res.data && res.data.message) ? res.data.message : "Failed to revert settings.", "error");
+                }
+            }).fail(function() {
+                if (window.coraShowToast) window.coraShowToast("Server error reverting settings.", "error");
+            });
+        } catch (e) {
+            if (window.coraShowToast) window.coraShowToast("Failed to parse undo data.", "error");
+        }
+    };
 
     // 9. Premium AI Modules Switch Toggles
     window.coraToggleModule = function(moduleName, isChecked) {
