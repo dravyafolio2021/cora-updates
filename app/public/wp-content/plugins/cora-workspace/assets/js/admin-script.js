@@ -1205,6 +1205,19 @@ jQuery(document).ready(function($) {
                         chat.append(`<div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl p-4 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">${reply}</div>`);
                     }
 
+                    // Dynamically update Quota Usage counters across sidebar popover & diagnostics card
+                    if (response.data.ai_usage) {
+                        const u = response.data.ai_usage;
+                        const dailyPct = u.daily_limit > 0 ? Math.min(100, Math.round((u.daily_count / u.daily_limit) * 100)) : 0;
+                        const fiveHrPct = u.five_hour_limit > 0 ? Math.min(100, Math.round((u.five_hour_count / u.five_hour_limit) * 100)) : 0;
+                        
+                        $('#cora-ai-diagnostics-quota-text').text(`${u.daily_count} / ${u.daily_limit} (${dailyPct}%)`);
+                        $('#cora-ai-daily-quota-text').text(`${u.daily_count} / ${u.daily_limit}`);
+                        $('#cora-ai-daily-quota-bar').css('width', `${dailyPct}%`);
+                        $('#cora-ai-5h-quota-text').text(`${u.five_hour_count} / ${u.five_hour_limit}`);
+                        $('#cora-ai-5h-quota-bar').css('width', `${fiveHrPct}%`);
+                    }
+
                     // Render Rich Autonomous Action Result Cards
                     if (response.data.action_results && Array.isArray(response.data.action_results) && response.data.action_results.length > 0) {
                         response.data.action_results.forEach(function(act) {

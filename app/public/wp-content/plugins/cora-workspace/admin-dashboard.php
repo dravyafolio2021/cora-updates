@@ -434,7 +434,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     
     <!-- Load QuillJS Rich Text ListingCoordinator -->
     <link href="<?php echo CORA_WORKSPACE_URL . 'assets/css/quill.snow.css'; ?>" rel="stylesheet" media="print" onload="this.media='all'">
-    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/quill.min.js'; ?>"></script>
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/quill.min.js'; ?>" defer></script>
     
     <!-- Load ChartJS -->
     <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/chart.min.js'; ?>" defer></script>
@@ -4076,20 +4076,20 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <div class="space-y-1">
                         <div class="flex items-center justify-between text-[10px] font-bold text-zinc-500">
                             <span>AI Requests (Daily)</span>
-                            <span><?php echo esc_html( $usage_stats['daily_count'] ); ?> / <?php echo esc_html( $usage_stats['daily_limit'] ); ?></span>
+                            <span id="cora-ai-daily-quota-text"><?php echo esc_html( $usage_stats['daily_count'] ); ?> / <?php echo esc_html( $usage_stats['daily_limit'] ); ?></span>
                         </div>
-                        <div class="w-full h-1.5 bg-zinc-200 rounded-full overflow-hidden">
-                            <div class="bg-zinc-950 h-full rounded-full" style="width: <?php echo esc_attr( $daily_percent ); ?>%;"></div>
+                        <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                            <div id="cora-ai-daily-quota-bar" class="bg-zinc-950 dark:bg-white h-full rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $daily_percent ); ?>%;"></div>
                         </div>
                     </div>
                     
                     <div class="space-y-1">
                         <div class="flex items-center justify-between text-[10px] font-bold text-zinc-500">
                             <span>AI Requests (5h Window)</span>
-                            <span><?php echo esc_html( $usage_stats['five_hour_count'] ); ?> / <?php echo esc_html( $usage_stats['five_hour_limit'] ); ?></span>
+                            <span id="cora-ai-5h-quota-text"><?php echo esc_html( $usage_stats['five_hour_count'] ); ?> / <?php echo esc_html( $usage_stats['five_hour_limit'] ); ?></span>
                         </div>
-                        <div class="w-full h-1.5 bg-zinc-200 rounded-full overflow-hidden">
-                            <div class="bg-zinc-950 h-full rounded-full" style="width: <?php echo esc_attr( $five_hour_percent ); ?>%;"></div>
+                        <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                            <div id="cora-ai-5h-quota-bar" class="bg-zinc-950 dark:bg-white h-full rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $five_hour_percent ); ?>%;"></div>
                         </div>
                     </div>
                 </div>
@@ -5339,9 +5339,13 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                             142ms
                                         </span>
                                     </div>
-                                    <div class="flex items-center justify-between py-1 border-b border-zinc-100">
+                                    <div class="flex items-center justify-between py-1 border-b border-zinc-100 dark:border-zinc-800">
                                         <span class="text-xs text-zinc-500 font-bold">Quota Usage</span>
-                                        <span class="text-xs font-extrabold text-zinc-800">12,402 / 50,000 (24%)</span>
+                                        <?php
+                                        $ai_stats = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 0, 'daily_limit' => 100 );
+                                        $daily_pct = $ai_stats['daily_limit'] > 0 ? min(100, round(($ai_stats['daily_count'] / $ai_stats['daily_limit']) * 100)) : 0;
+                                        ?>
+                                        <span class="text-xs font-extrabold text-zinc-800 dark:text-zinc-200" id="cora-ai-diagnostics-quota-text"><?php echo esc_html( $ai_stats['daily_count'] ); ?> / <?php echo esc_html( $ai_stats['daily_limit'] ); ?> (<?php echo esc_html( $daily_pct ); ?>%)</span>
                                     </div>
                                     <div class="flex items-center justify-between py-1">
                                         <span class="text-xs text-zinc-500 font-bold">Database Health</span>

@@ -43,12 +43,12 @@ deploy_site() {
     
     # 1. SCP Zip to remote server temp location
     echo "1. Uploading release zip to server..."
-    scp -P "$SSH_PORT" -o StrictHostKeyChecking=no "$LOCAL_ZIP" "$SSH_USER@$SSH_IP:$REMOTE_TMP"
+    scp -P "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 "$LOCAL_ZIP" "$SSH_USER@$SSH_IP:$REMOTE_TMP"
     
     # 2. SSH: Backup, Extract, Activate, Test, Rollback if failed
     echo "2. Executing remote update, verification & activation..."
     
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$SSH_USER@$SSH_IP" bash -s <<EOF
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=15 "$SSH_USER@$SSH_IP" bash -s <<EOF
 set -e
 
 # Define directories
