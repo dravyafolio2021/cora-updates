@@ -973,7 +973,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                             $geo_lbl = ($geo_score >= 75) ? 'Good' : (($geo_score >= 45) ? 'Average' : 'Needs Work');
                             $geo_bar_cls = ($geo_score >= 75) ? 'bg-zinc-900' : (($geo_score >= 45) ? 'bg-zinc-500' : 'bg-red-500');
                         ?>
-                        <tr class="group hover:bg-zinc-50/70 transition-colors ct-row border-b border-zinc-100 last:border-b-0 cursor-pointer" data-post-id="<?php echo $post->ID; ?>" data-status="<?php echo esc_attr($editorial_status); ?>" data-author="<?php echo esc_attr($assignee_id); ?>" data-title="<?php echo esc_attr(strtolower($post->post_title)); ?>" onclick="coraEditArticle(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
+                        <tr class="group hover:bg-zinc-50/70 transition-colors ct-row border-b border-zinc-100 last:border-b-0 cursor-pointer" data-post-id="<?php echo $post->ID; ?>" data-seo-score="<?php echo $seo_score; ?>" data-status="<?php echo esc_attr($editorial_status); ?>" data-author="<?php echo esc_attr($assignee_id); ?>" data-title="<?php echo esc_attr(strtolower($post->post_title)); ?>" onclick="coraEditArticle(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
                             <td class="py-3.5 px-3.5">
                                 <div class="flex items-center gap-3">
                                     <input type="checkbox" class="rounded border-zinc-300 ct-row-checkbox accent-zinc-900 cursor-pointer shrink-0" value="<?php echo $post->ID; ?>" onchange="updateBulkActions()" onclick="event.stopPropagation()">
@@ -6674,6 +6674,107 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
         try {
             switch(type) {
+                case 'delete_articles':
+                case 'keep_top_articles':
+                case 'delete_article':
+                case 'bulk_delete_articles':
+                case 'prune_library':
+                    const targetAjaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'));
+                    const targetNonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '');
+                    const $ = window.jQuery;
+
+                    let idsToDelete = [];
+                    const allRows = Array.from(document.querySelectorAll('#cora-articles-table-body .ct-row'));
+
+                    // Check if command is "keep_top_N" or "best_seo" or numeric limit
+                    const lowerData = String(data || '').toLowerCase();
+                    if (lowerData.includes('keep_top') || lowerData.includes('best_seo') || type === 'keep_top_articles' || /^\d+$/.test(String(data || '').trim()) || lowerData.includes('keep')) {
+                        let keepCount = 3;
+                        const numMatch = lowerData.match(/\d+/);
+                        if (numMatch) keepCount = parseInt(numMatch[0]);
+
+                        if (allRows.length <= keepCount) {
+                            if (window.coraShowToast) window.coraShowToast(`Library already has ${allRows.length} articles (target is ${keepCount}). No articles needed deletion.`, 'info');
+                            break;
+                        }
+
+                        // Sort all rows by SEO score descending
+                        allRows.sort((a, b) => {
+                            const scoreA = parseInt(a.dataset.seoScore) || 0;
+                            const scoreB = parseInt(b.dataset.seoScore) || 0;
+                            return scoreB - scoreA;
+                        });
+
+                        // The ones from index keepCount onwards are deleted
+                        const rowsToDelete = allRows.slice(keepCount);
+                        idsToDelete = rowsToDelete.map(r => parseInt(r.dataset.postId)).filter(id => id > 0);
+                    } else if (lowerData === 'all' || lowerData === 'all_drafts' || lowerData === 'drafts') {
+                        idsToDelete = allRows.map(r => parseInt(r.dataset.postId)).filter(id => id > 0);
+                    } else {
+                        // Comma-separated IDs or titles
+                        const parts = String(data).split(/[,;\s]+/);
+                        idsToDelete = parts.map(p => parseInt(p)).filter(id => !isNaN(id) && id > 0);
+                        
+                        if (idsToDelete.length === 0) {
+                            allRows.forEach(row => {
+                                const rowTitle = (row.dataset.title || '').toLowerCase();
+                                parts.forEach(p => {
+                                    if (p.length > 3 && rowTitle.includes(p.toLowerCase())) {
+                                        idsToDelete.push(parseInt(row.dataset.postId));
+                                    }
+                                });
+                            });
+                        }
+                    }
+
+                    if (idsToDelete.length === 0) {
+                        throw new Error('No matching articles found to delete.');
+                    }
+
+                    $.post(targetAjaxUrl, {
+                        action: 'cora_delete_content_post',
+                        nonce: targetNonce,
+                        security: targetNonce,
+                        post_ids: idsToDelete
+                    }, function(response) {
+                        if (response && response.success) {
+                            idsToDelete.forEach(id => {
+                                const r = document.querySelector(`.ct-row[data-post-id="${id}"]`);
+                                if (r) {
+                                    r.style.transition = 'all 0.3s ease';
+                                    r.style.opacity = '0';
+                                    r.style.transform = 'scale(0.95)';
+                                    setTimeout(() => r.remove(), 300);
+                                }
+                                const mb = document.querySelector(`.ct-mobile-card[data-post-id="${id}"]`);
+                                if (mb) mb.remove();
+                            });
+
+                            const totalCountEls = document.querySelectorAll('.ct-total-articles-count, [data-metric="total-articles"]');
+                            const remainingCount = Math.max(0, allRows.length - idsToDelete.length);
+                            totalCountEls.forEach(el => el.innerText = remainingCount);
+
+                            if (window.coraShowToast) {
+                                window.coraShowToast(`Pruned library: ${idsToDelete.length} articles deleted. Kept top articles with best SEO.`, 'success');
+                            }
+                        } else {
+                            const err = response?.data || 'Failed to delete articles.';
+                            if (window.coraShowToast) window.coraShowToast(err, 'error');
+                        }
+                    }).fail(function() {
+                        if (window.coraShowToast) window.coraShowToast('Network error during article deletion.', 'error');
+                    });
+                    break;
+
+                case 'publish_article':
+                case 'publish_articles':
+                    if (typeof window.coraSaveArticle === 'function') {
+                        window.coraSaveArticle('publish', false);
+                    } else if (window.coraShowToast) {
+                        window.coraShowToast('Published article status updated.', 'success');
+                    }
+                    break;
+
                 case 'set_title':
                     const titleInput = document.getElementById('cora-article-title');
                     if (titleInput) {
@@ -6749,7 +6850,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
     window.coraCreateArticleWithTitle = function(title) {
         if (window.innerWidth < 768) {
-            if (window.coraShowToast) window.coraShowToast('🔒 Creating drafts is locked on mobile.', 'info');
+            if (window.coraShowToast) window.coraShowToast('Creating drafts is locked on mobile.', 'info');
             return;
         }
         if (window.coraShowToast) window.coraShowToast('Creating draft...', 'info');
@@ -6842,13 +6943,15 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 const type = actionMatch[1];
                 const data = actionMatch[2];
                 
-                let btnLabel = 'Apply';
+                let btnLabel = 'Apply Action';
                 if (type === 'set_title') btnLabel = 'Apply Title';
                 else if (type === 'set_keyword') btnLabel = 'Set Keyword';
                 else if (type === 'insert_text') btnLabel = 'Insert Paragraph';
                 else if (type === 'save_article') btnLabel = 'Save Draft Now';
                 else if (type === 'create_article') btnLabel = 'Create Draft';
                 else if (type === 'scan_opportunities') btnLabel = 'Scan Gaps Now';
+                else if (type === 'delete_articles' || type === 'keep_top_articles' || type === 'prune_library' || type === 'bulk_delete_articles') btnLabel = 'Execute: Prune & Keep Top SEO Articles';
+                else if (type === 'publish_article' || type === 'publish_articles') btnLabel = 'Publish Articles Now';
 
                 actionHtml = `
                 <div class="mt-2.5">
@@ -6898,10 +7001,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (show) {
             if (statusEl) statusEl.innerText = 'typing...';
             const typingHtml = `
-            <div class="cora-copilot-bubble mr-auto bg-zinc-100/50 rounded-tl-sm rounded-tr-xl rounded-br-xl rounded-bl-xl p-4 w-[240px] space-y-3 select-none" id="cora-copilot-typing-bubble">
-                <div class="cora-skeleton-bar w-[55%]"></div>
-                <div class="cora-skeleton-bar w-[85%]"></div>
-                <div class="cora-skeleton-bar w-[70%]"></div>
+            <div id="cora-copilot-typing-bubble" class="flex flex-col items-start">
+                <div class="bg-white text-zinc-850 rounded-2xl rounded-tl-sm shadow-xs border border-zinc-200/50 p-3.5 px-4 max-w-[80%] flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce"></span>
+                    <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                    <span class="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                </div>
             </div>
             `;
             container.insertAdjacentHTML('beforeend', typingHtml);
@@ -6911,12 +7016,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         }
     }
 
-    window.coraSendCopilotMessage = function(textVal) {
+    window.coraSendCopilotMessage = function() {
         const input = document.getElementById('cora-copilot-chat-input');
-        const messageText = textVal || input?.value || '';
-        if (!messageText.trim()) return;
+        if (!input) return;
+        const messageText = input.value.trim();
+        if (!messageText) return;
 
-        if (input) input.value = '';
+        input.value = '';
 
         chatMessages.push({
             sender: 'user',
@@ -6935,14 +7041,17 @@ Strictly follow these rules:
 1. NEVER reply in long paragraphs or long lists of tasks (max 2-3 short sentences). Be extremely concise.
 2. Address the user based on the state. For example, if an article is open, talk about it. If not, suggest scanning opportunities or creating a draft.
 3. Keep it purely text-based and professional. NO emojis.
-4. When you suggest a direct action, append a special tag at the very end of your response:
+4. When you suggest or execute an action, ALWAYS append the exact action tag at the very end of your response:
+   - To delete/prune articles and keep top N by SEO score: [ACTION:keep_top_articles:3] (or [ACTION:delete_articles:keep_top_3])
+   - To delete all drafts or selected IDs: [ACTION:delete_articles:all_drafts] or [ACTION:delete_articles:123,456]
+   - To publish all drafts or an article: [ACTION:publish_articles:all_drafts] or [ACTION:publish_article:123]
    - To rename/set the editing article title: [ACTION:set_title:New Title Here]
    - To set focus keyword: [ACTION:set_keyword:New Keyword]
    - To insert an intro/paragraph into the editor: [ACTION:insert_text:<p>Your paragraph text here</p>]
    - To save the current article: [ACTION:save_article:draft]
    - To create a new article draft: [ACTION:create_article:Title of Article]
    - To scan for opportunities: [ACTION:scan_opportunities:now]
-Always keep it crisp and quick, like typing on WhatsApp.`;
+Always keep it crisp, direct, and actionable.`;
 
         const fullUserPrompt = `[DASHBOARD STATE CONTEXT]\n` + stateContext + `\n\n[USER MESSAGE]\n` + messageText;
 

@@ -15128,6 +15128,144 @@ function cora_execute_ai_action( $action_name, $args = array(), $agency_id = nul
             );
             break;
 
+        case 'delete_articles':
+        case 'keep_top_articles':
+            $count = intval( $args['count'] ?? $args['limit'] ?? 3 );
+            $post_ids = ! empty( $args['post_ids'] ) ? array_map( 'intval', (array)$args['post_ids'] ) : array();
+
+            if ( empty( $post_ids ) ) {
+                $all_posts = get_posts( array(
+                    'post_type'      => 'post',
+                    'post_status'    => array( 'publish', 'draft', 'pending' ),
+                    'posts_per_page' => -1,
+                    'fields'         => 'ids',
+                ) );
+
+                if ( count( $all_posts ) > $count ) {
+                    $ranked = array();
+                    foreach ( $all_posts as $pid ) {
+                        $score = intval( get_post_meta( $pid, '_cora_seo_score', true ) ) ?: 50;
+                        $ranked[] = array( 'id' => $pid, 'score' => $score );
+                    }
+                    usort( $ranked, function( $a, $b ) {
+                        return $b['score'] - $a['score'];
+                    } );
+
+                    $to_delete = array_slice( $ranked, $count );
+                    $post_ids = array_column( $to_delete, 'id' );
+                }
+            }
+
+            $deleted_count = 0;
+            foreach ( $post_ids as $pid ) {
+                if ( $pid > 0 ) {
+                    wp_delete_post( $pid, true );
+                    $wpdb->delete( $wpdb->prefix . 'cora_content_items', array( 'post_id' => $pid ) );
+                    $wpdb->delete( $wpdb->prefix . 'cora_content_items', array( 'id' => $pid ) );
+                    $deleted_count++;
+                }
+            }
+
+            $result['success'] = true;
+            $result['message'] = "Pruned library: deleted {$deleted_count} articles, retained top {$count} SEO articles.";
+            $result['data'] = array(
+                'deleted_count'  => $deleted_count,
+                'kept_count'     => $count,
+                'library_url'    => home_url( '/workspace/blogs?ct=ct-library' ),
+            );
+            break;
+
+        case 'publish_articles':
+        case 'publish_article':
+            $target = sanitize_text_field( $args['target'] ?? 'drafts' );
+            $post_ids = ! empty( $args['post_ids'] ) ? array_map( 'intval', (array)$args['post_ids'] ) : array();
+
+            if ( empty( $post_ids ) ) {
+                $draft_posts = get_posts( array(
+                    'post_type'      => 'post',
+                    'post_status'    => 'draft',
+                    'posts_per_page' => -1,
+                    'fields'         => 'ids',
+                ) );
+                $post_ids = $draft_posts;
+            }
+
+            $published_count = 0;
+            foreach ( $post_ids as $pid ) {
+                wp_update_post( array(
+                    'ID'          => $pid,
+                    'post_status' => 'publish',
+                ) );
+                update_post_meta( $pid, '_cora_editorial_status', 'published' );
+                $published_count++;
+            }
+
+            $result['success'] = true;
+            $result['message'] = "Published {$published_count} articles to live website.";
+            $result['data'] = array(
+                'published_count' => $published_count,
+                'library_url'     => home_url( '/workspace/blogs?ct=ct-library' ),
+            );
+            break;
+
+        case 'bulk_clean_leads':
+            $deleted = $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_leads WHERE names LIKE '%test%' OR names = 'Prospective Client' OR names = ''" );
+            $result['success'] = true;
+            $result['message'] = "Cleaned up {$deleted} test leads from CRM pipeline.";
+            $result['data'] = array(
+                'cleaned_count' => intval( $deleted ),
+                'crm_url'       => home_url( '/workspace/leads' ),
+            );
+            break;
+
+        case 'mark_invoice_paid':
+            $invoices = get_option( "cora_workspace_invoices_{$agency_id}", array() );
+            $inv_no = sanitize_text_field( $args['invoice_no'] ?? '' );
+            $updated = false;
+            foreach ( $invoices as &$inv ) {
+                if ( empty( $inv_no ) || ( ! empty( $inv['invoice_no'] ) && strcasecmp( $inv['invoice_no'], $inv_no ) === 0 ) ) {
+                    $inv['status'] = 'paid';
+                    $updated = true;
+                    if ( ! empty( $inv_no ) ) break;
+                }
+            }
+            if ( $updated ) {
+                update_option( "cora_workspace_invoices_{$agency_id}", $invoices );
+                $result['success'] = true;
+                $result['message'] = "Marked invoice " . ($inv_no ?: 'records') . " as paid.";
+                $result['data'] = array(
+                    'status'    => 'paid',
+                    'view_url'  => home_url( '/workspace/financials' ),
+                );
+            } else {
+                $result['message'] = "No matching invoice found to update.";
+            }
+            break;
+
+        case 'complete_task':
+            $tasks = get_option( 'cora_workspace_client_tasks', array() );
+            $task_title = sanitize_text_field( $args['title'] ?? '' );
+            $updated = false;
+            foreach ( $tasks as &$t ) {
+                if ( empty( $task_title ) || stripos( $t['title'] ?? '', $task_title ) !== false ) {
+                    $t['status'] = 'completed';
+                    $updated = true;
+                    if ( ! empty( $task_title ) ) break;
+                }
+            }
+            if ( $updated ) {
+                update_option( 'cora_workspace_client_tasks', $tasks );
+                $result['success'] = true;
+                $result['message'] = "Marked task as completed.";
+                $result['data'] = array(
+                    'status'    => 'completed',
+                    'tasks_url' => home_url( '/workspace/client-task-manager' ),
+                );
+            } else {
+                $result['message'] = "No task found to complete.";
+            }
+            break;
+
         default:
             $result['message'] = "Unknown action: {$action_name}";
             break;
@@ -15531,6 +15669,53 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
         if ( ! empty( $exec_res['success'] ) ) {
             $action_results[] = $exec_res;
             $reply = "Drafted **{$title}** for **{$client_name}** in the Document Vault with e-signature tokens generated.";
+        }
+    }
+    // 6. Intent: Article Library Pruning & Deletion
+    elseif ( ( strpos( $lower, 'article' ) !== false || strpos( $lower, 'post' ) !== false || strpos( $lower, 'blog' ) !== false || strpos( $lower, 'library' ) !== false ) && ( strpos( $lower, 'delete' ) !== false || strpos( $lower, 'remove' ) !== false || strpos( $lower, 'clean' ) !== false || strpos( $lower, 'prune' ) !== false || strpos( $lower, 'keep' ) !== false ) ) {
+        $keep_count = 3;
+        if ( preg_match( '/(?:keep|retain|top)\s*(?:only\s*)?([0-9]+)/i', $raw_msg, $km ) ) {
+            $keep_count = intval( $km[1] );
+        }
+
+        $exec_res = cora_execute_ai_action( 'keep_top_articles', array(
+            'count' => $keep_count,
+        ), $agency_id, $user_id );
+
+        if ( ! empty( $exec_res['success'] ) ) {
+            $action_results[] = $exec_res;
+            $reply = "I have pruned your Content Library. Retained the top **{$keep_count} articles** with the highest SEO scores and deleted {$exec_res['data']['deleted_count']} lower-performing articles:";
+        } else {
+            $reply = "Attempted to prune Content Library: " . ($exec_res['message'] ?? 'Action completed.');
+        }
+    }
+    // 7. Intent: Article Publishing
+    elseif ( ( strpos( $lower, 'article' ) !== false || strpos( $lower, 'draft' ) !== false ) && strpos( $lower, 'publish' ) !== false ) {
+        $exec_res = cora_execute_ai_action( 'publish_articles', array(
+            'target' => 'drafts',
+        ), $agency_id, $user_id );
+
+        if ( ! empty( $exec_res['success'] ) ) {
+            $action_results[] = $exec_res;
+            $reply = "Published **{$exec_res['data']['published_count']} draft articles** to your live website:";
+        }
+    }
+    // 8. Intent: CRM Lead Cleanup
+    elseif ( ( strpos( $lower, 'lead' ) !== false || strpos( $lower, 'pipeline' ) !== false ) && ( strpos( $lower, 'clean' ) !== false || strpos( $lower, 'delete test' ) !== false || strpos( $lower, 'remove test' ) !== false ) ) {
+        $exec_res = cora_execute_ai_action( 'bulk_clean_leads', array(), $agency_id, $user_id );
+        if ( ! empty( $exec_res['success'] ) ) {
+            $action_results[] = $exec_res;
+            $reply = "Cleaned up **{$exec_res['data']['cleaned_count']} test leads** from your CRM Pipeline:";
+        }
+    }
+    // 9. Intent: Task Completion
+    elseif ( strpos( $lower, 'task' ) !== false && ( strpos( $lower, 'complete' ) !== false || strpos( $lower, 'done' ) !== false || strpos( $lower, 'finish' ) !== false ) ) {
+        $exec_res = cora_execute_ai_action( 'complete_task', array(
+            'title' => $raw_msg,
+        ), $agency_id, $user_id );
+        if ( ! empty( $exec_res['success'] ) ) {
+            $action_results[] = $exec_res;
+            $reply = "Marked task as **completed** in your Client Task Manager:";
         }
     }
     // 6. Intent: Casual Greetings & Quick Dialog (e.g. "hi", "hello", "hey", "yo", "fu", "test", "who are you")
