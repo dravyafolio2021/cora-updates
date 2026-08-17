@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.69
+ * Version: 3.4.70
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.69' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.70' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -5632,14 +5632,31 @@ function cora_mcp_handle_call_tool( $name, $args, $id ) {
             }
 
             $context = cora_build_dynamic_workspace_context( $agency_id );
-            $system_prompt = "You are Cora Workspace AI Co-founder. Use the following real-time operational workspace context to deliver concise, strategic, and accurate answers:\n" . $context;
+            $system_prompt = "You are Cora Workspace AI Co-founder. Use the following real-time operational workspace context to deliver concise, strategic, and actionable answers:\n" . $context . "\n\nIf the user requests to create a form, add a lead, generate an invoice, or schedule a booking, embed [ACTION:action_name]{...JSON...}[/ACTION] to execute it immediately.";
             
             $ai_response = cora_rag_call_ai_api( $question, $system_prompt );
             if ( is_wp_error( $ai_response ) ) {
                 return cora_mcp_make_tool_error( "AI Model Error: " . $ai_response->get_error_message(), $id );
             }
 
-            return cora_mcp_make_tool_response( $ai_response, $id );
+            // Parse and execute actions if present
+            if ( preg_match_all( '/\[ACTION:([a-zA-Z0-9_]+)\](.*?)\[\/ACTION\]/s', $ai_response, $matches, PREG_SET_ORDER ) ) {
+                foreach ( $matches as $m ) {
+                    $full_tag    = $m[0];
+                    $action_name = $m[1];
+                    $json_str    = trim( $m[2] );
+                    $exec_args   = json_decode( $json_str, true ) ?: array();
+
+                    $exec_res = cora_execute_ai_action( $action_name, $exec_args, $agency_id );
+                    $formatted_msg = "\n\n[Action Executed: {$exec_res['message']}]";
+                    if ( ! empty( $exec_res['data']['public_url'] ) ) {
+                        $formatted_msg .= "\nPublic Form Link: " . $exec_res['data']['public_url'];
+                    }
+                    $ai_response = str_replace( $full_tag, $formatted_msg, $ai_response );
+                }
+            }
+
+            return cora_mcp_make_tool_response( trim( $ai_response ), $id );
 
         // ── Legacy Search Listings ───────────────────────────────────────────
         case 'cora_search_listings':
@@ -14840,6 +14857,329 @@ add_action( 'wp_ajax_cora_workspace_save_ai_keys', 'cora_ajax_save_ai_keys' );
  * Proxies the user's chat message to whichever AI provider they have configured.
  * Priority: active_model setting → Gemini BYOK → OpenAI BYOK → fallback stub.
  */
+/**
+ * Master Server-Side Action Execution Engine for Cora AI Co-Founder.
+ */
+if ( ! function_exists( 'cora_execute_ai_action' ) ) {
+function cora_execute_ai_action( $action_name, $args = array(), $agency_id = null, $user_id = null ) {
+    global $wpdb;
+    if ( ! $agency_id ) {
+        $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
+    }
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+
+    $result = array(
+        'action'  => $action_name,
+        'success' => false,
+        'message' => '',
+        'data'    => array(),
+    );
+
+    switch ( $action_name ) {
+        case 'create_form':
+            $title = ! empty( $args['title'] ) ? sanitize_text_field( $args['title'] ) : 'Client Inquiry Form';
+            $form_key = 'frm_' . substr( md5( uniqid( $title . time(), true ) ), 0, 8 );
+            $raw_fields = ! empty( $args['fields'] ) && is_array( $args['fields'] ) ? $args['fields'] : array(
+                array( 'id' => 'block_1', 'type' => 'text', 'label' => 'Full Name', 'placeholder' => 'Enter full name', 'required' => true ),
+                array( 'id' => 'block_2', 'type' => 'email', 'label' => 'Email Address', 'placeholder' => 'name@domain.com', 'required' => true ),
+                array( 'id' => 'block_3', 'type' => 'phone', 'label' => 'Phone Number', 'placeholder' => '+91 98765 43210', 'required' => true ),
+            );
+
+            $blocks = array();
+            $idx = 1;
+            foreach ( $raw_fields as $f ) {
+                if ( is_string( $f ) ) {
+                    $label = sanitize_text_field( $f );
+                    $type = 'text';
+                    $lower = strtolower( $label );
+                    if ( strpos( $lower, 'email' ) !== false ) $type = 'email';
+                    elseif ( strpos( $lower, 'phone' ) !== false || strpos( $lower, 'mobile' ) !== false || strpos( $lower, 'contact' ) !== false ) $type = 'phone';
+                    elseif ( strpos( $lower, 'date' ) !== false || strpos( $lower, 'time' ) !== false ) $type = 'date';
+                    elseif ( strpos( $lower, 'message' ) !== false || strpos( $lower, 'requirement' ) !== false || strpos( $lower, 'detail' ) !== false || strpos( $lower, 'note' ) !== false ) $type = 'textarea';
+                    elseif ( strpos( $lower, 'budget' ) !== false || strpos( $lower, 'package' ) !== false || strpos( $lower, 'service' ) !== false ) $type = 'select';
+
+                    $blocks[] = array(
+                        'id'          => 'block_' . $idx,
+                        'type'        => $type,
+                        'label'       => $label,
+                        'placeholder' => 'Enter ' . $label,
+                        'required'    => true,
+                        'options'     => $type === 'select' ? array('Standard Engagement', 'Premium Package', 'Custom Scope') : array(),
+                    );
+                } elseif ( is_array( $f ) ) {
+                    $blocks[] = array(
+                        'id'          => 'block_' . $idx,
+                        'type'        => sanitize_text_field( $f['type'] ?? 'text' ),
+                        'label'       => sanitize_text_field( $f['label'] ?? ('Field ' . $idx) ),
+                        'placeholder' => sanitize_text_field( $f['placeholder'] ?? '' ),
+                        'required'    => ! empty( $f['required'] ),
+                        'options'     => ! empty( $f['options'] ) && is_array( $f['options'] ) ? array_map( 'sanitize_text_field', $f['options'] ) : array(),
+                    );
+                }
+                $idx++;
+            }
+
+            $styling = json_encode( array( 'theme' => 'light', 'border_radius' => 'rounded-xl', 'primary_color' => '#18181b' ) );
+            $settings = json_encode( array(
+                'subtitle'       => sanitize_text_field( $args['subtitle'] ?? 'Please fill out details below.' ),
+                'submit_text'    => sanitize_text_field( $args['submit_text'] ?? 'Submit Inquiry' ),
+                'success_msg'    => 'Thank you! Your submission has been received.',
+                'auto_create_crm'=> true,
+            ) );
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_forms',
+                array(
+                    'agency_id'  => $agency_id,
+                    'form_key'   => $form_key,
+                    'title'      => $title,
+                    'status'     => 'published',
+                    'styling'    => $styling,
+                    'settings'   => $settings,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql'),
+                )
+            );
+            $form_id = $wpdb->insert_id;
+
+            if ( $form_id ) {
+                $wpdb->insert(
+                    $wpdb->prefix . 'cora_form_blocks',
+                    array(
+                        'form_id'     => $form_id,
+                        'blocks_json' => json_encode( $blocks ),
+                        'logic_json'  => '[]',
+                        'updated_at'  => current_time('mysql'),
+                    )
+                );
+
+                $public_url = home_url( '/shared-form/' . $form_key );
+                $edit_url   = home_url( '/workspace/forms?form_id=' . $form_id );
+
+                $result['success'] = true;
+                $result['message'] = "Created and published form: {$title}";
+                $result['data'] = array(
+                    'form_id'      => $form_id,
+                    'form_key'     => $form_key,
+                    'title'        => $title,
+                    'fields_count' => count( $blocks ),
+                    'fields'       => array_column( $blocks, 'label' ),
+                    'public_url'   => $public_url,
+                    'edit_url'     => $edit_url,
+                );
+            }
+            break;
+
+        case 'create_lead':
+            $name = sanitize_text_field( $args['name'] ?? 'New Client Lead' );
+            $phone = sanitize_text_field( $args['phone'] ?? '' );
+            $email = sanitize_email( $args['email'] ?? '' );
+            $deal_value = floatval( $args['deal_value'] ?? $args['budget'] ?? 0 );
+            $notes = sanitize_textarea_field( $args['notes'] ?? $args['requirement'] ?? '' );
+            $status = sanitize_text_field( $args['status'] ?? 'new' );
+
+            $lead_id = cora_db_insert_lead( array(
+                'names'      => $name,
+                'phone'      => $phone,
+                'email'      => $email,
+                'price'      => $deal_value,
+                'status'     => $status,
+                'notes'      => $notes,
+                'source'     => 'AI Co-Founder',
+                'agency_id'  => $agency_id,
+                'created_at' => current_time('mysql'),
+            ) );
+
+            $result['success'] = true;
+            $result['message'] = "Created CRM lead for {$name}";
+            $result['data'] = array(
+                'lead_id'    => $lead_id,
+                'name'       => $name,
+                'phone'      => $phone,
+                'email'      => $email,
+                'deal_value' => $deal_value,
+                'status'     => $status,
+                'crm_url'    => home_url( '/workspace/leads' ),
+            );
+            break;
+
+        case 'create_invoice':
+            $client_name = sanitize_text_field( $args['client_name'] ?? $args['name'] ?? 'Client' );
+            $amount = floatval( $args['amount'] ?? $args['subtotal'] ?? 0 );
+            $tax_rate = floatval( $args['tax_rate'] ?? $args['gst_rate'] ?? 18 );
+            $gst_amount = round( ($amount * $tax_rate) / 100, 2 );
+            $total_amount = $amount + $gst_amount;
+            $due_date = ! empty( $args['due_date'] ) ? sanitize_text_field( $args['due_date'] ) : date('Y-m-d', strtotime('+7 days'));
+            $invoice_no = 'INV-' . date('Y') . '-' . rand(1000, 9999);
+
+            $invoices = get_option( "cora_workspace_invoices_{$agency_id}", array() );
+            $new_inv = array(
+                'id'           => uniqid('inv_'),
+                'invoice_no'   => $invoice_no,
+                'client_name'  => $client_name,
+                'subtotal'     => $amount,
+                'gst_rate'     => $tax_rate,
+                'sgst'         => round($gst_amount / 2, 2),
+                'cgst'         => round($gst_amount / 2, 2),
+                'total_amount' => $total_amount,
+                'status'       => 'unpaid',
+                'due_date'     => $due_date,
+                'created_at'   => current_time('mysql'),
+            );
+            array_unshift( $invoices, $new_inv );
+            update_option( "cora_workspace_invoices_{$agency_id}", $invoices );
+
+            $result['success'] = true;
+            $result['message'] = "Generated invoice {$invoice_no} for ₹" . number_format($total_amount);
+            $result['data'] = array(
+                'invoice_no'   => $invoice_no,
+                'client_name'  => $client_name,
+                'subtotal'     => $amount,
+                'gst_amount'   => $gst_amount,
+                'total_amount' => $total_amount,
+                'due_date'     => $due_date,
+                'view_url'     => home_url( '/workspace/financials' ),
+            );
+            break;
+
+        case 'create_booking':
+            $title = sanitize_text_field( $args['title'] ?? $args['client_name'] ?? 'Shoot Booking' );
+            $date = sanitize_text_field( $args['date'] ?? date('Y-m-d', strtotime('+2 days')) );
+            $time = sanitize_text_field( $args['time'] ?? '10:00 AM' );
+            $location = sanitize_text_field( $args['location'] ?? $args['venue'] ?? 'Studio A' );
+            $crew = sanitize_text_field( $args['crew'] ?? 'Lead Photographer' );
+
+            $bookings = get_option( "cora_workspace_bookings_{$agency_id}", array() );
+            $new_booking = array(
+                'id'         => uniqid('bk_'),
+                'title'      => $title,
+                'date'       => $date,
+                'time'       => $time,
+                'location'   => $location,
+                'crew'       => $crew,
+                'status'     => 'scheduled',
+                'created_at' => current_time('mysql'),
+            );
+            array_unshift( $bookings, $new_booking );
+            update_option( "cora_workspace_bookings_{$agency_id}", $bookings );
+
+            $result['success'] = true;
+            $result['message'] = "Scheduled booking '{$title}' on {$date} at {$time}";
+            $result['data'] = array(
+                'title'        => $title,
+                'date'         => $date,
+                'time'         => $time,
+                'location'     => $location,
+                'crew'         => $crew,
+                'calendar_url' => home_url( '/workspace/bookings' ),
+            );
+            break;
+
+        case 'create_task':
+            $title = sanitize_text_field( $args['title'] ?? 'New Deliverable Task' );
+            $priority = sanitize_text_field( $args['priority'] ?? 'high' );
+            $due_date = sanitize_text_field( $args['due_date'] ?? date('Y-m-d', strtotime('+3 days')) );
+
+            $tasks = get_option( 'cora_workspace_client_tasks', array() );
+            $new_task = array(
+                'id'         => uniqid('tsk_'),
+                'title'      => $title,
+                'priority'   => $priority,
+                'due_date'   => $due_date,
+                'status'     => 'pending',
+                'created_at' => current_time('mysql'),
+            );
+            array_unshift( $tasks, $new_task );
+            update_option( 'cora_workspace_client_tasks', $tasks );
+
+            $result['success'] = true;
+            $result['message'] = "Added task: {$title}";
+            $result['data'] = array(
+                'task_title' => $title,
+                'priority'   => $priority,
+                'due_date'   => $due_date,
+                'tasks_url'  => home_url( '/workspace/client-task-manager' ),
+            );
+            break;
+
+        case 'create_document':
+            $title = sanitize_text_field( $args['title'] ?? 'Service Agreement' );
+            $client_name = sanitize_text_field( $args['client_name'] ?? 'Client' );
+            $vault_docs = get_option( 'cora_workspace_vault_docs', array() );
+            $new_doc = array(
+                'id'          => uniqid('doc_'),
+                'title'       => $title,
+                'client_name' => $client_name,
+                'status'      => 'draft',
+                'sign_token'  => 'sgn_' . wp_generate_password( 12, false ),
+                'created_at'  => current_time('mysql'),
+            );
+            array_unshift( $vault_docs, $new_doc );
+            update_option( 'cora_workspace_vault_docs', $vault_docs );
+
+            $result['success'] = true;
+            $result['message'] = "Drafted document '{$title}' in Vault";
+            $result['data'] = array(
+                'title'       => $title,
+                'client_name' => $client_name,
+                'vault_url'   => home_url( '/workspace/vault' ),
+            );
+            break;
+
+        default:
+            $result['message'] = "Unknown action: {$action_name}";
+            break;
+    }
+
+    return $result;
+}
+}
+
+/**
+ * Parser that extracts [ACTION:name]{json}[/ACTION] from AI response, executes it, and formats clean response.
+ */
+if ( ! function_exists( 'cora_ai_process_response_and_execute_actions' ) ) {
+function cora_ai_process_response_and_execute_actions( $raw_reply, $provider, $model_id ) {
+    $action_results = array();
+    $clean_reply = $raw_reply;
+
+    if ( preg_match_all( '/\[ACTION:([a-zA-Z0-9_]+)\](.*?)\[\/ACTION\]/s', $raw_reply, $matches, PREG_SET_ORDER ) ) {
+        foreach ( $matches as $m ) {
+            $full_tag    = $m[0];
+            $action_name = $m[1];
+            $json_str    = trim( $m[2] );
+            $args        = json_decode( $json_str, true ) ?: array();
+
+            $exec_res = cora_execute_ai_action( $action_name, $args );
+            if ( ! empty( $exec_res['success'] ) ) {
+                $action_results[] = $exec_res;
+            }
+
+            // Remove raw tag from display text
+            $clean_reply = str_replace( $full_tag, '', $clean_reply );
+        }
+    }
+
+    $clean_reply = trim( $clean_reply );
+
+    if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
+        cora_workspace_log_ai_request();
+    }
+
+    wp_send_json_success( array(
+        'reply'          => $clean_reply,
+        'action_results' => $action_results,
+        'provider'       => $provider,
+        'model'          => $model_id,
+    ) );
+}
+}
+
+/**
+ * Enhanced AI Chat Proxy: Autonomous AI Co-Founder Action Router
+ */
 if ( ! function_exists( 'cora_ajax_ai_chat' ) ) {
 function cora_ajax_ai_chat() {
     check_ajax_referer( 'cora_ajax_nonce', 'security' );
@@ -14854,37 +15194,43 @@ function cora_ajax_ai_chat() {
         ) );
     }
 
-    $message      = sanitize_text_field( $_POST['message'] ?? '' );
-    $default_prompt = "You are Cora AI, the unified platform assistant for the Cora Workspace Platform. 
-Your task is to help workspace owners, administrators, and team members manage their business.
-Understand everything about the Cora platform, which includes:
-1. Multi-Tenant Modules: Dynamically supports multiple industries (e.g. Photography Studio owned by Owner Studio, Real Estate owned by Owner Real Estate).
-2. Lead Management Pipeline: Kanban boards, leads generation logs, and manual lead bookings.
-3. Attendance/Punch Widget: Allows staff to Punch In/Out from the topbar button to track work hours.
-4. Document Vault & E-Sign: Secure PDF client contracts, GST tax calculations (Delhi/Jaipur state SGST/CGST split), and e-signing.
-5. Listing Geolocation & Sync: Syncs MLS data from Zillow URLs and checks RERA registration IDs for properties.
-6. Quotas & Status Connection: Workspace connection indicator shows 'Connected' using the global platform-wide Gemini API key, with dynamic sliding limits (30 reqs/5h, 100 reqs/24h) tracked per workspace.
-Answer concisely, professionally, and matching the light Notion-styled/Claude-cream aesthetic of the platform. Avoid mention of raw API keys.";
-    $system_prompt = $_POST['system_prompt'] ?? $default_prompt;
+    $message = sanitize_text_field( $_POST['message'] ?? '' );
     $current_page = sanitize_text_field( $_POST['current_page'] ?? 'dashboard' );
+
+    $default_prompt = "You are Cora AI, the autonomous AI Co-Founder and business intelligence engine for the Cora Workspace Platform.
+You do not merely chat; you actively TAKE ACTION to run and automate the user's business across all modules: Forms, CRM Leads, Invoices & GST, Bookings, Client Tasks, Document Vault, SEO Articles, and Living AI Memory.
+
+=== ACTION EXECUTION CAPABILITY ===
+When the user asks you to create or execute something:
+1. If you have enough details, IMMEDIATELY execute the action by embedding a clean JSON action block in your response:
+   [ACTION:create_form]{\"title\":\"Wedding Photography Inquiry\",\"fields\":[{\"label\":\"Full Name\",\"type\":\"text\"},{\"label\":\"Email Address\",\"type\":\"email\"},{\"label\":\"Phone Number\",\"type\":\"phone\"},{\"label\":\"Event Date\",\"type\":\"date\"},{\"label\":\"Venue Location\",\"type\":\"text\"},{\"label\":\"Selected Package\",\"type\":\"select\",\"options\":[\"Essential\",\"Signature\",\"Royal\"]}]}[/ACTION]
+   [ACTION:create_lead]{\"name\":\"Rahul Sharma\",\"phone\":\"9876543210\",\"email\":\"rahul@example.com\",\"deal_value\":150000,\"status\":\"new\",\"notes\":\"Commercial studio shoot inquiry\"}[/ACTION]
+   [ACTION:create_invoice]{\"client_name\":\"Acme Corp\",\"amount\":75000,\"tax_rate\":18,\"due_date\":\"2026-08-25\"}[/ACTION]
+   [ACTION:create_booking]{\"title\":\"Pre-Wedding Shoot\",\"date\":\"2026-08-22\",\"time\":\"09:00 AM\",\"location\":\"City Palace, Jaipur\",\"crew\":\"Lead Cinematographer\"}[/ACTION]
+   [ACTION:create_task]{\"title\":\"Deliver Edited Reel Selection to Client\",\"priority\":\"high\",\"due_date\":\"2026-08-20\"}[/ACTION]
+   [ACTION:create_document]{\"title\":\"Commercial Video Production Master Agreement\",\"client_name\":\"Acme Studios\"}[/ACTION]
+
+2. Two-Way Discussion Flow:
+   - If the user's request is missing details (for example, 'create a form for me'), respond in a helpful, friendly, and crisp 2-way manner: ask 1-2 focused questions (e.g. 'What is the form for, and which fields would you like to include? (e.g., Name, Email, Phone, Event Date)'), and execute the moment they reply.
+   - Do NOT output long paragraphs of text. Keep your responses crisp, direct, and actionable.
+   - Adhere strictly to the Cora monochrome visual palette: ZERO emojis, professional typography, and sleek presentation.";
+
+    $system_prompt = $_POST['system_prompt'] ?? $default_prompt;
     $page_contexts = array(
-        'dashboard'  => "The user is currently viewing the main dashboard workspace. Focus on general productivity, quick overview tasks, workspace settings, connection status, and co-founder briefing metrics.",
-        'leads'      => "The user is currently viewing the Lead Management CRM Pipeline. Focus on managing prospective clients, lead status categories (new, contacted, proposal, negotiation, closed), WhatsApp message reminders, and booking tours.",
-        'bookings'   => "The user is currently viewing the Bookings Calendar. Focus on scheduling appointments, viewing photographer slots, and editing showing dates.",
-        'financials' => "The user is currently viewing Financials & Invoices. Focus on invoicing clients, state GST calculations (Jaipur/Delhi SGST & CGST split), and profit breakdowns.",
-        'vault'      => "The user is currently viewing the Secure Document Vault. Focus on client contracts, PDF templates, and uploading and auditing official credentials.",
-        'settings'   => "The user is currently viewing Workspace & Member Settings. Focus on API keys, role governance, adding members, and editing platform options.",
-        'portfolio'  => "The user is currently viewing the Photography Portfolio. Focus on image galleries, upload presets, client review links, and asset metadata.",
+        'dashboard'  => "The user is currently viewing the main dashboard workspace.",
+        'forms'      => "The user is currently in the Forms Builder.",
+        'leads'      => "The user is in the Lead Management CRM Pipeline.",
+        'bookings'   => "The user is in the Bookings Calendar.",
+        'financials' => "The user is in Financials & Invoices.",
+        'vault'      => "The user is in the Secure Document Vault.",
+        'settings'   => "The user is in Workspace Settings.",
     );
-    $page_instruction = isset( $page_contexts[$current_page] ) ? $page_contexts[$current_page] : "The user is currently viewing the {$current_page} section.";
-    $system_prompt .= "\n[CURRENT CONTEXT] " . $page_instruction;
-    $system_prompt = sanitize_textarea_field( $system_prompt );
+    $system_prompt .= "\n[CURRENT CONTEXT] " . ($page_contexts[$current_page] ?? "User is in {$current_page}.");
 
     if ( empty( $message ) ) {
         wp_send_json_error( 'No message provided.' );
     }
 
-    $active_model   = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
     $openrouter_key = defined( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ? CORA_PLATFORM_OPENROUTER_API_KEY : '';
     $groq_key       = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : '';
     $gemini_key_b64 = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) && ! empty( CORA_PLATFORM_GEMINI_API_KEY ) ? CORA_PLATFORM_GEMINI_API_KEY : get_option( 'cora_workspace_ai_gemini_key', '' );
@@ -14906,7 +15252,7 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
                 array( 'role' => 'system', 'content' => $system_prompt ),
                 array( 'role' => 'user',   'content' => $message ),
             ),
-            'max_tokens'  => 512,
+            'max_tokens'  => 768,
             'temperature' => 0.7,
         ) );
 
@@ -14922,14 +15268,8 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
             $code = wp_remote_retrieve_response_code( $response );
             $data = json_decode( wp_remote_retrieve_body( $response ), true );
             if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
-                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
-                    cora_workspace_log_ai_request();
-                }
-                wp_send_json_success( array(
-                    'reply'    => $data['choices'][0]['message']['content'],
-                    'provider' => 'gemini',
-                    'model'    => 'gemini-2.5-flash',
-                ) );
+                cora_ai_process_response_and_execute_actions( $data['choices'][0]['message']['content'], 'gemini', 'gemini-2.5-flash' );
+                exit;
             }
         }
     }
@@ -14948,7 +15288,7 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
                 array( 'role' => 'system', 'content' => $system_prompt ),
                 array( 'role' => 'user',   'content' => $message ),
             ),
-            'max_tokens'  => 512,
+            'max_tokens'  => 768,
             'temperature' => 0.7,
         ) );
 
@@ -14964,14 +15304,8 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
             $code = wp_remote_retrieve_response_code( $response );
             $data = json_decode( wp_remote_retrieve_body( $response ), true );
             if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
-                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
-                    cora_workspace_log_ai_request();
-                }
-                wp_send_json_success( array(
-                    'reply'    => $data['choices'][0]['message']['content'],
-                    'provider' => 'groq',
-                    'model'    => $model_id,
-                ) );
+                cora_ai_process_response_and_execute_actions( $data['choices'][0]['message']['content'], 'groq', $model_id );
+                exit;
             }
         }
     }
@@ -14993,7 +15327,7 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
                 )
             ),
             'generationConfig' => array(
-                'maxOutputTokens' => 512,
+                'maxOutputTokens' => 768,
                 'temperature'     => 0.7,
             ),
         ) );
@@ -15008,14 +15342,8 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
             $code = wp_remote_retrieve_response_code( $response );
             $data = json_decode( wp_remote_retrieve_body( $response ), true );
             if ( $code === 200 && ! empty( $data['candidates'][0]['content']['parts'][0]['text'] ) ) {
-                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
-                    cora_workspace_log_ai_request();
-                }
-                wp_send_json_success( array(
-                    'reply'    => $data['candidates'][0]['content']['parts'][0]['text'],
-                    'provider' => 'gemini',
-                    'model'    => $model_id,
-                ) );
+                cora_ai_process_response_and_execute_actions( $data['candidates'][0]['content']['parts'][0]['text'], 'gemini', $model_id );
+                exit;
             }
         }
     }
@@ -15032,7 +15360,7 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
                 array( 'role' => 'system', 'content' => $system_prompt ),
                 array( 'role' => 'user',   'content' => $message ),
             ),
-            'max_tokens'  => 512,
+            'max_tokens'  => 768,
             'temperature' => 0.7,
         ) );
 
@@ -15049,14 +15377,8 @@ Answer concisely, professionally, and matching the light Notion-styled/Claude-cr
             $code = wp_remote_retrieve_response_code( $response );
             $data = json_decode( wp_remote_retrieve_body( $response ), true );
             if ( $code === 200 && ! empty( $data['choices'][0]['message']['content'] ) ) {
-                if ( function_exists( 'cora_workspace_log_ai_request' ) ) {
-                    cora_workspace_log_ai_request();
-                }
-                wp_send_json_success( array(
-                    'reply'    => $data['choices'][0]['message']['content'],
-                    'provider' => 'openai',
-                    'model'    => $model_id,
-                ) );
+                cora_ai_process_response_and_execute_actions( $data['choices'][0]['message']['content'], 'openai', $model_id );
+                exit;
             }
         }
     }
@@ -15403,6 +15725,27 @@ function cora_ajax_chat_query() {
         $total_tokens = $data['usage']['total_tokens'] ?? 0;
     }
 
+    $action_results = array();
+    $clean_reply = $reply;
+
+    if ( preg_match_all( '/\[ACTION:([a-zA-Z0-9_]+)\](.*?)\[\/ACTION\]/s', $reply, $matches, PREG_SET_ORDER ) ) {
+        foreach ( $matches as $m ) {
+            $full_tag    = $m[0];
+            $action_name = $m[1];
+            $json_str    = trim( $m[2] );
+            $args        = json_decode( $json_str, true ) ?: array();
+
+            $exec_res = cora_execute_ai_action( $action_name, $args );
+            if ( ! empty( $exec_res['success'] ) ) {
+                $action_results[] = $exec_res;
+            }
+
+            $clean_reply = str_replace( $full_tag, '', $clean_reply );
+        }
+    }
+
+    $clean_reply = trim( $clean_reply );
+
     $fallback_notice = '';
     if ( $fallback_activated ) {
         $recovered_provider_name = ($provider === 'gemini') ? 'Gemini Flash' : (($provider === 'groq') ? 'Groq Llama 3.1' : 'OpenRouter Llama 3.1');
@@ -15410,7 +15753,8 @@ function cora_ajax_chat_query() {
     }
 
     wp_send_json_success( array(
-        'reply'             => $reply,
+        'reply'             => $clean_reply,
+        'action_results'    => $action_results,
         'model'             => $model,
         'provider'          => $provider,
         'fallback_notice'   => $fallback_notice,
