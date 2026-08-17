@@ -1106,8 +1106,8 @@ jQuery(document).ready(function($) {
             window.coraShowToast("Starting a new conversation...", "info");
         }
         $('#cora-sidebar-chat').html(`
-            <div class="chat-bubble ai bg-zinc-100 text-zinc-850 rounded-lg rounded-bl-none p-3 text-xs leading-relaxed self-start border border-zinc-200/50 shadow-sm max-w-[85%]">
-                Hello! I am Cora, your workspace co-founder intelligence. Ask me about your business stats, recent logs, or quick actions.
+            <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">
+                Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?
             </div>
         `);
         // Show native integration block again & re-init context
@@ -11443,52 +11443,74 @@ jQuery(document).ready(function($) {
         const curPage = window.coraCurrentView || new URLSearchParams(window.location.search).get('sub_page') || pathParts[pathParts.length - 1] || 'dashboard';
         
         const welcomeMessages = {
-            dashboard: "Hello! I am Cora, your workspace co-founder intelligence. Ask me about your business stats, recent logs, or quick actions.",
-            leads: "Hello! I am Cora, your CRM and Lead assistant. Ask me about lead details, WhatsApp reminder drafts, or scheduling follow-up calls.",
-            financials: "Hello! I am Cora, your Financials & Billing copilot. Ask me about state GST splits, invoicing clients, or profit metrics.",
-            vault: "Hello! I am Cora, your Document Vault assistant. Ask me about e-sign templates, active client contracts, or secure credentials audits.",
-            bookings: "Hello! I am Cora, your Booking Calendar coordinator. Ask me about photog appointments, showing slot availabilities, or photographer calendars.",
-            settings: "Hello! I am Cora, your Workspace Governance assistant. Ask me about system configurations, API keys, or team member role assignments.",
-            portfolio: "Hello! I am Cora, your Portfolio & Asset manager. Ask me about client photo reviews, upload resolutions, or optimizing image SEO."
+            dashboard: "Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?",
+            leads: "Hello! I am Cora, your AI Co-Founder for CRM. I can create leads, update pipeline stages, draft agreements, and log inquiries.",
+            financials: "Hello! I am Cora, your AI Co-Founder for Financials. I generate official GST invoices, compute SGST/CGST tax splits, and record payments.",
+            forms: "Hello! I am Cora, your AI Co-Founder for Forms. I create custom forms with any fields you need and provide live shareable links.",
+            vault: "Hello! I am Cora, your AI Co-Founder for Documents. I draft master service agreements, client contracts, and generate e-signature links.",
+            bookings: "Hello! I am Cora, your AI Co-Founder for Bookings. I schedule shoots, assign crew members, and book showing appointments.",
+            settings: "Hello! I am Cora, your AI Co-Founder. I manage platform connections, member roles, and automate workspace settings.",
+            portfolio: "Hello! I am Cora, your AI Co-Founder. I manage photography galleries, review links, and asset deliveries."
         };
         
-        const quickPrompts = {
+        const actionPrompts = {
             dashboard: [
-                { text: "Summarize today's workspace activity", label: "Summarize activity" },
-                { text: "Show current automations status", label: "Check automations" }
+                { text: "Create a client inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link.", label: "Build Client Inquiry Form" },
+                { text: "Create a new lead for Rahul Sharma, phone +91 98765 43210, deal value ₹1,50,000 interested in commercial shoot.", label: "Add New CRM Lead" },
+                { text: "Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date.", label: "Generate GST Invoice" },
+                { text: "Schedule a studio photoshoot booking for Tomorrow at 10:00 AM at Main Studio A.", label: "Schedule Studio Shoot" },
+                { text: "Draft a master service agreement in Document Vault for Rajesh Kumar.", label: "Draft Master Agreement" },
+                { text: "Summarize today's workspace activity, active leads, and unpaid receivables.", label: "Executive Activity Briefing" }
             ],
             leads: [
-                { text: "Draft a WhatsApp reminder for Ananya Sharma", label: "Draft reminder for Ananya" },
-                { text: "Check status of Rohit & Sneha's deal", label: "Check Rohit & Sneha's deal" }
+                { text: "Create a new lead for Priya Patel, phone +91 98111 22334, deal value ₹2,00,000.", label: "Add Qualified Lead" },
+                { text: "Create a lead qualification form with Name, Phone, Budget, Preferred Date and give me the link.", label: "Build Lead Capture Form" },
+                { text: "Draft a master service agreement in Document Vault for Rajesh Kumar.", label: "Draft Client Contract" }
+            ],
+            forms: [
+                { text: "Create a client inquiry form with Full Name, Email, Phone, Event Date, and Service Package, and give me the link.", label: "Build Inquiry Form" },
+                { text: "Create a client feedback survey form with Name, Rating, Project Feedback, and Testimonial.", label: "Build Feedback Survey" }
             ],
             financials: [
-                { text: "Calculate GST for 50,000 INR Delhi-Jaipur split", label: "Calculate GST split" },
-                { text: "Create a draft invoice template", label: "Draft invoice template" }
+                { text: "Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date.", label: "Generate 18% GST Invoice" },
+                { text: "Create an advance payment invoice of ₹25,000 for Commercial Shoot Project.", label: "Create Milestone Invoice" }
             ],
             vault: [
-                { text: "Verify the RERA registration document", label: "Verify RERA doc" },
-                { text: "Draft a client lease agreement", label: "Draft lease agreement" }
+                { text: "Draft a master video production service agreement for Acme Studios.", label: "Draft Service Agreement" },
+                { text: "Draft a commercial studio lease agreement for 12 months.", label: "Draft Studio Lease" }
             ],
             bookings: [
-                { text: "Check photographer slots for tomorrow", label: "Check photog slots" },
-                { text: "Schedule a new listing tour", label: "Schedule tour" }
-            ],
-            settings: [
-                { text: "Explain role governance access permissions", label: "Explain roles" },
-                { text: "Check Gemini API connection status", label: "Check connection status" }
-            ],
-            portfolio: [
-                { text: "Scan my gallery for missing SEO meta details", label: "Scan image SEO" },
-                { text: "Generate a client review sharing link", label: "Create sharing link" }
+                { text: "Schedule a studio photoshoot booking for Tomorrow at 10:00 AM at Main Studio A.", label: "Schedule Shoot Booking" },
+                { text: "Schedule a luxury property showing tour for Saturday at 3:00 PM.", label: "Schedule Showing Tour" }
             ]
         };
         
         const welcomeText = welcomeMessages[curPage] || welcomeMessages.dashboard;
-        const prompts = quickPrompts[curPage] || quickPrompts.dashboard;
+        const prompts = actionPrompts[curPage] || actionPrompts.dashboard;
         
         const welcomeBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
         if (welcomeBubble.length) {
             welcomeBubble.text(welcomeText);
+        }
+
+        // Render Action Presets Dynamically
+        const presetContainer = $('#cora-sidebar-action-presets');
+        if (presetContainer.length && prompts) {
+            let phtml = '';
+            prompts.forEach(function(p) {
+                phtml += `
+                    <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('${p.text.replace(/'/g, "\\'")}')">
+                        <div class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            </span>
+                            <span>${p.label}</span>
+                        </div>
+                        <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
+                    </button>
+                `;
+            });
+            presetContainer.html(phtml);
         }
 
         // Update header model label with dynamic RAG context

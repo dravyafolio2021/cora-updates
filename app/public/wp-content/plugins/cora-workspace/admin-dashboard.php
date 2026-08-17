@@ -7847,18 +7847,80 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         <div class="cora-ai-sidebar-body flex-1 overflow-y-auto p-4 flex flex-col gap-6">
             <div class="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-between gap-6">
                 <div class="cora-ai-sidebar-chat-history flex flex-col gap-3" id="cora-sidebar-chat">
-                    <div class="chat-bubble ai bg-zinc-100 text-zinc-850 rounded-lg rounded-bl-none p-3 text-xs leading-relaxed self-start border border-zinc-200/50 shadow-sm max-w-[85%]">
-                        Hello! I am Cora, your workspace co-founder intelligence. Ask me about your business stats, recent logs, or quick actions.
+                    <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">
+                        Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?
                     </div>
                 </div>
 
                 <!-- Native AI Integration Block (persists inside sidebar) -->
-                <div id="cora-sidebar-native-integration" class="flex flex-col gap-4">
-                    <!-- Dynamic Quick Prompts -->
-                    <div class="cora-ai-sidebar-shortcuts pt-3 border-t border-zinc-200">
-                        <span class="cora-sidebar-sublabel text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2.5 block">Quick Prompts</span>
-                        <button class="cora-shortcut-btn w-full text-left p-2.5 text-xs text-zinc-600 border border-zinc-200 rounded-md hover:bg-zinc-50 hover:text-zinc-900 transition-colors mb-2 cursor-pointer font-medium" onclick="coraSendShortcut('Summarize today\'s workspace activity')">Summarize activity</button>
-                        <button class="cora-shortcut-btn w-full text-left p-2.5 text-xs text-zinc-500 border border-zinc-200 rounded-md hover:bg-zinc-50 hover:text-zinc-900 transition-colors cursor-pointer font-medium" onclick="coraSendShortcut('Show current automations status')">Check automations</button>
+                <div id="cora-sidebar-native-integration" class="flex flex-col gap-3">
+                    <!-- Dynamic Action-Oriented Quick Executions -->
+                    <div class="cora-ai-sidebar-shortcuts pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                        <div class="flex items-center justify-between mb-2.5">
+                            <span class="cora-sidebar-sublabel text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Recommended Actions</span>
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Autonomous</span>
+                        </div>
+                        <div class="space-y-1.5" id="cora-sidebar-action-presets">
+                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Create a client inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link.')">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
+                                    </span>
+                                    <span>Build Client Inquiry Form</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
+                            </button>
+
+                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Create a new lead for Rahul Sharma, phone +91 98765 43210, deal value ₹1,50,000 interested in commercial studio shoot.')">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                    </span>
+                                    <span>Add New CRM Lead</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
+                            </button>
+
+                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date.')">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="10" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="18" y2="16"></line></svg>
+                                    </span>
+                                    <span>Generate GST Invoice</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
+                            </button>
+
+                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Schedule a studio photoshoot booking for Tomorrow at 10:00 AM at Main Studio A.')">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                    </span>
+                                    <span>Schedule Studio Shoot</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
+                            </button>
+
+                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Draft a master service agreement in Document Vault for Rajesh Kumar.')">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                    </span>
+                                    <span>Draft Master Agreement</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
+                            </button>
+
+                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Summarize today\'s workspace activity, active leads, and unpaid receivables.')">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                    </span>
+                                    <span>Executive Activity Briefing</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
