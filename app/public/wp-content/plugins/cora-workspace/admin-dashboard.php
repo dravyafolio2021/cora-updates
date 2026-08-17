@@ -7896,6 +7896,32 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         return localStorage.getItem('cora_ai_smart_routing') === '1';
     };
 
+    window.coraApplySwitchStyle = function(switchEl, knobEl, isActive) {
+        if (!switchEl || !knobEl) return;
+        switchEl.style.position = 'relative';
+        switchEl.style.display = 'inline-flex';
+        switchEl.style.width = '36px';
+        switchEl.style.height = '20px';
+        switchEl.style.borderRadius = '9999px';
+        switchEl.style.cursor = 'pointer';
+        switchEl.style.transition = 'background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+        switchEl.style.backgroundColor = isActive ? '#18181b' : '#e4e4e7';
+        switchEl.style.alignItems = 'center';
+        switchEl.style.padding = '2px';
+        switchEl.style.boxSizing = 'border-box';
+        switchEl.style.flexShrink = '0';
+
+        knobEl.style.display = 'inline-block';
+        knobEl.style.width = '16px';
+        knobEl.style.height = '16px';
+        knobEl.style.borderRadius = '9999px';
+        knobEl.style.backgroundColor = '#ffffff';
+        knobEl.style.boxShadow = '0 1px 3px rgba(0,0,0,0.25)';
+        knobEl.style.transition = 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+        knobEl.style.transform = isActive ? 'translateX(16px)' : 'translateX(0px)';
+        knobEl.style.pointerEvents = 'none';
+    };
+
     window.coraUpdatePopoverUI = function() {
         var isAuto = window.coraIsSmartRouting();
         var curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
@@ -7906,18 +7932,18 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
             'groq': 'Groq',
             'deepseek': 'DeepSeek'
         };
-        var activeModelName = isAuto ? 'Auto (Smart)' : (modelNames[curModel] || 'Gemini');
+        var shortName = isAuto ? 'Auto' : (modelNames[curModel] || 'Gemini');
 
-        // Sync header toolbar model label
+        // Sync header toolbar model label (Short Name Only)
         var headerModelLabel = document.getElementById('cora-sidebar-model-label');
         if (headerModelLabel) {
-            headerModelLabel.innerText = activeModelName;
+            headerModelLabel.innerText = shortName;
         }
 
         // Sync popover active model badge
         var popModelBadge = document.getElementById('cora-popover-current-model-badge');
         if (popModelBadge) {
-            popModelBadge.innerText = 'Active: ' + activeModelName;
+            popModelBadge.innerText = 'Active: ' + shortName;
         }
         
         // Sync Quota Ratio & Progress Bar with Header Pill
@@ -7982,7 +8008,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         // Sync Smart Route Switch
         var srSwitch = document.getElementById('cora-smart-route-switch');
         var srKnob = document.getElementById('cora-smart-route-knob');
-        if (srSwitch && srKnob && typeof window.coraApplySwitchStyle === 'function') {
+        if (srSwitch && srKnob) {
             window.coraApplySwitchStyle(srSwitch, srKnob, isAuto);
         }
 
@@ -7990,35 +8016,9 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         var isAutoExec = localStorage.getItem('cora_ai_autoexec') !== '0';
         var aeSwitch = document.getElementById('cora-autoexec-switch');
         var aeKnob = document.getElementById('cora-autoexec-knob');
-        if (aeSwitch && aeKnob && typeof window.coraApplySwitchStyle === 'function') {
+        if (aeSwitch && aeKnob) {
             window.coraApplySwitchStyle(aeSwitch, aeKnob, isAutoExec);
         }
-    };
-
-    window.coraApplySwitchStyle = function(switchEl, knobEl, isActive) {
-        if (!switchEl || !knobEl) return;
-        switchEl.style.position = 'relative';
-        switchEl.style.display = 'inline-flex';
-        switchEl.style.width = '36px';
-        switchEl.style.height = '20px';
-        switchEl.style.borderRadius = '9999px';
-        switchEl.style.cursor = 'pointer';
-        switchEl.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
-        switchEl.style.backgroundColor = isActive ? '#18181b' : '#e4e4e7';
-        switchEl.style.alignItems = 'center';
-        switchEl.style.padding = '2px';
-        switchEl.style.boxSizing = 'border-box';
-        switchEl.style.flexShrink = '0';
-
-        knobEl.style.display = 'inline-block';
-        knobEl.style.width = '16px';
-        knobEl.style.height = '16px';
-        knobEl.style.borderRadius = '9999px';
-        knobEl.style.backgroundColor = '#ffffff';
-        knobEl.style.boxShadow = '0 1px 3px rgba(0,0,0,0.25)';
-        knobEl.style.transition = 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
-        knobEl.style.transform = isActive ? 'translateX(16px)' : 'translateX(0px)';
-        knobEl.style.pointerEvents = 'none';
     };
 
     window.coraToggleAIUsagePopover = function(e) {
@@ -8052,9 +8052,9 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         localStorage.setItem('cora_ai_smart_routing', next ? '1' : '0');
         var labelEl = document.getElementById('cora-sidebar-model-label');
         if (next) {
-            if (labelEl) labelEl.innerText = 'Auto (Smart)';
+            if (labelEl) labelEl.innerText = 'Auto';
             if (typeof window.coraShowToast === 'function') {
-                window.coraShowToast('Smart Routing enabled: Auto-routes tasks', 'info');
+                window.coraShowToast('Smart Routing enabled: Auto model selection', 'info');
             }
         } else {
             var curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
@@ -8242,10 +8242,10 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                             <div class="h-px bg-zinc-100 my-2"></div>
 
                             <!-- Custom iOS-Style Animated Preferences -->
-                            <div class="space-y-2 px-1 py-0.5">
+                            <div class="space-y-1.5 px-1 py-0.5">
                                 <!-- Auto-Route Switch -->
-                                <div onclick="window.coraToggleSmartRouting(event)" class="flex items-center justify-between cursor-pointer group select-none py-1">
-                                    <div class="flex items-center gap-2">
+                                <div onclick="window.coraToggleSmartRouting(event)" role="button" class="flex items-center justify-between cursor-pointer group select-none py-1 px-1.5 rounded-xl hover:bg-zinc-100 transition-colors">
+                                    <div class="flex items-center gap-2 pointer-events-none">
                                         <div class="w-5 h-5 rounded-md bg-zinc-100 group-hover:bg-zinc-200 text-zinc-700 flex items-center justify-center transition-colors">
                                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
                                         </div>
@@ -8254,14 +8254,14 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                             <div class="text-[9.5px] text-zinc-400">Save tokens automatically</div>
                                         </div>
                                     </div>
-                                    <div class="cora-switch" id="cora-smart-route-switch">
+                                    <div class="cora-switch pointer-events-none" id="cora-smart-route-switch">
                                         <span id="cora-smart-route-knob"></span>
                                     </div>
                                 </div>
 
                                 <!-- Autonomous DB Actions Switch -->
-                                <div onclick="window.coraToggleAutoExec(event)" class="flex items-center justify-between cursor-pointer group select-none py-1">
-                                    <div class="flex items-center gap-2">
+                                <div onclick="window.coraToggleAutoExec(event)" role="button" class="flex items-center justify-between cursor-pointer group select-none py-1 px-1.5 rounded-xl hover:bg-zinc-100 transition-colors">
+                                    <div class="flex items-center gap-2 pointer-events-none">
                                         <div class="w-5 h-5 rounded-md bg-zinc-100 group-hover:bg-zinc-200 text-zinc-700 flex items-center justify-center transition-colors">
                                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                                         </div>
@@ -8270,7 +8270,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                             <div class="text-[9.5px] text-zinc-400">Direct DB mutations</div>
                                         </div>
                                     </div>
-                                    <div class="cora-switch" id="cora-autoexec-switch">
+                                    <div class="cora-switch pointer-events-none" id="cora-autoexec-switch">
                                         <span id="cora-autoexec-knob"></span>
                                     </div>
                                 </div>

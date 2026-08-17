@@ -12222,7 +12222,18 @@ jQuery(document).ready(function($) {
             portfolio: "Portfolio"
         };
         const activePageName = pageNames[curPage] || "Workspace";
-        $('#cora-sidebar-model-label').text('Gemini 2.5 Flash • ' + activePageName);
+        const curModelKey = localStorage.getItem('cora_ai_active_model') || 'gemini';
+        const isAutoModel = localStorage.getItem('cora_ai_smart_routing') === '1';
+        const modelShortNames = {
+            'gemini': 'Gemini',
+            'gpt-4o': 'ChatGPT',
+            'claude-3-5-sonnet': 'Claude',
+            'groq': 'Groq',
+            'deepseek': 'DeepSeek'
+        };
+        const shortModelName = isAutoModel ? 'Auto' : (modelShortNames[curModelKey] || 'Gemini');
+        $('#cora-sidebar-model-label').text(shortModelName);
+        $('#cora-sidebar-page-context-label').text(activePageName);
 
         // Update dynamic RAG Popover HTML
         const popoverEl = $('#cora-sidebar-rag-popover');
