@@ -15426,23 +15426,51 @@ function cora_ajax_ai_chat() {
     $message = sanitize_text_field( $_POST['message'] ?? '' );
     $current_page = sanitize_text_field( $_POST['current_page'] ?? 'dashboard' );
 
-    $default_prompt = "You are Cora AI, the autonomous AI Co-Founder and business intelligence engine for the Cora Workspace Platform.
-You do not merely chat; you actively TAKE ACTION to run and automate the user's business across all modules: Forms, CRM Leads, Invoices & GST, Bookings, Client Tasks, Document Vault, SEO Articles, and Living AI Memory.
+    $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'custom';
+    $mod_instance    = class_exists( 'Cora_Module_Registry' ) ? Cora_Module_Registry::get_module( $active_industry ) : null;
+    $active_modules  = array( 'dashboard' => 'Dashboard' );
+    if ( $mod_instance && ! cora_is_super_owner() ) {
+        $user_role_val = function_exists('cora_get_current_user_role') ? cora_get_current_user_role() : 'administrator';
+        $mod_nav = $mod_instance->get_navigation_groups( $user_role_val );
+        foreach ( $mod_nav as $grp ) {
+            if ( ! empty( $grp['items'] ) ) {
+                foreach ( $grp['items'] as $m_key => $m_val ) {
+                    if ( function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $m_key ) ) {
+                        continue;
+                    }
+                    $active_modules[ $m_key ] = $m_val['title'];
+                }
+            }
+        }
+    }
+    $active_modules_str = implode( ', ', array_values( $active_modules ) );
+    $active_keys        = array_keys( $active_modules );
+
+    $default_prompt = "You are Cora AI, the autonomous AI Co-Founder for the Cora Workspace Platform.
+You do not merely chat; you actively TAKE ACTION to run and automate the user's business.
+
+[ACTIVE WORKSPACE ENVIRONMENT]
+Workspace Industry Mode: " . strtoupper( $active_industry ) . "
+Active Modules: " . $active_modules_str . "
+
+CRITICAL DOMAIN RULES:
+1. STRICT MODULE AWARENESS: You MUST only suggest actions, ask questions, and create entities for active modules (" . $active_modules_str . ").
+2. If the user is in Custom Workspace mode or an industry feature (like CRM Leads or Studio Shoots) is NOT active, DO NOT assume or inject real estate or photography terms unless the user explicitly mentions them. Focus purely on general-purpose business forms, GST invoices, documents, client workflows, and files.
+3. Keep responses crisp, professional, and zero-clutter. Adhere strictly to monochromatic visual standards (ZERO emojis).
 
 === ACTION EXECUTION CAPABILITY ===
 When the user asks you to create or execute something:
-1. If you have enough details, IMMEDIATELY execute the action by embedding a clean JSON action block in your response:
-   [ACTION:create_form]{\"title\":\"Wedding Photography Inquiry\",\"fields\":[{\"label\":\"Full Name\",\"type\":\"text\"},{\"label\":\"Email Address\",\"type\":\"email\"},{\"label\":\"Phone Number\",\"type\":\"phone\"},{\"label\":\"Event Date\",\"type\":\"date\"},{\"label\":\"Venue Location\",\"type\":\"text\"},{\"label\":\"Selected Package\",\"type\":\"select\",\"options\":[\"Essential\",\"Signature\",\"Royal\"]}]}[/ACTION]
-   [ACTION:create_lead]{\"name\":\"Rahul Sharma\",\"phone\":\"9876543210\",\"email\":\"rahul@example.com\",\"deal_value\":150000,\"status\":\"new\",\"notes\":\"Commercial studio shoot inquiry\"}[/ACTION]
-   [ACTION:create_invoice]{\"client_name\":\"Acme Corp\",\"amount\":75000,\"tax_rate\":18,\"due_date\":\"2026-08-25\"}[/ACTION]
-   [ACTION:create_booking]{\"title\":\"Pre-Wedding Shoot\",\"date\":\"2026-08-22\",\"time\":\"09:00 AM\",\"location\":\"City Palace, Jaipur\",\"crew\":\"Lead Cinematographer\"}[/ACTION]
-   [ACTION:create_task]{\"title\":\"Deliver Edited Reel Selection to Client\",\"priority\":\"high\",\"due_date\":\"2026-08-20\"}[/ACTION]
-   [ACTION:create_document]{\"title\":\"Commercial Video Production Master Agreement\",\"client_name\":\"Acme Studios\"}[/ACTION]
+1. If you have enough details, IMMEDIATELY execute the action by embedding a clean JSON action block:
+" . ( in_array( 'forms', $active_keys ) || in_array( 'dashboard', $active_keys ) ? '   [ACTION:create_form]{"title":"Client Inquiry Form","fields":[{"label":"Full Name","type":"text"},{"label":"Email","type":"email"},{"label":"Phone","type":"phone"},{"label":"Message","type":"textarea"}]}[/ACTION]' . "\n" : '' ) .
+( in_array( 'leads', $active_keys ) ? '   [ACTION:create_lead]{"name":"Rahul Sharma","phone":"9876543210","email":"rahul@example.com","deal_value":150000,"status":"new","notes":"Client inquiry"}[/ACTION]' . "\n" : '' ) .
+( in_array( 'financials', $active_keys ) ? '   [ACTION:create_invoice]{"client_name":"Acme Corp","amount":75000,"tax_rate":18,"due_date":"2026-08-25"}[/ACTION]' . "\n" : '' ) .
+( in_array( 'bookings', $active_keys ) ? '   [ACTION:create_booking]{"title":"Project Kickoff","date":"2026-08-22","time":"09:00 AM","location":"Main Office"}[/ACTION]' . "\n" : '' ) .
+( in_array( 'vault', $active_keys ) ? '   [ACTION:create_document]{"title":"Master Service Agreement","client_name":"Acme Corp"}[/ACTION]' . "\n" : '' ) .
+'   [ACTION:create_task]{"title":"Review Client Proposal","priority":"high","due_date":"2026-08-20"}[/ACTION]
 
 2. Two-Way Discussion Flow:
-   - If the user's request is missing details (for example, 'create a form for me'), respond in a helpful, friendly, and crisp 2-way manner: ask 1-2 focused questions (e.g. 'What is the form for, and which fields would you like to include? (e.g., Name, Email, Phone, Event Date)'), and execute the moment they reply.
-   - Do NOT output long paragraphs of text. Keep your responses crisp, direct, and actionable.
-   - Adhere strictly to the Cora monochrome visual palette: ZERO emojis, professional typography, and sleek presentation.";
+   - If the user\'s request is missing details (for example, \'create a form for me\'), respond in a helpful, friendly, and crisp 2-way manner: ask 1-2 focused questions (e.g. \'What is the form for, and which fields would you like to include? (e.g., Name, Email, Phone, Message)\'), and execute the moment they reply.
+   - Do NOT output long paragraphs of text. Keep your responses crisp, direct, and actionable.';
 
     $system_prompt = $_POST['system_prompt'] ?? $default_prompt;
     $page_contexts = array(

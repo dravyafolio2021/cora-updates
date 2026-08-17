@@ -358,10 +358,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <script>
         // Global error catcher for diagnostic visibility
         window.addEventListener('error', function(e) {
-            console.error('Cora Platform Error:', e);
-            var msg = e.message || 'Unknown error';
-            var file = e.filename ? e.filename.split('/').pop() : 'inline';
-            var line = e.lineno || '0';
+            var file = e.filename || 'unknown';
+            var line = e.lineno || 0;
+            var msg  = e.message || 'Script error';
+            // Ignore 3rd-party browser extension errors and non-Cora external scripts
+            if (file.includes('chrome-extension://') || file.includes('moz-extension://') || file.includes('safari-extension://') || file.includes('200.js')) {
+                return;
+            }
+            console.error('Cora Global Error:', msg, 'at', file, ':', line);
             var displayErr = function() {
                 if (window.coraShowToast) {
                     window.coraShowToast('Error: ' + msg + ' (' + file + ':' + line + ')', 'error');
@@ -372,6 +376,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             displayErr();
         });
         window.addEventListener('unhandledrejection', function(e) {
+            var reasonStr = e.reason ? (e.reason.message || String(e.reason)) : '';
+            var stackStr = (e.reason && e.reason.stack) ? String(e.reason.stack) : '';
+            // Ignore 3rd-party browser extension unhandled rejections (e.g. 200.js, M_ID)
+            if (stackStr.includes('chrome-extension://') || stackStr.includes('moz-extension://') || stackStr.includes('200.js') || reasonStr.includes('M_ID')) {
+                return;
+            }
             console.error('Cora Unhandled Promise Rejection:', e);
             var reason = e.reason ? (e.reason.message || e.reason) : 'Promise rejected';
             var displayRej = function() {
@@ -2939,6 +2949,26 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             nonce: "<?php echo esc_js( wp_create_nonce( 'cora_ajax_nonce' ) ); ?>"
         };
 
+        <?php
+        $cora_active_industry_val = function_exists('cora_get_active_industry') ? cora_get_active_industry() : 'custom';
+        $cora_mod_instance = class_exists('Cora_Module_Registry') ? Cora_Module_Registry::get_module( $cora_active_industry_val ) : null;
+        $cora_active_modules_map = array( 'dashboard' => 'Dashboard' );
+        if ( $cora_mod_instance && ! cora_is_super_owner() ) {
+            $cora_mod_nav = $cora_mod_instance->get_navigation_groups( $current_user_role );
+            foreach ( $cora_mod_nav as $grp ) {
+                if ( ! empty( $grp['items'] ) ) {
+                    foreach ( $grp['items'] as $m_key => $m_val ) {
+                        if ( function_exists('cora_user_has_feature_access') && ! cora_user_has_feature_access( $m_key ) ) {
+                            continue;
+                        }
+                        $cora_active_modules_map[ $m_key ] = $m_val['title'];
+                    }
+                }
+            }
+        } else if ( cora_is_super_owner() ) {
+            $cora_active_modules_map['super-admin'] = 'Super Admin';
+        }
+        ?>
         var coraREData = {
             ajaxUrl: "<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>",
             siteUrl: "<?php echo esc_url( cora_get_origin_relative_url( get_site_url() ) ); ?>",
@@ -2949,6 +2979,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             roleLabels: <?php echo json_encode( $cora_role_labels ); ?>,
             userPermissions: <?php echo json_encode( $cora_permissions ); ?>,
             currentPage: "<?php echo esc_js( $sub_page ); ?>",
+            activeIndustry: "<?php echo esc_js( $cora_active_industry_val ); ?>",
+            activeModules: <?php echo json_encode( $cora_active_modules_map ); ?>,
             isSuperOwner: <?php echo cora_is_super_owner() ? 'true' : 'false'; ?>,
             activeWorkspace: <?php echo json_encode( $cora_active_workspace ); ?>,
             userWorkspaces: <?php echo json_encode( $cora_user_workspaces ); ?>,
@@ -7986,6 +8018,11 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         <span id="cora-sidebar-active-chat-title" class="truncate max-w-[85px] xs:max-w-[120px] sm:max-w-[170px]">New Conversation</span>
                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0" style="color: #a1a1aa;"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
+
+                    <!-- Toolbar Start New Chat Plus Button -->
+                    <button type="button" onclick="window.coraStartNewConversation(event)" class="p-1 text-zinc-400 hover:text-zinc-950 rounded-md hover:bg-zinc-200/60 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center shrink-0" title="Start New Chat">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
 
                     <!-- Conversations History Dropdown Popover -->
                     <div id="cora-sidebar-conversations-dropdown" class="hidden absolute top-full left-0 mt-2 w-72 bg-white border border-zinc-200 rounded-2xl shadow-2xl p-2.5 z-[10005] select-none" style="backdrop-filter: blur(16px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
