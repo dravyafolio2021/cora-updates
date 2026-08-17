@@ -7829,17 +7829,17 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
 
     <!-- Collapsible Right-side AI Sidebar (Notion-AI style) -->
     <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 lg:top-[52px] right-0 left-0 z-[999] h-full lg:h-[calc(100vh-52px)] w-full max-w-full bg-white border-t border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
-        <div class="cora-ai-sidebar-header w-full shrink-0 select-none" style="padding: 10px 16px; background: #fafafa; border-bottom: 1px solid #e4e4e7;">
-            <div class="flex justify-between items-center w-full max-w-3xl mx-auto">
+        <div class="cora-ai-sidebar-header w-full shrink-0 select-none px-3 py-2 bg-[#fafafa] border-b border-zinc-200">
+            <div class="flex justify-between items-center w-full max-w-3xl mx-auto gap-1">
                 <!-- Left: Conversation Selector Dropdown + Model Context Pill -->
-                <div class="flex items-center gap-2 relative">
+                <div class="flex items-center gap-1.5 min-w-0 flex-1 relative">
                     <!-- Conversation Selector Button -->
-                    <div id="cora-sidebar-conversation-toggle" class="cora-ai-sidebar-title flex items-center gap-1.5 cursor-pointer transition-colors hover:text-zinc-950 px-2 py-1 rounded-lg hover:bg-zinc-200/50" onclick="window.coraToggleConversationsDropdown(event)" style="font-size: 12px; font-weight: 700; color: #27272a;">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" style="color: #52525b;">
+                    <div id="cora-sidebar-conversation-toggle" class="cora-ai-sidebar-title flex items-center gap-1 cursor-pointer transition-colors hover:text-zinc-950 px-1.5 py-1 rounded-lg hover:bg-zinc-200/50 shrink min-w-0" onclick="window.coraToggleConversationsDropdown(event)" style="font-size: 11.5px; font-weight: 700; color: #27272a;">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0" style="color: #52525b;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/>
                         </svg>
-                        <span id="cora-sidebar-active-chat-title" class="truncate max-w-[130px]">New Conversation</span>
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" style="color: #a1a1aa;"><polyline points="6 9 12 15 18 9"/></svg>
+                        <span id="cora-sidebar-active-chat-title" class="truncate max-w-[85px] xs:max-w-[120px] sm:max-w-[170px]">New Conversation</span>
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0" style="color: #a1a1aa;"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
 
                     <!-- Conversations History Dropdown Popover -->
@@ -7857,20 +7857,20 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                     </div>
 
                     <!-- Page-Aware Model Pill -->
-                    <div id="cora-sidebar-model-pill" onclick="window.coraToggleRAGScopePopover(event)" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 9999px; font-size: 10px; font-weight: 600; color: #71717a; cursor: pointer; white-space: nowrap; position: relative;">
-                        <span style="width: 5px; height: 5px; border-radius: 50%; background: #22c55e; display: inline-block;"></span>
-                        <span id="cora-sidebar-model-label">Gemini 2.5 Flash</span>
-                        <span style="color: #d4d4d8;">•</span>
-                        <span id="cora-sidebar-page-context-label" class="font-bold text-zinc-800">Dashboard</span>
+                    <div id="cora-sidebar-model-pill" onclick="window.coraToggleRAGScopePopover(event)" class="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-100 border border-zinc-200 rounded-full text-[9.5px] font-semibold text-zinc-600 cursor-pointer shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block shrink-0"></span>
+                        <span id="cora-sidebar-model-label" class="hidden sm:inline">Gemini Flash</span>
+                        <span class="text-zinc-300 hidden sm:inline">•</span>
+                        <span id="cora-sidebar-page-context-label" class="font-bold text-zinc-900 truncate max-w-[70px] xs:max-w-[100px]">Dashboard</span>
                         <div id="cora-sidebar-rag-popover" class="hidden" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); width: 240px; z-index: 10000; text-align: left; pointer-events: auto;"></div>
                     </div>
                 </div>
 
                 <!-- Right: Expand (90%) + Settings + Close -->
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-0.5 shrink-0">
                     <!-- Expand / Fullscreen Toggle Button -->
                     <button id="cora-ai-expand-btn" onclick="window.coraToggleSidebarFullscreen(event)" class="p-1 text-zinc-400 hover:text-zinc-900 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center" title="Toggle 90% Expand Mode">
-                        <svg id="cora-ai-expand-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <svg id="cora-ai-expand-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="15 3 21 3 21 9"></polyline>
                             <polyline points="9 21 3 21 3 15"></polyline>
                             <line x1="21" y1="3" x2="14" y2="10"></line>
@@ -7878,8 +7878,8 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         </svg>
                     </button>
                     <!-- Settings -->
-                    <button onclick="window.coraOpenAISettingsDrawer()" style="color: #a1a1aa; border: 0; background: transparent; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#3f3f46'" onmouseout="this.style.color='#a1a1aa'" title="AI Model Settings">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <button onclick="window.coraOpenAISettingsDrawer()" style="color: #a1a1aa; border: 0; background: transparent; padding: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#3f3f46'" onmouseout="this.style.color='#a1a1aa'" title="AI Model Settings">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
                             <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
                             <line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line>
@@ -7887,8 +7887,8 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                         </svg>
                     </button>
                     <!-- Close -->
-                    <button class="cora-ai-sidebar-close" onclick="coraToggleSidebar(false)" style="color: #a1a1aa; border: 0; background: transparent; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#18181b'" onmouseout="this.style.color='#a1a1aa'">
-                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <button class="cora-ai-sidebar-close" onclick="coraToggleSidebar(false)" style="color: #a1a1aa; border: 0; background: transparent; padding: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s;" onmouseover="this.style.color='#18181b'" onmouseout="this.style.color='#a1a1aa'">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
                     </button>
@@ -11750,9 +11750,6 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                         Ask AI
                     </button>
                 </div>
-                <div class="cora-ai-disclaimer text-[9px] text-zinc-400 text-center select-none pt-1">
-                    Cora AI can make mistakes. Please verify important actions.
-                </div>
             </div>
 
             <!-- STATE 3: Navigation Tabs Bar (Middle) -->
@@ -11799,6 +11796,10 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                     <path d="M12 2l2.4 4.86L19.8 8l-3.9 3.8 0.9 5.36L12 14.6l-4.8 2.56 0.9-5.36L4.2 8l5.4-1.14L12 2z"></path>
                 </svg>
             </button>
+        </div>
+        <!-- Safety Disclaimer as a dedicated column below the floating island card -->
+        <div class="cora-ai-disclaimer text-[9.5px] text-zinc-400 dark:text-zinc-500 text-center select-none pt-1 px-3 font-normal tracking-tight w-full drop-shadow-xs pointer-events-none">
+            Cora AI can make mistakes. Please verify important actions.
         </div>
     </div>
     </div> <!-- .flex.flex-row.flex-1.min-h-0 -->
