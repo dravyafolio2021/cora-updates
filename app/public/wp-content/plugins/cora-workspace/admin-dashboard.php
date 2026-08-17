@@ -7899,6 +7899,26 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
     window.coraUpdatePopoverUI = function() {
         var isAuto = window.coraIsSmartRouting();
         var curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
+        var modelNames = {
+            'gemini': 'Gemini',
+            'gpt-4o': 'ChatGPT',
+            'claude-3-5-sonnet': 'Claude',
+            'groq': 'Groq',
+            'deepseek': 'DeepSeek'
+        };
+        var activeModelName = isAuto ? 'Auto (Smart)' : (modelNames[curModel] || 'Gemini');
+
+        // Sync header toolbar model label
+        var headerModelLabel = document.getElementById('cora-sidebar-model-label');
+        if (headerModelLabel) {
+            headerModelLabel.innerText = activeModelName;
+        }
+
+        // Sync popover active model badge
+        var popModelBadge = document.getElementById('cora-popover-current-model-badge');
+        if (popModelBadge) {
+            popModelBadge.innerText = 'Active: ' + activeModelName;
+        }
         
         // Sync Quota Ratio & Progress Bar with Header Pill
         var headerPillText = document.getElementById('cora-header-ai-usage-text');
@@ -8101,11 +8121,11 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                     </div>
 
                     <!-- Page-Aware Model Pill -->
-                    <div id="cora-sidebar-model-pill" onclick="window.coraToggleRAGScopePopover(event)" class="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-100 border border-zinc-200 rounded-full text-[9.5px] font-semibold text-zinc-600 cursor-pointer shrink-0">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block shrink-0"></span>
-                        <span id="cora-sidebar-model-label" class="hidden sm:inline">Gemini</span>
-                        <span class="text-zinc-300 hidden sm:inline">•</span>
-                        <span id="cora-sidebar-page-context-label" class="font-bold text-zinc-900 truncate max-w-[70px] xs:max-w-[100px]">Dashboard</span>
+                    <div id="cora-sidebar-model-pill" onclick="window.coraToggleRAGScopePopover(event)" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-[10px] font-medium text-zinc-600 dark:text-zinc-300 cursor-pointer shrink-0" title="Active Model & Workspace Scope">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0"></span>
+                        <span id="cora-sidebar-model-label" class="font-bold text-zinc-950 dark:text-white">Gemini</span>
+                        <span class="text-zinc-300 dark:text-zinc-600">•</span>
+                        <span id="cora-sidebar-page-context-label" class="text-zinc-600 dark:text-zinc-400 truncate max-w-[70px] xs:max-w-[100px]">Dashboard</span>
                         <div id="cora-sidebar-rag-popover" class="hidden" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); width: 240px; z-index: 10000; text-align: left; pointer-events: auto;"></div>
                     </div>
 
@@ -8142,7 +8162,10 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
 
                             <!-- Models List Matrix -->
                             <div class="space-y-1">
-                                <div class="px-1 py-1 text-[9px] font-extrabold uppercase tracking-wider text-zinc-400">Foundation Model</div>
+                                <div class="flex items-center justify-between px-1 py-1">
+                                    <span class="text-[9px] font-extrabold uppercase tracking-wider text-zinc-400">Foundation Model</span>
+                                    <span id="cora-popover-current-model-badge" class="text-[9px] font-mono font-bold text-zinc-900 bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded-md">Active: Gemini</span>
+                                </div>
                                 
                                 <!-- Gemini -->
                                 <div onclick="window.coraQuickSetModel('gemini', 'Gemini')" class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="gemini" style="background-color: #ffffff;">
