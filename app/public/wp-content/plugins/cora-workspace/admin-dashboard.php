@@ -8316,65 +8316,73 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">Autonomous</span>
                         </div>
                         <div class="space-y-1.5" id="cora-sidebar-action-presets">
-                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Create a client inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link.')">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
-                                    </span>
-                                    <span>Build Client Inquiry Form</span>
-                                </div>
-                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
-                            </button>
+                            <?php
+                            $ai_action_presets = array();
+                            if ( $cora_active_industry_val === 'real_estate' ) {
+                                if ( ! empty( $cora_active_modules_map['forms'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Build Property Intake Form', 'text' => 'Create a buyer/tenant property inquiry form with Full Name, Phone, Budget, Preferred Location, and Property Type, and give me the link.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['leads'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Add Buyer Lead', 'text' => 'Create a new buyer lead for Vikram Mehta, phone +91 98201 12345, budget ₹1.8 Cr interested in a 3BHK apartment.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['financials'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Generate Property Invoice', 'text' => 'Generate a token advance / rent invoice for Vikram Mehta of ₹1,00,000 with 18% GST and 5 days due date.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['bookings'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Schedule Property Tour', 'text' => 'Schedule a property showing appointment for Tomorrow at 11:00 AM at Grand Horizon Villa 4.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['vault'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Draft Lease Agreement', 'text' => 'Draft a residential tenancy agreement in Document Vault for Vikram Mehta.' );
+                                }
+                                $ai_action_presets[] = array( 'label' => 'Real Estate Market Briefing', 'text' => 'Summarize today\'s real estate pipeline, buyer inquiries, and upcoming site visits.' );
+                            } elseif ( $cora_active_industry_val === 'photography_studio' ) {
+                                if ( ! empty( $cora_active_modules_map['forms'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Build Shoot Inquiry Form', 'text' => 'Create a client photoshoot inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['leads'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Add Wedding Shoot Lead', 'text' => 'Create a new lead for Rahul Sharma, phone +91 98765 43210, deal value ₹1,50,000 interested in a 2-day wedding shoot.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['financials'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Generate GST Shoot Invoice', 'text' => 'Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['bookings'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Schedule Studio Shoot', 'text' => 'Schedule a studio photoshoot booking for Tomorrow at 10:00 AM at Main Studio Bay 1.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['vault'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Draft Model Release Agreement', 'text' => 'Draft a model release and commercial photography agreement for Rajesh Kumar in Document Vault.' );
+                                }
+                                $ai_action_presets[] = array( 'label' => 'Studio Operations Briefing', 'text' => 'Summarize today\'s shoot schedule, pending client deliverables, and open invoices.' );
+                            } else {
+                                if ( ! empty( $cora_active_modules_map['forms'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Build Client Inquiry Form', 'text' => 'Create a client inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['leads'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Add New CRM Lead', 'text' => 'Create a new lead for Rahul Sharma, phone +91 98765 43210, deal value ₹1,50,000 interested in enterprise services.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['financials'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Generate GST Invoice', 'text' => 'Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['bookings'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Schedule Client Meeting', 'text' => 'Schedule a project kickoff meeting for Tomorrow at 10:00 AM.' );
+                                }
+                                if ( ! empty( $cora_active_modules_map['vault'] ) ) {
+                                    $ai_action_presets[] = array( 'label' => 'Draft Master Agreement', 'text' => 'Draft a master service agreement in Document Vault for Rajesh Kumar.' );
+                                }
+                                $ai_action_presets[] = array( 'label' => 'Executive Activity Briefing', 'text' => 'Summarize today\'s workspace activity, active leads, and unpaid receivables.' );
+                            }
 
-                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Create a new lead for Rahul Sharma, phone +91 98765 43210, deal value ₹1,50,000 interested in commercial studio shoot.')">
+                            foreach ( $ai_action_presets as $preset ) :
+                            ?>
+                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('<?php echo esc_js( $preset['text'] ); ?>')">
                                 <div class="flex items-center gap-2">
                                     <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                                     </span>
-                                    <span>Add New CRM Lead</span>
+                                    <span><?php echo esc_html( $preset['label'] ); ?></span>
                                 </div>
                                 <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
                             </button>
-
-                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date.')">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="10" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="18" y2="16"></line></svg>
-                                    </span>
-                                    <span>Generate GST Invoice</span>
-                                </div>
-                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
-                            </button>
-
-                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Schedule a studio photoshoot booking for Tomorrow at 10:00 AM at Main Studio A.')">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                    </span>
-                                    <span>Schedule Studio Shoot</span>
-                                </div>
-                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
-                            </button>
-
-                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Draft a master service agreement in Document Vault for Rajesh Kumar.')">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                                    </span>
-                                    <span>Draft Master Agreement</span>
-                                </div>
-                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
-                            </button>
-
-                            <button type="button" class="cora-shortcut-btn group flex items-center justify-between w-full p-2.5 text-xs text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-950 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer font-medium shadow-xs" onclick="coraSendShortcut('Summarize today\'s workspace activity, active leads, and unpaid receivables.')">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                                    </span>
-                                    <span>Executive Activity Briefing</span>
-                                </div>
-                                <span class="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">⚡ Run</span>
-                            </button>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>

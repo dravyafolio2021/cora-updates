@@ -12139,52 +12139,154 @@ jQuery(document).ready(function($) {
     window.coraInitSidebarContext = function() {
         const pathParts = window.location.pathname.split('/').filter(Boolean);
         const curPage = window.coraCurrentView || new URLSearchParams(window.location.search).get('sub_page') || pathParts[pathParts.length - 1] || 'dashboard';
-        
+        const activeIndustry = (window.coraREData && window.coraREData.activeIndustry) ? window.coraREData.activeIndustry : 'custom';
+        const activeModules = (window.coraREData && window.coraREData.activeModules) ? window.coraREData.activeModules : { dashboard: 'Dashboard' };
+
+        // 1. Industry-Aware Welcome Messages
         const welcomeMessages = {
-            dashboard: "Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?",
-            leads: "Hello! I am Cora, your AI Co-Founder for CRM. I can create leads, update pipeline stages, draft agreements, and log inquiries.",
-            financials: "Hello! I am Cora, your AI Co-Founder for Financials. I generate official GST invoices, compute SGST/CGST tax splits, and record payments.",
-            forms: "Hello! I am Cora, your AI Co-Founder for Forms. I create custom forms with any fields you need and provide live shareable links.",
-            vault: "Hello! I am Cora, your AI Co-Founder for Documents. I draft master service agreements, client contracts, and generate e-signature links.",
-            bookings: "Hello! I am Cora, your AI Co-Founder for Bookings. I schedule shoots, assign crew members, and book showing appointments.",
-            settings: "Hello! I am Cora, your AI Co-Founder. I manage platform connections, member roles, and automate workspace settings.",
-            portfolio: "Hello! I am Cora, your AI Co-Founder. I manage photography galleries, review links, and asset deliveries."
+            real_estate: {
+                dashboard: "Hello! I am Cora, your autonomous AI Co-Founder for Real Estate. I manage property listings, buyer inquiries, site visit tours, and lease deeds. What would you like to build or automate today?",
+                leads: "Hello! I am Cora, your Real Estate CRM Assistant. I can qualify buyers, update property pipelines, and log inquiries.",
+                financials: "Hello! I am Cora, your Real Estate Finance Assistant. I generate brokerage invoices, rent receipts, and tax calculations.",
+                bookings: "Hello! I am Cora, your Site Visit Scheduler. I book property showing tours, client inspections, and manage agent calendars.",
+                vault: "Hello! I am Cora, your Real Estate Legal Assistant. I draft lease deeds, sale agreements, and buyer token NDAs.",
+                forms: "Hello! I am Cora, your Property Intake Builder. I create custom property inquiry and seller listing forms.",
+                settings: "Hello! I am Cora. I manage your real estate workspace settings, team agents, and permissions.",
+                portfolio: "Hello! I am Cora. I manage your property photo galleries and virtual tour media."
+            },
+            photography_studio: {
+                dashboard: "Hello! I am Cora, your autonomous AI Co-Founder for Studio. I execute shoot bookings, GST invoices, client contracts, and intake forms. What would you like to build or automate today?",
+                leads: "Hello! I am Cora, your Studio CRM Assistant. I track prospective clients, wedding shoot inquiries, and deal stages.",
+                financials: "Hello! I am Cora, your Studio Finance Assistant. I compute GST splits, generate client invoices, and track payments.",
+                bookings: "Hello! I am Cora, your Studio Booking Assistant. I schedule shoot sessions, assign crew members, and block studio bays.",
+                vault: "Hello! I am Cora, your Studio Legal Assistant. I draft model releases, shoot contracts, and copyright assignments.",
+                forms: "Hello! I am Cora, your Studio Form Builder. I create customized photoshoot inquiry and feedback forms.",
+                settings: "Hello! I am Cora. I configure studio equipment, workspace team members, and preferences.",
+                portfolio: "Hello! I am Cora. I manage photo proofing galleries, client delivery links, and portfolio assets."
+            },
+            custom: {
+                dashboard: "Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?",
+                leads: "Hello! I am Cora, your CRM Assistant. I create leads, update pipeline stages, and log inquiries.",
+                financials: "Hello! I am Cora, your Financials Assistant. I generate GST invoices, calculate tax splits, and record payments.",
+                forms: "Hello! I am Cora, your Form Builder. I create custom forms with dynamic fields and live shareable links.",
+                vault: "Hello! I am Cora, your Document Assistant. I draft master service agreements, contracts, and e-signatures.",
+                bookings: "Hello! I am Cora, your Schedule Assistant. I book appointments, calendar slots, and client meetings.",
+                settings: "Hello! I am Cora. I manage workspace integrations, team roles, and platform settings.",
+                portfolio: "Hello! I am Cora. I manage asset galleries and media deliverables."
+            }
         };
-        
-        const actionPrompts = {
-            dashboard: [
-                { text: "Create a client inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link.", label: "Build Client Inquiry Form" },
-                { text: "Create a new lead for Rahul Sharma, phone +91 98765 43210, deal value ₹1,50,000 interested in commercial shoot.", label: "Add New CRM Lead" },
-                { text: "Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date.", label: "Generate GST Invoice" },
-                { text: "Schedule a studio photoshoot booking for Tomorrow at 10:00 AM at Main Studio A.", label: "Schedule Studio Shoot" },
-                { text: "Draft a master service agreement in Document Vault for Rajesh Kumar.", label: "Draft Master Agreement" },
-                { text: "Summarize today's workspace activity, active leads, and unpaid receivables.", label: "Executive Activity Briefing" }
-            ],
-            leads: [
-                { text: "Create a new lead for Priya Patel, phone +91 98111 22334, deal value ₹2,00,000.", label: "Add Qualified Lead" },
-                { text: "Create a lead qualification form with Name, Phone, Budget, Preferred Date and give me the link.", label: "Build Lead Capture Form" },
-                { text: "Draft a master service agreement in Document Vault for Rajesh Kumar.", label: "Draft Client Contract" }
-            ],
-            forms: [
-                { text: "Create a client inquiry form with Full Name, Email, Phone, Event Date, and Service Package, and give me the link.", label: "Build Inquiry Form" },
-                { text: "Create a client feedback survey form with Name, Rating, Project Feedback, and Testimonial.", label: "Build Feedback Survey" }
-            ],
-            financials: [
-                { text: "Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date.", label: "Generate 18% GST Invoice" },
-                { text: "Create an advance payment invoice of ₹25,000 for Commercial Shoot Project.", label: "Create Milestone Invoice" }
-            ],
-            vault: [
-                { text: "Draft a master video production service agreement for Acme Studios.", label: "Draft Service Agreement" },
-                { text: "Draft a commercial studio lease agreement for 12 months.", label: "Draft Studio Lease" }
-            ],
-            bookings: [
-                { text: "Schedule a studio photoshoot booking for Tomorrow at 10:00 AM at Main Studio A.", label: "Schedule Shoot Booking" },
-                { text: "Schedule a luxury property showing tour for Saturday at 3:00 PM.", label: "Schedule Showing Tour" }
-            ]
+
+        // 2. Industry & Page-Aware Action Prompts Matrix with requiredModule Guards
+        const actionPromptsByIndustry = {
+            real_estate: {
+                dashboard: [
+                    { requiredModule: 'forms', label: "Build Property Intake Form", text: "Create a buyer/tenant property inquiry form with Full Name, Phone, Budget, Preferred Location, and Property Type, and give me the link." },
+                    { requiredModule: 'leads', label: "Add Buyer Lead", text: "Create a new buyer lead for Vikram Mehta, phone +91 98201 12345, budget ₹1.8 Cr interested in a 3BHK apartment." },
+                    { requiredModule: 'financials', label: "Generate Property Invoice", text: "Generate a token advance / rent invoice for Vikram Mehta of ₹1,00,000 with 18% GST and 5 days due date." },
+                    { requiredModule: 'bookings', label: "Schedule Property Tour", text: "Schedule a property showing appointment for Tomorrow at 11:00 AM at Grand Horizon Villa 4." },
+                    { requiredModule: 'vault', label: "Draft Lease Agreement", text: "Draft a residential tenancy agreement in Document Vault for Vikram Mehta." },
+                    { requiredModule: null, label: "Real Estate Market Briefing", text: "Summarize today's real estate pipeline, buyer inquiries, and upcoming site visits." }
+                ],
+                leads: [
+                    { requiredModule: 'leads', label: "Add High-Intent Buyer", text: "Create a new buyer lead for Ananya Roy, phone +91 98111 22334, budget ₹2.5 Cr for luxury penthouse." },
+                    { requiredModule: 'forms', label: "Build Property Lead Form", text: "Create a property inquiry lead form with Name, Phone, Budget Range, and Desired BHK." },
+                    { requiredModule: 'vault', label: "Draft Purchase Contract", text: "Draft a property purchase token agreement for Ananya Roy in Document Vault." }
+                ],
+                financials: [
+                    { requiredModule: 'financials', label: "Generate Commission Invoice", text: "Generate an official brokerage / commission invoice of ₹1,50,000 + 18% GST for DLF Cybercity deal." },
+                    { requiredModule: 'financials', label: "Create Security Deposit Slip", text: "Create a rental security deposit invoice of ₹75,000 for Apartment 402." }
+                ],
+                bookings: [
+                    { requiredModule: 'bookings', label: "Schedule Property Showing", text: "Schedule a physical property showing appointment for Saturday at 4:00 PM at Ocean View Tower." },
+                    { requiredModule: 'bookings', label: "Block Site Inspection Slots", text: "Block agent calendar for client site inspections this Sunday from 10:00 AM to 2:00 PM." }
+                ],
+                vault: [
+                    { requiredModule: 'vault', label: "Draft 11-Month Lease", text: "Draft an 11-month residential tenancy agreement with ₹45,000 monthly rent and ₹1,50,000 security deposit." },
+                    { requiredModule: 'vault', label: "Draft Property NDA", text: "Draft a non-disclosure agreement for exclusive commercial property listing." }
+                ],
+                forms: [
+                    { requiredModule: 'forms', label: "Build Property Intake Form", text: "Create a property inquiry form with Full Name, Phone, Budget, Preferred City, and Move-in Date." },
+                    { requiredModule: 'forms', label: "Build Seller Listing Form", text: "Create a seller property listing submission form with Property Type, Area, Price, and Address." }
+                ]
+            },
+            photography_studio: {
+                dashboard: [
+                    { requiredModule: 'forms', label: "Build Shoot Inquiry Form", text: "Create a client photoshoot inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link." },
+                    { requiredModule: 'leads', label: "Add Wedding Shoot Lead", text: "Create a new lead for Rahul Sharma, phone +91 98765 43210, deal value ₹1,50,000 interested in a 2-day wedding shoot." },
+                    { requiredModule: 'financials', label: "Generate GST Shoot Invoice", text: "Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date." },
+                    { requiredModule: 'bookings', label: "Schedule Studio Shoot", text: "Schedule a studio photoshoot booking for Tomorrow at 10:00 AM at Main Studio Bay 1." },
+                    { requiredModule: 'vault', label: "Draft Model Release Agreement", text: "Draft a model release and commercial photography agreement for Rajesh Kumar in Document Vault." },
+                    { requiredModule: null, label: "Studio Operations Briefing", text: "Summarize today's shoot schedule, pending client deliverables, and open invoices." }
+                ],
+                leads: [
+                    { requiredModule: 'leads', label: "Add Portrait Shoot Lead", text: "Create a qualified portrait shoot lead for Sneha Kapoor, deal value ₹35,000." },
+                    { requiredModule: 'forms', label: "Build Wedding Intake Form", text: "Create a wedding shoot intake form with Event Date, Venue, Hours, and Package Selection." },
+                    { requiredModule: 'vault', label: "Draft Client Contract", text: "Draft a photography service contract in Document Vault for Sneha Kapoor." }
+                ],
+                financials: [
+                    { requiredModule: 'financials', label: "Generate 18% GST Invoice", text: "Generate an 18% GST invoice of ₹65,000 for Pre-Wedding Studio & Drone Package." },
+                    { requiredModule: 'financials', label: "Create Milestone Invoice", text: "Create an advance milestone invoice of ₹25,000 for Commercial Fashion Shoot." }
+                ],
+                bookings: [
+                    { requiredModule: 'bookings', label: "Schedule Studio Shoot", text: "Schedule a studio photoshoot booking for Tomorrow at 10:00 AM at Main Studio Bay 1." },
+                    { requiredModule: 'bookings', label: "Check Studio Availability", text: "Check crew and studio bay availability for this upcoming weekend." }
+                ],
+                vault: [
+                    { requiredModule: 'vault', label: "Draft Model Release", text: "Draft a commercial model release form for product photoshoot." },
+                    { requiredModule: 'vault', label: "Draft Video Production Agreement", text: "Draft a master commercial video production and licensing agreement." }
+                ],
+                forms: [
+                    { requiredModule: 'forms', label: "Build Shoot Booking Form", text: "Create a photoshoot booking inquiry form with Date, Location, Package, and Notes." },
+                    { requiredModule: 'forms', label: "Build Client Review Survey", text: "Create a client post-shoot feedback and rating survey form." }
+                ]
+            },
+            custom: {
+                dashboard: [
+                    { requiredModule: 'forms', label: "Build Client Inquiry Form", text: "Create a client inquiry form with Name, Email, Phone, Event Date, and Service Package, and give me the link." },
+                    { requiredModule: 'leads', label: "Add New CRM Lead", text: "Create a new lead for Rahul Sharma, phone +91 98765 43210, deal value ₹1,50,000 interested in enterprise services." },
+                    { requiredModule: 'financials', label: "Generate GST Invoice", text: "Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date." },
+                    { requiredModule: 'bookings', label: "Schedule Client Meeting", text: "Schedule a project kickoff meeting for Tomorrow at 10:00 AM." },
+                    { requiredModule: 'vault', label: "Draft Master Agreement", text: "Draft a master service agreement in Document Vault for Rajesh Kumar." },
+                    { requiredModule: null, label: "Executive Activity Briefing", text: "Summarize today's workspace activity, active leads, and unpaid receivables." }
+                ],
+                leads: [
+                    { requiredModule: 'leads', label: "Add Qualified Lead", text: "Create a new lead for Priya Patel, phone +91 98111 22334, deal value ₹2,00,000." },
+                    { requiredModule: 'forms', label: "Build Lead Capture Form", text: "Create a lead qualification form with Name, Phone, Budget, Preferred Date and give me the link." },
+                    { requiredModule: 'vault', label: "Draft Client Contract", text: "Draft a master service agreement in Document Vault for Priya Patel." }
+                ],
+                financials: [
+                    { requiredModule: 'financials', label: "Generate 18% GST Invoice", text: "Generate an invoice for Acme Studios of ₹45,000 with 18% GST and 7 days due date." },
+                    { requiredModule: 'financials', label: "Create Milestone Invoice", text: "Create an advance payment invoice of ₹25,000 for Milestone 1." }
+                ],
+                vault: [
+                    { requiredModule: 'vault', label: "Draft Master Service Agreement", text: "Draft a master service agreement for Acme Studios." },
+                    { requiredModule: 'vault', label: "Draft NDA Contract", text: "Draft a mutual Non-Disclosure Agreement for new client partnership." }
+                ],
+                bookings: [
+                    { requiredModule: 'bookings', label: "Schedule Project Kickoff", text: "Schedule a project kickoff meeting for Tomorrow at 10:00 AM." },
+                    { requiredModule: 'bookings', label: "Check Team Availability", text: "Check calendar availability for this upcoming week." }
+                ],
+                forms: [
+                    { requiredModule: 'forms', label: "Build Inquiry Form", text: "Create a client inquiry form with Full Name, Email, Phone, Event Date, and Service Package, and give me the link." },
+                    { requiredModule: 'forms', label: "Build Feedback Survey", text: "Create a client feedback survey form with Name, Rating, Project Feedback, and Testimonial." }
+                ]
+            }
         };
-        
-        const welcomeText = welcomeMessages[curPage] || welcomeMessages.dashboard;
-        const prompts = actionPrompts[curPage] || actionPrompts.dashboard;
+
+        const indMap = actionPromptsByIndustry[activeIndustry] || actionPromptsByIndustry.custom;
+        const pagePrompts = indMap[curPage] || indMap.dashboard || actionPromptsByIndustry.custom.dashboard;
+
+        // Strictly filter out prompts whose requiredModule is NOT active in this workspace!
+        const prompts = pagePrompts.filter(function(p) {
+            if (p.requiredModule && !activeModules[p.requiredModule]) {
+                return false;
+            }
+            return true;
+        });
+
+        // Welcome message based on industry & page
+        const indWelcome = welcomeMessages[activeIndustry] || welcomeMessages.custom;
+        const welcomeText = indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Co-Founder. What would you like to build or automate today?";
         
         const welcomeBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
         if (welcomeBubble.length) {
@@ -12193,7 +12295,7 @@ jQuery(document).ready(function($) {
 
         // Render Action Presets Dynamically
         const presetContainer = $('#cora-sidebar-action-presets');
-        if (presetContainer.length && prompts) {
+        if (presetContainer.length && prompts && prompts.length > 0) {
             let phtml = '';
             prompts.forEach(function(p) {
                 phtml += `
