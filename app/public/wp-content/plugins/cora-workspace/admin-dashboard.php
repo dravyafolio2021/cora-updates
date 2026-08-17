@@ -7962,33 +7962,43 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         // Sync Smart Route Switch
         var srSwitch = document.getElementById('cora-smart-route-switch');
         var srKnob = document.getElementById('cora-smart-route-knob');
-        if (srSwitch && srKnob) {
-            if (isAuto) {
-                srSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out';
-                srSwitch.style.backgroundColor = '#18181b';
-                srKnob.className = 'translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
-            } else {
-                srSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out';
-                srSwitch.style.backgroundColor = '#e4e4e7';
-                srKnob.className = 'translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
-            }
+        if (srSwitch && srKnob && typeof window.coraApplySwitchStyle === 'function') {
+            window.coraApplySwitchStyle(srSwitch, srKnob, isAuto);
         }
 
         // Sync Auto-exec Switch
         var isAutoExec = localStorage.getItem('cora_ai_autoexec') !== '0';
         var aeSwitch = document.getElementById('cora-autoexec-switch');
         var aeKnob = document.getElementById('cora-autoexec-knob');
-        if (aeSwitch && aeKnob) {
-            if (isAutoExec) {
-                aeSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out';
-                aeSwitch.style.backgroundColor = '#18181b';
-                aeKnob.className = 'translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
-            } else {
-                aeSwitch.className = 'cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out';
-                aeSwitch.style.backgroundColor = '#e4e4e7';
-                aeKnob.className = 'translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out';
-            }
+        if (aeSwitch && aeKnob && typeof window.coraApplySwitchStyle === 'function') {
+            window.coraApplySwitchStyle(aeSwitch, aeKnob, isAutoExec);
         }
+    };
+
+    window.coraApplySwitchStyle = function(switchEl, knobEl, isActive) {
+        if (!switchEl || !knobEl) return;
+        switchEl.style.position = 'relative';
+        switchEl.style.display = 'inline-flex';
+        switchEl.style.width = '36px';
+        switchEl.style.height = '20px';
+        switchEl.style.borderRadius = '9999px';
+        switchEl.style.cursor = 'pointer';
+        switchEl.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+        switchEl.style.backgroundColor = isActive ? '#18181b' : '#e4e4e7';
+        switchEl.style.alignItems = 'center';
+        switchEl.style.padding = '2px';
+        switchEl.style.boxSizing = 'border-box';
+        switchEl.style.flexShrink = '0';
+
+        knobEl.style.display = 'inline-block';
+        knobEl.style.width = '16px';
+        knobEl.style.height = '16px';
+        knobEl.style.borderRadius = '9999px';
+        knobEl.style.backgroundColor = '#ffffff';
+        knobEl.style.boxShadow = '0 1px 3px rgba(0,0,0,0.25)';
+        knobEl.style.transition = 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+        knobEl.style.transform = isActive ? 'translateX(16px)' : 'translateX(0px)';
+        knobEl.style.pointerEvents = 'none';
     };
 
     window.coraToggleAIUsagePopover = function(e) {
@@ -8015,13 +8025,16 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
         }
     };
 
-    window.coraToggleSmartRouting = function(isChecked) {
-        localStorage.setItem('cora_ai_smart_routing', isChecked ? '1' : '0');
+    window.coraToggleSmartRouting = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        var current = window.coraIsSmartRouting();
+        var next = !current;
+        localStorage.setItem('cora_ai_smart_routing', next ? '1' : '0');
         var labelEl = document.getElementById('cora-sidebar-model-label');
-        if (isChecked) {
+        if (next) {
             if (labelEl) labelEl.innerText = 'Auto (Smart)';
             if (typeof window.coraShowToast === 'function') {
-                window.coraShowToast('Smart Routing active: Auto-routes tasks to save tokens', 'info');
+                window.coraShowToast('Smart Routing enabled: Auto-routes tasks', 'info');
             }
         } else {
             var curModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
@@ -8029,19 +8042,20 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
             var lbl = modelNames[curModel] || 'Gemini';
             if (labelEl) labelEl.innerText = lbl;
             if (typeof window.coraShowToast === 'function') {
-                window.coraShowToast('Manual model selection: ' + lbl, 'info');
+                window.coraShowToast('Smart Routing disabled: Using ' + lbl, 'info');
             }
         }
         window.coraUpdatePopoverUI();
     };
 
-    window.coraToggleAutoExec = function() {
+    window.coraToggleAutoExec = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
         var current = localStorage.getItem('cora_ai_autoexec') !== '0';
         var next = !current;
         localStorage.setItem('cora_ai_autoexec', next ? '1' : '0');
         window.coraUpdatePopoverUI();
         if (typeof window.coraShowToast === 'function') {
-            window.coraShowToast('Autonomous DB Actions: ' + (next ? 'Enabled' : 'Disabled'), 'info');
+            window.coraShowToast('Autonomous Actions: ' + (next ? 'Enabled' : 'Disabled'), 'info');
         }
     };
 
@@ -8207,7 +8221,7 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                             <!-- Custom iOS-Style Animated Preferences -->
                             <div class="space-y-2 px-1 py-0.5">
                                 <!-- Auto-Route Switch -->
-                                <div onclick="window.coraToggleSmartRouting(!window.coraIsSmartRouting())" class="flex items-center justify-between cursor-pointer group select-none">
+                                <div onclick="window.coraToggleSmartRouting(event)" class="flex items-center justify-between cursor-pointer group select-none py-1">
                                     <div class="flex items-center gap-2">
                                         <div class="w-5 h-5 rounded-md bg-zinc-100 group-hover:bg-zinc-200 text-zinc-700 flex items-center justify-center transition-colors">
                                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
@@ -8217,13 +8231,13 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                             <div class="text-[9.5px] text-zinc-400">Save tokens automatically</div>
                                         </div>
                                     </div>
-                                    <div class="cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out" style="background-color: #e4e4e7;" id="cora-smart-route-switch">
-                                        <span class="translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out" id="cora-smart-route-knob"></span>
+                                    <div class="cora-switch" id="cora-smart-route-switch">
+                                        <span id="cora-smart-route-knob"></span>
                                     </div>
                                 </div>
 
                                 <!-- Autonomous DB Actions Switch -->
-                                <div onclick="window.coraToggleAutoExec()" class="flex items-center justify-between cursor-pointer group select-none">
+                                <div onclick="window.coraToggleAutoExec(event)" class="flex items-center justify-between cursor-pointer group select-none py-1">
                                     <div class="flex items-center gap-2">
                                         <div class="w-5 h-5 rounded-md bg-zinc-100 group-hover:bg-zinc-200 text-zinc-700 flex items-center justify-center transition-colors">
                                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -8233,8 +8247,8 @@ window.addEventListener('resize', window.coraRenderQuickActionsBar);
                                             <div class="text-[9.5px] text-zinc-400">Direct DB mutations</div>
                                         </div>
                                     </div>
-                                    <div class="cora-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out" style="background-color: #18181b;" id="cora-autoexec-switch">
-                                        <span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out" id="cora-autoexec-knob"></span>
+                                    <div class="cora-switch" id="cora-autoexec-switch">
+                                        <span id="cora-autoexec-knob"></span>
                                     </div>
                                 </div>
                             </div>
