@@ -42,7 +42,7 @@ if (typeof window.ajaxurl === 'undefined') {
     window.ajaxurl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
 }
 
-// Global AI Model Settings Drawer Controls (Immediate Availability)
+// Global AI Model Settings Drawer Controls (Immediate Top-Level Availability)
 window.coraOpenAISettingsDrawer = function(e) {
     if (e && e.stopPropagation) e.stopPropagation();
     const backdrop = document.getElementById('cora-ai-settings-backdrop');
@@ -67,6 +67,11 @@ window.coraOpenAISettingsDrawer = function(e) {
             window.coraShowToast("AI Model: Gemini 2.5 Flash (Active)", "info");
         }
     }
+};
+
+window.coraToggleAIUsagePopover = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    window.coraOpenAISettingsDrawer(e);
 };
 
 window.coraCloseAISettingsDrawer = function(e) {
@@ -105,6 +110,15 @@ window.coraSaveAISettings = function(e) {
     if (labelEl) labelEl.innerText = label;
 
     window.coraCloseAISettingsDrawer();
+    if (typeof window.coraShowToast === 'function') {
+        window.coraShowToast(`AI model updated to ${label}`, 'success');
+    }
+};
+
+window.coraQuickSetModel = function(modelKey, label) {
+    localStorage.setItem('cora_ai_active_model', modelKey);
+    const labelEl = document.getElementById('cora-sidebar-model-label');
+    if (labelEl) labelEl.innerText = label;
     if (typeof window.coraShowToast === 'function') {
         window.coraShowToast(`AI model updated to ${label}`, 'success');
     }
