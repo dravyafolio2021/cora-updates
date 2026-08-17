@@ -12109,6 +12109,69 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
     </div>
 </div>
 
+<script>
+window.coraOpenAISettingsDrawer = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    var backdrop = document.getElementById('cora-ai-settings-backdrop');
+    var drawer = document.getElementById('cora-ai-settings-drawer');
+    if (backdrop && drawer) {
+        backdrop.classList.remove('hidden');
+        drawer.style.transform = 'translateX(0)';
+        var savedModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
+        var savedTemp = localStorage.getItem('cora_ai_temperature') || '0.7';
+        var radio = document.querySelector('input[name="cora_global_ai_model"][value="' + savedModel + '"]');
+        if (radio) radio.checked = true;
+        var slider = document.getElementById('cora-ai-temp-slider');
+        if (slider) slider.value = savedTemp;
+        var display = document.getElementById('cora-ai-temp-display');
+        if (display) display.innerText = savedTemp;
+    } else if (typeof window.coraToggleAISettingsDrawer === 'function') {
+        window.coraToggleAISettingsDrawer(true);
+    }
+};
+
+window.coraCloseAISettingsDrawer = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    var backdrop = document.getElementById('cora-ai-settings-backdrop');
+    var drawer = document.getElementById('cora-ai-settings-drawer');
+    if (drawer) {
+        drawer.style.transform = 'translateX(100%)';
+        setTimeout(function() {
+            if (backdrop) backdrop.classList.add('hidden');
+        }, 250);
+    }
+    if (typeof window.coraToggleAISettingsDrawer === 'function') {
+        window.coraToggleAISettingsDrawer(false);
+    }
+};
+
+window.coraSaveAISettings = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    var selectedRadio = document.querySelector('input[name="cora_global_ai_model"]:checked');
+    var selectedModel = selectedRadio ? selectedRadio.value : 'gemini';
+    var slider = document.getElementById('cora-ai-temp-slider');
+    var temp = slider ? slider.value : '0.7';
+    
+    localStorage.setItem('cora_ai_active_model', selectedModel);
+    localStorage.setItem('cora_ai_temperature', temp);
+
+    var modelLabels = {
+        'gemini': 'Gemini Flash',
+        'gpt-4o': 'GPT-4o',
+        'claude-3-5-sonnet': 'Claude 3.5'
+    };
+
+    var label = modelLabels[selectedModel] || 'Gemini Flash';
+    var labelEl = document.getElementById('cora-sidebar-model-label');
+    if (labelEl) labelEl.innerText = label;
+
+    window.coraCloseAISettingsDrawer();
+    if (typeof window.coraShowToast === 'function') {
+        window.coraShowToast('AI model updated to ' + label, 'success');
+    }
+};
+</script>
+
 <?php
 wp_print_media_templates();
 wp_print_footer_scripts();
