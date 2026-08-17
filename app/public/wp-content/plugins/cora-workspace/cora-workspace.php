@@ -15980,11 +15980,15 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard' 
 
         $default_icon = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>';
 
+        $active_ws = function_exists('cora_get_active_workspace') ? cora_get_active_workspace() : array();
+        $ws_slug   = ! empty( $active_ws['slug'] ) ? $active_ws['slug'] : 'workspace';
+
         $modules_cards = '';
         foreach ( $active_modules as $m_slug => $m_title ) {
             $m_icon = $module_icons[ $m_slug ] ?? $default_icon;
+            $tile_url = home_url( '/' . $ws_slug . '/' . $m_slug );
             $modules_cards .= '
-            <a href="?sub_page=' . esc_attr( $m_slug ) . '" style="display: flex; align-items: center; justify-content: space-between; padding: 7px 9px; border-radius: 10px; background-color: #ffffff; border: 1px solid #e4e4e7; text-decoration: none; color: #18181b; transition: all 0.15s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.03); min-width: 0;" onmouseover="this.style.borderColor=\'#18181b\'; this.style.backgroundColor=\'#f4f4f5\';" onmouseout="this.style.borderColor=\'#e4e4e7\'; this.style.backgroundColor=\'#ffffff\';">
+            <a href="' . esc_url( $tile_url ) . '" onclick="if(typeof window.coraNavigateTo===\'function\'){ window.coraNavigateTo(\'' . esc_js( $m_slug ) . '\'); return false; }" style="display: flex; align-items: center; justify-content: space-between; padding: 7px 9px; border-radius: 10px; background-color: #ffffff; border: 1px solid #e4e4e7; text-decoration: none; color: #18181b; transition: all 0.15s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.03); min-width: 0; cursor: pointer;" onmouseover="this.style.borderColor=\'#18181b\'; this.style.backgroundColor=\'#f4f4f5\';" onmouseout="this.style.borderColor=\'#e4e4e7\'; this.style.backgroundColor=\'#ffffff\';">
                 <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
                     <div style="width: 22px; height: 22px; border-radius: 6px; background-color: #f4f4f5; display: flex; align-items: center; justify-content: center; color: #27272a; flex-shrink: 0;">
                         ' . $m_icon . '
