@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.82
+ * Version: 3.4.83
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.82' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.83' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -24669,11 +24669,14 @@ function cora_ajax_login() {
         }
     }
 
-    // 3. Check account active status
-    $status = get_user_meta( $user->ID, 'cora_user_status', true );
-    if ( $status === 'inactive' ) {
-        cora_log_activity( 'Authentication', "Blocked login for deactivated account (email: {$email}).", $user->ID );
-        wp_send_json_error( array( 'message' => 'Your account has been deactivated. Contact your agency admin.' ) );
+    // 3. Check account active status (Super Admins & Administrators are immune to deactivation)
+    $is_super_admin = cora_is_super_owner( $user ) || in_array( 'administrator', (array) $user->roles, true ) || in_array( 'cora_shruti', (array) $user->roles, true ) || in_array( 'cora_super_admin', (array) $user->roles, true );
+    if ( ! $is_super_admin ) {
+        $status = get_user_meta( $user->ID, 'cora_user_status', true );
+        if ( $status === 'inactive' ) {
+            cora_log_activity( 'Authentication', "Blocked login for deactivated account (login: {$login_input}).", $user->ID );
+            wp_send_json_error( array( 'message' => 'Your account has been deactivated. Contact your agency admin.' ) );
+        }
     }
 
     // Check agency suspension status
