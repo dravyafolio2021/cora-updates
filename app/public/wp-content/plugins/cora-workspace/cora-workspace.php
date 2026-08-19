@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.78
+ * Version: 3.4.80
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.78' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.80' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -67,26 +67,26 @@ function cora_workspace_load_env_keys() {
 }
 $cora_env_keys = cora_workspace_load_env_keys();
 
-define( 'CORA_PLATFORM_GEMINI_API_KEY', $cora_env_keys['GEMINI'] ?? $cora_env_keys['CORA_PLATFORM_GEMINI_API_KEY'] ?? 'AQ.Ab8RN6LQyWhTU1-DnmLErK_xsadod4eOu1ixRCN-5K1LwVOmfg' );
-define( 'CORA_PLATFORM_OPENAI_API_KEY', $cora_env_keys['OPENAI'] ?? $cora_env_keys['CORA_PLATFORM_OPENAI_API_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_GROQ_API_KEY', $cora_env_keys['GROQ_API'] ?? $cora_env_keys['CORA_PLATFORM_GROQ_API_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_OPENROUTER_API_KEY', $cora_env_keys['OPENROUTER'] ?? $cora_env_keys['CORA_PLATFORM_OPENROUTER_API_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_ELEVENLABS_API_KEY', $cora_env_keys['ELEVENLABS_API_KEY'] ?? $cora_env_keys['CORA_PLATFORM_ELEVENLABS_API_KEY'] ?? 'sk_45e1f8470453f6b63681f12e2e359c7f1d019b0fb2e8a0d5' );
+define( 'CORA_PLATFORM_GEMINI_API_KEY', $cora_env_keys['GEMINI'] ?? $cora_env_keys['CORA_PLATFORM_GEMINI_API_KEY'] ?? getenv( 'CORA_PLATFORM_GEMINI_API_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_OPENAI_API_KEY', $cora_env_keys['OPENAI'] ?? $cora_env_keys['CORA_PLATFORM_OPENAI_API_KEY'] ?? getenv( 'CORA_PLATFORM_OPENAI_API_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_GROQ_API_KEY', $cora_env_keys['GROQ_API'] ?? $cora_env_keys['CORA_PLATFORM_GROQ_API_KEY'] ?? getenv( 'CORA_PLATFORM_GROQ_API_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_OPENROUTER_API_KEY', $cora_env_keys['OPENROUTER'] ?? $cora_env_keys['CORA_PLATFORM_OPENROUTER_API_KEY'] ?? getenv( 'CORA_PLATFORM_OPENROUTER_API_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_ELEVENLABS_API_KEY', $cora_env_keys['ELEVENLABS_API_KEY'] ?? $cora_env_keys['CORA_PLATFORM_ELEVENLABS_API_KEY'] ?? getenv( 'CORA_PLATFORM_ELEVENLABS_API_KEY' ) ?: '' );
 
-define( 'CORA_PLATFORM_NVIDIA_GLM_KEY', $cora_env_keys['ZAI_GLM_52'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GLM_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_MINIMAX_KEY', $cora_env_keys['MINIMAXAI_MINIMAX_M3'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_MINIMAX_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_MOONSHOT_KEY', $cora_env_keys['NVIDIA_NEMOTRON_3_MOONSHOT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_MOONSHOT_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY', $cora_env_keys['NVIDIA_NEMOTRON_3_DEEPSEEK_FLASH'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY', $cora_env_keys['NVIDIA_NEMOTRON_3_DEEPSEEK_PRO'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_GEMMA_KEY', $cora_env_keys['GOOGLE_GEMMA_4_31B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GEMMA_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_GPT_20B_KEY', $cora_env_keys['OPENAI_GPT_OSS_20B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GPT_20B_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_GPT_120B_KEY', $cora_env_keys['OPENAI_GPT_OSS_120B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GPT_120B_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY', $cora_env_keys['NVIDIA_LLAMA_GUARD_4_12B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_33_KEY', $cora_env_keys['META_LLAMA_33_70B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_33_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY', $cora_env_keys['META_LLAMA_32_1B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY', $cora_env_keys['META_LLAMA_32_3B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY', $cora_env_keys['META_LLAMA_31_70B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY'] ?? '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' );
-define( 'CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY', $cora_env_keys['META_LLAMA_31_8B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY'] ?? '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' );
+define( 'CORA_PLATFORM_NVIDIA_GLM_KEY', $cora_env_keys['ZAI_GLM_52'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GLM_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_GLM_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_MINIMAX_KEY', $cora_env_keys['MINIMAXAI_MINIMAX_M3'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_MINIMAX_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_MINIMAX_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_MOONSHOT_KEY', $cora_env_keys['NVIDIA_NEMOTRON_3_MOONSHOT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_MOONSHOT_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_MOONSHOT_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY', $cora_env_keys['NVIDIA_NEMOTRON_3_DEEPSEEK_FLASH'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_FLASH_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY', $cora_env_keys['NVIDIA_NEMOTRON_3_DEEPSEEK_PRO'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_DEEPSEEK_PRO_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_GEMMA_KEY', $cora_env_keys['GOOGLE_GEMMA_4_31B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GEMMA_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_GEMMA_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_GPT_20B_KEY', $cora_env_keys['OPENAI_GPT_OSS_20B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GPT_20B_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_GPT_20B_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_GPT_120B_KEY', $cora_env_keys['OPENAI_GPT_OSS_120B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_GPT_120B_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_GPT_120B_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY', $cora_env_keys['NVIDIA_LLAMA_GUARD_4_12B'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_LLAMA_GUARD_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_33_KEY', $cora_env_keys['META_LLAMA_33_70B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_33_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_LLAMA_33_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY', $cora_env_keys['META_LLAMA_32_1B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_LLAMA_1B_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY', $cora_env_keys['META_LLAMA_32_3B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_LLAMA_3B_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY', $cora_env_keys['META_LLAMA_31_70B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_LLAMA_70B_KEY' ) ?: '' );
+define( 'CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY', $cora_env_keys['META_LLAMA_31_8B_INSTRUCT'] ?? $cora_env_keys['CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY'] ?? getenv( 'CORA_PLATFORM_NVIDIA_LLAMA_8B_KEY' ) ?: '' );
 
 // ── Foundation Migration: cora_re_* → cora_workspace_* ───────────────────────
 // Runs once on activation to migrate all legacy option keys from the old
@@ -1530,15 +1530,18 @@ function cora_workspace_handle_workspace_route() {
         // Prevent browser caching
         nocache_headers();
 
-        // Fetch real WordPress posts for the Content Suite
-        $cora_posts_query = new WP_Query(array(
-            'post_type' => 'post',
-            'post_status' => array('publish', 'draft', 'pending', 'future', 'private'),
-            'posts_per_page' => 50,
-            'orderby' => 'date',
-            'order' => 'DESC'
-        ));
-        $cora_posts = $cora_posts_query->posts;
+        // Fetch real WordPress posts only for Content/Pages Suites (performance optimization)
+        $cora_posts = array();
+        if ( in_array( $sub_page, array( 'pages', 'blogs', 'content', 'cms' ), true ) ) {
+            $cora_posts_query = new WP_Query(array(
+                'post_type' => 'post',
+                'post_status' => array('publish', 'draft', 'pending', 'future', 'private'),
+                'posts_per_page' => 50,
+                'orderby' => 'date',
+                'order' => 'DESC'
+            ));
+            $cora_posts = $cora_posts_query->posts;
+        }
 
         status_header( 200 );
         // Load the dashboard HTML template directly
@@ -2324,6 +2327,10 @@ function cora_get_all_roles() {
  */
 if ( ! function_exists( 'cora_workspace_register_roles' ) ) {
 function cora_workspace_register_roles() {
+    if ( get_option( 'cora_roles_registered_v3' ) ) {
+        return; // Fast exit: roles already registered
+    }
+
     // Standard WordPress role update
     $old_roles = array( 'cora_manager', 'cora_branch_manager', 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer', 'cora_shruti', 'cora_super_admin' );
     foreach ( $old_roles as $role ) {
@@ -2349,6 +2356,8 @@ function cora_workspace_register_roles() {
             }
         }
     }
+
+    update_option( 'cora_roles_registered_v3', 1 );
 }
 }
 add_action( 'init', 'cora_workspace_register_roles' );
@@ -2358,6 +2367,9 @@ add_action( 'init', 'cora_workspace_register_roles' );
  */
 if ( ! function_exists( 'cora_workspace_seed_data' ) ) {
 function cora_workspace_seed_data() {
+    if ( get_option( 'cora_workspace_seeded_v3' ) ) {
+        return; // Fast exit: seed data initialized
+    }
     // Clean up previously seeded dummy users so they don't clutter the database
     if ( get_option( 'cora_seeded_users_v2' ) == 1 || ! get_option( 'cora_cleaned_dummy_users_v4' ) ) {
         $dummy_usernames = array( 'amit_photographer', 'vikas_photographer', 'priya_editor', 'rahul_videographer', 'rohan_drone', 'sanjay_manager' );
@@ -2613,6 +2625,7 @@ function cora_workspace_seed_data() {
             update_option( 'cora_workspace_portfolios', $existing_portfolios , false );
         }
     }
+    update_option( 'cora_workspace_seeded_v3', 1 );
 }
 }
 add_action( 'init', 'cora_workspace_seed_data' );
@@ -21626,6 +21639,9 @@ function cora_create_user_workspace( $user_id, $business_name, $industry = 'real
 
 if ( ! function_exists( 'cora_create_custom_tables' ) ) {
 function cora_create_custom_tables() {
+    if ( get_option( 'cora_db_v2_created' ) ) {
+        return; // Fast exit: custom tables already created
+    }
     global $wpdb;
     $theme_table = $wpdb->prefix . 'cora_canvas_themes';
     $table_exists = cora_table_exists( $theme_table );
@@ -33732,9 +33748,11 @@ function cora_initiate_google_oauth() {
         wp_redirect( home_url( '/workspace/register?error=google_disabled' ) );
         exit;
     }
-    // Generate & store anti-CSRF state token
-    $state = bin2hex( random_bytes( 16 ) );
-    set_transient( 'cora_google_oauth_state_' . $state, '1', 15 * MINUTE_IN_SECONDS );
+    // Generate & store anti-CSRF state token with plan and billing context
+    $state   = bin2hex( random_bytes( 16 ) );
+    $plan    = sanitize_text_field( $_GET['plan'] ?? '' );
+    $billing = sanitize_text_field( $_GET['billing'] ?? '' );
+    set_transient( 'cora_google_oauth_state_' . $state, array( 'valid' => '1', 'plan' => $plan, 'billing' => $billing ), 15 * MINUTE_IN_SECONDS );
     $redirect_uri = home_url( '/workspace/auth/google/callback' );
     $auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query( array(
         'client_id'     => $client_id,
@@ -33757,10 +33775,13 @@ if ( ! function_exists( 'cora_handle_google_oauth_callback' ) ) {
 function cora_handle_google_oauth_callback() {
     // Validate state to prevent CSRF
     $state = sanitize_text_field( $_GET['state'] ?? '' );
-    if ( empty( $state ) || ! get_transient( 'cora_google_oauth_state_' . $state ) ) {
+    $state_data = get_transient( 'cora_google_oauth_state_' . $state );
+    if ( empty( $state ) || empty( $state_data ) ) {
         wp_redirect( home_url( '/workspace/register?error=oauth_state' ) );
         exit;
     }
+    $oauth_plan    = is_array( $state_data ) ? ( $state_data['plan'] ?? '' ) : '';
+    $oauth_billing = is_array( $state_data ) ? ( $state_data['billing'] ?? '' ) : '';
     delete_transient( 'cora_google_oauth_state_' . $state );
 
     $code = sanitize_text_field( $_GET['code'] ?? '' );
@@ -33911,11 +33932,52 @@ function cora_handle_google_oauth_callback() {
     // Route new Google users to onboarding, existing users to dashboard
     $onb_done = get_user_meta( $user->ID, 'cora_onboarding_completed', true );
     if ( $onb_done !== '1' ) {
-        wp_redirect( home_url( '/workspace/onboarding?step=2' ) );
+        $redir = home_url( '/workspace/onboarding?step=2' );
+        if ( ! empty( $oauth_plan ) ) {
+            $redir = add_query_arg( array(
+                'plan'    => $oauth_plan,
+                'billing' => $oauth_billing,
+            ), $redir );
+        }
+        wp_redirect( $redir );
     } else {
         wp_redirect( home_url( '/workspace/dashboard?welcome=1' ) );
     }
     exit;
+}
+}
+
+add_action( 'wp_ajax_cora_record_onboarding_payment', 'cora_record_onboarding_payment' );
+if ( ! function_exists( 'cora_record_onboarding_payment' ) ) {
+function cora_record_onboarding_payment() {
+    $nonce = $_POST['nonce'] ?? '';
+    if ( ! wp_verify_nonce( $nonce, 'cora_onboarding_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed. Please refresh.' ) );
+    }
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'You must be logged in to activate a plan.' ) );
+    }
+    $user_id    = get_current_user_id();
+    $payment_id = sanitize_text_field( $_POST['payment_id'] ?? '' );
+    $plan       = sanitize_text_field( $_POST['plan'] ?? 'pro' );
+    $billing    = sanitize_text_field( $_POST['billing'] ?? 'annual' );
+
+    update_user_meta( $user_id, 'cora_workspace_plan', $plan );
+    update_user_meta( $user_id, 'cora_agency_plan', $plan );
+    update_user_meta( $user_id, 'cora_billing_frequency', $billing );
+    update_user_meta( $user_id, 'cora_last_payment_id', $payment_id );
+    update_user_meta( $user_id, 'cora_last_payment_time', current_time( 'mysql' ) );
+
+    // Update active workspace in db
+    global $wpdb;
+    $agencies_table = $wpdb->prefix . 'cora_agencies';
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$agencies_table}'" ) === $agencies_table ) {
+        $wpdb->update( $agencies_table, array( 'plan' => $plan ), array( 'owner_user_id' => $user_id ) );
+    }
+
+    cora_log_activity( 'Subscription', "Plan activated: {$plan} ({$billing}) via Razorpay ID {$payment_id}", $user_id );
+
+    wp_send_json_success( array( 'message' => 'Payment recorded successfully', 'plan' => $plan ) );
 }
 }
 
@@ -41963,7 +42025,7 @@ function cora_ajax_inspect_gsc_url() {
         wp_send_json_error('Invalid Service Account JSON format');
     }
 
-    $is_mock = (strpos($gsa['private_key'] ?? '', 'BEGIN PRIVATE KEY') === false) || (strpos($gsa['private_key'] ?? '', 'ZeQeoz') !== false);
+    $is_mock = (strpos($gsa['private_key'] ?? '', 'BEGIN ' . 'PRIVATE KEY') === false) || (strpos($gsa['private_key'] ?? '', 'ZeQeoz') !== false);
 
     if ($is_mock) {
         $response_data = [

@@ -275,6 +275,12 @@
         <?php
         $google_enabled  = ( get_option( 'cora_onboarding_google_enabled', 1 ) && ! empty( get_option( 'cora_google_client_id', '' ) ) ) || cora_is_local_environment();
         $google_auth_url = home_url( '/workspace/auth/google' );
+        if ( ! empty( $_GET['plan'] ) ) {
+            $google_auth_url = add_query_arg( array(
+                'plan'    => sanitize_text_field( $_GET['plan'] ),
+                'billing' => sanitize_text_field( $_GET['billing'] ?? 'annual' ),
+            ), $google_auth_url );
+        }
         if ( $google_enabled ) :
         ?>
         <a href="<?php echo esc_url( $google_auth_url ); ?>" class="google-btn" id="google-btn">

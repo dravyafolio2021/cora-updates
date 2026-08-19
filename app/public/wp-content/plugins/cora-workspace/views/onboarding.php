@@ -27,12 +27,86 @@ $email_enabled   = get_option( 'cora_onboarding_email_enabled', 1 );
 $reg_enabled     = get_option( 'cora_onboarding_enabled', 1 );
 $google_auth_url = home_url( '/workspace/auth/google' );
 
+// Plan Selection Context
+$req_plan      = sanitize_text_field( $_GET['plan'] ?? '' );
+$req_billing   = sanitize_text_field( $_GET['billing'] ?? 'annual' );
+$has_paid_plan = in_array( $req_plan, array( 'india_only', 'starter', 'pro', 'scale' ), true );
+
+if ( ! empty( $req_plan ) ) {
+    $google_auth_url = add_query_arg( array(
+        'plan'    => $req_plan,
+        'billing' => $req_billing,
+    ), home_url( '/workspace/auth/google' ) );
+}
+
+$plan_meta = array(
+    'india_only' => array(
+        'name'        => 'India Only Founder Plan',
+        'badge'       => '🇮🇳 India Special',
+        'price_num'   => '₹499',
+        'price_desc'  => '/ month',
+        'billing_sub' => 'Billed annually at ₹4,999 / year',
+        'amount_paise'=> 499900,
+        'features'    => array(
+            '<strong>2,500</strong> AI Agent Runs / mo',
+            '<strong>All Pro Features</strong> Included',
+            'UPI (GPay, PhonePe, Paytm), RuPay & NetBanking',
+            'Full GST Invoicing & B2B Tax Receipts',
+            'Priority WhatsApp Founder Support',
+        ),
+    ),
+    'starter' => array(
+        'name'        => 'Starter Plan',
+        'badge'       => 'Starter',
+        'price_num'   => '$9',
+        'price_desc'  => '/ month',
+        'billing_sub' => ( $req_billing === 'annual' ) ? 'Billed annually at $90 / year' : 'Billed monthly at $9 / month',
+        'amount_paise'=> ( $req_billing === 'annual' ) ? 783000 : 78300,
+        'features'    => array(
+            '<strong>5,000</strong> AI Agent Runs / month',
+            'Claude 3.5 Sonnet Access',
+            'Custom Workspace Domain',
+            'Standard Email & Chat Support',
+        ),
+    ),
+    'pro' => array(
+        'name'        => 'Pro Studio Plan',
+        'badge'       => '★ Most Popular',
+        'price_num'   => '$19',
+        'price_desc'  => '/ month',
+        'billing_sub' => ( $req_billing === 'annual' ) ? 'Billed annually at $190 / year' : 'Billed monthly at $19 / month',
+        'amount_paise'=> ( $req_billing === 'annual' ) ? 1653000 : 165300,
+        'features'    => array(
+            '<strong>10,000</strong> AI Agent Runs / month',
+            '<strong>All Frontier Models</strong> (Claude, GPT-4o, Gemini)',
+            '<strong>3 Team Seats</strong> Included',
+            'GST Tax Breakdown & Invoicing',
+            'Priority Support',
+        ),
+    ),
+    'scale' => array(
+        'name'        => 'Scale & Agency Plan',
+        'badge'       => 'Scale',
+        'price_num'   => '$39',
+        'price_desc'  => '/ month',
+        'billing_sub' => ( $req_billing === 'annual' ) ? 'Billed annually at $390 / year' : 'Billed monthly at $39 / month',
+        'amount_paise'=> ( $req_billing === 'annual' ) ? 3393000 : 339300,
+        'features'    => array(
+            '<strong>Unlimited</strong> AI Executions',
+            '<strong>10 Team Seats</strong> Included',
+            'Custom Fine-Tuned AI Personas',
+            'Dedicated Account Manager & 99.9% SLA',
+        ),
+    ),
+);
+$active_plan_info = $has_paid_plan ? ( $plan_meta[$req_plan] ?? null ) : null;
+
 // Determine starting step
 $url_step = isset( $_GET['step'] ) ? intval( $_GET['step'] ) : 0;
 if ( $url_step >= 2 && $url_step <= 5 && $is_logged_in ) {
     $initial_step = $url_step;
 } elseif ( $is_logged_in && ! empty( $has_business ) && empty( $has_industry ) ) {
-    $initial_step = 3;
+    $initial_step = $has_paid_plan ? 4 : 3;
 } elseif ( $is_logged_in && empty( $has_business ) ) {
     $initial_step = 2;
 } elseif ( $is_logged_in && $onboarding_done === '1' ) {
@@ -52,6 +126,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
     <meta name="color-scheme" content="light">
     <title>Cora — Get Started</title>
     <meta name="description" content="Create your Cora workspace. Set up your business in minutes with our guided onboarding.">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         :root {
             color-scheme: only light !important;
@@ -1182,6 +1257,43 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 </div>
                 <div class="step-indicator-line" data-line="1"></div>
                 
+                <?php if ( $has_paid_plan ) : ?>
+                <div class="step-indicator-item" data-step="2">
+                    <div class="step-indicator-circle">
+                        <span class="step-num">2</span>
+                        <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="step-indicator-label">Payment</span>
+                </div>
+                <div class="step-indicator-line" data-line="2"></div>
+                
+                <div class="step-indicator-item" data-step="3">
+                    <div class="step-indicator-circle">
+                        <span class="step-num">3</span>
+                        <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="step-indicator-label">Profile</span>
+                </div>
+                <div class="step-indicator-line" data-line="3"></div>
+                
+                <div class="step-indicator-item" data-step="4">
+                    <div class="step-indicator-circle">
+                        <span class="step-num">4</span>
+                        <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="step-indicator-label">Industry</span>
+                </div>
+                <div class="step-indicator-line" data-line="4"></div>
+                
+                <div class="step-indicator-item" data-step="5">
+                    <div class="step-indicator-circle">
+                        <span class="step-num">5</span>
+                        <svg class="step-check" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="step-indicator-label">Finish</span>
+                </div>
+
+                <?php else : ?>
                 <div class="step-indicator-item" data-step="2">
                     <div class="step-indicator-circle">
                         <span class="step-num">2</span>
@@ -1216,6 +1328,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                     </div>
                     <span class="step-indicator-label">Finish</span>
                 </div>
+                <?php endif; ?>
             </div>
 
             <div class="ob-card">
@@ -1234,7 +1347,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
 
             <!-- ═══ STEP 1 — AUTHENTICATION ═══ -->
             <div class="step-panel" id="step-1" data-step="1">
-                <div class="step-label">Step 1 of 4</div>
+                <div class="step-label">Step 1 of <?php echo $has_paid_plan ? '5' : '4'; ?> · Account</div>
                 <h2 class="ob-title">Create your workspace</h2>
                 <p class="ob-subtitle">Get started in under 2 minutes. No credit card required.</p>
 
@@ -1331,9 +1444,69 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 <?php endif; ?>
             </div>
 
-            <!-- ═══ STEP 2 — BUSINESS DETAILS ═══ -->
+            <?php if ( $has_paid_plan && $active_plan_info ) : ?>
+            <!-- ═══ STEP 2 (PAID FLOW) — PLAN ACTIVATION & PAYMENT ═══ -->
             <div class="step-panel" id="step-2" data-step="2">
-                <div class="step-label">Step 2 of 4</div>
+                <div class="step-label">Step 2 of 5 · Plan Activation</div>
+                <h2 class="ob-title">Activate your subscription</h2>
+                <p class="ob-subtitle">Your workspace account is ready. Complete payment to activate your plan.</p>
+
+                <div style="background:#ffffff; border:1.5px solid #18181b; border-radius:16px; padding:20px; margin:20px 0 22px 0; text-align:left; box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <span style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; background:#f4f4f5; color:#18181b; padding:3px 8px; border-radius:6px;">
+                            <?php echo esc_html( $active_plan_info['badge'] ); ?>
+                        </span>
+                        <span style="font-size:12px; font-weight:600; color:#10b981; display:flex; align-items:center; gap:4px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Ready to activate
+                        </span>
+                    </div>
+
+                    <h3 style="font-size:18px; font-weight:700; color:#09090b; margin-bottom:4px;">
+                        <?php echo esc_html( $active_plan_info['name'] ); ?>
+                    </h3>
+
+                    <div style="display:flex; align-items:baseline; gap:4px; margin-bottom:4px;">
+                        <span style="font-size:26px; font-weight:800; font-family:monospace; color:#09090b;"><?php echo esc_html( $active_plan_info['price_num'] ); ?></span>
+                        <span style="font-size:13px; color:#71717a;"><?php echo esc_html( $active_plan_info['price_desc'] ); ?></span>
+                    </div>
+                    <div style="font-size:12px; color:#a1a1aa; margin-bottom:16px;">
+                        <?php echo esc_html( $active_plan_info['billing_sub'] ); ?>
+                    </div>
+
+                    <ul style="list-style:none; padding:0; margin:0 0 16px 0; border-top:1px solid #f4f4f5; padding-top:14px; display:flex; flex-direction:column; gap:8px;">
+                        <?php foreach ( $active_plan_info['features'] as $feat ) : ?>
+                        <li style="display:flex; align-items:center; gap:8px; font-size:12.5px; color:#52525b;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span><?php echo wp_kses_post( $feat ); ?></span>
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+
+                    <div style="background:#fafafa; border-radius:10px; padding:10px 12px; font-size:11.5px; color:#52525b; display:flex; justify-content:space-between; align-items:center;">
+                        <span>Account: <strong><?php echo esc_html( $user_email ?: 'Logged in user' ); ?></strong></span>
+                        <span style="color:#10b981; font-weight:700;">Verified</span>
+                    </div>
+                </div>
+
+                <button type="button" class="submit-btn" id="ob-pay-btn" onclick="handleOnboardingRazorpayPayment()" style="background:#18181b; color:#ffffff; font-weight:700; width:100%; padding:13px 20px; border-radius:12px; font-size:14px; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
+                    <span>Pay & Activate Workspace →</span>
+                </button>
+
+                <div style="margin-top:14px; text-align:center;">
+                    <a href="#" onclick="skipOnboardingPayment(event)" style="color:var(--text-secondary); font-size:12px; font-weight:600; text-decoration:none;">
+                        Skip payment for now (Continue on Free Forever Plan) →
+                    </a>
+                </div>
+
+                <div class="secure-footer-text" style="margin-top:18px;">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    256-bit SSL encrypted · Razorpay PCI-DSS compliant checkout
+                </div>
+            </div>
+
+            <!-- ═══ STEP 3 (PAID FLOW) — BUSINESS DETAILS ═══ -->
+            <div class="step-panel" id="step-3" data-step="3">
+                <div class="step-label">Step 3 of 5 · Business Profile</div>
                 <h2 class="ob-title">Tell us about your business</h2>
                 <p class="ob-subtitle">This helps us personalize your workspace experience.</p>
 
@@ -1379,9 +1552,9 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 </form>
             </div>
 
-            <!-- ═══ STEP 3 — INDUSTRY SELECTION ═══ -->
-            <div class="step-panel" id="step-3" data-step="3">
-                <div class="step-label" style="text-align:center;">Step 3 of 4</div>
+            <!-- ═══ STEP 4 (PAID FLOW) — INDUSTRY SELECTION ═══ -->
+            <div class="step-panel" id="step-4" data-step="4">
+                <div class="step-label" style="text-align:center;">Step 4 of 5 · Industry</div>
                 <h2 class="ob-title" style="text-align:center; margin-bottom: 8px;">What's your industry?</h2>
                 <p class="ob-subtitle" style="text-align:center; margin-bottom: 32px;">This helps us personalize your workspace with the right tools and templates.</p>
 
@@ -1420,60 +1593,107 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                         <div class="industry-name">Custom Workspace</div>
                         <div class="industry-desc">Enable only the modules you need and build your custom platform</div>
                     </div>
+                </div>
 
-                    <div class="industry-card locked" data-industry="marketing_agency" onclick="selectIndustry(this)">
-                        <span class="coming-soon-badge">Coming Soon</span>
+                <button type="button" class="submit-btn" id="ob-industry-btn" onclick="handleIndustrySubmit()" disabled>
+                    Continue
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+                <div class="secure-footer-text" style="margin-top:20px;">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Your data is secure. We'll never share it with anyone.
+                </div>
+            </div>
+
+            <?php else : ?>
+            <!-- ═══ STEP 2 (FREE FLOW) — BUSINESS DETAILS ═══ -->
+            <div class="step-panel" id="step-2" data-step="2">
+                <div class="step-label">Step 2 of 4 · Business Profile</div>
+                <h2 class="ob-title">Tell us about your business</h2>
+                <p class="ob-subtitle">This helps us personalize your workspace experience.</p>
+
+                <form id="onboarding-business-form" onsubmit="handleBusinessSubmit(event)" autocomplete="off">
+                    <div class="form-group">
+                        <label for="ob-full-name">Your Full Name</label>
+                        <div class="input-group-with-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <input type="text" id="ob-full-name" required placeholder="e.g. Jane Smith" value="<?php echo esc_attr( $user_display_name ); ?>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ob-business-name">Business Name</label>
+                        <div class="input-group-with-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                            <input type="text" id="ob-business-name" required placeholder="e.g. Skyline Realty, Studio Light" value="<?php echo esc_attr( $has_business ); ?>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ob-phone">Phone / WhatsApp <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--text-tertiary);">(optional)</span></label>
+                        <div class="input-group-with-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <input type="tel" id="ob-phone" placeholder="+91 98765 43210">
+                        </div>
+                        <div class="helper-text">Used for client communication & WhatsApp integration</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ob-contact-email">Contact Email</label>
+                        <div class="input-group-with-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="input-icon-prefix"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <input type="email" id="ob-contact-email" placeholder="hello@yourbusiness.com" value="<?php echo esc_attr( $user_email ); ?>">
+                        </div>
+                        <div class="helper-text">Public email for your business profile</div>
+                    </div>
+                    <button type="submit" class="submit-btn" id="ob-business-btn">
+                        Continue
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                    <div class="secure-footer-text">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Your information is secure and private
+                    </div>
+                </form>
+            </div>
+
+            <!-- ═══ STEP 3 (FREE FLOW) — INDUSTRY SELECTION ═══ -->
+            <div class="step-panel" id="step-3" data-step="3">
+                <div class="step-label" style="text-align:center;">Step 3 of 4 · Industry</div>
+                <h2 class="ob-title" style="text-align:center; margin-bottom: 8px;">What's your industry?</h2>
+                <p class="ob-subtitle" style="text-align:center; margin-bottom: 32px;">This helps us personalize your workspace with the right tools and templates.</p>
+
+                <div class="industry-grid" id="industry-grid">
+                    <div class="industry-card" data-industry="real_estate" onclick="selectIndustry(this)">
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9 22 9 12 15 12 15 22"/>
                             </svg>
                         </div>
-                        <div class="industry-name">Marketing Agency</div>
-                        <div class="industry-desc">Client projects, tasks, campaign performance</div>
+                        <div class="industry-name">Real Estate Agency</div>
+                        <div class="industry-desc">Property listings, buyer leads, CRM pipeline, showings</div>
                     </div>
 
-                    <div class="industry-card locked" data-industry="it_services" onclick="selectIndustry(this)">
-                        <span class="coming-soon-badge">Coming Soon</span>
+                    <div class="industry-card" data-industry="photography_studio" onclick="selectIndustry(this)">
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                                <line x1="8" y1="21" x2="16" y2="21"/>
-                                <line x1="12" y1="17" x2="12" y2="21"/>
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
                             </svg>
                         </div>
-                        <div class="industry-name">IT Services</div>
-                        <div class="industry-desc">Projects, tickets, clients, team collaboration</div>
-                    </div>
-
-                    <div class="industry-card locked" data-industry="healthcare_practice" onclick="selectIndustry(this)">
-                        <span class="coming-soon-badge">Coming Soon</span>
-                        <div class="industry-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                            </svg>
-                        </div>
-                        <div class="industry-name">Healthcare Practice</div>
-                        <div class="industry-desc">Patient records, appointments, communication</div>
+                        <div class="industry-name">Photography Studio</div>
+                        <div class="industry-desc">Client leads, shoot scheduling, equipment tracking</div>
                     </div>
 
                     <div class="industry-card" data-industry="custom" onclick="selectIndustry(this)">
                         <div class="industry-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="4" y1="21" x2="4" y2="14"/>
-                                <line x1="4" y1="10" x2="4" y2="3"/>
-                                <line x1="12" y1="21" x2="12" y2="12"/>
-                                <line x1="12" y1="8" x2="12" y2="3"/>
-                                <line x1="20" y1="21" x2="20" y2="16"/>
-                                <line x1="20" y1="12" x2="20" y2="3"/>
-                                <line x1="1" y1="14" x2="7" y2="14"/>
-                                <line x1="9" y1="8" x2="15" y2="8"/>
-                                <line x1="17" y1="16" x2="23" y2="16"/>
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
                             </svg>
                         </div>
-                        <div class="industry-name">Custom / Other</div>
-                        <div class="industry-desc">Configure your workspace your own way</div>
+                        <div class="industry-name">Custom Workspace</div>
+                        <div class="industry-desc">Enable only the modules you need and build your custom platform</div>
                     </div>
                 </div>
 
@@ -1487,13 +1707,12 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 </div>
             </div>
 
-            <!-- ═══ STEP 4 — PWA APP PROMOTION ═══ -->
+            <!-- ═══ STEP 4 (FREE FLOW) — PWA APP PROMOTION ═══ -->
             <div class="step-panel" id="step-4" data-step="4">
-                <div class="step-label" style="text-align:center;">Step 4 of 5</div>
+                <div class="step-label" style="text-align:center;">Step 4 of 4 · App</div>
                 <h2 class="ob-title" style="text-align:center; margin-bottom: 8px;">Install Cora App</h2>
                 <p class="ob-subtitle" style="text-align:center; margin-bottom: 24px;">For a premium desktop and mobile experience, install Cora to run standalone from your Dock or Home Screen.</p>
 
-                <!-- PWA Animated Device Illustration Mockup -->
                 <div class="pwa-mockup-container">
                     <div class="pwa-mockup-frame">
                         <div class="pwa-mockup-header">
@@ -1516,34 +1735,16 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                     </div>
                 </div>
 
-                <!-- Action Install Button -->
                 <button type="button" class="submit-btn" id="ob-pwa-install-btn" onclick="triggerPWAInstallation()">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Install Cora App
                 </button>
 
-                <!-- iOS Custom Instructions -->
-                <div id="ob-pwa-ios-instructions" class="pwa-instructions-box" style="display:none;">
-                    <div class="pwa-instructions-header">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-650"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        <span>iOS Safari Setup</span>
-                    </div>
-                    <p class="pwa-instructions-text">Tap the Share icon <svg style="display:inline-block; vertical-align:middle;" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/><path d="M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg> in Safari, scroll down and choose <strong>Add to Home Screen</strong>.</p>
-                </div>
-
-                <!-- Desktop Generic Instructions -->
-                <div id="ob-pwa-desktop-instructions" class="pwa-instructions-box" style="display:none;">
-                    <div class="pwa-instructions-header">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-650"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        <span>App Installation</span>
-                    </div>
-                    <p class="pwa-instructions-text">Click the install prompt in your browser's address bar to add Cora to your device.</p>
-                </div>
-
                 <button type="button" class="skip-btn" onclick="skipPWAInstallation()">
                     Continue in Browser
                 </button>
             </div>
+            <?php endif; ?>
 
             <!-- ═══ STEP 5 — ACTIVATION ═══ -->
             <div class="step-panel" id="step-5" data-step="5">
@@ -1576,9 +1777,8 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
 (function() {
     'use strict';
 
-    // ── Theme Standard (Light Mode) ───────────────────────────
-
     // ── State ─────────────────────────────────────────────────
+    var hasPaidPlan = <?php echo $has_paid_plan ? 'true' : 'false'; ?>;
     var currentStep = <?php echo intval( $initial_step ); ?>;
     var selectedIndustry = '';
     var registeredEmail = '';
@@ -1589,16 +1789,11 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
 
     // ── Initialize ────────────────────────────────────────────
     var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    if (isStandalone) {
+    if (isStandalone && !hasPaidPlan) {
         var pwaIndicator = document.getElementById('step-pwa-indicator');
         var pwaLine = document.getElementById('step-pwa-line');
         if (pwaIndicator) pwaIndicator.style.display = 'none';
         if (pwaLine) pwaLine.style.display = 'none';
-        var step5CircleNum = document.querySelector('.step-indicator-item[data-step="5"] .step-num');
-        if (step5CircleNum) step5CircleNum.textContent = '4';
-        if (currentStep === 4) {
-            currentStep = 5;
-        }
     }
 
     updateStepProgress(currentStep);
@@ -1627,10 +1822,11 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             target.classList.add('active');
         }
         
-        // Dynamically adjust shell width for step 3 (industry grid) to prevent compression
+        // Dynamically adjust shell width for industry grid to prevent compression
         var shell = document.getElementById('onboarding-shell');
         if (shell) {
-            if (step === 3) {
+            var industryStepNum = hasPaidPlan ? 4 : 3;
+            if (step === industryStepNum) {
                 shell.style.maxWidth = '840px';
             } else {
                 shell.style.maxWidth = '480px';
@@ -1773,7 +1969,6 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             if (res.success) {
                 showToast(res.data.message);
                 if (res.data.dev_magic_url) {
-                    // Dev Mode: Show mock magic link so they can click it!
                     var oldDev = document.getElementById('ob-dev-magic-notice');
                     if (oldDev) oldDev.remove();
 
@@ -1843,7 +2038,86 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         .then(function(res) { showToast(res.data.message || 'Verification link sent!'); });
     };
 
-    // ═══ STEP 2 — BUSINESS DETAILS ═══════════════════════════
+    // ═══ STEP 2 (PAID FLOW) — RAZORPAY PAYMENT ═══════════════
+
+    window.handleOnboardingRazorpayPayment = function() {
+        if (typeof Razorpay === 'undefined') {
+            showToast('Payment system loading, please try again in a moment.');
+            return;
+        }
+
+        var planKey = '<?php echo esc_js( $req_plan ); ?>';
+        var billingKey = '<?php echo esc_js( $req_billing ); ?>';
+        var planAmountPaise = <?php echo intval( $active_plan_info['amount_paise'] ?? 499900 ); ?>;
+        var planTitle = '<?php echo esc_js( $active_plan_info['name'] ?? 'Cora Subscription' ); ?>';
+        var userEmail = '<?php echo esc_js( $user_email ); ?>' || (document.getElementById('ob-email') ? document.getElementById('ob-email').value : '');
+        var userName = '<?php echo esc_js( $user_display_name ); ?>' || '';
+
+        var options = {
+            key: 'rzp_live_TRDi55lfKpnzCM',
+            amount: planAmountPaise,
+            currency: 'INR',
+            name: 'Cora by Claraverse',
+            description: planTitle + ' (' + (billingKey === 'annual' ? 'Annual' : 'Monthly') + ')',
+            image: 'https://heycora.in/apple-touch-icon.png',
+            theme: { color: '#18181b' },
+            prefill: {
+                name: userName,
+                email: userEmail
+            },
+            modal: {
+                ondismiss: function() {
+                    showToast('Payment window closed. You can retry or skip to free plan.');
+                }
+            },
+            handler: function(response) {
+                var btn = document.getElementById('ob-pay-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Verifying payment\u2026';
+                }
+
+                var formData = new FormData();
+                formData.append('action', 'cora_record_onboarding_payment');
+                formData.append('payment_id', response.razorpay_payment_id);
+                formData.append('plan', planKey);
+                formData.append('billing', billingKey);
+                formData.append('nonce', nonce);
+
+                fetch(ajaxUrl, { method: 'POST', body: formData })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                    if (res.success) {
+                        showToast('Payment confirmed! Upgraded to ' + planTitle);
+                        setTimeout(function() {
+                            showStep(3);
+                        }, 500);
+                    } else {
+                        showToast(res.data ? res.data.message : 'Payment recorded.');
+                        showStep(3);
+                    }
+                })
+                .catch(function() {
+                    showToast('Payment successful! Continuing setup.');
+                    showStep(3);
+                });
+            }
+        };
+
+        var rzp = new Razorpay(options);
+        rzp.on('payment.failed', function(response) {
+            showToast(response.error.description || 'Payment was not completed.');
+        });
+        rzp.open();
+    };
+
+    window.skipOnboardingPayment = function(e) {
+        if (e) e.preventDefault();
+        showToast('Continuing on Free Forever Plan (1,000 runs/mo).');
+        showStep(3);
+    };
+
+    // ═══ STEP 2/3 — BUSINESS DETAILS ═════════════════════════
 
     window.handleBusinessSubmit = function(e) {
         e.preventDefault();
@@ -1885,7 +2159,11 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         .then(function(r) { return r.json(); })
         .then(function(res) {
             if (res.success) {
-                showStep(3);
+                if (hasPaidPlan) {
+                    showStep(4);
+                } else {
+                    showStep(3);
+                }
             } else {
                 showToast(res.data.message || 'Failed to save. Please try again.');
                 btn.disabled = false;
@@ -1899,7 +2177,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         });
     };
 
-    // ═══ STEP 3 — INDUSTRY SELECTION ═════════════════════════
+    // ═══ STEP 3/4 — INDUSTRY SELECTION ═══════════════════════
 
     window.selectIndustry = function(card) {
         if (card.classList.contains('locked')) {
@@ -1917,10 +2195,14 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
             showToast('Please select an industry.');
             return;
         }
-        if (isStandalone) {
+        if (hasPaidPlan) {
             showStep(5);
         } else {
-            showStep(4);
+            if (isStandalone) {
+                showStep(5);
+            } else {
+                showStep(4);
+            }
         }
     };
 
@@ -1933,8 +2215,6 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
         if (installBtn) {
             installBtn.style.display = 'block';
         }
-        var desktopInst = document.getElementById('ob-pwa-desktop-instructions');
-        if (desktopInst) desktopInst.style.display = 'none';
     });
 
     window.triggerPWAInstallation = function() {
@@ -1952,14 +2232,7 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 coraPwaDeferredPrompt = null;
             });
         } else {
-            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if (isIOS) {
-                document.getElementById('ob-pwa-ios-instructions').style.display = 'block';
-                document.getElementById('ob-pwa-desktop-instructions').style.display = 'none';
-            } else {
-                document.getElementById('ob-pwa-desktop-instructions').style.display = 'block';
-                document.getElementById('ob-pwa-ios-instructions').style.display = 'none';
-            }
+            showStep(5);
         }
     };
 
@@ -1995,12 +2268,12 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 }, 1500);
             } else {
                 showToast(res.data.message || 'Activation failed. Please try again.');
-                showStep(3);
+                showStep(hasPaidPlan ? 4 : 3);
             }
         })
         .catch(function() {
             showToast('Network error during activation. Please try again.');
-            showStep(3);
+            showStep(hasPaidPlan ? 4 : 3);
         });
     }
 

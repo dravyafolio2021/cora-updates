@@ -269,6 +269,12 @@ $google_enabled  = get_option( 'cora_onboarding_google_enabled', 1 ) && ! empty(
 $email_enabled   = get_option( 'cora_onboarding_email_enabled', 1 );
 $reg_enabled     = get_option( 'cora_onboarding_enabled', 1 );
 $google_auth_url = home_url( '/workspace/auth/google' );
+if ( ! empty( $_GET['plan'] ) ) {
+    $google_auth_url = add_query_arg( array(
+        'plan'    => sanitize_text_field( $_GET['plan'] ),
+        'billing' => sanitize_text_field( $_GET['billing'] ?? 'annual' ),
+    ), $google_auth_url );
+}
 ?>
 
 <div id="reg-card">

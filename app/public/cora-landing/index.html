@@ -2,344 +2,2011 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cora for Real Estate — Book a Demo</title>
-  <meta name="description" content="Cora is a purpose-built platform for real estate agencies. Lead pipeline, property listings, AI follow-ups. Built in public, live on YouTube. Book a free demo." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Cora — The AI workspace built for ambitious founders</title>
+  <meta name="description" content="Cora orchestrates your client pipelines, revenue workflows, and specialized AI agents in one hyper-focused command center." />
+  
+  <!-- Open Graph / WhatsApp / Facebook / LinkedIn / Slack -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://heycora.in/" />
+  <meta property="og:site_name" content="Cora" />
+  <meta property="og:title" content="Cora — The AI workspace built for ambitious founders" />
+  <meta property="og:description" content="Cora orchestrates your client pipelines, revenue workflows, and specialized AI agents in one hyper-focused command center." />
+  <meta property="og:image" content="https://heycora.in/og-image.png" />
+  <meta property="og:image:secure_url" content="https://heycora.in/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Cora — The AI workspace built for ambitious founders" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://heycora.in/" />
+  <meta name="twitter:title" content="Cora — The AI workspace built for ambitious founders" />
+  <meta name="twitter:description" content="Cora orchestrates your client pipelines, revenue workflows, and specialized AI agents in one hyper-focused command center." />
+  <meta name="twitter:image" content="https://heycora.in/og-image.png" />
+
+  <!-- Fallback, Favicons & Apple Touch Icons -->
+  <link rel="image_src" href="https://heycora.in/og-image.png" />
+  <link rel="canonical" href="https://heycora.in/" />
+  <link rel="icon" type="image/png" href="https://heycora.in/favicon.png" />
+  <link rel="apple-touch-icon" href="https://heycora.in/apple-touch-icon.png" />
+  
+  <!-- Preconnect & Google Fonts: Caveat (Handwritten/Scribble), Inter Tight (Display), Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter+Tight:ital,wght@0,400..900;1,400..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
+
+  <!-- Razorpay Official Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ==========================================================================
+       CORA DESIGN SYSTEM TOKENS & ATOMIC FOUNDATION (v2.4.0)
+       Attio / Linear Minimalist Rhythm + Inter Tight Display Typography
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     :root {
-      --bg:#fafafa;--bg-card:#ffffff;--bg-subtle:#f4f4f5;--border:#e4e4e7;
-      --border-strong:#d4d4d8;--text-primary:#09090b;--text-secondary:#52525b;
-      --text-tertiary:#a1a1aa;--accent:#18181b;--accent-hover:#27272a;
-      --input-bg:#ffffff;--tag-bg:#f4f4f5;
+      --bg: #ffffff;
+      --bg-subtle: #fafafa;
+      --bg-card: #ffffff;
+      --border: #e4e4e7;
+      --border-subtle: #f4f4f5;
+      --border-strong: #d4d4d8;
+      --text-primary: #09090b;
+      --text-secondary: #52525b;
+      --text-tertiary: #71717a;
+      --btn-primary-bg: #09090b;
+      --btn-primary-fg: #ffffff;
+      --btn-primary-hover: #1c1d22;
+      --pill-bg: #f4f4f5;
+      --highlight-brush: #c4b5fd;
+      --highlight-scribble: #a78bfa;
+      --font-display: 'Inter Tight', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-scribble: 'Caveat', cursive, sans-serif;
     }
-    [data-theme="dark"] {
-      --bg:#09090b;--bg-card:#18181b;--bg-subtle:#27272a;--border:#27272a;
-      --border-strong:#3f3f46;--text-primary:#fafafa;--text-secondary:#a1a1aa;
-      --text-tertiary:#52525b;--accent:#fafafa;--accent-hover:#e4e4e7;
-      --input-bg:#18181b;--tag-bg:#27272a;
+
+    html {
+      scroll-behavior: smooth;
     }
-    html{scroll-behavior:smooth}
-    body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.6;transition:background .2s,color .2s}
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;background:var(--bg);border-bottom:1px solid var(--border)}
-    .nav-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;letter-spacing:-.02em;color:var(--text-primary);text-decoration:none}
-    .nav-logo-mark{width:26px;height:26px;background:var(--text-primary);border-radius:6px;display:flex;align-items:center;justify-content:center}
-    .nav-right{display:flex;align-items:center;gap:12px}
-    .theme-toggle{background:none;border:1px solid var(--border);border-radius:6px;padding:6px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;transition:border-color .2s,color .2s}
-    .theme-toggle:hover{border-color:var(--border-strong);color:var(--text-primary)}
-    .nav-cta{background:var(--accent);color:var(--bg);border:none;padding:7px 16px;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity .2s}
-    .nav-cta:hover{opacity:.85}
-    .live-banner{position:fixed;top:56px;left:0;right:0;z-index:99;background:var(--text-primary);color:var(--bg);display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 1rem;font-size:.78rem;font-weight:500}
-    .live-dot{width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pulse 1.5s infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
-    .live-banner a{color:inherit;text-decoration:underline;text-underline-offset:2px}
-    main{padding-top:104px}
-    section{padding:72px 0}
-    .container{max-width:1100px;margin:0 auto;padding:0 2rem}
-    .container-narrow{max-width:720px;margin:0 auto;padding:0 2rem}
-    .hero{padding-top:80px;padding-bottom:80px;text-align:center}
-    .hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--tag-bg);border:1px solid var(--border);border-radius:100px;padding:4px 12px;font-size:.75rem;font-weight:500;color:var(--text-secondary);margin-bottom:24px;letter-spacing:.02em}
-    .hero h1{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.1;color:var(--text-primary);max-width:820px;margin:0 auto 20px}
-    .hero h1 em{font-style:normal;color:var(--text-secondary)}
-    .hero-sub{font-size:1.05rem;color:var(--text-secondary);max-width:540px;margin:0 auto 40px;line-height:1.7}
-    .hero-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
-    .btn-primary{background:var(--accent);color:var(--bg);padding:13px 28px;border-radius:9px;font-size:.9rem;font-weight:600;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:opacity .2s,transform .15s}
-    .btn-primary:hover{opacity:.85;transform:translateY(-1px)}
-    .btn-secondary{background:transparent;color:var(--text-primary);padding:12px 24px;border-radius:9px;font-size:.9rem;font-weight:500;border:1px solid var(--border-strong);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:border-color .2s,background .15s}
-    .btn-secondary:hover{background:var(--bg-subtle)}
-    .client-strip{padding:32px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center}
-    .client-strip p{font-size:.75rem;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px}
-    .client-name{display:inline-flex;align-items:center;gap:10px;font-size:.95rem;font-weight:600;color:var(--text-primary)}
-    .client-badge{background:var(--tag-bg);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:.8rem;font-weight:500;color:var(--text-secondary)}
-    .section-label{font-size:.72rem;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
-    .section-title{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:750;letter-spacing:-.03em;color:var(--text-primary)}
-    .series-header{text-align:center;margin-bottom:48px}
-    .day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .day-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;transition:border-color .2s,transform .15s}
-    .day-card:hover{border-color:var(--border-strong);transform:translateY(-2px)}
-    .day-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .day-num{font-size:.7rem;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em}
-    .day-date{font-size:.7rem;color:var(--text-tertiary)}
-    .day-card h3{font-size:.9rem;font-weight:650;letter-spacing:-.01em;color:var(--text-primary);margin-bottom:8px;line-height:1.4}
-    .day-card p{font-size:.8rem;color:var(--text-secondary);line-height:1.5}
-    .day-tag{display:inline-block;margin-top:12px;background:var(--tag-bg);border-radius:100px;padding:3px 10px;font-size:.7rem;font-weight:500;color:var(--text-secondary)}
-    .features-bg{background:var(--bg-subtle)}
-    .features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
-    .feature-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px}
-    .feature-icon{width:38px;height:38px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
-    .feature-icon svg{width:18px;height:18px;stroke:var(--text-primary)}
-    .feature-card h3{font-size:.9rem;font-weight:650;letter-spacing:-.01em;margin-bottom:6px}
-    .feature-card p{font-size:.82rem;color:var(--text-secondary);line-height:1.6}
-    .form-section{text-align:center}
-    .form-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:44px 48px;max-width:560px;margin:48px auto 0;text-align:left}
-    .form-card h2{font-size:1.5rem;font-weight:750;letter-spacing:-.03em;margin-bottom:6px}
-    .form-card>p{font-size:.85rem;color:var(--text-secondary);margin-bottom:28px}
-    .form-group{margin-bottom:16px}
-    .form-group label{display:block;font-size:.78rem;font-weight:550;color:var(--text-secondary);margin-bottom:6px}
-    .form-group input,.form-group select{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.875rem;color:var(--text-primary);font-family:inherit;outline:none;transition:border-color .15s;-webkit-appearance:none}
-    .form-group input::placeholder{color:var(--text-tertiary)}
-    .form-group input:focus,.form-group select:focus{border-color:var(--border-strong)}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .form-submit{width:100%;background:var(--accent);color:var(--bg);padding:12px;border-radius:9px;font-size:.9rem;font-weight:600;border:none;cursor:pointer;margin-top:8px;font-family:inherit;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:8px}
-    .form-submit:hover{opacity:.85}
-    .form-disclaimer{font-size:.72rem;color:var(--text-tertiary);text-align:center;margin-top:14px}
-    #toast-container{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px}
-    .toast{background:var(--accent);color:var(--bg);padding:12px 18px;border-radius:9px;font-size:.82rem;font-weight:500;box-shadow:0 4px 24px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;animation:slideUp .25s ease;max-width:320px}
-    @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-    footer{padding:40px 0;border-top:1px solid var(--border);text-align:center}
-    footer p{font-size:.78rem;color:var(--text-tertiary)}
-    footer a{color:var(--text-secondary);text-decoration:none}
-    footer a:hover{color:var(--text-primary)}
-    @media(max-width:640px){.form-card{padding:28px 20px}.form-row{grid-template-columns:1fr}.live-banner{font-size:.72rem}}
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.5;
+      letter-spacing: -0.011em;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Subtle Background Mesh */
+    .bg-ambient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(167, 139, 250, 0.09), transparent 70%),
+        linear-gradient(to bottom, transparent, var(--bg));
+      opacity: 0.9;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 0 1.25rem;
+      }
+    }
+
+    /* ==========================================================================
+       HEADER: MINIMALIST BRAND & NAVIGATION
+       ========================================================================== */
+    header.site-header {
+      width: 100%;
+      padding: 1.25rem 0;
+      z-index: 50;
+      position: relative;
+    }
+
+    @media (max-width: 640px) {
+      header.site-header {
+        padding: 1rem 0;
+      }
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-family: var(--font-display);
+      font-weight: 750;
+      font-size: 1.18rem;
+      letter-spacing: -0.035em;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      background: var(--text-primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .brand-logo:hover .brand-mark {
+      transform: scale(1.06);
+    }
+    .brand-mark svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--bg);
+      fill: none;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .nav-link-pricing {
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 550;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+      transition: color 0.15s ease;
+    }
+    .nav-link-pricing:hover {
+      color: var(--text-primary);
+    }
+
+    /* Single Header CTA: Get started for free */
+    .btn-header-get-started {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-fg);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.48rem 1.15rem;
+      border-radius: 9px;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.12);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @media (max-width: 480px) {
+      .btn-header-get-started {
+        padding: 0.42rem 0.95rem;
+        font-size: 0.8rem;
+      }
+    }
+    .btn-header-get-started:hover {
+      background: var(--btn-primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px -1px rgba(0, 0, 0, 0.2);
+    }
+    .btn-header-get-started:active {
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       HERO SECTION: 90 DVH FULL VIEWPORT
+       ========================================================================== */
+    main.site-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 90dvh;
+      min-height: 90vh;
+      padding: 1.5rem 0;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 640px) {
+      main.site-main {
+        min-height: 90dvh;
+        min-height: 90vh;
+        padding: 1.25rem 0;
+      }
+    }
+
+    .hero-container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Top Announcement Badge (BETA) */
+    .announcement-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.32rem 0.85rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      margin-bottom: 1.85rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 100%;
+    }
+    @media (max-width: 640px) {
+      .announcement-pill {
+        font-size: 0.78rem;
+        padding: 0.28rem 0.75rem;
+        margin-bottom: 1.35rem;
+        gap: 0.4rem;
+      }
+    }
+    .announcement-pill:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+    .pill-badge {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.12rem 0.45rem;
+      background: var(--pill-bg);
+      border-radius: 9999px;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+    .pill-arrow {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .announcement-pill:hover .pill-arrow {
+      transform: translateX(2px);
+    }
+
+    /* Hero Main Headline (Strictly 2 Lines on All Screen Sizes) */
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.35rem, 5.2vw, 3.85rem);
+      font-weight: 550;
+      line-height: 1.14;
+      letter-spacing: -0.035em;
+      color: var(--text-primary);
+      margin-bottom: 1.25rem;
+      max-width: 950px;
+    }
+
+    .hero-title-line {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+      .hero-title {
+        font-size: clamp(1.42rem, 6.4vw, 2.15rem);
+        line-height: 1.18;
+        margin-bottom: 1rem;
+      }
+    }
+
+    /* Official AI Logos Cluster (OpenAI, Claude, Gemini) */
+    .ai-logos-official-svg {
+      display: inline-block;
+      vertical-align: middle;
+      height: 44px;
+      width: auto;
+      margin-left: 0.45rem;
+      position: relative;
+      top: -2px;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.04));
+    }
+    .ai-logos-official-svg:hover {
+      transform: scale(1.04);
+    }
+
+    @media (max-width: 640px) {
+      .ai-logos-official-svg {
+        height: 28px;
+        margin-left: 0.3rem;
+        top: -1px;
+      }
+    }
+
+    /* Artistic Brush Underline under "founders." */
+    .highlight-wrapper {
+      position: relative;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .brush-underline {
+      position: absolute;
+      left: -2%;
+      bottom: -7px;
+      width: 104%;
+      height: 15px;
+      pointer-events: none;
+      z-index: -1;
+    }
+    @media (max-width: 640px) {
+      .brush-underline {
+        bottom: -5px;
+        height: 11px;
+      }
+    }
+
+    /* Hero Subtitle (Strictly 1-Line on Desktop) */
+    .hero-subtitle {
+      font-family: var(--font-sans);
+      font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+      color: var(--text-secondary);
+      line-height: 1.55;
+      max-width: 860px;
+      margin: 0 auto 2.25rem;
+      font-weight: 400;
+    }
+
+    @media (min-width: 840px) {
+      .hero-subtitle {
+        white-space: nowrap;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-subtitle {
+        font-size: 0.9rem;
+        line-height: 1.48;
+        margin-bottom: 1.85rem;
+        padding: 0 0.25rem;
+      }
+    }
+
+    /* ==========================================================================
+       CTA GROUP: GOOGLE BUTTON + TEXT BUTTON
+       ========================================================================== */
+    .hero-cta-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hero-cta-group {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+      z-index: 2;
+    }
+    @media (max-width: 540px) {
+      .hero-cta-group {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        max-width: 320px;
+      }
+    }
+
+    /* Solid Dark Button (Sign up with Google) */
+    .btn-attio-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-fg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.75rem 1.65rem;
+      border-radius: 12px;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.08);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @media (max-width: 540px) {
+      .btn-attio-primary {
+        width: 100%;
+        padding: 0.8rem 1.4rem;
+        font-size: 0.95rem;
+      }
+    }
+    .btn-attio-primary:hover {
+      background: var(--btn-primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px -2px rgba(0, 0, 0, 0.24);
+    }
+    .btn-attio-primary:active {
+      transform: translateY(0);
+    }
+
+    .google-icon-wrapper {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .google-icon-wrapper svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Text Button: Connect with founder */
+    .btn-text-founder {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      background: transparent;
+      color: var(--text-primary);
+      border: 1.5px solid transparent;
+      padding: 0.75rem 1.15rem;
+      border-radius: 12px;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 550;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @media (max-width: 540px) {
+      .btn-text-founder {
+        width: 100%;
+        padding: 0.65rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+    .btn-text-founder:hover {
+      color: var(--text-primary);
+      background: var(--bg-subtle);
+      border-color: var(--border);
+      transform: translateY(-1px);
+    }
+    .btn-text-founder:active {
+      transform: translateY(0);
+    }
+    .btn-text-founder svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      transition: transform 0.15s ease;
+      flex-shrink: 0;
+    }
+    .btn-text-founder:hover svg {
+      transform: translateX(3px);
+    }
+
+    /* ==========================================================================
+       ARTISTIC SCRIBBLE HIGHLIGHTED TRUST ROW
+       ========================================================================== */
+    .artistic-trust-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      margin-top: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 640px) {
+      .artistic-trust-container {
+        gap: 0.85rem 1.15rem;
+        margin-top: 1.75rem;
+        font-size: 0.8125rem;
+      }
+    }
+
+    /* Hand-Drawn Doodle Pointer Arrow pointing from left of Free Forever towards Google Button */
+    .scribble-arrow-indicator {
+      position: absolute;
+      right: calc(100% + 4px);
+      bottom: 8px;
+      display: none;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @media (min-width: 768px) {
+      .scribble-arrow-indicator {
+        display: block;
+      }
+    }
+    .scribble-arrow-indicator svg {
+      width: 46px;
+      height: 32px;
+      stroke: var(--text-primary);
+      opacity: 0.8;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.05));
+    }
+
+    /* Scribble Highlight Wrapper for "Free forever" */
+    .scribble-highlight-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.2rem 0.75rem;
+      transform: rotate(-1.5deg);
+      user-select: none;
+    }
+
+    .scribble-text {
+      font-family: var(--font-scribble);
+      font-size: 1.42rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.28rem;
+      position: relative;
+      z-index: 2;
+    }
+    @media (max-width: 640px) {
+      .scribble-text {
+        font-size: 1.25rem;
+      }
+    }
+
+    .scribble-sparkle {
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    /* Organic Hand-Drawn Scribble Loop SVG */
+    .scribble-loop-svg {
+      position: absolute;
+      left: -9%;
+      top: -20%;
+      width: 118%;
+      height: 140%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .trust-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .trust-icon {
+      width: 15px;
+      height: 15px;
+      stroke: var(--text-primary);
+      opacity: 0.85;
+      flex-shrink: 0;
+    }
+    @media (max-width: 640px) {
+      .trust-icon {
+        width: 14px;
+        height: 14px;
+      }
+    }
+    .trust-divider {
+      width: 1px;
+      height: 14px;
+      background-color: var(--border);
+    }
+    @media (max-width: 480px) {
+      .trust-divider {
+        display: none;
+      }
+    }
+
+    /* ==========================================================================
+       PRICING SECTION: 50% COMPACT STREAMLINED ARCHITECTURE + RAZORPAY
+       ========================================================================== */
+    section.pricing-section {
+      padding: 4rem 0 5rem;
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border-subtle);
+      background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+    }
+
+    @media (max-width: 640px) {
+      section.pricing-section {
+        padding: 3rem 0 3.5rem;
+      }
+    }
+
+    .pricing-header {
+      text-align: center;
+      max-width: 780px;
+      margin: 0 auto 1.85rem;
+    }
+
+    .pricing-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 0.28rem 0.85rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      margin-bottom: 1.15rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .pricing-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4.2vw, 3.15rem);
+      font-weight: 550;
+      letter-spacing: -0.035em;
+      color: var(--text-primary);
+      line-height: 1.15;
+      margin-bottom: 0.85rem;
+    }
+
+    .pricing-subtitle {
+      font-family: var(--font-sans);
+      font-size: clamp(0.85rem, 1.2vw, 1.02rem);
+      color: var(--text-secondary);
+      line-height: 1.55;
+      font-weight: 400;
+    }
+
+    .pricing-subtitle .highlight-blue {
+      color: #4f46e5;
+      font-weight: 600;
+    }
+
+    /* Centered Billing Frequency Switcher & Doodle Annotation (Sticky on Scroll) */
+    .pricing-toggle-container {
+      position: sticky;
+      top: 1rem;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      padding: 0.35rem 0;
+      pointer-events: auto;
+    }
+
+    .pricing-toggle-group {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(244, 244, 245, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 4px;
+      border-radius: 9999px;
+      border: 1px solid rgba(228, 228, 231, 0.9);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .toggle-btn {
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 0.38rem 1.15rem;
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toggle-btn.active {
+      background: #09090b;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Hand-drawn save note with curved arrow pointing to Annual */
+    .toggle-doodle-note {
+      position: absolute;
+      left: calc(50% + 110px);
+      top: -4px;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-scribble);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.1;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    @media (max-width: 720px) {
+      .toggle-doodle-note {
+        display: none;
+      }
+    }
+
+    .toggle-doodle-note svg {
+      width: 28px;
+      height: 18px;
+      stroke: var(--text-primary);
+      transform: rotate(-10deg);
+    }
+
+    /* ROW 1: Free Forever + India Only Plan (2 Columns - Ultra Compact) */
+    .pricing-row-top {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 768px) {
+      .pricing-row-top {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+    }
+
+    /* ROW 2: Global 3-Tier Grid (3 Columns - Compact) */
+    .pricing-row-bottom {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.15rem;
+      align-items: stretch;
+      margin-bottom: 2.75rem;
+    }
+
+    @media (max-width: 960px) {
+      .pricing-row-bottom {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+
+    /* Card Architecture - 50% Height Reduction */
+    .p-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem 1.35rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .p-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    /* India Only Plan Warm Cream Styling */
+    .p-card.card-india {
+      background: #fffdfa;
+      border: 1px solid #fde68a;
+      box-shadow: 0 2px 12px rgba(245, 158, 11, 0.03);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* India Only Plan Disabled in Monthly Mode */
+    .p-card.card-india.card-india-disabled {
+      opacity: 0.42;
+      filter: grayscale(0.5);
+      background: #fafafa;
+      border-color: var(--border);
+      box-shadow: none;
+    }
+
+    .p-card.card-india.card-india-disabled:hover {
+      transform: none;
+      border-color: var(--border);
+      box-shadow: none;
+    }
+
+    .p-card.card-india.card-india-disabled .card-btn-primary {
+      background: #52525b;
+      border-color: #52525b;
+      color: #f4f4f5;
+    }
+
+    /* Pro Plan Highlighted */
+    .p-card.card-popular {
+      border: 2px solid #09090b;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+    }
+
+    .p-card.card-popular .popular-banner {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #09090b;
+      color: #ffffff;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.65rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      white-space: nowrap;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Card Top Header Element (Super Tight) */
+    .card-header-top {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .card-icon-round {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #f4f4f5;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .card-icon-round svg {
+      width: 14px;
+      height: 14px;
+      stroke: #6366f1;
+    }
+
+    .card-icon-round.icon-purple {
+      background: #f3e8ff;
+    }
+    .card-icon-round.icon-purple svg {
+      stroke: #7e22ce;
+    }
+
+    .card-icon-round.icon-blue {
+      background: #eff6ff;
+    }
+    .card-icon-round.icon-blue svg {
+      stroke: #2563eb;
+    }
+
+    .card-icon-round.icon-india {
+      background: #ffffff;
+      font-size: 1rem;
+      border: 1px solid #fed7aa;
+    }
+
+    .card-tag {
+      font-size: 0.625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.1rem 0.45rem;
+      background: #f4f4f5;
+      border-radius: 5px;
+      color: var(--text-secondary);
+    }
+
+    .card-tag.tag-india {
+      background: #fed7aa;
+      color: #9a3412;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.18rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 0.15rem;
+    }
+
+    .card-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.35;
+      margin-bottom: 0.65rem;
+    }
+
+    /* Price Display (Tight) */
+    .card-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.15rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .card-currency {
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-price-num {
+      font-family: var(--font-mono);
+      font-size: 1.95rem;
+      font-weight: 750;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .card-period {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-left: 0.2rem;
+    }
+
+    .card-annual-badge-row {
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+    }
+
+    .card-annual-total {
+      color: var(--text-tertiary);
+    }
+
+    .discount-pill {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      background: #ede9fe;
+      color: #5b21b6;
+      padding: 0.08rem 0.45rem;
+      border-radius: 9999px;
+    }
+
+    .discount-pill.pill-orange {
+      background: #ffedd5;
+      color: #c2410c;
+    }
+
+    /* 2-Column Grid for Top Cards Features (Super Compact) */
+    .card-features-grid-2col {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem 0.85rem;
+      margin-bottom: 1rem;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 0.75rem;
+    }
+
+    @media (max-width: 580px) {
+      .card-features-grid-2col {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+      }
+    }
+
+    /* Single-Column Tight Features for 3-tier Cards */
+    .card-features-list-tight {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.38rem;
+      margin-bottom: 1rem;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 0.75rem;
+    }
+
+    .card-feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.45rem;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.35;
+    }
+
+    .card-feature-item svg {
+      width: 13px;
+      height: 13px;
+      stroke: var(--text-primary);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .card-feature-item strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Card Action Button (Compact) */
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      width: 100%;
+      padding: 0.58rem 1rem;
+      border-radius: 10px;
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-btn-primary {
+      background: #09090b;
+      color: #ffffff;
+      border: 1px solid #09090b;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-btn-primary:hover {
+      background: #1c1d22;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.14);
+    }
+
+    .card-btn-outline {
+      background: #ffffff;
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+    }
+
+    .card-btn-outline:hover {
+      background: #fafafa;
+      border-color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+
+    .card-footer-note {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      margin-top: 0.4rem;
+    }
+
+    /* Trust Guarantee Strip */
+    .pricing-trust-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.75rem;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      padding: 0.5rem 0 2.5rem;
+    }
+
+    .trust-strip-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .trust-strip-item svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--text-primary);
+    }
+
+    /* Bottom Testimonial + Ready to Build Card (Compact) */
+    .pricing-testimonial-cta {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem 1.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    @media (max-width: 880px) {
+      .pricing-testimonial-cta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.35rem;
+        padding: 1.35rem;
+      }
+      .testimonial-cta-right {
+        width: 100%;
+      }
+      .testimonial-cta-right a {
+        width: 100%;
+      }
+    }
+
+    .testimonial-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      flex: 1;
+    }
+
+    .quote-icon-badge {
+      width: 36px;
+      height: 36px;
+      background: #ede9fe;
+      color: #6d28d9;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .quote-icon-badge svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .quote-text-wrap blockquote {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.45;
+      margin-bottom: 0.45rem;
+    }
+
+    .quote-author {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .author-avatar {
+      width: 22px;
+      height: 22px;
+      background: #e0e7ff;
+      color: #3730a3;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .author-info {
+      font-size: 0.74rem;
+    }
+
+    .author-name {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .author-title {
+      color: var(--text-tertiary);
+    }
+
+    .testimonial-cta-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.45rem;
+      min-width: 260px;
+    }
+
+    .cta-heading {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .cta-sub {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.15rem;
+    }
+
+    /* ==========================================================================
+       FOOTER: ULTRA MINIMAL
+       ========================================================================== */
+    footer.site-footer {
+      padding: 2rem 0;
+      font-size: 0.8125rem;
+      color: var(--text-tertiary);
+      text-align: center;
+      font-family: var(--font-sans);
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg);
+    }
   </style>
 </head>
 <body>
-  <nav>
-    <a href="#" class="nav-logo">
-      <div class="nav-logo-mark">
-        <svg viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" width="14" height="14">
-          <rect x="1" y="1" width="12" height="12" rx="2"/><path d="M4 7h6M4 4.5h4M4 9.5h3"/>
-        </svg>
-      </div>
-      Cora
-    </a>
-    <div class="nav-right">
-      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-        <svg id="icon-sun" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16" style="display:none"><circle cx="10" cy="10" r="4"/><path d="M10 2v1M10 17v1M2 10h1M17 10h1M4.22 4.22l.71.71M14.36 14.36l.71.71M4.22 15.78l.71-.71M14.36 5.64l.71-.71"/></svg>
-        <svg id="icon-moon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M17.5 12A7.5 7.5 0 0 1 8 2.5a7.5 7.5 0 1 0 9.5 9.5z"/></svg>
-      </button>
-      <a href="#demo" class="nav-cta">Book Demo</a>
-    </div>
-  </nav>
 
-  <div class="live-banner">
-    <span class="live-dot"></span>
-    <span>Building in public — 7-day YouTube live series starts June 30, 2026.</span>
-    <a href="https://www.youtube.com" target="_blank">Watch live →</a>
-  </div>
+  <!-- Ambient Mesh Background -->
+  <div class="bg-ambient"></div>
 
-  <main>
-    <section class="hero">
-      <div class="container-narrow">
-        <div class="hero-eyebrow">
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><polygon points="7,1 9,5.5 13,5.5 9.8,8.4 11,13 7,10.5 3,13 4.2,8.4 1,5.5 5,5.5"/></svg>
-          Built in public — June 30 to July 6, 2026
-        </div>
-        <h1>The platform your real estate agency <em>actually</em> deserves</h1>
-        <p class="hero-sub">Stop managing crores of inventory on WhatsApp and spreadsheets. Cora is a purpose-built studio for Indian real estate teams — leads, listings, clients, and AI-powered follow-ups in one place.</p>
-        <div class="hero-actions">
-          <a href="#demo" class="btn-primary">
-            Book a Free Demo
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
-          </a>
-          <a href="https://www.youtube.com" target="_blank" class="btn-secondary">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><polygon points="5,3 13,8 5,13"/></svg>
-            Watch Live Build
+  <!-- Minimalist Header (Brand + Pricing Link + Get Started Button) -->
+  <header class="site-header">
+    <div class="container">
+      <div class="nav-inner">
+        <!-- Brand Logo -->
+        <a href="https://heycora.in" class="brand-logo" aria-label="Cora">
+          <div class="brand-mark">
+            <svg viewBox="0 0 16 16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="12" height="12" rx="3.5" />
+              <path d="M5 8h6M5 5.5h4M5 10.5h3" />
+            </svg>
+          </div>
+          <span>Cora</span>
+        </a>
+
+        <!-- Header Actions: Pricing Anchor + Get Started Button -->
+        <div class="header-actions">
+          <a href="#pricing" class="nav-link-pricing">Pricing</a>
+          <a href="https://app.heycora.in/workspace" class="btn-header-get-started" aria-label="Get started for free with Cora">
+            <span>Get started for free</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 13px; height: 13px; margin-left: 2px;">
+              <path d="M6 3l5 5-5 5" />
+            </svg>
           </a>
         </div>
       </div>
-    </section>
+    </div>
+  </header>
 
-    <div class="client-strip">
-      <div class="container">
-        <p>Built live with</p>
-        <div class="client-name">
-          <span class="client-badge">WVIN Wealth Infra &amp; Ventures LLP</span>
-          <span style="font-size:.8rem;color:var(--text-tertiary)">Saurabh Bansal — Gurgaon, NCR</span>
+  <!-- Hero Section -->
+  <main class="site-main">
+    <div class="container">
+      <div class="hero-container">
+        
+        <!-- Top Announcement Pill (BETA) -->
+        <div>
+          <a href="https://app.heycora.in/workspace" class="announcement-pill">
+            <span class="pill-badge">BETA</span>
+            <span>Introducing Cora 2.4</span>
+            <svg class="pill-arrow" viewBox="0 0 16 16" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3l5 5-5 5" />
+            </svg>
+          </a>
         </div>
+
+        <!-- Headline with Official AI Logos and Brush Highlight -->
+        <h1 class="hero-title">
+          <span class="hero-title-line">
+            The AI workspace
+            <svg class="ai-logos-official-svg" width="134" height="55" viewBox="0 0 134 55" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="OpenAI, Anthropic Claude, and Google Gemini Models">
+              <g filter="url(#filter0_d_49_2401)">
+                <path d="M81 26.5C81 11.8645 92.8645 0 107.5 0V0C122.136 0 134 11.8645 134 26.5V26.5C134 41.1355 122.136 53 107.5 53V53C92.8645 53 81 41.1355 81 26.5V26.5Z" fill="white" fill-opacity="0.01" shape-rendering="crispEdges"/>
+                <g clip-path="url(#clip0_49_2401)">
+                  <path d="M106.44 34.5825C107.147 36.1946 107.5 37.9171 107.5 39.75C107.5 37.9171 107.842 36.1946 108.527 34.5825C109.234 32.9704 110.183 31.5681 111.376 30.3756C112.568 29.1831 113.97 28.2446 115.582 27.56C117.195 26.8533 118.917 26.5 120.75 26.5C118.917 26.5 117.195 26.1577 115.582 25.4731C114.013 24.7966 112.586 23.8301 111.376 22.6244C110.17 21.4138 109.203 19.9865 108.527 18.4175C107.842 16.8054 107.5 15.0829 107.5 13.25C107.5 15.0829 107.147 16.8054 106.44 18.4175C105.755 20.0296 104.817 21.4319 103.624 22.6244C102.414 23.8301 100.987 24.7966 99.4175 25.4731C97.8054 26.1577 96.0829 26.5 94.25 26.5C96.0829 26.5 97.8054 26.8533 99.4175 27.56C101.03 28.2446 102.432 29.1831 103.624 30.3756C104.817 31.5681 105.755 32.9704 106.44 34.5825Z" fill="#155DFC"/>
+                </g>
+              </g>
+              <g filter="url(#filter1_d_49_2401)">
+                <path d="M38 26.5C38 11.8645 49.8645 0 64.5 0V0C79.1355 0 91 11.8645 91 26.5V26.5C91 41.1355 79.1355 53 64.5 53V53C49.8645 53 38 41.1355 38 26.5V26.5Z" fill="#FFFBEB" fill-opacity="0.7" shape-rendering="crispEdges"/>
+                <g clip-path="url(#clip1_49_2401)">
+                  <path d="M56.4552 30.8675L61.664 27.9447L61.7512 27.69L61.664 27.5492H61.4093L60.5377 27.4955L57.5614 27.415L54.9804 27.3078L52.4799 27.1738L51.8497 27.0396L51.2598 26.2621L51.3201 25.8732L51.8497 25.5178L52.6072 25.585L54.2832 25.6989L56.7971 25.8732L58.6205 25.9805L61.3221 26.2621H61.7512L61.8115 26.0877L61.664 25.9805L61.55 25.8732L58.9491 24.1101L56.1334 22.2464L54.6587 21.1738L53.861 20.6308L53.4587 20.1213L53.2845 19.0086L54.0085 18.2108L54.9805 18.2778L55.2285 18.3448L56.2139 19.1023L58.3189 20.7314L61.0675 22.756L61.4698 23.0911L61.6307 22.9772L61.6507 22.8968L61.4697 22.595L59.9747 19.8934L58.3792 17.1448L57.6687 16.0053L57.481 15.3214C57.4139 15.0399 57.367 14.8053 57.367 14.517L58.1916 13.3974L58.6473 13.25L59.7467 13.3975L60.2094 13.7997L60.8931 15.3617L61.9992 17.822L63.7154 21.1672L64.2182 22.1593L64.4864 23.0777L64.5868 23.3593H64.7612V23.1984L64.902 21.3147L65.1634 19.0018L65.4182 16.0253L65.5053 15.1874L65.9209 14.1818L66.7455 13.6388L67.389 13.9472L67.9187 14.7046L67.8449 15.1941L67.5299 17.2387L66.9131 20.4431L66.5108 22.5884H66.7455L67.0137 22.3202L68.0996 20.8789L69.9231 18.5996L70.7275 17.6946L71.6661 16.6958L72.2694 16.2198H73.409L74.2471 17.4667L73.8717 18.7538L72.6985 20.242L71.7264 21.5023L70.332 23.3794L69.4605 24.8811L69.541 25.0018L69.7488 24.9815L72.8996 24.3113L74.6023 24.0028L76.6335 23.6542L77.552 24.0833L77.6524 24.519L77.2905 25.4106L75.1186 25.9469L72.5711 26.4564L68.7767 27.3547L68.7298 27.3883L68.7834 27.4553L70.4929 27.6162L71.2236 27.6564H73.0135L76.3453 27.9045L77.2167 28.4809L77.7397 29.1849L77.6524 29.7212L76.3118 30.405L74.5017 29.9759L70.2783 28.9704L68.8304 28.6083H68.6292V28.729L69.8359 29.9089L72.0481 31.9066L74.8168 34.4808L74.9576 35.1177L74.6023 35.6205L74.2269 35.5669L71.7934 33.7367L70.8549 32.9121L68.7298 31.1223H68.589V31.31L69.0784 32.0272L71.6661 35.9154L71.8001 37.1087L71.6124 37.4975L70.9421 37.7321L70.2046 37.5981L68.6896 35.473L67.1276 33.0797L65.8673 30.9346L65.7131 31.0218L64.9689 39.0327L64.6204 39.4416L63.8159 39.75L63.1456 39.2405L62.7902 38.4159L63.1456 36.787L63.5746 34.6619L63.9232 32.9725L64.2383 30.8742L64.426 30.177L64.4126 30.1301L64.2583 30.1502L62.6763 32.3223L60.2697 35.5736L58.3657 37.6114L57.9099 37.7925L57.1189 37.3835L57.1926 36.6528L57.6351 36.0026L60.2697 32.6506L61.8584 30.5726L62.8842 29.3726L62.8774 29.1983H62.8171L55.8183 33.7434L54.5714 33.9043L54.0351 33.4015L54.1022 32.577L54.357 32.3088L56.4619 30.8608L56.4552 30.8675Z" fill="#E17100"/>
+                </g>
+              </g>
+              <g filter="url(#filter2_d_49_2401)">
+                <path d="M0 26.5C0 11.8645 11.8645 0 26.5 0V0C41.1355 0 53 11.8645 53 26.5V26.5C53 41.1355 41.1355 53 26.5 53V53C11.8645 53 0 41.1355 0 26.5V26.5Z" fill="#ECFDF5" fill-opacity="0.7" shape-rendering="crispEdges"/>
+                <path d="M23.4134 22.8098V20.3144C23.4134 20.1046 23.4929 19.9467 23.6762 19.8418L28.6925 16.9533C29.3759 16.5591 30.1897 16.3758 31.03 16.3758C34.1813 16.3758 36.1776 18.8182 36.1776 21.4174C36.1776 21.6018 36.1776 21.8116 36.1511 22.0214L30.9505 18.975C30.8092 18.8851 30.6453 18.8374 30.4779 18.8374C30.3105 18.8374 30.1465 18.8851 30.0053 18.975L23.4134 22.8098ZM35.1275 32.5265V26.5662C35.1275 26.1985 34.9696 25.9368 34.6538 25.7524L28.062 21.9176L30.2151 20.6832C30.2931 20.6318 30.3845 20.6045 30.4779 20.6045C30.5713 20.6045 30.6627 20.6318 30.7407 20.6832L35.7569 23.5728C37.2023 24.4119 38.1739 26.1985 38.1739 27.932C38.1739 29.9284 36.9925 31.7668 35.1264 32.5287L35.1275 32.5265ZM21.8643 27.2761L19.7112 26.0152C19.5268 25.9103 19.4473 25.7524 19.4473 25.5426V19.7634C19.4473 16.9533 21.6004 14.8256 24.5165 14.8256C25.6207 14.8256 26.6442 15.1932 27.511 15.8502L22.3369 18.8447C22.0222 19.028 21.8643 19.2908 21.8643 19.6585V27.275V27.2761ZM26.4996 29.9538L23.4134 28.2202V24.5433L26.4996 22.8098L29.5857 24.5433V28.2202L26.4996 29.9538ZM28.4827 37.9369C27.3785 37.9369 26.3549 37.5703 25.4882 36.9133L30.6623 33.9188C30.977 33.7355 31.1349 33.4727 31.1349 33.105V25.4885L33.3145 26.7495C33.4989 26.8544 33.5773 27.0123 33.5773 27.222V33.0001C33.5773 35.8102 31.3977 37.9369 28.4827 37.9369ZM22.2585 32.0815L17.2411 29.1919C15.7969 28.3516 14.8252 26.5662 14.8252 24.8326C14.8218 23.8476 15.1124 22.884 15.6599 22.0651C16.2073 21.2463 16.9866 20.6094 17.8981 20.236V26.2239C17.8981 26.5916 18.056 26.8544 18.3707 27.0387L24.9372 30.847L22.7841 32.0815C22.7061 32.6096 22.6147 32.8911 22.5213 32.8911C22.4278 32.8911 22.3365 32.6096 22.2585 32.0815ZM21.9692 36.3877C19.0012 36.3877 16.8216 34.1562 16.8216 31.398C16.8216 31.1882 16.8481 30.9784 16.8735 30.7686L22.0476 33.7609C22.3634 33.9453 22.6781 33.9453 22.9927 33.7609L29.5846 29.9538V32.4492C29.5846 32.659 29.5073 32.8169 29.3229 32.9218L24.3067 35.8102C23.6232 36.2044 22.8095 36.3877 21.9692 36.3877Z" fill="#009966"/>
+              </g>
+              <defs>
+                <filter id="filter0_d_49_2401" x="81" y="0" width="53" height="54.6562" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                  <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                  <feOffset dy="1.65625"/>
+                  <feComposite in2="hardAlpha" operator="out"/>
+                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0"/>
+                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_49_2401"/>
+                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_49_2401" result="shape"/>
+                </filter>
+                <filter id="filter1_d_49_2401" x="38" y="0" width="53" height="54.6562" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                  <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                  <feOffset dy="1.65625"/>
+                  <feComposite in2="hardAlpha" operator="out"/>
+                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0"/>
+                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_49_2401"/>
+                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_49_2401" result="shape"/>
+                </filter>
+                <filter id="filter2_d_49_2401" x="0" y="0" width="53" height="54.6562" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                  <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                  <feOffset dy="1.65625"/>
+                  <feComposite in2="hardAlpha" operator="out"/>
+                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0"/>
+                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_49_2401"/>
+                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_49_2401" result="shape"/>
+                </filter>
+                <clipPath id="clip0_49_2401">
+                  <rect width="26.5" height="26.5" fill="white" transform="translate(94.25 13.25)"/>
+                </clipPath>
+                <clipPath id="clip1_49_2401">
+                  <rect width="26.5" height="26.5" fill="white" transform="translate(51.25 13.25)"/>
+                </clipPath>
+              </defs>
+            </svg>
+          </span>
+          <span class="hero-title-line">
+            built for ambitious <span class="highlight-wrapper">founders.<svg class="brush-underline" viewBox="0 0 240 18" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M 3 12 C 45 6, 120 4, 235 11 C 180 16, 95 15, 15 14" stroke="var(--highlight-brush)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/></svg></span>
+          </span>
+        </h1>
+
+        <!-- Subtitle (Strictly 1 Line on Desktop) -->
+        <p class="hero-subtitle">
+          Cora orchestrates your client pipelines, revenue workflows, and specialized AI agents in one hyper-focused command center.
+        </p>
+
+        <!-- CTA Area: Sign up with Google + Text Button Connect with founder -->
+        <div class="hero-cta-wrapper">
+          <div class="hero-cta-group">
+            <a href="https://app.heycora.in/workspace" class="btn-attio-primary" id="google-cta-btn">
+              <div class="google-icon-wrapper">
+                <svg viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.36 24 12 24z"/>
+                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                </svg>
+              </div>
+              <span>Sign up with Google</span>
+            </a>
+
+            <a href="mailto:dravya.bansal@heycora.in" class="btn-text-founder" id="founder-cta-btn" aria-label="Connect with founder">
+              <span>Connect with founder</span>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 3l5 5-5 5" />
+              </svg>
+            </a>
+          </div>
+
+          <!-- Artistic Scribble Highlighted Trust Row -->
+          <div class="artistic-trust-container">
+            
+            <!-- Hand-Drawn Doodle Pointer Arrow (Desktop) -->
+            <div class="scribble-arrow-indicator" aria-hidden="true">
+              <svg viewBox="0 0 54 38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M 4 28 C 12 32, 28 30, 36 12 C 38 6, 40 4, 40 2" />
+                <path d="M 32 3 L 41 2 L 40 11" />
+              </svg>
+            </div>
+
+            <!-- Scribble Highlight for "Free forever" -->
+            <div class="scribble-highlight-wrapper">
+              <span class="scribble-text">
+                <span class="scribble-sparkle">✦</span>
+                <span>free forever</span>
+              </span>
+              <!-- Organic Multi-loop SVG Scribble Oval -->
+              <svg class="scribble-loop-svg" viewBox="0 0 148 48" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M 16 25 C 24 9, 122 5, 136 18 C 146 29, 98 43, 22 40 C 9 39, 4 28, 18 16 C 32 4, 118 7, 134 16" stroke="var(--highlight-scribble)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+                <path d="M 12 30 C 35 44, 105 45, 138 28" stroke="var(--highlight-scribble)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+              </svg>
+            </div>
+
+            <div class="trust-divider"></div>
+
+            <!-- Feature 2 -->
+            <div class="trust-item">
+              <svg class="trust-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 2L4 11h5l-1 7 7-9h-5l1-7z" />
+              </svg>
+              <span>1-click setup</span>
+            </div>
+
+            <div class="trust-divider"></div>
+
+            <!-- Feature 3 -->
+            <div class="trust-item">
+              <svg class="trust-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="8" width="12" height="10" rx="2" />
+                <path d="M7 8V5a3 3 0 0 1 6 0v3" />
+              </svg>
+              <span>No credit card needed</span>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <section>
-      <div class="container">
-        <div class="series-header">
-          <p class="section-label">7-Day Public Build</p>
-          <h2 class="section-title">Watch us build it — every step, live on YouTube</h2>
-        </div>
-        <div class="day-grid">
-          <div class="day-card">
-            <div class="day-card-top"><span class="day-num">Day 1</span><span class="day-date">Jun 30</span></div>
-            <h3>Research + Architecture</h3>
-            <p>We break down the real problem — why Gurgaon agencies lose leads every day. Then we architect the full platform.</p>
-            <span class="day-tag">Research</span>
-          </div>
-          <div class="day-card">
-            <div class="day-card-top"><span class="day-num">Day 2</span><span class="day-date">Jul 1</span></div>
-            <h3>Live UI Design</h3>
-            <p>Design the full interface from scratch — sidebar, dashboard, property cards. No templates, every decision on camera.</p>
-            <span class="day-tag">Design</span>
-          </div>
-          <div class="day-card">
-            <div class="day-card-top"><span class="day-num">Day 3</span><span class="day-date">Jul 2</span></div>
-            <h3>Property Listings Module</h3>
-            <p>Build a full property management system — add, filter, track status across premium Gurgaon projects in real time.</p>
-            <span class="day-tag">Development</span>
-          </div>
-          <div class="day-card">
-            <div class="day-card-top"><span class="day-num">Day 4</span><span class="day-date">Jul 3</span></div>
-            <h3>Lead Pipeline</h3>
-            <p>Visual kanban pipeline from first enquiry through site visits to closed deals. End to WhatsApp chaos.</p>
-            <span class="day-tag">Development</span>
-          </div>
-          <div class="day-card">
-            <div class="day-card-top"><span class="day-num">Day 5</span><span class="day-date">Jul 4</span></div>
-            <h3>AI Follow-up Integration</h3>
-            <p>Integrate AI to draft personalised follow-up messages for every lead at every stage — in under 2 seconds.</p>
-            <span class="day-tag">AI</span>
-          </div>
-          <div class="day-card">
-            <div class="day-card-top"><span class="day-num">Day 6</span><span class="day-date">Jul 5</span></div>
-            <h3>Testing &amp; Polish</h3>
-            <p>Live QA, bug fixes, mobile responsiveness, and final polish. We break our own product on camera — then fix it.</p>
-            <span class="day-tag">QA</span>
-          </div>
-          <div class="day-card" style="border-color:var(--border-strong)">
-            <div class="day-card-top"><span class="day-num">Day 7</span><span class="day-date">Jul 6</span></div>
-            <h3>Full Demo — Live with WVIN</h3>
-            <p>Complete walkthrough with Saurabh Bansal from WVIN Wealth Infra, Gurgaon. Then agency onboarding opens.</p>
-            <span class="day-tag">Demo Day</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="features-bg">
-      <div class="container">
-        <div class="series-header">
-          <p class="section-label">Platform Features</p>
-          <h2 class="section-title">Everything a real estate team needs</h2>
-        </div>
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon"><svg viewBox="0 0 20 20" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M3 7L10 2L17 7V18H12V13H8V18H3V7Z"/></svg></div>
-            <h3>Property Listings</h3>
-            <p>Manage your entire inventory — type, price, status, location, floor plans. Filter in real time across all projects.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"><svg viewBox="0 0 20 20" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg></div>
-            <h3>Visual Lead Pipeline</h3>
-            <p>Kanban view from enquiry to site visit to closed. Every lead tracked, nothing falls through the cracks.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"><svg viewBox="0 0 20 20" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><circle cx="10" cy="6" r="4"/><path d="M3 18c0-4 3.13-7 7-7s7 3 7 7"/></svg></div>
-            <h3>Client Profiles</h3>
-            <p>Every client's contact info, property interests, site visits, notes, and full communication history in one place.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"><svg viewBox="0 0 20 20" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M4 2h12a1 1 0 0 1 1 1v14l-4-2H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M7 8h6M7 11h4"/></svg></div>
-            <h3>AI Follow-up Drafts</h3>
-            <p>One click generates a personalized follow-up based on the lead's stage, interests, and interaction history.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"><svg viewBox="0 0 20 20" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><rect x="2" y="2" width="16" height="16" rx="2"/><path d="M7 10l2 2 4-4"/></svg></div>
-            <h3>Agency Dashboard</h3>
-            <p>Live metrics — active leads, properties, follow-ups due today, team activity. Your whole business at a glance.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"><svg viewBox="0 0 20 20" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M2 8h16M7 3v5M13 3v5"/></svg></div>
-            <h3>Site Visit Tracking</h3>
-            <p>Schedule, confirm, and log site visits as a dedicated stage. Every visit tied to a lead and a property.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="form-section" id="demo">
-      <div class="container-narrow">
-        <p class="section-label">Get Early Access</p>
-        <h2 class="section-title">Book a free 20-minute demo</h2>
-        <p style="color:var(--text-secondary);margin-top:8px;font-size:.9rem">We'll walk you through the full platform and discuss exactly what Cora can do for your agency.</p>
-        <div class="form-card">
-          <h2>Request a Demo</h2>
-          <p>First 3 agencies get the platform set up free — in exchange for a live testimonial.</p>
-          <form id="demo-form" novalidate>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="field-name">Your Name</label>
-                <input type="text" id="field-name" placeholder="Saurabh Bansal" required />
-              </div>
-              <div class="form-group">
-                <label for="field-phone">Phone Number</label>
-                <input type="tel" id="field-phone" placeholder="+91 98765 43210" required />
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="field-agency">Agency Name</label>
-              <input type="text" id="field-agency" placeholder="WVIN Wealth Infra" required />
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="field-city">City</label>
-                <input type="text" id="field-city" placeholder="Gurgaon" required />
-              </div>
-              <div class="form-group">
-                <label for="field-size">Team Size</label>
-                <select id="field-size">
-                  <option value="">Select</option>
-                  <option>1–3 agents</option>
-                  <option>4–10 agents</option>
-                  <option>11–25 agents</option>
-                  <option>25+ agents</option>
-                </select>
-              </div>
-            </div>
-            <button type="submit" class="form-submit" id="submit-btn">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14" stroke-linecap="round"><path d="M2 8h12M9 4l5 4-5 4"/></svg>
-              Book My Demo
-            </button>
-          </form>
-          <p class="form-disclaimer">No spam. No calls from strangers. Just a real conversation about your agency.</p>
-        </div>
-      </div>
-    </section>
   </main>
 
-  <footer>
+  <!-- ==========================================================================
+       PRICING SECTION: 50% COMPACT PRODUCTION LAYOUT + RAZORPAY INTEGRATION
+       ========================================================================== -->
+  <section id="pricing" class="pricing-section">
     <div class="container">
-      <p>© 2026 Cora for Real Estate. Built live on YouTube, Jun 30 – Jul 6. &nbsp;·&nbsp; <a href="https://www.youtube.com" target="_blank">Watch the Series</a></p>
+      
+      <!-- Section Header -->
+      <div class="pricing-header">
+        <div class="pricing-kicker">Pricing</div>
+        <h2 class="pricing-title">
+          Simple, transparent pricing.
+        </h2>
+        <p class="pricing-subtitle">
+          Start for free. Upgrade when you need more power.<br />
+          Annual plans get <span class="highlight-blue">2 months free.</span>
+        </p>
+      </div>
+
+      <!-- Centered Monthly / Annual Switcher + Hand-drawn Arrow Note -->
+      <div class="pricing-toggle-container">
+        <div class="pricing-toggle-group" id="billing-toggle">
+          <button type="button" class="toggle-btn" data-billing="monthly" id="btn-billing-monthly">
+            Monthly
+          </button>
+          <button type="button" class="toggle-btn active" data-billing="annual" id="btn-billing-annual">
+            Annual
+          </button>
+        </div>
+
+        <!-- Doodle Arrow with "Save up to 16% + 2 months free" -->
+        <div class="toggle-doodle-note" aria-hidden="true">
+          <svg viewBox="0 0 45 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 40 22 C 30 26, 12 24, 6 10 C 5 7, 4 4, 3 2" />
+            <path d="M 12 4 L 3 2 L 4 11" />
+          </svg>
+          <div>
+            <span>Save up to 16%</span><br />
+            <span style="color: #6366f1;">+ 2 months free</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 1: Free Forever (For Everyone) + India Only Plan (2 Columns - 50% Compact) -->
+      <div class="pricing-row-top">
+        
+        <!-- Card 1: Free Forever -->
+        <div class="p-card">
+          <div>
+            <div class="card-header-top">
+              <div class="card-icon-round icon-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
+              <span class="card-tag">For Everyone</span>
+            </div>
+
+            <h3 class="card-title">Free Forever</h3>
+            <p class="card-desc">For individuals exploring and building with AI.</p>
+
+            <div class="card-price-row">
+              <span class="card-currency">$</span>
+              <span class="card-price-num">0</span>
+              <span class="card-period">/ forever</span>
+            </div>
+
+            <div class="card-annual-badge-row">
+              <span class="card-annual-total">Free for early adopters</span>
+            </div>
+
+            <!-- Compact 2-Column Features Grid -->
+            <ul class="card-features-grid-2col">
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>Core AI Models</strong> (Gemini & GPT-4o mini)</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Smart Document Vault</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>1,000</strong> AI Agent Runs / mo</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Community & Discord</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>Unlimited</strong> Client Funnels</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Early feature access</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="https://app.heycora.in/workspace" class="card-btn card-btn-outline">
+              <span>Get Started Free →</span>
+            </a>
+            <div class="card-footer-note">No credit card required</div>
+          </div>
+        </div>
+
+        <!-- Card 2: India Only Plan -->
+        <div class="p-card card-india" id="card-india-plan">
+          <div>
+            <div class="card-header-top">
+              <div class="card-icon-round card-icon-round.icon-india">
+                <span>🇮🇳</span>
+              </div>
+              <span class="card-tag tag-india">India Only</span>
+            </div>
+
+            <h3 class="card-title">India Only Plan</h3>
+            <p class="card-desc">All Pro features for Indian founders & solo builders.</p>
+
+            <div class="card-price-row">
+              <span class="card-currency">₹</span>
+              <span class="card-price-num">499</span>
+              <span class="card-period">/ month</span>
+            </div>
+
+            <div class="card-annual-badge-row">
+              <span class="discount-pill pill-orange" id="india-plan-badge">Billed annually (₹4,999 / year)</span>
+            </div>
+
+            <!-- Compact 2-Column Features Grid -->
+            <ul class="card-features-grid-2col">
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>All Pro Features</strong> Included</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>2,500</strong> AI Agent Runs / mo</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>UPI, NetBanking & RuPay</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Priority WhatsApp Support</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>Full GST Invoicing</strong> (B2B)</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Indian Rupee Direct Billing</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <button type="button" class="card-btn card-btn-primary" id="btn-pay-india" onclick="handleRazorpayPay('india_only')">
+              <span id="india-btn-label">Get India Plan →</span>
+            </button>
+            <div class="card-footer-note" id="india-footer-note">Annual billing only</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ROW 2: Starter, Pro, Scale (3 Columns - Compact) -->
+      <div class="pricing-row-bottom">
+        
+        <!-- Starter Plan ($9/mo) -->
+        <div class="p-card" data-plan="starter">
+          <div>
+            <div class="card-header-top">
+              <div class="card-icon-round icon-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <span class="card-tag">Starter</span>
+            </div>
+
+            <h3 class="card-title">Starter</h3>
+            <p class="card-desc">For solo operators starting their journey.</p>
+
+            <div class="card-price-row">
+              <span class="card-currency">$</span>
+              <span class="card-price-num" id="starter-price">9</span>
+              <span class="card-period">/ month</span>
+            </div>
+
+            <div class="card-annual-badge-row">
+              <span class="card-annual-total" id="starter-annual-total">$108 / year</span>
+              <span class="discount-pill" id="starter-save-pill">Save $18 with annual</span>
+            </div>
+
+            <ul class="card-features-list-tight">
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Everything in <strong>Free</strong></span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>5,000</strong> AI Agent Runs / month</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Claude 3.5 Sonnet Access</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Custom Workspace Domain</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Standard Email & Chat Support</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <button type="button" class="card-btn card-btn-outline" onclick="handleRazorpayPay('starter')">
+              <span>Get Started →</span>
+            </button>
+            <div class="card-footer-note">Cancel anytime</div>
+          </div>
+        </div>
+
+        <!-- Pro Plan ($19/mo) — MOST POPULAR -->
+        <div class="p-card card-popular" data-plan="pro">
+          <div class="popular-banner">★ Most Popular</div>
+          <div>
+            <div class="card-header-top">
+              <div class="card-icon-round icon-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                  <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                  <path d="M9 12H4s.55-3.03 2-4.5c1.62-1.63 5-2 5-2"/>
+                  <path d="M12 15v5s3.03-.55 4.5-2c1.63-1.62 2-5 2-5"/>
+                </svg>
+              </div>
+              <span class="card-tag">Pro Studio</span>
+            </div>
+
+            <h3 class="card-title">Pro</h3>
+            <p class="card-desc">For growing teams needing more power & flexibility.</p>
+
+            <div class="card-price-row">
+              <span class="card-currency">$</span>
+              <span class="card-price-num" id="pro-price">19</span>
+              <span class="card-period">/ month</span>
+            </div>
+
+            <div class="card-annual-badge-row">
+              <span class="card-annual-total" id="pro-annual-total">$228 / year</span>
+              <span class="discount-pill" id="pro-save-pill">Save $38 with annual</span>
+            </div>
+
+            <ul class="card-features-list-tight">
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Everything in <strong>Starter</strong></span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>10,000</strong> AI Agent Runs / month</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>All Frontier Models</strong> (Claude, GPT-4o, Gemini)</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>3 Team Seats</strong> Included</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>GST Tax Breakdown & Invoicing</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <button type="button" class="card-btn card-btn-primary" onclick="handleRazorpayPay('pro')">
+              <span>Get Pro →</span>
+            </button>
+            <div class="card-footer-note">Cancel anytime</div>
+          </div>
+        </div>
+
+        <!-- Scale Plan ($39/mo) -->
+        <div class="p-card" data-plan="scale">
+          <div>
+            <div class="card-header-top">
+              <div class="card-icon-round icon-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 20V10M12 20V4M6 20v-6"/>
+                </svg>
+              </div>
+              <span class="card-tag">Scale & Agency</span>
+            </div>
+
+            <h3 class="card-title">Scale</h3>
+            <p class="card-desc">For agencies with high-volume operations.</p>
+
+            <div class="card-price-row">
+              <span class="card-currency">$</span>
+              <span class="card-price-num" id="scale-price">39</span>
+              <span class="card-period">/ month</span>
+            </div>
+
+            <div class="card-annual-badge-row">
+              <span class="card-annual-total" id="scale-annual-total">$468 / year</span>
+              <span class="discount-pill" id="scale-save-pill">Save $78 with annual</span>
+            </div>
+
+            <ul class="card-features-list-tight">
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Everything in <strong>Pro</strong></span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>Unlimited</strong> AI Executions</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span><strong>10 Team Seats</strong> Included</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Custom Fine-Tuned AI Personas</span>
+              </li>
+              <li class="card-feature-item">
+                <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10l3.5 3.5L15 6"/></svg>
+                <span>Dedicated Account Manager & 99.9% SLA</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <button type="button" class="card-btn card-btn-outline" onclick="handleRazorpayPay('scale')">
+              <span>Get Scale →</span>
+            </button>
+            <div class="card-footer-note">Cancel anytime</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Trust Guarantee Strip -->
+      <div class="pricing-trust-strip">
+        <div class="trust-strip-item">
+          <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="14" height="10" rx="2"/><path d="M3 9h14"/></svg>
+          <span>No credit card required</span>
+        </div>
+        <div class="trust-strip-item">
+          <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span>Switch, pause, or cancel anytime</span>
+        </div>
+        <div class="trust-strip-item">
+          <svg viewBox="0 0 20 20" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="12" height="10" rx="2" /><path d="M7 8V5a3 3 0 0 1 6 0v3" /></svg>
+          <span>Secure 256-bit SSL encrypted payments</span>
+        </div>
+      </div>
+
+      <!-- Bottom Testimonial + Ready to Build Card (Compact) -->
+      <div class="pricing-testimonial-cta">
+        <div class="testimonial-left">
+          <div class="quote-icon-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+            </svg>
+          </div>
+          <div class="quote-text-wrap">
+            <blockquote>
+              "Finally, an AI workspace that doesn't overcharge early builders. The free plan is actually useful."
+            </blockquote>
+            <div class="quote-author">
+              <div class="author-avatar">A</div>
+              <div class="author-info">
+                <span class="author-name">Ankit Sharma</span> &nbsp;·&nbsp; <span class="author-title">Founder, New Delhi</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-cta-right">
+          <h4 class="cta-heading">Ready to build your AI advantage?</h4>
+          <p class="cta-sub">Join thousands of builders already scaling with us.</p>
+          <a href="https://app.heycora.in/workspace" class="card-btn card-btn-primary" style="padding: 0.6rem 1.25rem;">
+            <span>Start Free Today →</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Minimal Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <span>© 2026 Claraverse. All rights reserved.</span>
     </div>
   </footer>
 
-  <div id="toast-container"></div>
-
+  <!-- Pricing Interactive Recalculator & Razorpay Live Payment Gateway Script -->
   <script>
-    const root=document.documentElement;
-    const toggle=document.getElementById('theme-toggle');
-    const iconSun=document.getElementById('icon-sun');
-    const iconMoon=document.getElementById('icon-moon');
-    let dark=window.matchMedia('(prefers-color-scheme: dark)').matches;
-    function applyTheme(){root.setAttribute('data-theme',dark?'dark':'light');iconSun.style.display=dark?'block':'none';iconMoon.style.display=dark?'none':'block'}
-    applyTheme();
-    toggle.addEventListener('click',()=>{dark=!dark;applyTheme()});
+    (function() {
+      var RAZORPAY_KEY = 'rzp_live_TRDi55lfKpnzCM';
+      var currentBilling = 'annual'; // Default is annual
+      var usdToInrRate = 87.0; // Reliable fallback
 
-    function showToast(msg,dur=4000){
-      const c=document.getElementById('toast-container');
-      const t=document.createElement('div');
-      t.className='toast';
-      t.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M5.5 8.5l2 2 3-3"/></svg>'+msg;
-      c.appendChild(t);
-      setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='opacity .3s,transform .3s';setTimeout(()=>t.remove(),300)},dur);
-    }
+      // Fetch live real-time USD/INR conversion rate
+      fetch('https://open.er-api.com/v6/latest/USD')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data && data.rates && data.rates.INR) {
+            usdToInrRate = parseFloat(data.rates.INR);
+          }
+        })
+        .catch(function(e) {
+          console.log('Using default exchange rate:', usdToInrRate);
+        });
 
-    document.getElementById('demo-form').addEventListener('submit',function(e){
-      e.preventDefault();
-      const name=document.getElementById('field-name').value.trim();
-      const phone=document.getElementById('field-phone').value.trim();
-      const agency=document.getElementById('field-agency').value.trim();
-      const city=document.getElementById('field-city').value.trim();
-      if(!name||!phone||!agency||!city){showToast('Please fill in all required fields');return}
-      const btn=document.getElementById('submit-btn');
-      btn.textContent='Submitting…';btn.disabled=true;
-      setTimeout(()=>{
-        btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><path d="M3 8.5l3 3 7-7"/></svg>Request Sent!';
-        showToast('Thanks '+name+'! We\'ll reach out within 24 hours.');
-        document.getElementById('demo-form').reset();
-        setTimeout(()=>{btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14" stroke-linecap="round"><path d="M2 8h12M9 4l5 4-5 4"/></svg>Book My Demo';btn.disabled=false},3000);
-      },1200);
-    });
+      var btnMonthly = document.getElementById('btn-billing-monthly');
+      var btnAnnual = document.getElementById('btn-billing-annual');
+
+      var starterAnnualTotal = document.getElementById('starter-annual-total');
+      var starterSavePill = document.getElementById('starter-save-pill');
+
+      var proAnnualTotal = document.getElementById('pro-annual-total');
+      var proSavePill = document.getElementById('pro-save-pill');
+
+      var scaleAnnualTotal = document.getElementById('scale-annual-total');
+      var scaleSavePill = document.getElementById('scale-save-pill');
+
+      var cardIndia = document.getElementById('card-india-plan');
+      var indiaBtnLabel = document.getElementById('india-btn-label');
+      var indiaPlanBadge = document.getElementById('india-plan-badge');
+      var indiaFooterNote = document.getElementById('india-footer-note');
+
+      function setBilling(isAnnual) {
+        currentBilling = isAnnual ? 'annual' : 'monthly';
+        if (isAnnual) {
+          btnAnnual.classList.add('active');
+          btnMonthly.classList.remove('active');
+
+          if (cardIndia) cardIndia.classList.remove('card-india-disabled');
+          if (indiaBtnLabel) indiaBtnLabel.textContent = 'Get India Plan →';
+          if (indiaPlanBadge) indiaPlanBadge.textContent = 'Billed annually (₹4,999 / year)';
+          if (indiaFooterNote) indiaFooterNote.textContent = 'Annual billing only';
+
+          starterAnnualTotal.textContent = '$90 / year';
+          starterSavePill.textContent = 'Save $18 with annual';
+          starterSavePill.style.display = 'inline-block';
+
+          proAnnualTotal.textContent = '$190 / year';
+          proSavePill.textContent = 'Save $38 with annual';
+          proSavePill.style.display = 'inline-block';
+
+          scaleAnnualTotal.textContent = '$390 / year';
+          scaleSavePill.textContent = 'Save $78 with annual';
+          scaleSavePill.style.display = 'inline-block';
+        } else {
+          btnMonthly.classList.add('active');
+          btnAnnual.classList.remove('active');
+
+          if (cardIndia) cardIndia.classList.add('card-india-disabled');
+          if (indiaBtnLabel) indiaBtnLabel.textContent = 'Annual Only (Switch to Unlock) →';
+          if (indiaPlanBadge) indiaPlanBadge.textContent = 'Available on annual only';
+          if (indiaFooterNote) indiaFooterNote.textContent = 'Switch to Annual mode to unlock';
+
+          starterAnnualTotal.textContent = '$108 / year (monthly billed)';
+          starterSavePill.style.display = 'none';
+
+          proAnnualTotal.textContent = '$228 / year (monthly billed)';
+          proSavePill.style.display = 'none';
+
+          scaleAnnualTotal.textContent = '$468 / year (monthly billed)';
+          scaleSavePill.style.display = 'none';
+        }
+      }
+
+      if (btnMonthly && btnAnnual) {
+        btnMonthly.addEventListener('click', function() { setBilling(false); });
+        btnAnnual.addEventListener('click', function() { setBilling(true); });
+      }
+
+      // Monochromatic Custom Toast Alert
+      function showToast(msg) {
+        var toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#09090b;color:#ffffff;padding:10px 18px;border-radius:10px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.24);border:1px solid rgba(255,255,255,0.15);';
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(function() {
+          toast.style.transition = 'opacity 0.3s ease';
+          toast.style.opacity = '0';
+          setTimeout(function() { toast.remove(); }, 300);
+        }, 3500);
+      }
+
+      // Account First Onboarding Handler (Industry Standard Flow)
+      window.handleRazorpayPay = function(planType) {
+        if (planType === 'india_only' && currentBilling === 'monthly') {
+          setBilling(true);
+          showToast('Switched to Annual mode for the India Only plan. Click again to continue.');
+          return;
+        }
+
+        var billingParam = currentBilling === 'annual' ? 'annual' : 'monthly';
+        var targetUrl = 'https://app.heycora.in/workspace/login?plan=' + encodeURIComponent(planType) + '&billing=' + encodeURIComponent(billingParam);
+        window.location.href = targetUrl;
+      };
+    })();
   </script>
+
 </body>
 </html>
