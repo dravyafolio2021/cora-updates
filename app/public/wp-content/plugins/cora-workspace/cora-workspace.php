@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.83
+ * Version: 3.4.84
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.83' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.84' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -1404,12 +1404,15 @@ function cora_workspace_handle_workspace_route() {
             setcookie( 'cora_active_workspace_slug', $matched_workspace['slug'], time() + 86400 * 365, $cookie_path, $cookie_domain, is_ssl(), false );
         }
         
-        // Deactivated user check (Spec Section 6.3)
-        $user_status = get_user_meta( $user->ID, 'cora_user_status', true );
-        if ( $user_status === 'inactive' ) {
-            wp_logout();
-            wp_redirect( home_url( '/workspace/login?deactivated=1' ) );
-            exit;
+        // Deactivated user check (Spec Section 6.3) - Super Admins & Administrators are immune
+        $is_super_user = cora_is_super_owner( $user ) || in_array( 'administrator', (array) $user->roles, true ) || in_array( 'cora_shruti', (array) $user->roles, true ) || in_array( 'cora_super_admin', (array) $user->roles, true );
+        if ( ! $is_super_user ) {
+            $user_status = get_user_meta( $user->ID, 'cora_user_status', true );
+            if ( $user_status === 'inactive' ) {
+                wp_logout();
+                wp_redirect( home_url( '/workspace/login?deactivated=1' ) );
+                exit;
+            }
         }
 
         // Force password change on next login check
@@ -33901,15 +33904,18 @@ function cora_handle_google_oauth_callback() {
         update_user_meta( $existing_user->ID, 'cora_google_id', $google_id );
         $user = $existing_user;
 
-        // Check if account is deactivated or expired
-        if ( get_user_meta( $user->ID, 'cora_user_status', true ) === 'inactive' ) {
-            wp_redirect( home_url( '/workspace/login?deactivated=1' ) );
-            exit;
-        }
-        $expires_at = get_user_meta( $user->ID, 'cora_account_expires_at', true );
-        if ( ! empty( $expires_at ) && intval( $expires_at ) > 0 && time() > intval( $expires_at ) ) {
-            wp_redirect( home_url( '/workspace/login?expired=1' ) );
-            exit;
+        // Check if account is deactivated or expired (Super Admins & Administrators are immune)
+        $is_super_user = cora_is_super_owner( $user ) || in_array( 'administrator', (array) $user->roles, true ) || in_array( 'cora_shruti', (array) $user->roles, true ) || in_array( 'cora_super_admin', (array) $user->roles, true );
+        if ( ! $is_super_user ) {
+            if ( get_user_meta( $user->ID, 'cora_user_status', true ) === 'inactive' ) {
+                wp_redirect( home_url( '/workspace/login?deactivated=1' ) );
+                exit;
+            }
+            $expires_at = get_user_meta( $user->ID, 'cora_account_expires_at', true );
+            if ( ! empty( $expires_at ) && intval( $expires_at ) > 0 && time() > intval( $expires_at ) ) {
+                wp_redirect( home_url( '/workspace/login?expired=1' ) );
+                exit;
+            }
         }
     } else {
         // New user — check registration is open

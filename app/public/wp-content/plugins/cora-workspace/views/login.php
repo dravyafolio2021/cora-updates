@@ -396,6 +396,10 @@
             var urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('deactivated')) {
                 showToast('Your account has been deactivated. Contact your agency admin.');
+                if (window.history.replaceState) {
+                    var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+                }
             }
             if (urlParams.get('suspended')) {
                 $('#cora-suspended-banner').show();
