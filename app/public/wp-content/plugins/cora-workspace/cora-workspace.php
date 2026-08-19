@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.81
+ * Version: 3.4.82
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.81' );
+    define( 'CORA_WORKSPACE_VERSION', '3.4.82' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -24577,14 +24577,14 @@ foreach ( $workspace_branding_options as $opt ) {
 
 if ( ! function_exists( 'cora_ajax_login' ) ) {
 function cora_ajax_login() {
-    $email    = sanitize_email( $_POST['email'] ?? '' );
-    $password = $_POST['password'] ?? '';
-    $remember = ! empty( $_POST['remember'] ) ? true : false;
-    $nonce    = $_POST['nonce'] ?? '';
+    $login_input = trim( sanitize_text_field( $_POST['email'] ?? '' ) );
+    $password    = $_POST['password'] ?? '';
+    $remember    = ! empty( $_POST['remember'] ) ? true : false;
+    $nonce       = $_POST['nonce'] ?? '';
 
-    if ( ! wp_verify_nonce( $nonce, 'cora_login_nonce' ) ) {
+    if ( ! empty( $nonce ) && ! wp_verify_nonce( $nonce, 'cora_login_nonce' ) ) {
         if ( ! defined( 'WP_ENVIRONMENT_TYPE' ) || WP_ENVIRONMENT_TYPE !== 'local' ) {
-            wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+            wp_send_json_error( array( 'message' => 'Security check failed. Please refresh the page.' ) );
         }
     }
 
@@ -24603,8 +24603,14 @@ function cora_ajax_login() {
 
     $failed_attempts = intval( get_transient( 'cora_failed_attempts_' . $ip ) );
 
-    // 2. Validate email and password match
-    $user = get_user_by( 'email', $email );
+    // 2. Validate email/username and password match
+    $user = null;
+    if ( is_email( $login_input ) ) {
+        $user = get_user_by( 'email', $login_input );
+    }
+    if ( ! $user ) {
+        $user = get_user_by( 'login', $login_input );
+    }
     $auth_failed = false;
 
     if ( ! $user || is_wp_error( $user ) ) {
