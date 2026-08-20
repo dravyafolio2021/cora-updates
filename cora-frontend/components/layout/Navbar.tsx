@@ -25,41 +25,41 @@ export function Navbar() {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-zinc-700 font-sans">
-            <a
-              href="/#capabilities"
-              onClick={() => handleNavClick('capabilities')}
+            <Link
+              href="/features"
+              onClick={() => handleNavClick('features')}
               className="hover:text-zinc-950 transition-colors py-1"
             >
               Features
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#how-it-works"
               onClick={() => handleNavClick('how-it-works')}
               className="hover:text-zinc-950 transition-colors py-1"
             >
               How It Works
-            </a>
-            <a
-              href="/#use-cases"
+            </Link>
+            <Link
+              href="/use-cases"
               onClick={() => handleNavClick('use-cases')}
               className="hover:text-zinc-950 transition-colors py-1"
             >
               Use Cases
-            </a>
-            <a
-              href="/#integrations"
-              onClick={() => handleNavClick('integrations')}
-              className="hover:text-zinc-950 transition-colors py-1"
-            >
-              Integrations
-            </a>
-            <a
-              href="/#pricing"
+            </Link>
+            <Link
+              href="/pricing"
               onClick={() => handleNavClick('pricing')}
               className="hover:text-zinc-950 transition-colors py-1"
             >
               Pricing
-            </a>
+            </Link>
+            <Link
+              href="/about"
+              onClick={() => handleNavClick('about')}
+              className="hover:text-zinc-950 transition-colors py-1"
+            >
+              About
+            </Link>
             <Link
               href="/tools"
               onClick={() => handleNavClick('tools')}

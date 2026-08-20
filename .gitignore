@@ -34,8 +34,10 @@
 # Node dependencies
 node_modules/
 
-# Production ZIP releases
+# Production releases and archives
 *.zip
+*.tar.gz
+*.bak
 
 # Playwright test artifacts
 test-results/

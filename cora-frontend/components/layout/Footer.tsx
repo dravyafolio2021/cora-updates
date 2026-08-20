@@ -94,11 +94,11 @@ export function Footer() {
                 Quick links
               </div>
               <ul className="space-y-2.5 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><a href="/#capabilities" className="hover:text-zinc-950 transition-colors">Features</a></li>
-                <li><a href="/#how-it-works" className="hover:text-zinc-950 transition-colors">How It Works</a></li>
-                <li><a href="/#use-cases" className="hover:text-zinc-950 transition-colors">Use Cases</a></li>
-                <li><a href="/#integrations" className="hover:text-zinc-950 transition-colors">Integrations</a></li>
-                <li><a href="/#stats" className="hover:text-zinc-950 transition-colors">Platform Stats</a></li>
+                <li><Link href="/features" className="hover:text-zinc-950 transition-colors">Features</Link></li>
+                <li><Link href="/#how-it-works" className="hover:text-zinc-950 transition-colors">How It Works</Link></li>
+                <li><Link href="/use-cases" className="hover:text-zinc-950 transition-colors">Use Cases</Link></li>
+                <li><Link href="/pricing" className="hover:text-zinc-950 transition-colors">Pricing</Link></li>
+                <li><Link href="/about" className="hover:text-zinc-950 transition-colors">About Us</Link></li>
               </ul>
             </div>
 
@@ -111,7 +111,7 @@ export function Footer() {
                 <li><Link href="/tools/gst-calculator" className="hover:text-zinc-950 transition-colors">18% GST Tax Calculator</Link></li>
                 <li><Link href="/tools/listing-ai" className="hover:text-zinc-950 transition-colors">Real Estate AI Writer</Link></li>
                 <li><Link href="/tools" className="hover:text-zinc-950 transition-colors">All Public Micro-Tools &rarr;</Link></li>
-                <li><a href="/#pricing" className="hover:text-zinc-950 transition-colors">Commercial Pricing</a></li>
+                <li><Link href="/contact" className="hover:text-zinc-950 transition-colors font-medium">Advisory Desk &rarr;</Link></li>
                 <li><a href="https://app.heycora.in/workspace/login" className="hover:text-zinc-950 transition-colors text-zinc-900 font-semibold">Workspace Portal &rarr;</a></li>
               </ul>
             </div>
@@ -122,10 +122,10 @@ export function Footer() {
                 Support
               </div>
               <ul className="space-y-2.5 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><a href="/#faq" className="hover:text-zinc-950 transition-colors">FAQs</a></li>
-                <li><a href="mailto:support@heycora.in" className="hover:text-zinc-950 transition-colors">Contact Support</a></li>
+                <li><Link href="/#faq" className="hover:text-zinc-950 transition-colors">FAQs</Link></li>
+                <li><Link href="/contact" className="hover:text-zinc-950 transition-colors">Talk to Founder</Link></li>
+                <li><a href="mailto:dravya.bansal@heycora.in" className="hover:text-zinc-950 transition-colors">Direct Support</a></li>
                 <li><a href="https://x.com/dravyafolio" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-950 transition-colors">Changelog &amp; Updates</a></li>
-                <li><span className="text-zinc-400">Privacy Policy</span></li>
               </ul>
             </div>
 

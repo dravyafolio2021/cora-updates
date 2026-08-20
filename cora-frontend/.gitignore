@@ -32,6 +32,11 @@
 *.tsbuildinfo
 next-env.d.ts
 
+# Archives & Backups
+*.tar.gz
+*.zip
+*.bak
+
 # OS & Logs
 .DS_Store
 *.log
