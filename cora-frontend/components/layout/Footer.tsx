@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Mail, Instagram, Linkedin, Twitter, Facebook } from 'lucide-react';
+import { ArrowRight, Mail, Instagram, Linkedin, Twitter, Sparkles, ShieldCheck } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
 export function Footer() {
@@ -24,7 +24,7 @@ export function Footer() {
         <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
       </div>
 
-      <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6">
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6">
         
         {/* ── Top Conversion CTA Banner ── */}
         <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20">
@@ -59,82 +59,115 @@ export function Footer() {
         {/* ── Master White Footer Card ── */}
         <div className="w-full rounded-[36px] bg-white border border-zinc-200/90 shadow-[0px_20px_60px_rgba(0,0,0,0.06)] p-8 sm:p-12 md:p-14">
           
-          {/* Main 4-Column Navigation Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12 pb-12 border-b border-zinc-200/80">
+          {/* Main 5-Column Navigation Layout */}
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-12 border-b border-zinc-200/80">
             
-            {/* Col 1: Brand Bio & Support Email (Span 5) */}
-            <div className="md:col-span-5 space-y-6">
-              <Link href="/" className="inline-flex items-center gap-2.5 text-zinc-950 font-display font-bold text-2xl tracking-tight group">
-                <div className="w-9 h-9 rounded-[10px] bg-zinc-950 text-white flex items-center justify-center font-mono text-sm font-bold shadow-2xs border border-zinc-800">
-                  &lt; &gt;
-                </div>
-                <span className="font-display font-bold text-2xl text-zinc-950 tracking-tight">
-                  Cora
-                </span>
+            {/* Col 1: Brand Bio & Support Email (Span 4) */}
+            <div className="col-span-2 md:col-span-4 space-y-5">
+              <Link href="/" className="text-zinc-950 font-display font-bold text-2xl sm:text-3xl tracking-tight block">
+                <span>Cora</span>
               </Link>
 
-              <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[340px] font-normal">
+              <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[320px] font-normal">
                 An autonomous operating system for modern commercial photography studios, film production houses, and creative agencies.
               </p>
 
-              <div>
+              <div className="flex flex-col gap-2.5 pt-1">
                 <a
                   href="mailto:support@heycora.in"
-                  className="inline-flex items-center gap-2 bg-[#100F12] text-white px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-zinc-800 transition-all border border-zinc-800 shadow-2xs"
+                  className="inline-flex items-center gap-2 bg-[#100F12] text-white px-3.5 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 transition-all border border-zinc-800 shadow-2xs w-fit"
                 >
                   <Mail className="w-3.5 h-3.5 text-zinc-400" />
                   <span>support@heycora.in</span>
                 </a>
+
+                <Link
+                  href="/status"
+                  className="inline-flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-950 transition-colors w-fit pt-1"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="font-semibold text-emerald-700">All systems operational (99.98%)</span>
+                </Link>
               </div>
             </div>
 
-            {/* Col 2: Quick Links (Span 2) */}
-            <div className="md:col-span-2 space-y-3.5">
+            {/* Col 2: Product & Platform (Span 2) */}
+            <div className="col-span-1 md:col-span-2 space-y-3">
               <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                Quick links
+                Platform
               </div>
-              <ul className="space-y-2.5 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><Link href="/features" className="hover:text-zinc-950 transition-colors">Features</Link></li>
-                <li><Link href="/#how-it-works" className="hover:text-zinc-950 transition-colors">How It Works</Link></li>
-                <li><Link href="/use-cases" className="hover:text-zinc-950 transition-colors">Use Cases</Link></li>
-                <li><Link href="/pricing" className="hover:text-zinc-950 transition-colors">Pricing</Link></li>
-                <li><Link href="/about" className="hover:text-zinc-950 transition-colors">About Us</Link></li>
+              <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
+                <li><Link href="/features" className="hover:text-zinc-950 transition-colors">20 Built Modules</Link></li>
+                <li><Link href="/ai-agent" className="hover:text-zinc-950 transition-colors">AI Co-Founder</Link></li>
+                <li><Link href="/use-cases" className="hover:text-zinc-950 transition-colors">5 Workspaces</Link></li>
+                <li><Link href="/pricing" className="hover:text-zinc-950 transition-colors">Pricing Plans</Link></li>
+                <li><Link href="/changelog" className="hover:text-zinc-950 transition-colors">Changelog &bull; v2.4</Link></li>
               </ul>
             </div>
 
-            {/* Col 3: Pages & Tools (Span 3) */}
-            <div className="md:col-span-3 space-y-3.5">
+            {/* Col 3: Competitor Comparisons (Span 2) */}
+            <div className="col-span-1 md:col-span-2 space-y-3">
               <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                Pages &amp; Tools
+                Compare
               </div>
-              <ul className="space-y-2.5 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><Link href="/tools/gst-calculator" className="hover:text-zinc-950 transition-colors">18% GST Tax Calculator</Link></li>
-                <li><Link href="/tools/listing-ai" className="hover:text-zinc-950 transition-colors">Real Estate AI Writer</Link></li>
-                <li><Link href="/tools" className="hover:text-zinc-950 transition-colors">All Public Micro-Tools &rarr;</Link></li>
-                <li><Link href="/contact" className="hover:text-zinc-950 transition-colors font-medium">Advisory Desk &rarr;</Link></li>
-                <li><a href="https://app.heycora.in/workspace/login" className="hover:text-zinc-950 transition-colors text-zinc-900 font-semibold">Workspace Portal &rarr;</a></li>
+              <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
+                <li><Link href="/compare/cora-vs-honeybook" className="hover:text-zinc-950 transition-colors">vs HoneyBook</Link></li>
+                <li><Link href="/compare/cora-vs-studio-ninja" className="hover:text-zinc-950 transition-colors">vs Studio Ninja</Link></li>
+                <li><Link href="/compare/cora-vs-hubspot" className="hover:text-zinc-950 transition-colors">vs HubSpot CRM</Link></li>
+                <li><Link href="/compare/cora-vs-docusign" className="hover:text-zinc-950 transition-colors">vs DocuSign</Link></li>
+                <li><Link href="/compare" className="hover:text-zinc-950 transition-colors text-emerald-700 font-bold">All 8 Benchmarks &rarr;</Link></li>
               </ul>
             </div>
 
-            {/* Col 4: Support & Legal (Span 2) */}
-            <div className="md:col-span-2 space-y-3.5">
+            {/* Col 4: Tools & Support (Span 2) */}
+            <div className="col-span-1 md:col-span-2 space-y-3">
               <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                Support
+                Resources
               </div>
-              <ul className="space-y-2.5 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><Link href="/#faq" className="hover:text-zinc-950 transition-colors">FAQs</Link></li>
-                <li><Link href="/contact" className="hover:text-zinc-950 transition-colors">Talk to Founder</Link></li>
-                <li><a href="mailto:dravya.bansal@heycora.in" className="hover:text-zinc-950 transition-colors">Direct Support</a></li>
-                <li><a href="https://x.com/dravyafolio" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-950 transition-colors">Changelog &amp; Updates</a></li>
+              <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
+                <li><Link href="/tools/gst-calculator" className="hover:text-zinc-950 transition-colors">18% GST Calculator</Link></li>
+                <li><Link href="/tools/listing-ai" className="hover:text-zinc-950 transition-colors">Real Estate AI</Link></li>
+                <li><Link href="/tools" className="hover:text-zinc-950 transition-colors">All Public Tools</Link></li>
+                <li><Link href="/about" className="hover:text-zinc-950 transition-colors">About &amp; Story</Link></li>
+                <li><Link href="/contact" className="hover:text-zinc-950 transition-colors">Advisory Desk</Link></li>
+              </ul>
+            </div>
+
+            {/* Col 5: Trust & Policies (Span 2) */}
+            <div className="col-span-1 md:col-span-2 space-y-3">
+              <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
+                Trust &amp; Legal
+              </div>
+              <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
+                <li><Link href="/terms" className="hover:text-zinc-950 transition-colors">Terms of Service</Link></li>
+                <li><Link href="/privacy" className="hover:text-zinc-950 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/refund-policy" className="hover:text-zinc-950 transition-colors">14-Day Refunds</Link></li>
+                <li><Link href="/security" className="hover:text-zinc-950 transition-colors">Security &amp; SOC-2</Link></li>
+                <li><Link href="/sla" className="hover:text-zinc-950 transition-colors">99.95% SLA</Link></li>
               </ul>
             </div>
 
           </div>
 
-          {/* ── Sub-Footer: Copyright & Social Links ── */}
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
-            <div>
-              &copy; {new Date().getFullYear()} Cora Inc. All rights reserved. Indian IT Act 2000 &amp; GST compliant.
+          {/* ── Sub-Footer: Copyright, Legal Links & Socials ── */}
+          <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
+            <div className="text-center md:text-left">
+              &copy; {new Date().getFullYear()} Cora Platforms Inc. All rights reserved. Indian IT Act 2000 &amp; GST compliant.
+            </div>
+
+            {/* Middle: Inline Policy Quick Links */}
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 font-medium">
+              <Link href="/terms" className="hover:text-zinc-950 transition-colors">Terms</Link>
+              <span>&bull;</span>
+              <Link href="/privacy" className="hover:text-zinc-950 transition-colors">Privacy</Link>
+              <span>&bull;</span>
+              <Link href="/refund-policy" className="hover:text-zinc-950 transition-colors">Refunds</Link>
+              <span>&bull;</span>
+              <Link href="/security" className="hover:text-zinc-950 transition-colors">Security</Link>
+              <span>&bull;</span>
+              <Link href="/sla" className="hover:text-zinc-950 transition-colors">SLA</Link>
+              <span>&bull;</span>
+              <Link href="/status" className="hover:text-zinc-950 transition-colors">Status</Link>
             </div>
 
             {/* Social Icons in Clean Rounded-xl Buttons */}

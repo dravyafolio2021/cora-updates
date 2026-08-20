@@ -3,9 +3,9 @@
 import React, { useEffect } from 'react';
 import Script from 'next/script';
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-CORAPLATFORM';
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || '';
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || '';
-const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID || 'q9cora0clarity';
+const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID || '';
 
 declare global {
   interface Window {

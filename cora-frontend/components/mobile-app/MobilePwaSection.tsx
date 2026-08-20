@@ -15,7 +15,8 @@ import {
   Send, 
   Sparkles,
   Users,
-  ShieldCheck
+  ShieldCheck,
+  Camera
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
@@ -162,8 +163,8 @@ export function MobilePwaSection() {
                   {/* Top Mobile Status Header */}
                   <div className="flex items-center justify-between mb-4 pt-1">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-mono text-[10px] font-bold">
-                        &lt;&gt;
+                      <div className="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center">
+                        <Camera className="w-3.5 h-3.5" />
                       </div>
                       <div className="leading-tight">
                         <div className="text-xs font-bold text-zinc-950">Studio Aperture</div>

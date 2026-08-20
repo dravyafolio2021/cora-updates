@@ -70,7 +70,7 @@ export function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative w-full overflow-hidden bg-gradient-to-b from-[#5caae8] via-[#cae6fc] to-white pt-24 sm:pt-32 pb-16 sm:pb-28"
+      className="relative w-full overflow-hidden bg-gradient-to-b from-[#5caae8] via-[#cae6fc] to-white pt-28 sm:pt-36 pb-16 sm:pb-28"
     >
       {/* ── Background Scenic Landscape with GSAP Parallax ─────────── */}
       <div
@@ -129,7 +129,7 @@ export function Hero() {
           {/* Headline */}
           <h1 className="font-display text-[2.1rem] xs:text-[2.45rem] sm:text-5xl md:text-[58px] font-semibold text-zinc-950 leading-[1.12] sm:leading-[1.10] md:leading-[68px] tracking-[-0.035em] flex flex-col items-center justify-center gap-1.5 sm:gap-2">
             <div className="inline-flex items-center justify-center flex-wrap gap-2 sm:gap-3">
-              <span>The</span>
+              <span>Your</span>
               <div
                 ref={badgeRef}
                 className="relative inline-flex items-center justify-center w-11 h-11 xs:w-12 xs:h-12 sm:w-15 sm:h-15 md:w-[64px] md:h-[64px] shrink-0 self-center transition-transform duration-300 hover:scale-105"
@@ -141,10 +141,10 @@ export function Hero() {
                   className="object-contain rounded-xl sm:rounded-2xl shadow-[0px_6px_14px_rgba(0,0,0,0.12)]"
                 />
               </div>
-              <span>cofounder,</span>
+              <span>Cofounder with</span>
             </div>
             <div className="text-center px-1">
-              Workspace, Forms &amp; Finance
+              Website, Forms &amp; Finance....
             </div>
           </h1>
 
