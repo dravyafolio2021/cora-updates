@@ -33,7 +33,8 @@ import {
   Star,
   CheckSquare,
   Users2,
-  Calendar
+  Calendar,
+  Code
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
@@ -932,6 +933,15 @@ export function Navbar() {
 
                   <button
                     type="button"
+                    onClick={() => setActiveMobileSubmenu('integrations')}
+                    className="w-full py-4 flex items-center justify-between text-left hover:text-black transition-colors"
+                  >
+                    <span>Integrations</span>
+                    <ChevronRight className="w-4 h-4 text-zinc-400" />
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => setActiveMobileSubmenu('resources')}
                     className="w-full py-4 flex items-center justify-between text-left hover:text-black transition-colors"
                   >
@@ -1047,6 +1057,41 @@ export function Navbar() {
                   <div className="pt-2">
                     <Link href="/compare" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
                       <span>View all 8 comparison benchmarks</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* Level 2 Submenu: Integrations */}
+              {activeMobileSubmenu === 'integrations' && (
+                <div className="space-y-3 animate-in fade-in slide-in-from-right-3 duration-150">
+                  <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
+                    WEBSITE CONNECTORS &amp; EMBEDS
+                  </span>
+                  <Link href="/integrations/framer" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
+                    <div><div className="text-sm font-bold text-zinc-950">Framer Connector</div><div className="text-xs text-zinc-500">Client portals, e-signs &amp; 18% GST</div></div>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  </Link>
+                  <Link href="/integrations/webflow" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
+                    <div><div className="text-sm font-bold text-zinc-950">Webflow Connector</div><div className="text-xs text-zinc-500">Form webhooks &amp; WhatsApp dispatch</div></div>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  </Link>
+                  <Link href="/integrations/wordpress" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
+                    <div><div className="text-sm font-bold text-zinc-950">WordPress Connector</div><div className="text-xs text-zinc-500">Replace 6 heavy plugins with 1 script</div></div>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  </Link>
+                  <Link href="/integrations/shopify" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
+                    <div><div className="text-sm font-bold text-zinc-950">Shopify Custom Quotes</div><div className="text-xs text-zinc-500">High-ticket production &amp; 50/50 split</div></div>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  </Link>
+                  <Link href="/tools/embed-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl bg-zinc-50 border border-zinc-200/80">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center"><Code className="w-4 h-4 text-emerald-400" /></div>
+                    <div><div className="text-sm font-bold text-zinc-950">1-Click Embed Builder</div><div className="text-xs text-zinc-500">Generate script/iframe snippets</div></div>
+                  </Link>
+                  <div className="pt-2">
+                    <Link href="/integrations" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                      <span>View all integration guides</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>

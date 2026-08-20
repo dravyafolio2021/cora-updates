@@ -119,17 +119,17 @@ export function Footer() {
               </ul>
             </div>
 
-            {/* Col 4: Tools & Support (Span 2) */}
+            {/* Col 4: Tools & Ecosystem (Span 2) */}
             <div className="col-span-1 md:col-span-2 space-y-3">
               <div className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                Resources
+                Ecosystem
               </div>
               <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
+                <li><Link href="/integrations" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-900">Framer &amp; Webflow Hub</Link></li>
+                <li><Link href="/tools/embed-builder" className="hover:text-zinc-950 transition-colors">1-Click Embed Builder</Link></li>
                 <li><Link href="/tools/gst-calculator" className="hover:text-zinc-950 transition-colors">18% GST Calculator</Link></li>
                 <li><Link href="/tools/listing-ai" className="hover:text-zinc-950 transition-colors">Real Estate AI</Link></li>
-                <li><Link href="/tools" className="hover:text-zinc-950 transition-colors">All Public Tools</Link></li>
                 <li><Link href="/about" className="hover:text-zinc-950 transition-colors">About &amp; Story</Link></li>
-                <li><Link href="/contact" className="hover:text-zinc-950 transition-colors">Advisory Desk</Link></li>
               </ul>
             </div>
 

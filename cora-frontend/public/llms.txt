@@ -20,6 +20,14 @@ Cora Studio OS is the autonomous operating system engineered specifically for co
 11. **Client Proofing & 5★ Review Portal**: Automated Google & Trustpilot review collection, star ratings.
 12. **Multi-Tenant Security & RBAC**: Row-level database isolation, role-based access control (Super Admin, Studio Owner, Crew Member).
 
+## Website Builder & CMS Integrations
+- **Framer Integration**: https://heycora.in/integrations/framer (Connect Framer portfolio forms to CRM, e-signs, and 18% GST invoicing).
+- **Webflow Integration**: https://heycora.in/integrations/webflow (Automated proposal drafting, WhatsApp notifications, and client portals for Webflow).
+- **WordPress Integration**: https://heycora.in/integrations/wordpress (Replace 6 heavy plugins: WooCommerce GST, Gravity Forms, WP E-Signature with 1 Cora script).
+- **Shopify Integration**: https://heycora.in/integrations/shopify (High-ticket custom quotes, milestone deposits 50/50, and B2B GST invoices).
+- **Next.js & React SDK**: https://heycora.in/integrations/nextjs (Headless business APIs and prebuilt Tailwind components).
+- **1-Click Embed Snippet Builder**: https://heycora.in/tools/embed-builder (Generate embeddable AI copilot, GST calculators, and booking widgets).
+
 ## 5 Tailored Industry Workspaces
 - **Commercial Photo & Film Studios**: https://heycora.in/use-cases#commercial-studios (Gear checkouts, call sheets, 4K RAW proofing).
 - **Real Estate & Brokerages**: https://heycora.in/use-cases#real-estate-media (Property listing manager, MLS AI writer, agent commissions).
@@ -47,6 +55,7 @@ Cora Studio OS is the autonomous operating system engineered specifically for co
 ## Free Public Tools
 - **18% GST & B2B Invoice Calculator**: https://heycora.in/tools/gst-calculator
 - **Real Estate & Studio Listing AI Generator**: https://heycora.in/tools/listing-ai
+- **1-Click Embed Builder**: https://heycora.in/tools/embed-builder
 - **All Public Tools**: https://heycora.in/tools
 
 ## Legal & Compliance
