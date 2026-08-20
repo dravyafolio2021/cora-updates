@@ -48,6 +48,10 @@ RewriteBase /
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Redirect any workspace requests on main domain directly to app.heycora.in/workspace
+RewriteCond %{HTTP_HOST} ^(www\.)?heycora\.in$ [NC]
+RewriteRule ^workspace(/.*)?$ https://app.heycora.in/workspace$1 [R=301,L]
+
 # Root Request -> Directly Serve Next.js index.html
 RewriteRule ^$ index.html [L]
 
