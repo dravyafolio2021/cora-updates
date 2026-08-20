@@ -12,7 +12,20 @@
 *.log
 .DS_Store
 .env
+.env*
+*.env
+*.env.*
+**/.env
+**/.env*
+.env.local
+.env.production
+.env.development
 .envrc
+*.pem
+*.key
+*.secret
+*credentials*
+*secret*
 
 # IDE files
 .vscode/

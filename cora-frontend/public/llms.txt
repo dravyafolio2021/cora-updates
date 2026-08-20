@@ -1,0 +1,23 @@
+# Cora — The AI Workspace for Ambitious Founders
+> Operating Entity: Claraverse (https://heycora.in)
+> Main App: https://app.heycora.in/workspace
+
+## Product Overview
+Cora is an AI-powered operating system for founders, digital agencies, and solo builders.
+It unifies multi-model AI agents (Claude 3.5 Sonnet, OpenAI GPT-4o, Google Gemini, Groq), client pipeline funnels, document signing, and GST-compliant invoicing under a single command center.
+
+## Pricing Specifications
+- Free Forever Plan: $0 / forever. 1,000 AI Agent Runs/mo, Core Models (Gemini & GPT-4o mini), Document Vault, Unlimited Client Funnels.
+- India Only Plan: ₹499 / mo (Billed annually at ₹4,999 / year). 2,500 AI Agent Runs/mo, All Pro Features, UPI & RuPay Direct Billing, Full GST Invoicing (B2B).
+- Starter Plan: $9 / mo ($90 / year). 5,000 AI Agent Runs/mo, Claude 3.5 Sonnet Access, Custom Workspace Domain.
+- Pro Studio Plan: $19 / mo ($190 / year). 10,000 AI Agent Runs/mo, All Frontier Models (Claude, GPT-4o, Gemini), 3 Team Seats, GST Invoicing.
+- Scale & Agency Plan: $39 / mo ($390 / year). Unlimited AI Agent Executions, 10 Team Seats, Custom Personas, 99.9% SLA.
+
+## Free Public Tools
+- Indian GST & B2B Invoice Calculator: https://heycora.in/tools/gst-calculator
+- Real Estate & Studio Listing AI Generator: https://heycora.in/tools/listing-ai
+
+## Technical & Legal Details
+- Company: Claraverse
+- Founder Contact: dravya.bansal@heycora.in
+- Security: 256-bit SSL/TLS encryption, zero client secret exposure, Razorpay PCI-DSS compliant checkout.

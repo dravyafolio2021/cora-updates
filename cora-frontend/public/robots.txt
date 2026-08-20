@@ -1,0 +1,15 @@
+User-Agent: *
+Allow: /
+Disallow: /api/
+Disallow: /workspace/
+
+User-Agent: GPTBot
+User-Agent: ChatGPT-User
+User-Agent: ClaudeBot
+User-Agent: PerplexityBot
+User-Agent: Google-Extended
+Allow: /
+Allow: /tools/
+Allow: /llms.txt
+
+Sitemap: https://heycora.in/sitemap.xml
