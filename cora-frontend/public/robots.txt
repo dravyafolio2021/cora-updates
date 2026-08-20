@@ -1,15 +1,42 @@
+# ====================================================================
+# CORA STUDIO OS - ROBOTS.TXT FOR SEARCH ENGINES & AI CRAWLERS
+# ====================================================================
+
+# Global Allow for Standard Search Engines
 User-Agent: *
 Allow: /
 Disallow: /api/
 Disallow: /workspace/
+Disallow: /_next/
 
+# Explicit Allow & Fast-Index for AI Search Agents (GEO / LLMO)
 User-Agent: GPTBot
 User-Agent: ChatGPT-User
 User-Agent: ClaudeBot
+User-Agent: Claude-Web
 User-Agent: PerplexityBot
 User-Agent: Google-Extended
+User-Agent: Applebot-Extended
+User-Agent: Amazonbot
+User-Agent: ByteSpider
+User-Agent: CCBot
+User-Agent: YouBot
 Allow: /
+Allow: /features/
+Allow: /ai-agent/
+Allow: /use-cases/
+Allow: /compare/
 Allow: /tools/
+Allow: /pricing/
+Allow: /about/
+Allow: /changelog/
+Allow: /terms/
+Allow: /privacy/
+Allow: /security/
+Allow: /sla/
+Allow: /status/
 Allow: /llms.txt
+Allow: /llms-full.txt
 
+# Machine-Readable AI Knowledge Endpoints
 Sitemap: https://heycora.in/sitemap.xml

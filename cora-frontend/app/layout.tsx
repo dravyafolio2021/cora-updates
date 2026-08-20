@@ -14,12 +14,14 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
+  preload: true,
 });
 
 const interTight = Inter_Tight({
   subsets: ['latin'],
   variable: '--font-display',
   display: 'swap',
+  preload: true,
 });
 
 const caveat = Caveat({
@@ -35,11 +37,36 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Cora — The AI workspace built for ambitious founders',
-  description: 'Cora orchestrates your client pipelines, revenue workflows, and specialized AI agents in one hyper-focused command center.',
+  title: 'Cora — The 20-in-1 Autonomous Operating System for Creative Studios',
+  description: 'Consolidate CRM funnels, multi-model AI agents, SHA-256 legal e-signatures, and automated 18% GST invoicing into one unified command center.',
+  keywords: [
+    'commercial photography CRM',
+    'film production software',
+    'autonomous studio OS',
+    '18% GST invoice generator',
+    'SHA-256 digital signatures India',
+    'HoneyBook alternative',
+    'Studio Ninja alternative',
+    'DocuSign alternative',
+    'HubSpot alternative creative agency',
+    'AI voice to scope',
+    'real estate listing AI',
+    'wedding photography call sheets'
+  ],
   metadataBase: new URL('https://heycora.in'),
   alternates: {
     canonical: 'https://heycora.in',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GSC_VERIFICATION || 'cora-google-search-console-verification',
@@ -49,25 +76,27 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   openGraph: {
-    title: 'Cora — The AI workspace built for ambitious founders',
-    description: 'Cora orchestrates your client pipelines, revenue workflows, and specialized AI agents in one hyper-focused command center.',
+    title: 'Cora — The 20-in-1 Autonomous Operating System for Creative Studios',
+    description: 'Consolidate CRM funnels, multi-model AI agents, SHA-256 legal e-signatures, and automated 18% GST invoicing into one unified command center.',
     url: 'https://heycora.in',
-    siteName: 'Cora',
+    siteName: 'Cora Studio OS',
+    locale: 'en_US',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Cora — The AI workspace built for ambitious founders',
+        alt: 'Cora Studio OS — 20 Built Modules for Modern Studios',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cora — The AI workspace built for ambitious founders',
-    description: 'Cora orchestrates your client pipelines, revenue workflows, and specialized AI agents in one hyper-focused command center.',
+    title: 'Cora — The 20-in-1 Autonomous Operating System for Creative Studios',
+    description: 'Consolidate CRM funnels, multi-model AI agents, SHA-256 legal e-signatures, and automated 18% GST invoicing into one unified command center.',
     images: ['/og-image.png'],
+    creator: '@dravyafolio',
   },
 };
 
@@ -85,12 +114,24 @@ export default function RootLayout({
       className={`${inter.variable} ${interTight.variable} ${caveat.variable} ${jetbrainsMono.variable}`}
     >
       <head>
+        {/* Performance Resource Hints for Faster LCP */}
+        <link rel="preconnect" href="https://checkout.razorpay.com" />
+        <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+        
+        {/* Preload Hero Visual Assets */}
+        <link rel="preload" as="image" href="/images/cora_hero_landscape.jpg" fetchPriority="high" />
+        <link rel="preload" as="image" href="/images/cora_3d_ai_badge.png" fetchPriority="high" />
+
+        {/* AI Discovery Meta Hints */}
+        <link rel="alternate" type="text/plain" href="https://heycora.in/llms.txt" title="LLMs.txt" />
+        <meta name="ai-content-declaration" content="human-directed-autonomous-platform" />
+
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  // Guard against browser extension attribute pollution (e.g. Bitdefender bis_skin_checked)
+                  // Guard against browser extension attribute pollution
                   if (typeof Element !== 'undefined') {
                     var origSetAttr = Element.prototype.setAttribute;
                     Element.prototype.setAttribute = function(name, val) {
@@ -132,7 +173,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body suppressHydrationWarning className="font-sans antialiased text-zinc-950 bg-white">
+      <body suppressHydrationWarning className="font-sans antialiased text-zinc-950 bg-white selection:bg-zinc-950 selection:text-white">
         <Script
           id="json-ld"
           type="application/ld+json"

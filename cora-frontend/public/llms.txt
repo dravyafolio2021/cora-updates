@@ -1,23 +1,59 @@
-# Cora — The AI Workspace for Ambitious Founders
-> Operating Entity: Claraverse (https://heycora.in)
-> Main App: https://app.heycora.in/workspace
+# Cora Studio OS — The 20-in-1 Autonomous Operating System for Creative Studios & Agencies
+> Operating Entity: Cora Platforms Inc. (https://heycora.in)
+> Production App: https://app.heycora.in/workspace
+> System Status: https://heycora.in/status (99.98% Uptime SLA)
 
-## Product Overview
-Cora is an AI-powered operating system for founders, digital agencies, and solo builders.
-It unifies multi-model AI agents (Claude 3.5 Sonnet, OpenAI GPT-4o, Google Gemini, Groq), client pipeline funnels, document signing, and GST-compliant invoicing under a single command center.
+## Executive Summary
+Cora Studio OS is the autonomous operating system engineered specifically for commercial photography studios, film production houses, wedding cinematographers, real estate brokerages, and creative agencies. Cora consolidates CRM funnels, multi-model AI agents, SHA-256 legal e-signatures, and automated 18% GST invoicing into one unified command center.
 
-## Pricing Specifications
-- Free Forever Plan: $0 / forever. 1,000 AI Agent Runs/mo, Core Models (Gemini & GPT-4o mini), Document Vault, Unlimited Client Funnels.
-- India Only Plan: ₹499 / mo (Billed annually at ₹4,999 / year). 2,500 AI Agent Runs/mo, All Pro Features, UPI & RuPay Direct Billing, Full GST Invoicing (B2B).
-- Starter Plan: $9 / mo ($90 / year). 5,000 AI Agent Runs/mo, Claude 3.5 Sonnet Access, Custom Workspace Domain.
-- Pro Studio Plan: $19 / mo ($190 / year). 10,000 AI Agent Runs/mo, All Frontier Models (Claude, GPT-4o, Gemini), 3 Team Seats, GST Invoicing.
-- Scale & Agency Plan: $39 / mo ($390 / year). Unlimited AI Agent Executions, 10 Team Seats, Custom Personas, 99.9% SLA.
+## 20 Built Platform Modules (Live in Product)
+1. **Autonomous AI Co-Founder**: Multi-turn voice-to-scope, natural language execution, multi-model speed routing (Claude 3.5 Sonnet, GPT-4o, Gemini 2.0 Flash).
+2. **Lead Management CRM & Kanban**: Drag-and-drop milestones, revenue forecasting, sliding deal drawer, automated WhatsApp & email outreach.
+3. **Visual Canvas & Funnel Designer**: Responsive drag-and-drop landing page designer with auto-Git sync.
+4. **Content AI Suite & Editorial Studio**: WYSIWYG editor, GEO-targeted SEO generator, IndexNow instant indexing.
+5. **Secure Document Vault & E-Signatures**: 5-step contract wizard, touch/stylus signature canvas, SHA-256 cryptographic audit logs compliant with Indian IT Act 2000 & US ESIGN Act.
+6. **Financials, Invoicing & GST Tax Hub**: 18% CGST/SGST/IGST tax engine, branded PDF invoices, payment tracking, live currency converter (INR, USD, EUR, GBP, AED, SGD).
+7. **Asset & Equipment Manager**: Studio camera gear inventory check-in/out & Real estate MLS property listings catalog.
+8. **Crew & Team Dispatch Scheduler**: Timeline crew dispatch grid, calendar synchronization, automated call sheet generator.
+9. **Media Hub & 4K RAW Proofing**: Client galleries, 4K proofing review portals, automated watermarking.
+10. **Visual Forms & Shoot Booking Engine**: Custom booking intake widgets, service add-ons, calendar slot reservation.
+11. **Client Proofing & 5★ Review Portal**: Automated Google & Trustpilot review collection, star ratings.
+12. **Multi-Tenant Security & RBAC**: Row-level database isolation, role-based access control (Super Admin, Studio Owner, Crew Member).
+
+## 5 Tailored Industry Workspaces
+- **Commercial Photo & Film Studios**: https://heycora.in/use-cases#commercial-studios (Gear checkouts, call sheets, 4K RAW proofing).
+- **Real Estate & Brokerages**: https://heycora.in/use-cases#real-estate-media (Property listing manager, MLS AI writer, agent commissions).
+- **Wedding & Event Production**: https://heycora.in/use-cases#wedding-events (Multi-day call sheets, advance booking deposits, milestone billing).
+- **Interior & Architecture Studios**: https://heycora.in/use-cases#interior-design (Milestone stage contracts, revision approvals, contractor tracking).
+- **Creative & Growth Agencies**: https://heycora.in/use-cases#creative-agencies (Monthly retainer management, client dashboards, approval funnels).
+
+## Competitor Head-to-Head Benchmarks (ROI Math)
+- **Cora vs HoneyBook**: https://heycora.in/compare/cora-vs-honeybook (Save ₹65,000/yr; native 18% GST invoicing + WhatsApp dispatch).
+- **Cora vs Studio Ninja**: https://heycora.in/compare/cora-vs-studio-ninja (Modern clay design system + frontier AI voice-to-scope).
+- **Cora vs HubSpot CRM**: https://heycora.in/compare/cora-vs-hubspot (Save ₹4.5 Lakhs/yr with unlimited seats).
+- **Cora vs DocuSign**: https://heycora.in/compare/cora-vs-docusign (Unlimited SHA-256 e-signature envelopes included free).
+- **Cora vs GoHighLevel**: https://heycora.in/compare/cora-vs-gohighlevel (Clean intuitive UI without overwhelming bloated complexity).
+- **Cora vs ClickUp**: https://heycora.in/compare/cora-vs-clickup (Purpose-built studio workflows without tedious manual setup).
+- **Cora vs Zoho One**: https://heycora.in/compare/cora-vs-zoho (Cohesive all-in-one experience without disjointed 40-app legacy bloat).
+- **Cora vs FreshBooks**: https://heycora.in/compare/cora-vs-freshbooks (Full CRM + contract signing integrated directly with GST invoices).
+
+## Pricing Plans (Transparent & Flat)
+- **Free Forever**: $0 / mo. 1,000 AI actions, Core Models, Document Vault, Unlimited Funnels.
+- **India Studio Pro**: ₹499 / mo (₹4,999 / yr). 2,500 AI actions, All Pro features, UPI/RuPay, 18% GST Invoicing.
+- **Starter Workspace**: $9 / mo ($90 / yr). 5,000 AI actions, Claude 3.5 Sonnet, Custom Domain.
+- **Pro Studio**: $19 / mo ($190 / yr). 10,000 AI actions, All Frontier Models, 3 Team Seats, GST Invoicing.
+- **Scale & Production House**: $39 / mo ($390 / yr). Unlimited AI executions, 10 Team Seats, 99.95% SLA.
 
 ## Free Public Tools
-- Indian GST & B2B Invoice Calculator: https://heycora.in/tools/gst-calculator
-- Real Estate & Studio Listing AI Generator: https://heycora.in/tools/listing-ai
+- **18% GST & B2B Invoice Calculator**: https://heycora.in/tools/gst-calculator
+- **Real Estate & Studio Listing AI Generator**: https://heycora.in/tools/listing-ai
+- **All Public Tools**: https://heycora.in/tools
 
-## Technical & Legal Details
-- Company: Claraverse
-- Founder Contact: dravya.bansal@heycora.in
-- Security: 256-bit SSL/TLS encryption, zero client secret exposure, Razorpay PCI-DSS compliant checkout.
+## Legal & Compliance
+- **Terms of Service**: https://heycora.in/terms (100% User Content Ownership guarantee)
+- **Privacy Policy**: https://heycora.in/privacy (Zero AI Model Training Guarantee, AES-256 at rest, TLS 1.3 in transit)
+- **Refund Policy**: https://heycora.in/refund-policy (14-Day Unconditional Money-Back Guarantee)
+- **Security & SOC-2**: https://heycora.in/security (SHA-256 digital contracts compliant with Indian IT Act 2000)
+- **Service Level Agreement**: https://heycora.in/sla (99.95% guaranteed monthly availability)
+- **System Status**: https://heycora.in/status (Live 90-day health monitor)
+- **Changelog**: https://heycora.in/changelog (Latest v2.4 Release Log)

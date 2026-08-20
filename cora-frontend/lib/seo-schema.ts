@@ -3,19 +3,44 @@ export function generatePlatformSchemas() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": "https://heycora.in/#organization",
-    "name": "Cora by Claraverse",
-    "legalName": "Claraverse Inc.",
+    "name": "Cora Platforms Inc.",
+    "legalName": "Cora Platforms Inc.",
     "url": "https://heycora.in",
     "logo": "https://heycora.in/apple-touch-icon.png",
     "sameAs": [
-      "https://twitter.com/heycora_ai",
-      "https://linkedin.com/company/claraverse",
+      "https://twitter.com/dravyafolio",
+      "https://linkedin.com/in/dravyafolio",
+      "https://instagram.com/dravyafolio",
       "https://github.com/dravyafolio2021"
     ],
     "founder": {
       "@type": "Person",
       "name": "Dravya Bansal",
+      "jobTitle": "Founder & CEO",
       "email": "dravya.bansal@heycora.in"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "Customer Support",
+      "email": "support@heycora.in",
+      "url": "https://heycora.in/contact"
+    }
+  };
+
+  const webSiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://heycora.in/#website",
+    "url": "https://heycora.in",
+    "name": "Cora Studio OS",
+    "description": "The 20-in-1 Autonomous Operating System for Creative Studios, Production Houses & Agencies.",
+    "publisher": {
+      "@id": "https://heycora.in/#organization"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://heycora.in/compare?q={search_term_string}",
+      "query-input": "required name=search_term_string"
     }
   };
 
@@ -23,23 +48,27 @@ export function generatePlatformSchemas() {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "@id": "https://heycora.in/#software",
-    "name": "Cora",
+    "name": "Cora Studio OS",
     "operatingSystem": "Web, macOS, Windows, iOS, Android (PWA)",
-    "applicationCategory": "BusinessApplication, DeveloperApplication, WorkflowAutomation",
-    "description": "Cora is the multi-model AI workspace that consolidates client pipelines, revenue workflows, e-signatures, and specialized frontier AI agents into one hyper-focused command center.",
+    "applicationCategory": "BusinessApplication, CRMApplication, FinancialApplication",
+    "description": "Cora is the autonomous AI operating system that unifies client CRM pipelines, SHA-256 legal contracts, multi-model AI voice-to-scope agents, and automated 18% GST invoicing into one command center.",
     "url": "https://heycora.in",
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.9",
-      "reviewCount": "128"
+      "bestRating": "5.0",
+      "ratingCount": "142"
     },
     "featureList": [
+      "Autonomous AI Co-Founder with Voice-to-Scope Execution",
       "Frontier Multi-Model AI Routing (Claude 3.5 Sonnet, GPT-4o, Gemini 2.0 Flash)",
-      "Automated Lead Capture and Pipeline Kanban",
-      "Legally Binding Document Vault & Digital Signatures",
-      "GST-Compliant B2B Tax Calculation & Invoicing",
-      "Native WhatsApp Cloud API & Gmail Automation",
-      "Real Estate & Studio AI Listing Generator"
+      "Automated Lead Capture & Kanban Deal Pipeline",
+      "Legally Binding SHA-256 E-Sign Vault (Indian IT Act 2000 & US ESIGN Compliant)",
+      "18% CGST/SGST/IGST Automated Tax Engine & Invoicing",
+      "Studio Camera Gear Checkouts & MLS Property Listings",
+      "Timeline Crew Dispatch & Automated Call Sheets",
+      "4K RAW Client Media Hub & Proofing Portals",
+      "Visual Landing Page Funnel Canvas with Git Synchronization"
     ],
     "offers": [
       {
@@ -47,18 +76,18 @@ export function generatePlatformSchemas() {
         "name": "Free Forever Plan",
         "price": "0",
         "priceCurrency": "USD",
-        "description": "1,000 AI Agent Runs/mo, Core Models (Gemini & GPT-4o mini), Document Vault, Unlimited Client Funnels."
+        "description": "1,000 AI Agent Runs/mo, Core Models, Document Vault, Unlimited Client Funnels."
       },
       {
         "@type": "Offer",
-        "name": "India Only Plan",
+        "name": "India Studio Pro Plan",
         "price": "4999",
         "priceCurrency": "INR",
         "description": "2,500 AI Agent Runs/mo, All Pro Features, UPI & RuPay Direct Billing, Full GST Invoicing (B2B)."
       },
       {
         "@type": "Offer",
-        "name": "Starter Plan",
+        "name": "Starter Workspace Plan",
         "price": "9",
         "priceCurrency": "USD",
         "description": "5,000 AI Agent Runs/mo, Claude 3.5 Sonnet Access, Custom Workspace Domain."
@@ -72,10 +101,10 @@ export function generatePlatformSchemas() {
       },
       {
         "@type": "Offer",
-        "name": "Scale Plan",
+        "name": "Scale & Production House Plan",
         "price": "39",
         "priceCurrency": "USD",
-        "description": "Unlimited AI Executions, 10 Team Seats, Custom Fine-Tuned AI Personas, 99.9% SLA."
+        "description": "Unlimited AI Executions, 10 Team Seats, Custom Personas, 99.95% SLA."
       }
     ]
   };
@@ -86,46 +115,46 @@ export function generatePlatformSchemas() {
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "What is Cora?",
+        "name": "What is Cora Studio OS?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Cora is an AI-powered operating system and workspace designed for ambitious founders, digital agencies, and solo builders to automate client funnels, document signing, and multi-model AI agent routing."
+          "text": "Cora Studio OS is a 20-in-1 autonomous operating system engineered for commercial photography studios, film production houses, wedding cinematographers, real estate brokerages, and creative agencies. It automates client proposals, SHA-256 contract signing, crew call sheets, and 18% GST invoicing."
         }
       },
       {
         "@type": "Question",
-        "name": "Is Cora free to use?",
+        "name": "How does Cora compare to HoneyBook and Studio Ninja?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, Cora provides a Free Forever plan with 1,000 AI agent runs per month, core AI models (Gemini & GPT-4o mini), and unlimited funnels with no credit card required."
+          "text": "Unlike HoneyBook and Studio Ninja, Cora features native 18% CGST/SGST/IGST tax calculation, WhatsApp dispatch automation, autonomous AI voice-to-scope drafting, and saves creative businesses over ₹65,000 to ₹4.5 Lakhs annually."
         }
       },
       {
         "@type": "Question",
-        "name": "How does Cora replace my existing software stack?",
+        "name": "Are digital signatures in Cora legally binding in India and the US?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Cora consolidates fragmented subscriptions including Notion (workspaces), HoneyBook/Pipedrive (CRM funnels), DocuSign (e-signatures), Zapier (automations), and ChatGPT Plus/Claude subscriptions into one unified $19/mo workspace, saving founders $200+ monthly."
+          "text": "Yes, Cora's E-Signature Vault generates cryptographic SHA-256 audit stamps including signer IP address, timestamp, and device fingerprint, compliant with Section 65B of the Indian Information Technology Act 2000 and the US ESIGN Act."
         }
       },
       {
         "@type": "Question",
-        "name": "Which AI models does Cora support?",
+        "name": "Does Cora train public AI models on my proprietary media or shoot data?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Cora supports frontier models from Anthropic (Claude 3.5 Sonnet), OpenAI (GPT-4o, GPT-4o mini), Google (Gemini 2.0 Flash), and Groq/Llama 3 with dynamic intelligent latency routing."
+          "text": "No. Cora enforces a strict Zero AI Model Training Guarantee. Your photos, 4K RAW video assets, client proposals, and rate cards are never used to train public LLMs or foundation models."
         }
       },
       {
         "@type": "Question",
-        "name": "What payment methods are supported in India?",
+        "name": "Is there a free trial or money-back guarantee?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Indian customers can pay via UPI (Google Pay, PhonePe, Paytm, CRED), Indian NetBanking, RuPay cards, and GST-compliant B2B invoices."
+          "text": "Cora offers a Free Forever plan with 1,000 monthly AI actions and unlimited funnels, plus an unconditional 14-day 100% money-back guarantee on all paid plans with self-serve 1-click cancellation."
         }
       }
     ]
   };
 
-  return [organizationSchema, softwareApplicationSchema, faqSchema];
+  return [organizationSchema, webSiteSchema, softwareApplicationSchema, faqSchema];
 }
