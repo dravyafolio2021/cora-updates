@@ -51,12 +51,20 @@ RewriteBase /
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Direct Service Worker & PWA manifest routing without redirection
+RewriteRule ^(cora-service-worker\.js|cora-manifest\.json|cora-offline\.html)$ /index.php [L]
+
 # Redirect any workspace requests on main domain directly to app.heycora.in/workspace
 RewriteCond %{HTTP_HOST} ^(www\.)?heycora\.in$ [NC]
 RewriteRule ^workspace(/.*)?$ https://app.heycora.in/workspace$1 [R=301,L]
 
-# Root Request -> Directly Serve Next.js index.html
+# Root Request -> Directly Serve Next.js index.html on main domain
+RewriteCond %{HTTP_HOST} ^(www\.)?heycora\.in$ [NC]
 RewriteRule ^$ index.html [L]
+
+# On app.heycora.in, redirect root to /workspace/dashboard
+RewriteCond %{HTTP_HOST} ^app\.heycora\.in$ [NC]
+RewriteRule ^$ /workspace/dashboard [R=302,L]
 
 # Serve existing static files, directories, and assets directly
 RewriteCond %{REQUEST_FILENAME} -f [OR]

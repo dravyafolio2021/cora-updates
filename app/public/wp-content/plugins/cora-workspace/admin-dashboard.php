@@ -343,17 +343,26 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <meta name="color-scheme" content="light">
     <title><?php echo esc_html( $page_title_format ); ?></title>
     
-    <!-- Compiled Tailwind CSS -->
+    <!-- High-Performance Preloads & DNS Prefetches -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preload" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css?v=' . CORA_WORKSPACE_VERSION; ?>" as="style">
+    <link rel="preload" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/admin-style.css?v=' . CORA_WORKSPACE_VERSION; ?>" as="style">
+    <link rel="preload" href="<?php echo CORA_WORKSPACE_URL . 'assets/js/admin-script.js?v=' . CORA_WORKSPACE_VERSION; ?>" as="script">
+    <link rel="prefetch" href="/cora-offline.html">
+
+    <!-- Compiled Tailwind CSS & Admin Styles -->
     <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css?v=' . CORA_WORKSPACE_VERSION; ?>" />
     <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/admin-style.css?v=' . CORA_WORKSPACE_VERSION; ?>" />
-    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     
-    <!-- PWA Manifest & Service Worker -->
+    <!-- PWA Manifest & Mobile App Capabilities -->
     <link rel="manifest" href="<?php echo home_url('/cora-manifest.json?v=' . CORA_WORKSPACE_VERSION); ?>">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#09090b">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CORA">
     <meta name="application-name" content="CORA">
     <script>

@@ -1,35 +1,35 @@
 {
-  "name": "CORA",
+  "name": "CORA Workspace",
   "short_name": "CORA",
-  "description": "CORA — AI Co-founder for Modern Founders",
+  "description": "CORA — AI Co-founder for Indian Service Businesses & Solopreneurs",
   "start_url": "/workspace/dashboard",
-  "scope": "/workspace/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "categories": ["business", "productivity"],
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "categories": ["business", "productivity", "finance"],
   "icons": [
     {
-      "src": "icon_192.png",
+      "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon_192.png",
+      "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "icon_512.png",
+      "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon_512.png",
+      "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -42,31 +42,31 @@
       "url": "/workspace/dashboard",
       "icons": [
         {
-          "src": "icon_192.png",
+          "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
       ]
     },
     {
-      "name": "CRM",
-      "short_name": "CRM",
-      "url": "/workspace/crm_leads",
+      "name": "GST Invoicing",
+      "short_name": "Invoices",
+      "url": "/workspace/vault",
       "icons": [
         {
-          "src": "icon_192.png",
+          "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
       ]
     },
     {
-      "name": "Canvas",
-      "short_name": "Canvas",
-      "url": "/workspace/canvas",
+      "name": "Leads & CRM",
+      "short_name": "Leads",
+      "url": "/workspace/leads",
       "icons": [
         {
-          "src": "icon_192.png",
+          "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
           "sizes": "192x192",
           "type": "image/png"
         }

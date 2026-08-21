@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 3.4.84
+ * Version: 3.5.0
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '3.4.84' );
+    define( 'CORA_WORKSPACE_VERSION', '3.5.0' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -656,19 +656,24 @@ function cora_add_performance_resource_hints() {
     echo '<link rel="dns-prefetch" href="https://fonts.googleapis.com">' . "\n";
     echo '<link rel="dns-prefetch" href="https://fonts.gstatic.com">' . "\n";
 
+    // Mobile PWA App Meta Tags
+    echo '<meta name="mobile-web-app-capable" content="yes">' . "\n";
+    echo '<meta name="apple-mobile-web-app-capable" content="yes">' . "\n";
+    echo '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">' . "\n";
+    echo '<meta name="theme-color" content="#09090b">' . "\n";
+
     // Preload critical workspace assets for faster initial paint
     if ( ! is_admin() ) {
         $plugin_url = CORA_WORKSPACE_URL;
-        // Critical CSS — preload so the browser fetches it with highest priority before render
-        echo '<link rel="preload" href="' . esc_url( $plugin_url . 'assets/css/admin-style.css' ) . '" as="style">' . "\n";
-        // Critical JS — preload the main workspace script
-        echo '<link rel="preload" href="' . esc_url( $plugin_url . 'assets/js/admin-script.js' ) . '" as="script">' . "\n";
-        // Prefetch offline page so the service worker can serve it instantly
+        echo '<link rel="preload" href="' . esc_url( $plugin_url . 'assets/css/tailwind-built.css?v=' . CORA_WORKSPACE_VERSION ) . '" as="style">' . "\n";
+        echo '<link rel="preload" href="' . esc_url( $plugin_url . 'assets/css/admin-style.css?v=' . CORA_WORKSPACE_VERSION ) . '" as="style">' . "\n";
+        echo '<link rel="preload" href="' . esc_url( $plugin_url . 'assets/js/admin-script.js?v=' . CORA_WORKSPACE_VERSION ) . '" as="script">' . "\n";
         echo '<link rel="prefetch" href="/cora-offline.html">' . "\n";
     }
 }
 add_action( 'wp_head', 'cora_add_performance_resource_hints', 1 );
 add_action( 'admin_head', 'cora_add_performance_resource_hints', 1 );
+add_action( 'login_head', 'cora_add_performance_resource_hints', 1 );
 }
 
 /**
@@ -22930,6 +22935,10 @@ if ( ! function_exists( 'cora_normalize_lead_stage' ) ) {
 
 if ( ! function_exists( 'cora_db_get_leads' ) ) {
 function cora_db_get_leads() {
+    static $leads_cache = null;
+    if ( $leads_cache !== null ) {
+        return $leads_cache;
+    }
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
     $branch_id = cora_db_get_branch_id();
@@ -23042,12 +23051,17 @@ function cora_db_get_leads() {
         }
     }
 
+    $leads_cache = $mapped;
     return $mapped;
 }
 }
 
 if ( ! function_exists( 'cora_db_get_clients' ) ) {
 function cora_db_get_clients() {
+    static $clients_cache = null;
+    if ( $clients_cache !== null ) {
+        return $clients_cache;
+    }
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
     $branch_id = cora_db_get_branch_id();
@@ -23085,12 +23099,17 @@ function cora_db_get_clients() {
             );
         }
     }
+    $clients_cache = $mapped;
     return $mapped;
 }
 }
 
 if ( ! function_exists( 'cora_db_get_properties' ) ) {
 function cora_db_get_properties() {
+    static $props_cache = null;
+    if ( $props_cache !== null ) {
+        return $props_cache;
+    }
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
     $branch_id = cora_db_get_branch_id();
@@ -23136,12 +23155,17 @@ function cora_db_get_properties() {
             );
         }
     }
+    $props_cache = $mapped;
     return $mapped;
 }
 }
 
 if ( ! function_exists( 'cora_db_get_bookings' ) ) {
 function cora_db_get_bookings() {
+    static $bookings_cache = null;
+    if ( $bookings_cache !== null ) {
+        return $bookings_cache;
+    }
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
     $branch_id = cora_db_get_branch_id();
@@ -23181,12 +23205,17 @@ function cora_db_get_bookings() {
             );
         }
     }
+    $bookings_cache = $mapped;
     return $mapped;
 }
 }
 
 if ( ! function_exists( 'cora_db_get_ledger' ) ) {
 function cora_db_get_ledger() {
+    static $ledger_cache = null;
+    if ( $ledger_cache !== null ) {
+        return $ledger_cache;
+    }
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
     $branch_id = cora_db_get_branch_id();
@@ -23228,12 +23257,17 @@ function cora_db_get_ledger() {
             );
         }
     }
+    $ledger_cache = $mapped;
     return $mapped;
 }
 }
 
 if ( ! function_exists( 'cora_db_get_branches' ) ) {
 function cora_db_get_branches() {
+    static $branches_cache = null;
+    if ( $branches_cache !== null ) {
+        return $branches_cache;
+    }
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
     
@@ -23262,12 +23296,17 @@ function cora_db_get_branches() {
             }
         }
     }
+    $branches_cache = $mapped;
     return $mapped;
 }
 }
 
 if ( ! function_exists( 'cora_db_get_agencies' ) ) {
 function cora_db_get_agencies() {
+    static $agencies_cache = null;
+    if ( $agencies_cache !== null ) {
+        return $agencies_cache;
+    }
     global $wpdb;
     $rows = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_agencies", ARRAY_A );
     $mapped = array();
@@ -23283,12 +23322,17 @@ function cora_db_get_agencies() {
             );
         }
     }
+    $agencies_cache = $mapped;
     return $mapped;
 }
 }
 
 if ( ! function_exists( 'cora_db_get_invitations' ) ) {
 function cora_db_get_invitations() {
+    static $invitations_cache = null;
+    if ( $invitations_cache !== null ) {
+        return $invitations_cache;
+    }
     global $wpdb;
     $agency_id = cora_db_get_agency_id();
     $branch_id = cora_db_get_branch_id();
@@ -23328,12 +23372,17 @@ function cora_db_get_invitations() {
             );
         }
     }
+    $invitations_cache = $mapped;
     return $mapped;
 }
 }
 
 if ( ! function_exists( 'cora_db_get_activity_logs' ) ) {
 function cora_db_get_activity_logs() {
+    static $logs_cache = null;
+    if ( $logs_cache !== null ) {
+        return $logs_cache;
+    }
     global $wpdb;
     $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
     $branch_id = function_exists('cora_db_get_branch_id') ? cora_db_get_branch_id() : 1;
@@ -23451,6 +23500,7 @@ function cora_db_get_activity_logs() {
         update_option( 'cora_activity_logs', $mapped );
     }
 
+    $logs_cache = $mapped;
     return $mapped;
 }
 }
