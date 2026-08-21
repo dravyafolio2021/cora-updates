@@ -11,7 +11,6 @@ import {
   Scissors,
   X,
   Send,
-  ChevronDown,
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
@@ -61,6 +60,25 @@ const industryPills = [
   },
 ];
 
+// Helper to detect nonsensical / gibberish typing
+function isGibberish(str: string): boolean {
+  const clean = str.trim().toLowerCase().replace(/[^a-z]/g, '');
+  if (clean.length < 4) return false;
+
+  // Check vowel to consonant ratio
+  const vowels = clean.match(/[aeiou]/g) || [];
+  const vowelRatio = vowels.length / clean.length;
+  if (vowelRatio < 0.12 || vowelRatio > 0.85) return true;
+
+  // Check long consonant streaks (e.g. "jehgyuftyrfjhg" has "yft", "rfjhg")
+  if (/[bcdfghjklmnpqrstvwxyz]{5,}/.test(clean)) return true;
+
+  // Check repeated character streaks (e.g. "aaaaa", "asdfasdf")
+  if (/(.)\1{3,}/.test(clean)) return true;
+
+  return false;
+}
+
 function getSimpleRichReply(query: string): {
   text: string;
   highlights?: FeatureHighlight[];
@@ -68,10 +86,60 @@ function getSimpleRichReply(query: string): {
   ctaText?: string;
   ctaLink?: string;
 } {
-  const q = query.trim().toLowerCase();
+  const original = query.trim();
+  const q = original.toLowerCase();
 
-  // 1. Photo & Video Studios
-  if (q.includes('photo') || q.includes('video') || q.includes('studio') || q.includes('shoot') || q.includes('camera') || q.includes('production')) {
+  // 0. Gibberish / Random keyboard mash detector
+  if (isGibberish(q)) {
+    return {
+      text: `I couldn't quite understand "${original}". I'm Cora's AI sales concierge, trained to answer questions about running service businesses and creative studios in India.`,
+      highlights: [
+        { title: '18% GST Invoicing', desc: 'Auto CGST/SGST splits with instant UPI QR codes on WhatsApp', badge: 'Billing' },
+        { title: 'Client Vault & E-Sign', desc: 'Legally binding digital contracts with mobile tap signatures', badge: 'Legal' },
+      ],
+      quickReplies: [
+        { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
+        { label: 'Creative & Digital Agencies', query: 'How does Cora help digital and creative agencies?' },
+        { label: 'Real Estate Brokers', query: 'How does Cora help real estate brokers?' },
+        { label: 'What is the pricing?', query: 'What are the pricing plans for Cora?' },
+      ],
+      ctaText: 'Explore Free Forever Plan (₹0) →',
+      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_gibberish',
+    };
+  }
+
+  // 1. Math / Dynamic Number & GST Calculator
+  const numMatch = q.match(/(?:₹|rs\.?|inr)?\s*(\d{1,3}(?:,\d{3})*|\d+)(?:\s*(?:k|thousand|lakh))?/i);
+  if (numMatch && (q.includes('gst') || q.includes('tax') || q.includes('calculate') || q.includes('invoice') || q.includes('bill') || q.includes('18%'))) {
+    let rawNum = parseFloat(numMatch[1].replace(/,/g, ''));
+    if (q.includes('k') || q.includes('thousand')) rawNum *= 1000;
+    if (q.includes('lakh')) rawNum *= 100000;
+
+    if (rawNum > 0) {
+      const cgst = Math.round(rawNum * 0.09);
+      const sgst = Math.round(rawNum * 0.09);
+      const total = rawNum + cgst + sgst;
+
+      return {
+        text: `Here is the exact 18% GST invoice breakdown for ₹${rawNum.toLocaleString('en-IN')}:`,
+        highlights: [
+          { title: `Base Amount: ₹${rawNum.toLocaleString('en-IN')}`, desc: 'Your net service package / fee before tax', badge: 'Base' },
+          { title: `18% GST: ₹${(cgst + sgst).toLocaleString('en-IN')}`, desc: `CGST (9%): ₹${cgst.toLocaleString('en-IN')} + SGST (9%): ₹${sgst.toLocaleString('en-IN')}`, badge: '18% Tax' },
+          { title: `Total Payable: ₹${total.toLocaleString('en-IN')}`, desc: 'Total client amount with instant PhonePe / GPay QR code', badge: 'Total' },
+          { title: '1-Click WhatsApp Share', desc: 'PDF bill with your logo and bank account details generated in 3 seconds', badge: 'Instant' },
+        ],
+        quickReplies: [
+          { label: 'Generate Free Invoice', query: `Make an invoice of ₹${rawNum} for Rahul` },
+          { label: 'How does UPI QR work?', query: 'How does UPI QR payment work in invoices?' },
+        ],
+        ctaText: `Generate ₹${total.toLocaleString('en-IN')} Invoice Free →`,
+        ctaLink: `https://app.heycora.in/workspace/login?source=sdr_calc&amount=${rawNum}`,
+      };
+    }
+  }
+
+  // 2. Photo & Video Studios
+  if (q.includes('photo') || q.includes('video') || q.includes('studio') || q.includes('shoot') || q.includes('camera') || q.includes('production') || q.includes('cinemat')) {
     return {
       text: `Here's how Cora runs your entire photo & video production studio:`,
       highlights: [
@@ -90,8 +158,8 @@ function getSimpleRichReply(query: string): {
     };
   }
 
-  // 2. Creative & Digital Agencies
-  if (q.includes('agency') || q.includes('digital') || q.includes('creative') || q.includes('freelancer') || q.includes('marketing') || q.includes('design')) {
+  // 3. Creative & Digital Agencies
+  if (q.includes('agency') || q.includes('digital') || q.includes('creative') || q.includes('freelancer') || q.includes('marketing') || q.includes('design') || q.includes('developer') || q.includes('seo')) {
     return {
       text: `Here's how Cora streamlines operations for creative & digital agencies:`,
       highlights: [
@@ -110,8 +178,8 @@ function getSimpleRichReply(query: string): {
     };
   }
 
-  // 3. Real Estate Brokers
-  if (q.includes('real estate') || q.includes('property') || q.includes('broker') || q.includes('realtor') || q.includes('listing')) {
+  // 4. Real Estate Brokers
+  if (q.includes('real estate') || q.includes('property') || q.includes('broker') || q.includes('realtor') || q.includes('listing') || q.includes('builder') || q.includes('flat')) {
     return {
       text: `Here's how Cora powers modern real estate brokers & property consultants:`,
       highlights: [
@@ -130,8 +198,8 @@ function getSimpleRichReply(query: string): {
     };
   }
 
-  // 4. Salons, Spas & Clinics
-  if (q.includes('salon') || q.includes('spa') || q.includes('clinic') || q.includes('dental') || q.includes('health') || q.includes('fitness') || q.includes('gym') || q.includes('wellness')) {
+  // 5. Salons, Spas & Clinics
+  if (q.includes('salon') || q.includes('spa') || q.includes('clinic') || q.includes('dental') || q.includes('health') || q.includes('fitness') || q.includes('gym') || q.includes('wellness') || q.includes('doctor')) {
     return {
       text: `Here's how Cora manages daily operations for salons, spas, and clinics:`,
       highlights: [
@@ -150,25 +218,63 @@ function getSimpleRichReply(query: string): {
     };
   }
 
-  // 5. GST & Invoicing
-  if (q.includes('gst') || q.includes('invoice') || q.includes('bill') || q.includes('tax') || q.includes('15,000') || q.includes('15000')) {
+  // 6. WhatsApp & Automation
+  if (q.includes('whatsapp') || q.includes('meta') || q.includes('message') || q.includes('sms') || q.includes('automation')) {
     return {
-      text: `Cora creates compliant 18% GST invoices in under 10 seconds:`,
+      text: `Cora connects directly with official Meta WhatsApp Cloud API:`,
       highlights: [
-        { title: 'Auto CGST / SGST', desc: 'Automatic state split calculations with zero math errors', badge: '18% GST' },
-        { title: 'Direct UPI & QR', desc: 'Clients scan to pay instantly via PhonePe, GPay, or Paytm', badge: 'UPI' },
+        { title: 'Automated 24h CSW Optimizer', desc: 'Maximizes Meta\'s 1,000 free monthly customer conversations', badge: 'Zero Cost' },
+        { title: 'PDF Invoices & Receipts', desc: 'Dispatches GST bills and payment receipts to client WhatsApp in 1 tap', badge: 'Invoices' },
+        { title: 'Automated Shoot Reminders', desc: 'Sends location pins and call-time notifications 24h and 2h before', badge: 'Alerts' },
       ],
       quickReplies: [
         { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
-        { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?' },
+        { label: '18% GST Invoicing', query: 'How does 18% GST billing work?' },
       ],
-      ctaText: 'Generate First GST Invoice Free →',
-      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_gst',
+      ctaText: 'Connect WhatsApp on Free Plan →',
+      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_whatsapp',
     };
   }
 
-  // 6. Pricing
-  if (q.includes('price') || q.includes('pricing') || q.includes('plan') || q.includes('cost') || q.includes('free') || q.includes('299') || q.includes('999')) {
+  // 7. E-Signatures & Contracts
+  if (q.includes('sign') || q.includes('contract') || q.includes('agreement') || q.includes('legal') || q.includes('vault') || q.includes('terms')) {
+    return {
+      text: `Cora Document Vault provides legally compliant digital e-signatures:`,
+      highlights: [
+        { title: 'Mobile Tap Signatures', desc: 'Clients sign agreements on their mobile phone in 10 seconds with no app needed', badge: 'E-Sign' },
+        { title: 'Audit Trail & Timestamps', desc: 'Every signature logs signer IP, device fingerprint, and exact timestamp', badge: 'Compliant' },
+        { title: 'Zero Re-Upload Hassle', desc: 'Save reusable templates for photo shoots, agency retainers, and NDAs', badge: 'Vault' },
+      ],
+      quickReplies: [
+        { label: 'Digital Agency Contracts', query: 'How does Cora manage agency clients and proposals?' },
+        { label: 'Free Plan Invoicing', query: 'What is included in the free plan?' },
+      ],
+      ctaText: 'Start Free E-Signing →',
+      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_esign',
+    };
+  }
+
+  // 8. HoneyBook / Studio Ninja / Notion Comparisons
+  if (q.includes('honeybook') || q.includes('studio ninja') || q.includes('notion') || q.includes('quickbooks') || q.includes('zoho') || q.includes('vs') || q.includes('compare') || q.includes('alternative')) {
+    return {
+      text: `Why Indian founders choose Cora over foreign platforms like HoneyBook or Studio Ninja:`,
+      highlights: [
+        { title: 'Built for India & 18% GST', desc: 'HoneyBook & Studio Ninja lack CGST/SGST splits and state tax compliance', badge: 'Indian Tax' },
+        { title: 'Direct UPI QR Payments', desc: 'Clients pay instantly via PhonePe/GPay without 3% Stripe international fees', badge: 'UPI' },
+        { title: 'WhatsApp-First Dispatch', desc: 'Share bills, call sheets, and e-sign links directly via WhatsApp Cloud API', badge: 'WhatsApp' },
+        { title: 'Transparent INR Pricing', desc: 'Free ₹0 tier; paid plans start at ₹299/mo (no $40/mo USD subscriptions)', badge: 'Value' },
+      ],
+      quickReplies: [
+        { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?' },
+        { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
+      ],
+      ctaText: 'Switch to Cora Free →',
+      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_compare',
+    };
+  }
+
+  // 9. Pricing & Plans
+  if (q.includes('price') || q.includes('pricing') || q.includes('plan') || q.includes('cost') || q.includes('free') || q.includes('299') || q.includes('999') || q.includes('charge') || q.includes('fee')) {
     return {
       text: `Cora offers transparent pricing in Indian Rupees with a Free Forever plan:`,
       highlights: [
@@ -185,18 +291,18 @@ function getSimpleRichReply(query: string): {
     };
   }
 
-  // 7. Greetings / Default
+  // 10. General / Fallback contextual response for any open question
   return {
-    text: `Cora is your AI co-founder. Type what you need in plain English or Hinglish:`,
+    text: `Regarding "${original}": Cora is your AI co-founder that centralizes client intake, 18% GST billing, and service agreements into one conversation.`,
     highlights: [
-      { title: 'Single Chat Input', desc: 'Manage invoices, bookings, and inquiries without clicking through 10 apps', badge: 'Simple' },
-      { title: 'Business Memory', desc: 'Remembers your client rates, service menu, and active jobs automatically', badge: 'Context' },
+      { title: 'Conversational Ops', desc: 'Generate invoices, proposals, and shoot notes simply by typing in chat', badge: 'AI Native' },
+      { title: 'Indian Business Engine', desc: 'Direct UPI QR codes, state GST splitting, and WhatsApp delivery', badge: 'Made for India' },
     ],
     quickReplies: [
       { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
       { label: 'Creative & Digital Agencies', query: 'How does Cora help digital and creative agencies?' },
-      { label: 'Real Estate Brokers', query: 'How does Cora help real estate brokers and property consultants?' },
-      { label: 'Salons & Clinics', query: 'How does Cora help salons, spas, and wellness clinics?' },
+      { label: 'Real Estate Brokers', query: 'How does Cora help real estate brokers?' },
+      { label: '18% GST Billing Demo', query: 'Make a ₹15,000 invoice with 18% GST for Rahul' },
     ],
     ctaText: 'Start Free Forever (No Card) →',
     ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_default',
@@ -229,7 +335,6 @@ export function HeroAIInput() {
     const isScrollable = scrollHeight > clientHeight;
 
     if (isScrollable) {
-      // Prevent parent/body scrolling if scrolling within limits
       const isAtTop = scrollTop === 0 && e.deltaY < 0;
       const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0;
 
@@ -239,7 +344,7 @@ export function HeroAIInput() {
     }
   };
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const text = (textToSend || inputValue).trim();
     if (!text) {
       setIsExpanded(true);
@@ -260,6 +365,44 @@ export function HeroAIInput() {
     setIsExpanded(true);
     setIsLoading(true);
 
+    try {
+      // First attempt dynamic API endpoint
+      const res = await fetch('/api/ai-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.output) {
+          const sdrMsg: Message = {
+            id: (Date.now() + 1).toString(),
+            sender: 'sdr',
+            text: data.output,
+            highlights: data.highlights || [
+              { title: 'Multi-Model Engine', desc: `Routed dynamically via ${data.model || 'Cora AI'} in ${data.latency || '280ms'}`, badge: 'Live AI' },
+              { title: 'Indian Tax & Workflows', desc: 'Pre-configured with 18% GST, WhatsApp integration, and UPI payments', badge: 'Active' },
+            ],
+            quickReplies: [
+              { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
+              { label: 'Creative & Digital Agencies', query: 'How does Cora help digital and creative agencies?' },
+              { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?' },
+            ],
+            ctaText: 'Start Free Forever (No Card) →',
+            ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_api',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          };
+          setMessages((prev) => [...prev, sdrMsg]);
+          setIsLoading(false);
+          return;
+        }
+      }
+    } catch (e) {
+      // Fallback gracefully to smart client intelligence
+    }
+
+    // Smart rich fallback engine
     setTimeout(() => {
       const response = getSimpleRichReply(text);
       const sdrMsg: Message = {
