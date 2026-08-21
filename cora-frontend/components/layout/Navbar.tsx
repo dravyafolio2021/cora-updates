@@ -721,11 +721,11 @@ export function Navbar() {
                 {activeDropdown === 'resources' && (
                   <div className="grid grid-cols-3 gap-6 items-stretch">
                     
-                    {/* Card 1: Free Public Tools (Solid Pastel Mint Green, No Border) */}
+                    {/* Card 1: Free Public Tools (Solid Soft Lavender / Periwinkle, No Border) */}
                     <Link
                       href="/tools"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[26px] bg-[#DCFCE7] hover:bg-[#D1FAE5] border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
+                      className="group relative rounded-[26px] bg-[#EEF2FF] hover:bg-[#E0E7FF] border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
                     >
                       <div className="text-center space-y-1 mb-4">
                         <h3 className="font-display text-xl font-bold text-zinc-950">
@@ -737,7 +737,7 @@ export function Navbar() {
                       </div>
 
                       {/* Floating Mockup Card inside */}
-                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_4px_16px_rgba(0,0,0,0.04)] space-y-2 group-hover:scale-[1.02] transition-transform">
+                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_6px_20px_rgba(0,0,0,0.06)] space-y-2 group-hover:scale-[1.02] transition-transform">
                         <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
                           <div className="flex items-center gap-1.5">
                             <span className="w-5 h-5 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-[10px] font-bold">₹</span>
@@ -752,18 +752,18 @@ export function Navbar() {
                       </div>
 
                       <div className="pt-4 text-center">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 group-hover:translate-x-0.5 transition-transform">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-950 group-hover:translate-x-0.5 transition-transform">
                           <span>Browse all micro-tools</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </span>
                       </div>
                     </Link>
 
-                    {/* Card 2: Guides & Playbooks (Solid Pastel Butter Yellow, No Border) */}
+                    {/* Card 2: Guides & Playbooks (Solid Soft Sky Blue, No Border) */}
                     <Link
                       href="/features#esign-vault"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[26px] bg-[#FEF08A] hover:bg-[#FDE047]/90 border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
+                      className="group relative rounded-[26px] bg-[#E0F2FE] hover:bg-[#BAE6FD] border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
                     >
                       <div className="text-center space-y-1 mb-4">
                         <h3 className="font-display text-xl font-bold text-zinc-950">
@@ -775,39 +775,39 @@ export function Navbar() {
                       </div>
 
                       {/* Floating Mockup Card inside */}
-                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_4px_16px_rgba(0,0,0,0.04)] space-y-2 group-hover:scale-[1.02] transition-transform">
-                        <span className="text-[10px] font-mono font-bold text-zinc-800 uppercase tracking-wider block pb-1 border-b border-zinc-100">
+                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_6px_20px_rgba(0,0,0,0.06)] space-y-2 group-hover:scale-[1.02] transition-transform">
+                        <span className="text-[10px] font-mono font-bold text-sky-700 uppercase tracking-wider block pb-1 border-b border-zinc-100">
                           FEATURED ASSETS
                         </span>
                         <div className="space-y-1.5 text-[11px] font-medium text-zinc-800">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-zinc-400">✦</span>
+                            <span className="text-sky-600">✦</span>
                             <span>Commercial Studio Rate Card 2026</span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-zinc-400">✦</span>
+                            <span className="text-sky-600">✦</span>
                             <span>IT Act 2000 Model Release NDA</span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-zinc-400">✦</span>
+                            <span className="text-sky-600">✦</span>
                             <span>WhatsApp Call-Sheet Checklist</span>
                           </div>
                         </div>
                       </div>
 
                       <div className="pt-4 text-center">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 group-hover:translate-x-0.5 transition-transform">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-950 group-hover:translate-x-0.5 transition-transform">
                           <span>Explore playbooks</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </span>
                       </div>
                     </Link>
 
-                    {/* Card 3: Articles & Market Comparisons (Solid Pastel Soft Pink, No Border) */}
+                    {/* Card 3: Articles & Market Comparisons (Solid Soft Mint Green, No Border) */}
                     <Link
                       href="/compare"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[26px] bg-[#FFE4E6] hover:bg-[#FECDD3] border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
+                      className="group relative rounded-[26px] bg-[#DCFCE7] hover:bg-[#D1FAE5] border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
                     >
                       <div className="text-center space-y-1 mb-4">
                         <h3 className="font-display text-xl font-bold text-zinc-950">
@@ -819,9 +819,9 @@ export function Navbar() {
                       </div>
 
                       {/* Floating Mockup Card inside */}
-                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_4px_16px_rgba(0,0,0,0.04)] space-y-2 group-hover:scale-[1.02] transition-transform">
+                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_6px_20px_rgba(0,0,0,0.06)] space-y-2 group-hover:scale-[1.02] transition-transform">
                         <div className="flex items-center justify-between pb-1 border-b border-zinc-100">
-                          <span className="text-[10px] font-mono font-bold text-zinc-800 uppercase tracking-wider">
+                          <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-wider">
                             HEAD-TO-HEAD
                           </span>
                           <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
@@ -841,7 +841,7 @@ export function Navbar() {
                       </div>
 
                       <div className="pt-4 text-center">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 group-hover:translate-x-0.5 transition-transform">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-950 group-hover:translate-x-0.5 transition-transform">
                           <span>Browse all 8 comparisons</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </span>
