@@ -3,58 +3,66 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { ArrowRight, Mail, Instagram, Linkedin, Twitter, Sparkles, ShieldCheck } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
 export function Footer() {
+  const pathname = usePathname();
+  const is404 = pathname === '/404' || pathname?.includes('_not-found');
+
   return (
-    <footer className="relative w-full overflow-hidden pt-20 sm:pt-28 pb-12">
+    <footer className="relative w-full overflow-hidden pt-12 sm:pt-16 pb-12">
       
-      {/* ── Background Landscape Horizon & Atmospheric Overlays ── */}
-      <div className="absolute inset-0 pointer-events-none select-none z-0">
-        <Image
-          src="/images/cora_hero_landscape.jpg"
-          alt="Landscape Horizon"
-          fill
-          sizes="100vw"
-          className="object-cover object-[center_55%]"
-        />
-        {/* Soft sky overlays fading down into the card */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-white/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
-      </div>
+      {/* ── Background Landscape Horizon & Atmospheric Overlays (Hidden on 404) ── */}
+      {!is404 && (
+        <div className="absolute inset-0 pointer-events-none select-none z-0">
+          <Image
+            src="/images/cora_hero_landscape.jpg"
+            alt="Landscape Horizon"
+            fill
+            sizes="100vw"
+            className="object-cover object-[center_55%]"
+          />
+          {/* Soft sky overlays fading down into the card */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-white/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
+        </div>
+      )}
 
       <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6">
         
-        {/* ── Top Conversion CTA Banner ── */}
-        <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20">
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-[48px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-4">
-            Ready to run an autonomous studio?
-          </h2>
-          <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[600px] mx-auto mb-8">
-            Join 1,200+ founders and creative operators using AI dispatch, legally binding digital contracts, and automated GST invoicing.
-          </p>
+        {/* ── Top Conversion CTA Banner (Hidden on 404) ── */}
+        {!is404 && (
+          <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20">
+            <h2 className="font-display text-3xl xs:text-4xl sm:text-[48px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-4">
+              Ready to run an autonomous studio?
+            </h2>
+            <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[600px] mx-auto mb-8">
+              Join 1,200+ founders and creative operators using AI dispatch, legally binding digital contracts, and automated GST invoicing.
+            </p>
 
-          {/* Action Buttons following Cora Design System */}
-          <div className="flex items-center justify-center flex-wrap gap-3.5">
-            <a
-              href="https://app.heycora.in/workspace/login?source=footer_cta"
-              onClick={() => trackEvent('cta_click', { section: 'footer_cta_primary' })}
-              className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-sm border border-zinc-800 group"
-            >
-              <span>Get started for Free</span>
-              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
-            </a>
+            {/* Action Buttons following Cora Design System */}
+            <div className="flex items-center justify-center flex-wrap gap-3.5">
+              <a
+                href="https://app.heycora.in/workspace/login?source=footer_cta"
+                onClick={() => trackEvent('cta_click', { section: 'footer_cta_primary' })}
+                className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-sm border border-zinc-800 group"
+              >
+                <span>Get started for Free</span>
+                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+              </a>
 
-            <a
-              href="mailto:dravya.bansal@heycora.in?subject=Inquiry%20from%20Cora%20Website"
-              onClick={() => trackEvent('cta_click', { section: 'footer_cta_chat_founder' })}
-              className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
-            >
-              <span>Chat with Founder</span>
-            </a>
+              <a
+                href="mailto:dravya.bansal@heycora.in?subject=Inquiry%20from%20Cora%20Website"
+                onClick={() => trackEvent('cta_click', { section: 'footer_cta_chat_founder' })}
+                className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
+              >
+                <span>Chat with Founder</span>
+              </a>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ── Master White Footer Card ── */}
         <div className="w-full rounded-[36px] bg-white border border-zinc-200/90 shadow-[0px_20px_60px_rgba(0,0,0,0.06)] p-8 sm:p-12 md:p-14">
