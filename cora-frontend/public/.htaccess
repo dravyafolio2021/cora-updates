@@ -5,6 +5,9 @@
 # 1. Prioritize index.html for Next.js Frontend, fall back to index.php for WordPress
 DirectoryIndex index.html index.php
 
+# Custom 404 Error Document for Next.js static 404 page
+ErrorDocument 404 /404.html
+
 # 2. Enable LiteSpeed & Apache Output Compression (Brotli / Gzip)
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml application/rss+xml application/atom+xml image/svg+xml font/ttf font/otf font/woff font/woff2
