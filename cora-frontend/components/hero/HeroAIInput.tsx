@@ -7,11 +7,8 @@ import {
   RotateCcw,
   Camera,
   Building2,
-  Receipt,
-  FileSignature,
   Home,
-  Briefcase,
-  Layers,
+  Scissors,
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
@@ -38,12 +35,27 @@ interface Message {
   timestamp: string;
 }
 
-const idlePills = [
-  { icon: Camera, label: 'Photo & Video Studio', query: 'How does Cora help a photo and video studio?' },
-  { icon: Building2, label: 'Digital Agency', query: 'How does Cora manage agency clients and proposals?' },
-  { icon: Receipt, label: '18% GST Invoicing', query: 'Make a ₹15,000 invoice with 18% GST for Rahul' },
-  { icon: FileSignature, label: 'Legal E-Signatures', query: 'How do legal e-signatures and client agreements work?' },
-  { icon: Home, label: 'Real Estate AI', query: 'How does real estate property listing AI work?' },
+const industryPills = [
+  { 
+    icon: Camera, 
+    label: 'Photo & Video Studios', 
+    query: 'How does Cora help a photo and video studio?' 
+  },
+  { 
+    icon: Building2, 
+    label: 'Creative & Digital Agencies', 
+    query: 'How does Cora help digital and creative agencies?' 
+  },
+  { 
+    icon: Home, 
+    label: 'Real Estate Brokers', 
+    query: 'How does Cora help real estate brokers and property consultants?' 
+  },
+  { 
+    icon: Scissors, 
+    label: 'Salons, Spas & Clinics', 
+    query: 'How does Cora help salons, spas, and wellness clinics?' 
+  },
 ];
 
 function getSimpleRichReply(query: string): {
@@ -55,25 +67,87 @@ function getSimpleRichReply(query: string): {
 } {
   const q = query.trim().toLowerCase();
 
-  // 1. Greetings
-  if (['hey', 'hi', 'hello', 'yo', 'sup', 'heya', 'good morning', 'good afternoon', 'hola'].includes(q) || q.length <= 3) {
+  // 1. Photo & Video Studios
+  if (q.includes('photo') || q.includes('video') || q.includes('studio') || q.includes('shoot') || q.includes('camera') || q.includes('production')) {
     return {
-      text: `Hey! I'm Cora, your AI co-founder. What workflow would you like to run today?`,
+      text: `Here's how Cora runs your entire photo & video production studio:`,
       highlights: [
-        { title: 'Inquiry Funnel', desc: 'Auto-capture client leads from WhatsApp & web', badge: 'Auto' },
-        { title: '18% GST Invoicing', desc: 'Instant UPI QR codes & compliant tax invoices', badge: 'Verified' },
+        { title: 'Shoot Notes & Hold Dates', desc: 'Track client shoot dates, call times, and crew allocations in chat', badge: 'Bookings' },
+        { title: '18% GST & Instant UPI', desc: 'Generate 18% GST invoices and send UPI payment links directly on WhatsApp', badge: 'Billing' },
+        { title: 'Digital E-Sign Agreements', desc: 'Send shoot contracts and capture legally binding client signatures on mobile', badge: 'E-Sign' },
+        { title: 'Crew Call-Sheets', desc: 'Auto-generate shoot call-sheets and dispatch details to your team', badge: 'Dispatch' },
       ],
       quickReplies: [
-        { label: 'Photo & Video Studio', query: 'How does Cora help a photo and video studio?', iconName: 'camera' },
-        { label: 'Digital Agency', query: 'How does Cora manage agency clients and proposals?', iconName: 'building' },
-        { label: '18% GST Invoicing', query: 'Make a ₹15,000 invoice with 18% GST for Rahul', iconName: 'receipt' },
+        { label: 'Creative & Digital Agencies', query: 'How does Cora help digital and creative agencies?' },
+        { label: '18% GST Billing Demo', query: 'Make a ₹15,000 invoice with 18% GST for Rahul' },
+        { label: 'Free Plan Details', query: 'What is included in the free plan?' },
       ],
-      ctaText: 'Start Free Forever (No Card) →',
-      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_greet',
+      ctaText: 'Start Free Studio Workspace →',
+      ctaLink: 'https://app.heycora.in/workspace/login?industry=photography_studio&source=sdr_industry_chip',
     };
   }
 
-  // 2. GST & Invoicing
+  // 2. Creative & Digital Agencies
+  if (q.includes('agency') || q.includes('digital') || q.includes('creative') || q.includes('freelancer') || q.includes('marketing') || q.includes('design')) {
+    return {
+      text: `Here's how Cora streamlines operations for creative & digital agencies:`,
+      highlights: [
+        { title: 'Client Scopes & Proposals', desc: 'Draft custom project proposals, retainers, and deliverable agreements in seconds', badge: 'Proposals' },
+        { title: 'Inquiry-to-Cash CRM', desc: 'Track leads from initial WhatsApp discovery call to final milestone payment', badge: 'Pipeline' },
+        { title: 'Automated Reminders', desc: 'Send polite payment reminders and milestone sign-off links with zero awkwardness', badge: 'Follow-ups' },
+        { title: 'Cash Flow & Margins', desc: 'Monitor project margins, monthly recurring retainers, and contractor payouts', badge: 'Finance' },
+      ],
+      quickReplies: [
+        { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
+        { label: 'Real Estate Brokers', query: 'How does Cora help real estate brokers and property consultants?' },
+        { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?' },
+      ],
+      ctaText: 'Start Free Agency Workspace →',
+      ctaLink: 'https://app.heycora.in/workspace/login?industry=custom&source=sdr_industry_chip',
+    };
+  }
+
+  // 3. Real Estate Brokers
+  if (q.includes('real estate') || q.includes('property') || q.includes('broker') || q.includes('realtor') || q.includes('listing')) {
+    return {
+      text: `Here's how Cora powers modern real estate brokers & property consultants:`,
+      highlights: [
+        { title: 'Buyer Lead Matching', desc: 'Log buyer budgets, locations, and match matching property inventory', badge: 'Leads' },
+        { title: 'WhatsApp Property Briefs', desc: 'Generate clean property briefs and listing descriptions in seconds', badge: 'Listings' },
+        { title: 'Site Visit Coordination', desc: 'Track client property visits, site viewing notes, and client hold requests', badge: 'Visits' },
+        { title: 'Brokerage Fee Invoices', desc: 'Create 18% GST brokerage invoices with instant UPI QR payment links', badge: 'Invoices' },
+      ],
+      quickReplies: [
+        { label: 'Salons & Clinics', query: 'How does Cora help salons, spas, and wellness clinics?' },
+        { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
+        { label: 'Is card required?', query: 'Do I need a credit card to get started?' },
+      ],
+      ctaText: 'Start Free Real Estate Workspace →',
+      ctaLink: 'https://app.heycora.in/workspace/login?industry=real_estate&source=sdr_industry_chip',
+    };
+  }
+
+  // 4. Salons, Spas & Clinics
+  if (q.includes('salon') || q.includes('spa') || q.includes('clinic') || q.includes('dental') || q.includes('health') || q.includes('fitness') || q.includes('gym') || q.includes('wellness')) {
+    return {
+      text: `Here's how Cora manages daily operations for salons, spas, and clinics:`,
+      highlights: [
+        { title: 'WhatsApp Booking Confirmations', desc: 'Send instant booking confirmations and automated appointment reminders', badge: 'Appointments' },
+        { title: 'Service Menu Digital Bills', desc: 'Generate instant GST bills and UPI QR codes for walk-in client checkout', badge: 'Checkout' },
+        { title: 'Client Visit History', desc: 'Remember past services, preferences, and repeat customer frequency', badge: 'Memory' },
+        { title: 'Daily Collections & Cash Flow', desc: 'Track daily UPI/cash collections and staff service commissions in real time', badge: 'Accounts' },
+      ],
+      quickReplies: [
+        { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
+        { label: 'Creative & Digital Agencies', query: 'How does Cora help digital and creative agencies?' },
+        { label: 'Free Forever Plan', query: 'What is included in the free plan?' },
+      ],
+      ctaText: 'Start Free Clinic / Salon Workspace →',
+      ctaLink: 'https://app.heycora.in/workspace/login?industry=custom&source=sdr_industry_chip',
+    };
+  }
+
+  // 5. GST & Invoicing
   if (q.includes('gst') || q.includes('invoice') || q.includes('bill') || q.includes('tax') || q.includes('15,000') || q.includes('15000')) {
     return {
       text: `Cora creates compliant 18% GST invoices in under 10 seconds:`,
@@ -82,58 +156,44 @@ function getSimpleRichReply(query: string): {
         { title: 'Direct UPI & QR', desc: 'Clients scan to pay instantly via PhonePe, GPay, or Paytm', badge: 'UPI' },
       ],
       quickReplies: [
-        { label: 'Legal E-Signatures', query: 'How do legal e-signatures and client agreements work?', iconName: 'signature' },
-        { label: 'Pricing Plans', query: 'What are the pricing plans?', iconName: 'zap' },
+        { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
+        { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?' },
       ],
       ctaText: 'Generate First GST Invoice Free →',
       ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_gst',
     };
   }
 
-  // 3. Studio / Photo / Video
-  if (q.includes('photo') || q.includes('video') || q.includes('studio') || q.includes('shoot')) {
+  // 6. Pricing
+  if (q.includes('price') || q.includes('pricing') || q.includes('plan') || q.includes('cost') || q.includes('free') || q.includes('299') || q.includes('999')) {
     return {
-      text: `Studios manage their bookings, client terms, and billing in one unified chat:`,
+      text: `Cora offers transparent pricing in Indian Rupees with a Free Forever plan:`,
       highlights: [
-        { title: 'Client Booking Notes', desc: 'Auto-track hold dates, call times, and service packages', badge: 'Bookings' },
-        { title: 'Instant WhatsApp Bills', desc: 'Share payment receipts and UPI QR links directly on WhatsApp', badge: 'Billing' },
+        { title: 'Free Forever (₹0)', desc: '1 User workspace, core AI chat, client manager, up to 15 GST invoices/mo', badge: '₹0' },
+        { title: 'Standard (₹299/mo)', desc: 'Billed annually. Full AI memory, 3 team seats, unlimited invoices', badge: 'Popular' },
+        { title: 'Business (₹999/mo)', desc: 'Billed annually. Up to 10 team seats, multi-location & priority support', badge: 'Agencies' },
       ],
       quickReplies: [
-        { label: '18% GST Invoices', query: 'Make a ₹15,000 invoice with 18% GST for Rahul', iconName: 'receipt' },
-        { label: 'Legal E-Signatures', query: 'How do legal e-signatures work?', iconName: 'signature' },
+        { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
+        { label: 'Creative & Digital Agencies', query: 'How does Cora help digital and creative agencies?' },
       ],
-      ctaText: 'Start Free Studio Workspace →',
-      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_studio',
+      ctaText: 'Start Free Forever (No Card) →',
+      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_pricing',
     };
   }
 
-  // 4. Agency / Solopreneur
-  if (q.includes('agency') || q.includes('digital') || q.includes('creative') || q.includes('freelancer')) {
-    return {
-      text: `Agencies replace 8-10 disconnected apps with one conversational workspace:`,
-      highlights: [
-        { title: 'Fast Client Scopes', desc: 'Draft custom project proposals with your saved rates', badge: 'Proposals' },
-        { title: 'Deal Pipeline', desc: 'Track clients from first inquiry to final payment', badge: 'CRM' },
-      ],
-      quickReplies: [
-        { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?', iconName: 'receipt' },
-        { label: '18% GST Invoicing', query: 'Make a ₹15,000 invoice with 18% GST for Rahul', iconName: 'receipt' },
-      ],
-      ctaText: 'Start Free Agency Workspace →',
-      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_agency',
-    };
-  }
-
-  // 5. Default
+  // 7. Greetings / Default
   return {
     text: `Cora is your AI co-founder. Type what you need in plain English or Hinglish:`,
     highlights: [
-      { title: 'Single Chat Input', desc: 'Type what you need done without clicking through 10 apps', badge: 'Simple' },
-      { title: 'Business Memory', desc: 'Remembers your client rates, history, and active jobs', badge: 'Context' },
+      { title: 'Single Chat Input', desc: 'Manage invoices, bookings, and inquiries without clicking through 10 apps', badge: 'Simple' },
+      { title: 'Business Memory', desc: 'Remembers your client rates, service menu, and active jobs automatically', badge: 'Context' },
     ],
     quickReplies: [
-      { label: '18% GST Invoicing', query: 'Make a ₹15,000 invoice with 18% GST for Rahul', iconName: 'receipt' },
-      { label: 'Pricing Plans', query: 'What are the pricing plans?', iconName: 'zap' },
+      { label: 'Photo & Video Studios', query: 'How does Cora help a photo and video studio?' },
+      { label: 'Creative & Digital Agencies', query: 'How does Cora help digital and creative agencies?' },
+      { label: 'Real Estate Brokers', query: 'How does Cora help real estate brokers and property consultants?' },
+      { label: 'Salons & Clinics', query: 'How does Cora help salons, spas, and wellness clinics?' },
     ],
     ctaText: 'Start Free Forever (No Card) →',
     ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_default',
@@ -190,7 +250,7 @@ export function HeroAIInput() {
       };
       setMessages((prev) => [...prev, sdrMsg]);
       setIsLoading(false);
-    }, 450);
+    }, 400);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -339,29 +399,22 @@ export function HeroAIInput() {
 
       </div>
 
-      {/* ── Bottom Row Outside Card (Pills + Made in Cora Badge) ── */}
-      <div className="mt-4 flex items-center justify-between flex-wrap gap-2.5">
-        <div className="flex items-center gap-2 flex-wrap">
-          {idlePills.map((pill, idx) => {
-            const IconComp = pill.icon;
-            return (
-              <button
-                key={idx}
-                onClick={() => handleSend(pill.query)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-white text-zinc-800 text-xs font-medium transition-all hover:-translate-y-0.5 border border-zinc-200/80 shadow-2xs"
-              >
-                <IconComp className="w-3.5 h-3.5 text-zinc-600" />
-                <span>{pill.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Made in Cora Badge */}
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 backdrop-blur-md rounded-full border border-zinc-200/80 text-zinc-800 text-xs font-semibold shadow-2xs">
-          <Layers className="w-3.5 h-3.5 text-zinc-900" />
-          <span>Made in Cora</span>
-        </div>
+      {/* ── 3-4 Industry Chips (Clicking explains how Cora helps that industry) ── */}
+      <div className="mt-4 flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+        {industryPills.map((pill, idx) => {
+          const IconComp = pill.icon;
+          return (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleSend(pill.query)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 hover:bg-white text-zinc-800 hover:text-zinc-950 text-xs font-medium transition-all hover:-translate-y-0.5 border border-zinc-200/90 hover:border-zinc-400 shadow-2xs cursor-pointer"
+            >
+              <IconComp className="w-3.5 h-3.5 text-zinc-700" />
+              <span>{pill.label}</span>
+            </button>
+          );
+        })}
       </div>
 
     </div>
