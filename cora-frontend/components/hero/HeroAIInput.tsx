@@ -400,7 +400,7 @@ export function HeroAIInput() {
       </div>
 
       {/* ── 3-4 Industry Chips (Clicking explains how Cora helps that industry) ── */}
-      <div className="mt-4 flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+      <div className="mt-4 flex items-center justify-center gap-2 flex-wrap w-full">
         {industryPills.map((pill, idx) => {
           const IconComp = pill.icon;
           return (
