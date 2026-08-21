@@ -721,11 +721,11 @@ export function Navbar() {
                 {activeDropdown === 'resources' && (
                   <div className="grid grid-cols-3 gap-6 items-stretch">
                     
-                    {/* Card 1: Free Public Tools (Solid Monochromatic Surface, No Border) */}
+                    {/* Card 1: Free Public Tools (Solid Pastel Mint Green, No Border) */}
                     <Link
                       href="/tools"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[26px] bg-zinc-50 hover:bg-zinc-100/80 border-0 p-6 flex flex-col justify-between overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.07)] hover:-translate-y-1 transition-all"
+                      className="group relative rounded-[26px] bg-[#DCFCE7] hover:bg-[#D1FAE5] border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
                     >
                       <div className="text-center space-y-1 mb-4">
                         <h3 className="font-display text-xl font-bold text-zinc-950">
@@ -737,7 +737,7 @@ export function Navbar() {
                       </div>
 
                       {/* Floating Mockup Card inside */}
-                      <div className="bg-white rounded-2xl p-3.5 border-0 shadow-[0_2px_12px_rgba(0,0,0,0.04)] space-y-2 group-hover:scale-[1.02] transition-transform">
+                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_4px_16px_rgba(0,0,0,0.04)] space-y-2 group-hover:scale-[1.02] transition-transform">
                         <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
                           <div className="flex items-center gap-1.5">
                             <span className="w-5 h-5 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-[10px] font-bold">₹</span>
@@ -759,11 +759,11 @@ export function Navbar() {
                       </div>
                     </Link>
 
-                    {/* Card 2: Guides & Playbooks (Solid Monochromatic Surface, No Border) */}
+                    {/* Card 2: Guides & Playbooks (Solid Pastel Butter Yellow, No Border) */}
                     <Link
                       href="/features#esign-vault"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[26px] bg-zinc-50 hover:bg-zinc-100/80 border-0 p-6 flex flex-col justify-between overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.07)] hover:-translate-y-1 transition-all"
+                      className="group relative rounded-[26px] bg-[#FEF08A] hover:bg-[#FDE047]/90 border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
                     >
                       <div className="text-center space-y-1 mb-4">
                         <h3 className="font-display text-xl font-bold text-zinc-950">
@@ -775,7 +775,7 @@ export function Navbar() {
                       </div>
 
                       {/* Floating Mockup Card inside */}
-                      <div className="bg-white rounded-2xl p-3.5 border-0 shadow-[0_2px_12px_rgba(0,0,0,0.04)] space-y-2 group-hover:scale-[1.02] transition-transform">
+                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_4px_16px_rgba(0,0,0,0.04)] space-y-2 group-hover:scale-[1.02] transition-transform">
                         <span className="text-[10px] font-mono font-bold text-zinc-800 uppercase tracking-wider block pb-1 border-b border-zinc-100">
                           FEATURED ASSETS
                         </span>
@@ -803,11 +803,11 @@ export function Navbar() {
                       </div>
                     </Link>
 
-                    {/* Card 3: Articles & Market Comparisons (Solid Monochromatic Surface, No Border) */}
+                    {/* Card 3: Articles & Market Comparisons (Solid Pastel Soft Pink, No Border) */}
                     <Link
                       href="/compare"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[26px] bg-zinc-50 hover:bg-zinc-100/80 border-0 p-6 flex flex-col justify-between overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.07)] hover:-translate-y-1 transition-all"
+                      className="group relative rounded-[26px] bg-[#FFE4E6] hover:bg-[#FECDD3] border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
                     >
                       <div className="text-center space-y-1 mb-4">
                         <h3 className="font-display text-xl font-bold text-zinc-950">
@@ -819,7 +819,7 @@ export function Navbar() {
                       </div>
 
                       {/* Floating Mockup Card inside */}
-                      <div className="bg-white rounded-2xl p-3.5 border-0 shadow-[0_2px_12px_rgba(0,0,0,0.04)] space-y-2 group-hover:scale-[1.02] transition-transform">
+                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_4px_16px_rgba(0,0,0,0.04)] space-y-2 group-hover:scale-[1.02] transition-transform">
                         <div className="flex items-center justify-between pb-1 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-800 uppercase tracking-wider">
                             HEAD-TO-HEAD
