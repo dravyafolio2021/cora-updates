@@ -11,8 +11,7 @@ import {
   Scissors,
   X,
   Send,
-  MessageSquare,
-  Bot,
+  ChevronDown,
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
@@ -205,54 +204,45 @@ function getSimpleRichReply(query: string): {
 }
 
 export function HeroAIInput() {
-  const [heroInputValue, setHeroInputValue] = useState('');
-  const [modalInputValue, setModalInputValue] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const modalInputRef = useRef<HTMLInputElement>(null);
-
-  // Lock body scroll when modal is active
-  useEffect(() => {
-    if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
-      // Auto-focus modal input after opening
-      setTimeout(() => {
-        modalInputRef.current?.focus();
-      }, 100);
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isModalOpen]);
-
-  // Escape key listener to close modal
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isModalOpen) {
-        setIsModalOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen]);
+  const chatScrollContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll chat to latest message
   useEffect(() => {
-    if (isModalOpen && messages.length > 0) {
+    if (isExpanded && messages.length > 0) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isModalOpen]);
+  }, [messages, isExpanded]);
+
+  // Isolate scroll within the chat container so it never scrolls the underlying window
+  const handleChatWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const container = chatScrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const isScrollable = scrollHeight > clientHeight;
+
+    if (isScrollable) {
+      // Prevent parent/body scrolling if scrolling within limits
+      const isAtTop = scrollTop === 0 && e.deltaY < 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0;
+
+      if (!isAtTop && !isAtBottom) {
+        e.stopPropagation();
+      }
+    }
+  };
 
   const handleSend = (textToSend?: string) => {
-    const text = (textToSend || modalInputValue || heroInputValue).trim();
+    const text = (textToSend || inputValue).trim();
     if (!text) {
-      // If empty and opened from hero, open modal with default welcome
-      setIsModalOpen(true);
+      setIsExpanded(true);
       return;
     }
 
@@ -266,9 +256,8 @@ export function HeroAIInput() {
     };
 
     setMessages((prev) => [...prev, userMsg]);
-    setHeroInputValue('');
-    setModalInputValue('');
-    setIsModalOpen(true);
+    setInputValue('');
+    setIsExpanded(true);
     setIsLoading(true);
 
     setTimeout(() => {
@@ -285,53 +274,169 @@ export function HeroAIInput() {
       };
       setMessages((prev) => [...prev, sdrMsg]);
       setIsLoading(false);
-    }, 400);
+    }, 350);
   };
 
-  const handleHeroSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSend(heroInputValue);
-  };
-
-  const handleModalSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSend(modalInputValue);
+    handleSend();
   };
 
   const handleReset = () => {
     setMessages([]);
-    setModalInputValue('');
-    setHeroInputValue('');
+    setInputValue('');
     trackEvent('hero_ai_chat_reset');
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCollapse = () => {
+    setIsExpanded(false);
   };
 
   return (
     <div className="w-full max-w-[820px] mx-auto text-left relative z-20">
       
-      {/* ── Normal Static Hero Input Card (Stays Clean & Undisturbed) ── */}
+      {/* ── Expanding Hero AI Card (Smooth In-Place Expansion with Isolated Scroll) ── */}
       <div 
-        onClick={() => {
-          if (!heroInputValue) {
-            // If empty, open modal with welcome context or let user type
-            setIsModalOpen(true);
-          }
-        }}
-        className="w-full bg-white/95 backdrop-blur-xl border border-white/80 rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 shadow-[0px_16px_48px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04] transition-all cursor-pointer"
+        className={`w-full bg-white/95 backdrop-blur-xl border border-white/80 rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 transition-all duration-300 ease-out ${
+          isExpanded 
+            ? 'shadow-[0px_24px_70px_rgba(0,0,0,0.12)] ring-1 ring-black/[0.06] -translate-y-1' 
+            : 'shadow-[0px_16px_48px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04]'
+        }`}
       >
         
-        {/* Top Input Bar Area */}
-        <form onSubmit={handleHeroSubmit} className="relative flex items-center justify-between gap-3 pb-3 border-b border-zinc-100/90">
+        {/* Expanded Top Header Bar (Only visible when expanded) */}
+        {isExpanded && (
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-100/90 animate-in fade-in duration-200">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              </div>
+              <span className="text-xs sm:text-sm font-bold text-zinc-950">Cora AI Sales Concierge</span>
+              <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full">
+                Active Session
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              {messages.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  title="Reset Conversation"
+                  className="w-7 h-7 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleCollapse}
+                title="Collapse Card"
+                className="w-7 h-7 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Expanded Scrollable Chat Feed (Isolated Scroll, Never Scrolls Window) */}
+        {isExpanded && (
+          <div 
+            ref={chatScrollContainerRef}
+            onWheel={handleChatWheel}
+            className="my-3 max-h-[320px] overflow-y-auto overscroll-contain pr-1.5 space-y-3.5 scrollbar-thin scrollbar-thumb-zinc-200"
+          >
+            {messages.length === 0 ? (
+              <div className="py-4 text-center text-zinc-500 text-xs">
+                Ask a question below or click any of the 4 industry chips to see how Cora works for you:
+              </div>
+            ) : (
+              messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1.5`}
+                >
+                  <div
+                    className={`max-w-[88%] sm:max-w-[85%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${
+                      msg.sender === 'user'
+                        ? 'bg-zinc-950 text-white rounded-br-xs font-medium'
+                        : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/70 font-normal'
+                    }`}
+                  >
+                    <p className="whitespace-pre-line">{msg.text}</p>
+
+                    {msg.highlights && msg.highlights.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-zinc-200/60">
+                        {msg.highlights.map((h, i) => (
+                          <div key={i} className="p-2.5 rounded-xl bg-white border border-zinc-200/80 text-left">
+                            <div className="flex items-center justify-between gap-1 mb-1">
+                              <span className="text-[11.5px] font-bold text-zinc-950">{h.title}</span>
+                              {h.badge && (
+                                <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 rounded-md">
+                                  {h.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-zinc-600 leading-normal">{h.desc}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {msg.ctaText && msg.ctaLink && (
+                      <div className="mt-3 pt-1">
+                        <a
+                          href={msg.ctaLink}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-950 text-white rounded-lg text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
+                        >
+                          <span>{msg.ctaText}</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  {msg.quickReplies && msg.quickReplies.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {msg.quickReplies.map((qr, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleSend(qr.query)}
+                          className="text-[11px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-full border border-zinc-200 shadow-2xs transition-colors cursor-pointer"
+                        >
+                          {qr.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+
+            {isLoading && (
+              <div className="flex items-center gap-2 text-zinc-400 text-xs py-1 pl-2">
+                <div className="w-2 h-2 rounded-full bg-zinc-400 animate-pulse" />
+                <span>Cora is thinking...</span>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+        )}
+
+        {/* Input Bar Area */}
+        <form onSubmit={handleSubmit} className="relative flex items-center justify-between gap-3 pb-3 border-b border-zinc-100/90">
           <input
+            ref={inputRef}
             type="text"
-            value={heroInputValue}
-            onChange={(e) => setHeroInputValue(e.target.value)}
-            onFocus={() => setIsModalOpen(true)}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onFocus={() => {
+              if (!isExpanded) setIsExpanded(true);
+            }}
             placeholder="Ask anything about Cora... (e.g. How does 18% GST billing or WhatsApp booking work?)"
-            className="w-full bg-transparent text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-950 placeholder:text-zinc-400 focus:outline-none tracking-tight cursor-text"
+            className="w-full bg-transparent text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-950 placeholder:text-zinc-400 focus:outline-none tracking-tight"
           />
 
           {/* Right Circular Brand Badges */}
@@ -353,10 +458,7 @@ export function HeroAIInput() {
 
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSend(heroInputValue);
-            }}
+            onClick={() => handleSend()}
             className="px-4 py-1.5 bg-zinc-400 hover:bg-zinc-500 text-white rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -366,7 +468,7 @@ export function HeroAIInput() {
 
       </div>
 
-      {/* ── Center-Aligned Industry Chips ── */}
+      {/* ── Center-Aligned 4 Industry Chips ── */}
       <div className="mt-4 flex items-center justify-center gap-2 flex-wrap w-full">
         {industryPills.map((pill, idx) => {
           const IconComp = pill.icon;
@@ -383,181 +485,6 @@ export function HeroAIInput() {
           );
         })}
       </div>
-
-      {/* ── Full Screen Session Modal Popup (Zero Page Scroll Disturbance) ── */}
-      {isModalOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-zinc-950/60 backdrop-blur-md animate-in fade-in duration-200"
-          onClick={handleCloseModal}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-[760px] bg-white rounded-[28px] sm:rounded-[32px] shadow-[0px_24px_80px_rgba(0,0,0,0.25)] border border-zinc-200/90 flex flex-col max-h-[88vh] overflow-hidden animate-in zoom-in-95 duration-200"
-          >
-            
-            {/* Modal Header */}
-            <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/70">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-2xs">
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-zinc-950">Cora AI Sales Concierge</h3>
-                  <p className="text-[11px] text-zinc-500">Ask about workflows, Indian GST, pricing & features</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                {messages.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleReset}
-                    title="Reset Conversation"
-                    className="w-8 h-8 rounded-full text-zinc-500 hover:text-zinc-950 hover:bg-zinc-200/60 flex items-center justify-center transition-colors cursor-pointer"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  title="Close (Esc)"
-                  className="w-8 h-8 rounded-full text-zinc-500 hover:text-zinc-950 hover:bg-zinc-200/60 flex items-center justify-center transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Scrollable Chat Messages Container */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 overscroll-contain bg-white">
-              
-              {/* Initial Welcome Greeting if no messages yet */}
-              {messages.length === 0 && (
-                <div className="py-6 text-center max-w-md mx-auto space-y-4">
-                  <div className="w-12 h-12 rounded-2xl bg-zinc-100 border border-zinc-200 flex items-center justify-center mx-auto text-zinc-800">
-                    <Bot className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="text-base font-bold text-zinc-950">What can Cora do for your business?</h4>
-                    <p className="text-xs text-zinc-500 mt-1">Select an industry below or ask any specific workflow question:</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2 justify-center pt-2">
-                    {industryPills.map((pill, idx) => {
-                      const IconComp = pill.icon;
-                      return (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => handleSend(pill.query)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200/80 text-zinc-800 text-xs font-medium transition-colors"
-                        >
-                          <IconComp className="w-3.5 h-3.5 text-zinc-600" />
-                          <span>{pill.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Message List */}
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1.5`}
-                >
-                  <div
-                    className={`max-w-[90%] sm:max-w-[85%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${
-                      msg.sender === 'user'
-                        ? 'bg-zinc-950 text-white rounded-br-xs font-medium'
-                        : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/80 font-normal'
-                    }`}
-                  >
-                    <p className="whitespace-pre-line">{msg.text}</p>
-
-                    {msg.highlights && msg.highlights.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-zinc-200/60">
-                        {msg.highlights.map((h, i) => (
-                          <div key={i} className="p-3 rounded-xl bg-white border border-zinc-200/80 text-left">
-                            <div className="flex items-center justify-between gap-1 mb-1">
-                              <span className="text-[11.5px] font-bold text-zinc-950">{h.title}</span>
-                              {h.badge && (
-                                <span className="px-1.5 py-0.5 text-[9.5px] font-mono font-bold bg-zinc-100 text-zinc-700 rounded-md">
-                                  {h.badge}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11.5px] text-zinc-600 leading-normal">{h.desc}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {msg.ctaText && msg.ctaLink && (
-                      <div className="mt-3 pt-2">
-                        <a
-                          href={msg.ctaLink}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-zinc-950 text-white rounded-xl text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
-                        >
-                          <span>{msg.ctaText}</span>
-                        </a>
-                      </div>
-                    )}
-                  </div>
-
-                  {msg.quickReplies && msg.quickReplies.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {msg.quickReplies.map((qr, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => handleSend(qr.query)}
-                          className="text-[11px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-3 py-1.5 rounded-full border border-zinc-200 shadow-2xs transition-colors cursor-pointer"
-                        >
-                          {qr.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              {isLoading && (
-                <div className="flex items-center gap-2 text-zinc-400 text-xs py-2 pl-2">
-                  <div className="w-2 h-2 rounded-full bg-zinc-400 animate-pulse" />
-                  <span>Cora is analyzing...</span>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Modal Bottom Input Bar */}
-            <div className="p-3 sm:p-4 border-t border-zinc-100 bg-zinc-50/70">
-              <form onSubmit={handleModalSubmit} className="flex items-center gap-2">
-                <input
-                  ref={modalInputRef}
-                  type="text"
-                  value={modalInputValue}
-                  onChange={(e) => setModalInputValue(e.target.value)}
-                  placeholder="Ask a question or request a workflow demo..."
-                  className="flex-1 bg-white border border-zinc-200/90 rounded-2xl px-4 py-2.5 text-xs sm:text-sm text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-500 shadow-2xs"
-                />
-                <button
-                  type="submit"
-                  disabled={!modalInputValue.trim()}
-                  className="px-4 py-2.5 bg-zinc-950 disabled:bg-zinc-300 text-white rounded-2xl text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:cursor-not-allowed"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Send</span>
-                </button>
-              </form>
-            </div>
-
-          </div>
-        </div>
-      )}
 
     </div>
   );
