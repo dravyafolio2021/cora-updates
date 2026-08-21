@@ -4,9 +4,9 @@ import React, { useEffect } from 'react';
 import Script from 'next/script';
 
 // Environment variable keys for Omnichannel Analytics
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID || '';
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-5BW9VLMM7F';
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || '';
-const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID || '';
+const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID || 'y5wmfas17o';
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '';
 const LINKEDIN_PARTNER_ID = process.env.NEXT_PUBLIC_LINKEDIN_PARTNER_ID || '';
 
