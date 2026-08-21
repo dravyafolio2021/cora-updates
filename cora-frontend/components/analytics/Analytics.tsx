@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Script from 'next/script';
+import { isLocalHost, dispatchEvent } from '@/lib/analytics-funnels';
 
 // Environment variable keys for Omnichannel Analytics
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-5BW9VLMM7F';
@@ -22,60 +23,13 @@ declare global {
 }
 
 /**
- * Checks if the current execution is on a local development host.
- */
-function isLocalHost(): boolean {
-  if (typeof window === 'undefined') return false;
-  const h = window.location.hostname;
-  return h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || h === '';
-}
-
-/**
  * Universal client-side event tracking helper for omnichannel analytics
- * Dispatches to GA4, GTM, Meta Pixel, Microsoft Clarity, and LinkedIn in parallel.
- * Automatically ignores development / localhost traffic.
  */
 export function trackEvent(
   action: string,
   params: Record<string, any> = {}
 ) {
-  if (typeof window === 'undefined' || isLocalHost()) return;
-
-  // 1. Google Analytics 4 (GA4)
-  if (typeof window.gtag === 'function') {
-    window.gtag('event', action, params);
-  }
-
-  // 2. Google Tag Manager (GTM DataLayer)
-  if (Array.isArray(window.dataLayer)) {
-    window.dataLayer.push({
-      event: action,
-      ...params,
-    });
-  }
-
-  // 3. Meta Pixel (Facebook / Instagram)
-  if (typeof window.fbq === 'function') {
-    if (action === 'lead_form_submitted' || action === 'contact_submitted') {
-      window.fbq('track', 'Lead', params);
-    } else if (action === 'start_trial_clicked' || action === 'signup_clicked') {
-      window.fbq('track', 'InitiateCheckout', params);
-    } else if (action === 'pricing_viewed') {
-      window.fbq('track', 'ViewContent', { content_name: 'Pricing Plans', ...params });
-    } else {
-      window.fbq('trackCustom', action, params);
-    }
-  }
-
-  // 4. Microsoft Clarity Custom Events
-  if (typeof window.clarity === 'function') {
-    window.clarity('event', action);
-  }
-
-  // 5. LinkedIn Insight Tag Conversion
-  if (typeof window.lintrk === 'function' && params.conversionId) {
-    window.lintrk('track', { conversion_id: params.conversionId });
-  }
+  dispatchEvent(action, params);
 }
 
 /**
@@ -115,6 +69,65 @@ function captureAttribution() {
   }
 }
 
+/**
+ * Sets up automated scroll depth milestones (25%, 50%, 75%, 90%)
+ */
+function setupScrollTracking() {
+  if (typeof window === 'undefined' || isLocalHost()) return () => {};
+
+  const milestones = [25, 50, 75, 90];
+  const reached = new Set<number>();
+
+  const handleScroll = () => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    if (docHeight <= 0) return;
+
+    const scrollPercent = Math.round((scrollTop / docHeight) * 100);
+
+    milestones.forEach((threshold) => {
+      if (scrollPercent >= threshold && !reached.has(threshold)) {
+        reached.add(threshold);
+        dispatchEvent('scroll_depth', {
+          scroll_percent: threshold,
+          label: `Scrolled ${threshold}%`,
+        });
+        if (typeof window.clarity === 'function') {
+          window.clarity('set', 'max_scroll', `${threshold}%`);
+        }
+      }
+    });
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  return () => window.removeEventListener('scroll', handleScroll);
+}
+
+/**
+ * Sets up engaged time-on-page milestones (30s, 60s, 120s)
+ */
+function setupEngagementTimers() {
+  if (typeof window === 'undefined' || isLocalHost()) return () => {};
+
+  const timers: NodeJS.Timeout[] = [];
+  const intervals = [30, 60, 120];
+
+  intervals.forEach((sec) => {
+    const t = setTimeout(() => {
+      dispatchEvent('engaged_time', {
+        time_seconds: sec,
+        label: `Engaged for ${sec}s`,
+      });
+      if (typeof window.clarity === 'function') {
+        window.clarity('set', 'engaged_time', `${sec}s`);
+      }
+    }, sec * 1000);
+    timers.push(t);
+  });
+
+  return () => timers.forEach(clearTimeout);
+}
+
 export function Analytics() {
   const [isProduction, setIsProduction] = useState(false);
 
@@ -123,11 +136,33 @@ export function Analytics() {
       setIsProduction(true);
       captureAttribution();
 
-      // Microsoft Clarity custom tagging on production
+      const cleanupScroll = setupScrollTracking();
+      const cleanupTimers = setupEngagementTimers();
+
+      // Microsoft Clarity smart tags & user intent classification
       if (typeof window.clarity === 'function') {
         window.clarity('set', 'platform', 'cora-marketing');
         window.clarity('set', 'environment', 'production');
+        
+        // Tag traffic source
+        try {
+          const rawUtm = localStorage.getItem('cora_first_touch_utm');
+          if (rawUtm) {
+            const parsed = JSON.parse(rawUtm);
+            if (parsed.utm_source) {
+              window.clarity('set', 'utm_source', parsed.utm_source);
+            }
+            if (parsed.utm_campaign) {
+              window.clarity('set', 'utm_campaign', parsed.utm_campaign);
+            }
+          }
+        } catch (e) {}
       }
+
+      return () => {
+        cleanupScroll();
+        cleanupTimers();
+      };
     }
   }, []);
 
