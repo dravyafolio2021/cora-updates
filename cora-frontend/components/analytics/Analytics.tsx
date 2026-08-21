@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Script from 'next/script';
 
 // Environment variable keys for Omnichannel Analytics
@@ -22,14 +22,24 @@ declare global {
 }
 
 /**
+ * Checks if the current execution is on a local development host.
+ */
+function isLocalHost(): boolean {
+  if (typeof window === 'undefined') return false;
+  const h = window.location.hostname;
+  return h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || h === '';
+}
+
+/**
  * Universal client-side event tracking helper for omnichannel analytics
  * Dispatches to GA4, GTM, Meta Pixel, Microsoft Clarity, and LinkedIn in parallel.
+ * Automatically ignores development / localhost traffic.
  */
 export function trackEvent(
   action: string,
   params: Record<string, any> = {}
 ) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || isLocalHost()) return;
 
   // 1. Google Analytics 4 (GA4)
   if (typeof window.gtag === 'function') {
@@ -46,7 +56,6 @@ export function trackEvent(
 
   // 3. Meta Pixel (Facebook / Instagram)
   if (typeof window.fbq === 'function') {
-    // Map standard funnel actions
     if (action === 'lead_form_submitted' || action === 'contact_submitted') {
       window.fbq('track', 'Lead', params);
     } else if (action === 'start_trial_clicked' || action === 'signup_clicked') {
@@ -58,7 +67,7 @@ export function trackEvent(
     }
   }
 
-  // 4. Microsoft Clarity Custom Events & Smart Tags
+  // 4. Microsoft Clarity Custom Events
   if (typeof window.clarity === 'function') {
     window.clarity('event', action);
   }
@@ -71,10 +80,9 @@ export function trackEvent(
 
 /**
  * Captures first-touch and last-touch UTM parameters & ad click IDs
- * (utm_source, utm_medium, utm_campaign, gclid, fbclid) and saves to localStorage.
  */
 function captureAttribution() {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || isLocalHost()) return;
   try {
     const urlParams = new URLSearchParams(window.location.search);
     const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'];
@@ -88,14 +96,12 @@ function captureAttribution() {
     });
 
     if (Object.keys(captured).length > 0) {
-      // Save last-touch UTM parameters
       localStorage.setItem('cora_last_touch_utm', JSON.stringify({
         ...captured,
         timestamp: new Date().toISOString(),
         referrer: document.referrer,
       }));
 
-      // Preserve first-touch if not already set
       if (!localStorage.getItem('cora_first_touch_utm')) {
         localStorage.setItem('cora_first_touch_utm', JSON.stringify({
           ...captured,
@@ -110,15 +116,25 @@ function captureAttribution() {
 }
 
 export function Analytics() {
-  useEffect(() => {
-    captureAttribution();
+  const [isProduction, setIsProduction] = useState(false);
 
-    // Microsoft Clarity custom tagging
-    if (typeof window.clarity === 'function') {
-      window.clarity('set', 'platform', 'cora-marketing');
-      window.clarity('set', 'environment', process.env.NODE_ENV || 'production');
+  useEffect(() => {
+    if (!isLocalHost()) {
+      setIsProduction(true);
+      captureAttribution();
+
+      // Microsoft Clarity custom tagging on production
+      if (typeof window.clarity === 'function') {
+        window.clarity('set', 'platform', 'cora-marketing');
+        window.clarity('set', 'environment', 'production');
+      }
     }
   }, []);
+
+  // Suppress all analytics & screen recordings on localhost
+  if (!isProduction) {
+    return null;
+  }
 
   return (
     <>
