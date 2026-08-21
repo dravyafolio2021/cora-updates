@@ -5,15 +5,13 @@ import {
   Sparkles,
   ArrowRight,
   RotateCcw,
-  X,
   Camera,
   Building2,
   Receipt,
   FileSignature,
   Home,
   Briefcase,
-  MessageSquare,
-  Zap,
+  Layers,
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
@@ -41,14 +39,14 @@ interface Message {
 }
 
 const idlePills = [
-  { icon: Camera, label: 'Photo & Video Studio', query: 'I run a photo and video production studio' },
-  { icon: Building2, label: 'Digital Agency', query: 'I manage a digital marketing or creative agency' },
-  { icon: Receipt, label: '18% GST Invoicing', query: 'How does 18% GST invoicing work?' },
-  { icon: FileSignature, label: 'Legal E-Signatures', query: 'Are contracts and e-signatures in Cora legally binding?' },
+  { icon: Camera, label: 'Photo & Video Studio', query: 'How does Cora help a photo and video studio?' },
+  { icon: Building2, label: 'Digital Agency', query: 'How does Cora manage agency clients and proposals?' },
+  { icon: Receipt, label: '18% GST Invoicing', query: 'Make a ₹15,000 invoice with 18% GST for Rahul' },
+  { icon: FileSignature, label: 'Legal E-Signatures', query: 'How do legal e-signatures and client agreements work?' },
   { icon: Home, label: 'Real Estate AI', query: 'How does real estate property listing AI work?' },
 ];
 
-function getSimpleRichReply(query: string, isIndia: boolean): {
+function getSimpleRichReply(query: string): {
   text: string;
   highlights?: FeatureHighlight[];
   quickReplies?: QuickReply[];
@@ -60,460 +58,311 @@ function getSimpleRichReply(query: string, isIndia: boolean): {
   // 1. Greetings
   if (['hey', 'hi', 'hello', 'yo', 'sup', 'heya', 'good morning', 'good afternoon', 'hola'].includes(q) || q.length <= 3) {
     return {
-      text: `Hey! I'm Shruti from Cora. What workflow would you like to automate today?`,
+      text: `Hey! I'm Cora, your AI co-founder. What workflow would you like to run today?`,
       highlights: [
         { title: 'Inquiry Funnel', desc: 'Auto-capture client leads from WhatsApp & web', badge: 'Auto' },
         { title: '18% GST Invoicing', desc: 'Instant UPI QR codes & compliant tax invoices', badge: 'Verified' },
       ],
       quickReplies: [
-        { label: 'Photo & Video Studio', query: 'I run a photo and video production studio', iconName: 'camera' },
-        { label: 'Digital Agency', query: 'I manage a digital marketing or creative agency', iconName: 'building' },
-        { label: 'Real Estate Broker', query: 'I work in real estate and luxury properties', iconName: 'home' },
+        { label: 'Photo & Video Studio', query: 'How does Cora help a photo and video studio?', iconName: 'camera' },
+        { label: 'Digital Agency', query: 'How does Cora manage agency clients and proposals?', iconName: 'building' },
+        { label: '18% GST Invoicing', query: 'Make a ₹15,000 invoice with 18% GST for Rahul', iconName: 'receipt' },
       ],
       ctaText: 'Start Free Forever (No Card) →',
       ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_greet',
     };
   }
 
-  // 2. Photo / Video Studio Branch
-  if (q.includes('photo') || q.includes('video') || q.includes('production studio') || q.includes('shoot')) {
+  // 2. GST & Invoicing
+  if (q.includes('gst') || q.includes('invoice') || q.includes('bill') || q.includes('tax') || q.includes('15,000') || q.includes('15000')) {
     return {
-      text: `Studios automate their entire commercial booking pipeline on Cora:`,
+      text: `Cora creates compliant 18% GST invoices in under 10 seconds:`,
       highlights: [
-        { title: 'WhatsApp Call-Sheets', desc: 'Sent 24h & 2h before call-time to crew & client phones', badge: 'Meta API' },
-        { title: '18% GST & UPI', desc: 'Auto-splits CGST/SGST with direct UPI payment QR links', badge: 'Instant' },
+        { title: 'Auto CGST / SGST', desc: 'Automatic state split calculations with zero math errors', badge: '18% GST' },
+        { title: 'Direct UPI & QR', desc: 'Clients scan to pay instantly via PhonePe, GPay, or Paytm', badge: 'UPI' },
       ],
       quickReplies: [
-        { label: 'WhatsApp Call-Sheets', query: 'Tell me more about WhatsApp call-sheet alerts', iconName: 'message' },
-        { label: 'Legal E-Sign Contracts', query: 'How does the legal e-sign contract vault work?', iconName: 'signature' },
+        { label: 'Legal E-Signatures', query: 'How do legal e-signatures and client agreements work?', iconName: 'signature' },
+        { label: 'Pricing Plans', query: 'What are the pricing plans?', iconName: 'zap' },
+      ],
+      ctaText: 'Generate First GST Invoice Free →',
+      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_gst',
+    };
+  }
+
+  // 3. Studio / Photo / Video
+  if (q.includes('photo') || q.includes('video') || q.includes('studio') || q.includes('shoot')) {
+    return {
+      text: `Studios manage their bookings, client terms, and billing in one unified chat:`,
+      highlights: [
+        { title: 'Client Booking Notes', desc: 'Auto-track hold dates, call times, and service packages', badge: 'Bookings' },
+        { title: 'Instant WhatsApp Bills', desc: 'Share payment receipts and UPI QR links directly on WhatsApp', badge: 'Billing' },
+      ],
+      quickReplies: [
+        { label: '18% GST Invoices', query: 'Make a ₹15,000 invoice with 18% GST for Rahul', iconName: 'receipt' },
+        { label: 'Legal E-Signatures', query: 'How do legal e-signatures work?', iconName: 'signature' },
       ],
       ctaText: 'Start Free Studio Workspace →',
       ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_studio',
     };
   }
 
-  // 3. Agency Branch
-  if (q.includes('agency') || q.includes('freelancer') || q.includes('consultant') || q.includes('marketing')) {
+  // 4. Agency / Solopreneur
+  if (q.includes('agency') || q.includes('digital') || q.includes('creative') || q.includes('freelancer')) {
     return {
-      text: `Cora replaces HoneyBook, DocuSign, and Notion for agency workflows:`,
+      text: `Agencies replace 8-10 disconnected apps with one conversational workspace:`,
       highlights: [
-        { title: '5-Second AI Proposals', desc: 'Draft bespoke client proposals with Claude 3.5 Sonnet', badge: 'Multi-Model' },
-        { title: 'Kanban Deal Pipeline', desc: 'Track clients from first inquiry to final payment', badge: 'Drag & Drop' },
+        { title: 'Fast Client Scopes', desc: 'Draft custom project proposals with your saved rates', badge: 'Proposals' },
+        { title: 'Deal Pipeline', desc: 'Track clients from first inquiry to final payment', badge: 'CRM' },
       ],
       quickReplies: [
-        { label: 'Pricing Plans', query: 'What are the pricing plans?', iconName: 'receipt' },
-        { label: 'Sample Agreement', query: 'Show me an example client agreement', iconName: 'signature' },
+        { label: 'Pricing Plans', query: 'What are the pricing plans for Cora?', iconName: 'receipt' },
+        { label: '18% GST Invoicing', query: 'Make a ₹15,000 invoice with 18% GST for Rahul', iconName: 'receipt' },
       ],
-      ctaText: isIndia ? 'Start Free (India ₹499/mo available) →' : 'Start Free Forever with Google →',
+      ctaText: 'Start Free Agency Workspace →',
       ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_agency',
     };
   }
 
-  // 4. Real Estate Branch
-  if (q.includes('real estate') || q.includes('property') || q.includes('broker') || q.includes('villa') || q.includes('penthouse')) {
-    return {
-      text: `Cora's Real Estate Copilot saves agents 4+ hours per property listing:`,
-      highlights: [
-        { title: 'GEO-Targeted SEO', desc: 'Ready-to-post descriptions for MagicBricks & 99acres', badge: 'SEO Ranked' },
-        { title: 'Social Video Hooks', desc: 'Viral Instagram Reels scripts & WhatsApp brochures', badge: 'Instant' },
-      ],
-      quickReplies: [
-        { label: 'Sample Property Listing', query: 'Show me a luxury property listing sample', iconName: 'home' },
-        { label: 'Check Pricing Plans', query: 'What are the pricing plans?', iconName: 'receipt' },
-      ],
-      ctaText: 'Try Real Estate Copilot for Free →',
-      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_realestate',
-    };
-  }
-
-  // 5. Pricing & Plans
-  if (q.includes('price') || q.includes('cost') || q.includes('how much') || q.includes('plan') || q.includes('discount')) {
-    return {
-      text: `Transparent pricing with zero credit card required to start:`,
-      highlights: [
-        { title: 'Free Forever Plan', desc: '1,000 free AI runs/mo, Kanban CRM, and document vault', badge: '₹0 Forever' },
-        { title: 'India Only Plan', desc: 'Unlimited GST invoices, WhatsApp API & UPI integration', badge: '₹499/mo' },
-      ],
-      quickReplies: [
-        { label: 'Start Free Forever', query: 'How do I start on the Free Forever Plan?', iconName: 'zap' },
-        { label: 'India ₹499 Plan', query: 'Tell me about the India ₹499 plan', iconName: 'receipt' },
-      ],
-      ctaText: 'Sign up for Free Forever (No Card) →',
-      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_pricing',
-    };
-  }
-
-  // 6. GST & Invoicing
-  if (q.includes('gst') || q.includes('tax') || q.includes('invoice') || q.includes('bill') || q.includes('upi')) {
-    return {
-      text: `Automated Indian B2B GST calculation and payment collection:`,
-      highlights: [
-        { title: 'Auto Tax Split', desc: 'Calculates CGST/SGST (9%+9%) or IGST (18%) with GSTIN lookup', badge: 'Compliant' },
-        { title: 'Razorpay UPI QR', desc: 'Direct UPI payment links for instant bank settlements', badge: 'Direct Pay' },
-      ],
-      quickReplies: [
-        { label: 'Legal Contract Integration', query: 'Can I attach legal contracts to invoices?', iconName: 'signature' },
-        { label: 'Try Free Forever', query: 'How do I start on the Free Forever Plan?', iconName: 'zap' },
-      ],
-      ctaText: 'Generate Compliant Invoices on Cora →',
-      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_gst',
-    };
-  }
-
-  // 7. E-Signatures
-  if (q.includes('esign') || q.includes('sign') || q.includes('legal') || q.includes('contract') || q.includes('agreement') || q.includes('security')) {
-    return {
-      text: `100% legally binding contracts under Section 10A of the Indian IT Act:`,
-      highlights: [
-        { title: 'SHA-256 Audit Seal', desc: 'Verified IP timestamps and tamper-evident signatures', badge: 'Legally Binding' },
-        { title: 'Cancel DocuSign', desc: 'Save $40+/mo by using Cora’s built-in PDF vault for free', badge: 'Free Vault' },
-      ],
-      quickReplies: [
-        { label: 'Check Pricing Plans', query: 'What are the pricing plans?', iconName: 'receipt' },
-        { label: 'Set Up E-Sign Vault', query: 'How do I set up my workspace?', iconName: 'signature' },
-      ],
-      ctaText: 'Unlock Free E-Sign Vault →',
-      ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_esign',
-    };
-  }
-
-  // Fallback
+  // 5. Default
   return {
-    text: `Cora replaces 5+ separate subscriptions in one clean AI workspace:`,
+    text: `Cora is your AI co-founder. Type what you need in plain English or Hinglish:`,
     highlights: [
-      { title: 'Multi-Model AI', desc: 'Claude 3.5 Sonnet, GPT-4o, and Gemini routing', badge: 'Frontier AI' },
-      { title: 'Funnels & GST Billing', desc: 'Lead capture, WhatsApp alerts, and legal e-sign vault', badge: 'All-in-One' },
+      { title: 'Single Chat Input', desc: 'Type what you need done without clicking through 10 apps', badge: 'Simple' },
+      { title: 'Business Memory', desc: 'Remembers your client rates, history, and active jobs', badge: 'Context' },
     ],
     quickReplies: [
-      { label: 'Studio Features', query: 'I run a photo and video production studio', iconName: 'camera' },
-      { label: 'Agency Features', query: 'I manage a digital marketing or creative agency', iconName: 'building' },
+      { label: '18% GST Invoicing', query: 'Make a ₹15,000 invoice with 18% GST for Rahul', iconName: 'receipt' },
+      { label: 'Pricing Plans', query: 'What are the pricing plans?', iconName: 'zap' },
     ],
-    ctaText: isIndia ? 'Start Free (India ₹499/mo available) →' : 'Start Free Forever with Google →',
+    ctaText: 'Start Free Forever (No Card) →',
     ctaLink: 'https://app.heycora.in/workspace/login?source=sdr_default',
   };
 }
 
-function renderQuickReplyIcon(iconName?: string) {
-  switch (iconName) {
-    case 'camera':
-      return <Camera className="w-3 h-3 text-zinc-700" />;
-    case 'building':
-      return <Building2 className="w-3 h-3 text-zinc-700" />;
-    case 'receipt':
-      return <Receipt className="w-3 h-3 text-zinc-700" />;
-    case 'signature':
-      return <FileSignature className="w-3 h-3 text-zinc-700" />;
-    case 'home':
-      return <Home className="w-3 h-3 text-zinc-700" />;
-    case 'briefcase':
-      return <Briefcase className="w-3 h-3 text-zinc-700" />;
-    case 'message':
-      return <MessageSquare className="w-3 h-3 text-zinc-700" />;
-    default:
-      return <Zap className="w-3 h-3 text-zinc-700" />;
-  }
-}
-
 export function HeroAIInput() {
-  const [prompt, setPrompt] = useState<string>('');
-  const [isActive, setIsActive] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isIndia, setIsIndia] = useState<boolean>(true);
+  const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
-    try {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-      setIsIndia(tz.includes('Calcutta') || tz.includes('Kolkata') || tz.includes('IST'));
-    } catch {
-      setIsIndia(true);
+    if (isOpen && messages.length > 0) {
+      scrollToBottom();
     }
-  }, []);
-
-  // Smooth, non-intrusive internal scroll
-  useEffect(() => {
-    if (isActive && chatContainerRef.current) {
-      const el = chatContainerRef.current;
-      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
-    }
-  }, [messages, isLoading, isActive]);
+  }, [messages, isOpen]);
 
   const handleSend = (textToSend?: string) => {
-    const query = (textToSend || prompt).trim();
-    if (!query) return;
+    const text = (textToSend || inputValue).trim();
+    if (!text) return;
 
-    setIsActive(true);
+    trackEvent('hero_ai_prompt_submitted', { query: text });
 
     const userMsg: Message = {
-      id: `user-${Date.now()}`,
+      id: Date.now().toString(),
       sender: 'user',
-      text: query,
+      text,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
     setMessages((prev) => [...prev, userMsg]);
-    setPrompt('');
+    setInputValue('');
+    setIsOpen(true);
     setIsLoading(true);
-    trackEvent('hero_sdr_query_sent', { query: query.slice(0, 50) });
 
     setTimeout(() => {
-      const sdrData = getSimpleRichReply(query, isIndia);
+      const response = getSimpleRichReply(text);
       const sdrMsg: Message = {
-        id: `sdr-${Date.now()}`,
+        id: (Date.now() + 1).toString(),
         sender: 'sdr',
-        text: sdrData.text,
-        highlights: sdrData.highlights,
-        quickReplies: sdrData.quickReplies,
-        ctaText: sdrData.ctaText,
-        ctaLink: sdrData.ctaLink,
+        text: response.text,
+        highlights: response.highlights,
+        quickReplies: response.quickReplies,
+        ctaText: response.ctaText,
+        ctaLink: response.ctaLink,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, sdrMsg]);
       setIsLoading(false);
-      trackEvent('hero_sdr_response_rendered');
-    }, 350);
+    }, 450);
   };
 
-  const handleCloseModal = () => {
-    setIsActive(false);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSend();
+    }
   };
 
-  const handleResetChat = () => {
+  const handleReset = () => {
     setMessages([]);
-    setPrompt('');
-    setIsActive(false);
+    setIsOpen(false);
+    setInputValue('');
+    trackEvent('hero_ai_chat_reset');
   };
 
   return (
-    <div className="w-full max-w-[880px] flex flex-col items-center gap-4 relative z-20 text-left">
+    <div className="w-full max-w-[820px] mx-auto text-left relative z-20">
       
-      {/* ── 1. Minimal Normal (Idle) State Card ── */}
-      {!isActive && (
-        <>
-          <div className="w-full bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-[0px_25px_60px_-15px_rgba(0,0,0,0.18)] outline outline-1 outline-offset-[-1px] outline-white/90 p-4 sm:p-5 transition-all duration-300 hover:shadow-[0px_30px_70px_-15px_rgba(0,0,0,0.22)]">
-            
-            {/* Input Row */}
-            <div className="relative mb-2">
-              <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                placeholder="Ask anything about Cora... (e.g. How does 18% GST billing or WhatsApp booking work?)"
-                rows={2}
-                className="w-full bg-transparent text-zinc-950 placeholder-zinc-400 font-sans text-sm sm:text-base resize-none focus:outline-none leading-relaxed"
-              />
+      {/* ── Main Outer White Card ── */}
+      <div className="w-full bg-white/95 backdrop-blur-xl border border-white/80 rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 shadow-[0px_16px_48px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04] transition-all">
+        
+        {/* Top Input Bar Area */}
+        <div className="relative flex items-center justify-between gap-3 pb-3 border-b border-zinc-100/90">
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask anything about Cora... (e.g. How does 18% GST billing or WhatsApp booking work?)"
+            className="w-full bg-transparent text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-950 placeholder:text-zinc-400 focus:outline-none tracking-tight"
+          />
+
+          {/* Right Circular Brand Badges */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-600 text-[10px] font-bold">
+              ✦
             </div>
-
-            {/* Bottom Bar: Clean with Generate Button on Right */}
-            <div className="flex items-center justify-between pt-2 border-t border-zinc-100">
-              <span className="text-xs text-zinc-500 font-medium hidden sm:inline-block">
-                Ask our AI Sales Concierge • No signup needed
-              </span>
-
-              <button
-                type="button"
-                disabled={isLoading || !prompt.trim()}
-                onClick={() => handleSend()}
-                className="ml-auto inline-flex items-center justify-center gap-1.5 bg-zinc-950 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-800 px-5 sm:px-6 py-2 rounded-full font-sans text-xs sm:text-sm font-semibold shadow-sm active:translate-y-0 hover:-translate-y-0.5 transition-all"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Generate</span>
-              </button>
-            </div>
-
-          </div>
-
-          {/* Quick Action Pill Tags (Clean Vector Icons Only, No Emojis) */}
-          <div className="flex items-center justify-center gap-2 flex-wrap max-w-full px-2">
-            {idlePills.map((pill, idx) => {
-              const Icon = pill.icon;
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleSend(pill.query)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 backdrop-blur-md border border-white/80 rounded-full text-zinc-800 text-xs font-semibold shadow-2xs hover:bg-white hover:border-zinc-300 hover:-translate-y-0.5 transition-all whitespace-nowrap"
-                >
-                  <Icon className="w-3.5 h-3.5 text-zinc-700" />
-                  <span>{pill.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
-
-      {/* ── 2. Active Discussion Modal with Smooth Non-Trapping Scrolling ── */}
-      {isActive && (
-        <div className="w-full bg-white/98 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-[0px_25px_60px_-15px_rgba(0,0,0,0.22)] border border-zinc-200/90 p-4 sm:p-5 text-left transition-all duration-300">
-          
-          {/* Header Bar */}
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-100 mb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-full bg-zinc-950 text-white flex items-center justify-center text-xs font-bold font-display shadow-2xs">
-                S
-              </div>
-              <div>
-                <div className="text-xs font-bold text-zinc-950 flex items-center gap-1.5">
-                  <span>Shruti</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[10px] font-normal text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded">Online</span>
-                </div>
-                <div className="text-[11px] text-zinc-500">Cora Sales Concierge • Discussion</div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleResetChat}
-                className="inline-flex items-center gap-1 text-[11px] text-zinc-500 hover:text-zinc-900 px-2 py-1 rounded hover:bg-zinc-100 transition-colors"
-                title="Reset conversation"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span>Reset</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="w-7 h-7 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center transition-colors"
-                title="Minimize discussion"
-              >
-                <X className="w-4 h-4" />
-              </button>
+            <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
+              G
             </div>
           </div>
+        </div>
 
-          {/* Chat Messages Stream with Smooth Touch & Mouse Scrolling */}
-          <div
-            ref={chatContainerRef}
-            className="space-y-3 max-h-[460px] overflow-y-auto pr-1 mb-3 scroll-smooth touch-pan-y overscroll-contain"
-            style={{ WebkitOverflowScrolling: 'touch' }}
-          >
+        {/* Expanded Messages Viewport */}
+        {isOpen && messages.length > 0 && (
+          <div className="my-4 max-h-[320px] overflow-y-auto space-y-4 pr-1 scrollbar-thin scrollbar-thumb-zinc-200">
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+                className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1.5`}
               >
-                {/* Message Bubble */}
                 <div
-                  className={`max-w-[94%] sm:max-w-[85%] rounded-2xl p-3 sm:p-3.5 text-xs sm:text-sm leading-relaxed ${
+                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${
                     msg.sender === 'user'
-                      ? 'bg-zinc-950 text-white rounded-br-xs shadow-sm'
-                      : 'bg-zinc-50 text-zinc-900 border border-zinc-200/70 rounded-bl-xs shadow-2xs'
+                      ? 'bg-zinc-950 text-white rounded-br-xs font-medium'
+                      : 'bg-zinc-100/90 text-zinc-900 rounded-bl-xs border border-zinc-200/70 font-normal'
                   }`}
                 >
-                  {/* SDR Intro Text */}
-                  <p className="font-medium text-zinc-900 mb-2 whitespace-pre-line">{msg.text}</p>
+                  <p className="whitespace-pre-line">{msg.text}</p>
 
-                  {/* Concise 2-Tile Highlights */}
-                  {msg.sender === 'sdr' && msg.highlights && msg.highlights.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 my-2.5">
-                      {msg.highlights.map((h, hIdx) => (
-                        <div
-                          key={hIdx}
-                          className="bg-white border border-zinc-200/80 rounded-xl p-2.5 shadow-2xs flex flex-col justify-between text-left"
-                        >
-                          <div>
-                            <div className="flex items-center justify-between gap-1 mb-0.5">
-                              <span className="font-bold text-xs text-zinc-950">{h.title}</span>
-                              {h.badge && (
-                                <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 bg-zinc-100 text-zinc-700 rounded">
-                                  {h.badge}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-zinc-600 leading-snug">{h.desc}</p>
+                  {msg.highlights && msg.highlights.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-zinc-200/60">
+                      {msg.highlights.map((h, i) => (
+                        <div key={i} className="p-2.5 rounded-xl bg-white border border-zinc-200/80 text-left">
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <span className="text-[11px] font-bold text-zinc-950">{h.title}</span>
+                            {h.badge && (
+                              <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 rounded-md">
+                                {h.badge}
+                              </span>
+                            )}
                           </div>
+                          <p className="text-[11px] text-zinc-500 leading-normal">{h.desc}</p>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {/* Quick Reply Chips (Clean Vector Icons Only) */}
-                  {msg.sender === 'sdr' && msg.quickReplies && (
-                    <div className="mt-2 pt-2 border-t border-zinc-200/60 flex items-center gap-1.5 flex-wrap">
-                      {msg.quickReplies.map((qr, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => handleSend(qr.query)}
-                          className="inline-flex items-center gap-1 text-[11px] font-semibold bg-white border border-zinc-200 text-zinc-900 hover:bg-zinc-100 hover:border-zinc-300 px-2.5 py-1 rounded-full shadow-2xs hover:-translate-y-0.5 active:translate-y-0 transition-all"
-                        >
-                          {renderQuickReplyIcon(qr.iconName)}
-                          <span>{qr.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* High-Converting 1-Click CTA */}
-                  {msg.sender === 'sdr' && msg.ctaLink && (
-                    <div className="mt-2.5 pt-2.5 border-t border-zinc-200/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  {msg.ctaText && msg.ctaLink && (
+                    <div className="mt-3 pt-2">
                       <a
                         href={msg.ctaLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 bg-zinc-950 text-white hover:bg-zinc-800 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm hover:-translate-y-0.5 active:translate-y-0"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-950 text-white rounded-lg text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-2xs"
                       >
                         <span>{msg.ctaText}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
                       </a>
-                      <span className="text-[10px] text-zinc-500 font-medium">1,000 Free AI Runs • No Card</span>
                     </div>
                   )}
                 </div>
 
-                <span className="text-[10px] text-zinc-400 mt-0.5 px-1 font-mono">
-                  {msg.timestamp}
-                </span>
+                {msg.quickReplies && msg.quickReplies.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {msg.quickReplies.map((qr, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleSend(qr.query)}
+                        className="text-[11px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-full border border-zinc-200 shadow-2xs transition-colors"
+                      >
+                        {qr.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
 
             {isLoading && (
-              <div className="flex items-center gap-2 text-xs text-zinc-500 p-2">
-                <div className="w-2 h-2 rounded-full bg-zinc-400 animate-ping" />
-                <span>Shruti is typing...</span>
+              <div className="flex items-center gap-2 text-zinc-400 text-xs py-2 pl-2">
+                <div className="w-2 h-2 rounded-full bg-zinc-400 animate-pulse" />
+                <span>Cora is thinking...</span>
               </div>
             )}
-          </div>
 
-          {/* Active Input Row */}
-          <div className="pt-2.5 border-t border-zinc-100 flex items-center gap-2">
-            <input
-              type="text"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder="Ask a question or select a topic above..."
-              className="flex-1 bg-zinc-50 border border-zinc-200/80 rounded-full px-3.5 py-2 text-xs sm:text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-colors"
-            />
+            <div ref={messagesEndRef} />
+          </div>
+        )}
+
+        {/* Bottom Action Row Inside Card */}
+        <div className="flex items-center justify-between pt-3 text-xs">
+          <span className="text-zinc-500 text-[11.5px] font-medium">
+            Ask our AI Sales Concierge &bull; No signup needed
+          </span>
+
+          <div className="flex items-center gap-2">
+            {isOpen && (
+              <button
+                onClick={handleReset}
+                title="Reset Chat"
+                className="w-7 h-7 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+            )}
 
             <button
-              type="button"
-              disabled={isLoading || !prompt.trim()}
               onClick={() => handleSend()}
-              className="inline-flex items-center justify-center gap-1.5 bg-zinc-950 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-800 px-4 py-2 rounded-full font-sans text-xs sm:text-sm font-semibold shadow-sm active:translate-y-0 hover:-translate-y-0.5 transition-all shrink-0"
+              className="px-4 py-1.5 bg-zinc-400 hover:bg-zinc-500 text-white rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Send</span>
+              <span>Generate</span>
             </button>
           </div>
-
         </div>
-      )}
+
+      </div>
+
+      {/* ── Bottom Row Outside Card (Pills + Made in Cora Badge) ── */}
+      <div className="mt-4 flex items-center justify-between flex-wrap gap-2.5">
+        <div className="flex items-center gap-2 flex-wrap">
+          {idlePills.map((pill, idx) => {
+            const IconComp = pill.icon;
+            return (
+              <button
+                key={idx}
+                onClick={() => handleSend(pill.query)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-white text-zinc-800 text-xs font-medium transition-all hover:-translate-y-0.5 border border-zinc-200/80 shadow-2xs"
+              >
+                <IconComp className="w-3.5 h-3.5 text-zinc-600" />
+                <span>{pill.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Made in Cora Badge */}
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 backdrop-blur-md rounded-full border border-zinc-200/80 text-zinc-800 text-xs font-semibold shadow-2xs">
+          <Layers className="w-3.5 h-3.5 text-zinc-900" />
+          <span>Made in Cora</span>
+        </div>
+      </div>
 
     </div>
   );

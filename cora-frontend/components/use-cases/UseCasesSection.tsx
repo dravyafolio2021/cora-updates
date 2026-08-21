@@ -1,10 +1,18 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import Image from 'next/image';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-import { Camera, Film, Building2, User, Sparkles, Clapperboard, Layers } from 'lucide-react';
+import { 
+  Scissors, 
+  Dumbbell, 
+  Stethoscope, 
+  Utensils, 
+  Building2, 
+  Briefcase, 
+  CheckCircle2, 
+  ArrowRight 
+} from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
 if (typeof window !== 'undefined') {
@@ -13,64 +21,46 @@ if (typeof window !== 'undefined') {
 
 const USE_CASES = [
   {
-    id: 'commercial_studios',
-    title: 'Commercial Photography Studios',
-    desc: 'Manage multiple client shoots, crew hold dates, 18% GST tax invoices, and mobile client sign-offs without manual spreadsheets.',
-    stat: '+40% Faster',
-    statDesc: 'Shoot-to-invoice turnaround time',
-    image: '/images/usecase_commercial_studio.jpg',
-    category: 'Commercial Studios',
-    icon: Camera,
+    id: 'salons_spas',
+    title: 'Salons & Spas',
+    desc: 'Manage appointments, repeat client preferences, service menus, and instant UPI billing.',
+    badge: 'Appointments & Billing',
+    icon: Scissors,
+  },
+  {
+    id: 'gyms_fitness',
+    title: 'Gyms & Fitness Studios',
+    desc: 'Track active memberships, renewal dates, trainer schedules, and fee collections without spreadsheets.',
+    badge: 'Memberships & Fees',
+    icon: Dumbbell,
+  },
+  {
+    id: 'dental_clinics',
+    title: 'Dental & Health Clinics',
+    desc: 'Organize patient appointments, consultation invoices, and automatic follow-up reminders.',
+    badge: 'Patient Visits',
+    icon: Stethoscope,
+  },
+  {
+    id: 'restaurants_cafes',
+    title: 'Restaurants & Cafes',
+    desc: 'Track vendor invoices, daily supplier expenses, party bookings, and catering inquiries.',
+    badge: 'Expenses & Catering',
+    icon: Utensils,
   },
   {
     id: 'real_estate',
-    title: 'Real Estate Media Agencies',
-    desc: 'Generate AI property descriptions with Claude 3.5 & Gemini, dispatch drone pilots via WhatsApp, and deliver 4K asset links instantly.',
-    stat: '3X Faster',
-    statDesc: 'Listing copy & drone asset handoff',
-    image: '/images/usecase_realestate_agency.jpg',
-    category: 'Real Estate Media',
+    title: 'Real Estate Agencies',
+    desc: 'Organize buyer inquiries, property site visits, agreement drafting, and commission tracking.',
+    badge: 'Leads & Deals',
     icon: Building2,
   },
   {
-    id: 'production_houses',
-    title: 'Film & Video Production Houses',
-    desc: 'Lock in high-ticket client retainers with tamper-evident SHA-256 digital signatures, automated call-sheets, and instant UPI milestones.',
-    stat: '100% Compliant',
-    statDesc: 'Legal e-signatures & B2B GST tax math',
-    image: '/images/usecase_production_house.jpg',
-    category: 'Production Houses',
-    icon: Film,
-  },
-  {
-    id: 'solo_creators',
-    title: 'Solo Creators & Lead Photographers',
-    desc: 'Run your full creative business from your phone. Send professional client agreements, track invoices, and automate 5-star Google review collection.',
-    stat: '20+ Hrs / Wk',
-    statDesc: 'Reclaimed founder & admin time',
-    image: '/images/usecase_solo_creator.jpg',
-    category: 'Solo Creators',
-    icon: User,
-  },
-  {
-    id: 'fashion_editorial',
-    title: 'Fashion & Editorial Labs',
-    desc: 'Coordinate model releases, stylist call times, studio bay rentals, and high-resolution asset approvals in a unified live pipeline.',
-    stat: 'Zero Friction',
-    statDesc: 'Automated call-sheet dispatch & hold dates',
-    image: '/images/bento_crew_camera.jpg',
-    category: 'Fashion & Editorial',
-    icon: Clapperboard,
-  },
-  {
-    id: 'creative_agencies',
-    title: 'Creative Marketing Agencies',
-    desc: 'Consolidate 5+ fragmented tools into a single command center. Automate monthly client retainers, proposal drafting, and multi-model AI workflows.',
-    stat: '₹1.8L / Mo',
-    statDesc: 'Saved in disconnected SaaS subscriptions',
-    image: '/images/cora_community_crowd.jpg',
-    category: 'Creative Agencies',
-    icon: Layers,
+    id: 'agencies_solo',
+    title: 'Creative Agencies & Solo Founders',
+    desc: 'Handle project milestones, client scope approvals, deliverable handoffs, and tax-ready GST accounts.',
+    badge: 'Retainers & Invoices',
+    icon: Briefcase,
   },
 ];
 
@@ -99,130 +89,83 @@ export function UseCasesSection() {
     return () => ctx.revert();
   }, []);
 
+  const handleCardClick = (id: string, title: string) => {
+    trackEvent('usecase_card_clicked', { usecase_id: id, usecase_title: title });
+  };
+
   return (
     <section
-      ref={sectionRef}
       id="use-cases"
-      className="py-20 sm:py-28 relative z-10 bg-[#FAFAFA] border-b border-zinc-200/70 overflow-hidden"
+      ref={sectionRef}
+      className="py-20 sm:py-28 bg-[#FAFAFA] relative z-10 overflow-hidden border-b border-zinc-200/60"
     >
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         
-        {/* ── Section Header ── */}
-        <div className="usecase-anim-item text-center max-w-[780px] mx-auto mb-14 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white rounded-xl border border-zinc-200/90 text-xs font-semibold text-zinc-800 mb-3.5 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>Target Workspaces</span>
-          </div>
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em]">
-            Who this platform is built for
+        {/* Section Header */}
+        <div className="text-center max-w-[760px] mx-auto mb-14 sm:mb-18 usecase-anim-item">
+          <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 font-mono mb-2 inline-block">
+            WHO THIS IS FOR
+          </span>
+          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-4">
+            Built for businesses that deliver real services.
           </h2>
-          <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[620px] mx-auto mt-3">
-            Purpose-built workflows for modern commercial studios, agency founders, and high-velocity production teams.
+          <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed">
+            Run your appointments, client records, and cash flow from one conversational assistant.
           </p>
         </div>
 
-      </div>
+        {/* 6 Grid Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+          {USE_CASES.map((uc) => {
+            const IconComp = uc.icon;
+            return (
+              <div
+                key={uc.id}
+                onClick={() => handleCardClick(uc.id, uc.title)}
+                className="usecase-anim-item bg-white rounded-3xl p-6 sm:p-7 border border-zinc-200/80 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center text-zinc-900 border border-zinc-200/80 group-hover:bg-zinc-950 group-hover:text-white transition-colors">
+                      <IconComp className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold uppercase px-2.5 py-1 bg-zinc-100 text-zinc-700 rounded-full border border-zinc-200/60">
+                      {uc.badge}
+                    </span>
+                  </div>
 
-      {/* ── Infinite Horizontal Marquee with 1 Unique Card Per Industry ── */}
-      <div className="relative w-full overflow-hidden py-4">
-        
-        {/* Soft edge fade masks */}
-        <div className="absolute left-0 inset-y-0 w-12 sm:w-28 bg-gradient-to-r from-[#FAFAFA] via-[#FAFAFA]/60 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 inset-y-0 w-12 sm:w-28 bg-gradient-to-l from-[#FAFAFA] via-[#FAFAFA]/60 to-transparent z-10 pointer-events-none" />
+                  <h3 className="font-display text-xl font-bold text-zinc-950 mb-2">
+                    {uc.title}
+                  </h3>
 
-        <div className="flex gap-6 w-max animate-review-scroll hover:[animation-play-state:paused] px-4">
-          
-          {/* Double list for smooth infinite scrolling */}
-          {[...USE_CASES, ...USE_CASES].map((item, idx) => (
-            <div
-              key={`${item.id}-${idx}`}
-              className="w-[320px] sm:w-[380px] h-[440px] sm:h-[480px] rounded-[32px] overflow-hidden relative p-7 sm:p-8 flex flex-col justify-between text-white border border-white/20 shadow-[0px_14px_36px_rgba(0,0,0,0.12)] shrink-0 select-none group"
-            >
-              {/* Background Image */}
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                sizes="(max-width: 768px) 320px, 380px"
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
-              />
-
-              {/* Dark Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/30 pointer-events-none" />
-
-              {/* Top Category Badge & Title */}
-              <div className="relative z-10 space-y-3">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-xl border border-white/30 text-[11px] font-semibold text-white shadow-2xs">
-                  {React.createElement(item.icon, { className: 'w-3.5 h-3.5' })}
-                  <span>{item.category}</span>
+                  <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                    {uc.desc}
+                  </p>
                 </div>
 
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight leading-snug">
-                  {item.title}
-                </h3>
-
-                <p className="text-zinc-300 text-xs sm:text-[13px] leading-relaxed font-normal">
-                  {item.desc}
-                </p>
-              </div>
-
-              {/* Bottom Glassmorphic Stat Badge */}
-              <div className="relative z-10 bg-white/15 backdrop-blur-xl rounded-2xl p-4 border border-white/25 shadow-xs">
-                <div className="text-lg sm:text-xl font-bold text-white tracking-tight font-display">
-                  {item.stat}
+                <div className="pt-6 mt-4 border-t border-zinc-100 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-zinc-900 group-hover:text-zinc-950 inline-flex items-center gap-1.5">
+                    <span>Explore workflow</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </div>
-                <p className="text-[11px] text-zinc-200 font-medium leading-tight mt-0.5">
-                  {item.statDesc}
-                </p>
               </div>
+            );
+          })}
+        </div>
 
-            </div>
-          ))}
-
+        {/* Bottom CTA Box */}
+        <div className="mt-12 text-center usecase-anim-item">
+          <a
+            href="https://app.heycora.in/workspace/login?source=usecases_footer"
+            className="inline-flex items-center gap-2 bg-zinc-950 text-white hover:bg-zinc-800 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold shadow-2xs transition-all hover:-translate-y-0.5"
+          >
+            <span>Start your business workspace for free</span>
+            <ArrowRight className="w-4 h-4" />
+          </a>
         </div>
 
       </div>
-
-      {/* ── Bottom Metrics Badges & Founder Quote Bar ── */}
-      <div className="w-full max-w-[1080px] mx-auto px-4 sm:px-6 mt-16 sm:mt-20">
-        
-        {/* 4 Neutral Feature Badges */}
-        <div className="usecase-anim-item flex items-center justify-center flex-wrap gap-2.5 sm:gap-3 mb-8">
-          {['1,200+ Workspaces', '4.9 Rating', 'Real-time Dispatch', '100% Tax Compliant'].map((badge, i) => (
-            <div
-              key={i}
-              className="px-4 py-2 bg-white rounded-xl border border-zinc-200/90 text-xs font-semibold text-zinc-800 shadow-2xs"
-            >
-              {badge}
-            </div>
-          ))}
-        </div>
-
-        {/* Founder Quote */}
-        <div className="usecase-anim-item text-center max-w-[680px] mx-auto space-y-4">
-          <blockquote className="text-zinc-700 text-sm sm:text-base font-normal italic leading-relaxed">
-            "We built Cora to remove administrative guesswork from creative operations and give founders clear, autonomous execution."
-          </blockquote>
-
-          <div className="flex items-center justify-center gap-2.5 pt-1">
-            <div className="w-8 h-8 rounded-full overflow-hidden border border-zinc-300 shadow-2xs relative">
-              <Image
-                src="/images/dravya_bansal_black.jpg"
-                alt="Dravya Bansal"
-                fill
-                sizes="32px"
-                className="object-cover object-top"
-              />
-            </div>
-            <div className="text-xs font-semibold text-zinc-950 text-left">
-              <span>Dravya Bansal</span>
-              <span className="text-zinc-500 font-normal ml-1">&bull; Co-founder, Cora</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
     </section>
   );
 }

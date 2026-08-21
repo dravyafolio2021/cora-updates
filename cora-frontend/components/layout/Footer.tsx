@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ArrowRight, Mail, Instagram, Linkedin, Twitter, Sparkles, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Mail, Instagram, Linkedin, Twitter } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
 export function Footer() {
@@ -14,7 +14,7 @@ export function Footer() {
   return (
     <footer className="relative w-full overflow-hidden pt-12 sm:pt-16 pb-12">
       
-      {/* ── Background Landscape Horizon & Atmospheric Overlays (Hidden on 404) ── */}
+      {/* ── Background Landscape Horizon (Hidden on 404) ── */}
       {!is404 && (
         <div className="absolute inset-0 pointer-events-none select-none z-0">
           <Image
@@ -24,7 +24,6 @@ export function Footer() {
             sizes="100vw"
             className="object-cover object-[center_55%]"
           />
-          {/* Soft sky overlays fading down into the card */}
           <div className="absolute inset-0 bg-gradient-to-b from-white via-white/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
         </div>
@@ -36,21 +35,20 @@ export function Footer() {
         {!is404 && (
           <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20">
             <h2 className="font-display text-3xl xs:text-4xl sm:text-[48px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-4">
-              Ready to run an autonomous studio?
+              Ready to simplify your business?
             </h2>
             <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[600px] mx-auto mb-8">
-              Join 1,200+ founders and creative operators using AI dispatch, legally binding digital contracts, and automated GST invoicing.
+              Join Indian founders managing their daily operations, GST invoices, and WhatsApp leads in one place.
             </p>
 
-            {/* Action Buttons following Cora Design System */}
             <div className="flex items-center justify-center flex-wrap gap-3.5">
               <a
                 href="https://app.heycora.in/workspace/login?source=footer_cta"
                 onClick={() => trackEvent('cta_click', { section: 'footer_cta_primary' })}
-                className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-sm border border-zinc-800 group"
+                className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
               >
-                <span>Get started for Free</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+                <span>Start free — no card needed</span>
+                <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
               </a>
 
               <a
@@ -65,9 +63,8 @@ export function Footer() {
         )}
 
         {/* ── Master White Footer Card ── */}
-        <div className="w-full rounded-[36px] bg-white border border-zinc-200/90 shadow-[0px_20px_60px_rgba(0,0,0,0.06)] p-8 sm:p-12 md:p-14">
+        <div className="w-full rounded-[36px] bg-white border border-zinc-200/90 shadow-2xs p-8 sm:p-12 md:p-14">
           
-          {/* Main 5-Column Navigation Layout */}
           <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10 pb-12 border-b border-zinc-200/80">
             
             {/* Col 1: Brand Bio & Support Email (Span 4) */}
@@ -77,7 +74,7 @@ export function Footer() {
               </Link>
 
               <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[320px] font-normal">
-                An autonomous operating system for modern commercial photography studios, film production houses, and creative agencies.
+                The AI co-founder for Indian service businesses, clinics, gyms, salons, and solo founders.
               </p>
 
               <div className="flex flex-col gap-2.5 pt-1">
@@ -105,11 +102,11 @@ export function Footer() {
                 Platform
               </div>
               <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><Link href="/features" className="hover:text-zinc-950 transition-colors">20 Built Modules</Link></li>
+                <li><Link href="/features" className="hover:text-zinc-950 transition-colors">Features</Link></li>
                 <li><Link href="/ai-agent" className="hover:text-zinc-950 transition-colors">AI Co-Founder</Link></li>
-                <li><Link href="/use-cases" className="hover:text-zinc-950 transition-colors">5 Workspaces</Link></li>
-                <li><Link href="/pricing" className="hover:text-zinc-950 transition-colors">Pricing Plans</Link></li>
-                <li><Link href="/changelog" className="hover:text-zinc-950 transition-colors">Changelog &bull; v2.4</Link></li>
+                <li><Link href="/use-cases" className="hover:text-zinc-950 transition-colors">Use Cases</Link></li>
+                <li><Link href="/pricing" className="hover:text-zinc-950 transition-colors">Pricing</Link></li>
+                <li><Link href="/changelog" className="hover:text-zinc-950 transition-colors">Changelog</Link></li>
               </ul>
             </div>
 
@@ -121,9 +118,9 @@ export function Footer() {
               <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
                 <li><Link href="/compare/cora-vs-honeybook" className="hover:text-zinc-950 transition-colors">vs HoneyBook</Link></li>
                 <li><Link href="/compare/cora-vs-studio-ninja" className="hover:text-zinc-950 transition-colors">vs Studio Ninja</Link></li>
-                <li><Link href="/compare/cora-vs-hubspot" className="hover:text-zinc-950 transition-colors">vs HubSpot CRM</Link></li>
+                <li><Link href="/compare/cora-vs-hubspot" className="hover:text-zinc-950 transition-colors">vs HubSpot</Link></li>
                 <li><Link href="/compare/cora-vs-docusign" className="hover:text-zinc-950 transition-colors">vs DocuSign</Link></li>
-                <li><Link href="/compare" className="hover:text-zinc-950 transition-colors text-emerald-700 font-bold">All 8 Benchmarks &rarr;</Link></li>
+                <li><Link href="/compare" className="hover:text-zinc-950 transition-colors text-emerald-700 font-bold">All Comparisons &rarr;</Link></li>
               </ul>
             </div>
 
@@ -133,10 +130,9 @@ export function Footer() {
                 Ecosystem
               </div>
               <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
-                <li><Link href="/integrations" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-900">Framer &amp; Webflow Hub</Link></li>
-                <li><Link href="/tools/embed-builder" className="hover:text-zinc-950 transition-colors">1-Click Embed Builder</Link></li>
+                <li><Link href="/integrations" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-900">Integrations</Link></li>
+                <li><Link href="/tools/embed-builder" className="hover:text-zinc-950 transition-colors">Embed Builder</Link></li>
                 <li><Link href="/tools/gst-calculator" className="hover:text-zinc-950 transition-colors">18% GST Calculator</Link></li>
-                <li><Link href="/tools/listing-ai" className="hover:text-zinc-950 transition-colors">Real Estate AI</Link></li>
                 <li><Link href="/about" className="hover:text-zinc-950 transition-colors">About &amp; Story</Link></li>
               </ul>
             </div>
@@ -149,21 +145,20 @@ export function Footer() {
               <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
                 <li><Link href="/terms" className="hover:text-zinc-950 transition-colors">Terms of Service</Link></li>
                 <li><Link href="/privacy" className="hover:text-zinc-950 transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/refund-policy" className="hover:text-zinc-950 transition-colors">14-Day Refunds</Link></li>
-                <li><Link href="/security" className="hover:text-zinc-950 transition-colors">Security &amp; SOC-2</Link></li>
+                <li><Link href="/refund-policy" className="hover:text-zinc-950 transition-colors">Refund Policy</Link></li>
+                <li><Link href="/security" className="hover:text-zinc-950 transition-colors">Security &amp; Trust</Link></li>
                 <li><Link href="/sla" className="hover:text-zinc-950 transition-colors">99.95% SLA</Link></li>
               </ul>
             </div>
 
           </div>
 
-          {/* ── Sub-Footer: Copyright, Legal Links & Socials ── */}
+          {/* ── Sub-Footer ── */}
           <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
             <div className="text-center md:text-left">
               &copy; {new Date().getFullYear()} Cora Platforms Inc. All rights reserved. Indian IT Act 2000 &amp; GST compliant.
             </div>
 
-            {/* Middle: Inline Policy Quick Links */}
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 font-medium">
               <Link href="/terms" className="hover:text-zinc-950 transition-colors">Terms</Link>
               <span>&bull;</span>
@@ -178,7 +173,6 @@ export function Footer() {
               <Link href="/status" className="hover:text-zinc-950 transition-colors">Status</Link>
             </div>
 
-            {/* Social Icons in Clean Rounded-xl Buttons */}
             <div className="flex items-center gap-2">
               <a
                 href="https://instagram.com/dravyafolio"

@@ -20,7 +20,6 @@ export function FounderCommunitySection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // 1. Staggered reveal for Header & 3 Narrative Columns
       gsap.fromTo(
         '.founder-anim-item',
         { y: 30, opacity: 0 },
@@ -37,7 +36,6 @@ export function FounderCommunitySection() {
         }
       );
 
-      // 2. Grand Entrance for the Dark Obsidian Showcase Container
       gsap.fromTo(
         showcaseCardRef.current,
         { y: 45, opacity: 0, scale: 0.98 },
@@ -54,7 +52,6 @@ export function FounderCommunitySection() {
         }
       );
 
-      // 3. Founder Portrait Rising Entrance
       if (founderImageRef.current) {
         gsap.fromTo(
           founderImageRef.current,
@@ -74,7 +71,6 @@ export function FounderCommunitySection() {
         );
       }
 
-      // 4. Subtle Floating Sine Waves on Badges
       if (badgeLeftRef.current) {
         gsap.to(badgeLeftRef.current, {
           y: -8,
@@ -109,11 +105,14 @@ export function FounderCommunitySection() {
         
         {/* ── Section Header ── */}
         <div className="founder-anim-item text-center max-w-[780px] mx-auto mb-14 sm:mb-16">
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-semibold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-3.5">
-            Join the movement
+          <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 font-mono mb-2 inline-block">
+            FOUNDER NOTE
+          </span>
+          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-3.5">
+            Built by a founder who was tired of running 8 different tabs.
           </h2>
           <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[640px] mx-auto">
-            Our thriving community of the most visionary creative studios, agencies, and photographers. Get all the workflows and infrastructure you need to scale.
+            We built Cora so you can manage your daily operations simply by talking to an assistant that actually knows your business.
           </p>
         </div>
 
@@ -123,30 +122,30 @@ export function FounderCommunitySection() {
           {/* Column 1 */}
           <div className="founder-anim-item space-y-2.5">
             <h3 className="font-display text-xs sm:text-[13px] font-bold uppercase tracking-wider text-zinc-950">
-              By Creators, For Creators
+              Built For Busy Founders
             </h3>
             <p className="text-zinc-600 text-xs sm:text-[13.5px] leading-relaxed font-normal">
-              Cora was built and powered by creators focused on the real friction creative studios face day to day. Once success was found, we introduced it to the market to help founders eliminate admin chaos forever.
+              Running a service business means wearing 5 hats every day. Cora gives you back hours lost to spreadsheet data entry and endless app switching.
             </p>
           </div>
 
           {/* Column 2 */}
           <div className="founder-anim-item space-y-2.5">
             <h3 className="font-display text-xs sm:text-[13px] font-bold uppercase tracking-wider text-zinc-950">
-              Community-Driven Development
+              Built In Public
             </h3>
             <p className="text-zinc-600 text-xs sm:text-[13.5px] leading-relaxed font-normal">
-              Cora is committed to empowering the creative world. We build directly in public alongside 1,200+ agency owners who share feedback and vote on features to lead the direction of our AI platform roadmap.
+              We build directly alongside local service business founders who share weekly feedback to refine workflows for real Indian businesses.
             </p>
           </div>
 
           {/* Column 3 */}
           <div className="founder-anim-item space-y-2.5">
             <h3 className="font-display text-xs sm:text-[13px] font-bold uppercase tracking-wider text-zinc-950">
-              Network With Ambitious Studios
+              Zero Navigation Friction
             </h3>
             <p className="text-zinc-600 text-xs sm:text-[13.5px] leading-relaxed font-normal">
-              Connect with high-caliber agency founders, commercial filmmakers, and studio owners who are scaling high-margin, predictable retainer businesses with Cora’s autonomous AI operating system.
+              Everything happens in one conversational input. Create invoices, check cash flow, and reply to client inquiries without clicking 20 menus.
             </p>
           </div>
 
@@ -155,9 +154,8 @@ export function FounderCommunitySection() {
         {/* ── High-Impact Obsidian Founder Presentation Stage ── */}
         <div
           ref={showcaseCardRef}
-          className="relative w-full rounded-[36px] overflow-hidden bg-[#0A0D10] border border-zinc-800 shadow-[0px_24px_60px_rgba(0,0,0,0.22)]"
+          className="relative w-full rounded-[36px] overflow-hidden bg-[#0A0D10] border border-zinc-800 shadow-2xs"
         >
-          {/* Subtle Ambient Meadow Radial Glow */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -166,16 +164,6 @@ export function FounderCommunitySection() {
             }}
           />
 
-          {/* Subtle Background Grid */}
-          <div 
-            className="absolute inset-0 opacity-[0.06] pointer-events-none"
-            style={{
-              backgroundImage: 'radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)',
-              backgroundSize: '24px 24px',
-            }}
-          />
-
-          {/* Content Container */}
           <div className="relative z-10 flex flex-col items-center pt-10 sm:pt-14 px-6 sm:px-12">
             
             {/* Top Founder Identity Pill */}
@@ -186,38 +174,38 @@ export function FounderCommunitySection() {
               </span>
             </div>
 
-            {/* Stage: Founder Standing Presentation with Clean Cutout */}
+            {/* Stage */}
             <div className="relative w-full max-w-[940px] flex items-end justify-center min-h-[380px] sm:min-h-[460px] md:min-h-[500px]">
               
-              {/* Floating Badge Left: Product Architect */}
+              {/* Floating Badge Left */}
               <div
                 ref={badgeLeftRef}
-                className="hidden md:flex absolute left-2 lg:left-6 top-16 z-20 bg-zinc-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-zinc-700/80 shadow-[0px_14px_32px_rgba(0,0,0,0.35)] flex-col text-left max-w-[240px] transition-transform duration-300 hover:scale-105"
+                className="hidden md:flex absolute left-2 lg:left-6 top-16 z-20 bg-zinc-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-zinc-700/80 shadow-2xs flex-col text-left max-w-[240px] transition-transform duration-300 hover:scale-105"
               >
                 <div className="flex items-center gap-2 text-xs font-bold text-white mb-1">
                   <div className="w-6 h-6 rounded-lg bg-purple-900/60 text-purple-300 flex items-center justify-center border border-purple-700/50">
                     <Sparkles className="w-3.5 h-3.5" />
                   </div>
-                  <span>Product Architect</span>
+                  <span>Product Vision</span>
                 </div>
                 <p className="text-zinc-400 text-[11px] leading-relaxed">
-                  Building autonomous AI infrastructure designed from scratch for high-ticket commercial studios.
+                  Building simple AI tools tailored for Indian service businesses and solopreneurs.
                 </p>
                 <div className="mt-2.5 pt-2 border-t border-zinc-800 flex items-center gap-1.5 text-[10px] font-semibold text-purple-300">
-                  <span>Claraverse Inc.</span>
+                  <span>Cora Studio</span>
                   <span>&bull;</span>
                   <span>Build in Public</span>
                 </div>
               </div>
 
-              {/* Central Founder Cutout Presentation (Full Scale, Crisp Studio Lighting) */}
+              {/* Central Founder Cutout */}
               <div
                 ref={founderImageRef}
                 className="relative z-10 w-[320px] sm:w-[400px] md:w-[460px] h-[380px] sm:h-[460px] md:h-[500px] flex items-end justify-center filter drop-shadow-[0px_16px_36px_rgba(0,0,0,0.6)] select-none"
               >
                 <Image
                   src="/images/dravya_bansal_cutout_clean.png"
-                  alt="Dravya Bansal — Co-founder of Cora"
+                  alt="Dravya Bansal — Founder of Cora"
                   fill
                   sizes="(max-width: 768px) 400px, 460px"
                   className="object-contain object-bottom"
@@ -225,23 +213,23 @@ export function FounderCommunitySection() {
                 />
               </div>
 
-              {/* Floating Badge Right: Community & GST Scale */}
+              {/* Floating Badge Right */}
               <div
                 ref={badgeRightRef}
-                className="hidden md:flex absolute right-2 lg:right-6 top-24 z-20 bg-zinc-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-zinc-700/80 shadow-[0px_14px_32px_rgba(0,0,0,0.35)] flex-col text-left max-w-[250px] transition-transform duration-300 hover:scale-105"
+                className="hidden md:flex absolute right-2 lg:right-6 top-24 z-20 bg-zinc-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-zinc-700/80 shadow-2xs flex-col text-left max-w-[250px] transition-transform duration-300 hover:scale-105"
               >
                 <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 mb-1">
                   <div className="w-6 h-6 rounded-lg bg-emerald-950 text-emerald-400 flex items-center justify-center border border-emerald-700/50">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                   </div>
-                  <span>1,200+ Workspaces</span>
+                  <span>Indian Commerce</span>
                 </div>
                 <p className="text-zinc-400 text-[11px] leading-relaxed">
-                  Over ₹4.8Cr in 18% GST invoices, retainers, and crew call-sheets processed autonomously.
+                  18% GST calculations, instant UPI QR links, and WhatsApp sharing built in.
                 </p>
                 <div className="mt-2.5 pt-2 border-t border-zinc-800 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Live Production Traffic</span>
+                  <span>Free Forever Plan</span>
                 </div>
               </div>
 
@@ -255,23 +243,23 @@ export function FounderCommunitySection() {
                   Dravya Bansal
                 </h4>
                 <p className="text-zinc-400 text-xs sm:text-sm font-semibold tracking-wider uppercase mt-0.5">
-                  Co-founder &bull; Claraverse &amp; Cora
+                  Founder &bull; Cora
                 </p>
               </div>
 
               <blockquote className="text-zinc-300 text-sm sm:text-base font-normal italic leading-relaxed max-w-[680px] mx-auto">
-                "Our mission with Cora is simple: give ambitious founders an operating system so complete and autonomous that they never have to think about spreadsheets, invoices, or dispatch logistics again."
+                &ldquo;Running a service business in India shouldn&apos;t mean spending your evenings copying data between WhatsApp, Excel sheets, and billing apps. We built Cora so you can manage your operations simply by talking to an assistant that actually knows your business.&rdquo;
               </blockquote>
 
               {/* Action Buttons */}
               <div className="flex items-center justify-center flex-wrap gap-3.5 pt-3">
                 <a
                   href="https://app.heycora.in/workspace/login?source=founder_stage"
-                  onClick={() => trackEvent('founder_cta_click', { action: 'join_movement' })}
+                  onClick={() => trackEvent('founder_cta_click', { action: 'start_free' })}
                   className="inline-flex items-center gap-2 bg-white text-zinc-950 px-5 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-100 transition-all shadow-sm"
                 >
                   <Users className="w-4 h-4 text-emerald-600" />
-                  <span>Join the Movement</span>
+                  <span>Start Free Workspace</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                 </a>
 

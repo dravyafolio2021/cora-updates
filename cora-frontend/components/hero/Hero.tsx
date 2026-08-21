@@ -86,7 +86,7 @@ export function Hero() {
           sizes="100vw"
         />
         
-        {/* Figma Linear Gradient Overlay */}
+        {/* Linear Gradient Overlay */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -94,11 +94,11 @@ export function Hero() {
           }}
         />
 
-        {/* Tall Soft Multi-Stop Pure White Fade (Completely dissolves bottom image edge) */}
+        {/* Tall Soft Multi-Stop Pure White Fade */}
         <div className="absolute inset-x-0 bottom-0 h-[60%] sm:h-[55%] bg-gradient-to-t from-white via-white/80 via-white/40 to-transparent pointer-events-none" />
       </div>
 
-      {/* Front-Facing Bottom Fade Veil (Guarantees zero sharp edge over the entire section bottom) */}
+      {/* Front-Facing Bottom Fade Veil */}
       <div className="absolute inset-x-0 bottom-0 h-40 sm:h-64 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none z-[5]" />
 
       <div
@@ -167,7 +167,7 @@ export function Hero() {
               onClick={handleGoogleSignup}
               className="px-6 sm:px-10 py-3 sm:py-2.5 bg-zinc-950 text-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] shadow-[0px_4px_14px_-2px_rgba(0,0,0,0.16)] outline outline-1 outline-offset-[-1px] outline-white/15 flex items-center justify-center gap-2.5 hover:bg-zinc-800 transition-all hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto shrink-0"
             >
-              {/* Official 4-Color Google Icon */}
+              {/* Official Google Icon */}
               <div className="w-5 h-5 flex items-center justify-center shrink-0">
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
@@ -202,7 +202,6 @@ export function Hero() {
                 <span className="text-sm sm:text-base">✦</span>
                 <span>free forever</span>
               </span>
-              {/* Hand-drawn double oval loop scribble in violet-400 */}
               <svg
                 className="absolute inset-0 w-full h-full text-violet-400 stroke-current fill-none pointer-events-none -rotate-1 scale-110"
                 viewBox="0 0 130 36"

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Calculator, Sparkles, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { Calculator, Code2, ArrowUpRight } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 
 export function ToolsBanner() {
@@ -13,14 +13,14 @@ export function ToolsBanner() {
           
           <div className="max-w-[540px]">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-xs font-semibold text-zinc-300 mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-              <span>100% Free Public Micro-Tools</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>Free Public Micro-Tools</span>
             </div>
             <h3 className="font-display text-2xl font-bold text-white mb-2">
-              Free Utilities for Founders & Studios
+              Free business tools for Indian founders.
             </h3>
             <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-              No account or credit card required. Calculate GST invoices or generate high-converting listing descriptions instantly in your browser.
+              No account or credit card required. Calculate 18% GST breakdowns or generate custom booking forms for your website in seconds.
             </p>
           </div>
 
@@ -29,7 +29,7 @@ export function ToolsBanner() {
             <Link
               href="/tools/gst-calculator"
               onClick={() => trackEvent('banner_tool_clicked', { tool: 'gst-calculator' })}
-              className="bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 p-4 rounded-xl flex items-center justify-between gap-4 group transition-all hover:-translate-y-0.5 shadow-sm"
+              className="bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 p-4 rounded-xl flex items-center justify-between gap-4 group transition-all hover:-translate-y-0.5 shadow-2xs"
             >
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
@@ -37,32 +37,32 @@ export function ToolsBanner() {
                 </div>
                 <div>
                   <div className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors">
-                    GST Calculator
+                    18% GST Calculator
                   </div>
                   <div className="text-[0.6875rem] text-zinc-400">
-                    B2B Invoices & Tax Math
+                    CGST &amp; SGST Tax Breakdown
                   </div>
                 </div>
               </div>
               <ArrowUpRight className="w-4 h-4 text-zinc-500 group-hover:text-white transition-colors" />
             </Link>
 
-            {/* Tool 2: Listing AI */}
+            {/* Tool 2: Embed Builder */}
             <Link
-              href="/tools/listing-ai"
-              onClick={() => trackEvent('banner_tool_clicked', { tool: 'listing-ai' })}
-              className="bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 p-4 rounded-xl flex items-center justify-between gap-4 group transition-all hover:-translate-y-0.5 shadow-sm"
+              href="/tools/embed-builder"
+              onClick={() => trackEvent('banner_tool_clicked', { tool: 'embed-builder' })}
+              className="bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 p-4 rounded-xl flex items-center justify-between gap-4 group transition-all hover:-translate-y-0.5 shadow-2xs"
             >
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20">
-                  <Sparkles className="w-4 h-4" />
+                  <Code2 className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-white group-hover:text-purple-400 transition-colors">
-                    Listing AI Copilot
+                    1-Click Embed Builder
                   </div>
                   <div className="text-[0.6875rem] text-zinc-400">
-                    GEO & SEO Generator
+                    Lead Widget Generator
                   </div>
                 </div>
               </div>
