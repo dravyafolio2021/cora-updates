@@ -88,11 +88,8 @@ export function FounderValueShowcase() {
             </h2>
           </div>
 
-          {/* Right Subtitle & Action Button */}
-          <div className="max-w-[440px] flex flex-col items-start lg:items-end text-left lg:text-right gap-4">
-            <p className="text-zinc-600 text-sm sm:text-base leading-relaxed font-normal">
-              Replace 10 disconnected tools. From the first inquiry on WhatsApp to legal e-signing and 18% GST payments — Cora handles the busywork in one conversation.
-            </p>
+          {/* Right Action Button */}
+          <div className="flex items-center lg:items-end justify-start lg:justify-end shrink-0">
             <a
               href="https://app.heycora.in/workspace/login"
               onClick={handleCtaClick}
