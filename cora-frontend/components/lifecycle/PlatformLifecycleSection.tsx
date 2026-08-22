@@ -19,8 +19,6 @@ import {
   Clock,
   TrendingUp,
   ArrowRight,
-  HelpCircle,
-  Zap,
 } from 'lucide-react';
 
 if (typeof window !== 'undefined') {
@@ -95,7 +93,7 @@ export function PlatformLifecycleSection() {
 
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
             
-            {/* Left: Fragmented App Nodes & Chaos Bubbles */}
+            {/* Left: Fragmented App Nodes & Context Bubbles */}
             <div className="flex-1 w-full flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
               
               {/* Node 1 */}
@@ -165,127 +163,80 @@ export function PlatformLifecycleSection() {
 
         </div>
 
-        {/* ── 7-Card Foundational Bento Grid with Rich Visuals & Backdrops ── */}
+        {/* ── 7-Card Foundational Bento Grid with Bespoke 3D Renders ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7 items-stretch justify-center">
           
-          {/* ── CARD 1: INQUIRIES & LEAD PIPELINE (2-Col Wide with Background Photo Layer) ── */}
-          <div className="cora-bento-card lg:col-span-2 relative flex flex-col justify-between min-h-[440px] sm:min-h-[460px] overflow-hidden rounded-[32px] p-6 sm:p-8 bg-[#EEF2FF] border-0 shadow-[0px_4px_20px_rgba(99,102,241,0.04)] group hover:shadow-[0px_16px_36px_rgba(99,102,241,0.09)] transition-all duration-300">
+          {/* ── CARD 1: INQUIRIES & AI AGENT (2-Col Wide with 3D Render) ── */}
+          <div className="cora-bento-card lg:col-span-2 relative flex flex-col justify-between min-h-[460px] sm:min-h-[500px] overflow-hidden rounded-[32px] p-6 sm:p-8 bg-[#FAF5EF] border border-orange-100/60 shadow-[0px_4px_20px_rgba(249,115,22,0.04)] group hover:shadow-[0px_16px_36px_rgba(249,115,22,0.08)] transition-all duration-300">
             
-            {/* Background Atmospheric Photo */}
-            <div className="absolute right-0 top-0 w-1/2 h-full opacity-10 pointer-events-none mix-blend-multiply">
-              <Image
-                src="/images/usecase_commercial_studio.jpg"
-                alt="Studio workflow"
-                fill
-                className="object-cover"
-              />
-            </div>
-
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4 relative z-10">
               <div>
                 <h3 className="font-display text-2xl sm:text-[26px] font-bold text-zinc-950 tracking-tight mb-1">
-                  Client Inquiries &amp; Leads
+                  Client Inquiries &amp; 24/7 AI Agent
                 </h3>
-                <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[460px]">
-                  Capture customer inquiries from WhatsApp, phone calls, and web forms into one organized pipeline.
+                <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-[440px]">
+                  Autonomous conversational agent that replies to customer briefs on WhatsApp, captures requirements, and schedules hold dates.
                 </p>
               </div>
-              <span className="text-[10.5px] font-bold uppercase px-3 py-1 bg-white text-indigo-950 rounded-full shadow-2xs shrink-0 self-start">
-                Lead Manager
+              <span className="text-[10.5px] font-bold uppercase px-3 py-1 bg-white text-orange-950 rounded-full shadow-2xs shrink-0 self-start border border-orange-100">
+                Works 24/7
               </span>
             </div>
 
-            {/* Anchored Layered UI Cards */}
-            <div className="relative w-full h-[260px] sm:h-[280px] my-auto flex items-end justify-center z-10">
+            {/* Visual 3D Hero Render with Live Dialog Overlay */}
+            <div className="relative w-full h-[280px] sm:h-[320px] my-auto flex items-center justify-between gap-4 z-10">
               
-              {/* Back Card: Active Inquiries */}
-              <div className="absolute bottom-6 left-2 sm:left-12 w-[220px] sm:w-[240px] bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(0,0,0,0.06)] border border-zinc-200/80 space-y-2.5 z-10 transition-transform duration-300 group-hover:-translate-y-1">
-                <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-zinc-950 text-white flex items-center justify-center">
-                      <Inbox className="w-3 h-3 text-zinc-200" />
-                    </div>
-                    <span className="text-xs font-bold text-zinc-900">Lead Registry</span>
-                  </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
-                </div>
-
-                <div className="space-y-1.5 text-[11px] text-zinc-700">
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Active Leads</div>
-                  <div className="flex items-center gap-1.5 text-zinc-800 font-medium truncate">
-                    <FileText className="w-3 h-3 text-zinc-400 shrink-0" />
-                    <span className="truncate">Lakme Fashion Shoot</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-zinc-800 font-medium truncate">
-                    <FileText className="w-3 h-3 text-zinc-400 shrink-0" />
-                    <span className="truncate">BMW Commercial Video</span>
-                  </div>
-                </div>
-
-                <div className="pt-1.5 border-t border-zinc-100 space-y-1 text-[10.5px] text-zinc-500">
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Deliverables</div>
-                  <div className="flex items-center gap-1.5">
-                    <Folder className="w-3 h-3 text-indigo-600 shrink-0" />
-                    <span>Raw Footage &amp; Cuts</span>
-                  </div>
-                </div>
+              {/* 3D Image Artwork */}
+              <div className="relative w-full h-full max-w-[340px] sm:max-w-[400px] rounded-2xl overflow-hidden shadow-[0px_12px_28px_rgba(0,0,0,0.08)] border border-white/80">
+                <Image
+                  src="/images/cora_ai_agent_avatar.jpg"
+                  alt="Cora 24/7 AI Co-Founder Agent"
+                  fill
+                  className="object-cover"
+                />
               </div>
 
-              {/* Front Overlapping Card: WhatsApp Pipeline */}
-              <div className="absolute bottom-0 right-2 sm:right-12 w-[220px] sm:w-[245px] bg-white rounded-2xl p-4 shadow-[0px_16px_36px_rgba(0,0,0,0.12)] border border-zinc-200/90 space-y-2.5 z-20 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
-                <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-indigo-600 text-white flex items-center justify-center">
+              {/* Floating Live WhatsApp Resolution Box */}
+              <div className="hidden sm:flex flex-col w-[230px] bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-[0px_16px_36px_rgba(0,0,0,0.12)] border border-zinc-200/80 space-y-2.5 shrink-0">
+                <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-md bg-[#25D366] text-white flex items-center justify-center">
                       <MessageSquare className="w-3 h-3 text-white" />
                     </div>
-                    <span className="text-xs font-bold text-zinc-900">WhatsApp Sync</span>
+                    <span className="text-xs font-bold text-zinc-900">WhatsApp Intake</span>
                   </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
+                  <span className="text-[9px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded">
+                    Active
+                  </span>
                 </div>
-
-                <div className="space-y-1.5 text-[11px] text-zinc-700">
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Recent Client</div>
-                  <div className="flex items-center gap-1.5 text-zinc-800 font-medium truncate">
-                    <FileText className="w-3 h-3 text-indigo-500 shrink-0" />
-                    <span className="truncate">Priya (Wedding Retainer)</span>
+                <div className="space-y-1.5 text-[10.5px] text-zinc-700">
+                  <div className="font-semibold text-zinc-900">Priya Verma (Fashion Shoot)</div>
+                  <div className="text-zinc-500 text-[10px] leading-tight">
+                    &ldquo;Looking for a 2-day studio lookbook shoot in Bandra.&rdquo;
                   </div>
                 </div>
-
-                <div className="pt-1.5 border-t border-zinc-100 space-y-1 text-[10.5px]">
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Status</div>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md font-semibold text-[10px]">
-                      #Quote-Sent
-                    </span>
-                    <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md font-semibold text-[10px]">
-                      #Advance-Paid
-                    </span>
-                  </div>
+                <div className="pt-1.5 border-t border-zinc-100 flex items-center gap-1 flex-wrap">
+                  <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded font-semibold text-[9.5px]">
+                    #Quote-Sent
+                  </span>
+                  <span className="px-2 py-0.5 bg-indigo-50 text-indigo-800 rounded font-semibold text-[9.5px]">
+                    #Slot-Held
+                  </span>
                 </div>
               </div>
 
             </div>
 
             <div className="flex items-center justify-between text-[11px] font-semibold text-zinc-600 pt-2 relative z-10">
-              <span>WhatsApp &amp; Phone Inquiries</span>
-              <span className="text-indigo-950 font-bold">Never Lose a Lead &rarr;</span>
+              <span>Automated WhatsApp &amp; Call Inquiries</span>
+              <span className="text-orange-950 font-bold">Never Miss a Lead &rarr;</span>
             </div>
 
           </div>
 
-          {/* ── CARD 2: CONTRACTS & E-SIGN VAULT (With E-Sign Seal Texture) ── */}
-          <div className="cora-bento-card relative flex flex-col justify-between min-h-[440px] sm:min-h-[460px] overflow-hidden rounded-[32px] p-6 sm:p-7 bg-[#E0F2FE] border-0 shadow-[0px_4px_20px_rgba(14,165,233,0.04)] group hover:shadow-[0px_16px_36px_rgba(14,165,233,0.09)] transition-all duration-300">
+          {/* ── CARD 2: CONTRACTS & E-SIGN (With 3D Glass Tablet Render) ── */}
+          <div className="cora-bento-card relative flex flex-col justify-between min-h-[460px] sm:min-h-[500px] overflow-hidden rounded-[32px] p-6 sm:p-7 bg-[#F0F7FA] border border-sky-100/60 shadow-[0px_4px_20px_rgba(14,165,233,0.04)] group hover:shadow-[0px_16px_36px_rgba(14,165,233,0.08)] transition-all duration-300">
             
-            {/* Background Texture */}
-            <div className="absolute right-0 bottom-0 w-3/4 h-1/2 opacity-15 pointer-events-none mix-blend-multiply">
-              <Image
-                src="/images/bento_esign_seal.jpg"
-                alt="Legal vault"
-                fill
-                className="object-cover"
-              />
-            </div>
-
             <div className="text-center relative z-10">
               <h3 className="font-display text-2xl font-bold text-zinc-950 mb-1">
                 Contracts &amp; E-Sign
@@ -295,134 +246,49 @@ export function PlatformLifecycleSection() {
               </p>
             </div>
 
-            {/* Anchored Overlapping Cards */}
-            <div className="relative w-full h-[260px] my-auto flex items-end justify-center z-10">
-              
-              {/* Left Card: Contract Templates */}
-              <div className="absolute bottom-4 left-1 sm:left-2 w-[185px] bg-white rounded-2xl p-3.5 shadow-[0px_10px_28px_rgba(0,0,0,0.08)] border border-zinc-200/80 space-y-2 z-10 -rotate-[4deg] group-hover:-rotate-[2deg] transition-transform duration-300">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-900 pb-1.5 border-b border-zinc-100">
-                  <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
-                  <span>Legal Templates</span>
-                </div>
-                <div className="space-y-1.5 text-[10.5px] text-zinc-700 font-medium">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <FileText className="w-3 h-3 text-sky-600 shrink-0" />
-                    <span className="truncate">Commercial Agreement</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 truncate">
-                    <FileText className="w-3 h-3 text-sky-600 shrink-0" />
-                    <span className="truncate">IT Act Model NDA</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 truncate">
-                    <FileText className="w-3 h-3 text-sky-600 shrink-0" />
-                    <span className="truncate">Call-Sheet SOP</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 truncate">
-                    <FileText className="w-3 h-3 text-sky-600 shrink-0" />
-                    <span className="truncate">50% Advance Clause</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Card: E-Sign Status Tags */}
-              <div className="absolute bottom-6 right-1 sm:right-2 w-[155px] bg-white rounded-2xl p-3.5 shadow-[0px_16px_36px_rgba(0,0,0,0.12)] border border-zinc-200/90 space-y-2 z-20 rotate-[6deg] group-hover:rotate-[3deg] transition-transform duration-300">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-900 pb-1.5 border-b border-zinc-100">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Status</span>
-                </div>
-                <div className="space-y-1.5 text-[10.5px]">
-                  <div className="flex items-center gap-1.5 text-emerald-800 font-semibold bg-emerald-50 px-2 py-1 rounded-lg">
-                    <Hash className="w-3 h-3 text-emerald-600" />
-                    <span>e-signed</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-sky-800 font-semibold bg-sky-50 px-2 py-1 rounded-lg">
-                    <Hash className="w-3 h-3 text-sky-600" />
-                    <span>advance-paid</span>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <div className="text-center pt-2 relative z-10">
-              <span className="text-[10.5px] font-semibold text-sky-950 bg-white/90 px-3.5 py-1 rounded-full shadow-2xs">
-                Zero Scope Creep
-              </span>
-            </div>
-
-          </div>
-
-          {/* ── CARD 3: 18% GST BILLING (With Real Indian Bill Texture) ── */}
-          <div className="cora-bento-card relative flex flex-col justify-between min-h-[440px] sm:min-h-[460px] overflow-hidden rounded-[32px] p-6 sm:p-7 bg-[#DCFCE7] border-0 shadow-[0px_4px_20px_rgba(16,185,129,0.04)] group hover:shadow-[0px_16px_36px_rgba(16,185,129,0.09)] transition-all duration-300">
-            
-            {/* Background Texture */}
-            <div className="absolute right-0 bottom-0 w-3/4 h-1/2 opacity-15 pointer-events-none mix-blend-multiply">
+            {/* 3D Glass Tablet Render Artwork */}
+            <div className="relative w-full h-[260px] sm:h-[280px] my-auto rounded-2xl overflow-hidden shadow-[0px_12px_28px_rgba(0,0,0,0.08)] border border-white/80 z-10">
               <Image
-                src="/images/bento_gst_upi.jpg"
-                alt="GST Tax Math"
+                src="/images/cora_esign_vault_3d.jpg"
+                alt="3D Frosted Glass Legal Agreement Tablet"
                 fill
                 className="object-cover"
               />
             </div>
 
+            <div className="text-center pt-2 relative z-10">
+              <span className="text-[10.5px] font-semibold text-sky-950 bg-white/95 px-3.5 py-1 rounded-full shadow-2xs border border-sky-100">
+                Legally Binding &bull; Zero Scope Creep
+              </span>
+            </div>
+
+          </div>
+
+          {/* ── CARD 3: 18% GST BILLING (With 3D UPI Soundbox Standee Render) ── */}
+          <div className="cora-bento-card relative flex flex-col justify-between min-h-[460px] sm:min-h-[500px] overflow-hidden rounded-[32px] p-6 sm:p-7 bg-[#F0FDF4] border border-emerald-100/60 shadow-[0px_4px_20px_rgba(16,185,129,0.04)] group hover:shadow-[0px_16px_36px_rgba(16,185,129,0.08)] transition-all duration-300">
+            
             <div className="text-center relative z-10">
               <h3 className="font-display text-2xl font-bold text-zinc-950 mb-1">
-                18% GST Billing
+                18% GST &amp; UPI Commerce
               </h3>
               <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
                 Automatic tax math &amp; UPI payment QR
               </p>
             </div>
 
-            {/* Anchored Structured Table */}
-            <div className="relative w-full my-auto bg-white rounded-2xl shadow-[0px_12px_28px_rgba(0,0,0,0.08)] border border-zinc-200/90 overflow-hidden text-left z-10">
-              <div className="flex items-center justify-between px-3.5 py-2.5 bg-zinc-50 border-b border-zinc-200/80 text-[10px] font-semibold text-zinc-500">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-3 text-center">#</span>
-                  <span>Client &amp; Project</span>
-                </div>
-                <span>Tax Split</span>
-              </div>
-
-              <div className="divide-y divide-zinc-100 text-[11px]">
-                <div className="flex items-center justify-between px-3 py-2">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="w-3 text-zinc-400 text-[10px]">1</span>
-                    <span className="font-medium text-zinc-900 truncate">Priya Wedding Shoot</span>
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-amber-100 text-amber-800">
-                    18% GST
-                  </span>
-                </div>
-                <div className="flex items-center justify-between px-3 py-2">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="w-3 text-zinc-400 text-[10px]">2</span>
-                    <span className="font-medium text-zinc-900 truncate">Apex Realty Ad Video</span>
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-emerald-100 text-emerald-800">
-                    Paid UPI
-                  </span>
-                </div>
-                <div className="flex items-center justify-between px-3 py-2">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="w-3 text-zinc-400 text-[10px]">3</span>
-                    <span className="font-medium text-zinc-900 truncate">Nitin Studio Retainer</span>
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-purple-100 text-purple-800">
-                    Auto Split
-                  </span>
-                </div>
-              </div>
-
-              <div className="px-3 py-1.5 bg-zinc-50/60 border-t border-zinc-100 flex items-center justify-between text-[9.5px] text-zinc-400">
-                <span>3 records this week</span>
-                <span className="text-emerald-700 font-semibold">+ New Bill</span>
-              </div>
+            {/* 3D UPI Soundbox & QR Standee Render Artwork */}
+            <div className="relative w-full h-[260px] sm:h-[280px] my-auto rounded-2xl overflow-hidden shadow-[0px_12px_28px_rgba(0,0,0,0.08)] border border-white/80 z-10">
+              <Image
+                src="/images/cora_gst_upi_3d.jpg"
+                alt="3D Indian UPI Soundbox and GST Breakdown Standee"
+                fill
+                className="object-cover"
+              />
             </div>
 
             <div className="text-center pt-2 relative z-10">
-              <span className="text-[10.5px] font-semibold text-emerald-950 bg-white/90 px-3.5 py-1 rounded-full shadow-2xs">
-                Zero Manual Calculations
+              <span className="text-[10.5px] font-semibold text-emerald-950 bg-white/95 px-3.5 py-1 rounded-full shadow-2xs border border-emerald-100">
+                18% CGST/SGST Auto Split
               </span>
             </div>
 
@@ -532,19 +398,9 @@ export function PlatformLifecycleSection() {
 
           </div>
 
-          {/* ── CARD 6: CASH FLOW & FINANCIAL LEDGER (2-Col Wide with Background Studio Lens) ── */}
+          {/* ── CARD 6: CASH FLOW & FINANCIAL LEDGER (2-Col Wide) ── */}
           <div className="cora-bento-card lg:col-span-2 relative flex flex-col justify-between min-h-[400px] sm:min-h-[420px] overflow-hidden rounded-[32px] p-6 sm:p-8 bg-[#EEF2FF] border-0 shadow-[0px_4px_20px_rgba(99,102,241,0.04)] group hover:shadow-[0px_16px_36px_rgba(99,102,241,0.09)] transition-all duration-300">
             
-            {/* Background Studio Photography */}
-            <div className="absolute left-0 bottom-0 w-1/2 h-full opacity-10 pointer-events-none mix-blend-multiply">
-              <Image
-                src="/images/usecase_solo_creator.jpg"
-                alt="Solo creator accounting"
-                fill
-                className="object-cover"
-              />
-            </div>
-
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4 relative z-10">
               <div>
                 <h3 className="font-display text-2xl sm:text-[26px] font-bold text-zinc-950 tracking-tight mb-1">
