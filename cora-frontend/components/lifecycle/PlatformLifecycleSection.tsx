@@ -8,8 +8,12 @@ import {
   Folder,
   CheckCircle2,
   ChevronDown,
-  Star,
   Hash,
+  Inbox,
+  MessageSquare,
+  ShieldCheck,
+  CreditCard,
+  Layers,
   Sparkles,
 } from 'lucide-react';
 
@@ -60,83 +64,83 @@ export function PlatformLifecycleSection() {
           </p>
         </div>
 
-        {/* ── 3 Elegant Editorial Cards (Calm, Anchored, Meaningful) ── */}
+        {/* ── 3 Elegant Editorial Cards (Cora Business Features, Zero Emojis, Pure SVGs) ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch justify-center">
           
-          {/* ── CARD 1: SPACES (Workspaces & Client Pipelines) ── */}
-          <div className="cora-bento-card relative flex flex-col justify-between h-[480px] sm:h-[520px] overflow-hidden rounded-[32px] p-6 sm:p-8 bg-[#EEF2FF] shadow-[0px_4px_20px_rgba(99,102,241,0.04)] group hover:shadow-[0px_16px_36px_rgba(99,102,241,0.09)] transition-all duration-300">
+          {/* ── CARD 1: INQUIRIES & LEAD PIPELINE ── */}
+          <div className="cora-bento-card relative flex flex-col justify-between h-[480px] sm:h-[520px] overflow-hidden rounded-[32px] p-6 sm:p-8 bg-[#EEF2FF] border-0 shadow-[0px_4px_20px_rgba(99,102,241,0.04)] group hover:shadow-[0px_16px_36px_rgba(99,102,241,0.09)] transition-all duration-300">
             
             {/* Header */}
             <div className="text-center relative z-10">
               <h3 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 mb-1.5">
-                Spaces
+                Inquiries &amp; CRM
               </h3>
-              <p className="text-zinc-600 text-xs sm:text-sm max-w-[240px] mx-auto leading-relaxed">
-                Switch between client shoots, retainers, and agency accounts
+              <p className="text-zinc-600 text-xs sm:text-sm max-w-[250px] mx-auto leading-relaxed">
+                Capture client briefs from WhatsApp and calls into an organized pipeline
               </p>
             </div>
 
             {/* Anchored Layered UI Cards */}
             <div className="relative w-full h-[280px] sm:h-[300px] mt-auto flex items-end justify-center">
               
-              {/* Back Card: Studio Space */}
+              {/* Back Card: Active Inquiries */}
               <div className="absolute bottom-6 left-2 sm:left-4 w-[210px] sm:w-[230px] bg-white rounded-2xl p-4 shadow-[0px_8px_24px_rgba(0,0,0,0.06)] border border-zinc-200/80 space-y-2.5 z-10 transition-transform duration-300 group-hover:-translate-y-1">
                 <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-zinc-900 text-white flex items-center justify-center text-[10px] font-bold">
-                      📸
+                    <div className="w-5 h-5 rounded-md bg-zinc-950 text-white flex items-center justify-center">
+                      <Inbox className="w-3 h-3 text-zinc-200" />
                     </div>
-                    <span className="text-xs font-bold text-zinc-900">Studio Space</span>
+                    <span className="text-xs font-bold text-zinc-900">Lead Registry</span>
                   </div>
                   <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
                 </div>
 
                 <div className="space-y-1.5 text-[11px] text-zinc-700">
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Starred</div>
+                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Active Leads</div>
                   <div className="flex items-center gap-1.5 text-zinc-800 font-medium truncate">
-                    <FileText className="w-3 h-3 text-zinc-400" />
-                    <span>Lakme Fashion Week</span>
+                    <FileText className="w-3 h-3 text-zinc-400 shrink-0" />
+                    <span className="truncate">Lakme Fashion Shoot</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-zinc-800 font-medium truncate">
-                    <FileText className="w-3 h-3 text-zinc-400" />
-                    <span>BMW Commercial Shoot</span>
+                    <FileText className="w-3 h-3 text-zinc-400 shrink-0" />
+                    <span className="truncate">BMW Commercial Video</span>
                   </div>
                 </div>
 
                 <div className="pt-1.5 border-t border-zinc-100 space-y-1 text-[10.5px] text-zinc-500">
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Folders</div>
+                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Deliverables</div>
                   <div className="flex items-center gap-1.5">
-                    <Folder className="w-3 h-3 text-indigo-500" />
-                    <span>Client Deliverables</span>
+                    <Folder className="w-3 h-3 text-indigo-600 shrink-0" />
+                    <span>Raw Footage &amp; Cuts</span>
                   </div>
                 </div>
               </div>
 
-              {/* Front Overlapping Card: Agency Space */}
+              {/* Front Overlapping Card: WhatsApp Pipeline */}
               <div className="absolute bottom-0 right-2 sm:right-4 w-[210px] sm:w-[230px] bg-white rounded-2xl p-4 shadow-[0px_16px_36px_rgba(0,0,0,0.12)] border border-zinc-200/90 space-y-2.5 z-20 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
                 <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold">
-                      🏢
+                    <div className="w-5 h-5 rounded-md bg-indigo-600 text-white flex items-center justify-center">
+                      <MessageSquare className="w-3 h-3 text-white" />
                     </div>
-                    <span className="text-xs font-bold text-zinc-900">Agency Workspace</span>
+                    <span className="text-xs font-bold text-zinc-900">WhatsApp Sync</span>
                   </div>
                   <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
                 </div>
 
                 <div className="space-y-1.5 text-[11px] text-zinc-700">
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Starred</div>
+                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Recent Client</div>
                   <div className="flex items-center gap-1.5 text-zinc-800 font-medium truncate">
-                    <FileText className="w-3 h-3 text-indigo-500" />
-                    <span>Zomato Brand Retainer</span>
+                    <FileText className="w-3 h-3 text-indigo-500 shrink-0" />
+                    <span className="truncate">Priya (Wedding Retainer)</span>
                   </div>
                 </div>
 
                 <div className="pt-1.5 border-t border-zinc-100 space-y-1 text-[10.5px]">
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Tags</div>
+                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Status</div>
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md font-semibold text-[10px]">
-                      #In-Progress
+                      #Quote-Sent
                     </span>
                     <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md font-semibold text-[10px]">
                       #Advance-Paid
@@ -149,64 +153,66 @@ export function PlatformLifecycleSection() {
 
           </div>
 
-          {/* ── CARD 2: FOLDERS & TAGS (SOPs, Contracts & Workflows) ── */}
-          <div className="cora-bento-card relative flex flex-col justify-between h-[480px] sm:h-[520px] overflow-hidden rounded-[32px] p-6 sm:p-8 bg-[#E0F2FE] shadow-[0px_4px_20px_rgba(14,165,233,0.04)] group hover:shadow-[0px_16px_36px_rgba(14,165,233,0.09)] transition-all duration-300">
+          {/* ── CARD 2: CONTRACTS & E-SIGN VAULT ── */}
+          <div className="cora-bento-card relative flex flex-col justify-between h-[480px] sm:h-[520px] overflow-hidden rounded-[32px] p-6 sm:p-8 bg-[#E0F2FE] border-0 shadow-[0px_4px_20px_rgba(14,165,233,0.04)] group hover:shadow-[0px_16px_36px_rgba(14,165,233,0.09)] transition-all duration-300">
             
             {/* Header */}
             <div className="text-center relative z-10">
               <h3 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 mb-1.5">
-                Folders &amp; Tags
+                Contracts &amp; E-Sign
               </h3>
-              <p className="text-zinc-600 text-xs sm:text-sm max-w-[240px] mx-auto leading-relaxed">
-                Standard structure for legal contracts, rates, and clear hierarchies
+              <p className="text-zinc-600 text-xs sm:text-sm max-w-[250px] mx-auto leading-relaxed">
+                Standardize commercial agreements, model releases, and payment terms
               </p>
             </div>
 
-            {/* Anchored Folders & Tags Overlapping Cards */}
+            {/* Anchored Overlapping Cards */}
             <div className="relative w-full h-[280px] sm:h-[300px] mt-auto flex items-end justify-center">
               
-              {/* Left Card: Folders / SOPs */}
+              {/* Left Card: Contract Templates */}
               <div className="absolute bottom-4 left-2 sm:left-4 w-[190px] sm:w-[210px] bg-white rounded-2xl p-4 shadow-[0px_10px_28px_rgba(0,0,0,0.08)] border border-zinc-200/80 space-y-2 z-10 -rotate-[4deg] group-hover:-rotate-[2deg] transition-transform duration-300">
-                <div className="text-xs font-bold text-zinc-900 pb-1.5 border-b border-zinc-100">
-                  Folders &amp; SOPs
+                <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-900 pb-1.5 border-b border-zinc-100">
+                  <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
+                  <span>Legal Templates</span>
                 </div>
                 <div className="space-y-2 text-[11px] text-zinc-700 font-medium">
-                  <div className="flex items-center gap-2">
-                    <Folder className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Contracts &amp; NDAs</span>
+                  <div className="flex items-center gap-2 truncate">
+                    <FileText className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                    <span className="truncate">Commercial Agreement</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Folder className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Studio Rate Cards</span>
+                  <div className="flex items-center gap-2 truncate">
+                    <FileText className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                    <span className="truncate">IT Act Model NDA</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Folder className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Call-Sheet SOPs</span>
+                  <div className="flex items-center gap-2 truncate">
+                    <FileText className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                    <span className="truncate">Call-Sheet SOP</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Folder className="w-3.5 h-3.5 text-sky-600" />
-                    <span>E-Sign Vault</span>
+                  <div className="flex items-center gap-2 truncate">
+                    <FileText className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                    <span className="truncate">50% Advance Clause</span>
                   </div>
                 </div>
               </div>
 
-              {/* Right Card: Tags */}
+              {/* Right Card: E-Sign Status Tags */}
               <div className="absolute bottom-8 right-2 sm:right-4 w-[160px] sm:w-[180px] bg-white rounded-2xl p-4 shadow-[0px_16px_36px_rgba(0,0,0,0.12)] border border-zinc-200/90 space-y-2.5 z-20 rotate-[6deg] group-hover:rotate-[3deg] transition-transform duration-300">
-                <div className="text-xs font-bold text-zinc-900 pb-1.5 border-b border-zinc-100">
-                  Status Tags
+                <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-900 pb-1.5 border-b border-zinc-100">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>E-Sign Registry</span>
                 </div>
                 <div className="space-y-1.5 text-[11px]">
-                  <div className="flex items-center gap-1.5 text-zinc-700 font-semibold bg-zinc-50 px-2 py-1 rounded-lg">
-                    <Hash className="w-3 h-3 text-zinc-400" />
+                  <div className="flex items-center gap-1.5 text-emerald-800 font-semibold bg-emerald-50 px-2 py-1 rounded-lg">
+                    <Hash className="w-3 h-3 text-emerald-600" />
                     <span>e-signed</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-emerald-700 font-semibold bg-emerald-50 px-2 py-1 rounded-lg">
-                    <Hash className="w-3 h-3 text-emerald-500" />
+                  <div className="flex items-center gap-1.5 text-sky-800 font-semibold bg-sky-50 px-2 py-1 rounded-lg">
+                    <Hash className="w-3 h-3 text-sky-600" />
                     <span>advance-paid</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-sky-700 font-semibold bg-sky-50 px-2 py-1 rounded-lg">
-                    <Hash className="w-3 h-3 text-sky-500" />
-                    <span>delivered</span>
+                  <div className="flex items-center gap-1.5 text-zinc-700 font-semibold bg-zinc-100 px-2 py-1 rounded-lg">
+                    <Hash className="w-3 h-3 text-zinc-400" />
+                    <span>slot-confirmed</span>
                   </div>
                 </div>
               </div>
@@ -215,27 +221,27 @@ export function PlatformLifecycleSection() {
 
           </div>
 
-          {/* ── CARD 3: COLLECTIONS (Notion-Style Data Table) ── */}
-          <div className="cora-bento-card relative flex flex-col justify-between h-[480px] sm:h-[520px] overflow-hidden rounded-[32px] p-6 sm:p-8 bg-[#DCFCE7] shadow-[0px_4px_20px_rgba(16,185,129,0.04)] group hover:shadow-[0px_16px_36px_rgba(16,185,129,0.09)] transition-all duration-300">
+          {/* ── CARD 3: GST BILLING & FINANCIAL LEDGER ── */}
+          <div className="cora-bento-card relative flex flex-col justify-between h-[480px] sm:h-[520px] overflow-hidden rounded-[32px] p-6 sm:p-8 bg-[#DCFCE7] border-0 shadow-[0px_4px_20px_rgba(16,185,129,0.04)] group hover:shadow-[0px_16px_36px_rgba(16,185,129,0.09)] transition-all duration-300">
             
             {/* Header */}
             <div className="text-center relative z-10">
               <h3 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 mb-1.5">
-                Collections
+                GST Billing &amp; Ledger
               </h3>
-              <p className="text-zinc-600 text-xs sm:text-sm max-w-[240px] mx-auto leading-relaxed">
-                For structured tracking, GST records, and rich client data
+              <p className="text-zinc-600 text-xs sm:text-sm max-w-[250px] mx-auto leading-relaxed">
+                Structured revenue tracking, 18% tax splits, and instant UPI settlement
               </p>
             </div>
 
-            {/* Anchored Clean Data Table */}
+            {/* Anchored Structured Real Business Table */}
             <div className="relative w-full mt-auto bg-white rounded-t-2xl shadow-[0px_16px_36px_rgba(0,0,0,0.1)] border-t border-x border-zinc-200/90 overflow-hidden text-left transition-transform duration-300 group-hover:-translate-y-1">
               
               {/* Table Header Row */}
               <div className="flex items-center justify-between px-3.5 py-2.5 bg-zinc-50 border-b border-zinc-200/80 text-[10.5px] font-semibold text-zinc-500">
                 <div className="flex items-center gap-2">
                   <span className="w-3 text-center">#</span>
-                  <span>Client &amp; Booking</span>
+                  <span>Client &amp; Shoot Project</span>
                 </div>
                 <span>18% GST Total</span>
               </div>
@@ -247,7 +253,7 @@ export function PlatformLifecycleSection() {
                   <div className="flex items-center gap-2 truncate">
                     <span className="w-3 text-zinc-400 text-[10px]">1</span>
                     <FileText className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span className="font-medium text-zinc-900 truncate">Priya (Wedding Shoot)</span>
+                    <span className="font-medium text-zinc-900 truncate">Priya Wedding (2-Day)</span>
                   </div>
                   <span className="font-mono font-bold text-zinc-900 text-[10.5px]">₹75,000</span>
                 </div>
@@ -256,7 +262,7 @@ export function PlatformLifecycleSection() {
                   <div className="flex items-center gap-2 truncate">
                     <span className="w-3 text-zinc-400 text-[10px]">2</span>
                     <FileText className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                    <span className="font-medium text-zinc-900 truncate">Apex Realty (Ad Video)</span>
+                    <span className="font-medium text-zinc-900 truncate">Apex Realty Ad Video</span>
                   </div>
                   <span className="font-mono font-bold text-zinc-900 text-[10.5px]">₹1,20,000</span>
                 </div>
@@ -265,7 +271,7 @@ export function PlatformLifecycleSection() {
                   <div className="flex items-center gap-2 truncate">
                     <span className="w-3 text-zinc-400 text-[10px]">3</span>
                     <FileText className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                    <span className="font-medium text-zinc-900 truncate">Nitin Studio (Retainer)</span>
+                    <span className="font-medium text-zinc-900 truncate">Nitin Studio Retainer</span>
                   </div>
                   <span className="font-mono font-bold text-emerald-700 text-[10.5px]">Paid UPI</span>
                 </div>
@@ -274,7 +280,7 @@ export function PlatformLifecycleSection() {
                   <div className="flex items-center gap-2 truncate">
                     <span className="w-3 text-zinc-400 text-[10px]">4</span>
                     <FileText className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                    <span className="font-medium text-zinc-900 truncate">Aura Clinic (Social Menu)</span>
+                    <span className="font-medium text-zinc-900 truncate">Aura Clinic Social Menu</span>
                   </div>
                   <span className="font-mono font-bold text-zinc-900 text-[10.5px]">₹32,000</span>
                 </div>
@@ -282,9 +288,12 @@ export function PlatformLifecycleSection() {
               </div>
 
               {/* Table Footer */}
-              <div className="px-3.5 py-1.5 bg-zinc-50/60 border-t border-zinc-100 flex items-center justify-between text-[10px] text-zinc-400">
-                <span>4 active bookings</span>
-                <span className="text-emerald-700 font-semibold">Synced in Real-Time</span>
+              <div className="px-3.5 py-1.5 bg-zinc-50/60 border-t border-zinc-100 flex items-center justify-between text-[10px] text-zinc-500">
+                <span className="flex items-center gap-1">
+                  <CreditCard className="w-3 h-3 text-emerald-600" />
+                  <span>4 active projects</span>
+                </span>
+                <span className="text-emerald-700 font-semibold font-mono">₹2,72,000 Settled</span>
               </div>
 
             </div>
