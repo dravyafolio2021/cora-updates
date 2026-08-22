@@ -67,15 +67,16 @@ export function PlatformLifecycleSection() {
           </p>
         </div>
 
-        {/* ── 7-Card Bento Grid with Tight Proportions & Seamless Bottom Anchoring ── */}
+        {/* ── 7-Card Bento Grid with Relatable Bespoke 3D Backgrounds ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch justify-center">
           
-          {/* ── CARD 1: INQUIRIES & LEAD PIPELINE (2-Col Wide) ── */}
+          {/* ── CARD 1: INQUIRIES & LEAD PIPELINE (2-Col Wide, 3D Chat Flow Background) ── */}
           <div className="cora-bento-card lg:col-span-2 relative flex flex-col justify-between h-[360px] sm:h-[390px] overflow-hidden rounded-[32px] p-6 pb-0 sm:p-7 sm:pb-0 shadow-[0px_8px_24px_rgba(0,0,0,0.05)] border border-zinc-200/60 group hover:shadow-[0px_16px_36px_rgba(0,0,0,0.09)] transition-all duration-300">
             
+            {/* Relatable 3D Chat Stream Background */}
             <Image
-              src="/images/card_bg_mountain_lavender.jpg"
-              alt="Mountain Lavender Sky Background"
+              src="/images/card_bg_crm_chat.jpg"
+              alt="Client Inquiries & CRM Chat Flow"
               fill
               className="absolute inset-0 object-cover -z-10"
               sizes="(max-width: 1024px) 100vw, 66vw"
@@ -87,7 +88,7 @@ export function PlatformLifecycleSection() {
               <h3 className="font-display text-2xl sm:text-[26px] font-bold text-zinc-950 mb-1 tracking-tight">
                 Client Inquiries &amp; CRM
               </h3>
-              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed">
+              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed font-medium">
                 Capture customer briefs from WhatsApp and phone calls into an automated pipeline
               </p>
             </div>
@@ -158,12 +159,13 @@ export function PlatformLifecycleSection() {
 
           </div>
 
-          {/* ── CARD 2: CONTRACTS & E-SIGN ── */}
+          {/* ── CARD 2: CONTRACTS & E-SIGN (3D Legal Wax Seal Background) ── */}
           <div className="cora-bento-card relative flex flex-col justify-between h-[360px] sm:h-[390px] overflow-hidden rounded-[32px] p-6 pb-0 sm:p-7 sm:pb-0 shadow-[0px_8px_24px_rgba(0,0,0,0.05)] border border-zinc-200/60 group hover:shadow-[0px_16px_36px_rgba(0,0,0,0.09)] transition-all duration-300">
             
+            {/* Relatable 3D Legal Agreement & Gold Seal Background */}
             <Image
-              src="/images/card_bg_meadow_sky.jpg"
-              alt="Wildflower Meadow Sky Background"
+              src="/images/card_bg_contract_seal.jpg"
+              alt="Legal Agreement & Gold Wax Seal"
               fill
               className="absolute inset-0 object-cover -z-10"
               sizes="(max-width: 1024px) 100vw, 33vw"
@@ -174,7 +176,7 @@ export function PlatformLifecycleSection() {
               <h3 className="font-display text-2xl font-bold text-zinc-950 mb-1">
                 Contracts &amp; E-Sign
               </h3>
-              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed max-w-[240px] mx-auto">
+              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed max-w-[240px] mx-auto font-medium">
                 Standardize legal terms, model NDAs &amp; advance clauses
               </p>
             </div>
@@ -226,12 +228,13 @@ export function PlatformLifecycleSection() {
 
           </div>
 
-          {/* ── CARD 3: 18% GST BILLING ── */}
+          {/* ── CARD 3: 18% GST BILLING (3D Invoice & UPI Standee Background) ── */}
           <div className="cora-bento-card relative flex flex-col justify-between h-[360px] sm:h-[390px] overflow-hidden rounded-[32px] p-6 pb-0 sm:p-7 sm:pb-0 shadow-[0px_8px_24px_rgba(0,0,0,0.05)] border border-zinc-200/60 group hover:shadow-[0px_16px_36px_rgba(0,0,0,0.09)] transition-all duration-300">
             
+            {/* Relatable 3D GST Invoice & Payment Standee Background */}
             <Image
-              src="/images/card_bg_spring_green.jpg"
-              alt="Spring Green Hillside Background"
+              src="/images/card_bg_gst_invoice.jpg"
+              alt="18% GST Invoicing & UPI Standee"
               fill
               className="absolute inset-0 object-cover -z-10"
               sizes="(max-width: 1024px) 100vw, 33vw"
@@ -242,7 +245,7 @@ export function PlatformLifecycleSection() {
               <h3 className="font-display text-2xl font-bold text-zinc-950 mb-1">
                 18% GST Billing
               </h3>
-              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed max-w-[240px] mx-auto">
+              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed max-w-[240px] mx-auto font-medium">
                 Automatic tax math, CGST/SGST split &amp; UPI payment QR
               </p>
             </div>
@@ -289,12 +292,13 @@ export function PlatformLifecycleSection() {
 
           </div>
 
-          {/* ── CARD 4: PROMOS & MARKETING ── */}
+          {/* ── CARD 4: PROMOS & MARKETING (3D Megaphone & Offer Tags Background) ── */}
           <div className="cora-bento-card relative flex flex-col justify-between h-[360px] sm:h-[390px] overflow-hidden rounded-[32px] p-6 pb-0 sm:p-7 sm:pb-0 shadow-[0px_8px_24px_rgba(0,0,0,0.05)] border border-zinc-200/60 group hover:shadow-[0px_16px_36px_rgba(0,0,0,0.09)] transition-all duration-300">
             
+            {/* Relatable 3D Promo Megaphone & Discount Badges Background */}
             <Image
-              src="/images/card_bg_meadow_sky.jpg"
-              alt="Meadow Sky Background"
+              src="/images/card_bg_marketing_spark.jpg"
+              alt="Promo Megaphone & Marketing"
               fill
               className="absolute inset-0 object-cover -z-10"
               sizes="(max-width: 1024px) 100vw, 33vw"
@@ -304,7 +308,7 @@ export function PlatformLifecycleSection() {
               <h3 className="font-display text-2xl font-bold text-zinc-950 mb-1">
                 Promos &amp; Marketing
               </h3>
-              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed max-w-[240px] mx-auto">
+              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed max-w-[240px] mx-auto font-medium">
                 Draft localized posts &amp; WhatsApp client offers
               </p>
             </div>
@@ -337,12 +341,13 @@ export function PlatformLifecycleSection() {
 
           </div>
 
-          {/* ── CARD 5: APPOINTMENTS & CALENDAR ── */}
+          {/* ── CARD 5: APPOINTMENTS & CALENDAR (3D Calendar Grid & Clock Background) ── */}
           <div className="cora-bento-card relative flex flex-col justify-between h-[360px] sm:h-[390px] overflow-hidden rounded-[32px] p-6 pb-0 sm:p-7 sm:pb-0 shadow-[0px_8px_24px_rgba(0,0,0,0.05)] border border-zinc-200/60 group hover:shadow-[0px_16px_36px_rgba(0,0,0,0.09)] transition-all duration-300">
             
+            {/* Relatable 3D Calendar Grid & Clock Background */}
             <Image
-              src="/images/card_bg_mountain_lavender.jpg"
-              alt="Mountain Background"
+              src="/images/card_bg_calendar_clock.jpg"
+              alt="3D Calendar Grid and Schedule Clock"
               fill
               className="absolute inset-0 object-cover -z-10"
               sizes="(max-width: 1024px) 100vw, 33vw"
@@ -352,7 +357,7 @@ export function PlatformLifecycleSection() {
               <h3 className="font-display text-2xl font-bold text-zinc-950 mb-1">
                 Appointments
               </h3>
-              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed max-w-[240px] mx-auto">
+              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed max-w-[240px] mx-auto font-medium">
                 Shoot bookings &amp; automated WhatsApp reminders
               </p>
             </div>
@@ -383,12 +388,13 @@ export function PlatformLifecycleSection() {
 
           </div>
 
-          {/* ── CARD 6: CASH FLOW & ACCOUNTS (2-Col Wide) ── */}
+          {/* ── CARD 6: CASH FLOW & ACCOUNTS (2-Col Wide, 3D Financial Growth Curve Background) ── */}
           <div className="cora-bento-card lg:col-span-2 relative flex flex-col justify-between h-[360px] sm:h-[390px] overflow-hidden rounded-[32px] p-6 pb-0 sm:p-7 sm:pb-0 shadow-[0px_8px_24px_rgba(0,0,0,0.05)] border border-zinc-200/60 group hover:shadow-[0px_16px_36px_rgba(0,0,0,0.09)] transition-all duration-300">
             
+            {/* Relatable 3D Financial Growth Curve Background */}
             <Image
-              src="/images/card_bg_mountain_lavender.jpg"
-              alt="Mountain Sky Background"
+              src="/images/card_bg_cashflow_growth.jpg"
+              alt="Cash Flow Growth Curve and Financial Ledger"
               fill
               className="absolute inset-0 object-cover -z-10"
               sizes="(max-width: 1024px) 100vw, 66vw"
@@ -399,7 +405,7 @@ export function PlatformLifecycleSection() {
                 <h3 className="font-display text-2xl sm:text-[26px] font-bold text-zinc-950 tracking-tight mb-0.5">
                   Cash Flow &amp; Accounts
                 </h3>
-                <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed max-w-[460px]">
+                <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed max-w-[460px] font-medium">
                   Know today&apos;s revenue, pending client balances, and GST liability at a single glance.
                 </p>
               </div>
@@ -423,11 +429,11 @@ export function PlatformLifecycleSection() {
                     <div className="text-[9.5px] text-zinc-500">This Month</div>
                     <div className="text-xs sm:text-sm font-bold text-zinc-900 font-mono">₹2,80,000</div>
                   </div>
-                  <div className="bg-indigo-50/60 p-2 rounded-xl">
+                  <div className="bg-indigo-50/60 p-2.5 rounded-xl">
                     <div className="text-[9.5px] text-zinc-500">Pending</div>
                     <div className="text-xs sm:text-sm font-bold text-amber-800 font-mono">₹35,000</div>
                   </div>
-                  <div className="bg-indigo-50/60 p-2 rounded-xl">
+                  <div className="bg-indigo-50/60 p-2.5 rounded-xl">
                     <div className="text-[9.5px] text-zinc-500">18% GST Output</div>
                     <div className="text-xs sm:text-sm font-bold text-zinc-900 font-mono">₹42,700</div>
                   </div>
@@ -442,14 +448,15 @@ export function PlatformLifecycleSection() {
 
           </div>
 
-          {/* ── CARD 7: FREE FOREVER TIER ── */}
+          {/* ── CARD 7: FREE FOREVER TIER (3D Mint Flow Background) ── */}
           <div className="cora-bento-card relative flex flex-col justify-between h-[360px] sm:h-[390px] overflow-hidden rounded-[32px] p-6 pb-0 sm:p-7 sm:pb-0 shadow-[0px_8px_24px_rgba(0,0,0,0.05)] border border-zinc-200/60 group hover:shadow-[0px_16px_36px_rgba(0,0,0,0.09)] transition-all duration-300">
             
+            {/* Relatable Clean Mint Invoice Theme */}
             <Image
-              src="/images/card_bg_spring_green.jpg"
-              alt="Green Hillside Background"
+              src="/images/card_bg_gst_invoice.jpg"
+              alt="Free Forever Tier"
               fill
-              className="absolute inset-0 object-cover -z-10"
+              className="absolute inset-0 object-cover -z-10 opacity-70"
               sizes="(max-width: 1024px) 100vw, 33vw"
             />
 
@@ -457,7 +464,7 @@ export function PlatformLifecycleSection() {
               <h3 className="font-display text-2xl font-bold text-zinc-950 mb-1">
                 Free Forever
               </h3>
-              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed">
+              <p className="text-zinc-700 text-xs sm:text-sm leading-relaxed font-medium">
                 Core chat &amp; 15 invoices every month
               </p>
             </div>
