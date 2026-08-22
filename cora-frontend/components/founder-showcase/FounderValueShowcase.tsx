@@ -13,20 +13,17 @@ if (typeof window !== 'undefined') {
 
 export function FounderValueShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
-  const card1Ref = useRef<HTMLDivElement>(null);
-  const card2Ref = useRef<HTMLDivElement>(null);
-  const card3Ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // 1. Staggered Entrance
+      // Staggered Entrance
       gsap.fromTo(
         '.cap-card',
-        { y: 35, opacity: 0 },
+        { y: 30, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.7,
+          duration: 0.65,
           stagger: 0.12,
           ease: 'power3.out',
           scrollTrigger: {
@@ -35,27 +32,6 @@ export function FounderValueShowcase() {
           },
         }
       );
-
-      // 2. Gentle Natural Floating Effects
-      if (card1Ref.current) {
-        gsap.to(card1Ref.current, {
-          y: -5,
-          duration: 3.5,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-        });
-      }
-
-      if (card3Ref.current) {
-        gsap.to(card3Ref.current, {
-          y: -5,
-          duration: 3.2,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-        });
-      }
     }, sectionRef);
 
     return () => ctx.revert();
@@ -101,13 +77,13 @@ export function FounderValueShowcase() {
           </div>
         </div>
 
-        {/* ── 2. Three Editorial Visual Cards (Real Photography, Tactile Cards, Zero Neon) ── */}
+        {/* ── 2. Three Clean, Grounded Visual Cards ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-7">
           
-          {/* ── Card 1: Natural Language Chat Operations ── */}
-          <div className="cap-card rounded-[32px] p-6 sm:p-7 border border-zinc-200/80 flex flex-col justify-between h-[460px] sm:h-[500px] relative overflow-hidden group hover:shadow-[0px_20px_45px_rgba(0,0,0,0.08)] transition-all duration-300 bg-zinc-50">
+          {/* ── Card 1: Natural Language Operations ── */}
+          <div className="cap-card rounded-[32px] p-6 sm:p-7 border border-zinc-200/80 flex flex-col justify-between h-[470px] sm:h-[510px] relative overflow-hidden group hover:shadow-[0px_20px_45px_rgba(0,0,0,0.08)] transition-all duration-300 bg-zinc-50">
             
-            {/* Background Photographic Atmosphere */}
+            {/* Background Atmosphere */}
             <div className="absolute inset-0 pointer-events-none select-none opacity-40 group-hover:opacity-50 transition-opacity">
               <Image
                 src="/images/usecase_solo_creator.jpg"
@@ -118,60 +94,57 @@ export function FounderValueShowcase() {
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-white via-white/85 to-white/70 pointer-events-none" />
 
-            {/* Header Text */}
+            {/* Clean Header */}
             <div className="relative z-10 text-center">
-              <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 mb-1.5">
+              <h3 className="font-display text-2xl font-bold text-zinc-950">
                 Talk naturally to your business
               </h3>
-              <p className="text-xs text-zinc-600 max-w-[270px] mx-auto leading-relaxed font-normal">
-                Type what you need done in plain English or Hinglish. Cora calculates taxes, drafts contracts, and prepares links.
-              </p>
             </div>
 
-            {/* Center Tactile Dialogue Card */}
-            <div ref={card1Ref} className="relative z-10 my-auto w-full max-w-[300px] mx-auto space-y-2 text-left will-change-transform">
+            {/* Solid Grounded Dialogue Card */}
+            <div className="relative z-10 w-full max-w-[300px] mx-auto space-y-2.5 text-left my-auto">
               
               {/* User Prompt Note */}
-              <div className="bg-white/95 backdrop-blur-md rounded-2xl p-3.5 border border-zinc-200/90 shadow-[0_6px_20px_rgba(0,0,0,0.05)]">
+              <div className="bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-zinc-200/90 shadow-[0_6px_20px_rgba(0,0,0,0.05)]">
                 <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
-                  Your Plain English Request
+                  Plain English Request
                 </span>
-                <p className="text-[12px] font-medium text-zinc-900 leading-snug">
+                <p className="text-[12.5px] font-medium text-zinc-900 leading-snug">
                   &ldquo;Draft a ₹25,000 agreement for Priya&rsquo;s 2-day shoot and bill 18% GST&rdquo;
                 </p>
               </div>
 
-              {/* Instant Action Result */}
-              <div className="bg-zinc-900 text-white rounded-2xl p-3.5 shadow-[0_10px_28px_rgba(0,0,0,0.14)] space-y-2 border border-zinc-800">
-                <div className="flex items-center justify-between text-[11px]">
+              {/* Action Result */}
+              <div className="bg-zinc-900 text-white rounded-2xl p-4 shadow-[0_10px_28px_rgba(0,0,0,0.14)] space-y-2.5 border border-zinc-800">
+                <div className="flex items-center justify-between text-[11.5px]">
                   <span className="font-bold text-zinc-100 flex items-center gap-1.5">
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    Agreement &amp; Invoice Prepared
+                    <Check className="w-4 h-4 text-emerald-400" />
+                    Agreement &amp; Tax Bill Ready
                   </span>
                   <span className="text-[9.5px] font-mono text-zinc-400">2.1s</span>
                 </div>
-                <div className="text-[11px] text-zinc-300 pt-1.5 border-t border-zinc-800 flex justify-between items-center">
+                <div className="text-[11.5px] text-zinc-300 pt-2 border-t border-zinc-800 flex justify-between items-center">
                   <span>Total: ₹29,500</span>
-                  <span className="text-white font-medium text-[10px] underline underline-offset-2">
-                    Ready to send on WhatsApp →
+                  <span className="text-white font-medium text-[10.5px] underline underline-offset-2">
+                    Send on WhatsApp →
                   </span>
                 </div>
               </div>
 
             </div>
 
-            {/* Bottom Status Tags */}
-            <div className="relative z-10 flex items-center justify-center gap-2 flex-wrap">
-              <span className="text-[11px] font-semibold bg-white/90 backdrop-blur-sm border border-zinc-200 text-zinc-800 px-3.5 py-1.5 rounded-full shadow-2xs">
-                Zero Menus or Spreadsheets
+            {/* Bottom Status Tag */}
+            <div className="relative z-10 flex items-center justify-center">
+              <span className="text-[11px] font-semibold bg-white/90 backdrop-blur-sm border border-zinc-200 text-zinc-800 px-4 py-1.5 rounded-full shadow-2xs">
+                Zero Complex Menus
               </span>
             </div>
           </div>
 
           {/* ── Card 2: Native Business Memory & CRM ── */}
-          <div className="cap-card rounded-[32px] p-6 sm:p-7 border border-zinc-200/80 flex flex-col justify-between h-[460px] sm:h-[500px] relative overflow-hidden group hover:shadow-[0px_20px_45px_rgba(0,0,0,0.08)] transition-all duration-300">
+          <div className="cap-card rounded-[32px] p-6 sm:p-7 border border-zinc-200/80 flex flex-col justify-between h-[470px] sm:h-[510px] relative overflow-hidden group hover:shadow-[0px_20px_45px_rgba(0,0,0,0.08)] transition-all duration-300">
             
-            {/* Background Meadow Landscape with Natural Light */}
+            {/* Background Landscape */}
             <div className="absolute inset-0 pointer-events-none select-none">
               <Image
                 src="/images/cora_hero_landscape.jpg"
@@ -182,26 +155,23 @@ export function FounderValueShowcase() {
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-white/20 to-white/50 pointer-events-none" />
 
-            {/* Header Text */}
+            {/* Clean Header */}
             <div className="relative z-10 text-center">
-              <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 mb-1.5">
+              <h3 className="font-display text-2xl font-bold text-zinc-950">
                 Remembers every client &amp; rate
               </h3>
-              <p className="text-xs text-zinc-700 max-w-[270px] mx-auto leading-relaxed font-normal">
-                Knows your pricing tiers, past shoot dates, and terms. You never have to re-explain context or search old chats.
-              </p>
             </div>
 
-            {/* Center Floating Glass Client Dossier Card */}
-            <div className="relative z-10 my-auto bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-white shadow-[0px_14px_35px_rgba(0,0,0,0.12)] text-left">
+            {/* Solid Grounded Client Dossier Card */}
+            <div className="relative z-10 w-full max-w-[300px] mx-auto bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-white shadow-[0px_14px_35px_rgba(0,0,0,0.12)] text-left my-auto">
               <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-zinc-100">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-zinc-950 text-white flex items-center justify-center text-[11px] font-bold">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center text-xs font-bold">
                     RV
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-zinc-950">Rahul Verma</h4>
-                    <p className="text-[10.5px] text-zinc-500">Commercial Studio Retainer</p>
+                    <p className="text-[10px] text-zinc-500">Commercial Studio Retainer</p>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-zinc-100 text-zinc-800 border border-zinc-200 rounded-full text-[9.5px] font-bold">
@@ -209,14 +179,14 @@ export function FounderValueShowcase() {
                 </span>
               </div>
 
-              <div className="space-y-1.5 text-[11px] text-zinc-700 font-medium">
+              <div className="space-y-2 text-[11px] text-zinc-700 font-medium">
                 <div className="flex items-center justify-between">
                   <span className="text-zinc-500">Locked Rate:</span>
                   <span className="font-bold text-zinc-900">₹45,000 / shoot</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-zinc-500">State &amp; GSTIN:</span>
-                  <span className="font-mono text-zinc-800 text-[10px]">Maharashtra (27)</span>
+                  <span className="font-mono text-zinc-800 text-[10.5px]">Maharashtra (27)</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-zinc-500">Upcoming Booking:</span>
@@ -233,10 +203,10 @@ export function FounderValueShowcase() {
             </div>
           </div>
 
-          {/* ── Card 3: Indian Commerce & GST Invoicing ── */}
-          <div className="cap-card rounded-[32px] p-6 sm:p-7 border border-zinc-200/80 flex flex-col justify-between h-[460px] sm:h-[500px] relative overflow-hidden group hover:shadow-[0px_20px_45px_rgba(0,0,0,0.08)] transition-all duration-300 bg-zinc-950 text-white">
+          {/* ── Card 3: Real Indian Business Payment QR Standee ── */}
+          <div className="cap-card rounded-[32px] p-6 sm:p-7 border border-zinc-200/80 flex flex-col justify-between h-[470px] sm:h-[510px] relative overflow-hidden group hover:shadow-[0px_20px_45px_rgba(0,0,0,0.08)] transition-all duration-300 bg-zinc-950 text-white">
             
-            {/* Background Studio Production Atmosphere */}
+            {/* Background Atmosphere */}
             <div className="absolute inset-0 pointer-events-none select-none opacity-30 group-hover:opacity-40 transition-opacity">
               <Image
                 src="/images/bento_gst_upi.jpg"
@@ -247,18 +217,15 @@ export function FounderValueShowcase() {
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-zinc-950/80 pointer-events-none" />
 
-            {/* Header Text */}
+            {/* Clean Header (No redundant description) */}
             <div className="relative z-10 text-center">
-              <h3 className="font-display text-xl sm:text-2xl font-bold text-white mb-1.5">
+              <h3 className="font-display text-2xl font-bold text-white">
                 Engineered for Indian commerce
               </h3>
-              <p className="text-xs text-zinc-400 max-w-[270px] mx-auto leading-relaxed font-normal">
-                Direct UPI payments with zero gateway deductions, automated 18% GST splits, and 1-tap WhatsApp delivery.
-              </p>
             </div>
 
-            {/* Center Realistic Indian Business Payment QR Card */}
-            <div ref={card3Ref} className="relative z-10 my-auto w-full max-w-[280px] mx-auto bg-white text-zinc-950 rounded-2xl p-3.5 border border-zinc-200/80 shadow-[0px_16px_40px_rgba(0,0,0,0.35)] text-center will-change-transform">
+            {/* Real Authentic High-Density Indian Payment QR Card */}
+            <div className="relative z-10 w-full max-w-[280px] mx-auto bg-white text-zinc-950 rounded-2xl p-3.5 border border-zinc-200/80 shadow-[0px_16px_40px_rgba(0,0,0,0.35)] text-center my-auto">
               
               {/* Standee Merchant Header */}
               <div className="pb-2 border-b border-zinc-100 mb-2">
@@ -268,9 +235,6 @@ export function FounderValueShowcase() {
                   </span>
                   <span className="w-3.5 h-3.5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[8px] font-bold">✓</span>
                 </div>
-                <p className="text-[9.5px] text-zinc-500 font-medium mt-0.5">
-                  Accepted via any UPI App
-                </p>
                 {/* UPI Provider Badges */}
                 <div className="flex items-center justify-center gap-1.5 mt-1.5 text-[9px] font-semibold text-zinc-700">
                   <span className="px-1.5 py-0.5 bg-zinc-100 rounded text-zinc-800">GPay</span>
@@ -280,57 +244,94 @@ export function FounderValueShowcase() {
                 </div>
               </div>
 
-              {/* Real Vector QR Code Matrix with Center UPI Emblem */}
+              {/* Realistic High-Density QR Code Matrix */}
               <div className="relative w-36 h-36 mx-auto bg-white p-2 border border-zinc-200 rounded-xl shadow-inner flex items-center justify-center">
-                <svg className="w-full h-full" viewBox="0 0 100 100" fill="none">
-                  {/* Outer corner squares */}
-                  <rect x="5" y="5" width="26" height="26" rx="4" fill="#18181B" />
-                  <rect x="9" y="9" width="18" height="18" rx="2" fill="#FFFFFF" />
-                  <rect x="13" y="13" width="10" height="10" rx="1" fill="#18181B" />
+                <svg className="w-full h-full" viewBox="0 0 105 105" fill="none" shapeRendering="crispEdges">
+                  {/* Position Detection Patterns (Top-Left, Top-Right, Bottom-Left) */}
+                  {/* Top-Left */}
+                  <rect x="0" y="0" width="35" height="35" fill="#18181B" />
+                  <rect x="5" y="5" width="25" height="25" fill="#FFFFFF" />
+                  <rect x="10" y="10" width="15" height="15" fill="#18181B" />
 
-                  <rect x="69" y="5" width="26" height="26" rx="4" fill="#18181B" />
-                  <rect x="73" y="9" width="18" height="18" rx="2" fill="#FFFFFF" />
-                  <rect x="77" y="13" width="10" height="10" rx="1" fill="#18181B" />
+                  {/* Top-Right */}
+                  <rect x="70" y="0" width="35" height="35" fill="#18181B" />
+                  <rect x="75" y="5" width="25" height="25" fill="#FFFFFF" />
+                  <rect x="80" y="10" width="15" height="15" fill="#18181B" />
 
-                  <rect x="5" y="69" width="26" height="26" rx="4" fill="#18181B" />
-                  <rect x="9" y="73" width="18" height="18" rx="2" fill="#FFFFFF" />
-                  <rect x="13" y="77" width="10" height="10" rx="1" fill="#18181B" />
+                  {/* Bottom-Left */}
+                  <rect x="0" y="70" width="35" height="35" fill="#18181B" />
+                  <rect x="5" y="75" width="25" height="25" fill="#FFFFFF" />
+                  <rect x="10" y="80" width="15" height="15" fill="#18181B" />
 
-                  {/* QR Data Pattern Blocks */}
-                  <rect x="36" y="8" width="6" height="6" rx="1" fill="#18181B" />
-                  <rect x="46" y="8" width="8" height="6" rx="1" fill="#18181B" />
-                  <rect x="58" y="8" width="6" height="6" rx="1" fill="#18181B" />
+                  {/* Timing Patterns */}
+                  <rect x="35" y="30" width="5" height="5" fill="#18181B" />
+                  <rect x="45" y="30" width="5" height="5" fill="#18181B" />
+                  <rect x="55" y="30" width="5" height="5" fill="#18181B" />
+                  <rect x="65" y="30" width="5" height="5" fill="#18181B" />
 
-                  <rect x="36" y="18" width="12" height="6" rx="1" fill="#18181B" />
-                  <rect x="52" y="18" width="10" height="6" rx="1" fill="#18181B" />
+                  <rect x="30" y="35" width="5" height="5" fill="#18181B" />
+                  <rect x="30" y="45" width="5" height="5" fill="#18181B" />
+                  <rect x="30" y="55" width="5" height="5" fill="#18181B" />
+                  <rect x="30" y="65" width="5" height="5" fill="#18181B" />
 
-                  <rect x="8" y="36" width="6" height="6" rx="1" fill="#18181B" />
-                  <rect x="18" y="36" width="8" height="6" rx="1" fill="#18181B" />
-                  <rect x="30" y="36" width="6" height="8" rx="1" fill="#18181B" />
-                  <rect x="40" y="36" width="20" height="6" rx="1" fill="#18181B" />
-                  <rect x="64" y="36" width="12" height="6" rx="1" fill="#18181B" />
-                  <rect x="80" y="36" width="12" height="6" rx="1" fill="#18181B" />
+                  {/* Alignment Pattern (Bottom-Right) */}
+                  <rect x="65" y="65" width="25" height="25" fill="#18181B" />
+                  <rect x="70" y="70" width="15" height="15" fill="#FFFFFF" />
+                  <rect x="75" y="75" width="5" height="5" fill="#18181B" />
 
-                  <rect x="8" y="46" width="12" height="6" rx="1" fill="#18181B" />
-                  <rect x="24" y="46" width="8" height="8" rx="1" fill="#18181B" />
-                  <rect x="68" y="46" width="10" height="6" rx="1" fill="#18181B" />
-                  <rect x="82" y="46" width="10" height="8" rx="1" fill="#18181B" />
+                  {/* Realistic Dense Data Payload Blocks */}
+                  <rect x="40" y="0" width="5" height="5" fill="#18181B" />
+                  <rect x="50" y="0" width="5" height="5" fill="#18181B" />
+                  <rect x="60" y="0" width="5" height="5" fill="#18181B" />
 
-                  <rect x="36" y="58" width="8" height="12" rx="1" fill="#18181B" />
-                  <rect x="48" y="58" width="14" height="6" rx="1" fill="#18181B" />
-                  <rect x="66" y="58" width="8" height="6" rx="1" fill="#18181B" />
-                  <rect x="78" y="58" width="14" height="6" rx="1" fill="#18181B" />
+                  <rect x="40" y="10" width="10" height="5" fill="#18181B" />
+                  <rect x="55" y="10" width="10" height="5" fill="#18181B" />
 
-                  <rect x="36" y="74" width="12" height="6" rx="1" fill="#18181B" />
-                  <rect x="52" y="74" width="8" height="14" rx="1" fill="#18181B" />
-                  <rect x="64" y="74" width="14" height="6" rx="1" fill="#18181B" />
-                  <rect x="82" y="74" width="10" height="14" rx="1" fill="#18181B" />
+                  <rect x="40" y="20" width="5" height="5" fill="#18181B" />
+                  <rect x="50" y="20" width="15" height="5" fill="#18181B" />
 
-                  <rect x="36" y="84" width="10" height="8" rx="1" fill="#18181B" />
-                  <rect x="64" y="84" width="12" height="8" rx="1" fill="#18181B" />
+                  <rect x="0" y="40" width="5" height="10" fill="#18181B" />
+                  <rect x="10" y="40" width="5" height="5" fill="#18181B" />
+                  <rect x="20" y="40" width="5" height="15" fill="#18181B" />
+
+                  <rect x="0" y="55" width="10" height="5" fill="#18181B" />
+                  <rect x="15" y="55" width="5" height="5" fill="#18181B" />
+
+                  <rect x="40" y="40" width="5" height="5" fill="#18181B" />
+                  <rect x="50" y="40" width="10" height="5" fill="#18181B" />
+                  <rect x="65" y="40" width="10" height="5" fill="#18181B" />
+                  <rect x="80" y="40" width="10" height="5" fill="#18181B" />
+                  <rect x="95" y="40" width="10" height="5" fill="#18181B" />
+
+                  <rect x="35" y="50" width="10" height="5" fill="#18181B" />
+                  <rect x="50" y="50" width="5" height="10" fill="#18181B" />
+                  <rect x="60" y="50" width="15" height="5" fill="#18181B" />
+                  <rect x="80" y="50" width="5" height="5" fill="#18181B" />
+                  <rect x="90" y="50" width="15" height="5" fill="#18181B" />
+
+                  <rect x="35" y="60" width="5" height="5" fill="#18181B" />
+                  <rect x="45" y="60" width="10" height="5" fill="#18181B" />
+                  <rect x="60" y="60" width="5" height="5" fill="#18181B" />
+                  <rect x="95" y="60" width="10" height="5" fill="#18181B" />
+
+                  <rect x="40" y="70" width="10" height="5" fill="#18181B" />
+                  <rect x="55" y="70" width="5" height="15" fill="#18181B" />
+                  <rect x="95" y="70" width="5" height="10" fill="#18181B" />
+
+                  <rect x="40" y="80" width="5" height="10" fill="#18181B" />
+                  <rect x="50" y="80" width="5" height="5" fill="#18181B" />
+                  <rect x="95" y="85" width="10" height="5" fill="#18181B" />
+
+                  <rect x="40" y="95" width="15" height="5" fill="#18181B" />
+                  <rect x="60" y="95" width="10" height="5" fill="#18181B" />
+                  <rect x="75" y="95" width="15" height="5" fill="#18181B" />
+                  <rect x="95" y="95" width="10" height="5" fill="#18181B" />
+
+                  <rect x="70" y="90" width="5" height="5" fill="#18181B" />
+                  <rect x="85" y="90" width="15" height="5" fill="#18181B" />
                 </svg>
                 {/* Center UPI Badge */}
-                <div className="absolute inset-0 m-auto w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shadow-md border-2 border-white">
+                <div className="absolute inset-0 m-auto w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center text-[11px] font-bold shadow-md border-2 border-white">
                   ₹
                 </div>
               </div>
