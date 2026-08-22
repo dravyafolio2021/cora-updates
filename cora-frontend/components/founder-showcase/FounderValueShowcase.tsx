@@ -260,40 +260,93 @@ export function FounderValueShowcase() {
               </p>
             </div>
 
-            {/* Center Realistic Tax Invoice Card */}
-            <div ref={card3Ref} className="relative z-10 my-auto w-full max-w-[300px] mx-auto bg-zinc-900/95 rounded-2xl p-4 border border-zinc-800 shadow-[0px_14px_35px_rgba(0,0,0,0.4)] text-left will-change-transform">
+            {/* Center Realistic Indian Business Payment QR Card */}
+            <div ref={card3Ref} className="relative z-10 my-auto w-full max-w-[280px] mx-auto bg-white text-zinc-950 rounded-2xl p-3.5 border border-zinc-200/80 shadow-[0px_16px_40px_rgba(0,0,0,0.35)] text-center will-change-transform">
               
-              <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
-                <span className="text-[10px] font-mono font-bold text-zinc-400 tracking-wider">
-                  TAX INVOICE #2026-08
-                </span>
-                <span className="px-2 py-0.5 rounded text-[9.5px] font-bold bg-zinc-800 text-zinc-200 border border-zinc-700">
-                  18% GST Split
-                </span>
-              </div>
-
-              <div className="py-2.5 space-y-1 text-[11px] text-zinc-300">
-                <div className="flex justify-between">
-                  <span>Professional Services</span>
-                  <span className="font-semibold text-white">₹50,000</span>
+              {/* Standee Merchant Header */}
+              <div className="pb-2 border-b border-zinc-100 mb-2">
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="font-display text-xs font-bold text-zinc-950 uppercase tracking-wide">
+                    DRAVYA CREATIVE STUDIO
+                  </span>
+                  <span className="w-3.5 h-3.5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[8px] font-bold">✓</span>
                 </div>
-                <div className="flex justify-between text-zinc-400 text-[10px]">
-                  <span>CGST (9%) + SGST (9%)</span>
-                  <span>+₹9,000</span>
-                </div>
-                <div className="flex justify-between items-center pt-1.5 border-t border-zinc-800 font-bold text-white">
-                  <span>Total Amount</span>
-                  <span className="text-white text-xs">₹59,000</span>
+                <p className="text-[9.5px] text-zinc-500 font-medium mt-0.5">
+                  Accepted via any UPI App
+                </p>
+                {/* UPI Provider Badges */}
+                <div className="flex items-center justify-center gap-1.5 mt-1.5 text-[9px] font-semibold text-zinc-700">
+                  <span className="px-1.5 py-0.5 bg-zinc-100 rounded text-zinc-800">GPay</span>
+                  <span className="px-1.5 py-0.5 bg-zinc-100 rounded text-zinc-800">PhonePe</span>
+                  <span className="px-1.5 py-0.5 bg-zinc-100 rounded text-zinc-800">Paytm</span>
+                  <span className="px-1.5 py-0.5 bg-zinc-100 rounded text-zinc-800">BHIM</span>
                 </div>
               </div>
 
-              {/* Settlement Badge */}
-              <div className="pt-2 border-t border-zinc-800 flex items-center justify-between text-[10px]">
-                <span className="flex items-center gap-1.5 text-zinc-300">
-                  <QrCode className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>Instant PhonePe / GPay QR</span>
-                </span>
-                <span className="text-zinc-400 font-medium">0% Fee</span>
+              {/* Real Vector QR Code Matrix with Center UPI Emblem */}
+              <div className="relative w-36 h-36 mx-auto bg-white p-2 border border-zinc-200 rounded-xl shadow-inner flex items-center justify-center">
+                <svg className="w-full h-full" viewBox="0 0 100 100" fill="none">
+                  {/* Outer corner squares */}
+                  <rect x="5" y="5" width="26" height="26" rx="4" fill="#18181B" />
+                  <rect x="9" y="9" width="18" height="18" rx="2" fill="#FFFFFF" />
+                  <rect x="13" y="13" width="10" height="10" rx="1" fill="#18181B" />
+
+                  <rect x="69" y="5" width="26" height="26" rx="4" fill="#18181B" />
+                  <rect x="73" y="9" width="18" height="18" rx="2" fill="#FFFFFF" />
+                  <rect x="77" y="13" width="10" height="10" rx="1" fill="#18181B" />
+
+                  <rect x="5" y="69" width="26" height="26" rx="4" fill="#18181B" />
+                  <rect x="9" y="73" width="18" height="18" rx="2" fill="#FFFFFF" />
+                  <rect x="13" y="77" width="10" height="10" rx="1" fill="#18181B" />
+
+                  {/* QR Data Pattern Blocks */}
+                  <rect x="36" y="8" width="6" height="6" rx="1" fill="#18181B" />
+                  <rect x="46" y="8" width="8" height="6" rx="1" fill="#18181B" />
+                  <rect x="58" y="8" width="6" height="6" rx="1" fill="#18181B" />
+
+                  <rect x="36" y="18" width="12" height="6" rx="1" fill="#18181B" />
+                  <rect x="52" y="18" width="10" height="6" rx="1" fill="#18181B" />
+
+                  <rect x="8" y="36" width="6" height="6" rx="1" fill="#18181B" />
+                  <rect x="18" y="36" width="8" height="6" rx="1" fill="#18181B" />
+                  <rect x="30" y="36" width="6" height="8" rx="1" fill="#18181B" />
+                  <rect x="40" y="36" width="20" height="6" rx="1" fill="#18181B" />
+                  <rect x="64" y="36" width="12" height="6" rx="1" fill="#18181B" />
+                  <rect x="80" y="36" width="12" height="6" rx="1" fill="#18181B" />
+
+                  <rect x="8" y="46" width="12" height="6" rx="1" fill="#18181B" />
+                  <rect x="24" y="46" width="8" height="8" rx="1" fill="#18181B" />
+                  <rect x="68" y="46" width="10" height="6" rx="1" fill="#18181B" />
+                  <rect x="82" y="46" width="10" height="8" rx="1" fill="#18181B" />
+
+                  <rect x="36" y="58" width="8" height="12" rx="1" fill="#18181B" />
+                  <rect x="48" y="58" width="14" height="6" rx="1" fill="#18181B" />
+                  <rect x="66" y="58" width="8" height="6" rx="1" fill="#18181B" />
+                  <rect x="78" y="58" width="14" height="6" rx="1" fill="#18181B" />
+
+                  <rect x="36" y="74" width="12" height="6" rx="1" fill="#18181B" />
+                  <rect x="52" y="74" width="8" height="14" rx="1" fill="#18181B" />
+                  <rect x="64" y="74" width="14" height="6" rx="1" fill="#18181B" />
+                  <rect x="82" y="74" width="10" height="14" rx="1" fill="#18181B" />
+
+                  <rect x="36" y="84" width="10" height="8" rx="1" fill="#18181B" />
+                  <rect x="64" y="84" width="12" height="8" rx="1" fill="#18181B" />
+                </svg>
+                {/* Center UPI Badge */}
+                <div className="absolute inset-0 m-auto w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center text-[10px] font-bold shadow-md border-2 border-white">
+                  ₹
+                </div>
+              </div>
+
+              {/* Amount and UPI VPA ID */}
+              <div className="mt-2.5 pt-2 border-t border-zinc-100">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-zinc-600 text-[10.5px]">Amount (with 18% GST):</span>
+                  <span className="font-bold text-zinc-950 text-sm">₹59,000</span>
+                </div>
+                <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
+                  UPI ID: <span className="text-zinc-800 font-semibold">studio@okhdfcbank</span>
+                </p>
               </div>
 
             </div>
