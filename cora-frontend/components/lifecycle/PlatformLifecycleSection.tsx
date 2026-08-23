@@ -85,7 +85,7 @@ const solutionsData: WorkflowSolution[] = [
         icon: TrendingUp,
       },
     ],
-    ctaText: 'Explore Studio Solution',
+    ctaText: 'Explore Studio Co-Founder',
     ctaLink: '/use-cases?industry=photography_studio',
   },
   {
@@ -131,7 +131,7 @@ const solutionsData: WorkflowSolution[] = [
         icon: TrendingUp,
       },
     ],
-    ctaText: 'Explore Agency Solution',
+    ctaText: 'Explore Agency Co-Founder',
     ctaLink: '/use-cases?industry=creative_agency',
   },
   {
@@ -177,7 +177,7 @@ const solutionsData: WorkflowSolution[] = [
         icon: TrendingUp,
       },
     ],
-    ctaText: 'Explore Real Estate Solution',
+    ctaText: 'Explore Real Estate Co-Founder',
     ctaLink: '/use-cases?industry=real_estate',
   },
   {
@@ -223,7 +223,7 @@ const solutionsData: WorkflowSolution[] = [
         icon: TrendingUp,
       },
     ],
-    ctaText: 'Explore Production Solution',
+    ctaText: 'Explore Production Co-Founder',
     ctaLink: '/use-cases?industry=production_events',
   },
   {
@@ -288,7 +288,7 @@ export function PlatformLifecycleSection() {
         {/* ── 1. Section Header ── */}
         <div className="max-w-[800px] mx-auto text-center mb-10 sm:mb-12">
           <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[52px] font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em] mb-4">
-            AI solutions for every <span className="text-zinc-400 font-semibold">team</span>
+            AI co-founder for every <span className="text-zinc-400 font-semibold">business</span>
           </h2>
           <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[560px] mx-auto">
             Your key workflows, automated by specialized Cora co-founders.
