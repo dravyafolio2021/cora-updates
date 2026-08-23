@@ -906,40 +906,6 @@ export default function AiAgentPage() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────
-          SECTION 7: BECOME SUPERHUMAN STREAMING PILLS + FINAL CTA
-      ───────────────────────────────────────────────────────────── */}
-      <section className="py-20 sm:py-28 bg-[#FAFAFB] relative z-10 overflow-hidden text-center">
-        <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 relative z-10">
-          
-          <div className="max-w-[760px] mx-auto mb-10">
-            <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-950 leading-[1.08] tracking-tight mb-4">
-              Become superhuman, <br />
-              with Cora AI Co-Founders.
-            </h2>
-            <p className="text-zinc-600 text-base sm:text-lg">
-              Over 9,660,000+ service business tasks automated. Start your 14-day free trial today.
-            </p>
-          </div>
-
-          <div className="inline-flex flex-col sm:flex-row items-center gap-3">
-            <Link
-              href="/workspace/login"
-              className="px-8 py-4 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 text-sm sm:text-base font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
-            >
-              Get Started with AI Co-Founders &rarr;
-            </Link>
-            <Link
-              href="/pricing"
-              className="px-7 py-4 rounded-full bg-white border border-zinc-200 text-zinc-800 hover:text-zinc-950 hover:bg-zinc-50 text-sm sm:text-base font-semibold shadow-2xs transition-all"
-            >
-              View Transparent Pricing
-            </Link>
-          </div>
-
-        </div>
-      </section>
-
     </main>
   );
 }
