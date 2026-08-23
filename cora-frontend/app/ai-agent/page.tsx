@@ -184,61 +184,13 @@ const humanSkills = [
   },
 ];
 
-// ── 4. Superintelligence Dark Tabs Data ──
-const superintelligenceTabs = [
-  {
-    num: '01',
-    title: 'Memory',
-    eyebrow: 'EPISODIC & CLIENT MEMORY',
-    desc: 'Cora automatically recalls past client rate cards, shoot preferences, GST numbers, and deliverable guidelines across every past booking.',
-    subdesc: 'Short-term context, working memory, and persistent studio knowledgebases stored with zero data leakage.',
-  },
-  {
-    num: '02',
-    title: 'Knowledge',
-    eyebrow: 'GROUNDED STUDIO CONTEXT',
-    desc: 'Connects with Google Drive, Gmail, WhatsApp Business, Notion, and Excel for live, permission-aware context synchronization.',
-    subdesc: 'Enterprise search across all past contracts, raw footage vaults, and client invoices in 0.4s.',
-  },
-  {
-    num: '03',
-    title: 'Collaboration',
-    eyebrow: 'MULTI-AGENT DELEGATION',
-    desc: 'Co-founders delegate tasks to each other seamlessly. One WhatsApp brief triggers rate calculation, NDA drafting, and call-sheet generation in tandem.',
-    subdesc: 'Human oversight with approval checkpoints for all commercial quotes and payouts.',
-  },
-  {
-    num: '04',
-    title: '18% GST Engine',
-    eyebrow: 'PROPRIETARY TAX MATH',
-    desc: 'Built specifically for Indian service businesses with automated CGST/SGST/IGST splitting, SAC code tagging, and GSTR-1 compliant JSON exports.',
-    subdesc: 'Dynamic UPI soundbox QR standees generated per booking with zero gateway fees.',
-  },
-  {
-    num: '05',
-    title: 'Ambient Awareness',
-    eyebrow: '24/7 BACKGROUND MONITORING',
-    desc: 'Runs silently in the background, detecting hold date clashes, uncollected advance deposits, and upcoming deliverable deadlines before you ask.',
-    subdesc: 'Instant proactive alerts via WhatsApp and mobile push notification.',
-  },
-  {
-    num: '06',
-    title: 'Self-Learning',
-    eyebrow: 'CONTINUOUS ACCURACY',
-    desc: 'Every approved invoice, client revision, and shoot completion fine-tunes your co-founders to match your studio’s exact working style.',
-    subdesc: 'Zero manual configuration required — improves automatically with every job.',
-  },
-];
-
 export default function AiAgentPage() {
   const [activeHumanTag, setActiveHumanTag] = useState<string | null>('assign');
   const [activeSuperTag, setActiveSuperTag] = useState<string | null>('24-7');
   const [activeCarouselIndex, setActiveCarouselIndex] = useState<number>(0);
   const [activeSkillId, setActiveSkillId] = useState<string>('brief-intake');
-  const [activeDarkTab, setActiveDarkTab] = useState<number>(0);
 
   const selectedSkill = humanSkills.find((s) => s.id === activeSkillId) || humanSkills[0];
-  const selectedDarkTab = superintelligenceTabs[activeDarkTab] || superintelligenceTabs[0];
 
   const carouselRef = useRef<HTMLDivElement>(null);
 
@@ -697,123 +649,7 @@ export default function AiAgentPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 5: [SUPERINTELLIGENCE] DARK TECH ARCHITECTURE
-      ───────────────────────────────────────────────────────────── */}
-      <section className="py-20 sm:py-28 bg-[#0B0C0E] text-white relative z-10 border-b border-zinc-800 overflow-hidden">
-        
-        {/* Subtle Green Ambient Glow */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
-          
-          {/* Eyebrow Header */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-zinc-800 mb-12">
-            <div>
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-emerald-400 block mb-1">
-                [ SUPERINTELLIGENCE ]
-              </span>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-                Works like superheroes
-              </h2>
-            </div>
-            <p className="text-zinc-400 text-xs sm:text-sm max-w-[400px]">
-              Grounded artificial intelligence designed to make informed decisions and execute service workflows autonomously.
-            </p>
-          </div>
-
-          {/* 3-Column Dark Explorer */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-            
-            {/* Column 1: Numbered Capability Tabs */}
-            <div className="lg:col-span-4 space-y-2">
-              <span className="text-[11px] font-mono font-bold text-zinc-500 uppercase tracking-wider block mb-2">
-                CAPABILITIES
-              </span>
-              {superintelligenceTabs.map((tab, idx) => {
-                const isActive = idx === activeDarkTab;
-                return (
-                  <div
-                    key={tab.num}
-                    onClick={() => setActiveDarkTab(idx)}
-                    className={`p-3.5 rounded-xl border transition-all duration-200 flex items-center justify-between cursor-pointer ${
-                      isActive
-                        ? 'bg-zinc-900 border-emerald-500/80 text-white shadow-lg'
-                        : 'bg-zinc-950/50 hover:bg-zinc-900/60 border-zinc-800/80 text-zinc-400'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs font-bold text-emerald-400">{tab.num}</span>
-                      <span className="text-sm font-semibold">{tab.title}</span>
-                    </div>
-                    {isActive && <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Column 2: Visual X-Ray & Dynamic Model Router HUD */}
-            <div className="lg:col-span-4 flex flex-col items-center justify-center">
-              <div className="relative w-full aspect-square max-w-[340px] rounded-3xl border border-zinc-800 bg-zinc-950/80 p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden">
-                
-                {/* HUD Lines */}
-                <div className="absolute inset-0 bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none" />
-
-                <div className="flex items-center justify-between relative z-10">
-                  <span className="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider">
-                    ● CORE ORCHESTRATOR
-                  </span>
-                  <span className="text-[10px] font-mono text-zinc-500">LIVE EVALS</span>
-                </div>
-
-                <div className="relative z-10 text-center py-6">
-                  <div className="w-20 h-20 rounded-full border-2 border-emerald-500/60 mx-auto flex items-center justify-center mb-3 shadow-[0px_0px_30px_rgba(16,185,129,0.2)]">
-                    <Cpu className="w-9 h-9 text-emerald-400 animate-pulse" />
-                  </div>
-                  <div className="font-mono text-sm font-bold text-white">Dynamic Model Routing</div>
-                  <div className="text-[11px] text-zinc-400 mt-1">Claude 3.5 &bull; GPT-4o &bull; Gemini 3.5</div>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 relative z-10 flex items-center justify-between text-xs font-mono">
-                  <span className="text-zinc-400">Context Window:</span>
-                  <span className="text-emerald-400 font-bold">2,000,000 Tokens</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Column 3: Active Capability Details */}
-            <div className="lg:col-span-4 space-y-4">
-              <div className="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800 shadow-xl space-y-4">
-                <span className="font-mono text-xs font-bold text-emerald-400 block">
-                  {selectedDarkTab.num} &mdash; {selectedDarkTab.eyebrow}
-                </span>
-                <h3 className="font-display text-2xl font-bold text-white">
-                  {selectedDarkTab.title}
-                </h3>
-                <p className="text-zinc-300 text-xs sm:text-sm leading-relaxed">
-                  {selectedDarkTab.desc}
-                </p>
-                <p className="text-zinc-500 text-xs leading-relaxed border-t border-zinc-800 pt-3">
-                  {selectedDarkTab.subdesc}
-                </p>
-                <div className="pt-2">
-                  <Link
-                    href="/workspace/login"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 text-black hover:bg-emerald-400 text-xs font-bold shadow-md transition-all"
-                  >
-                    <span>Get Started</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          SECTION 6: [TECHNOLOGY] TELEMETRY & LIVE RADAR
+          SECTION 5: [TECHNOLOGY] TELEMETRY & LIVE RADAR
       ───────────────────────────────────────────────────────────── */}
       <section className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
