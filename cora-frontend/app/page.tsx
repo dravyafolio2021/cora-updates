@@ -1,5 +1,6 @@
 import { Hero } from '@/components/hero/Hero';
 import { BrandTicker } from '@/components/social/BrandTicker';
+import { UnifiedHubSprawlSection } from '@/components/unified-hub/UnifiedHubSprawlSection';
 import { WallOfFeaturesSection } from '@/components/features/WallOfFeaturesSection';
 import { HorizontalModuleDeck } from '@/components/modules/HorizontalModuleDeck';
 import { PlatformLifecycleSection } from '@/components/lifecycle/PlatformLifecycleSection';
@@ -21,10 +22,13 @@ export default function HomePage() {
       {/* 2. Infinite Logo Marquee with Centered Line Badge */}
       <BrandTicker />
 
-      {/* 3. Wall of Features — All Workflows, AI Co-Founders & Humans in Cora */}
+      {/* 3. The Central Intelligence Hub (Unifying Work Sprawl & Question Chaos) */}
+      <UnifiedHubSprawlSection />
+
+      {/* 4. Wall of Features — All Workflows, AI Co-Founders & Humans in Cora */}
       <WallOfFeaturesSection />
 
-      {/* 4. Pinned Horizontal Parallax Module Deck (One Chat Bar. Every Business Task.) */}
+      {/* 5. Pinned Horizontal Parallax Module Deck (One Chat Bar. Every Business Task.) */}
       <HorizontalModuleDeck />
 
       {/* 4. AI Co-Founder for Every Business (Interactive Industry Showcase) */}
