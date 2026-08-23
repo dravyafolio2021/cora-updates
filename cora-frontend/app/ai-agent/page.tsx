@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import {
   Sparkles,
   ArrowRight,
@@ -29,6 +31,10 @@ import {
   Users,
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 // ── 1. Expandable Tags Data for Hero ──
 interface TagItem {
@@ -62,7 +68,6 @@ const cofoundersList = [
     avatar: '/images/agent_card_pm.jpg',
     action: 'Standardize Brief',
     stat: '0.8s Response',
-    codeSnippet: 'const brief = await cora.intake.parseWhatsApp();\nawait cora.calendar.lockHold({ date: "Oct 24", bay: "Studio 2" });',
   },
   {
     id: 'sales',
@@ -73,7 +78,6 @@ const cofoundersList = [
     avatar: '/images/agent_card_sales.jpg',
     action: 'Instant Quote',
     stat: '100% Lead Capture',
-    codeSnippet: 'const quote = await cora.sales.generateQuote({\n  client: "Lakme Fashion",\n  package: "Commercial 4K",\n  rate: 141600\n});',
   },
   {
     id: 'gst',
@@ -84,7 +88,6 @@ const cofoundersList = [
     avatar: '/images/agent_card_gst.jpg',
     action: 'Generate Invoice',
     stat: 'GSTR-1 Ready',
-    codeSnippet: 'const invoice = await cora.gst.createTaxInvoice({\n  base: 120000,\n  cgst: 10800,\n  sgst: 10800,\n  upiQR: true\n});',
   },
   {
     id: 'legal',
@@ -95,7 +98,6 @@ const cofoundersList = [
     avatar: '/images/agent_card_legal.jpg',
     action: 'Draft Agreement',
     stat: 'IT Act Valid',
-    codeSnippet: 'const contract = await cora.legal.signNDA({\n  terms: "50% Advance + Cancellation Clause",\n  hash: "SHA-256-7f8a9b1c2d3e"\n});',
   },
   {
     id: 'ledger',
@@ -106,7 +108,6 @@ const cofoundersList = [
     avatar: '/images/agent_card_finance.jpg',
     action: 'Reconcile Cash Flow',
     stat: '1-Tap CA Sync',
-    codeSnippet: 'const ledger = await cora.finance.reconcileUPI({\n  received: 70800,\n  status: "50% Advance Verified",\n  export: "TallyPrime"\n});',
   },
 ];
 
@@ -192,7 +193,8 @@ export default function AiAgentPage() {
 
   const selectedSkill = humanSkills.find((s) => s.id === activeSkillId) || humanSkills[0];
 
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const mainContainerRef = useRef<HTMLElement>(null);
+  const heroActorRef = useRef<HTMLDivElement>(null);
 
   const scrollCarousel = (direction: 'left' | 'right') => {
     if (direction === 'left') {
@@ -202,13 +204,136 @@ export default function AiAgentPage() {
     }
   };
 
+  // ── GSAP ScrollTrigger Animations ──
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // 1. Hero Headline & Subtitle Fade Up
+      gsap.fromTo(
+        '.gsap-hero-fade',
+        { y: 35, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, stagger: 0.12, ease: 'power3.out' }
+      );
+
+      // 2. Hero Powers Slide-In
+      gsap.fromTo(
+        '.gsap-hero-left',
+        { x: -30, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.75, delay: 0.25, ease: 'power3.out' }
+      );
+      gsap.fromTo(
+        '.gsap-hero-right',
+        { x: 30, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.75, delay: 0.25, ease: 'power3.out' }
+      );
+
+      // 3. Hero Center Actor Floating Bob
+      if (heroActorRef.current) {
+        gsap.to(heroActorRef.current, {
+          y: -8,
+          duration: 3,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        });
+      }
+
+      // 4. Capabilities Cards Staggered ScrollTrigger
+      gsap.fromTo(
+        '.gsap-capability-card',
+        { y: 40, opacity: 0, scale: 0.96 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.65,
+          stagger: 0.08,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#capabilities',
+            start: 'top 80%',
+          },
+        }
+      );
+
+      // 5. Orchestration Pipeline Step Reveal
+      gsap.fromTo(
+        '.gsap-orchestration-box',
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.75,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#orchestration',
+            start: 'top 80%',
+          },
+        }
+      );
+
+      // 6. Human Skills Showcase
+      gsap.fromTo(
+        '.gsap-skill-pill',
+        { x: -20, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.55,
+          stagger: 0.08,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#human-skills',
+            start: 'top 80%',
+          },
+        }
+      );
+
+      gsap.fromTo(
+        '.gsap-skill-canvas',
+        { scale: 0.95, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 0.7,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#human-skills',
+            start: 'top 80%',
+          },
+        }
+      );
+
+      // 7. Technology & Telemetry Cards Stagger
+      gsap.fromTo(
+        '.gsap-tech-card',
+        { y: 35, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.65,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#technology',
+            start: 'top 82%',
+          },
+        }
+      );
+    }, mainContainerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <main className="min-h-screen bg-[#FFFFFF] text-zinc-950 font-sans selection:bg-zinc-950 selection:text-white">
+    <main
+      ref={mainContainerRef}
+      className="min-h-screen bg-[#FFFFFF] text-zinc-950 font-sans selection:bg-zinc-950 selection:text-white"
+    >
       
       {/* ─────────────────────────────────────────────────────────────
           SECTION 1: HERO PINNED STAGE (ClickUp Super Agents™ Style)
       ───────────────────────────────────────────────────────────── */}
-      <section className="relative pt-28 pb-16 sm:pt-36 sm:pb-24 overflow-hidden border-b border-zinc-100 bg-[#FAFAFB]">
+      <section className="relative pt-24 pb-14 sm:pt-32 sm:pb-20 overflow-hidden border-b border-zinc-100 bg-[#FAFAFB]">
         
         {/* Background Atmospheric Glow */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[900px] h-[400px] bg-gradient-to-b from-zinc-200/50 via-zinc-100/30 to-transparent rounded-full blur-3xl pointer-events-none" />
@@ -216,7 +341,7 @@ export default function AiAgentPage() {
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
           
           {/* Top Eyebrow */}
-          <div className="text-center mb-4">
+          <div className="text-center mb-3 gsap-hero-fade">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-zinc-950 text-white rounded-full text-xs font-semibold uppercase tracking-widest shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>CORA AI CO-FOUNDERS&trade;</span>
@@ -224,17 +349,17 @@ export default function AiAgentPage() {
           </div>
 
           {/* Main Hero Headline */}
-          <div className="text-center max-w-[900px] mx-auto mb-8 sm:mb-12">
-            <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl lg:text-[72px] font-bold text-zinc-950 leading-[1.04] tracking-[-0.04em] mb-4">
+          <div className="text-center max-w-[900px] mx-auto mb-6 sm:mb-10">
+            <h1 className="gsap-hero-fade font-display text-4xl xs:text-5xl sm:text-6xl lg:text-[68px] font-bold text-zinc-950 leading-[1.05] tracking-[-0.04em] mb-3.5">
               A new era of service businesses, with <br className="hidden sm:inline" />
               <span className="text-zinc-400 font-medium">AI Co-Founders&trade;</span>
             </h1>
-            <p className="text-zinc-600 text-base sm:text-lg lg:text-xl font-normal leading-relaxed max-w-[680px] mx-auto">
+            <p className="gsap-hero-fade text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[660px] mx-auto">
               Maximize studio productivity with specialized autonomous teammates. @mention, assign bookings, and automate 18% GST billing &mdash; grounded in your studio&apos;s live brain.
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-6 sm:mt-8">
+            <div className="gsap-hero-fade flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-5 sm:mt-7">
               <Link
                 href="/workspace/login"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
@@ -252,32 +377,32 @@ export default function AiAgentPage() {
           </div>
 
           {/* Central 3D Character Visual + Two-Column Expandable Powers */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center max-w-[1180px] mx-auto pt-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center max-w-[1180px] mx-auto pt-2">
             
             {/* Left Column: HUMAN POWERS */}
-            <div className="lg:col-span-4 space-y-4">
+            <div className="lg:col-span-4 space-y-3.5 gsap-hero-left">
               <div className="flex items-center gap-2 border-b border-zinc-200 pb-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-950" />
+                <div className="w-2 h-2 rounded-full bg-zinc-950" />
                 <span className="text-xs font-bold uppercase tracking-widest text-zinc-950">
                   HUMAN POWERS
                 </span>
               </div>
 
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {humanPowers.map((item) => {
                   const isExpanded = activeHumanTag === item.id;
                   return (
                     <div
                       key={item.id}
                       onClick={() => setActiveHumanTag(isExpanded ? null : item.id)}
-                      className={`p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer ${
+                      className={`p-3 rounded-2xl border transition-all duration-200 cursor-pointer ${
                         isExpanded
                           ? 'bg-white border-zinc-950 shadow-sm ring-1 ring-zinc-950/10'
                           : 'bg-white/70 hover:bg-white border-zinc-200/80 hover:border-zinc-300 shadow-2xs'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-zinc-900">{item.label}</span>
+                        <span className="text-xs sm:text-sm font-bold text-zinc-900">{item.label}</span>
                         <span className="text-xs font-bold text-zinc-400">{isExpanded ? '−' : '+'}</span>
                       </div>
                       {isExpanded && (
@@ -291,9 +416,9 @@ export default function AiAgentPage() {
               </div>
             </div>
 
-            {/* Center: 3D Co-Founder Actor Card */}
-            <div className="lg:col-span-4 flex flex-col items-center justify-center text-center">
-              <div className="relative w-[280px] h-[360px] sm:w-[320px] sm:h-[420px] rounded-3xl overflow-hidden shadow-2xl border border-zinc-200/90 bg-white group">
+            {/* Center: 3D Co-Founder Actor Card with Floating Bob */}
+            <div ref={heroActorRef} className="lg:col-span-4 flex flex-col items-center justify-center text-center">
+              <div className="relative w-[260px] h-[340px] sm:w-[300px] sm:h-[390px] rounded-3xl overflow-hidden shadow-2xl border border-zinc-200/90 bg-white group">
                 <Image
                   src="/images/agent_card_pm.jpg"
                   alt="Cora AI Co-Founder"
@@ -302,40 +427,40 @@ export default function AiAgentPage() {
                   priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-5 text-left text-white">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/90 text-[11px] font-bold text-white mb-1.5 w-fit">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/90 text-[10.5px] font-bold text-white mb-1.5 w-fit">
                     <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                     <span>ONLINE &bull; 0.8s LATENCY</span>
                   </span>
-                  <h3 className="font-display text-lg font-bold">Intake &amp; Project Co-Founder</h3>
+                  <h3 className="font-display text-base sm:text-lg font-bold">Intake &amp; Project Co-Founder</h3>
                   <p className="text-zinc-300 text-xs mt-0.5">Handling briefs, rate cards &amp; hold dates</p>
                 </div>
               </div>
             </div>
 
             {/* Right Column: SUPERPOWERS */}
-            <div className="lg:col-span-4 space-y-4">
+            <div className="lg:col-span-4 space-y-3.5 gsap-hero-right">
               <div className="flex items-center gap-2 border-b border-zinc-200 pb-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
+                <div className="w-2 h-2 rounded-full bg-emerald-600" />
                 <span className="text-xs font-bold uppercase tracking-widest text-zinc-950">
                   SUPERPOWERS
                 </span>
               </div>
 
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {superpowers.map((item) => {
                   const isExpanded = activeSuperTag === item.id;
                   return (
                     <div
                       key={item.id}
                       onClick={() => setActiveSuperTag(isExpanded ? null : item.id)}
-                      className={`p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer ${
+                      className={`p-3 rounded-2xl border transition-all duration-200 cursor-pointer ${
                         isExpanded
                           ? 'bg-white border-zinc-950 shadow-sm ring-1 ring-zinc-950/10'
                           : 'bg-white/70 hover:bg-white border-zinc-200/80 hover:border-zinc-300 shadow-2xs'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-zinc-900">{item.label}</span>
+                        <span className="text-xs sm:text-sm font-bold text-zinc-900">{item.label}</span>
                         <span className="text-xs font-bold text-zinc-400">{isExpanded ? '−' : '+'}</span>
                       </div>
                       {isExpanded && (
@@ -352,7 +477,7 @@ export default function AiAgentPage() {
           </div>
 
           {/* Mobile Streaming Task Pills */}
-          <div className="mt-10 overflow-hidden select-none [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+          <div className="mt-8 overflow-hidden select-none [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
             <div className="flex min-w-full shrink-0 items-center justify-around gap-3 animate-marquee py-1">
               {[
                 'WhatsApp Brief Intake',
@@ -387,16 +512,16 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 2: [CAPABILITIES] CO-FOUNDER CAROUSEL DECK
       ───────────────────────────────────────────────────────────── */}
-      <section id="capabilities" className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
+      <section id="capabilities" className="py-14 sm:py-20 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
           
           {/* Eyebrow Header */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-zinc-200 mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-5 border-b border-zinc-200 mb-8 sm:mb-10">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 block mb-1">
                 [ CAPABILITIES ]
               </span>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-950 tracking-tight">
+              <h2 className="font-display text-2xl sm:text-4xl lg:text-[44px] font-bold text-zinc-950 tracking-tight">
                 Co-Founders for everything
               </h2>
             </div>
@@ -407,17 +532,17 @@ export default function AiAgentPage() {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => scrollCarousel('left')}
-                  className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 text-zinc-800 transition-colors cursor-pointer"
+                  className="w-9 h-9 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 text-zinc-800 transition-colors cursor-pointer"
                   aria-label="Previous co-founder"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => scrollCarousel('right')}
-                  className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 text-zinc-800 transition-colors cursor-pointer"
+                  className="w-9 h-9 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 text-zinc-800 transition-colors cursor-pointer"
                   aria-label="Next co-founder"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -431,7 +556,7 @@ export default function AiAgentPage() {
                 <div
                   key={card.id}
                   onClick={() => setActiveCarouselIndex(idx)}
-                  className={`rounded-3xl p-5 border transition-all duration-300 flex flex-col justify-between h-[420px] cursor-pointer relative overflow-hidden group ${
+                  className={`gsap-capability-card rounded-3xl p-5 border transition-all duration-300 flex flex-col justify-between h-[410px] cursor-pointer relative overflow-hidden group ${
                     isCurrent
                       ? 'ring-2 ring-zinc-950 border-transparent shadow-xl'
                       : 'hover:shadow-md border-zinc-200/80 bg-zinc-50/50'
@@ -439,13 +564,13 @@ export default function AiAgentPage() {
                   style={{ backgroundColor: isCurrent ? card.color : undefined }}
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center justify-between mb-2.5">
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${card.tagColor}`}>
                         {card.stat}
                       </span>
                       <span className="text-xs font-mono font-bold text-zinc-400">0{idx + 1}</span>
                     </div>
-                    <h3 className="font-display text-lg font-bold text-zinc-950 leading-snug mb-1">
+                    <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 leading-snug mb-1">
                       {card.title}
                     </h3>
                     <p className="text-zinc-600 text-xs leading-relaxed line-clamp-2">
@@ -454,7 +579,7 @@ export default function AiAgentPage() {
                   </div>
 
                   {/* Character Avatar with Parallax Frame */}
-                  <div className="relative w-full h-[180px] rounded-2xl overflow-hidden my-3 border border-zinc-200/60 bg-white shadow-2xs">
+                  <div className="relative w-full h-[170px] rounded-2xl overflow-hidden my-2 border border-zinc-200/60 bg-white shadow-2xs">
                     <Image
                       src={card.avatar}
                       alt={card.title}
@@ -478,12 +603,12 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 3: MULTI-AGENT ORCHESTRATION ("One Prompt Spins Up a Team")
       ───────────────────────────────────────────────────────────── */}
-      <section className="py-16 sm:py-20 bg-[#FAFAFB] relative z-10 border-b border-zinc-100">
+      <section id="orchestration" className="py-14 sm:py-20 bg-[#FAFAFB] relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             {/* Left: Interactive Multi-Agent Pipeline Visualization */}
-            <div className="lg:col-span-7 space-y-3">
+            <div className="lg:col-span-7 space-y-3 gsap-orchestration-box">
               <div className="bg-white rounded-3xl p-6 sm:p-8 border border-zinc-200/90 shadow-sm space-y-4">
                 
                 {/* Step 1: Input Prompt */}
@@ -494,7 +619,7 @@ export default function AiAgentPage() {
                       ONE CLIENT INQUIRY RECEIVED
                     </span>
                   </div>
-                  <p className="text-sm font-semibold text-zinc-950 font-mono">
+                  <p className="text-xs sm:text-sm font-semibold text-zinc-950 font-mono">
                     &ldquo;Hey Cora, Nike wants 2-day shoot at Studio 4 with 3 models, ₹4.5L budget. Lock it in.&rdquo;
                   </p>
                 </div>
@@ -531,10 +656,10 @@ export default function AiAgentPage() {
               <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 block">
                 [ ORCHESTRATION IN MINUTES ]
               </span>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold text-zinc-950 leading-tight">
+              <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 leading-tight">
                 One prompt spins up an entire autonomous team
               </h2>
-              <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
+              <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
                 Your goals, booking holds, and billing frustration &mdash; automatically delegated to specialized co-founders who work together without human bottlenecks.
               </p>
               <div className="pt-2">
@@ -555,16 +680,16 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 4: [HUMAN SKILLS] INTERACTIVE PILL SHOWCASE
       ───────────────────────────────────────────────────────────── */}
-      <section className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
+      <section id="human-skills" className="py-14 sm:py-20 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
           
           {/* Section Header */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-zinc-200 mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-5 border-b border-zinc-200 mb-8 sm:mb-10">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 block mb-1">
                 [ HUMAN SKILLS ]
               </span>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-950 tracking-tight">
+              <h2 className="font-display text-2xl sm:text-4xl lg:text-[44px] font-bold text-zinc-950 tracking-tight">
                 Do more than humanly possible
               </h2>
             </div>
@@ -574,12 +699,12 @@ export default function AiAgentPage() {
           </div>
 
           {/* Interactive 2-Column Showcase */}
-          <div className="bg-[#F8F9FA] rounded-[32px] p-6 sm:p-10 border border-zinc-200/80 shadow-xs">
+          <div className="bg-[#F8F9FA] rounded-[32px] p-5 sm:p-8 lg:p-10 border border-zinc-200/80 shadow-xs">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
               {/* Left Column: Clickable Skill Pills */}
               <div className="lg:col-span-5 space-y-2.5">
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 mb-3">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950 mb-2">
                   The only agents that work like humans &mdash; with infinite skills
                 </h3>
 
@@ -589,14 +714,14 @@ export default function AiAgentPage() {
                     <div
                       key={skill.id}
                       onClick={() => setActiveSkillId(skill.id)}
-                      className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer ${
+                      className={`gsap-skill-pill p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer ${
                         isSelected
                           ? 'bg-white border-zinc-950 shadow-md ring-1 ring-zinc-950/10'
                           : 'bg-white/70 hover:bg-white border-zinc-200/70 hover:border-zinc-300 shadow-2xs'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-zinc-900">{skill.title}</span>
+                        <span className="text-xs sm:text-sm font-bold text-zinc-900">{skill.title}</span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
                           isSelected ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-600'
                         }`}>
@@ -614,11 +739,11 @@ export default function AiAgentPage() {
               </div>
 
               {/* Right Column: Live Artifact Canvas Preview */}
-              <div className="lg:col-span-7">
-                <div className="bg-white rounded-2xl p-6 sm:p-8 border border-zinc-200 shadow-lg space-y-5">
+              <div className="lg:col-span-7 gsap-skill-canvas">
+                <div className="bg-white rounded-2xl p-5 sm:p-7 border border-zinc-200 shadow-lg space-y-4">
                   <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
                     <div>
-                      <div className="text-xs font-bold text-zinc-900">{selectedSkill.previewTitle}</div>
+                      <div className="text-xs sm:text-sm font-bold text-zinc-900">{selectedSkill.previewTitle}</div>
                       <div className="text-[11px] text-zinc-500 font-mono">{selectedSkill.previewSubtitle}</div>
                     </div>
                     <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
@@ -626,16 +751,16 @@ export default function AiAgentPage() {
                     </span>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {selectedSkill.details.map((row, rIdx) => (
-                      <div key={rIdx} className="p-3 bg-zinc-50 rounded-xl border border-zinc-100 flex items-center justify-between text-xs">
+                      <div key={rIdx} className="p-2.5 bg-zinc-50 rounded-xl border border-zinc-100 flex items-center justify-between text-xs">
                         <span className="text-zinc-500 font-medium">{row.label}</span>
                         <span className="font-semibold text-zinc-950 font-mono text-right">{row.value}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="pt-2 flex items-center justify-between text-xs text-zinc-500">
+                  <div className="pt-1 flex items-center justify-between text-xs text-zinc-500">
                     <span>Tamper-Proof Audit Hash: <code className="text-zinc-700 font-mono">SHA256:8f2a...</code></span>
                     <span className="text-zinc-950 font-bold">1-Click PDF &rarr;</span>
                   </div>
@@ -651,22 +776,22 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 5: [TECHNOLOGY] TELEMETRY & LIVE RADAR
       ───────────────────────────────────────────────────────────── */}
-      <section className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
+      <section id="technology" className="py-14 sm:py-20 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
           
-          <div className="max-w-[760px] mx-auto text-center mb-12">
+          <div className="max-w-[760px] mx-auto text-center mb-10">
             <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 block mb-1">
               [ PROPRIETARY AGENTIC TECHNOLOGY ]
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
+            <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
               Enterprise security &amp; live ambient awareness
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
             
             {/* Card 1: Studio Automation Telemetry */}
-            <div className="p-6 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-4 shadow-2xs">
+            <div className="gsap-tech-card p-5 sm:p-6 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-3.5 shadow-2xs">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-zinc-700 uppercase tracking-wider">
                   STUDIO AUTOMATION
@@ -675,7 +800,7 @@ export default function AiAgentPage() {
                   Top 5%
                 </span>
               </div>
-              <div className="font-display text-4xl font-bold text-zinc-950">
+              <div className="font-display text-3xl sm:text-4xl font-bold text-zinc-950">
                 84.6%
               </div>
               <p className="text-xs text-zinc-600 leading-relaxed">
@@ -693,14 +818,14 @@ export default function AiAgentPage() {
             </div>
 
             {/* Card 2: Live Ambient Radar */}
-            <div className="p-6 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-4 shadow-2xs">
+            <div className="gsap-tech-card p-5 sm:p-6 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-3.5 shadow-2xs">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-zinc-700 uppercase tracking-wider">
                   AMBIENT RADAR
                 </span>
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
-              <div className="font-display text-4xl font-bold text-zinc-950">
+              <div className="font-display text-3xl sm:text-4xl font-bold text-zinc-950">
                 24/7 Sweep
               </div>
               <p className="text-xs text-zinc-600 leading-relaxed">
@@ -719,20 +844,20 @@ export default function AiAgentPage() {
             </div>
 
             {/* Card 3: Encrypted SHA-256 Vault */}
-            <div className="p-6 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-4 shadow-2xs">
+            <div className="gsap-tech-card p-5 sm:p-6 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-3.5 shadow-2xs">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-zinc-700 uppercase tracking-wider">
                   SECURITY &amp; AUDIT
                 </span>
                 <Lock className="w-4 h-4 text-zinc-500" />
               </div>
-              <div className="font-display text-4xl font-bold text-zinc-950">
+              <div className="font-display text-3xl sm:text-4xl font-bold text-zinc-950">
                 SHA-256
               </div>
               <p className="text-xs text-zinc-600 leading-relaxed">
                 Every commercial agreement, model NDA, and tax invoice is cryptographically sealed and verifiable under the IT Act 2000.
               </p>
-              <div className="p-3 bg-white rounded-xl border border-zinc-200 font-mono text-[11px] text-zinc-600 truncate">
+              <div className="p-3 bg-white rounded-xl border border-zinc-200 font-mono text-[10.5px] text-zinc-600 truncate">
                 Hash: 7f8a9b1c2d3e4f5a6b7c8d9e...
               </div>
             </div>
