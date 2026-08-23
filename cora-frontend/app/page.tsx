@@ -3,10 +3,10 @@ import { BrandTicker } from '@/components/social/BrandTicker';
 import { FounderValueShowcase } from '@/components/founder-showcase/FounderValueShowcase';
 import { ValueTransformationSection } from '@/components/value-transformation/ValueTransformationSection';
 import { PlatformLifecycleSection } from '@/components/lifecycle/PlatformLifecycleSection';
-import { ProductFreedomRoiSection } from '@/components/product/ProductFreedomRoiSection';
-import { UseCasesSection } from '@/components/use-cases/UseCasesSection';
-import { IntegrationsRadialSection } from '@/components/integrations/IntegrationsRadialSection';
-import { FounderCommunitySection } from '@/components/founder/FounderCommunitySection';
+import { IntegrationsWaveSection } from '@/components/integrations/IntegrationsWaveSection';
+import { IndustryGridSection } from '@/components/industry-grid/IndustryGridSection';
+import { ExecutiveConfidenceSection } from '@/components/features-grid/ExecutiveConfidenceSection';
+import { CommunityStoriesSection } from '@/components/community/CommunityStoriesSection';
 import { MobilePwaSection } from '@/components/mobile-app/MobilePwaSection';
 import { PricingSection } from '@/components/pricing/PricingSection';
 import { ToolsBanner } from '@/components/tools/ToolsBanner';
@@ -16,7 +16,7 @@ import { FAQSection } from '@/components/faq/FAQSection';
 export default function HomePage() {
   return (
     <main className="w-full relative overflow-x-hidden">
-      {/* 1. Hero Section (Sky & Meadow with Interactive SDR prompt) */}
+      {/* 1. Hero Section (Conversational input & Hero) */}
       <Hero />
 
       {/* 2. Infinite Logo Marquee with Centered Line Badge */}
@@ -31,31 +31,31 @@ export default function HomePage() {
       {/* 5. AI Co-Founder for Every Business (Interactive Industry Showcase) */}
       <PlatformLifecycleSection />
 
-      {/* 5. How It Works, Agency ROI & Enterprise Security Architecture */}
-      <ProductFreedomRoiSection />
+      {/* 6. Integrations — Dual Flowing Wave with Central Cora Emblem */}
+      <IntegrationsWaveSection />
 
-      {/* 6. Use Cases — Who This Platform Is Built For */}
-      <UseCasesSection />
+      {/* 7. 12-Industry Directory Grid (Every Industry, One Platform) */}
+      <IndustryGridSection />
 
-      {/* 7. Integrations — Radial Orbit Tool Ecosystem */}
-      <IntegrationsRadialSection />
+      {/* 8. Plus, Everything You Need to Lead with Confidence (6-Feature Executive Grid) */}
+      <ExecutiveConfidenceSection />
 
-      {/* 8. Join the Movement — Founder Dravya Bansal & Community Spotlight */}
-      <FounderCommunitySection />
+      {/* 9. Learn More About Service Business Engineering (Clay-Style Bento Community Hub) */}
+      <CommunityStoriesSection />
 
-      {/* 9. PWA Mobile App — Run Your Studio On The Go */}
+      {/* 10. PWA Mobile App — Run Your Studio On The Go */}
       <MobilePwaSection />
 
-      {/* 10. Commercial Pricing Matrix & Live FX Toggle */}
+      {/* 11. Commercial Pricing Matrix & Live FX Toggle */}
       <PricingSection />
 
-      {/* 11. Free Public Micro-Tools Directory Banner */}
+      {/* 12. Free Public Micro-Tools Directory Banner */}
       <ToolsBanner />
 
-      {/* 12. Customer Testimonials & Social Proof */}
+      {/* 13. Customer Testimonials & Social Proof */}
       <TestimonialsSection />
 
-      {/* 13. SEO & Schema-Linked FAQ Accordion */}
+      {/* 14. SEO & Schema-Linked FAQ Accordion */}
       <FAQSection />
     </main>
   );
