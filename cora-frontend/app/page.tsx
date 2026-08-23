@@ -1,5 +1,6 @@
 import { Hero } from '@/components/hero/Hero';
 import { BrandTicker } from '@/components/social/BrandTicker';
+import { WallOfFeaturesSection } from '@/components/features/WallOfFeaturesSection';
 import { HorizontalModuleDeck } from '@/components/modules/HorizontalModuleDeck';
 import { PlatformLifecycleSection } from '@/components/lifecycle/PlatformLifecycleSection';
 import { IntegrationsWaveSection } from '@/components/integrations/IntegrationsWaveSection';
@@ -20,7 +21,10 @@ export default function HomePage() {
       {/* 2. Infinite Logo Marquee with Centered Line Badge */}
       <BrandTicker />
 
-      {/* 3. Pinned Horizontal Parallax Module Deck (One Chat Bar. Every Business Task.) */}
+      {/* 3. Wall of Features — All Workflows, AI Co-Founders & Humans in Cora */}
+      <WallOfFeaturesSection />
+
+      {/* 4. Pinned Horizontal Parallax Module Deck (One Chat Bar. Every Business Task.) */}
       <HorizontalModuleDeck />
 
       {/* 4. AI Co-Founder for Every Business (Interactive Industry Showcase) */}
