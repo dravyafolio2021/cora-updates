@@ -1,6 +1,7 @@
 import { Hero } from '@/components/hero/Hero';
 import { BrandTicker } from '@/components/social/BrandTicker';
 import { FounderValueShowcase } from '@/components/founder-showcase/FounderValueShowcase';
+import { ValueTransformationSection } from '@/components/value-transformation/ValueTransformationSection';
 import { PlatformLifecycleSection } from '@/components/lifecycle/PlatformLifecycleSection';
 import { ProductFreedomRoiSection } from '@/components/product/ProductFreedomRoiSection';
 import { UseCasesSection } from '@/components/use-cases/UseCasesSection';
@@ -21,10 +22,13 @@ export default function HomePage() {
       {/* 2. Infinite Logo Marquee with Centered Line Badge */}
       <BrandTicker />
 
-      {/* 3. Core Capabilities 3-Card Hi-Fi Founder Showcase */}
+      {/* 3. Native Dual-Interface Architecture (Customer Website + Admin Workspace) */}
       <FounderValueShowcase />
 
-      {/* 4. 7-Card Bento Grid Platform Lifecycle Section (Low Text, High Visual Storytelling) */}
+      {/* 4. Value Transformation (From WhatsApp Threads to Automated Revenue) */}
+      <ValueTransformationSection />
+
+      {/* 5. AI Co-Founder for Every Business (Interactive Industry Showcase) */}
       <PlatformLifecycleSection />
 
       {/* 5. How It Works, Agency ROI & Enterprise Security Architecture */}
