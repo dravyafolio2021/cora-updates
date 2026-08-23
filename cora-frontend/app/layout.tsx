@@ -130,6 +130,27 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
+                  // Suppress third-party Chrome extension runtime errors from triggering Next.js dev overlay
+                  if (typeof window !== 'undefined') {
+                    window.addEventListener('error', function(event) {
+                      if (event && (
+                        (event.filename && event.filename.indexOf('chrome-extension://') !== -1) ||
+                        (event.message && (event.message.indexOf('M_ID') !== -1 || event.message.indexOf('chrome-extension') !== -1))
+                      )) {
+                        event.stopImmediatePropagation();
+                        event.preventDefault();
+                        return true;
+                      }
+                    }, true);
+
+                    window.addEventListener('unhandledrejection', function(event) {
+                      if (event && event.reason && event.reason.stack && event.reason.stack.indexOf('chrome-extension://') !== -1) {
+                        event.stopImmediatePropagation();
+                        event.preventDefault();
+                      }
+                    }, true);
+                  }
+
                   // Guard against browser extension attribute pollution
                   if (typeof Element !== 'undefined') {
                     var origSetAttr = Element.prototype.setAttribute;
