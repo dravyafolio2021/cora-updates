@@ -2,6 +2,7 @@ import { Hero } from '@/components/hero/Hero';
 import { BrandTicker } from '@/components/social/BrandTicker';
 import { FounderValueShowcase } from '@/components/founder-showcase/FounderValueShowcase';
 import { ValueTransformationSection } from '@/components/value-transformation/ValueTransformationSection';
+import { HorizontalModuleDeck } from '@/components/modules/HorizontalModuleDeck';
 import { PlatformLifecycleSection } from '@/components/lifecycle/PlatformLifecycleSection';
 import { IntegrationsWaveSection } from '@/components/integrations/IntegrationsWaveSection';
 import { IndustryGridSection } from '@/components/industry-grid/IndustryGridSection';
@@ -28,34 +29,37 @@ export default function HomePage() {
       {/* 4. Value Transformation (From WhatsApp Threads to Automated Revenue) */}
       <ValueTransformationSection />
 
-      {/* 5. AI Co-Founder for Every Business (Interactive Industry Showcase) */}
+      {/* 5. Pinned Horizontal Parallax Module Deck (One Chat Bar. Every Business Task.) */}
+      <HorizontalModuleDeck />
+
+      {/* 6. AI Co-Founder for Every Business (Interactive Industry Showcase) */}
       <PlatformLifecycleSection />
 
-      {/* 6. Integrations — Dual Flowing Wave with Central Cora Emblem */}
+      {/* 7. Integrations — Dual Flowing Wave with Central Cora Emblem */}
       <IntegrationsWaveSection />
 
-      {/* 7. 12-Industry Directory Grid (Every Industry, One Platform) */}
+      {/* 8. 12-Industry Directory Grid (Every Industry, One Platform) */}
       <IndustryGridSection />
 
-      {/* 8. Plus, Everything You Need to Lead with Confidence (6-Feature Executive Grid) */}
+      {/* 9. Plus, Everything You Need to Lead with Confidence (6-Feature Executive Grid) */}
       <ExecutiveConfidenceSection />
 
-      {/* 9. Learn More About Service Business Engineering (Clay-Style Bento Community Hub) */}
+      {/* 10. Learn More About Service Business Engineering (Clay-Style Bento Community Hub) */}
       <CommunityStoriesSection />
 
-      {/* 10. PWA Mobile App — Run Your Studio On The Go */}
+      {/* 11. PWA Mobile App — Run Your Studio On The Go */}
       <MobilePwaSection />
 
-      {/* 11. Commercial Pricing Matrix & Live FX Toggle */}
+      {/* 12. Commercial Pricing Matrix & Live FX Toggle */}
       <PricingSection />
 
-      {/* 12. Free Public Micro-Tools Directory Banner */}
+      {/* 13. Free Public Micro-Tools Directory Banner */}
       <ToolsBanner />
 
-      {/* 13. Customer Testimonials & Social Proof */}
+      {/* 14. Customer Testimonials & Social Proof */}
       <TestimonialsSection />
 
-      {/* 14. SEO & Schema-Linked FAQ Accordion */}
+      {/* 15. SEO & Schema-Linked FAQ Accordion */}
       <FAQSection />
     </main>
   );
