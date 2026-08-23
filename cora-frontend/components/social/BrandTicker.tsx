@@ -11,9 +11,7 @@ import {
   SiZoho,
 } from 'react-icons/si';
 
-// ── Official Multi-Color / Authentic Brand SVG Components ──
-
-// Google Sheets Official Logo
+// Google Sheets Official SVG Logo
 const GoogleSheetsLogo = () => (
   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
     <path d="M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2z" fill="#0F9D58" />
@@ -22,7 +20,7 @@ const GoogleSheetsLogo = () => (
   </svg>
 );
 
-// Gmail Official 4-Color Logo
+// Gmail Official 4-Color M Logo
 const GmailLogo = () => (
   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
     <path d="M2.5 7v10.5a2 2 0 002 2h2.5V11L2.5 7z" fill="#4285F4" />
@@ -32,16 +30,7 @@ const GmailLogo = () => (
   </svg>
 );
 
-// Google Drive Official 3-Color Triangle Logo
-const GoogleDriveLogo = () => (
-  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
-    <path d="M8.2 14.5L3.5 22h9.5l4.7-7.5H8.2z" fill="#0066DA" />
-    <path d="M13 2.5L8.2 10.5 13 18.5h9.5L17.8 10.5 13 2.5z" fill="#00AC47" />
-    <path d="M8.2 2.5L3.5 10.5l4.7 7.5L13 10.5 8.2 2.5z" fill="#FFBA00" />
-  </svg>
-);
-
-// Microsoft Excel Official Green Workbook Logo
+// Microsoft Excel Official Green Logo
 const MicrosoftExcelLogo = () => (
   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
     <rect x="2" y="3" width="20" height="18" rx="3" fill="#107C41" />
@@ -50,7 +39,17 @@ const MicrosoftExcelLogo = () => (
   </svg>
 );
 
-// Slack Official 4-Color Octothorpe Logo
+// Google Drive Official Triangle Logo
+const GoogleDriveLogo = () => (
+  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
+    <path d="M8.2 3.5L2 14.2l3.8 6.5L12 10 8.2 3.5z" fill="#0066DA" />
+    <path d="M15.8 3.5H8.2L12 10l7.6 13.2h7.6L15.8 3.5z" fill="#00AC47" />
+    <path d="M2 14.2l3.8 6.5h15.4L17.4 14.2H2z" fill="#FFBA00" />
+    <path d="M8.2 3.5l3.8 6.5H27l-3.8-6.5H8.2z" fill="#EA4335" />
+  </svg>
+);
+
+// Slack Official 4-Color Hash Logo
 const SlackLogo = () => (
   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
     <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z" fill="#E01E5A"/>
@@ -60,7 +59,7 @@ const SlackLogo = () => (
   </svg>
 );
 
-// NPCI UPI Official 2-Tone Logo
+// Instant UPI Official 2-Tone Logo
 const UpiLogo = () => (
   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
     <path d="M14.8 3.5L8.5 12h5.2l-1.8 8.5 7.6-9.5h-5.6l1.1-7.5z" fill="#009F4D" />
@@ -68,7 +67,7 @@ const UpiLogo = () => (
   </svg>
 );
 
-// Tally Prime Official Logo
+// Tally Prime Official Gold/Navy Logo
 const TallyPrimeLogo = () => (
   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
     <rect width="24" height="24" rx="5" fill="#F4B41A" />
@@ -123,26 +122,10 @@ const ecosystemTools = [
 
 export function BrandTicker() {
   return (
-    <section className="py-8 sm:py-10 bg-white relative z-10 overflow-hidden border-b border-zinc-100">
-      
-      {/* ── Centered Badge on Divider Line ── */}
-      <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6 mb-6">
-        <div className="relative flex justify-center">
-          <div className="absolute inset-0 flex items-center" aria-hidden="true">
-            <div className="w-full border-t border-zinc-200/70" />
-          </div>
-          <div className="relative px-4 bg-white">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-zinc-50 rounded-full text-zinc-600 text-xs font-medium border border-zinc-200/60 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Works seamlessly with the tools you already use</span>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Infinite Marquee Ticker with Official Brand Logos ── */}
+    <section className="py-4 sm:py-6 bg-white relative z-10 overflow-hidden">
+      {/* ── Seamless Infinite Marquee Ticker with Official Brand Logos (Zero Lines & Badges) ── */}
       <div className="flex w-full overflow-hidden select-none [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
-        <div className="flex min-w-full shrink-0 items-center justify-around gap-6 sm:gap-8 animate-marquee py-2">
+        <div className="flex min-w-full shrink-0 items-center justify-around gap-6 sm:gap-8 animate-marquee py-1">
           {ecosystemTools.concat(ecosystemTools).map((tool, idx) => {
             const IconComp = tool.icon;
             const CustomComp = tool.custom;
