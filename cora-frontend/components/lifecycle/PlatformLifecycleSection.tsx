@@ -1,281 +1,408 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import {
-  Plus,
+  Check,
+  ArrowRight,
+  Sparkles,
   MessageSquare,
   ShieldCheck,
   Receipt,
   Calendar,
   TrendingUp,
-  Sparkles,
-  ArrowRight,
+  FileText,
+  Users,
+  Camera,
+  Building,
+  Briefcase,
+  Layers,
+  Palette,
+  Clock,
+  QrCode,
 } from 'lucide-react';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
-interface WorkflowCardData {
+interface WorkflowSolution {
   id: string;
-  badge: string;
-  title: string;
-  subtitle: string;
-  image: string;
-  iconBg: string;
-  Icon: React.ComponentType<{ className?: string }>;
-  tags: string[];
+  tabLabel: string;
+  headline: string;
+  headlineAccent: string;
+  description: string;
+  replaces: string[];
+  features: string[];
+  agents: {
+    name: string;
+    action: string;
+    avatar: string;
+    badgeColor: string;
+    icon: React.ComponentType<{ className?: string }>;
+  }[];
+  ctaText: string;
+  ctaLink: string;
 }
 
-const workflowCards: WorkflowCardData[] = [
+const solutionsData: WorkflowSolution[] = [
   {
-    id: 'crm-workflow',
-    badge: 'Inquiries & CRM',
-    title: 'Client Inquiries & Briefs',
-    subtitle: 'Captures incoming client briefs from WhatsApp & calls into structured shoot requests with automated hold tags.',
-    image: '/images/agent_card_pm.jpg',
-    iconBg: 'bg-amber-600',
-    Icon: Sparkles,
-    tags: ['WhatsApp Sync', 'Auto-Intake', 'Shoot Briefs'],
+    id: 'projects',
+    tabLabel: 'Photography & Film',
+    headline: 'Deliver shoot bookings on time,',
+    headlineAccent: 'every time',
+    description: 'Get your client inquiries, crew call-sheets, 18% GST invoicing, and deliverables running smoothly with specialized autonomous workflows.',
+    replaces: ['HoneyBook', 'Studio Ninja', 'QuickBooks', 'DocuSign'],
+    features: [
+      'Automate WhatsApp briefs into structured shoot packages',
+      'Generate IT Act compliant commercial agreements & model NDAs',
+      'Instant 18% GST calculation with dynamic UPI QR standees',
+      'Send automated WhatsApp call-time reminders to crew & clients',
+    ],
+    agents: [
+      {
+        name: 'Intake Agent',
+        action: 'standardizes project kickoff & briefs',
+        avatar: '/images/agent_card_pm.jpg',
+        badgeColor: 'bg-amber-500',
+        icon: Sparkles,
+      },
+      {
+        name: 'Rate Agent',
+        action: 'calculates commercial packages & 18% GST splits',
+        avatar: '/images/agent_card_gst.jpg',
+        badgeColor: 'bg-emerald-500',
+        icon: Receipt,
+      },
+      {
+        name: 'Legal Agent',
+        action: 'generates model release NDAs & collects e-signatures',
+        avatar: '/images/agent_card_legal.jpg',
+        badgeColor: 'bg-purple-500',
+        icon: ShieldCheck,
+      },
+      {
+        name: 'Ledger Agent',
+        action: 'reconciles UPI advances & tracks cash flow',
+        avatar: '/images/agent_card_finance.jpg',
+        badgeColor: 'bg-indigo-500',
+        icon: TrendingUp,
+      },
+    ],
+    ctaText: 'Explore Studio Solution',
+    ctaLink: '/use-cases?industry=photography_studio',
   },
   {
-    id: 'whatsapp-workflow',
-    badge: 'WhatsApp Concierge',
-    title: 'Instant Quotes & Closes',
-    subtitle: 'Quotes approved rate cards, answers commercial inquiries, and closes bookings 24/7 with zero delay.',
-    image: '/images/agent_card_sales.jpg',
-    iconBg: 'bg-sky-600',
-    Icon: MessageSquare,
-    tags: ['Instant Rate Math', '24/7 Follow-ups', 'Fast Closes'],
+    id: 'agencies',
+    tabLabel: 'Creative Agencies',
+    headline: 'Scale client retainers & approvals',
+    headlineAccent: 'without the chaos',
+    description: 'Eliminate scope creep and delayed payments. Turn incoming client briefs into signed milestone agreements and automated monthly retainer billing.',
+    replaces: ['Notion', 'Asana', 'QuickBooks', 'DocuSign'],
+    features: [
+      'Auto-draft client scope contracts with 50% upfront deposit terms',
+      'Track monthly retainer hours & deliverable milestones in real-time',
+      'Automate invoice generation with corporate GSTIN validation',
+      'Export CA-ready sales ledger and GSTR-1 summaries in one tap',
+    ],
+    agents: [
+      {
+        name: 'Brief Agent',
+        action: 'converts messy client messages into clear milestones',
+        avatar: '/images/agent_card_sales.jpg',
+        badgeColor: 'bg-sky-500',
+        icon: MessageSquare,
+      },
+      {
+        name: 'Scope Agent',
+        action: 'detects out-of-scope revisions & drafts addendums',
+        avatar: '/images/agent_card_legal.jpg',
+        badgeColor: 'bg-purple-500',
+        icon: ShieldCheck,
+      },
+      {
+        name: 'Billing Agent',
+        action: 'dispatches automated GSTR-1 compliant invoices',
+        avatar: '/images/agent_card_gst.jpg',
+        badgeColor: 'bg-emerald-500',
+        icon: Receipt,
+      },
+      {
+        name: 'Executive Agent',
+        action: 'reports live monthly revenue & profit margins',
+        avatar: '/images/agent_card_finance.jpg',
+        badgeColor: 'bg-indigo-500',
+        icon: TrendingUp,
+      },
+    ],
+    ctaText: 'Explore Agency Solution',
+    ctaLink: '/use-cases?industry=creative_agency',
   },
   {
-    id: 'gst-workflow',
-    badge: '18% GST Billing',
-    title: 'Tax Math & Dynamic UPI QR',
-    subtitle: 'Calculates CGST/SGST splits, outputs UPI soundbox payment QR standees, and generates GSTR-1 ready sales PDFs.',
-    image: '/images/agent_card_gst.jpg',
-    iconBg: 'bg-emerald-600',
-    Icon: Receipt,
-    tags: ['18% GST Split', 'Dynamic UPI QR', 'Tally Sync'],
+    id: 'real-estate',
+    tabLabel: 'Real Estate & Architecture',
+    headline: 'Lock site visits & commercial deals',
+    headlineAccent: 'at record speed',
+    description: 'From builder inventory walkthroughs to client token advances, coordinate buyer agreements, broker commissions, and property call-sheets on autopilot.',
+    replaces: ['HubSpot', 'Calendly', 'WhatsApp Groups', 'Excel'],
+    features: [
+      'Instant property brochure generation with localized rate math',
+      'Standardized brokerage & non-circumvention agreements',
+      'Automated site visit scheduling with Google Maps pin sync',
+      'Token advance tracking with dynamic UPI soundbox receipts',
+    ],
+    agents: [
+      {
+        name: 'Lead Concierge',
+        action: 'qualifies buyer budgets & schedules verified site visits',
+        avatar: '/images/agent_card_sales.jpg',
+        badgeColor: 'bg-sky-500',
+        icon: MessageSquare,
+      },
+      {
+        name: 'Contract Agent',
+        action: 'drafts builder-buyer & channel partner agreements',
+        avatar: '/images/agent_card_legal.jpg',
+        badgeColor: 'bg-purple-500',
+        icon: ShieldCheck,
+      },
+      {
+        name: 'Tax Agent',
+        action: 'calculates TDS on immovable property & GST splits',
+        avatar: '/images/agent_card_gst.jpg',
+        badgeColor: 'bg-emerald-500',
+        icon: Receipt,
+      },
+      {
+        name: 'Commission Agent',
+        action: 'tracks broker payouts & transaction milestones',
+        avatar: '/images/agent_card_finance.jpg',
+        badgeColor: 'bg-indigo-500',
+        icon: TrendingUp,
+      },
+    ],
+    ctaText: 'Explore Real Estate Solution',
+    ctaLink: '/use-cases?industry=real_estate',
   },
   {
-    id: 'legal-workflow',
-    badge: 'Contracts & E-Sign',
-    title: 'Agreements & Model NDAs',
-    subtitle: 'Generates IT Act compliant commercial agreements, shoots NDAs, and collects legally binding e-signatures.',
-    image: '/images/agent_card_legal.jpg',
-    iconBg: 'bg-purple-600',
-    Icon: ShieldCheck,
-    tags: ['Commercial Terms', '50% Advance Clause', 'E-Signature'],
+    id: 'production',
+    tabLabel: 'Production & Events',
+    headline: 'Orchestrate 50+ crew call-sheets',
+    headlineAccent: 'in one command',
+    description: 'Manage high-stakes event schedules, equipment rental agreements, vendor advances, and multi-location shoot logistics without missing a single detail.',
+    replaces: ['Google Sheets', 'Monday.com', 'Razorpay', 'WhatsApp'],
+    features: [
+      'Generate personalized call-sheets for 50+ crew members in seconds',
+      'Manage vendor payouts, GST TDS deductions, and rental holds',
+      'Real-time weather & location permit checklist tracking',
+      'Automated SMS & WhatsApp call-time broadcasts with read receipts',
+    ],
+    agents: [
+      {
+        name: 'Call-Sheet Agent',
+        action: 'dispatches custom call-times & location maps to crew',
+        avatar: '/images/agent_card_calendar.jpg',
+        badgeColor: 'bg-yellow-500',
+        icon: Calendar,
+      },
+      {
+        name: 'Vendor Agent',
+        action: 'manages equipment release NDAs & security deposits',
+        avatar: '/images/agent_card_legal.jpg',
+        badgeColor: 'bg-purple-500',
+        icon: ShieldCheck,
+      },
+      {
+        name: 'Payout Agent',
+        action: 'reconciles vendor invoices & generates instant UPI QR',
+        avatar: '/images/agent_card_gst.jpg',
+        badgeColor: 'bg-emerald-500',
+        icon: Receipt,
+      },
+      {
+        name: 'Budget Agent',
+        action: 'tracks day-wise production burn rate in real time',
+        avatar: '/images/agent_card_finance.jpg',
+        badgeColor: 'bg-indigo-500',
+        icon: TrendingUp,
+      },
+    ],
+    ctaText: 'Explore Production Solution',
+    ctaLink: '/use-cases?industry=production_events',
   },
   {
-    id: 'calendar-workflow',
-    badge: 'Shoot Bookings',
-    title: 'Call-Sheets & Slot Holds',
-    subtitle: 'Schedules production slots, sends automated WhatsApp call-time reminders, and locks studio hold dates.',
-    image: '/images/agent_card_calendar.jpg',
-    iconBg: 'bg-yellow-600',
-    Icon: Calendar,
-    tags: ['Hold Protection', 'Crew Dispatch', 'Call-Sheets'],
-  },
-  {
-    id: 'finance-workflow',
-    badge: 'Cash Flow & Accounts',
-    title: 'Revenue & Tax Summary',
-    subtitle: 'Live daily revenue tracking, outstanding client balances, and CA-ready ledger export in one tap.',
-    image: '/images/agent_card_finance.jpg',
-    iconBg: 'bg-indigo-600',
-    Icon: TrendingUp,
-    tags: ['Live Ledger', 'CA-Ready Export', 'Balance Alerts'],
+    id: 'freelancers',
+    tabLabel: 'Solo Creators & Consultants',
+    headline: 'Run a 7-figure creative studio',
+    headlineAccent: 'as a one-person army',
+    description: 'Stop spending half your week on paperwork. Let Cora handle client inquiries, send professional quotes, collect advance payments, and file your GST.',
+    replaces: ['7 Subscriptions', '₹15,000/mo in software bills'],
+    features: [
+      'Professional branded client portal with instant UPI checkout',
+      'Pre-built Indian commercial contract templates with advance terms',
+      'Auto-remind late-paying clients with gentle WhatsApp follow-ups',
+      'Free forever plan with 15 monthly invoices & full AI chat',
+    ],
+    agents: [
+      {
+        name: 'Sales Assistant',
+        action: 'responds to client inquiries 24/7 with approved rate card',
+        avatar: '/images/agent_card_sales.jpg',
+        badgeColor: 'bg-sky-500',
+        icon: MessageSquare,
+      },
+      {
+        name: 'Agreement Clerk',
+        action: 'generates 1-click e-signature links for every new project',
+        avatar: '/images/agent_card_legal.jpg',
+        badgeColor: 'bg-purple-500',
+        icon: ShieldCheck,
+      },
+      {
+        name: 'Invoice Clerk',
+        action: 'outputs 18% GST bills & tracks payment receipts',
+        avatar: '/images/agent_card_gst.jpg',
+        badgeColor: 'bg-emerald-500',
+        icon: Receipt,
+      },
+      {
+        name: 'Accounts Clerk',
+        action: 'maintains monthly profit, loss, and tax liability',
+        avatar: '/images/agent_card_finance.jpg',
+        badgeColor: 'bg-indigo-500',
+        icon: TrendingUp,
+      },
+    ],
+    ctaText: 'Start Free Workspace',
+    ctaLink: '/workspace/login',
   },
 ];
 
 export function PlatformLifecycleSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const track = trackRef.current;
-    if (!container || !track) return;
-
-    const ctx = gsap.context(() => {
-      const getScrollAmount = () => {
-        return track.scrollWidth - window.innerWidth + (window.innerWidth < 768 ? 60 : 160);
-      };
-
-      const tween = gsap.to(track, {
-        x: () => -getScrollAmount(),
-        ease: 'none',
-      });
-
-      ScrollTrigger.create({
-        trigger: container,
-        start: 'top top',
-        end: () => `+=${getScrollAmount() * 1.3}`,
-        pin: true,
-        animation: tween,
-        scrub: 1,
-        invalidateOnRefresh: true,
-      });
-
-      // Parallax Card Tilt & Depth
-      gsap.utils.toArray<HTMLElement>('.cora-parallax-card').forEach((card) => {
-        gsap.fromTo(
-          card,
-          { scale: 0.95, opacity: 0.8 },
-          {
-            scale: 1,
-            opacity: 1,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: card,
-              containerAnimation: tween,
-              start: 'left 90%',
-              end: 'center center',
-              scrub: true,
-            },
-          }
-        );
-      });
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
+  const [activeTab, setActiveTab] = useState<string>('projects');
+  const currentSolution = solutionsData.find((s) => s.id === activeTab) || solutionsData[0];
 
   return (
     <section
       id="how-it-works"
-      ref={containerRef}
-      className="bg-[#FAFAFA] relative z-10 overflow-hidden border-b border-zinc-200/60 min-h-screen flex flex-col justify-center py-12 sm:py-16"
+      className="py-20 sm:py-28 bg-[#FFFFFF] relative z-10 overflow-hidden border-b border-zinc-100"
     >
-      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 mb-8 sm:mb-12">
-        {/* ── Section Header ── */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="max-w-[720px]">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold uppercase tracking-wider mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-              <span>Modular Workflows</span>
-            </div>
-            <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em]">
-              One chat bar. <br className="hidden sm:inline" />
-              Every business task.
-            </h2>
-          </div>
-          <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[420px]">
-            Scroll horizontally through unified workflows running your client briefs, 18% GST billing, legal NDAs, and financial ledger.
+      <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
+        
+        {/* ── 1. Section Header ── */}
+        <div className="max-w-[800px] mx-auto text-center mb-10 sm:mb-12">
+          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[52px] font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em] mb-4">
+            AI solutions for every <span className="text-zinc-400 font-semibold">team</span>
+          </h2>
+          <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[560px] mx-auto">
+            Your key workflows, automated by specialized Cora co-founders.
           </p>
         </div>
-      </div>
 
-      {/* ── Horizontal Scrolling Card Track ── */}
-      <div className="w-full overflow-visible">
-        <div
-          ref={trackRef}
-          className="flex items-center gap-6 sm:gap-8 px-4 sm:px-8 w-max will-change-transform"
-        >
-          {workflowCards.map((card) => {
-            const Icon = card.Icon;
+        {/* ── 2. Filter Pills / Industry Tabs (ClickUp Style) ── */}
+        <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-2.5 overflow-x-auto pb-4 sm:pb-0 mb-10 sm:mb-14 scrollbar-none select-none">
+          {solutionsData.map((item) => {
+            const isActive = item.id === activeTab;
             return (
-              <div
-                key={card.id}
-                className="cora-parallax-card group relative w-[300px] sm:w-[350px] md:w-[380px] h-[480px] sm:h-[530px] rounded-[36px] overflow-hidden shadow-[0px_16px_40px_rgba(0,0,0,0.08)] border border-zinc-200/80 bg-white shrink-0 flex flex-col justify-between p-6 sm:p-7 transition-all duration-300 hover:shadow-[0px_24px_50px_rgba(0,0,0,0.12)] cursor-pointer"
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                type="button"
+                className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold tracking-tight whitespace-nowrap transition-all duration-200 cursor-pointer ${
+                  isActive
+                    ? 'bg-transparent text-sky-600 border-2 border-sky-500 shadow-xs'
+                    : 'bg-transparent text-zinc-600 border border-dashed border-zinc-300 hover:text-zinc-950 hover:border-zinc-400'
+                }`}
               >
-                {/* Full-bleed Portrait Image */}
-                <Image
-                  src={card.image}
-                  alt={card.title}
-                  fill
-                  className="absolute inset-0 object-cover -z-10 group-hover:scale-105 transition-transform duration-700 ease-out"
-                  sizes="(max-width: 768px) 300px, 380px"
-                  priority
-                />
-
-                {/* Top Badge (Clean Category Label, Zero "Agent" Buzzword) */}
-                <div className="relative z-10 flex items-center justify-start">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-white/90 shadow-[0px_4px_16px_rgba(0,0,0,0.08)]">
-                    <div className={`w-5 h-5 rounded-full ${card.iconBg} text-white flex items-center justify-center`}>
-                      <Icon className="w-2.5 h-2.5" />
-                    </div>
-                    <span className="text-xs sm:text-sm font-bold text-zinc-950 tracking-tight">
-                      {card.badge}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Bottom Content & Floating Action Button */}
-                <div className="relative z-10 space-y-3">
-                  {/* Frosted Glass Information Pill */}
-                  <div className="bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-white/90 shadow-[0px_8px_24px_rgba(0,0,0,0.08)] space-y-1.5 transition-transform duration-300 group-hover:-translate-y-1">
-                    <h3 className="text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
-                      {card.title}
-                    </h3>
-                    <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed line-clamp-2">
-                      {card.subtitle}
-                    </p>
-                    <div className="pt-2 flex items-center gap-1.5 flex-wrap">
-                      {card.tags.map((tag, tIdx) => (
-                        <span
-                          key={tIdx}
-                          className="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[10px] font-semibold"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Clean Bottom Action Row */}
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-xs font-semibold text-zinc-900 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-2xs">
-                      Explore Workflow &rarr;
-                    </span>
-                    <button
-                      type="button"
-                      aria-label={`Learn more about ${card.title}`}
-                      className="w-10 h-10 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform duration-200"
-                    >
-                      <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
-                    </button>
-                  </div>
-                </div>
-
-              </div>
+                {item.tabLabel}
+              </button>
             );
           })}
-
-          {/* ── End Card: Explore All Capabilities CTA ── */}
-          <div className="cora-parallax-card w-[280px] sm:w-[320px] h-[480px] sm:h-[530px] rounded-[36px] bg-zinc-950 text-white shrink-0 flex flex-col justify-between p-7 shadow-xl border border-zinc-800 relative overflow-hidden">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-2xl bg-zinc-800 text-white flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-indigo-400" />
-              </div>
-              <h3 className="font-display text-2xl font-bold text-white pt-2">
-                40+ Built-in Business Workflows
-              </h3>
-              <p className="text-zinc-400 text-xs leading-relaxed">
-                Connect your WhatsApp, bank account, and client rate cards in under 2 minutes.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <a
-                href="/workspace/login"
-                className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-white text-zinc-950 font-bold text-sm hover:bg-zinc-100 transition-colors shadow-sm"
-              >
-                <span>Start Free Trial</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-              <p className="text-[10px] text-zinc-500 text-center">
-                No credit card required &bull; Free forever tier
-              </p>
-            </div>
-          </div>
-
         </div>
+
+        {/* ── 3. Main Showcase Card (Matching Reference 1:1) ── */}
+        <div className="bg-[#F7F7F8] rounded-[36px] p-6 sm:p-10 lg:p-14 border border-zinc-200/80 shadow-[0px_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            
+            {/* Left Column: Solution Headline, Replaces & Features */}
+            <div className="lg:col-span-6 space-y-6">
+              <div>
+                <h3 className="font-display text-3xl sm:text-4xl lg:text-[42px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em]">
+                  {currentSolution.headline} <br />
+                  <span className="text-zinc-400 font-semibold">{currentSolution.headlineAccent}</span>
+                </h3>
+                <p className="text-zinc-600 text-sm sm:text-base leading-relaxed mt-4">
+                  {currentSolution.description}
+                </p>
+              </div>
+
+              {/* Replaces Badges */}
+              <div className="flex items-center gap-2 flex-wrap pt-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                  REPLACES
+                </span>
+                {currentSolution.replaces.map((app, rIdx) => (
+                  <span
+                    key={rIdx}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-zinc-200/80 text-zinc-700 text-xs font-semibold shadow-2xs"
+                  >
+                    {app}
+                  </span>
+                ))}
+              </div>
+
+              {/* Bullet Checklist */}
+              <div className="space-y-3 pt-2">
+                {currentSolution.features.map((feat, fIdx) => (
+                  <div key={fIdx} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-700 font-medium">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
+                    <span>{feat}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column: Stack of 4 Specialized Co-Founders / Agents */}
+            <div className="lg:col-span-6 space-y-3.5">
+              {currentSolution.agents.map((agent, aIdx) => (
+                <div
+                  key={aIdx}
+                  className="bg-white rounded-2xl p-4 sm:p-4.5 border border-zinc-200/80 shadow-[0px_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md hover:border-zinc-300 transition-all duration-200 flex items-center justify-between gap-3 group cursor-pointer"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border border-zinc-200 shadow-2xs">
+                      <Image
+                        src={agent.avatar}
+                        alt={agent.name}
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-white flex items-center justify-center">
+                        <span className={`w-2 h-2 rounded-full ${agent.badgeColor}`} />
+                      </div>
+                    </div>
+
+                    <div className="text-xs sm:text-sm truncate">
+                      <span className="font-bold text-zinc-950">{agent.name}</span>{' '}
+                      <span className="text-zinc-600 font-normal">{agent.action}</span>
+                    </div>
+                  </div>
+
+                  <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-950 group-hover:translate-x-0.5 transition-all shrink-0" />
+                </div>
+              ))}
+
+              {/* Bottom Action Button (Explore Solution) */}
+              <div className="pt-3">
+                <a
+                  href={currentSolution.ctaLink}
+                  className="inline-flex items-center gap-2 bg-zinc-950 text-white hover:bg-zinc-800 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition-all hover:-translate-y-0.5"
+                >
+                  <span>{currentSolution.ctaText}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </section>
   );
