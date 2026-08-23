@@ -1,13 +1,10 @@
 import { Hero } from '@/components/hero/Hero';
 import { BrandTicker } from '@/components/social/BrandTicker';
-import { FounderValueShowcase } from '@/components/founder-showcase/FounderValueShowcase';
-import { ValueTransformationSection } from '@/components/value-transformation/ValueTransformationSection';
 import { HorizontalModuleDeck } from '@/components/modules/HorizontalModuleDeck';
 import { PlatformLifecycleSection } from '@/components/lifecycle/PlatformLifecycleSection';
 import { IntegrationsWaveSection } from '@/components/integrations/IntegrationsWaveSection';
 import { IndustryGridSection } from '@/components/industry-grid/IndustryGridSection';
 import { ExecutiveConfidenceSection } from '@/components/features-grid/ExecutiveConfidenceSection';
-import { CommunityStoriesSection } from '@/components/community/CommunityStoriesSection';
 import { MobilePwaSection } from '@/components/mobile-app/MobilePwaSection';
 import { PricingSection } from '@/components/pricing/PricingSection';
 import { ToolsBanner } from '@/components/tools/ToolsBanner';
@@ -23,43 +20,34 @@ export default function HomePage() {
       {/* 2. Infinite Logo Marquee with Centered Line Badge */}
       <BrandTicker />
 
-      {/* 3. Native Dual-Interface Architecture (Customer Website + Admin Workspace) */}
-      <FounderValueShowcase />
-
-      {/* 4. Value Transformation (From WhatsApp Threads to Automated Revenue) */}
-      <ValueTransformationSection />
-
-      {/* 5. Pinned Horizontal Parallax Module Deck (One Chat Bar. Every Business Task.) */}
+      {/* 3. Pinned Horizontal Parallax Module Deck (One Chat Bar. Every Business Task.) */}
       <HorizontalModuleDeck />
 
-      {/* 6. AI Co-Founder for Every Business (Interactive Industry Showcase) */}
+      {/* 4. AI Co-Founder for Every Business (Interactive Industry Showcase) */}
       <PlatformLifecycleSection />
 
-      {/* 7. Integrations — Dual Flowing Wave with Central Cora Emblem */}
+      {/* 5. Integrations — Dual Flowing Wave with Central Cora Emblem */}
       <IntegrationsWaveSection />
 
-      {/* 8. 12-Industry Directory Grid (Every Industry, One Platform) */}
+      {/* 6. 12-Industry Directory Grid (Every Industry, One Platform) */}
       <IndustryGridSection />
 
-      {/* 9. Plus, Everything You Need to Lead with Confidence (6-Feature Executive Grid) */}
+      {/* 7. Plus, Everything You Need to Lead with Confidence (6-Feature Executive Grid) */}
       <ExecutiveConfidenceSection />
 
-      {/* 10. Learn More About Service Business Engineering (Clay-Style Bento Community Hub) */}
-      <CommunityStoriesSection />
-
-      {/* 11. PWA Mobile App — Run Your Studio On The Go */}
+      {/* 8. PWA Mobile App — Run Your Studio On The Go */}
       <MobilePwaSection />
 
-      {/* 12. Commercial Pricing Matrix & Live FX Toggle */}
+      {/* 9. Commercial Pricing Matrix & Live FX Toggle */}
       <PricingSection />
 
-      {/* 13. Free Public Micro-Tools Directory Banner */}
+      {/* 10. Free Public Micro-Tools Directory Banner */}
       <ToolsBanner />
 
-      {/* 14. Customer Testimonials & Social Proof */}
+      {/* 11. Customer Testimonials & Social Proof */}
       <TestimonialsSection />
 
-      {/* 15. SEO & Schema-Linked FAQ Accordion */}
+      {/* 12. SEO & Schema-Linked FAQ Accordion */}
       <FAQSection />
     </main>
   );
