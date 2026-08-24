@@ -698,42 +698,7 @@ export default function AiAgentPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 4: [INFINITE SKILLS] 100+ CAPABILITIES TEAM SHOWCASE
-      ───────────────────────────────────────────────────────────── */}
-      <section id="skills-constellation" className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
-        <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
-          
-          {/* Section Header */}
-          <div className="max-w-[760px] mx-auto text-center mb-10 sm:mb-14 space-y-3">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-indigo-600 block">
-              [ INFINITE SKILLS ]
-            </span>
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-[46px] font-bold text-zinc-950 tracking-tight leading-[1.12]">
-              One team. Hundreds of skills.
-            </h2>
-            <p className="text-zinc-600 text-sm sm:text-base max-w-[620px] mx-auto leading-relaxed">
-              From client brief intake and 18% GST tax invoices to SHA-256 NDAs and studio hold scheduling &mdash; your AI agent team handles every complex workflow across your commercial studio.
-            </p>
-          </div>
-
-          {/* Reference Showcase Visual Banner Card */}
-          <div className="relative w-full rounded-[32px] sm:rounded-[44px] overflow-hidden border border-zinc-200/90 shadow-xl bg-gradient-to-r from-[#4C1D95] via-[#7C3AED] via-45% to-[#EA580C] group">
-            <div className="relative w-full aspect-[16/10.5] sm:aspect-[16/9.8] lg:aspect-[16/9] overflow-hidden">
-              <Image
-                src="/images/cora_agents_skills_team.jpg"
-                alt="Cora AI Super Agents Team with Infinite Skills"
-                fill
-                priority
-                className="object-cover object-center group-hover:scale-[1.01] transition-transform duration-700"
-              />
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          SECTION 5: [HUMAN SKILLS] INTERACTIVE WORKSPACE LIVE DEMO
+          SECTION 4: [HUMAN SKILLS] INTERACTIVE WORKSPACE LIVE DEMO
       ───────────────────────────────────────────────────────────── */}
       <section id="human-skills" className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
@@ -1128,6 +1093,41 @@ export default function AiAgentPage() {
                 </div>
               );
             })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 7: [INFINITE SKILLS] 100+ CAPABILITIES TEAM SHOWCASE (AFTER FAQS)
+      ───────────────────────────────────────────────────────────── */}
+      <section id="skills-constellation" className="py-20 sm:py-28 bg-white relative z-10 border-t border-zinc-100">
+        <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
+          
+          {/* Section Header */}
+          <div className="max-w-[760px] mx-auto text-center mb-10 sm:mb-14 space-y-3">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-indigo-600 block">
+              [ INFINITE SKILLS ]
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-[46px] font-bold text-zinc-950 tracking-tight leading-[1.12]">
+              One team. Hundreds of skills.
+            </h2>
+            <p className="text-zinc-600 text-sm sm:text-base max-w-[620px] mx-auto leading-relaxed">
+              From client brief intake and 18% GST tax invoices to SHA-256 NDAs and studio hold scheduling &mdash; your AI agent team handles every complex workflow across your commercial studio.
+            </p>
+          </div>
+
+          {/* Reference Showcase Visual Banner Card with object-cover */}
+          <div className="relative w-full rounded-[32px] sm:rounded-[44px] overflow-hidden border border-zinc-200/90 shadow-xl bg-gradient-to-r from-[#4C1D95] via-[#7C3AED] via-45% to-[#EA580C] group">
+            <div className="relative w-full h-[320px] xs:h-[380px] sm:h-[480px] md:h-[560px] lg:h-[680px]">
+              <Image
+                src="/images/cora_agents_skills_team.jpg"
+                alt="Cora AI Super Agents Team with Infinite Skills"
+                fill
+                priority
+                className="object-cover object-center group-hover:scale-[1.01] transition-transform duration-700"
+              />
+            </div>
           </div>
 
         </div>
