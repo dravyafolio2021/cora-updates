@@ -475,72 +475,132 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 3: MULTI-AGENT ORCHESTRATION ("One Prompt Spins Up a Team")
       ───────────────────────────────────────────────────────────── */}
-      <section id="orchestration" className="py-14 sm:py-20 bg-[#FAFAFB] relative z-10 border-b border-zinc-100">
+      <section id="orchestration" className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             
-            {/* Left: Interactive Multi-Agent Pipeline Visualization */}
-            <div className="lg:col-span-7 space-y-3 gsap-orchestration-box">
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-zinc-200/90 shadow-sm space-y-4">
+            {/* Left: Interactive Multi-Agent Tree Branching Flowchart */}
+            <div className="lg:col-span-7 gsap-orchestration-box">
+              <div className="relative w-full max-w-[540px] mx-auto bg-[#FAFAFB] sm:bg-white rounded-3xl p-6 sm:p-10 border border-zinc-200/80 shadow-xs flex flex-col items-center justify-center min-h-[480px]">
                 
-                {/* Step 1: Input Prompt */}
-                <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/70 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
-                      ONE CLIENT INQUIRY RECEIVED
-                    </span>
+                {/* SVG Connecting Branch Lines */}
+                <svg
+                  className="absolute inset-0 w-full h-full pointer-events-none stroke-zinc-300"
+                  viewBox="0 0 500 460"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {/* Top Vertical Line into Co-Founder */}
+                  <path d="M 250,0 L 250,26" strokeWidth="1.5" />
+
+                  {/* Branching from Top Co-Founder to 3 Agents */}
+                  <path d="M 250,68 C 250,115 100,115 100,165" strokeWidth="1.5" />
+                  <path d="M 250,68 L 250,140" strokeWidth="1.5" />
+                  <path d="M 250,68 C 250,115 400,115 400,165" strokeWidth="1.5" />
+
+                  {/* Vertical Lines from Agents into Action Pills */}
+                  <path d="M 100,205 L 100,236" strokeWidth="1.5" />
+                  <path d="M 250,180 L 250,210" strokeWidth="1.5" />
+                  <path d="M 400,205 L 400,236" strokeWidth="1.5" />
+
+                  {/* Convergence Lines from Action Pills to Bottom Stem */}
+                  <path d="M 100,274 C 100,340 250,340 250,405" strokeWidth="1.5" />
+                  <path d="M 250,248 L 250,405" strokeWidth="1.5" />
+                  <path d="M 400,274 C 400,340 250,340 250,405" strokeWidth="1.5" />
+
+                  {/* Bottom Vertical Stem */}
+                  <path d="M 250,405 L 250,460" strokeWidth="1.5" />
+                </svg>
+
+                {/* Node 0: Top Central AI Co-Founder Avatar */}
+                <div className="relative z-10 flex flex-col items-center mb-16 sm:mb-20">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-white shadow-md bg-white ring-4 ring-amber-100/80">
+                    <Image
+                      src="/images/cora_hero_indian_agent.jpg"
+                      alt="AI Co-Founder"
+                      width={56}
+                      height={56}
+                      className="object-cover"
+                    />
                   </div>
-                  <p className="text-xs sm:text-sm font-semibold text-zinc-950 font-mono">
-                    &ldquo;Hey Cora, Nike wants 2-day shoot at Studio 4 with 3 models, ₹4.5L budget. Lock it in.&rdquo;
-                  </p>
                 </div>
 
-                {/* Step 2: 4 Specialized Agents Mobilize in Parallel */}
-                <div className="grid grid-cols-2 gap-2.5">
-                  <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl space-y-1">
-                    <div className="text-[10px] font-bold text-amber-800 uppercase">Sales Agent</div>
-                    <div className="text-xs font-semibold text-zinc-900">Qualifies ₹4.5L Scope &amp; Locks Client</div>
+                {/* Nodes 1, 2, 3: 3 Parallel Specialized Agents & Pills */}
+                <div className="relative z-10 w-full grid grid-cols-3 gap-2 sm:gap-4 items-start text-center mb-16 sm:mb-20">
+                  
+                  {/* Left Branch: Marketing / Copywriting */}
+                  <div className="flex flex-col items-center space-y-3">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-white shadow-sm bg-white ring-4 ring-pink-100/90">
+                      <Image
+                        src="/images/cora_agent_marketing.jpg"
+                        alt="Marketing Agent"
+                        width={48}
+                        height={48}
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs text-[11px] sm:text-xs font-semibold text-zinc-800 whitespace-nowrap">
+                      <span className="w-2 h-2 rounded-full bg-sky-500" />
+                      <span>Copywriting</span>
+                    </div>
                   </div>
-                  <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl space-y-1">
-                    <div className="text-[10px] font-bold text-emerald-800 uppercase">Operations Agent</div>
-                    <div className="text-xs font-semibold text-zinc-900">Holds Studio 4 &amp; 12 Crew Call-Sheets</div>
+
+                  {/* Center Branch: Operations / Email Design */}
+                  <div className="flex flex-col items-center space-y-3 -mt-6 sm:-mt-8">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-white shadow-sm bg-white ring-4 ring-purple-100/90">
+                      <Image
+                        src="/images/cora_agent_sales.jpg"
+                        alt="Sales Agent"
+                        width={48}
+                        height={48}
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs text-[11px] sm:text-xs font-semibold text-zinc-800 whitespace-nowrap">
+                      <span className="w-2 h-2 rounded-full bg-amber-500" />
+                      <span>Email Design</span>
+                    </div>
                   </div>
-                  <div className="p-3 bg-indigo-50/70 border border-indigo-200/80 rounded-xl space-y-1">
-                    <div className="text-[10px] font-bold text-indigo-800 uppercase">Finance Agent</div>
-                    <div className="text-xs font-semibold text-zinc-900">₹4.5L + ₹81k GST (Dynamic UPI QR)</div>
+
+                  {/* Right Branch: Legal & Campaign Lifecycle */}
+                  <div className="flex flex-col items-center space-y-3">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-white shadow-sm bg-white ring-4 ring-cyan-100/90">
+                      <Image
+                        src="/images/cora_agent_legal.jpg"
+                        alt="Legal Agent"
+                        width={48}
+                        height={48}
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs text-[11px] sm:text-xs font-semibold text-zinc-800 whitespace-nowrap">
+                      <span className="w-2 h-2 rounded-full bg-purple-500" />
+                      <span>Campaign lifecycle</span>
+                    </div>
                   </div>
-                  <div className="p-3 bg-purple-50/70 border border-purple-200/80 rounded-xl space-y-1">
-                    <div className="text-[10px] font-bold text-purple-800 uppercase">Legal Agent</div>
-                    <div className="text-xs font-semibold text-zinc-900">Commercial Usage NDA &bull; SHA-256 Hash</div>
-                  </div>
+
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-zinc-500 pt-1">
-                  <span>Execution Time: <strong className="text-zinc-950 font-bold">1.2 seconds</strong></span>
-                  <span className="text-emerald-700 font-bold">✓ 4 Agents Synchronized</span>
-                </div>
               </div>
             </div>
 
             {/* Right: Narrative */}
-            <div className="lg:col-span-5 space-y-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 block">
-                [ ORCHESTRATION IN MINUTES ]
+            <div className="lg:col-span-5 space-y-5">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-indigo-600 block">
+                AGENTS IN MINUTES
               </span>
-              <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 leading-tight">
-                One prompt spins up an entire autonomous team
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-[44px] font-bold text-zinc-950 leading-[1.1] tracking-tight">
+                One prompt spins up an entire team
               </h2>
-              <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
-                Your AI Co-Founder instantly delegates marketing, sales, studio scheduling, and finance billing to specialized agents without bottlenecks.
+              <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
+                Your goals, workflows, and frustrations &mdash; automatically delegated to a team of agents.
               </p>
               <div className="pt-2">
                 <Link
                   href="/workspace/login"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 text-xs sm:text-sm font-semibold shadow-sm transition-all"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 text-sm font-bold shadow-sm transition-all hover:-translate-y-0.5"
                 >
-                  <span>Explore Multi-Agent Workspace</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>Explore all agents</span>
                 </Link>
               </div>
             </div>
