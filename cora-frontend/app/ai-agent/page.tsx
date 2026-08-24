@@ -342,10 +342,9 @@ export default function AiAgentPage() {
           
           {/* Top Eyebrow */}
           <div className="text-center mb-3 gsap-hero-fade">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-zinc-950 text-white rounded-full text-xs font-semibold uppercase tracking-widest shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>CORA AI CO-FOUNDERS&trade;</span>
-            </div>
+            <span className="text-xs font-bold uppercase tracking-widest text-zinc-400">
+              [ AI CO-FOUNDERS™ ]
+            </span>
           </div>
 
           {/* Main Hero Headline */}
