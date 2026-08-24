@@ -57,57 +57,42 @@ const superpowers: TagItem[] = [
   { id: 'self-learning', label: 'Self-Learning', desc: 'Every booking, client brief, and feedback signal refines your co-founder’s pricing accuracy and execution speed.' },
 ];
 
-// ── 2. Carousel Co-Founders Data ──
-const cofoundersList = [
+// ── 2. Carousel AI Agents Data (Broad Functional Roles & Indian Portraits) ──
+const aiAgentsList = [
   {
-    id: 'pm',
-    title: 'Intake & PM Co-Founder',
-    role: 'Standardizes WhatsApp briefs & locks hold dates',
-    color: '#FDEDE7',
-    tagColor: 'text-amber-700 bg-amber-100',
-    avatar: '/images/agent_card_pm.jpg',
-    action: 'Standardize Brief',
-    stat: '0.8s Response',
+    id: 'marketing',
+    title: 'Marketing Agent',
+    role: 'Campaigns, brand reach & content',
+    avatar: '/images/cora_agent_marketing.jpg',
+    action: 'Deploy Campaigns',
   },
   {
     id: 'sales',
-    title: 'Sales & WhatsApp Concierge',
-    role: '24/7 client booking, rate card quotes & holds',
-    color: '#EDF6FD',
-    tagColor: 'text-sky-700 bg-sky-100',
-    avatar: '/images/agent_card_sales.jpg',
-    action: 'Instant Quote',
-    stat: '100% Lead Capture',
+    title: 'Sales Agent',
+    role: '24/7 lead capture & client booking',
+    avatar: '/images/cora_agent_sales.jpg',
+    action: 'Capture Leads',
   },
   {
-    id: 'gst',
-    title: '18% GST & Billing Co-Founder',
-    role: 'Instant CGST/SGST split & dynamic UPI QR',
-    color: '#EDFDED',
-    tagColor: 'text-emerald-700 bg-emerald-100',
-    avatar: '/images/agent_card_gst.jpg',
-    action: 'Generate Invoice',
-    stat: 'GSTR-1 Ready',
+    id: 'operations',
+    title: 'Operations Agent',
+    role: 'Studio schedules, holds & crew',
+    avatar: '/images/cora_agent_operations.jpg',
+    action: 'Manage Studio',
+  },
+  {
+    id: 'finance',
+    title: 'Finance Agent',
+    role: '18% GST billing & cash flow',
+    avatar: '/images/cora_agent_finance.jpg',
+    action: 'Reconcile Ledger',
   },
   {
     id: 'legal',
-    title: 'Legal & E-Sign Co-Founder',
-    role: 'Commercial NDAs & SHA-256 digital seals',
-    color: '#EFEDFD',
-    tagColor: 'text-purple-700 bg-purple-100',
-    avatar: '/images/agent_card_legal.jpg',
-    action: 'Draft Agreement',
-    stat: 'IT Act Valid',
-  },
-  {
-    id: 'ledger',
-    title: 'Finance & Ledger Co-Founder',
-    role: 'Reconciles UPI advances & exports to Tally/CA',
-    color: '#EAE8FE',
-    tagColor: 'text-indigo-700 bg-indigo-100',
-    avatar: '/images/agent_card_finance.jpg',
-    action: 'Reconcile Cash Flow',
-    stat: '1-Tap CA Sync',
+    title: 'Legal Agent',
+    role: 'NDAs, usage rights & contracts',
+    avatar: '/images/cora_agent_legal.jpg',
+    action: 'Draft Agreements',
   },
 ];
 
@@ -198,9 +183,9 @@ export default function AiAgentPage() {
 
   const scrollCarousel = (direction: 'left' | 'right') => {
     if (direction === 'left') {
-      setActiveCarouselIndex((prev) => (prev > 0 ? prev - 1 : cofoundersList.length - 1));
+      setActiveCarouselIndex((prev) => (prev > 0 ? prev - 1 : aiAgentsList.length - 1));
     } else {
-      setActiveCarouselIndex((prev) => (prev < cofoundersList.length - 1 ? prev + 1 : 0));
+      setActiveCarouselIndex((prev) => (prev < aiAgentsList.length - 1 ? prev + 1 : 0));
     }
   };
 
@@ -389,7 +374,7 @@ export default function AiAgentPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 2: [CAPABILITIES] CO-FOUNDER CAROUSEL DECK
+          SECTION 2: [CAPABILITIES] AI AGENTS CAROUSEL DECK
       ───────────────────────────────────────────────────────────── */}
       <section id="capabilities" className="py-14 sm:py-20 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
@@ -401,25 +386,25 @@ export default function AiAgentPage() {
                 [ CAPABILITIES ]
               </span>
               <h2 className="font-display text-2xl sm:text-4xl lg:text-[44px] font-bold text-zinc-950 tracking-tight">
-                Co-Founders for everything
+                Agents for everything
               </h2>
             </div>
             <div className="flex items-center gap-3">
-              <p className="text-zinc-600 text-xs sm:text-sm max-w-[360px] hidden md:block">
-                Autonomous co-founders tailored for commercial studios, creative agencies &amp; solo founders.
+              <p className="text-zinc-600 text-xs sm:text-sm max-w-[380px] hidden md:block">
+                Your AI Co-Founder commands specialized autonomous agents across marketing, sales, operations, finance &amp; legal.
               </p>
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => scrollCarousel('left')}
                   className="w-9 h-9 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 text-zinc-800 transition-colors cursor-pointer"
-                  aria-label="Previous co-founder"
+                  aria-label="Previous agent"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => scrollCarousel('right')}
                   className="w-9 h-9 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 text-zinc-800 transition-colors cursor-pointer"
-                  aria-label="Next co-founder"
+                  aria-label="Next agent"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -427,49 +412,57 @@ export default function AiAgentPage() {
             </div>
           </div>
 
-          {/* Cards Carousel Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {cofoundersList.map((card, idx) => {
+          {/* Cards Carousel Grid: Image Background with Single-Line Text */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {aiAgentsList.map((card, idx) => {
               const isCurrent = idx === activeCarouselIndex;
               return (
                 <div
                   key={card.id}
                   onClick={() => setActiveCarouselIndex(idx)}
-                  className={`gsap-capability-card rounded-3xl p-5 border transition-all duration-300 flex flex-col justify-between h-[410px] cursor-pointer relative overflow-hidden group ${
+                  className={`gsap-capability-card rounded-3xl overflow-hidden h-[410px] sm:h-[430px] cursor-pointer relative group transition-all duration-300 flex flex-col justify-between p-5 ${
                     isCurrent
-                      ? 'ring-2 ring-zinc-950 border-transparent shadow-xl'
-                      : 'hover:shadow-md border-zinc-200/80 bg-zinc-50/50'
+                      ? 'ring-2 ring-zinc-950 shadow-2xl scale-[1.02]'
+                      : 'border border-zinc-200/90 shadow-2xs hover:shadow-md hover:scale-[1.01]'
                   }`}
-                  style={{ backgroundColor: isCurrent ? card.color : undefined }}
                 >
-                  <div>
-                    <div className="flex items-center justify-between mb-2.5">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${card.tagColor}`}>
-                        {card.stat}
+                  {/* Full Background Image */}
+                  <Image
+                    src={card.avatar}
+                    alt={card.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                    priority={idx < 2}
+                  />
+
+                  {/* Gradient Dark Overlay for Legibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
+
+                  {/* Top: Index Indicator */}
+                  <div className="relative z-10 flex items-center justify-between">
+                    <span className="text-[11px] font-mono font-bold text-white/90 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/15">
+                      0{idx + 1}
+                    </span>
+                    {isCurrent && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                        Active
                       </span>
-                      <span className="text-xs font-mono font-bold text-zinc-400">0{idx + 1}</span>
-                    </div>
-                    <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 leading-snug mb-1">
+                    )}
+                  </div>
+
+                  {/* Bottom: Single-Line Title & Description */}
+                  <div className="relative z-10 space-y-1">
+                    <h3 className="font-display text-lg font-bold text-white leading-tight truncate">
                       {card.title}
                     </h3>
-                    <p className="text-zinc-600 text-xs leading-relaxed line-clamp-2">
+                    <p className="text-zinc-300 text-xs leading-snug line-clamp-1">
                       {card.role}
                     </p>
-                  </div>
-
-                  {/* Character Avatar with Parallax Frame */}
-                  <div className="relative w-full h-[170px] rounded-2xl overflow-hidden my-2 border border-zinc-200/60 bg-white shadow-2xs">
-                    <Image
-                      src={card.avatar}
-                      alt={card.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-
-                  <div className="pt-2 border-t border-zinc-200/60 flex items-center justify-between text-xs font-semibold text-zinc-800">
-                    <span>{card.action}</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <div className="pt-2 flex items-center justify-between text-xs font-semibold text-white/95 border-t border-white/15">
+                      <span>{card.action}</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
                 </div>
               );
@@ -503,29 +496,29 @@ export default function AiAgentPage() {
                   </p>
                 </div>
 
-                {/* Step 2: 4 Co-Founders Mobilize in Parallel */}
+                {/* Step 2: 4 Specialized Agents Mobilize in Parallel */}
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl space-y-1">
-                    <div className="text-[10px] font-bold text-amber-800 uppercase">Intake Co-Founder</div>
-                    <div className="text-xs font-semibold text-zinc-900">Hold Oct 24-25 Locked in Studio 4</div>
+                    <div className="text-[10px] font-bold text-amber-800 uppercase">Sales Agent</div>
+                    <div className="text-xs font-semibold text-zinc-900">Qualifies ₹4.5L Scope &amp; Locks Client</div>
                   </div>
                   <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl space-y-1">
-                    <div className="text-[10px] font-bold text-emerald-800 uppercase">18% GST Co-Founder</div>
+                    <div className="text-[10px] font-bold text-emerald-800 uppercase">Operations Agent</div>
+                    <div className="text-xs font-semibold text-zinc-900">Holds Studio 4 &amp; 12 Crew Call-Sheets</div>
+                  </div>
+                  <div className="p-3 bg-indigo-50/70 border border-indigo-200/80 rounded-xl space-y-1">
+                    <div className="text-[10px] font-bold text-indigo-800 uppercase">Finance Agent</div>
                     <div className="text-xs font-semibold text-zinc-900">₹4.5L + ₹81k GST (Dynamic UPI QR)</div>
                   </div>
                   <div className="p-3 bg-purple-50/70 border border-purple-200/80 rounded-xl space-y-1">
-                    <div className="text-[10px] font-bold text-purple-800 uppercase">Legal Co-Founder</div>
+                    <div className="text-[10px] font-bold text-purple-800 uppercase">Legal Agent</div>
                     <div className="text-xs font-semibold text-zinc-900">Commercial Usage NDA &bull; SHA-256 Hash</div>
-                  </div>
-                  <div className="p-3 bg-indigo-50/70 border border-indigo-200/80 rounded-xl space-y-1">
-                    <div className="text-[10px] font-bold text-indigo-800 uppercase">Call-Sheet Co-Founder</div>
-                    <div className="text-xs font-semibold text-zinc-900">12 Crew Call-Sheets Ready to Dispatch</div>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-zinc-500 pt-1">
                   <span>Execution Time: <strong className="text-zinc-950 font-bold">1.2 seconds</strong></span>
-                  <span className="text-emerald-700 font-bold">✓ 4 Co-Founders Synchronized</span>
+                  <span className="text-emerald-700 font-bold">✓ 4 Agents Synchronized</span>
                 </div>
               </div>
             </div>
@@ -539,7 +532,7 @@ export default function AiAgentPage() {
                 One prompt spins up an entire autonomous team
               </h2>
               <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
-                Your goals, booking holds, and billing frustration &mdash; automatically delegated to specialized co-founders who work together without human bottlenecks.
+                Your AI Co-Founder instantly delegates marketing, sales, studio scheduling, and finance billing to specialized agents without bottlenecks.
               </p>
               <div className="pt-2">
                 <Link
