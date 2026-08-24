@@ -693,7 +693,7 @@ export default function AiAgentPage() {
                 now happens in <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent font-extrabold">seconds</span>.
               </h3>
 
-              <div className="font-display font-extrabold text-5xl sm:text-7xl lg:text-[88px] text-zinc-950 tracking-tight py-2 font-mono select-none">
+              <div className="font-display font-extrabold text-5xl sm:text-7xl lg:text-[88px] text-zinc-950 tracking-tight py-2 tabular-nums select-none">
                 {liveTasksCount.toLocaleString('en-US')}
               </div>
 
