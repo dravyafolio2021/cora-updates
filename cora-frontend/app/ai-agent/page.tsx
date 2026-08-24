@@ -255,23 +255,24 @@ const humanSkills = [
   },
 ];
 
-// ── Mathematical Equation for Task Growth from 1,000 to 1,000,000 Tasks over 365 Days ──
+// ── Persistent Deterministic Mathematical Equation (Starts from 1,000 RN to 1,000,000 over 365 Days) ──
+const LAUNCH_TIMESTAMP = new Date('2026-08-24T13:30:00Z').getTime(); // Baseline starting point (1,000 tasks)
+const TOTAL_SPAN_MS = 365 * 24 * 60 * 60 * 1000; // 365 days in milliseconds
+
 function computeDynamicTasks(): number {
-  const launchTimestamp = new Date('2026-01-01T00:00:00Z').getTime();
-  const nowTimestamp = Date.now();
-  const elapsedDays = Math.max(0, (nowTimestamp - launchTimestamp) / (86400 * 1000));
-  const totalDays = 365;
-  const progressRatio = Math.min(1.0, elapsedDays / totalDays);
+  const now = Date.now();
+  const elapsedMs = Math.max(0, now - LAUNCH_TIMESTAMP);
+  const progress = Math.min(1.0, elapsedMs / TOTAL_SPAN_MS);
 
-  // S-Curve mathematical growth curve: 1,000 starting baseline scaling organically to 1,000,000
-  const sCurveFactor = 0.15 * progressRatio + 0.85 * Math.pow(progressRatio, 2.2);
-  const baseCalculatedTasks = 1000 + (1000000 - 1000) * sCurveFactor;
+  // S-Curve mathematical growth curve: 1,000 starting baseline scaling organically to 1,000,000 over 365 days
+  const sCurve = 0.15 * progress + 0.85 * Math.pow(progress, 1.85);
+  const calculatedTasks = 1000 + (1000000 - 1000) * sCurve;
 
-  // Intraday diurnal variation based on studio work hours
-  const currentHour = new Date().getHours();
-  const diurnalCycle = 520 * Math.sin((2 * Math.PI * (currentHour - 6)) / 24);
+  // Intraday micro-progress based on current seconds
+  const microSeconds = (elapsedMs % 86400000) / 1000;
+  const dailyPacing = (microSeconds / 86400) * 12;
 
-  return Math.floor(baseCalculatedTasks + diurnalCycle);
+  return Math.floor(calculatedTasks + dailyPacing);
 }
 
 export default function AiAgentPage() {
@@ -281,14 +282,23 @@ export default function AiAgentPage() {
 
   const selectedSkill = humanSkills.find((s) => s.id === activeSkillId) || humanSkills[0];
 
-  // Dynamic live ticker incrementing automatically
+  // Persistent live ticker: dynamically updates with Date.now() and never resets on refresh
   useEffect(() => {
-    setLiveTasksCount(computeDynamicTasks());
+    // Initial mount calculation
+    const baseCount = computeDynamicTasks();
+    const storedOffset = typeof window !== 'undefined' ? parseInt(localStorage.getItem('cora_task_offset') || '0', 10) : 0;
+    setLiveTasksCount(baseCount + storedOffset);
 
     const interval = setInterval(() => {
-      const randomTaskBurst = Math.floor(Math.random() * 3) + 1;
-      setLiveTasksCount((prev) => prev + randomTaskBurst);
-    }, 2600);
+      setLiveTasksCount((prev) => {
+        const nextCount = prev + Math.floor(Math.random() * 2) + 1;
+        if (typeof window !== 'undefined') {
+          const currentBase = computeDynamicTasks();
+          localStorage.setItem('cora_task_offset', String(Math.max(0, nextCount - currentBase)));
+        }
+        return nextCount;
+      });
+    }, 2400);
 
     return () => clearInterval(interval);
   }, []);
@@ -813,26 +823,26 @@ export default function AiAgentPage() {
             {/* Dot Matrix Pattern */}
             <div className="absolute inset-0 bg-[radial-gradient(#e4e4e7_1.2px,transparent_1.2px)] [background-size:20px_20px] pointer-events-none opacity-80" />
 
-            {/* Left Dissolved Indian Female Agent Portrait */}
-            <div className="absolute -left-10 sm:-left-4 top-1/2 -translate-y-1/2 w-[180px] sm:w-[260px] h-[260px] sm:h-[340px] pointer-events-none opacity-90 hidden sm:block">
-              <div className="relative w-full h-full [mask-image:linear-gradient(to_right,black_60%,transparent_100%)]">
+            {/* Left Indian Female AI Agent Team Member */}
+            <div className="absolute -left-6 sm:-left-2 md:left-2 lg:left-6 bottom-0 top-6 sm:top-4 w-[200px] sm:w-[280px] lg:w-[340px] pointer-events-none opacity-90 hidden sm:block">
+              <div className="relative w-full h-full [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
                 <Image
-                  src="/images/cora_hero_indian_agent.png"
-                  alt="Super Agent Female"
+                  src="/images/cora_telemetry_female_agent.png"
+                  alt="Cora Female Super Agent"
                   fill
-                  className="object-contain"
+                  className="object-contain object-bottom"
                 />
               </div>
             </div>
 
-            {/* Right Dissolved Indian Male Agent Portrait */}
-            <div className="absolute -right-10 sm:-right-4 top-1/2 -translate-y-1/2 w-[180px] sm:w-[260px] h-[260px] sm:h-[340px] pointer-events-none opacity-90 hidden sm:block">
-              <div className="relative w-full h-full [mask-image:linear-gradient(to_left,black_60%,transparent_100%)]">
+            {/* Right Indian Male AI Agent Team Member */}
+            <div className="absolute -right-6 sm:-right-2 md:right-2 lg:right-6 bottom-0 top-6 sm:top-4 w-[200px] sm:w-[280px] lg:w-[340px] pointer-events-none opacity-90 hidden sm:block">
+              <div className="relative w-full h-full [mask-image:linear-gradient(to_left,black_70%,transparent_100%)]">
                 <Image
-                  src="/images/cora_agent_telemetry_male.png"
-                  alt="Super Agent Male"
+                  src="/images/cora_telemetry_male_agent.png"
+                  alt="Cora Male Super Agent"
                   fill
-                  className="object-contain"
+                  className="object-contain object-bottom"
                 />
               </div>
             </div>
