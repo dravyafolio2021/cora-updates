@@ -180,22 +180,8 @@ export default function AiAgentPage() {
 
   const mainContainerRef = useRef<HTMLElement>(null);
   const heroActorRef = useRef<HTMLDivElement>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
-
-  const scrollCarousel = (direction: 'left' | 'right') => {
-    if (carouselRef.current) {
-      const scrollAmount = carouselRef.current.clientWidth * 0.75;
-      carouselRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
-    }
-    if (direction === 'left') {
-      setActiveCarouselIndex((prev) => (prev > 0 ? prev - 1 : aiAgentsList.length - 1));
-    } else {
-      setActiveCarouselIndex((prev) => (prev < aiAgentsList.length - 1 ? prev + 1 : 0));
-    }
-  };
+  const capabilitiesSectionRef = useRef<HTMLElement>(null);
+  const cardsTrackRef = useRef<HTMLDivElement>(null);
 
   // ── GSAP ScrollTrigger Animations ──
   useEffect(() => {
@@ -219,34 +205,25 @@ export default function AiAgentPage() {
         { x: 0, opacity: 1, duration: 0.75, delay: 0.25, ease: 'power3.out' }
       );
 
-      // 3. Hero Center Actor Floating Bob
-      if (heroActorRef.current) {
-        gsap.to(heroActorRef.current, {
-          y: -8,
-          duration: 3,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
+      // 3. Pinned Parallax Horizontal Scroll on Capabilities (AI Agent Team)
+      if (cardsTrackRef.current && capabilitiesSectionRef.current) {
+        const track = cardsTrackRef.current;
+        const getScrollDistance = () => track.scrollWidth - window.innerWidth + 80;
+
+        gsap.to(track, {
+          x: () => -getScrollDistance(),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: capabilitiesSectionRef.current,
+            start: 'top top',
+            end: () => `+=${Math.max(window.innerHeight * 1.5, getScrollDistance() + 200)}`,
+            pin: true,
+            scrub: 0.8,
+            invalidateOnRefresh: true,
+            anticipatePin: 1,
+          },
         });
       }
-
-      // 4. Capabilities Cards Staggered ScrollTrigger
-      gsap.fromTo(
-        '.gsap-capability-card',
-        { y: 40, opacity: 0, scale: 0.96 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.65,
-          stagger: 0.08,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: '#capabilities',
-            start: 'top 80%',
-          },
-        }
-      );
 
       // 5. Orchestration Pipeline Step Reveal
       gsap.fromTo(
@@ -324,41 +301,46 @@ export default function AiAgentPage() {
     >
       
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 1: HERO PINNED STAGE (ClickUp Super Agents™ Style)
+          SECTION 1: HERO PINNED STAGE (ClickUp Super Agents Style)
       ───────────────────────────────────────────────────────────── */}
       <section className="relative min-h-[92vh] flex flex-col justify-between pt-24 pb-12 sm:pt-28 sm:pb-16 overflow-hidden border-b border-zinc-100 bg-[#FFFFFF]">
         
-        {/* Giant Watermark 3D Typography in Background */}
+        {/* Giant Watermark 3D Typography in Background (No TM) */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
           <span className="font-display font-extrabold text-[120px] xs:text-[160px] sm:text-[230px] md:text-[290px] lg:text-[360px] text-zinc-950/[0.04] leading-[0.88] tracking-tighter">
             Super
           </span>
           <span className="font-display font-extrabold text-[95px] xs:text-[130px] sm:text-[190px] md:text-[240px] lg:text-[300px] text-zinc-950/[0.04] leading-[0.88] tracking-tighter">
-            Agents<span className="text-[0.3em] align-top">™</span>
+            Agents
           </span>
         </div>
 
         {/* Soft Warm Radial Glow Behind Portrait */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[560px] h-[340px] sm:h-[560px] bg-radial from-orange-200/40 via-amber-100/20 to-transparent rounded-full blur-3xl pointer-events-none z-0" />
 
-        {/* Center Stage: Indian Female AI Co-Founder with Gradient Visor (Transparent PNG) */}
+        {/* Center Stage: Indian Female AI Co-Founder with Gradient Visor & Dissolving Edges */}
         <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 flex-1 flex flex-col items-center justify-center my-auto">
-          <div ref={heroActorRef} className="relative w-[280px] h-[280px] xs:w-[320px] xs:h-[320px] sm:w-[420px] sm:h-[420px] lg:w-[480px] lg:h-[480px]">
-            <Image
-              src="/images/cora_hero_indian_agent.png"
-              alt="Cora AI Super Agent with Futuristic Visor"
-              fill
-              priority
-              className="object-contain drop-shadow-xl"
-            />
+          <div className="relative w-[280px] h-[280px] xs:w-[320px] xs:h-[320px] sm:w-[420px] sm:h-[420px] lg:w-[480px] lg:h-[480px]">
+            {/* Gradient Dissolve Mask so bottom/shoulders smoothly melt into canvas */}
+            <div className="relative w-full h-full [mask-image:linear-gradient(to_bottom,black_60%,black_80%,transparent_100%)]">
+              <Image
+                src="/images/cora_hero_indian_agent.png"
+                alt="Cora AI Super Agent with Futuristic Visor"
+                fill
+                priority
+                className="object-contain drop-shadow-xl"
+              />
+              {/* Bottom Scrim Dissolve */}
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/30 to-transparent pointer-events-none" />
+            </div>
           </div>
         </div>
 
-        {/* Bottom Stage Overlay: Headline & CTAs */}
+        {/* Bottom Stage Overlay: Headline & CTAs (No TM) */}
         <div className="relative z-20 w-full max-w-[800px] mx-auto px-4 text-center space-y-5 gsap-hero-fade mt-2">
           <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[54px] font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em]">
             A new era of humans, <br />
-            with <span className="text-zinc-900 font-extrabold">AI Super Agents&trade;</span>
+            with <span className="text-zinc-900 font-extrabold">AI Super Agents</span>
           </h1>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
@@ -380,13 +362,15 @@ export default function AiAgentPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 2: [CAPABILITIES] AI AGENTS CAROUSEL DECK
+          SECTION 2: [CAPABILITIES] AI AGENTS PINNED HORIZONTAL PARALLAX
       ───────────────────────────────────────────────────────────── */}
-      <section id="capabilities" className="py-14 sm:py-20 bg-white relative z-10 border-b border-zinc-100">
-        <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
-          
-          {/* Eyebrow Header */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-5 border-b border-zinc-200 mb-8 sm:mb-10">
+      <section
+        ref={capabilitiesSectionRef}
+        id="capabilities"
+        className="min-h-screen py-12 sm:py-16 bg-white relative z-10 border-b border-zinc-100 overflow-hidden flex flex-col justify-center"
+      >
+        <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 shrink-0 mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-zinc-200">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 block mb-1">
                 [ CAPABILITIES ]
@@ -395,89 +379,62 @@ export default function AiAgentPage() {
                 Agents for everything
               </h2>
             </div>
-            <div className="flex items-center gap-3">
-              <p className="text-zinc-600 text-xs sm:text-sm max-w-[380px] hidden md:block">
-                Your AI Co-Founder commands specialized autonomous agents across marketing, sales, operations, finance &amp; legal.
-              </p>
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={() => scrollCarousel('left')}
-                  className="w-9 h-9 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 text-zinc-800 transition-colors cursor-pointer"
-                  aria-label="Previous agent"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => scrollCarousel('right')}
-                  className="w-9 h-9 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-100 text-zinc-800 transition-colors cursor-pointer"
-                  aria-label="Next agent"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+            <p className="text-zinc-600 text-xs sm:text-sm max-w-[420px]">
+              Scroll down to explore your autonomous agent team across marketing, sales, operations, finance &amp; legal.
+            </p>
           </div>
+        </div>
 
-          {/* Cards Carousel Grid: Horizontal Swipe on Mobile & Multi-Column on Desktop */}
+        {/* Pinned Horizontal Parallax Scroll Track */}
+        <div className="w-full overflow-hidden px-4 sm:px-6">
           <div
-            ref={carouselRef}
-            className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:grid md:grid-cols-3 lg:grid-cols-5"
+            ref={cardsTrackRef}
+            className="flex gap-4 sm:gap-6 w-max will-change-transform pb-2"
           >
-            {aiAgentsList.map((card, idx) => {
-              const isCurrent = idx === activeCarouselIndex;
-              return (
-                <div
-                  key={card.id}
-                  onClick={() => setActiveCarouselIndex(idx)}
-                  className={`gsap-capability-card rounded-3xl overflow-hidden h-[410px] sm:h-[430px] min-w-[270px] xs:min-w-[290px] sm:min-w-[320px] md:min-w-0 snap-center shrink-0 md:shrink cursor-pointer relative group transition-all duration-300 flex flex-col justify-between p-5 ${
-                    isCurrent
-                      ? 'ring-2 ring-zinc-950 shadow-2xl scale-[1.02]'
-                      : 'border border-zinc-200/90 shadow-2xs hover:shadow-md hover:scale-[1.01]'
-                  }`}
-                >
-                  {/* Full Background Image */}
-                  <Image
-                    src={card.avatar}
-                    alt={card.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none"
-                    priority={idx < 2}
-                  />
+            {aiAgentsList.map((card, idx) => (
+              <div
+                key={card.id}
+                className="rounded-3xl overflow-hidden h-[410px] sm:h-[450px] w-[280px] xs:w-[320px] sm:w-[360px] md:w-[380px] shrink-0 cursor-pointer relative group transition-all duration-300 flex flex-col justify-between p-6 border border-zinc-200/90 shadow-2xs hover:shadow-xl hover:scale-[1.01]"
+              >
+                {/* Full Background Image */}
+                <Image
+                  src={card.avatar}
+                  alt={card.title}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                  priority={idx < 3}
+                />
 
-                  {/* Gradient Dark Overlay for Legibility */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
+                {/* Gradient Dark Overlay for Legibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
 
-                  {/* Top: Index Indicator */}
-                  <div className="relative z-10 flex items-center justify-between">
-                    <span className="text-[11px] font-mono font-bold text-white/90 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/15">
-                      0{idx + 1}
-                    </span>
-                    {isCurrent && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                        Active
-                      </span>
-                    )}
-                  </div>
+                {/* Top: Index Indicator */}
+                <div className="relative z-10 flex items-center justify-between">
+                  <span className="text-[11px] font-mono font-bold text-white/90 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/15">
+                    0{idx + 1}
+                  </span>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500 text-white flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    Active
+                  </span>
+                </div>
 
-                  {/* Bottom: Single-Line Title & Description */}
-                  <div className="relative z-10 space-y-1">
-                    <h3 className="font-display text-lg font-bold text-white leading-tight truncate">
-                      {card.title}
-                    </h3>
-                    <p className="text-zinc-300 text-xs leading-snug line-clamp-1">
-                      {card.role}
-                    </p>
-                    <div className="pt-2 flex items-center justify-between text-xs font-semibold text-white/95 border-t border-white/15">
-                      <span>{card.action}</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </div>
+                {/* Bottom: Single-Line Title & Description */}
+                <div className="relative z-10 space-y-1.5">
+                  <h3 className="font-display text-xl font-bold text-white leading-tight">
+                    {card.title}
+                  </h3>
+                  <p className="text-zinc-300 text-xs sm:text-sm leading-snug">
+                    {card.role}
+                  </p>
+                  <div className="pt-3 flex items-center justify-between text-xs font-semibold text-white/95 border-t border-white/15">
+                    <span>{card.action}</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
-
         </div>
       </section>
 
