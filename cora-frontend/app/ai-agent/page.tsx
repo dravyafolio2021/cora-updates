@@ -30,6 +30,7 @@ import {
   QrCode,
   Share2,
   Users,
+  Terminal,
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -60,24 +61,24 @@ const superAgentFaqs = [
       'You can delegate tasks via natural language directly in your Cora workspace, chat naturally on WhatsApp, or tag @Cora in any client shoot brief. Your agent team instantly interprets the scope, delegates subtasks, and reports back upon completion.',
   },
   {
-    question: 'Are Super Agents secure?',
+    question: 'Can Super Agents work together as a team?',
     answer:
-      'Yes. All commercial shoot contracts, client portfolios, and rate cards are encrypted with enterprise-grade AES-256. Every e-signature, NDA, and tax invoice receives a cryptographic SHA-256 seal with logged IP and timestamp audit trails, fully compliant under the Indian IT Act 2000.',
+      'Yes. When an incoming client brief arrives on WhatsApp, the Sales Agent qualifies the scope, the Operations Agent checks studio bay availability, the Finance Agent drafts an 18% GST invoice, and the Legal Agent seals the NDA &mdash; all coordinated in parallel within seconds.',
   },
   {
-    question: 'How much do Super Agents cost?',
+    question: 'How does the pricing work for Super Agents?',
     answer:
-      'Super Agents are included directly in all Cora Studio Pro and Enterprise plans with flexible token quotas. There are zero per-agent seat markups — one unified subscription unlocks your entire autonomous agent team across marketing, sales, operations, finance, and legal.',
+      'Super Agents are included in all Cora Pro and Studio Enterprise tiers. You get unlimited agent task executions, WhatsApp audio note parsing, dynamic UPI soundbox invoicing, and cryptographic contract storage with zero hidden API surcharges.',
   },
   {
-    question: 'Can Super Agents connect to tools outside Cora?',
+    question: 'Is client financial & contract data private?',
     answer:
-      'Yes. Super Agents integrate natively with WhatsApp Business API, Razorpay, PhonePe UPI, Google Calendar, Apple Calendar, Tally Prime, Zoho Books, and cloud storage vaults like Google Drive and Dropbox.',
+      'Yes. All client data, rate cards, GSTIN records, and contract PDFs are isolated per studio tenant with AES-256 encryption at rest and SHA-256 tamper-proof seals.',
   },
   {
-    question: 'Do Super Agents learn and improve over time?',
+    question: 'Can Super Agents integrate with our existing tools?',
     answer:
-      'Yes. Every commercial booking, custom rate negotiation, client preference, and shoot feedback signal grounds your agent team deeper into your studio\'s unique operating DNA, making future pricing and scheduling recommendations increasingly fast and accurate.',
+      'Super Agents natively sync with WhatsApp Business API, Google Calendar, Apple Calendar, Tally Prime, Zoho Books, Razorpay, and cloud storage systems.',
   },
 ];
 
@@ -88,10 +89,9 @@ interface TagItem {
   desc: string;
 }
 
-const humanPowers: TagItem[] = [
-  { id: 'assign', label: 'Assign', desc: 'Delegate client inquiries and shoot bookings to your AI co-founders just like a human team. They understand context and execute immediately.' },
-  { id: 'message', label: 'Message', desc: 'Chat naturally in WhatsApp or your studio workspace. Request rate cards, hold date checks, or call-sheet updates in real-time.' },
-  { id: 'mention', label: 'Mention', desc: 'Tag @Cora anywhere in client briefs or contracts. Your co-founder jumps in, checks hold dates, and drafts commercial scope.' },
+const superpowersLeft: TagItem[] = [
+  { id: '1-click', label: '1-Click Team Setup', desc: 'Deploy a specialized 5-agent commercial team in under 60 seconds with zero prompt engineering required.' },
+  { id: 'voice-briefs', label: 'Voice & WhatsApp Native', desc: 'Accepts raw client WhatsApp voice notes, extracting commercial shot lists and deliverable scopes automatically.' },
   { id: '50-skills', label: '50+ Studio Skills', desc: 'Auto-calculate 18% GST, generate SHA-256 signed NDAs, dispatch call-sheets, and reconcile UPI advances in 1 click.' },
 ];
 
@@ -145,16 +145,23 @@ const aiAgentsList = [
 const broadAgentSkills = [
   {
     id: 'marketing',
-    title: 'Marketing & Content',
+    title: 'Marketing & Growth',
     role: 'Marketing Super Agent',
     icon: TrendingUp,
     badge: 'Growth Engine',
+    model: 'Claude 3.5 Sonnet + Gemini Flash',
     shortDesc: 'Autonomous multi-channel campaigns, high-converting copy, and audience targeting.',
     agentAvatar: '/images/cora_agent_marketing.jpg',
     metrics: [
-      { label: 'Campaign Reach', value: '+340%', change: 'MoM' },
+      { label: 'Campaign Reach', value: '+340%', change: 'MoM Growth' },
       { label: 'Content Velocity', value: '14 Assets/hr', change: 'Automated' },
-      { label: 'Active Channels', value: '4 Synced', change: 'Live' },
+      { label: 'Active Channels', value: '4 Synced', change: 'Live Distribution' },
+    ],
+    logs: [
+      'cora-agent --dispatch marketing',
+      'Targeting luxury fashion brand leads',
+      'Generated 4K master ProRes teaser copy',
+      '4 channels scheduled for 18:00 IST',
     ],
     speechPill: 'Marketing funnels synced & scheduled across 4 channels.',
   },
@@ -164,12 +171,19 @@ const broadAgentSkills = [
     role: 'Sales Super Agent',
     icon: Zap,
     badge: '24/7 Lead Capture',
+    model: 'Gemini 1.5 Pro Neural Router',
     shortDesc: 'Instant lead qualification, rate card quoting, and 24/7 client onboarding.',
     agentAvatar: '/images/cora_agent_sales.jpg',
     metrics: [
-      { label: 'Response Time', value: '0.8s', change: 'Instant' },
-      { label: 'Lead Conversion', value: '42.8%', change: '+18.4%' },
-      { label: 'Active Inquiries', value: '28 In Queue', change: 'Live' },
+      { label: 'Response Time', value: '0.8s', change: 'Real-Time' },
+      { label: 'Conversion Rate', value: '42.8%', change: '+18.4% Lift' },
+      { label: 'Active Inquiries', value: '28 In Queue', change: 'Auto-Qualified' },
+    ],
+    logs: [
+      'cora-agent --qualify brief #CS-942',
+      'Parsed client voice brief in 0.8s',
+      'Calculated 18% GST split: ₹1,41,600',
+      'Dispatched formal quotation & UPI QR',
     ],
     speechPill: 'Inbound brief qualified & formal quote delivered in 0.8s.',
   },
@@ -179,12 +193,19 @@ const broadAgentSkills = [
     role: 'Operations Super Agent',
     icon: Layers,
     badge: 'Resource Allocation',
+    model: 'Ambient Context Scheduler',
     shortDesc: 'Automated schedule dispatch, task delegation, and cross-team project execution.',
     agentAvatar: '/images/cora_agent_operations.jpg',
     metrics: [
-      { label: 'Schedule Conflicts', value: '0 Clashes', change: 'Resolved' },
+      { label: 'Schedule Conflicts', value: '0 Clashes', change: 'Zero Overlaps' },
       { label: 'Task Dispatch', value: '100% On-Time', change: 'Automated' },
-      { label: 'Team Sync Rate', value: '14/14 Crew', change: 'Confirmed' },
+      { label: 'Crew Sync Rate', value: '14/14 Sync', change: 'Confirmed' },
+    ],
+    logs: [
+      'cora-agent --sync schedule-grid',
+      'Locked Studio Bay 02 for Lakme Shoot',
+      'Dispatched 14 call-sheets via WhatsApp',
+      '14/14 crew read receipts confirmed',
     ],
     speechPill: 'Studio calendar locked & 14 call-sheets dispatched.',
   },
@@ -194,12 +215,19 @@ const broadAgentSkills = [
     role: 'Finance Super Agent',
     icon: Receipt,
     badge: '18% GST Billing',
+    model: 'GSTR-1 Tax Engine',
     shortDesc: 'Automated tax invoices, dynamic UPI QR standees, and ledger reconciliation.',
     agentAvatar: '/images/cora_agent_finance.jpg',
     metrics: [
-      { label: 'Tax Accuracy', value: '100%', change: 'GSTR-1' },
+      { label: 'Tax Accuracy', value: '100%', change: 'GSTR-1 Valid' },
       { label: 'Settlement Time', value: 'Instant UPI', change: 'Auto-Matched' },
       { label: 'Ledger Status', value: 'Synced', change: 'Tally Prime' },
+    ],
+    logs: [
+      'cora-agent --generate invoice #CORA-104',
+      'Applied 9% CGST + 9% SGST breakdown',
+      'Generated dynamic UPI soundbox QR',
+      'Exported voucher to Tally Prime & Zoho',
     ],
     speechPill: '18% GST invoice verified & advance deposit matched.',
   },
@@ -209,12 +237,19 @@ const broadAgentSkills = [
     role: 'Legal Super Agent',
     icon: ShieldCheck,
     badge: 'SHA-256 Vault',
+    model: 'Cryptographic Legal Core',
     shortDesc: 'Cryptographically sealed NDAs, commercial usage licenses, and audit trails.',
     agentAvatar: '/images/cora_agent_legal.jpg',
     metrics: [
       { label: 'Seal Standard', value: 'SHA-256', change: 'IT Act 2000' },
       { label: 'Signature Audit', value: 'OTP Verified', change: 'Tamper-Proof' },
       { label: 'Vault Security', value: 'AES-256', change: 'Encrypted' },
+    ],
+    logs: [
+      'cora-agent --seal agreement #LIC-892',
+      'Drafted 1-year commercial usage license',
+      'Generated SHA-256 cryptographic seal',
+      'Verified mobile OTP link audit trail',
     ],
     speechPill: 'Usage license cryptographically sealed with SHA-256 hash.',
   },
@@ -654,28 +689,35 @@ export default function AiAgentPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 4: [WORKSPACE INTELLIGENCE] 5 BROAD AGENTS LIVE WORKSPACE DEMO
+          SECTION 4: [AI CO-FOUNDER PLATFORM] AUTONOMOUS EXECUTIVE COMMAND DECK
       ───────────────────────────────────────────────────────────── */}
-      <section id="human-skills" className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
+      <section id="human-skills" className="py-20 sm:py-28 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
           
-          <div className="bg-[#F8F9FA] rounded-[32px] sm:rounded-[40px] p-5 sm:p-8 lg:p-12 border border-zinc-200/80 shadow-xs">
+          {/* Main Futuristic Dark Container */}
+          <div className="bg-gradient-to-b from-[#090D16] via-[#0E1524] to-[#070A10] text-white rounded-[36px] sm:rounded-[44px] p-6 sm:p-10 lg:p-12 border border-zinc-800 shadow-2xl relative overflow-hidden">
             
-            {/* Header */}
-            <div className="max-w-[720px] mb-8 sm:mb-10 space-y-2">
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-indigo-600 block">
-                [ WORKSPACE INTELLIGENCE ]
+            {/* Ambient Background Glow Cones */}
+            <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-5" />
+
+            {/* Section Header */}
+            <div className="relative z-10 max-w-[800px] mx-auto text-center mb-10 sm:mb-12 space-y-3">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-mono font-bold tracking-widest uppercase">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>AI CO-FOUNDER PLATFORM</span>
               </span>
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-[34px] font-bold text-zinc-950 leading-tight">
-                The only AI agents with cross-functional execution &ndash; from marketing to legal
+              <h2 className="font-display text-2xl sm:text-4xl lg:text-[42px] font-bold text-white tracking-tight leading-[1.12]">
+                Your autonomous executive team. Working in parallel.
               </h2>
-              <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
-                Explore how specialized AI agents handle broad commercial workflows autonomously.
+              <p className="text-zinc-400 text-xs sm:text-base max-w-[640px] mx-auto leading-relaxed">
+                Five dedicated AI Super Agents collaborate continuously across marketing, sales, operations, finance, and legal to run your commercial business.
               </p>
             </div>
 
-            {/* Mobile-Friendly Horizontal Segment Bar (Visible on mobile & tablet) */}
-            <div className="lg:hidden mb-6 -mx-1 flex gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
+            {/* Interactive 5-Agent Command Switcher Bar */}
+            <div className="relative z-10 mb-8 sm:mb-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
               {broadAgentSkills.map((skill) => {
                 const isSelected = skill.id === activeSkillId;
                 const IconComp = skill.icon;
@@ -683,298 +725,309 @@ export default function AiAgentPage() {
                   <button
                     key={skill.id}
                     onClick={() => setActiveSkillId(skill.id)}
-                    className={`shrink-0 snap-start px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs font-semibold transition-all cursor-pointer ${
+                    className={`p-3 sm:p-3.5 rounded-2xl flex flex-col items-start gap-2 text-left transition-all duration-300 cursor-pointer relative overflow-hidden group ${
                       isSelected
-                        ? 'bg-zinc-950 text-white shadow-sm border border-zinc-950'
-                        : 'bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-100'
+                        ? 'bg-zinc-800/90 border-2 border-purple-400/80 shadow-[0_0_25px_rgba(168,85,247,0.25)] ring-1 ring-white/20'
+                        : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/60'
                     }`}
                   >
-                    <IconComp className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-zinc-500'}`} />
-                    <span>{skill.title}</span>
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-zinc-700">
+                          <Image
+                            src={skill.agentAvatar}
+                            alt={skill.title}
+                            width={32}
+                            height={32}
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="w-6 h-6 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
+                          <IconComp className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
+                      <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-600'}`} />
+                    </div>
+
+                    <div className="w-full">
+                      <span className="text-xs sm:text-sm font-bold text-white block truncate">
+                        {skill.title}
+                      </span>
+                      <span className="text-[10px] text-zinc-400 font-medium block truncate mt-0.5">
+                        {skill.badge}
+                      </span>
+                    </div>
                   </button>
                 );
               })}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+            {/* Core Intelligence Stage (2-Column Futuristic Cockpit) */}
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch gsap-skill-canvas">
               
-              {/* Left Column: Desktop Sticky Tab Selectors */}
-              <div className="hidden lg:block lg:col-span-5 space-y-2.5 lg:sticky lg:top-28">
-                {broadAgentSkills.map((skill) => {
-                  const isSelected = skill.id === activeSkillId;
-                  const IconComp = skill.icon;
-                  if (isSelected) {
-                    return (
-                      <div
-                        key={skill.id}
-                        onClick={() => setActiveSkillId(skill.id)}
-                        className="p-4 rounded-xl bg-white border-2 border-zinc-950 shadow-md transition-all cursor-pointer space-y-1.5"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center">
-                              <IconComp className="w-3.5 h-3.5" />
-                            </div>
-                            <span className="text-sm font-bold text-zinc-950">{skill.title}</span>
-                          </div>
-                          <span className="text-[10.5px] font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 border border-zinc-200">
-                            {skill.badge}
-                          </span>
-                        </div>
-                        <p className="text-xs text-zinc-600 leading-relaxed pt-0.5">
-                          {skill.shortDesc}
-                        </p>
+              {/* Left Column: Agent Neural Engine & Telemetry Card */}
+              <div className="lg:col-span-5 bg-zinc-900/80 rounded-3xl border border-zinc-800 p-5 sm:p-7 backdrop-blur-xl flex flex-col justify-between space-y-5">
+                
+                {/* Agent Persona & Model Info */}
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-purple-400/40 ring-4 ring-purple-500/10 shadow-lg">
+                        <Image
+                          src={selectedSkill.agentAvatar}
+                          alt={selectedSkill.role}
+                          fill
+                          className="object-cover"
+                        />
                       </div>
-                    );
-                  }
-                  return (
-                    <button
-                      key={skill.id}
-                      onClick={() => setActiveSkillId(skill.id)}
-                      className="w-full px-4 py-3 rounded-xl bg-white/80 hover:bg-white border border-zinc-200/80 hover:border-zinc-300 shadow-2xs flex items-center gap-2.5 text-left transition-all cursor-pointer group"
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-zinc-100 group-hover:bg-zinc-200 text-zinc-600 flex items-center justify-center transition-colors">
-                        <IconComp className="w-3.5 h-3.5" />
+                      <div>
+                        <h3 className="text-base sm:text-lg font-bold text-white">{selectedSkill.role}</h3>
+                        <span className="text-xs text-purple-300 font-mono block mt-0.5">{selectedSkill.badge}</span>
                       </div>
-                      <span className="text-xs sm:text-sm font-semibold text-zinc-700 group-hover:text-zinc-950 flex-1">
-                        {skill.title}
+                    </div>
+                    <span className="text-[10.5px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-md">
+                      0.8s Cycle
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    {selectedSkill.shortDesc}
+                  </p>
+                </div>
+
+                {/* 3 Metric Counters */}
+                <div className="grid grid-cols-3 gap-2">
+                  {selectedSkill.metrics.map((m, idx) => (
+                    <div key={idx} className="p-3 bg-zinc-950/80 rounded-xl border border-zinc-800/80 text-center">
+                      <span className="text-[9.5px] text-zinc-400 block uppercase tracking-wider font-semibold truncate">
+                        {m.label}
                       </span>
-                      <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 transition-transform group-hover:translate-x-0.5" />
-                    </button>
-                  );
-                })}
+                      <span className="text-xs sm:text-sm font-bold text-white font-mono block mt-1">
+                        {m.value}
+                      </span>
+                      <span className="text-[9.5px] text-emerald-400 font-semibold block mt-0.5">
+                        {m.change}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Live Terminal Output Stream */}
+                <div className="p-3.5 bg-black/80 rounded-2xl border border-zinc-800/90 font-mono text-[11px] space-y-1.5 shadow-inner">
+                  <div className="flex items-center justify-between text-zinc-500 pb-1.5 border-b border-zinc-800/80">
+                    <div className="flex items-center gap-1.5">
+                      <Terminal className="w-3.5 h-3.5 text-purple-400" />
+                      <span className="text-zinc-400 font-semibold">Autonomous Execution Core</span>
+                    </div>
+                    <span className="text-emerald-400 text-[10px]">LIVE STREAM</span>
+                  </div>
+                  <div className="space-y-1 pt-1 text-zinc-300">
+                    <p className="text-purple-300 font-bold">$ {selectedSkill.logs[0]}</p>
+                    <p className="text-zinc-400">&gt; {selectedSkill.logs[1]}</p>
+                    <p className="text-zinc-400">&gt; {selectedSkill.logs[2]}</p>
+                    <p className="text-emerald-400 font-semibold">&gt; {selectedSkill.logs[3]}</p>
+                  </div>
+                </div>
+
               </div>
 
-              {/* Right Column: Live Visual SaaS Workspace Dashboard */}
-              <div className="lg:col-span-7 gsap-skill-canvas">
-                <div className="bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/90 shadow-xl overflow-hidden">
+              {/* Right Column: Live Interactive Workspace Dashboard Window */}
+              <div className="lg:col-span-7 bg-zinc-950/90 rounded-3xl border border-zinc-800 overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col justify-between">
+                
+                {/* Window App Header */}
+                <div className="px-5 py-3.5 bg-zinc-900/90 border-b border-zinc-800 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                    </div>
+                    <span className="font-mono text-zinc-400 text-[11px] ml-2 truncate">
+                      cora.ai / workspace / {activeSkillId}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-mono font-semibold text-emerald-300 text-[11px]">100% Autonomous</span>
+                  </div>
+                </div>
+
+                {/* Dynamic Visual Content Body */}
+                <div className="p-5 sm:p-7 space-y-4 flex-1 flex flex-col justify-between">
                   
-                  {/* Browser / Workspace App Bar */}
-                  <div className="px-4 sm:px-5 py-3 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
-                      </div>
-                      <span className="font-mono text-zinc-400 text-[11px] ml-2 truncate">
-                        cora.workspace / {activeSkillId} / live
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="font-semibold text-zinc-700 text-[11px]">Autonomous</span>
-                    </div>
-                  </div>
-
-                  {/* Agent Header & Metrics Strip */}
-                  <div className="p-4 sm:p-5 border-b border-zinc-100 bg-white">
-                    <div className="flex items-center justify-between gap-3 mb-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shrink-0 border border-zinc-200 ring-2 ring-zinc-100 shadow-xs">
-                          <Image
-                            src={selectedSkill.agentAvatar}
-                            alt={selectedSkill.role}
-                            width={44}
-                            height={44}
-                            className="object-cover"
-                          />
-                        </div>
-                        <div>
-                          <h4 className="text-sm sm:text-base font-bold text-zinc-950">{selectedSkill.role}</h4>
-                          <p className="text-xs text-zinc-500 font-medium">{selectedSkill.badge}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[10.5px] font-mono font-bold text-zinc-700 bg-zinc-100 px-2.5 py-1 rounded-md border border-zinc-200/80">
-                          Latency: 0.8s
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* 3 Metric Pills */}
-                    <div className="grid grid-cols-3 gap-2">
-                      {selectedSkill.metrics.map((m, idx) => (
-                        <div key={idx} className="p-2.5 bg-zinc-50 rounded-xl border border-zinc-100 text-center">
-                          <span className="text-[10px] text-zinc-500 block uppercase tracking-wider font-semibold truncate">
-                            {m.label}
-                          </span>
-                          <span className="text-xs sm:text-sm font-bold text-zinc-950 font-mono block mt-0.5">
-                            {m.value}
-                          </span>
-                          <span className="text-[9.5px] text-emerald-700 font-semibold block">
-                            {m.change}
+                  {/* Demo 1: Marketing & Growth */}
+                  {activeSkillId === 'marketing' && (
+                    <div className="space-y-3.5">
+                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2.5">
+                        <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-800">
+                          <span className="font-bold text-white">Multi-Channel Distribution Engine</span>
+                          <span className="text-[10.5px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                            4 Sync Feeds Live
                           </span>
                         </div>
-                      ))}
+                        <div className="grid grid-cols-2 gap-2.5 text-xs">
+                          <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800/80 flex items-center justify-between">
+                            <span className="text-zinc-300 font-medium">Instagram &amp; Reels</span>
+                            <span className="text-[10px] font-mono font-semibold text-purple-300">18:00 IST</span>
+                          </div>
+                          <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800/80 flex items-center justify-between">
+                            <span className="text-zinc-300 font-medium">Client Newsletter</span>
+                            <span className="text-[10px] font-mono font-semibold text-emerald-400">2.4k Opens</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2">
+                        <span className="text-xs font-bold text-white block">Autonomous Content Pipeline</span>
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-xs font-mono text-zinc-300 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800">
+                            Format: 4K Master ProRes
+                          </span>
+                          <span className="text-xs font-mono text-zinc-300 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800">
+                            Tone: Commercial Luxury
+                          </span>
+                          <span className="text-xs font-mono text-zinc-300 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800">
+                            Target: Brand Decision Makers
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Dynamic Visual Content Body */}
-                  <div className="p-4 sm:p-5 space-y-3 bg-zinc-50/40 min-h-[320px] flex flex-col justify-between">
-                    
-                    {/* Demo 1: Marketing & Growth */}
-                    {activeSkillId === 'marketing' && (
-                      <div className="space-y-3">
-                        <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
-                          <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-100">
-                            <span className="font-bold text-zinc-900">Multi-Channel Distribution Matrix</span>
-                            <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">4 Channels Synced</span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div className="p-2 bg-zinc-50 rounded-lg border border-zinc-100 flex items-center justify-between">
-                              <span className="text-zinc-700 font-medium">Instagram &amp; Reels</span>
-                              <span className="text-[10px] font-mono font-semibold text-zinc-500">18:00 IST</span>
-                            </div>
-                            <div className="p-2 bg-zinc-50 rounded-lg border border-zinc-100 flex items-center justify-between">
-                              <span className="text-zinc-700 font-medium">Client Newsletter</span>
-                              <span className="text-[10px] font-mono font-semibold text-emerald-700">2.4k Opens</span>
-                            </div>
-                          </div>
+                  {/* Demo 2: Sales & Lead Intake */}
+                  {activeSkillId === 'sales' && (
+                    <div className="space-y-3.5">
+                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2.5">
+                        <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-800">
+                          <span className="font-bold text-white">Lead Qualification &amp; Quotation</span>
+                          <span className="text-[10.5px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                            0.8s Response
+                          </span>
                         </div>
-
-                        <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
-                          <span className="text-xs font-bold text-zinc-900 block">Content Generation Queue</span>
-                          <div className="flex flex-wrap gap-1.5">
-                            <span className="text-[10.5px] font-medium bg-zinc-100 text-zinc-700 px-2.5 py-1 rounded-md border border-zinc-200/60">
-                              Format: 4K Master Video
-                            </span>
-                            <span className="text-[10.5px] font-medium bg-zinc-100 text-zinc-700 px-2.5 py-1 rounded-md border border-zinc-200/60">
-                              Tone: Commercial Luxury
-                            </span>
-                            <span className="text-[10.5px] font-medium bg-zinc-100 text-zinc-700 px-2.5 py-1 rounded-md border border-zinc-200/60">
-                              Target: Brand Leads
-                            </span>
+                        <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800/80 text-xs space-y-2 font-mono">
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Commercial Shoot (2 Days):</span>
+                            <span className="font-bold text-white">₹1,20,000</span>
+                          </div>
+                          <div className="flex justify-between text-zinc-400">
+                            <span>18% GST (CGST + SGST):</span>
+                            <span className="font-bold text-white">₹21,600</span>
+                          </div>
+                          <div className="flex justify-between pt-2 border-t border-zinc-800 text-white font-bold text-sm">
+                            <span>Total Quotation:</span>
+                            <span className="text-emerald-400">₹1,41,600</span>
                           </div>
                         </div>
                       </div>
-                    )}
 
-                    {/* Demo 2: Sales & Lead Intake */}
-                    {activeSkillId === 'sales' && (
-                      <div className="space-y-3">
-                        <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
-                          <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-100">
-                            <span className="font-bold text-zinc-900">Lead Pipeline &amp; Rate Quotation</span>
-                            <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">0.8s Response</span>
-                          </div>
-                          <div className="p-2.5 bg-zinc-50 rounded-lg text-xs space-y-1 font-mono">
-                            <div className="flex justify-between text-zinc-600">
-                              <span>Commercial Shoot (2 Days):</span>
-                              <span className="font-bold text-zinc-950">₹1,20,000</span>
-                            </div>
-                            <div className="flex justify-between text-zinc-600">
-                              <span>18% GST (CGST + SGST):</span>
-                              <span className="font-bold text-zinc-950">₹21,600</span>
-                            </div>
-                            <div className="flex justify-between pt-1 border-t border-zinc-200 text-zinc-950 font-bold">
-                              <span>Total Quotation:</span>
-                              <span className="text-emerald-700">₹1,41,600</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="p-3 rounded-xl bg-white border border-zinc-200/80 shadow-xs flex items-center justify-between text-xs">
-                          <span className="text-zinc-600 font-medium">WhatsApp Delivery Status:</span>
-                          <span className="font-bold text-zinc-900 font-mono">Dispatched with Advance QR</span>
-                        </div>
+                      <div className="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-between text-xs">
+                        <span className="text-zinc-400 font-medium">WhatsApp Delivery:</span>
+                        <span className="font-bold text-white font-mono">Dispatched with Instant Advance QR</span>
                       </div>
-                    )}
-
-                    {/* Demo 3: Operations & Workflows */}
-                    {activeSkillId === 'operations' && (
-                      <div className="space-y-3">
-                        <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
-                          <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-100">
-                            <span className="font-bold text-zinc-900">Production Sprint &amp; Schedule Grid</span>
-                            <span className="text-[10px] font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">Sprint #42 Active</span>
-                          </div>
-                          <div className="space-y-1.5 text-xs">
-                            <div className="p-2 rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-between">
-                              <span className="font-medium text-zinc-800">Studio Bay 02 Setup</span>
-                              <span className="text-[10px] font-mono font-bold text-emerald-700">Ready (06:45 IST)</span>
-                            </div>
-                            <div className="p-2 rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-between">
-                              <span className="font-medium text-zinc-800">Crew Call-Sheets Dispatched</span>
-                              <span className="text-[10px] font-mono font-bold text-emerald-700">14/14 Confirmed</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="p-3 rounded-xl bg-white border border-zinc-200/80 shadow-xs flex items-center justify-between text-xs">
-                          <span className="text-zinc-600 font-medium">Clash Prevention Engine:</span>
-                          <span className="font-bold text-emerald-700 font-mono">0 Conflicts Detected</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Demo 4: Finance & Invoicing */}
-                    {activeSkillId === 'finance' && (
-                      <div className="space-y-3">
-                        <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
-                          <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-100">
-                            <span className="font-bold text-zinc-900">GSTR-1 Tax Invoice #CORA-2026-104</span>
-                            <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">GSTR-1 Valid</span>
-                          </div>
-                          <div className="grid grid-cols-3 gap-1.5 text-center text-xs">
-                            <div className="p-2 bg-zinc-50 rounded-lg border border-zinc-100">
-                              <span className="text-[10px] text-zinc-500 block">Base Value</span>
-                              <span className="font-bold text-zinc-950 font-mono">₹2,50,000</span>
-                            </div>
-                            <div className="p-2 bg-zinc-50 rounded-lg border border-zinc-100">
-                              <span className="text-[10px] text-zinc-500 block">18% GST</span>
-                              <span className="font-bold text-zinc-950 font-mono">₹45,000</span>
-                            </div>
-                            <div className="p-2 bg-zinc-50 rounded-lg border border-zinc-100">
-                              <span className="text-[10px] text-zinc-500 block">Total Payable</span>
-                              <span className="font-bold text-emerald-700 font-mono">₹2,95,000</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="p-3 rounded-xl bg-white border border-zinc-200/80 shadow-xs flex items-center justify-between text-xs">
-                          <span className="text-zinc-600 font-medium">UPI Settlement Soundbox:</span>
-                          <span className="font-bold text-zinc-900 font-mono">PhonePe / GPay Auto-Matched</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Demo 5: Legal & Compliance */}
-                    {activeSkillId === 'legal' && (
-                      <div className="space-y-3">
-                        <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
-                          <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-100">
-                            <span className="font-bold text-zinc-900">Commercial License &amp; NDA #LIC-892</span>
-                            <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">IT Act Sealed</span>
-                          </div>
-                          <div className="p-2 bg-zinc-50 rounded-lg text-[11px] font-mono text-zinc-600 truncate border border-zinc-100">
-                            SHA256: 9f82ab174e3c90df81e2893a7c6f01b7a2d4e6f8...
-                          </div>
-                        </div>
-
-                        <div className="p-3 rounded-xl bg-white border border-zinc-200/80 shadow-xs flex items-center justify-between text-xs">
-                          <span className="text-zinc-600 font-medium">Client Verification:</span>
-                          <span className="font-bold text-zinc-900 font-mono">Mobile OTP Audit Trail Locked</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Bottom Status Action Bar */}
-                    <div className="pt-2 flex items-center justify-between gap-3 border-t border-zinc-200/80">
-                      <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-zinc-950 text-white text-xs font-semibold shadow-xs">
-                        <span>{selectedSkill.speechPill}</span>
-                      </div>
-                      <span className="text-[11px] font-mono text-zinc-500 hidden sm:inline">
-                        100% Autonomous
-                      </span>
                     </div>
+                  )}
 
+                  {/* Demo 3: Operations & Workflows */}
+                  {activeSkillId === 'operations' && (
+                    <div className="space-y-3.5">
+                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2.5">
+                        <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-800">
+                          <span className="font-bold text-white">Production Sprint &amp; Schedule Matrix</span>
+                          <span className="text-[10.5px] font-mono font-bold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                            Sprint #42 Active
+                          </span>
+                        </div>
+                        <div className="space-y-2 text-xs">
+                          <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/80 flex items-center justify-between">
+                            <span className="font-medium text-zinc-200">Studio Bay 02 Stage Setup</span>
+                            <span className="text-xs font-mono font-bold text-emerald-400">Ready (06:45 IST)</span>
+                          </div>
+                          <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/80 flex items-center justify-between">
+                            <span className="font-medium text-zinc-200">Crew Call-Sheets Dispatched</span>
+                            <span className="text-xs font-mono font-bold text-emerald-400">14/14 Confirmed</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-between text-xs">
+                        <span className="text-zinc-400 font-medium">Clash Prevention Engine:</span>
+                        <span className="font-bold text-emerald-400 font-mono">0 Conflicts Detected</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Demo 4: Finance & Invoicing */}
+                  {activeSkillId === 'finance' && (
+                    <div className="space-y-3.5">
+                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2.5">
+                        <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-800">
+                          <span className="font-bold text-white">GSTR-1 Tax Invoice #CORA-2026-104</span>
+                          <span className="text-[10.5px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                            GSTR-1 Valid
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                          <div className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800/80">
+                            <span className="text-[10px] text-zinc-400 block">Base Value</span>
+                            <span className="font-bold text-white font-mono text-sm mt-0.5">₹2,50,000</span>
+                          </div>
+                          <div className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800/80">
+                            <span className="text-[10px] text-zinc-400 block">18% GST</span>
+                            <span className="font-bold text-white font-mono text-sm mt-0.5">₹45,000</span>
+                          </div>
+                          <div className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800/80">
+                            <span className="text-[10px] text-zinc-400 block">Total Net</span>
+                            <span className="font-bold text-emerald-400 font-mono text-sm mt-0.5">₹2,95,000</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-between text-xs">
+                        <span className="text-zinc-400 font-medium">Instant Settlement Stream:</span>
+                        <span className="font-bold text-white font-mono">PhonePe / GPay Auto-Matched</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Demo 5: Legal & Compliance */}
+                  {activeSkillId === 'legal' && (
+                    <div className="space-y-3.5">
+                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2.5">
+                        <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-800">
+                          <span className="font-bold text-white">Commercial License &amp; NDA #LIC-892</span>
+                          <span className="text-[10.5px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                            IT Act Sealed
+                          </span>
+                        </div>
+                        <div className="p-3 bg-zinc-950 rounded-xl text-xs font-mono text-zinc-300 truncate border border-zinc-800/80">
+                          SHA256: 9f82ab174e3c90df81e2893a7c6f01b7a2d4e6f8...
+                        </div>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-between text-xs">
+                        <span className="text-zinc-400 font-medium">Client Verification:</span>
+                        <span className="font-bold text-white font-mono">Mobile OTP Audit Trail Locked</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bottom Action Strip */}
+                  <div className="pt-3 flex items-center justify-between gap-3 border-t border-zinc-800/80">
+                    <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 text-white text-xs font-semibold shadow-md">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>{selectedSkill.speechPill}</span>
+                    </div>
+                    <span className="text-[11px] font-mono text-zinc-400 hidden sm:inline">
+                      100% Autonomous
+                    </span>
                   </div>
 
                 </div>
+
               </div>
 
             </div>
+
           </div>
 
         </div>
