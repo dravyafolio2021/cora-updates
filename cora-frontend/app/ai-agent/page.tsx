@@ -366,26 +366,27 @@ export default function AiAgentPage() {
         }
       );
 
-      // 6. Human Skills Showcase
-      gsap.fromTo(
-        '.gsap-skill-pill',
-        { x: -20, opacity: 0 },
-        {
-          x: 0,
-          opacity: 1,
-          duration: 0.55,
-          stagger: 0.08,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: '#human-skills',
-            start: 'top 80%',
+      // 6. Human Skills & Workspace Live Demo (Auto-switches tabs on scroll)
+      const humanSkillsSection = document.getElementById('human-skills');
+      if (humanSkillsSection) {
+        ScrollTrigger.create({
+          trigger: humanSkillsSection,
+          start: 'top 40%',
+          end: 'bottom 60%',
+          scrub: true,
+          onUpdate: (self) => {
+            const skillIndex = Math.min(
+              humanSkills.length - 1,
+              Math.max(0, Math.floor(self.progress * humanSkills.length))
+            );
+            setActiveSkillId(humanSkills[skillIndex].id);
           },
-        }
-      );
+        });
+      }
 
       gsap.fromTo(
         '.gsap-skill-canvas',
-        { scale: 0.95, opacity: 0 },
+        { scale: 0.96, opacity: 0 },
         {
           scale: 1,
           opacity: 1,
@@ -471,13 +472,13 @@ export default function AiAgentPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
             <Link
               href="/workspace/login"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 text-sm sm:text-base font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 text-sm sm:text-base font-semibold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
             >
               Try Super Agents
             </Link>
             <a
               href="#capabilities"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white/95 border border-zinc-200 text-zinc-800 hover:text-zinc-950 hover:bg-zinc-50 text-sm sm:text-base font-semibold shadow-2xs backdrop-blur-sm transition-all"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white border border-zinc-300 text-zinc-800 hover:text-zinc-950 hover:bg-zinc-50 text-sm sm:text-base font-semibold shadow-2xs backdrop-blur-sm transition-all"
             >
               Watch Intro
             </a>
@@ -732,21 +733,29 @@ export default function AiAgentPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 5: [HUMAN SKILLS] INTERACTIVE SIMULATION SHOWCASE
+          SECTION 5: [HUMAN SKILLS] INTERACTIVE WORKSPACE LIVE DEMO
       ───────────────────────────────────────────────────────────── */}
       <section id="human-skills" className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
           
-          <div className="bg-[#F8F9FA] rounded-[36px] sm:rounded-[44px] p-6 sm:p-10 lg:p-14 border border-zinc-200/80 shadow-xs">
+          <div className="bg-[#F8F9FA] rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 lg:p-12 border border-zinc-200/80 shadow-xs">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
               
-              {/* Left Column: Title & Skill Selectors */}
-              <div className="lg:col-span-5 space-y-3.5">
-                <h2 className="font-display text-2xl sm:text-3xl lg:text-[34px] font-bold text-zinc-950 leading-tight mb-5">
-                  The only agents that work like humans &ndash; with infinite skills
-                </h2>
+              {/* Left Column: Sticky Sidebar & Skill Selectors (Cora rounded-xl buttons) */}
+              <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-28">
+                <div>
+                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-indigo-600 block mb-1">
+                    [ WORKSPACE INTELLIGENCE ]
+                  </span>
+                  <h2 className="font-display text-2xl sm:text-3xl lg:text-[32px] font-bold text-zinc-950 leading-tight">
+                    The only AI agents built for studios &ndash; with infinite skills
+                  </h2>
+                  <p className="text-zinc-600 text-xs sm:text-sm mt-2">
+                    Scroll down or click any agent below to preview live studio workflows in action.
+                  </p>
+                </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-2.5 pt-2">
                   {humanSkills.map((skill) => {
                     const isSelected = skill.id === activeSkillId;
                     const IconComp = skill.icon;
@@ -755,13 +764,20 @@ export default function AiAgentPage() {
                         <div
                           key={skill.id}
                           onClick={() => setActiveSkillId(skill.id)}
-                          className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-md ring-1 ring-zinc-950/5 transition-all cursor-pointer space-y-2"
+                          className="p-4 sm:p-4.5 rounded-xl bg-white border-2 border-zinc-950 shadow-md transition-all cursor-pointer space-y-1.5"
                         >
-                          <div className="flex items-center gap-2.5">
-                            <IconComp className="w-4 h-4 text-purple-600 shrink-0" />
-                            <span className="text-sm font-bold text-zinc-950">{skill.title}</span>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center">
+                                <IconComp className="w-3.5 h-3.5" />
+                              </div>
+                              <span className="text-sm font-bold text-zinc-950">{skill.title}</span>
+                            </div>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                              Active Demo
+                            </span>
                           </div>
-                          <p className="text-xs text-zinc-600 leading-relaxed">
+                          <p className="text-xs text-zinc-600 leading-relaxed pt-1">
                             {skill.shortDesc}
                           </p>
                         </div>
@@ -771,72 +787,234 @@ export default function AiAgentPage() {
                       <button
                         key={skill.id}
                         onClick={() => setActiveSkillId(skill.id)}
-                        className="w-full px-4 py-3 rounded-full bg-white/80 hover:bg-white border border-zinc-200/70 hover:border-zinc-300 shadow-2xs flex items-center gap-2.5 text-left transition-all cursor-pointer group"
+                        className="w-full px-4 py-3 rounded-xl bg-white/80 hover:bg-white border border-zinc-200/80 hover:border-zinc-300 shadow-2xs flex items-center gap-2.5 text-left transition-all cursor-pointer group"
                       >
-                        <IconComp className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 shrink-0" />
-                        <span className="text-xs sm:text-sm font-semibold text-zinc-700 group-hover:text-zinc-950">{skill.title}</span>
+                        <div className="w-7 h-7 rounded-lg bg-zinc-100 group-hover:bg-zinc-200 text-zinc-600 flex items-center justify-center transition-colors">
+                          <IconComp className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-xs sm:text-sm font-semibold text-zinc-700 group-hover:text-zinc-950 flex-1">
+                          {skill.title}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 transition-transform group-hover:translate-x-0.5" />
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Right Column: Live Simulated Agent Workspace */}
+              {/* Right Column: Live High-Fidelity Cora Workspace Demo */}
               <div className="lg:col-span-7 gsap-skill-canvas">
-                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-zinc-200/90 shadow-lg relative overflow-hidden space-y-5">
+                <div className="bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/90 shadow-xl overflow-hidden">
                   
-                  {/* Top: Agent Header & Live Bullet Tasks */}
-                  <div className="pb-4 border-b border-zinc-100 flex items-start gap-3.5">
-                    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-zinc-200 ring-2 ring-purple-100">
-                      <Image
-                        src={selectedSkill.agentAvatar}
-                        alt={selectedSkill.agentName}
-                        width={40}
-                        height={40}
-                        className="object-cover"
-                      />
+                  {/* Cora Workspace App Header Bar */}
+                  <div className="px-5 py-3.5 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-400/80" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
+                      </div>
+                      <span className="font-mono text-zinc-400 text-[11px] ml-2">cora.workspace / studio / {activeSkillId}</span>
                     </div>
-                    <div className="space-y-1">
-                      <h4 className="text-sm font-bold text-zinc-950">{selectedSkill.agentName}</h4>
-                      <ul className="space-y-0.5 text-xs text-zinc-500 font-medium">
-                        {selectedSkill.tasks.map((task, tIdx) => (
-                          <li key={tIdx} className="flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-                            <span>{task}</span>
-                          </li>
-                        ))}
-                      </ul>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="font-semibold text-zinc-700 text-[11px]">Agent Connected</span>
                     </div>
                   </div>
 
-                  {/* Body: Simulated Message Container */}
-                  <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50/80 border border-zinc-200/70 space-y-3">
-                    <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/60 text-xs text-zinc-600 font-medium">
-                      <span className="font-bold text-zinc-900">{selectedSkill.subject}</span>
+                  {/* Active Agent Sub-Header */}
+                  <div className="p-5 sm:p-6 border-b border-zinc-100 bg-white flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 border border-zinc-200 ring-2 ring-zinc-100 shadow-xs">
+                        <Image
+                          src={selectedSkill.agentAvatar}
+                          alt={selectedSkill.agentName}
+                          width={44}
+                          height={44}
+                          className="object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h4 className="text-sm sm:text-base font-bold text-zinc-950">{selectedSkill.agentName}</h4>
+                        <p className="text-xs text-zinc-500 font-medium">Autonomous Commercial Studio Agent</p>
+                      </div>
                     </div>
-                    <div className="text-[11px] text-zinc-500 font-mono">
-                      To: <strong className="text-zinc-800">{selectedSkill.recipient}</strong>
-                    </div>
-                    <div className="space-y-1.5 text-xs text-zinc-700 leading-relaxed font-sans pt-1">
-                      {selectedSkill.messageLines.map((line, lIdx) => (
-                        <p key={lIdx}>{line}</p>
-                      ))}
+                    <div className="text-right hidden sm:block">
+                      <span className="text-[11px] font-mono font-semibold text-zinc-600 bg-zinc-100 px-2.5 py-1 rounded-md">
+                        Latency: 0.8s
+                      </span>
                     </div>
                   </div>
 
-                  {/* Bottom Right: Cutout Portrait with Floating Speech Pill */}
-                  <div className="pt-2 flex items-end justify-between gap-4">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold shadow-md">
-                      <span>{selectedSkill.speechPill}</span>
+                  {/* Visual Dynamic Workspace Demo Body */}
+                  <div className="p-5 sm:p-6 space-y-4 bg-zinc-50/40 min-h-[360px] flex flex-col justify-between">
+                    
+                    {/* Demo 1: WhatsApp Shoot Intake & Rate Quotes */}
+                    {activeSkillId === 'send-quote' && (
+                      <div className="space-y-3.5">
+                        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
+                          <div className="flex items-center justify-between text-xs text-zinc-500 pb-1.5 border-b border-zinc-100">
+                            <span className="font-bold text-zinc-900">💬 Client WhatsApp Thread</span>
+                            <span className="text-emerald-700 font-medium font-mono">Verified +91 98201...</span>
+                          </div>
+                          <div className="p-3 bg-zinc-50 rounded-lg text-xs text-zinc-700 leading-relaxed border border-zinc-100">
+                            &ldquo;Hey Cora, we need Studio Bay 2 for the Lakme Fashion campaign on Oct 24-25. 4K ProRes master + 40 retouched stills. What is the final quotation with GST?&rdquo;
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-bold text-zinc-900">⚡ Auto-Generated Commercial Scope</span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">
+                              Instant Split
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="p-2.5 bg-zinc-50 rounded-lg border border-zinc-100">
+                              <span className="text-zinc-500 block text-[10.5px]">Hold Dates</span>
+                              <span className="font-bold text-zinc-950">Oct 24 - 25 (Bay 02)</span>
+                            </div>
+                            <div className="p-2.5 bg-zinc-50 rounded-lg border border-zinc-100">
+                              <span className="text-zinc-500 block text-[10.5px]">Commercial Value</span>
+                              <span className="font-bold text-zinc-950 font-mono">₹1,20,000 + 18% GST</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Demo 2: Direct Message Audio Extraction */}
+                    {activeSkillId === 'direct-message' && (
+                      <div className="space-y-3.5">
+                        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
+                          <div className="flex items-center justify-between text-xs text-zinc-500 pb-1.5 border-b border-zinc-100">
+                            <span className="font-bold text-zinc-900">🎙️ WhatsApp Audio Note Transcribed</span>
+                            <span className="text-indigo-600 font-mono text-[10.5px]">0.8s AI Extraction</span>
+                          </div>
+                          <div className="p-3 bg-indigo-50/50 rounded-lg text-xs text-indigo-950 leading-relaxed border border-indigo-100">
+                            &ldquo;Looking for full-day studio hold on 28th Nov with 3 models, lighting grid, and 8K raw capture delivery.&rdquo;
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
+                          <span className="text-xs font-bold text-zinc-900 block">Structured Extraction Registry</span>
+                          <div className="space-y-1.5 text-xs">
+                            <div className="flex justify-between py-1 border-b border-zinc-100">
+                              <span className="text-zinc-500">Talent Scope:</span>
+                              <span className="font-semibold text-zinc-900">3 Models (Full Day)</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-zinc-100">
+                              <span className="text-zinc-500">Lighting Package:</span>
+                              <span className="font-semibold text-zinc-900">Aputure 600d x4 Included</span>
+                            </div>
+                            <div className="flex justify-between py-1">
+                              <span className="text-zinc-500">Deposit Requirement:</span>
+                              <span className="font-bold text-emerald-700 font-mono">50% Advance (₹45,000)</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Demo 3: Assign Studio Tasks & Crew Call-Sheets */}
+                    {activeSkillId === 'assign-task' && (
+                      <div className="space-y-3.5">
+                        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
+                          <div className="flex items-center justify-between text-xs text-zinc-500 pb-1.5 border-b border-zinc-100">
+                            <span className="font-bold text-zinc-900">📋 Crew Call-Time WhatsApp Broadcast</span>
+                            <span className="text-emerald-700 font-bold font-mono">14/14 Delivered</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="p-2.5 bg-zinc-50 rounded-lg border border-zinc-100">
+                              <span className="text-zinc-500 block text-[10.5px]">Call Time</span>
+                              <span className="font-bold text-zinc-950">07:30 AM IST (Stage 02)</span>
+                            </div>
+                            <div className="p-2.5 bg-zinc-50 rounded-lg border border-zinc-100">
+                              <span className="text-zinc-500 block text-[10.5px]">Location</span>
+                              <span className="font-bold text-zinc-950 truncate">Mehboob Studio, Mumbai</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-1.5 text-xs">
+                          <span className="font-bold text-zinc-900 block pb-1 border-b border-zinc-100">Live Crew Read Receipts</span>
+                          <div className="flex items-center justify-between text-zinc-600">
+                            <span>DOP &bull; Focus Puller &bull; Gaffer</span>
+                            <span className="text-emerald-700 font-bold font-mono">✓ Acknowledged</span>
+                          </div>
+                          <div className="flex items-center justify-between text-zinc-600">
+                            <span>Wardrobe Stylist &bull; Lead MUA</span>
+                            <span className="text-emerald-700 font-bold font-mono">✓ Acknowledged</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Demo 4: Schedule Hold Events & Bay Grid */}
+                    {activeSkillId === 'schedule-events' && (
+                      <div className="space-y-3.5">
+                        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2.5">
+                          <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-100">
+                            <span className="font-bold text-zinc-900">📅 Studio Bay Schedule Grid</span>
+                            <span className="text-xs font-mono font-bold text-indigo-600">Oct 24 - 25</span>
+                          </div>
+                          <div className="space-y-1.5 text-xs">
+                            <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200/80 flex items-center justify-between">
+                              <span className="font-semibold text-emerald-950">Studio Bay 01: Nike Commercial</span>
+                              <span className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded">Confirmed</span>
+                            </div>
+                            <div className="p-2 rounded-lg bg-indigo-50 border border-indigo-200/80 flex items-center justify-between">
+                              <span className="font-semibold text-indigo-950">Studio Bay 02: Lakme Fashion Shoot</span>
+                              <span className="text-[10px] font-bold text-indigo-700 bg-white px-2 py-0.5 rounded">Locked</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-xs flex items-center justify-between text-xs">
+                          <span className="text-zinc-600 font-medium">Clash Prevention Engine:</span>
+                          <span className="font-bold text-emerald-700 font-mono">Zero Overlaps Detected</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Demo 5: SHA-256 E-Sign & Legal Seals */}
+                    {activeSkillId === 'mentions' && (
+                      <div className="space-y-3.5">
+                        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-2">
+                          <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-100">
+                            <span className="font-bold text-zinc-900">🔒 Commercial Usage License &amp; NDA</span>
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                              IT Act 2000 Sealed
+                            </span>
+                          </div>
+                          <div className="p-2.5 bg-zinc-50 rounded-lg text-[11px] font-mono text-zinc-600 truncate border border-zinc-100">
+                            SHA256: 9f82ab174e3c90df81e2893a7c6f01b7a2d4e6f8...
+                          </div>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-xs space-y-1.5 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="text-zinc-500">Signee Audit:</span>
+                            <span className="font-semibold text-zinc-950">Pooja Sharma (Client Mobile OTP)</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-zinc-500">Vault Timestamp:</span>
+                            <span className="font-mono text-zinc-700">2026-08-24 14:32:08 IST</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Bottom Floating Speech Bubble */}
+                    <div className="pt-2 flex items-center justify-between gap-3 border-t border-zinc-200/80">
+                      <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-950 text-white text-xs font-semibold shadow-md">
+                        <span>{selectedSkill.speechPill}</span>
+                      </div>
+                      <span className="text-[11px] font-mono text-zinc-500 hidden sm:inline">
+                        100% Autonomous
+                      </span>
                     </div>
-                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shrink-0 border border-purple-200 ring-4 ring-purple-50 shadow-md">
-                      <Image
-                        src="/images/cora_agent_marketing.jpg"
-                        alt="Agent Visual"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+
                   </div>
 
                 </div>
@@ -900,7 +1078,7 @@ export default function AiAgentPage() {
               <div className="pt-2">
                 <Link
                   href="/workspace/login"
-                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 text-sm font-semibold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
                 >
                   <span>Try Super Agents</span>
                   <ArrowRight className="w-4 h-4" />
