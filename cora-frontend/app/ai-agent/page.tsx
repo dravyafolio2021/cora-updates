@@ -333,179 +333,59 @@ export default function AiAgentPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 1: HERO PINNED STAGE (ClickUp Super Agents™ Style)
       ───────────────────────────────────────────────────────────── */}
-      <section className="relative pt-24 pb-14 sm:pt-32 sm:pb-20 overflow-hidden border-b border-zinc-100 bg-[#FAFAFB]">
+      <section className="relative min-h-[92vh] flex flex-col justify-between pt-24 pb-12 sm:pt-28 sm:pb-16 overflow-hidden border-b border-zinc-100 bg-[#FFFFFF]">
         
-        {/* Background Atmospheric Glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[900px] h-[400px] bg-gradient-to-b from-zinc-200/50 via-zinc-100/30 to-transparent rounded-full blur-3xl pointer-events-none" />
-
-        <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
-          
-          {/* Top Eyebrow */}
-          <div className="text-center mb-3 gsap-hero-fade">
-            <span className="text-xs font-bold uppercase tracking-widest text-zinc-400">
-              [ AI CO-FOUNDERS™ ]
-            </span>
-          </div>
-
-          {/* Main Hero Headline */}
-          <div className="text-center max-w-[900px] mx-auto mb-6 sm:mb-10">
-            <h1 className="gsap-hero-fade font-display text-4xl xs:text-5xl sm:text-6xl lg:text-[68px] font-bold text-zinc-950 leading-[1.05] tracking-[-0.04em] mb-3.5">
-              A new era of service businesses, with <br className="hidden sm:inline" />
-              <span className="text-zinc-400 font-medium">AI Co-Founders&trade;</span>
-            </h1>
-            <p className="gsap-hero-fade text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[660px] mx-auto">
-              Maximize studio productivity with specialized autonomous teammates. @mention, assign bookings, and automate 18% GST billing &mdash; grounded in your studio&apos;s live brain.
-            </p>
-
-            {/* CTAs */}
-            <div className="gsap-hero-fade flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-5 sm:mt-7">
-              <Link
-                href="/workspace/login"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
-              >
-                <span>Try AI Co-Founders Free</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a
-                href="#capabilities"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white border border-zinc-200 text-zinc-800 hover:text-zinc-950 hover:bg-zinc-50 text-sm font-semibold shadow-2xs transition-all"
-              >
-                <span>Explore Capabilities</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Central 3D Character Visual + Two-Column Expandable Powers */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center max-w-[1180px] mx-auto pt-2">
-            
-            {/* Left Column: HUMAN POWERS */}
-            <div className="lg:col-span-4 space-y-3.5 gsap-hero-left">
-              <div className="flex items-center gap-2 border-b border-zinc-200 pb-2">
-                <div className="w-2 h-2 rounded-full bg-zinc-950" />
-                <span className="text-xs font-bold uppercase tracking-widest text-zinc-950">
-                  HUMAN POWERS
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                {humanPowers.map((item) => {
-                  const isExpanded = activeHumanTag === item.id;
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => setActiveHumanTag(isExpanded ? null : item.id)}
-                      className={`p-3 rounded-2xl border transition-all duration-200 cursor-pointer ${
-                        isExpanded
-                          ? 'bg-white border-zinc-950 shadow-sm ring-1 ring-zinc-950/10'
-                          : 'bg-white/70 hover:bg-white border-zinc-200/80 hover:border-zinc-300 shadow-2xs'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs sm:text-sm font-bold text-zinc-900">{item.label}</span>
-                        <span className="text-xs font-bold text-zinc-400">{isExpanded ? '−' : '+'}</span>
-                      </div>
-                      {isExpanded && (
-                        <p className="text-xs text-zinc-600 leading-relaxed mt-2 pt-2 border-t border-zinc-100">
-                          {item.desc}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Center: 3D Co-Founder Actor Card with Floating Bob */}
-            <div ref={heroActorRef} className="lg:col-span-4 flex flex-col items-center justify-center text-center">
-              <div className="relative w-[260px] h-[340px] sm:w-[300px] sm:h-[390px] rounded-3xl overflow-hidden shadow-2xl border border-zinc-200/90 bg-white group">
-                <Image
-                  src="/images/agent_card_pm.jpg"
-                  alt="Cora AI Co-Founder"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-5 text-left text-white">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/90 text-[10.5px] font-bold text-white mb-1.5 w-fit">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                    <span>ONLINE &bull; 0.8s LATENCY</span>
-                  </span>
-                  <h3 className="font-display text-base sm:text-lg font-bold">Intake &amp; Project Co-Founder</h3>
-                  <p className="text-zinc-300 text-xs mt-0.5">Handling briefs, rate cards &amp; hold dates</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: SUPERPOWERS */}
-            <div className="lg:col-span-4 space-y-3.5 gsap-hero-right">
-              <div className="flex items-center gap-2 border-b border-zinc-200 pb-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-600" />
-                <span className="text-xs font-bold uppercase tracking-widest text-zinc-950">
-                  SUPERPOWERS
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                {superpowers.map((item) => {
-                  const isExpanded = activeSuperTag === item.id;
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => setActiveSuperTag(isExpanded ? null : item.id)}
-                      className={`p-3 rounded-2xl border transition-all duration-200 cursor-pointer ${
-                        isExpanded
-                          ? 'bg-white border-zinc-950 shadow-sm ring-1 ring-zinc-950/10'
-                          : 'bg-white/70 hover:bg-white border-zinc-200/80 hover:border-zinc-300 shadow-2xs'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs sm:text-sm font-bold text-zinc-900">{item.label}</span>
-                        <span className="text-xs font-bold text-zinc-400">{isExpanded ? '−' : '+'}</span>
-                      </div>
-                      {isExpanded && (
-                        <p className="text-xs text-zinc-600 leading-relaxed mt-2 pt-2 border-t border-zinc-100">
-                          {item.desc}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-          </div>
-
-          {/* Mobile Streaming Task Pills */}
-          <div className="mt-8 overflow-hidden select-none [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-            <div className="flex min-w-full shrink-0 items-center justify-around gap-3 animate-marquee py-1">
-              {[
-                'WhatsApp Brief Intake',
-                '18% GST Invoicing',
-                'SHA-256 Model NDAs',
-                'Dynamic UPI QR Standees',
-                '50+ Crew Call-Sheets',
-                'Hold Date Clashes',
-                'CA GSTR-1 Sync',
-                'Client Review Portals',
-                'Scope Creep Protection',
-              ].concat([
-                'WhatsApp Brief Intake',
-                '18% GST Invoicing',
-                'SHA-256 Model NDAs',
-                'Dynamic UPI QR Standees',
-                '50+ Crew Call-Sheets',
-              ]).map((pill, idx) => (
-                <span
-                  key={idx}
-                  className="px-3.5 py-1.5 rounded-full bg-white border border-zinc-200 text-zinc-800 text-xs font-semibold shadow-2xs whitespace-nowrap"
-                >
-                  &bull; {pill}
-                </span>
-              ))}
-            </div>
-          </div>
-
+        {/* Giant Watermark 3D Typography in Background */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
+          <span className="font-display font-extrabold text-[120px] xs:text-[160px] sm:text-[230px] md:text-[290px] lg:text-[360px] text-zinc-950/[0.04] leading-[0.88] tracking-tighter">
+            Super
+          </span>
+          <span className="font-display font-extrabold text-[95px] xs:text-[130px] sm:text-[190px] md:text-[240px] lg:text-[300px] text-zinc-950/[0.04] leading-[0.88] tracking-tighter">
+            Agents<span className="text-[0.3em] align-top">™</span>
+          </span>
         </div>
+
+        {/* Soft Warm Radial Glow Behind Portrait */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[560px] h-[340px] sm:h-[560px] bg-radial from-orange-200/40 via-amber-100/20 to-transparent rounded-full blur-3xl pointer-events-none z-0" />
+
+        {/* Center Stage: Indian Boy Hero Portrait with Gradient Visor */}
+        <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 flex-1 flex flex-col items-center justify-center my-auto">
+          <div ref={heroActorRef} className="relative w-[300px] h-[300px] sm:w-[440px] sm:h-[440px] lg:w-[520px] lg:h-[520px]">
+            <div className="relative w-full h-full [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]">
+              <Image
+                src="/images/cora_hero_indian_agent.jpg"
+                alt="Cora AI Super Agent with Futuristic Visor"
+                fill
+                priority
+                className="object-contain drop-shadow-2xl"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Stage Overlay: Headline & CTAs */}
+        <div className="relative z-20 w-full max-w-[800px] mx-auto px-4 text-center space-y-5 gsap-hero-fade mt-2">
+          <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[54px] font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em]">
+            A new era of humans, <br />
+            with <span className="text-zinc-900 font-extrabold">AI Super Agents&trade;</span>
+          </h1>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
+            <Link
+              href="/workspace/login"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 text-sm sm:text-base font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
+            >
+              Try Super Agents
+            </Link>
+            <a
+              href="#capabilities"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white/95 border border-zinc-200 text-zinc-800 hover:text-zinc-950 hover:bg-zinc-50 text-sm sm:text-base font-semibold shadow-2xs backdrop-blur-sm transition-all"
+            >
+              Watch Intro
+            </a>
+          </div>
+        </div>
+
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
