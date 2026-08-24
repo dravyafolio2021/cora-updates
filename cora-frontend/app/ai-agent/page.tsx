@@ -180,8 +180,16 @@ export default function AiAgentPage() {
 
   const mainContainerRef = useRef<HTMLElement>(null);
   const heroActorRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const scrollCarousel = (direction: 'left' | 'right') => {
+    if (carouselRef.current) {
+      const scrollAmount = carouselRef.current.clientWidth * 0.75;
+      carouselRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
     if (direction === 'left') {
       setActiveCarouselIndex((prev) => (prev > 0 ? prev - 1 : aiAgentsList.length - 1));
     } else {
@@ -333,18 +341,16 @@ export default function AiAgentPage() {
         {/* Soft Warm Radial Glow Behind Portrait */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[560px] h-[340px] sm:h-[560px] bg-radial from-orange-200/40 via-amber-100/20 to-transparent rounded-full blur-3xl pointer-events-none z-0" />
 
-        {/* Center Stage: Indian Boy Hero Portrait with Gradient Visor */}
+        {/* Center Stage: Indian Female AI Co-Founder with Gradient Visor (Transparent PNG) */}
         <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 flex-1 flex flex-col items-center justify-center my-auto">
-          <div ref={heroActorRef} className="relative w-[300px] h-[300px] sm:w-[440px] sm:h-[440px] lg:w-[520px] lg:h-[520px]">
-            <div className="relative w-full h-full [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]">
-              <Image
-                src="/images/cora_hero_indian_agent.jpg"
-                alt="Cora AI Super Agent with Futuristic Visor"
-                fill
-                priority
-                className="object-contain drop-shadow-2xl"
-              />
-            </div>
+          <div ref={heroActorRef} className="relative w-[280px] h-[280px] xs:w-[320px] xs:h-[320px] sm:w-[420px] sm:h-[420px] lg:w-[480px] lg:h-[480px]">
+            <Image
+              src="/images/cora_hero_indian_agent.png"
+              alt="Cora AI Super Agent with Futuristic Visor"
+              fill
+              priority
+              className="object-contain drop-shadow-xl"
+            />
           </div>
         </div>
 
@@ -412,15 +418,18 @@ export default function AiAgentPage() {
             </div>
           </div>
 
-          {/* Cards Carousel Grid: Image Background with Single-Line Text */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {/* Cards Carousel Grid: Horizontal Swipe on Mobile & Multi-Column on Desktop */}
+          <div
+            ref={carouselRef}
+            className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:grid md:grid-cols-3 lg:grid-cols-5"
+          >
             {aiAgentsList.map((card, idx) => {
               const isCurrent = idx === activeCarouselIndex;
               return (
                 <div
                   key={card.id}
                   onClick={() => setActiveCarouselIndex(idx)}
-                  className={`gsap-capability-card rounded-3xl overflow-hidden h-[410px] sm:h-[430px] cursor-pointer relative group transition-all duration-300 flex flex-col justify-between p-5 ${
+                  className={`gsap-capability-card rounded-3xl overflow-hidden h-[410px] sm:h-[430px] min-w-[270px] xs:min-w-[290px] sm:min-w-[320px] md:min-w-0 snap-center shrink-0 md:shrink cursor-pointer relative group transition-all duration-300 flex flex-col justify-between p-5 ${
                     isCurrent
                       ? 'ring-2 ring-zinc-950 shadow-2xl scale-[1.02]'
                       : 'border border-zinc-200/90 shadow-2xs hover:shadow-md hover:scale-[1.01]'
