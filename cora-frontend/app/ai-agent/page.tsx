@@ -26,6 +26,7 @@ import {
   Check,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
   QrCode,
   Share2,
   Users,
@@ -35,6 +36,50 @@ import { trackEvent } from '@/components/analytics/Analytics';
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
+
+// ── 0. Frequently Asked Questions Data (Reference Accurate) ──
+const superAgentFaqs = [
+  {
+    question: 'What are Cora Super Agents?',
+    answer:
+      'Cora Super Agents are autonomous AI co-founders and specialized operational agents built specifically for commercial photography, film, and creative production studios. They understand commercial context, studio rate cards, 18% GST rules, and hold schedules to execute real workflows without manual supervision.',
+  },
+  {
+    question: 'How are Super Agents different from AI chatbots?',
+    answer:
+      'Unlike passive chatbots that only generate text answers, Super Agents possess tool execution capabilities. They can lock calendar bay holds, calculate compliant 18% GST splits, generate SHA-256 sealed NDAs, dispatch call-sheets to 50+ crew on WhatsApp, and reconcile bank deposits directly in your Cora workspace.',
+  },
+  {
+    question: 'What can Super Agents do?',
+    answer:
+      'Your AI team commands 5 major commercial pillars: Marketing (client outreach, campaigns, pitch decks), Sales (24/7 lead intake, instant WhatsApp quotations), Operations (studio bay calendar holds, crew call-sheets, gear checklists), Finance (18% GST invoicing, dynamic UPI QR standees, ledger reconciliation), and Legal (tamper-proof NDAs, model releases, usage licensing).',
+  },
+  {
+    question: 'How do I create a Super Agent?',
+    answer:
+      'You can delegate tasks via natural language directly in your Cora workspace, chat naturally on WhatsApp, or tag @Cora in any client shoot brief. Your agent team instantly interprets the scope, delegates subtasks, and reports back upon completion.',
+  },
+  {
+    question: 'Are Super Agents secure?',
+    answer:
+      'Yes. All commercial shoot contracts, client portfolios, and rate cards are encrypted with enterprise-grade AES-256. Every e-signature, NDA, and tax invoice receives a cryptographic SHA-256 seal with logged IP and timestamp audit trails, fully compliant under the Indian IT Act 2000.',
+  },
+  {
+    question: 'How much do Super Agents cost?',
+    answer:
+      'Super Agents are included directly in all Cora Studio Pro and Enterprise plans with flexible token quotas. There are zero per-agent seat markups — one unified subscription unlocks your entire autonomous agent team across marketing, sales, operations, finance, and legal.',
+  },
+  {
+    question: 'Can Super Agents connect to tools outside Cora?',
+    answer:
+      'Yes. Super Agents integrate natively with WhatsApp Business API, Razorpay, PhonePe UPI, Google Calendar, Apple Calendar, Tally Prime, Zoho Books, and cloud storage vaults like Google Drive and Dropbox.',
+  },
+  {
+    question: 'Do Super Agents learn and improve over time?',
+    answer:
+      'Yes. Every commercial booking, custom rate negotiation, client preference, and shoot feedback signal grounds your agent team deeper into your studio\'s unique operating DNA, making future pricing and scheduling recommendations increasingly fast and accurate.',
+  },
+];
 
 // ── 1. Expandable Tags Data for Hero ──
 interface TagItem {
@@ -232,6 +277,7 @@ function computeDynamicTasks(): number {
 export default function AiAgentPage() {
   const [activeSkillId, setActiveSkillId] = useState<string>('send-quote');
   const [liveTasksCount, setLiveTasksCount] = useState<number>(1000);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const selectedSkill = humanSkills.find((s) => s.id === activeSkillId) || humanSkills[0];
 
@@ -818,6 +864,49 @@ export default function AiAgentPage() {
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 6: FREQUENTLY ASKED QUESTIONS (Accordion Layout)
+      ───────────────────────────────────────────────────────────── */}
+      <section id="faqs" className="py-20 sm:py-28 bg-white relative z-10">
+        <div className="w-full max-w-[880px] mx-auto px-4 sm:px-6">
+          
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-[46px] font-bold text-zinc-950 tracking-tight text-center mb-12 sm:mb-16">
+            Frequently asked <span className="text-zinc-400">questions</span>
+          </h2>
+
+          <div className="divide-y divide-zinc-200 border-t border-b border-zinc-200">
+            {superAgentFaqs.map((faq, fIdx) => {
+              const isOpen = openFaqIndex === fIdx;
+              return (
+                <div key={fIdx} className="py-5 sm:py-6">
+                  <button
+                    onClick={() => setOpenFaqIndex(isOpen ? null : fIdx)}
+                    className="w-full flex items-center justify-between gap-4 text-left group cursor-pointer focus:outline-none"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="font-display text-base sm:text-lg font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                      {faq.question}
+                    </span>
+                    <ChevronDown
+                      className={`w-5 h-5 shrink-0 text-zinc-400 group-hover:text-zinc-700 transition-transform duration-200 ${
+                        isOpen ? 'rotate-180 text-zinc-950' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div className="pt-3.5 pr-8 text-zinc-600 text-sm sm:text-base leading-relaxed animate-in fade-in slide-in-from-top-1 duration-200">
+                      <p>{faq.answer}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
         </div>
       </section>
 
