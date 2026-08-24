@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   ChevronDown, 
   ChevronLeft,
@@ -721,127 +722,99 @@ export function Navbar() {
                 {activeDropdown === 'resources' && (
                   <div className="grid grid-cols-3 gap-6 items-stretch">
                     
-                    {/* Card 1: Free Public Tools (Solid Soft Lavender / Periwinkle, No Border) */}
+                    {/* Card 1: Free Public Tools (Solid Soft Lavender / Periwinkle) */}
                     <Link
                       href="/tools"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[26px] bg-[#EEF2FF] hover:bg-[#E0E7FF] border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
+                      className="group relative rounded-[28px] bg-[#EEF2FF] hover:bg-[#E0E7FF] border-0 p-6 sm:p-7 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[270px]"
                     >
-                      <div className="text-center space-y-1 mb-4">
-                        <h3 className="font-display text-xl font-bold text-zinc-950">
+                      <div className="space-y-1.5 z-10 max-w-[190px]">
+                        <h3 className="font-display text-2xl font-bold text-zinc-950 tracking-tight leading-tight">
                           Free Tools
                         </h3>
-                        <p className="text-zinc-600 text-xs font-normal max-w-[220px] mx-auto leading-relaxed">
+                        <p className="text-zinc-600 text-xs font-normal leading-relaxed">
                           Instant calculators &amp; AI generators with zero login
                         </p>
                       </div>
 
-                      {/* Floating Mockup Card inside */}
-                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_6px_20px_rgba(0,0,0,0.06)] space-y-2 group-hover:scale-[1.02] transition-transform">
-                        <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-                          <div className="flex items-center gap-1.5">
-                            <span className="w-5 h-5 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-[10px] font-bold">₹</span>
-                            <span className="text-[11px] font-bold text-zinc-900">18% GST Calculator</span>
-                          </div>
-                          <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-bold">FREE</span>
-                        </div>
-                        <div className="text-[10px] text-zinc-500 space-y-1">
-                          <div className="flex justify-between"><span>Base Total:</span><span className="font-semibold text-zinc-800">₹50,000</span></div>
-                          <div className="flex justify-between"><span>CGST (9%) + SGST (9%):</span><span className="font-semibold text-emerald-600">+₹9,000</span></div>
-                        </div>
+                      {/* Character Cutout Artwork */}
+                      <div className="absolute -right-2 -bottom-1 w-[165px] h-[205px] pointer-events-none transition-transform duration-300 group-hover:scale-105">
+                        <Image
+                          src="/images/cora_nav_tools_character.png"
+                          alt="Free Tools Super Agent"
+                          fill
+                          className="object-contain object-bottom"
+                        />
                       </div>
 
-                      <div className="pt-4 text-center">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-950 group-hover:translate-x-0.5 transition-transform">
+                      <div className="pt-6 z-10">
+                        <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-indigo-950 group-hover:translate-x-1 transition-transform">
                           <span>Browse all micro-tools</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </span>
                       </div>
                     </Link>
 
-                    {/* Card 2: Guides & Playbooks (Solid Soft Sky Blue, No Border) */}
+                    {/* Card 2: Guides & Playbooks (Solid Soft Sky Blue) */}
                     <Link
                       href="/features#esign-vault"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[26px] bg-[#E0F2FE] hover:bg-[#BAE6FD] border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
+                      className="group relative rounded-[28px] bg-[#E0F2FE] hover:bg-[#BAE6FD] border-0 p-6 sm:p-7 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[270px]"
                     >
-                      <div className="text-center space-y-1 mb-4">
-                        <h3 className="font-display text-xl font-bold text-zinc-950">
+                      <div className="space-y-1.5 z-10 max-w-[190px]">
+                        <h3 className="font-display text-2xl font-bold text-zinc-950 tracking-tight leading-tight">
                           Guides &amp; Playbooks
                         </h3>
-                        <p className="text-zinc-600 text-xs font-normal max-w-[220px] mx-auto leading-relaxed">
+                        <p className="text-zinc-600 text-xs font-normal leading-relaxed">
                           Studio SOPs, rate cards &amp; legal contract templates
                         </p>
                       </div>
 
-                      {/* Floating Mockup Card inside */}
-                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_6px_20px_rgba(0,0,0,0.06)] space-y-2 group-hover:scale-[1.02] transition-transform">
-                        <span className="text-[10px] font-mono font-bold text-sky-700 uppercase tracking-wider block pb-1 border-b border-zinc-100">
-                          FEATURED ASSETS
-                        </span>
-                        <div className="space-y-1.5 text-[11px] font-medium text-zinc-800">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sky-600">✦</span>
-                            <span>Commercial Studio Rate Card 2026</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sky-600">✦</span>
-                            <span>IT Act 2000 Model Release NDA</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sky-600">✦</span>
-                            <span>WhatsApp Call-Sheet Checklist</span>
-                          </div>
-                        </div>
+                      {/* Character Cutout Artwork */}
+                      <div className="absolute -right-2 -bottom-1 w-[170px] h-[210px] pointer-events-none transition-transform duration-300 group-hover:scale-105">
+                        <Image
+                          src="/images/cora_nav_guides_character.png"
+                          alt="Guides & Playbooks Super Agent"
+                          fill
+                          className="object-contain object-bottom"
+                        />
                       </div>
 
-                      <div className="pt-4 text-center">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-950 group-hover:translate-x-0.5 transition-transform">
+                      <div className="pt-6 z-10">
+                        <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-sky-950 group-hover:translate-x-1 transition-transform">
                           <span>Explore playbooks</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </span>
                       </div>
                     </Link>
 
-                    {/* Card 3: Articles & Market Comparisons (Solid Soft Mint Green, No Border) */}
+                    {/* Card 3: Articles & Market Comparisons (Solid Soft Mint Green) */}
                     <Link
                       href="/compare"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[26px] bg-[#DCFCE7] hover:bg-[#D1FAE5] border-0 p-6 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all"
+                      className="group relative rounded-[28px] bg-[#DCFCE7] hover:bg-[#D1FAE5] border-0 p-6 sm:p-7 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[270px]"
                     >
-                      <div className="text-center space-y-1 mb-4">
-                        <h3 className="font-display text-xl font-bold text-zinc-950">
+                      <div className="space-y-1.5 z-10 max-w-[190px]">
+                        <h3 className="font-display text-2xl font-bold text-zinc-950 tracking-tight leading-tight">
                           Articles &amp; Compare
                         </h3>
-                        <p className="text-zinc-600 text-xs font-normal max-w-[220px] mx-auto leading-relaxed">
+                        <p className="text-zinc-600 text-xs font-normal leading-relaxed">
                           Side-by-side benchmarks vs legacy market stacks
                         </p>
                       </div>
 
-                      {/* Floating Mockup Card inside */}
-                      <div className="bg-white/95 rounded-2xl p-3.5 border-0 shadow-[0_6px_20px_rgba(0,0,0,0.06)] space-y-2 group-hover:scale-[1.02] transition-transform">
-                        <div className="flex items-center justify-between pb-1 border-b border-zinc-100">
-                          <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-wider">
-                            HEAD-TO-HEAD
-                          </span>
-                          <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                            8 BENCHMARKS
-                          </span>
-                        </div>
-                        <div className="space-y-1 text-[11px] text-zinc-700">
-                          <div className="flex justify-between items-center">
-                            <span>vs HoneyBook &amp; Studio Ninja</span>
-                            <span className="text-emerald-700 font-bold text-[10px]">Save ₹65k/yr</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span>vs HubSpot Enterprise</span>
-                            <span className="text-emerald-700 font-bold text-[10px]">Save ₹4.5L/yr</span>
-                          </div>
-                        </div>
+                      {/* Character Cutout Artwork */}
+                      <div className="absolute -right-2 -bottom-1 w-[165px] h-[205px] pointer-events-none transition-transform duration-300 group-hover:scale-105">
+                        <Image
+                          src="/images/cora_nav_compare_character.png"
+                          alt="Articles & Compare Super Agent"
+                          fill
+                          className="object-contain object-bottom"
+                        />
                       </div>
 
-                      <div className="pt-4 text-center">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-950 group-hover:translate-x-0.5 transition-transform">
+                      <div className="pt-6 z-10">
+                        <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-emerald-950 group-hover:translate-x-1 transition-transform">
                           <span>Browse all 8 comparisons</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </span>
