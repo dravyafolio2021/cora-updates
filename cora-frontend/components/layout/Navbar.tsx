@@ -904,6 +904,21 @@ export function Navbar() {
               {/* Level 1: Main Category List (Clay style) */}
               {!activeMobileSubmenu && (
                 <div className="space-y-1 text-base font-semibold text-zinc-900">
+                  {/* AI Co-Founders Featured Pill on Mobile */}
+                  <Link
+                    href="/ai-agent"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full mb-2 p-3.5 rounded-2xl bg-zinc-950 text-white flex items-center justify-between shadow-sm transition-all"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Sparkles className="w-4 h-4 text-amber-400" />
+                      <span className="font-bold text-sm">AI Co-Founders™</span>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/90 text-white">
+                      NEW
+                    </span>
+                  </Link>
+
                   <button
                     type="button"
                     onClick={() => setActiveMobileSubmenu('product')}
