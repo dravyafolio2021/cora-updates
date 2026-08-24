@@ -737,13 +737,13 @@ export function Navbar() {
                         </p>
                       </div>
 
-                      {/* Character Cutout Artwork */}
-                      <div className="absolute -right-2 -bottom-1 w-[165px] h-[205px] pointer-events-none transition-transform duration-300 group-hover:scale-105">
+                      {/* Relatable 3D Tool & Calculator Artwork */}
+                      <div className="absolute -right-3 -bottom-3 w-[165px] h-[165px] rounded-2xl overflow-hidden shadow-md border-2 border-white/80 pointer-events-none transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-2">
                         <Image
-                          src="/images/cora_nav_tools_character.png"
-                          alt="Free Tools Super Agent"
+                          src="/images/cora_nav_tools_relatable.png"
+                          alt="Free Tools 3D Calculator & Tax Generator"
                           fill
-                          className="object-contain object-bottom"
+                          className="object-cover"
                         />
                       </div>
 
@@ -770,13 +770,13 @@ export function Navbar() {
                         </p>
                       </div>
 
-                      {/* Character Cutout Artwork */}
-                      <div className="absolute -right-2 -bottom-1 w-[170px] h-[210px] pointer-events-none transition-transform duration-300 group-hover:scale-105">
+                      {/* Relatable 3D Playbook & Legal Document Artwork */}
+                      <div className="absolute -right-3 -bottom-3 w-[165px] h-[165px] rounded-2xl overflow-hidden shadow-md border-2 border-white/80 pointer-events-none transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
                         <Image
-                          src="/images/cora_nav_guides_character.png"
-                          alt="Guides & Playbooks Super Agent"
+                          src="/images/cora_nav_guides_relatable.png"
+                          alt="Guides & Playbooks Contract Vault"
                           fill
-                          className="object-contain object-bottom"
+                          className="object-cover"
                         />
                       </div>
 
@@ -803,13 +803,13 @@ export function Navbar() {
                         </p>
                       </div>
 
-                      {/* Character Cutout Artwork */}
-                      <div className="absolute -right-2 -bottom-1 w-[165px] h-[205px] pointer-events-none transition-transform duration-300 group-hover:scale-105">
+                      {/* Relatable 3D Benchmark & Analytics Comparison Artwork */}
+                      <div className="absolute -right-3 -bottom-3 w-[165px] h-[165px] rounded-2xl overflow-hidden shadow-md border-2 border-white/80 pointer-events-none transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-2">
                         <Image
-                          src="/images/cora_nav_compare_character.png"
-                          alt="Articles & Compare Super Agent"
+                          src="/images/cora_nav_compare_relatable.png"
+                          alt="Articles & Compare Benchmarks Matrix"
                           fill
-                          className="object-contain object-bottom"
+                          className="object-cover"
                         />
                       </div>
 
