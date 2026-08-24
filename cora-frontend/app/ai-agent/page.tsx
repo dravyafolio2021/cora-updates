@@ -96,87 +96,156 @@ const aiAgentsList = [
   },
 ];
 
-// ── 3. Human Skills Showcase Data ──
+// ── 3. Human Skills Showcase Data (Matching ClickUp Infinite Skills Layout) ──
 const humanSkills = [
   {
-    id: 'brief-intake',
-    title: 'WhatsApp Brief Intake',
-    shortDesc: 'Auto-parses raw voice notes & WhatsApp chats into structured commercial shoot scopes.',
-    badge: '1-Tap Kickoff',
-    previewTitle: 'Lakme Commercial Shoot #CS-942',
-    previewSubtitle: 'Parsed from WhatsApp Voice Note (0.8s)',
-    details: [
-      { label: 'Client', value: 'Lakme Fashion Brand Team' },
-      { label: 'Hold Dates', value: 'October 24 - 25 (Confirmed)' },
-      { label: 'Deliverables', value: '4K ProRes Master + 40 Retouched Stills' },
-      { label: 'Commercial Budget', value: '₹1,20,000 + 18% GST (₹1,41,600)' },
+    id: 'send-quote',
+    title: 'Send Quote & Invoice',
+    icon: Send,
+    shortDesc: 'Super Agents draft, calculate 18% GST splits, and send clear, accurate rate card invoices based on client chats.',
+    agentName: 'Executive Assistant Agent',
+    agentAvatar: '/images/cora_agent_marketing.jpg',
+    tasks: [
+      'Reviewing client WhatsApp inquiry',
+      'Hold dates locked in Studio 4',
+      'Drafting 18% GST quotation',
     ],
+    subject: 'RE: Lakme Commercial Shoot #CS-942',
+    recipient: 'Pooja Sharma (Lakme Brand Lead)',
+    messageLines: [
+      'Hey Pooja!',
+      'Thanks for providing your commercial shoot requirements earlier today!',
+      "I've locked Studio Bay 02 for Oct 24-25 and generated your formal rate quotation with 18% GST.",
+      'The crew call-sheets and gear checklist are ready for dispatch.',
+    ],
+    speechPill: "✓ I'll lock the hold dates and dispatch the UPI advance QR.",
   },
   {
-    id: 'gst-calc',
-    title: 'Instant 18% GST Calculation',
-    shortDesc: 'Generates compliant GSTIN tax invoices with dynamic UPI soundbox QR standees.',
-    badge: 'GSTR-1 Valid',
-    previewTitle: 'Tax Invoice #CORA-2026-104',
-    previewSubtitle: 'Auto-Verified with GST Portal',
-    details: [
-      { label: 'Billed To', value: 'Oberoi Realty Ltd (GSTIN: 27AABCO1234F1Z5)' },
-      { label: 'Taxable Value', value: '₹2,50,000' },
-      { label: 'CGST 9% + SGST 9%', value: '₹22,500 + ₹22,500' },
-      { label: 'Total Payable', value: '₹2,95,000 (Dynamic UPI QR Active)' },
+    id: 'direct-message',
+    title: 'Direct Message Intake',
+    icon: MessageSquare,
+    shortDesc: 'Auto-parses raw voice notes & WhatsApp chats into structured commercial shoot scopes in 0.8s.',
+    agentName: 'Intake & PM Agent',
+    agentAvatar: '/images/cora_agent_sales.jpg',
+    tasks: [
+      'Transcribing audio voice note (0.8s)',
+      'Extracting 3-model commercial usage scope',
+      'Auto-populating shoot production brief',
     ],
+    subject: 'WhatsApp Brief #CS-942 Extracted',
+    recipient: 'Production Team Sync',
+    messageLines: [
+      'Client: Lakme Fashion Brand Team',
+      'Deliverables: 4K ProRes Master + 40 Retouched Stills',
+      'Commercial Budget: ₹1,20,000 + 18% GST (₹1,41,600)',
+      'SHA-256 NDA Seal & Crew Call-Sheets Queued.',
+    ],
+    speechPill: "✓ Brief standardized. Hold dates locked in calendar.",
   },
   {
-    id: 'legal-sign',
-    title: 'SHA-256 E-Signature NDAs',
-    shortDesc: 'Protects commercial usage rights and model releases with tamper-proof digital seals.',
-    badge: 'IT Act 2000 Compliant',
-    previewTitle: 'Commercial Rights & Usage License',
-    previewSubtitle: 'SHA-256 Hash: 9f82ab174e3c90df...',
-    details: [
-      { label: 'Usage Scope', value: 'Digital, Social & Print (India Region, 1 Year)' },
-      { label: 'Advance Deposit', value: '50% Non-Refundable Upfront' },
-      { label: 'E-Sign Audit', value: 'Client Signed via Mobile Link (IP & Timestamp Logged)' },
-      { label: 'Vault Registry', value: 'Stored in Encrypted Cora Vault' },
+    id: 'assign-task',
+    title: 'Assign Studio Tasks',
+    icon: CheckCircle2,
+    shortDesc: 'Dispatches personalized call times, maps, and gear lists to 50+ crew with live WhatsApp read receipts.',
+    agentName: 'Studio Director Agent',
+    agentAvatar: '/images/cora_agent_operations.jpg',
+    tasks: [
+      'Allocating Studio 4 lighting grid',
+      'Dispatching 12 crew call-time sheets',
+      'Verifying equipment gear insurance waiver',
     ],
+    subject: 'Mehboob Studio Bay 02 Call-Sheet',
+    recipient: '14 Crew Members via WhatsApp',
+    messageLines: [
+      'Call Time: 07:30 AM IST (Stage Setup: 06:45 AM)',
+      'Location: Mehboob Studio, Bandra West, Mumbai',
+      'Gear: Sony FX6 A/B, Aputure 600d x3, C-Stands x8',
+      'Read Status: 14/14 Crew Acknowledged.',
+    ],
+    speechPill: "✓ 14 crew members notified. All call times confirmed.",
   },
   {
-    id: 'call-sheets',
-    title: 'Crew Call-Time Broadcast',
-    shortDesc: 'Dispatches personalized call-sheets to 50+ crew with live WhatsApp read receipts.',
-    badge: '100% Delivery',
-    previewTitle: 'Mehboob Studio Bay 02 Call-Sheet',
-    previewSubtitle: 'Dispatched to 14 Crew Members',
-    details: [
-      { label: 'Call Time', value: '07:30 AM IST (Stage Setup: 06:45 AM)' },
-      { label: 'Location Pin', value: 'Mehboob Studio, Bandra West, Mumbai' },
-      { label: 'Gear Checklist', value: 'Sony FX6 A/B, Aputure 600d x3, C-Stands x8' },
-      { label: 'Read Status', value: '14/14 Crew Acknowledged' },
+    id: 'schedule-events',
+    title: 'Schedule Hold Events',
+    icon: Calendar,
+    shortDesc: 'Monitors studio calendar bays and resolves booking hold clashes in real time with ambient context.',
+    agentName: 'Operations & Calendar Agent',
+    agentAvatar: '/images/cora_agent_legal.jpg',
+    tasks: [
+      'Monitoring Studio 1, 2, 3, 4 holds',
+      'Resolving double-booking hold clash',
+      'Collecting 50% non-refundable advance',
     ],
+    subject: 'Hold Status: Oct 24-25 Confirmed',
+    recipient: 'Studio Calendar Manager',
+    messageLines: [
+      'Primary Hold: Nike Commercial (Studio 4)',
+      'Clash Resolved: Zara shifted to Studio 2',
+      'Advance Received: ₹70,800 via Instant UPI',
+      'Calendar Synced with Google & Apple Calendar.',
+    ],
+    speechPill: "✓ Hold secured. Zero double-booking clash.",
   },
   {
-    id: 'upi-reconcile',
-    title: 'UPI Advance Reconciliation',
-    shortDesc: 'Matches PhonePe, Razorpay & UPI deposits automatically to open bookings.',
-    badge: 'Instant Sync',
-    previewTitle: 'Operating Cash Flow & Ledger',
-    previewSubtitle: 'Auto-Matched to Shoot #CS-942',
-    details: [
-      { label: 'Advance Received', value: '₹70,800 via Instant UPI' },
-      { label: 'Pending at Delivery', value: '₹70,800 (Auto-Reminder Set)' },
-      { label: 'Tally Prime Export', value: 'Voucher #CORA-REC-89 Generated' },
-      { label: 'CA Filing Status', value: 'Ready for Monthly GSTR-1 Filing' },
+    id: 'mentions',
+    title: 'SHA-256 Legal Seals',
+    icon: ShieldCheck,
+    shortDesc: 'Protects commercial usage rights, model releases, and NDAs with legally binding cryptographic seals.',
+    agentName: 'Legal & Compliance Agent',
+    agentAvatar: '/images/cora_agent_finance.jpg',
+    tasks: [
+      'Drafting commercial usage license (1 Year)',
+      'Generating SHA-256 digital signature seal',
+      'Logging IP & timestamp audit trail',
     ],
+    subject: 'Commercial Rights License & Model Release',
+    recipient: 'Brand Legal Counsel',
+    messageLines: [
+      'Usage Scope: Digital, Social & Print (India Region)',
+      'SHA-256 Hash: 9f82ab174e3c90df81e2893a7c6f01b...',
+      'E-Sign Audit: Verified via Mobile Auth OTP',
+      'Stored in Encrypted Cora Vault.',
+    ],
+    speechPill: "✓ Legal agreement cryptographically sealed.",
   },
 ];
 
+// ── Mathematical Equation for Task Growth from 1,000 to 1,000,000 Tasks over 365 Days ──
+function computeDynamicTasks(): number {
+  const launchTimestamp = new Date('2026-01-01T00:00:00Z').getTime();
+  const nowTimestamp = Date.now();
+  const elapsedDays = Math.max(0, (nowTimestamp - launchTimestamp) / (86400 * 1000));
+  const totalDays = 365;
+  const progressRatio = Math.min(1.0, elapsedDays / totalDays);
+
+  // S-Curve mathematical growth curve: 1,000 starting baseline scaling organically to 1,000,000
+  const sCurveFactor = 0.15 * progressRatio + 0.85 * Math.pow(progressRatio, 2.2);
+  const baseCalculatedTasks = 1000 + (1000000 - 1000) * sCurveFactor;
+
+  // Intraday diurnal variation based on studio work hours
+  const currentHour = new Date().getHours();
+  const diurnalCycle = 520 * Math.sin((2 * Math.PI * (currentHour - 6)) / 24);
+
+  return Math.floor(baseCalculatedTasks + diurnalCycle);
+}
+
 export default function AiAgentPage() {
-  const [activeHumanTag, setActiveHumanTag] = useState<string | null>('assign');
-  const [activeSuperTag, setActiveSuperTag] = useState<string | null>('24-7');
-  const [activeCarouselIndex, setActiveCarouselIndex] = useState<number>(0);
-  const [activeSkillId, setActiveSkillId] = useState<string>('brief-intake');
+  const [activeSkillId, setActiveSkillId] = useState<string>('send-quote');
+  const [liveTasksCount, setLiveTasksCount] = useState<number>(1000);
 
   const selectedSkill = humanSkills.find((s) => s.id === activeSkillId) || humanSkills[0];
+
+  // Dynamic live ticker incrementing automatically
+  useEffect(() => {
+    setLiveTasksCount(computeDynamicTasks());
+
+    const interval = setInterval(() => {
+      const randomTaskBurst = Math.floor(Math.random() * 3) + 1;
+      setLiveTasksCount((prev) => prev + randomTaskBurst);
+    }, 2600);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const mainContainerRef = useRef<HTMLElement>(null);
   const heroActorRef = useRef<HTMLDivElement>(null);
@@ -394,7 +463,7 @@ export default function AiAgentPage() {
             {aiAgentsList.map((card, idx) => (
               <div
                 key={card.id}
-                className="rounded-3xl overflow-hidden h-[410px] sm:h-[450px] w-[280px] xs:w-[320px] sm:w-[360px] md:w-[380px] shrink-0 cursor-pointer relative group transition-all duration-300 flex flex-col justify-between p-6 border border-zinc-200/90 shadow-2xs hover:shadow-xl hover:scale-[1.01]"
+                className="rounded-3xl overflow-hidden h-[480px] sm:h-[530px] lg:h-[570px] w-[290px] xs:w-[330px] sm:w-[370px] md:w-[400px] shrink-0 cursor-pointer relative group transition-all duration-300 flex flex-col justify-between p-6 border border-zinc-200/90 shadow-2xs hover:shadow-xl hover:scale-[1.01]"
               >
                 {/* Full Background Image */}
                 <Image
@@ -408,20 +477,16 @@ export default function AiAgentPage() {
                 {/* Gradient Dark Overlay for Legibility */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
 
-                {/* Top: Index Indicator */}
+                {/* Top: Index Indicator (No Active Badge) */}
                 <div className="relative z-10 flex items-center justify-between">
                   <span className="text-[11px] font-mono font-bold text-white/90 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/15">
                     0{idx + 1}
-                  </span>
-                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500 text-white flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                    Active
                   </span>
                 </div>
 
                 {/* Bottom: Single-Line Title & Description */}
                 <div className="relative z-10 space-y-1.5">
-                  <h3 className="font-display text-xl font-bold text-white leading-tight">
+                  <h3 className="font-display text-xl sm:text-2xl font-bold text-white leading-tight">
                     {card.title}
                   </h3>
                   <p className="text-zinc-300 text-xs sm:text-sm leading-snug">
@@ -576,92 +641,113 @@ export default function AiAgentPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 4: [HUMAN SKILLS] INTERACTIVE PILL SHOWCASE
+          SECTION 4: [HUMAN SKILLS] INTERACTIVE SIMULATION SHOWCASE
       ───────────────────────────────────────────────────────────── */}
-      <section id="human-skills" className="py-14 sm:py-20 bg-white relative z-10 border-b border-zinc-100">
+      <section id="human-skills" className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
           
-          {/* Section Header */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-5 border-b border-zinc-200 mb-8 sm:mb-10">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 block mb-1">
-                [ HUMAN SKILLS ]
-              </span>
-              <h2 className="font-display text-2xl sm:text-4xl lg:text-[44px] font-bold text-zinc-950 tracking-tight">
-                Do more than humanly possible
-              </h2>
-            </div>
-            <p className="text-zinc-600 text-xs sm:text-sm max-w-[420px]">
-              &ldquo;The holy grail of what service enterprises are chasing &mdash; this is a game changer for creative business productivity.&rdquo;
-            </p>
-          </div>
-
-          {/* Interactive 2-Column Showcase */}
-          <div className="bg-[#F8F9FA] rounded-[32px] p-5 sm:p-8 lg:p-10 border border-zinc-200/80 shadow-xs">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="bg-[#F8F9FA] rounded-[36px] sm:rounded-[44px] p-6 sm:p-10 lg:p-14 border border-zinc-200/80 shadow-xs">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
               
-              {/* Left Column: Clickable Skill Pills */}
-              <div className="lg:col-span-5 space-y-2.5">
-                <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950 mb-2">
-                  The only agents that work like humans &mdash; with infinite skills
-                </h3>
+              {/* Left Column: Title & Skill Selectors */}
+              <div className="lg:col-span-5 space-y-3.5">
+                <h2 className="font-display text-2xl sm:text-3xl lg:text-[34px] font-bold text-zinc-950 leading-tight mb-5">
+                  The only agents that work like humans &ndash; with infinite skills
+                </h2>
 
-                {humanSkills.map((skill) => {
-                  const isSelected = skill.id === activeSkillId;
-                  return (
-                    <div
-                      key={skill.id}
-                      onClick={() => setActiveSkillId(skill.id)}
-                      className={`gsap-skill-pill p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer ${
-                        isSelected
-                          ? 'bg-white border-zinc-950 shadow-md ring-1 ring-zinc-950/10'
-                          : 'bg-white/70 hover:bg-white border-zinc-200/70 hover:border-zinc-300 shadow-2xs'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs sm:text-sm font-bold text-zinc-900">{skill.title}</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                          isSelected ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-600'
-                        }`}>
-                          {skill.badge}
-                        </span>
-                      </div>
-                      {isSelected && (
-                        <p className="text-xs text-zinc-600 leading-relaxed mt-2 pt-2 border-t border-zinc-100">
-                          {skill.shortDesc}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
+                <div className="space-y-2.5">
+                  {humanSkills.map((skill) => {
+                    const isSelected = skill.id === activeSkillId;
+                    const IconComp = skill.icon;
+                    if (isSelected) {
+                      return (
+                        <div
+                          key={skill.id}
+                          onClick={() => setActiveSkillId(skill.id)}
+                          className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-md ring-1 ring-zinc-950/5 transition-all cursor-pointer space-y-2"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <IconComp className="w-4 h-4 text-purple-600 shrink-0" />
+                            <span className="text-sm font-bold text-zinc-950">{skill.title}</span>
+                          </div>
+                          <p className="text-xs text-zinc-600 leading-relaxed">
+                            {skill.shortDesc}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <button
+                        key={skill.id}
+                        onClick={() => setActiveSkillId(skill.id)}
+                        className="w-full px-4 py-3 rounded-full bg-white/80 hover:bg-white border border-zinc-200/70 hover:border-zinc-300 shadow-2xs flex items-center gap-2.5 text-left transition-all cursor-pointer group"
+                      >
+                        <IconComp className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 shrink-0" />
+                        <span className="text-xs sm:text-sm font-semibold text-zinc-700 group-hover:text-zinc-950">{skill.title}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* Right Column: Live Artifact Canvas Preview */}
+              {/* Right Column: Live Simulated Agent Workspace */}
               <div className="lg:col-span-7 gsap-skill-canvas">
-                <div className="bg-white rounded-2xl p-5 sm:p-7 border border-zinc-200 shadow-lg space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-                    <div>
-                      <div className="text-xs sm:text-sm font-bold text-zinc-900">{selectedSkill.previewTitle}</div>
-                      <div className="text-[11px] text-zinc-500 font-mono">{selectedSkill.previewSubtitle}</div>
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-zinc-200/90 shadow-lg relative overflow-hidden space-y-5">
+                  
+                  {/* Top: Agent Header & Live Bullet Tasks */}
+                  <div className="pb-4 border-b border-zinc-100 flex items-start gap-3.5">
+                    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-zinc-200 ring-2 ring-purple-100">
+                      <Image
+                        src={selectedSkill.agentAvatar}
+                        alt={selectedSkill.agentName}
+                        width={40}
+                        height={40}
+                        className="object-cover"
+                      />
                     </div>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
-                      ● Active Artifact
-                    </span>
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold text-zinc-950">{selectedSkill.agentName}</h4>
+                      <ul className="space-y-0.5 text-xs text-zinc-500 font-medium">
+                        {selectedSkill.tasks.map((task, tIdx) => (
+                          <li key={tIdx} className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                            <span>{task}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
 
-                  <div className="space-y-2.5">
-                    {selectedSkill.details.map((row, rIdx) => (
-                      <div key={rIdx} className="p-2.5 bg-zinc-50 rounded-xl border border-zinc-100 flex items-center justify-between text-xs">
-                        <span className="text-zinc-500 font-medium">{row.label}</span>
-                        <span className="font-semibold text-zinc-950 font-mono text-right">{row.value}</span>
-                      </div>
-                    ))}
+                  {/* Body: Simulated Message Container */}
+                  <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50/80 border border-zinc-200/70 space-y-3">
+                    <div className="flex items-center gap-2 pb-2 border-b border-zinc-200/60 text-xs text-zinc-600 font-medium">
+                      <span className="font-bold text-zinc-900">{selectedSkill.subject}</span>
+                    </div>
+                    <div className="text-[11px] text-zinc-500 font-mono">
+                      To: <strong className="text-zinc-800">{selectedSkill.recipient}</strong>
+                    </div>
+                    <div className="space-y-1.5 text-xs text-zinc-700 leading-relaxed font-sans pt-1">
+                      {selectedSkill.messageLines.map((line, lIdx) => (
+                        <p key={lIdx}>{line}</p>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="pt-1 flex items-center justify-between text-xs text-zinc-500">
-                    <span>Tamper-Proof Audit Hash: <code className="text-zinc-700 font-mono">SHA256:8f2a...</code></span>
-                    <span className="text-zinc-950 font-bold">1-Click PDF &rarr;</span>
+                  {/* Bottom Right: Cutout Portrait with Floating Speech Pill */}
+                  <div className="pt-2 flex items-end justify-between gap-4">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold shadow-md">
+                      <span>{selectedSkill.speechPill}</span>
+                    </div>
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shrink-0 border border-purple-200 ring-4 ring-purple-50 shadow-md">
+                      <Image
+                        src="/images/cora_agent_marketing.jpg"
+                        alt="Agent Visual"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
+
                 </div>
               </div>
 
@@ -672,96 +758,66 @@ export default function AiAgentPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 5: [TECHNOLOGY] TELEMETRY & LIVE RADAR
+          SECTION 5: REAL-TIME AUTOMATION TELEMETRY BANNER (ClickUp Style)
       ───────────────────────────────────────────────────────────── */}
-      <section id="technology" className="py-14 sm:py-20 bg-white relative z-10 border-b border-zinc-100">
-        <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
-          
-          <div className="max-w-[760px] mx-auto text-center mb-10">
-            <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 block mb-1">
-              [ PROPRIETARY AGENTIC TECHNOLOGY ]
-            </span>
-            <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
-              Enterprise security &amp; live ambient awareness
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+      <section id="telemetry-banner" className="py-12 sm:py-16 bg-white relative z-10 border-b border-zinc-100">
+        <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
+          <div className="relative overflow-hidden bg-white border border-zinc-200/90 rounded-[32px] sm:rounded-[44px] p-8 sm:p-14 text-center shadow-xs">
             
-            {/* Card 1: Studio Automation Telemetry */}
-            <div className="gsap-tech-card p-5 sm:p-6 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-3.5 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-700 uppercase tracking-wider">
-                  STUDIO AUTOMATION
-                </span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                  Top 5%
-                </span>
-              </div>
-              <div className="font-display text-3xl sm:text-4xl font-bold text-zinc-950">
-                84.6%
-              </div>
-              <p className="text-xs text-zinc-600 leading-relaxed">
-                Repetitive client briefing, GST invoicing, and call-sheet coordination executed with zero manual effort.
-              </p>
-              <div className="p-3 bg-white rounded-xl border border-zinc-200 space-y-2 text-xs">
-                <div className="flex justify-between font-semibold">
-                  <span className="text-zinc-600">Hours Saved / Week:</span>
-                  <span className="text-zinc-950 font-bold">18.5 hrs</span>
-                </div>
-                <div className="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
-                  <div className="w-4/5 h-full bg-emerald-500 rounded-full" />
-                </div>
+            {/* Dot Matrix Pattern */}
+            <div className="absolute inset-0 bg-[radial-gradient(#e4e4e7_1.2px,transparent_1.2px)] [background-size:20px_20px] pointer-events-none opacity-80" />
+
+            {/* Left Dissolved Indian Female Agent Portrait */}
+            <div className="absolute -left-10 sm:-left-4 top-1/2 -translate-y-1/2 w-[180px] sm:w-[260px] h-[260px] sm:h-[340px] pointer-events-none opacity-90 hidden sm:block">
+              <div className="relative w-full h-full [mask-image:linear-gradient(to_right,black_60%,transparent_100%)]">
+                <Image
+                  src="/images/cora_hero_indian_agent.png"
+                  alt="Super Agent Female"
+                  fill
+                  className="object-contain"
+                />
               </div>
             </div>
 
-            {/* Card 2: Live Ambient Radar */}
-            <div className="gsap-tech-card p-5 sm:p-6 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-3.5 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-700 uppercase tracking-wider">
-                  AMBIENT RADAR
-                </span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              </div>
-              <div className="font-display text-3xl sm:text-4xl font-bold text-zinc-950">
-                24/7 Sweep
-              </div>
-              <p className="text-xs text-zinc-600 leading-relaxed">
-                Continuously scans for pending commercial usage renewals, unconfirmed hold dates, and unpaid UPI advances.
-              </p>
-              <div className="p-3 bg-white rounded-xl border border-zinc-200 space-y-1.5 text-xs">
-                <div className="flex items-center justify-between font-medium">
-                  <span className="text-zinc-700">&bull; Lakme Shoot Oct 24 Hold</span>
-                  <span className="text-emerald-700 font-bold">Safe</span>
-                </div>
-                <div className="flex items-center justify-between font-medium">
-                  <span className="text-zinc-700">&bull; Oberoi Advance Deposit</span>
-                  <span className="text-amber-700 font-bold">Pending</span>
-                </div>
+            {/* Right Dissolved Indian Male Agent Portrait */}
+            <div className="absolute -right-10 sm:-right-4 top-1/2 -translate-y-1/2 w-[180px] sm:w-[260px] h-[260px] sm:h-[340px] pointer-events-none opacity-90 hidden sm:block">
+              <div className="relative w-full h-full [mask-image:linear-gradient(to_left,black_60%,transparent_100%)]">
+                <Image
+                  src="/images/cora_agent_telemetry_male.png"
+                  alt="Super Agent Male"
+                  fill
+                  className="object-contain"
+                />
               </div>
             </div>
 
-            {/* Card 3: Encrypted SHA-256 Vault */}
-            <div className="gsap-tech-card p-5 sm:p-6 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-3.5 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-700 uppercase tracking-wider">
-                  SECURITY &amp; AUDIT
-                </span>
-                <Lock className="w-4 h-4 text-zinc-500" />
+            {/* Center Live Telemetry Headline & Ticking Number */}
+            <div className="relative z-10 max-w-[680px] mx-auto space-y-3 sm:space-y-4">
+              <h3 className="font-display text-2xl sm:text-3xl lg:text-[38px] font-bold text-zinc-950 leading-tight">
+                Work that used to take hours, <br />
+                now happens in <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent font-extrabold">seconds</span>.
+              </h3>
+
+              <div className="font-display font-extrabold text-5xl sm:text-7xl lg:text-[88px] text-zinc-950 tracking-tight py-2 font-mono select-none">
+                {liveTasksCount.toLocaleString('en-US')}
               </div>
-              <div className="font-display text-3xl sm:text-4xl font-bold text-zinc-950">
-                SHA-256
-              </div>
-              <p className="text-xs text-zinc-600 leading-relaxed">
-                Every commercial agreement, model NDA, and tax invoice is cryptographically sealed and verifiable under the IT Act 2000.
+
+              <p className="text-zinc-500 text-xs sm:text-sm font-medium">
+                Tasks automated by Super Agents
               </p>
-              <div className="p-3 bg-white rounded-xl border border-zinc-200 font-mono text-[10.5px] text-zinc-600 truncate">
-                Hash: 7f8a9b1c2d3e4f5a6b7c8d9e...
+
+              <div className="pt-2">
+                <Link
+                  href="/workspace/login"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
+                >
+                  <span>Try Super Agents</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </div>
 
           </div>
-
         </div>
       </section>
 
