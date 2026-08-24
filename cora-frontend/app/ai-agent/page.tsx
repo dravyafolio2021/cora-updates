@@ -689,35 +689,29 @@ export default function AiAgentPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 4: [AI CO-FOUNDER PLATFORM] AUTONOMOUS EXECUTIVE COMMAND DECK
+          SECTION 4: [WORKSPACE INTELLIGENCE] 5 SPECIALIZED AGENTS LIVE MATRIX
       ───────────────────────────────────────────────────────────── */}
-      <section id="human-skills" className="py-20 sm:py-28 bg-white relative z-10 border-b border-zinc-100">
+      <section id="human-skills" className="py-16 sm:py-24 bg-white relative z-10 border-b border-zinc-100">
         <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
           
-          {/* Main Futuristic Dark Container */}
-          <div className="bg-gradient-to-b from-[#090D16] via-[#0E1524] to-[#070A10] text-white rounded-[36px] sm:rounded-[44px] p-6 sm:p-10 lg:p-12 border border-zinc-800 shadow-2xl relative overflow-hidden">
+          {/* Main Clean Monochromatic Container */}
+          <div className="bg-[#F9FAFB] rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 lg:p-12 border border-zinc-200/80 shadow-xs relative">
             
-            {/* Ambient Background Glow Cones */}
-            <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-5" />
-
             {/* Section Header */}
-            <div className="relative z-10 max-w-[800px] mx-auto text-center mb-10 sm:mb-12 space-y-3">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-mono font-bold tracking-widest uppercase">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>AI CO-FOUNDER PLATFORM</span>
+            <div className="max-w-[760px] mx-auto text-center mb-8 sm:mb-10 space-y-2.5">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500 block">
+                [ WORKSPACE INTELLIGENCE ]
               </span>
-              <h2 className="font-display text-2xl sm:text-4xl lg:text-[42px] font-bold text-white tracking-tight leading-[1.12]">
-                Your autonomous executive team. Working in parallel.
+              <h2 className="font-display text-2xl sm:text-3xl lg:text-[38px] font-bold text-zinc-950 tracking-tight leading-tight">
+                Your autonomous executive team. Built into Cora.
               </h2>
-              <p className="text-zinc-400 text-xs sm:text-base max-w-[640px] mx-auto leading-relaxed">
-                Five dedicated AI Super Agents collaborate continuously across marketing, sales, operations, finance, and legal to run your commercial business.
+              <p className="text-zinc-600 text-xs sm:text-sm max-w-[620px] mx-auto leading-relaxed">
+                Five specialized AI agents collaborate across marketing, sales, scheduling, invoicing, and contracts autonomously.
               </p>
             </div>
 
-            {/* Interactive 5-Agent Command Switcher Bar */}
-            <div className="relative z-10 mb-8 sm:mb-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+            {/* Interactive 5-Agent Selector Bar */}
+            <div className="mb-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
               {broadAgentSkills.map((skill) => {
                 const isSelected = skill.id === activeSkillId;
                 const IconComp = skill.icon;
@@ -725,15 +719,15 @@ export default function AiAgentPage() {
                   <button
                     key={skill.id}
                     onClick={() => setActiveSkillId(skill.id)}
-                    className={`p-3 sm:p-3.5 rounded-2xl flex flex-col items-start gap-2 text-left transition-all duration-300 cursor-pointer relative overflow-hidden group ${
+                    className={`p-3.5 rounded-2xl flex flex-col items-start gap-2.5 text-left transition-all duration-200 cursor-pointer ${
                       isSelected
-                        ? 'bg-zinc-800/90 border-2 border-purple-400/80 shadow-[0_0_25px_rgba(168,85,247,0.25)] ring-1 ring-white/20'
-                        : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/60'
+                        ? 'bg-zinc-950 text-white shadow-md border border-zinc-950 ring-1 ring-zinc-950'
+                        : 'bg-white text-zinc-800 border border-zinc-200/80 hover:bg-zinc-50 hover:border-zinc-300 shadow-2xs'
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-zinc-700">
+                        <div className={`w-8 h-8 rounded-xl overflow-hidden shrink-0 border ${isSelected ? 'border-zinc-700' : 'border-zinc-200'}`}>
                           <Image
                             src={skill.agentAvatar}
                             alt={skill.title}
@@ -742,18 +736,18 @@ export default function AiAgentPage() {
                             className="object-cover"
                           />
                         </div>
-                        <div className="w-6 h-6 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
+                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${isSelected ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-zinc-700'}`}>
                           <IconComp className="w-3.5 h-3.5" />
                         </div>
                       </div>
-                      <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-600'}`} />
+                      <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-emerald-400' : 'bg-zinc-300'}`} />
                     </div>
 
                     <div className="w-full">
-                      <span className="text-xs sm:text-sm font-bold text-white block truncate">
+                      <span className="text-xs sm:text-sm font-bold block truncate">
                         {skill.title}
                       </span>
-                      <span className="text-[10px] text-zinc-400 font-medium block truncate mt-0.5">
+                      <span className={`text-[10px] font-medium block truncate mt-0.5 ${isSelected ? 'text-zinc-300' : 'text-zinc-500'}`}>
                         {skill.badge}
                       </span>
                     </div>
@@ -762,132 +756,136 @@ export default function AiAgentPage() {
               })}
             </div>
 
-            {/* Core Intelligence Stage (2-Column Futuristic Cockpit) */}
-            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch gsap-skill-canvas">
+            {/* Core Intelligence Stage (2-Column Monochromatic Layout) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start gsap-skill-canvas">
               
-              {/* Left Column: Agent Neural Engine & Telemetry Card */}
-              <div className="lg:col-span-5 bg-zinc-900/80 rounded-3xl border border-zinc-800 p-5 sm:p-7 backdrop-blur-xl flex flex-col justify-between space-y-5">
+              {/* Left Column: Agent Overview & Capability Metrics */}
+              <div className="lg:col-span-5 bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/90 p-5 sm:p-6 shadow-xs space-y-4">
                 
-                {/* Agent Persona & Model Info */}
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-purple-400/40 ring-4 ring-purple-500/10 shadow-lg">
-                        <Image
-                          src={selectedSkill.agentAvatar}
-                          alt={selectedSkill.role}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div>
-                        <h3 className="text-base sm:text-lg font-bold text-white">{selectedSkill.role}</h3>
-                        <span className="text-xs text-purple-300 font-mono block mt-0.5">{selectedSkill.badge}</span>
-                      </div>
+                {/* Agent Header */}
+                <div className="flex items-center justify-between gap-3 pb-3.5 border-b border-zinc-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 border border-zinc-200 shadow-2xs">
+                      <Image
+                        src={selectedSkill.agentAvatar}
+                        alt={selectedSkill.role}
+                        width={44}
+                        height={44}
+                        className="object-cover"
+                      />
                     </div>
-                    <span className="text-[10.5px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-md">
-                      0.8s Cycle
-                    </span>
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-zinc-950">{selectedSkill.role}</h3>
+                      <span className="text-xs text-zinc-500 font-medium block">{selectedSkill.badge}</span>
+                    </div>
                   </div>
-
-                  <p className="text-xs text-zinc-400 leading-relaxed">
-                    {selectedSkill.shortDesc}
-                  </p>
+                  <span className="text-[10.5px] font-mono font-bold text-zinc-700 bg-zinc-100 border border-zinc-200 px-2.5 py-1 rounded-md">
+                    0.8s Cycle
+                  </span>
                 </div>
 
-                {/* 3 Metric Counters */}
+                <p className="text-xs text-zinc-600 leading-relaxed">
+                  {selectedSkill.shortDesc}
+                </p>
+
+                {/* 3 Metric Pills */}
                 <div className="grid grid-cols-3 gap-2">
                   {selectedSkill.metrics.map((m, idx) => (
-                    <div key={idx} className="p-3 bg-zinc-950/80 rounded-xl border border-zinc-800/80 text-center">
-                      <span className="text-[9.5px] text-zinc-400 block uppercase tracking-wider font-semibold truncate">
+                    <div key={idx} className="p-2.5 bg-zinc-50 rounded-xl border border-zinc-100 text-center">
+                      <span className="text-[9.5px] text-zinc-500 block uppercase tracking-wider font-semibold truncate">
                         {m.label}
                       </span>
-                      <span className="text-xs sm:text-sm font-bold text-white font-mono block mt-1">
+                      <span className="text-xs sm:text-sm font-bold text-zinc-950 font-mono block mt-0.5">
                         {m.value}
                       </span>
-                      <span className="text-[9.5px] text-emerald-400 font-semibold block mt-0.5">
+                      <span className="text-[9.5px] text-emerald-700 font-semibold block">
                         {m.change}
                       </span>
                     </div>
                   ))}
                 </div>
 
-                {/* Live Terminal Output Stream */}
-                <div className="p-3.5 bg-black/80 rounded-2xl border border-zinc-800/90 font-mono text-[11px] space-y-1.5 shadow-inner">
-                  <div className="flex items-center justify-between text-zinc-500 pb-1.5 border-b border-zinc-800/80">
-                    <div className="flex items-center gap-1.5">
-                      <Terminal className="w-3.5 h-3.5 text-purple-400" />
-                      <span className="text-zinc-400 font-semibold">Autonomous Execution Core</span>
-                    </div>
-                    <span className="text-emerald-400 text-[10px]">LIVE STREAM</span>
+                {/* Autonomous Logs & Readout */}
+                <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-200/80 font-mono text-[11px] space-y-1">
+                  <div className="flex items-center justify-between text-zinc-500 pb-1 border-b border-zinc-200/60">
+                    <span className="font-semibold text-zinc-700">Autonomous Action Trail</span>
+                    <span className="text-emerald-700 font-bold text-[10px]">VERIFIED</span>
                   </div>
-                  <div className="space-y-1 pt-1 text-zinc-300">
-                    <p className="text-purple-300 font-bold">$ {selectedSkill.logs[0]}</p>
-                    <p className="text-zinc-400">&gt; {selectedSkill.logs[1]}</p>
-                    <p className="text-zinc-400">&gt; {selectedSkill.logs[2]}</p>
-                    <p className="text-emerald-400 font-semibold">&gt; {selectedSkill.logs[3]}</p>
+                  <div className="space-y-0.5 pt-1 text-zinc-600">
+                    <p className="text-zinc-900 font-bold">$ {selectedSkill.logs[0]}</p>
+                    <p>&gt; {selectedSkill.logs[1]}</p>
+                    <p>&gt; {selectedSkill.logs[2]}</p>
+                    <p className="text-emerald-700 font-semibold">&gt; {selectedSkill.logs[3]}</p>
+                  </div>
+                </div>
+
+                {/* Speech Bubble Strip */}
+                <div className="pt-2">
+                  <div className="p-3 rounded-xl bg-zinc-950 text-white text-xs font-semibold flex items-center justify-between shadow-xs">
+                    <span>{selectedSkill.speechPill}</span>
+                    <span className="text-[10px] font-mono text-zinc-400">100% Autonomous</span>
                   </div>
                 </div>
 
               </div>
 
               {/* Right Column: Live Interactive Workspace Dashboard Window */}
-              <div className="lg:col-span-7 bg-zinc-950/90 rounded-3xl border border-zinc-800 overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col justify-between">
+              <div className="lg:col-span-7 bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/90 shadow-md overflow-hidden">
                 
-                {/* Window App Header */}
-                <div className="px-5 py-3.5 bg-zinc-900/90 border-b border-zinc-800 flex items-center justify-between text-xs">
+                {/* Browser / App Navigation Bar */}
+                <div className="px-4 sm:px-5 py-3 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-zinc-300" />
                     </div>
                     <span className="font-mono text-zinc-400 text-[11px] ml-2 truncate">
-                      cora.ai / workspace / {activeSkillId}
+                      cora.workspace / {activeSkillId} / live
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="font-mono font-semibold text-emerald-300 text-[11px]">100% Autonomous</span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="font-semibold text-zinc-700 text-[11px]">Live Autonomous</span>
                   </div>
                 </div>
 
                 {/* Dynamic Visual Content Body */}
-                <div className="p-5 sm:p-7 space-y-4 flex-1 flex flex-col justify-between">
+                <div className="p-4 sm:p-6 space-y-3.5 bg-white">
                   
                   {/* Demo 1: Marketing & Growth */}
                   {activeSkillId === 'marketing' && (
-                    <div className="space-y-3.5">
-                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2.5">
-                        <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-800">
-                          <span className="font-bold text-white">Multi-Channel Distribution Engine</span>
-                          <span className="text-[10.5px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                            4 Sync Feeds Live
+                    <div className="space-y-3">
+                      <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-2">
+                        <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-200/80">
+                          <span className="font-bold text-zinc-900">Multi-Channel Distribution Matrix</span>
+                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">
+                            4 Feeds Synced
                           </span>
                         </div>
-                        <div className="grid grid-cols-2 gap-2.5 text-xs">
-                          <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800/80 flex items-center justify-between">
-                            <span className="text-zinc-300 font-medium">Instagram &amp; Reels</span>
-                            <span className="text-[10px] font-mono font-semibold text-purple-300">18:00 IST</span>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="p-2.5 bg-white rounded-lg border border-zinc-200/80 flex items-center justify-between">
+                            <span className="text-zinc-700 font-medium">Instagram &amp; Reels</span>
+                            <span className="text-[10px] font-mono font-semibold text-zinc-500">18:00 IST</span>
                           </div>
-                          <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800/80 flex items-center justify-between">
-                            <span className="text-zinc-300 font-medium">Client Newsletter</span>
-                            <span className="text-[10px] font-mono font-semibold text-emerald-400">2.4k Opens</span>
+                          <div className="p-2.5 bg-white rounded-lg border border-zinc-200/80 flex items-center justify-between">
+                            <span className="text-zinc-700 font-medium">Client Newsletter</span>
+                            <span className="text-[10px] font-mono font-semibold text-emerald-700">2.4k Opens</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2">
-                        <span className="text-xs font-bold text-white block">Autonomous Content Pipeline</span>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="text-xs font-mono text-zinc-300 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800">
-                            Format: 4K Master ProRes
+                      <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-2">
+                        <span className="text-xs font-bold text-zinc-900 block">Content Generation Queue</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          <span className="text-[11px] font-medium bg-white text-zinc-700 px-2.5 py-1 rounded-md border border-zinc-200">
+                            Format: 4K Master Video
                           </span>
-                          <span className="text-xs font-mono text-zinc-300 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800">
+                          <span className="text-[11px] font-medium bg-white text-zinc-700 px-2.5 py-1 rounded-md border border-zinc-200">
                             Tone: Commercial Luxury
                           </span>
-                          <span className="text-xs font-mono text-zinc-300 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800">
-                            Target: Brand Decision Makers
+                          <span className="text-[11px] font-medium bg-white text-zinc-700 px-2.5 py-1 rounded-md border border-zinc-200">
+                            Target: Brand Leads
                           </span>
                         </div>
                       </div>
@@ -896,131 +894,120 @@ export default function AiAgentPage() {
 
                   {/* Demo 2: Sales & Lead Intake */}
                   {activeSkillId === 'sales' && (
-                    <div className="space-y-3.5">
-                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2.5">
-                        <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-800">
-                          <span className="font-bold text-white">Lead Qualification &amp; Quotation</span>
-                          <span className="text-[10.5px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                    <div className="space-y-3">
+                      <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-2">
+                        <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-200/80">
+                          <span className="font-bold text-zinc-900">Lead Pipeline &amp; Rate Quotation</span>
+                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">
                             0.8s Response
                           </span>
                         </div>
-                        <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800/80 text-xs space-y-2 font-mono">
-                          <div className="flex justify-between text-zinc-400">
+                        <div className="p-3 bg-white rounded-lg text-xs space-y-1.5 font-mono border border-zinc-200/80">
+                          <div className="flex justify-between text-zinc-600">
                             <span>Commercial Shoot (2 Days):</span>
-                            <span className="font-bold text-white">₹1,20,000</span>
+                            <span className="font-bold text-zinc-950">₹1,20,000</span>
                           </div>
-                          <div className="flex justify-between text-zinc-400">
+                          <div className="flex justify-between text-zinc-600">
                             <span>18% GST (CGST + SGST):</span>
-                            <span className="font-bold text-white">₹21,600</span>
+                            <span className="font-bold text-zinc-950">₹21,600</span>
                           </div>
-                          <div className="flex justify-between pt-2 border-t border-zinc-800 text-white font-bold text-sm">
+                          <div className="flex justify-between pt-1.5 border-t border-zinc-200 text-zinc-950 font-bold">
                             <span>Total Quotation:</span>
-                            <span className="text-emerald-400">₹1,41,600</span>
+                            <span className="text-emerald-700">₹1,41,600</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-between text-xs">
-                        <span className="text-zinc-400 font-medium">WhatsApp Delivery:</span>
-                        <span className="font-bold text-white font-mono">Dispatched with Instant Advance QR</span>
+                      <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80 flex items-center justify-between text-xs">
+                        <span className="text-zinc-600 font-medium">WhatsApp Delivery:</span>
+                        <span className="font-bold text-zinc-900 font-mono">Dispatched with Instant Advance QR</span>
                       </div>
                     </div>
                   )}
 
                   {/* Demo 3: Operations & Workflows */}
                   {activeSkillId === 'operations' && (
-                    <div className="space-y-3.5">
-                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2.5">
-                        <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-800">
-                          <span className="font-bold text-white">Production Sprint &amp; Schedule Matrix</span>
-                          <span className="text-[10.5px] font-mono font-bold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                    <div className="space-y-3">
+                      <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-2">
+                        <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-200/80">
+                          <span className="font-bold text-zinc-900">Production Sprint &amp; Schedule Matrix</span>
+                          <span className="text-[10px] font-mono font-bold text-zinc-800 bg-zinc-200 px-2 py-0.5 rounded">
                             Sprint #42 Active
                           </span>
                         </div>
-                        <div className="space-y-2 text-xs">
-                          <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/80 flex items-center justify-between">
-                            <span className="font-medium text-zinc-200">Studio Bay 02 Stage Setup</span>
-                            <span className="text-xs font-mono font-bold text-emerald-400">Ready (06:45 IST)</span>
+                        <div className="space-y-1.5 text-xs">
+                          <div className="p-2.5 rounded-lg bg-white border border-zinc-200/80 flex items-center justify-between">
+                            <span className="font-medium text-zinc-800">Studio Bay 02 Stage Setup</span>
+                            <span className="text-[10px] font-mono font-bold text-emerald-700">Ready (06:45 IST)</span>
                           </div>
-                          <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/80 flex items-center justify-between">
-                            <span className="font-medium text-zinc-200">Crew Call-Sheets Dispatched</span>
-                            <span className="text-xs font-mono font-bold text-emerald-400">14/14 Confirmed</span>
+                          <div className="p-2.5 rounded-lg bg-white border border-zinc-200/80 flex items-center justify-between">
+                            <span className="font-medium text-zinc-800">Crew Call-Sheets Dispatched</span>
+                            <span className="text-[10px] font-mono font-bold text-emerald-700">14/14 Confirmed</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-between text-xs">
-                        <span className="text-zinc-400 font-medium">Clash Prevention Engine:</span>
-                        <span className="font-bold text-emerald-400 font-mono">0 Conflicts Detected</span>
+                      <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80 flex items-center justify-between text-xs">
+                        <span className="text-zinc-600 font-medium">Clash Prevention Engine:</span>
+                        <span className="font-bold text-emerald-700 font-mono">0 Conflicts Detected</span>
                       </div>
                     </div>
                   )}
 
                   {/* Demo 4: Finance & Invoicing */}
                   {activeSkillId === 'finance' && (
-                    <div className="space-y-3.5">
-                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2.5">
-                        <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-800">
-                          <span className="font-bold text-white">GSTR-1 Tax Invoice #CORA-2026-104</span>
-                          <span className="text-[10.5px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                    <div className="space-y-3">
+                      <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-2">
+                        <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-200/80">
+                          <span className="font-bold text-zinc-900">GSTR-1 Tax Invoice #CORA-2026-104</span>
+                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">
                             GSTR-1 Valid
                           </span>
                         </div>
-                        <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                          <div className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800/80">
-                            <span className="text-[10px] text-zinc-400 block">Base Value</span>
-                            <span className="font-bold text-white font-mono text-sm mt-0.5">₹2,50,000</span>
+                        <div className="grid grid-cols-3 gap-1.5 text-center text-xs">
+                          <div className="p-2 bg-white rounded-lg border border-zinc-200/80">
+                            <span className="text-[10px] text-zinc-500 block">Base Value</span>
+                            <span className="font-bold text-zinc-950 font-mono">₹2,50,000</span>
                           </div>
-                          <div className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800/80">
-                            <span className="text-[10px] text-zinc-400 block">18% GST</span>
-                            <span className="font-bold text-white font-mono text-sm mt-0.5">₹45,000</span>
+                          <div className="p-2 bg-white rounded-lg border border-zinc-200/80">
+                            <span className="text-[10px] text-zinc-500 block">18% GST</span>
+                            <span className="font-bold text-zinc-950 font-mono">₹45,000</span>
                           </div>
-                          <div className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800/80">
-                            <span className="text-[10px] text-zinc-400 block">Total Net</span>
-                            <span className="font-bold text-emerald-400 font-mono text-sm mt-0.5">₹2,95,000</span>
+                          <div className="p-2 bg-white rounded-lg border border-zinc-200/80">
+                            <span className="text-[10px] text-zinc-500 block">Total Payable</span>
+                            <span className="font-bold text-emerald-700 font-mono">₹2,95,000</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-between text-xs">
-                        <span className="text-zinc-400 font-medium">Instant Settlement Stream:</span>
-                        <span className="font-bold text-white font-mono">PhonePe / GPay Auto-Matched</span>
+                      <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80 flex items-center justify-between text-xs">
+                        <span className="text-zinc-600 font-medium">UPI Settlement Stream:</span>
+                        <span className="font-bold text-zinc-900 font-mono">PhonePe / GPay Auto-Matched</span>
                       </div>
                     </div>
                   )}
 
                   {/* Demo 5: Legal & Compliance */}
                   {activeSkillId === 'legal' && (
-                    <div className="space-y-3.5">
-                      <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2.5">
-                        <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-800">
-                          <span className="font-bold text-white">Commercial License &amp; NDA #LIC-892</span>
-                          <span className="text-[10.5px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                    <div className="space-y-3">
+                      <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-2">
+                        <div className="flex items-center justify-between text-xs pb-1.5 border-b border-zinc-200/80">
+                          <span className="font-bold text-zinc-900">Commercial License &amp; NDA #LIC-892</span>
+                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">
                             IT Act Sealed
                           </span>
                         </div>
-                        <div className="p-3 bg-zinc-950 rounded-xl text-xs font-mono text-zinc-300 truncate border border-zinc-800/80">
+                        <div className="p-2.5 bg-white rounded-lg text-[11px] font-mono text-zinc-600 truncate border border-zinc-200/80">
                           SHA256: 9f82ab174e3c90df81e2893a7c6f01b7a2d4e6f8...
                         </div>
                       </div>
 
-                      <div className="p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-between text-xs">
-                        <span className="text-zinc-400 font-medium">Client Verification:</span>
-                        <span className="font-bold text-white font-mono">Mobile OTP Audit Trail Locked</span>
+                      <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80 flex items-center justify-between text-xs">
+                        <span className="text-zinc-600 font-medium">Client Verification:</span>
+                        <span className="font-bold text-zinc-900 font-mono">Mobile OTP Audit Trail Locked</span>
                       </div>
                     </div>
                   )}
-
-                  {/* Bottom Action Strip */}
-                  <div className="pt-3 flex items-center justify-between gap-3 border-t border-zinc-800/80">
-                    <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 text-white text-xs font-semibold shadow-md">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>{selectedSkill.speechPill}</span>
-                    </div>
-                    <span className="text-[11px] font-mono text-zinc-400 hidden sm:inline">
-                      100% Autonomous
-                    </span>
-                  </div>
 
                 </div>
 
