@@ -255,24 +255,21 @@ const humanSkills = [
   },
 ];
 
-// ── Persistent Deterministic Mathematical Equation (Starts from 1,000 RN to 1,000,000 over 365 Days) ──
-const LAUNCH_TIMESTAMP = new Date('2026-08-24T13:30:00Z').getTime(); // Baseline starting point (1,000 tasks)
+// ── Universal Deterministic Mathematical Task Counter ──
+// Globally identical and synchronized across all visitors worldwide.
+// Starts at exactly 1,000 tasks at launch timestamp (Aug 24, 2026 19:40 IST)
+// and scales smoothly & organically to 1,000,000 tasks over 365 days.
+const GLOBAL_LAUNCH_TIMESTAMP = 1787580600000; // August 24, 2026 19:40:00 IST (14:10:00 UTC)
 const TOTAL_SPAN_MS = 365 * 24 * 60 * 60 * 1000; // 365 days in milliseconds
 
-function computeDynamicTasks(): number {
-  const now = Date.now();
-  const elapsedMs = Math.max(0, now - LAUNCH_TIMESTAMP);
+function computeGlobalUniversalTasks(): number {
+  const now = typeof window !== 'undefined' ? Date.now() : GLOBAL_LAUNCH_TIMESTAMP;
+  const elapsedMs = Math.max(0, now - GLOBAL_LAUNCH_TIMESTAMP);
   const progress = Math.min(1.0, elapsedMs / TOTAL_SPAN_MS);
 
-  // S-Curve mathematical growth curve: 1,000 starting baseline scaling organically to 1,000,000 over 365 days
+  // S-Curve mathematical growth equation: 1,000 starting baseline scaling organically to 1,000,000 over 365 days
   const sCurve = 0.15 * progress + 0.85 * Math.pow(progress, 1.85);
-  const calculatedTasks = 1000 + (1000000 - 1000) * sCurve;
-
-  // Intraday micro-progress based on current seconds
-  const microSeconds = (elapsedMs % 86400000) / 1000;
-  const dailyPacing = (microSeconds / 86400) * 12;
-
-  return Math.floor(calculatedTasks + dailyPacing);
+  return Math.floor(1000 + (1000000 - 1000) * sCurve);
 }
 
 export default function AiAgentPage() {
@@ -282,23 +279,17 @@ export default function AiAgentPage() {
 
   const selectedSkill = humanSkills.find((s) => s.id === activeSkillId) || humanSkills[0];
 
-  // Persistent live ticker: dynamically updates with Date.now() and never resets on refresh
+  // Universal real-time synchronization:
+  // Derived purely from UTC timestamp Date.now() — identical across every browser globally with zero reset on reload.
   useEffect(() => {
-    // Initial mount calculation
-    const baseCount = computeDynamicTasks();
-    const storedOffset = typeof window !== 'undefined' ? parseInt(localStorage.getItem('cora_task_offset') || '0', 10) : 0;
-    setLiveTasksCount(baseCount + storedOffset);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('cora_task_offset');
+    }
+    setLiveTasksCount(computeGlobalUniversalTasks());
 
     const interval = setInterval(() => {
-      setLiveTasksCount((prev) => {
-        const nextCount = prev + Math.floor(Math.random() * 2) + 1;
-        if (typeof window !== 'undefined') {
-          const currentBase = computeDynamicTasks();
-          localStorage.setItem('cora_task_offset', String(Math.max(0, nextCount - currentBase)));
-        }
-        return nextCount;
-      });
-    }, 2400);
+      setLiveTasksCount(computeGlobalUniversalTasks());
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
