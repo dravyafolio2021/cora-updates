@@ -17,7 +17,8 @@ import {
   Minus,
   Info,
   Flame,
-  Globe
+  Globe,
+  Gift
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -32,23 +33,23 @@ const TESTIMONIAL_LOGOS = [
 const FAQS = [
   {
     q: 'Is the Free Forever plan really free?',
-    a: 'Yes, absolutely. Our Free Forever tier includes 1,000 complimentary AI agent runs each month, unlimited tamper-evident SHA-256 e-signatures, automated GST invoicing, and full Kanban CRM access with zero credit card required.'
+    a: 'Yes, 100% free forever. It includes 1,000 complimentary AI agent runs every month, unlimited tamper-evident SHA-256 e-signatures, automated GST invoicing, and Kanban CRM access with zero credit card required.'
   },
   {
-    q: 'What is the India Edition annual commitment?',
-    a: 'The India Edition is specially crafted for Indian MSMEs, agencies, and consultancies. It includes full GSTIN tax split calculations, instant UPI dynamic QR codes on invoices, and Meta WhatsApp integration at ₹999/month, billed annually (₹11,988/year).'
+    q: 'How does the Free Domain on annual plans work?',
+    a: 'When you subscribe to any of our paid annual plans ($9/mo, $19/mo, $29/mo, or the India ₹499/mo plan), you receive a complimentary custom domain registration (.com, .in, or .co) with automatic SSL and DNS configuration.'
   },
   {
-    q: 'Can I change plans or cancel anytime?',
-    a: 'Yes. You can upgrade, downgrade, or cancel your subscription at any time directly from your workspace billing dashboard. If you downgrade, your existing data remains fully secure and accessible.'
+    q: 'Why is the India Only plan strictly annual?',
+    a: 'The India MSME Edition is heavily subsidised at ₹499/month specifically to support registered Indian businesses and founders with long-term operational infrastructure. It is only available as an annual commitment (₹5,988/year).'
   },
   {
-    q: 'How do AI agent runs work?',
-    a: 'Each AI run powers an autonomous operation — such as drafting a detailed proposal, calculating multi-tier project scopes, extracting lead intelligence, or formatting customized GST invoices. Additional run packs can be added anytime.'
+    q: 'Can I upgrade, downgrade, or cancel anytime?',
+    a: 'Yes. You can manage your tier anytime directly in your workspace settings. If you downgrade, your historical contracts, invoices, and clients remain fully accessible and protected.'
   },
   {
-    q: 'Is our client and financial data secure?',
-    a: 'Yes. All data is encrypted with AES-256 at rest and TLS 1.3 in transit. All e-signatures are cryptographic SHA-256 sealed under the Indian IT Act 2000 and DPDP Act 2023.'
+    q: 'Is our financial and client data secure?',
+    a: 'All data is protected by AES-256 encryption at rest and TLS 1.3 in transit. All e-signatures are SHA-256 cryptographically sealed and legally compliant under the Indian IT Act 2000 and DPDP Act 2023.'
   }
 ];
 
@@ -56,13 +57,12 @@ export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
   const [isIndia, setIsIndia] = useState(true);
-  const [showTable, setShowTable] = useState(true);
+  const [showTable, setShowTable] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // Dynamic Geolocation detection
   useEffect(() => {
     try {
-      // 1. Instant synchronous browser timezone check (0ms latency, zero layout shift)
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
       const isIndiaTz = tz.includes('Kolkata') || tz.includes('Calcutta') || tz.includes('India');
       if (isIndiaTz) {
@@ -73,7 +73,6 @@ export default function PricingPage() {
         setIsIndia(false);
       }
 
-      // 2. Fast background Geo-IP verification
       fetch('https://api.country.is')
         .then(res => res.json())
         .then(data => {
@@ -87,7 +86,6 @@ export default function PricingPage() {
         })
         .catch(() => {});
     } catch (e) {
-      // Graceful fallback to INR
       setCurrency('INR');
       setIsIndia(true);
     }
@@ -111,12 +109,12 @@ export default function PricingPage() {
           Flexible pricing that fits your business
         </h1>
 
-        <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[620px] mx-auto mb-8">
-          Start for free with 1,000 complimentary AI runs and e-signatures. Upgrade as your team, client volume, and automated workflows scale.
+        <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[640px] mx-auto mb-8">
+          Start with our free forever plan, or choose an annual tier with a complimentary custom domain and high-throughput AI reasoning.
         </p>
 
-        {/* ── Cadence Selector (Monthly / Annual) ── */}
-        <div className="flex items-center justify-center gap-3 mb-10">
+        {/* ── Cadence Selector (Monthly / Annual) with Free Domain Badge ── */}
+        <div className="flex flex-col items-center justify-center gap-2 mb-10">
           <div className="inline-flex items-center p-1 bg-zinc-100 rounded-xl border border-zinc-200 shadow-2xs">
             <button
               type="button"
@@ -146,10 +144,17 @@ export default function PricingPage() {
             >
               <span>Annual</span>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-200 text-zinc-900 font-bold">
-                SAVE 20%
+                FREE DOMAIN + SAVE 20%
               </span>
             </button>
           </div>
+          
+          {billingCycle === 'annual' && (
+            <div className="inline-flex items-center gap-1.5 text-xs text-zinc-500 font-mono animate-in fade-in duration-200">
+              <Gift className="w-3.5 h-3.5 text-zinc-900" />
+              <span>Includes 1 year free custom domain (.com / .in) on all annual tiers</span>
+            </div>
+          )}
         </div>
 
         {/* ── Marquee / Client Quotes Strip ── */}
@@ -167,13 +172,93 @@ export default function PricingPage() {
 
       </section>
 
-      {/* ── 4 Main Pricing Cards Grid ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+      {/* ══════════════════════════════════════════════════════════════════════
+          ROW 1: FREE FOREVER PLAN (HERO BANNER CARD)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12">
+        <div className="bg-white border border-zinc-200 rounded-[28px] p-6 sm:p-8 shadow-[0_12px_36px_rgba(0,0,0,0.03)] hover:border-zinc-300 transition-all">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            
+            <div className="lg:col-span-4 space-y-2">
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[10px] font-mono font-bold text-zinc-700 uppercase tracking-wider">
+                <span>TIER 01</span>
+                <span>&bull;</span>
+                <span>NO CREDIT CARD REQUIRED</span>
+              </div>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950">
+                Free Forever Plan
+              </h2>
+              <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed">
+                Everything you need to launch, manage leads, send proposals, and execute legally binding e-contracts for your business.
+              </p>
+              <div className="pt-1 flex items-baseline gap-1.5">
+                <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">$0 / ₹0</span>
+                <span className="text-xs text-zinc-400 font-mono">forever free</span>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-zinc-700">
+              <div className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
+                <span><strong>1,000</strong> AI agent runs/month</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
+                <span>Google Gemini 2.5 Flash LLM</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
+                <span>Unlimited SHA-256 E-Sign Vault</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
+                <span>Automated 18% GST Invoicing</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
+                <span>Kanban CRM &amp; Lead Registry</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
+                <span>1 Workspace &amp; Community Support</span>
+              </div>
+            </div>
+
+            <div className="lg:col-span-3 flex lg:justify-end">
+              <a
+                href="https://app.heycora.in/workspace/login?plan=free"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-sm"
+              >
+                <span>Start Free — No Card Needed</span>
+                <ArrowRight className="w-4 h-4 text-zinc-400" />
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          ROW 2: 3-TIER GLOBAL SAAS PRICING ($9, $19, $29)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+          <div>
+            <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400">
+              GROWTH PLANS
+            </div>
+            <h2 className="font-display text-2xl font-bold text-zinc-950">
+              High-Throughput Operating Plans
+            </h2>
+          </div>
+          <div className="text-xs text-zinc-500 font-mono">
+            {billingCycle === 'annual' ? '🎉 Free custom domain included with all annual plans' : 'Switch to annual for a free custom domain'}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           
-          {/* ══════════════════════════════════════════════════════════════
-              PLAN 1: FREE FOREVER
-          ══════════════════════════════════════════════════════════════ */}
+          {/* TIER A: $9 / mo */}
           <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-2xs hover:border-zinc-300 transition-all">
             <div className="space-y-4">
               <div>
@@ -181,55 +266,53 @@ export default function PricingPage() {
                   STARTER
                 </span>
                 <h3 className="font-display text-2xl font-bold text-zinc-950 mt-1">
-                  Free Forever
+                  Starter Plan
                 </h3>
                 <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
-                  Essential operating tools for solo founders, independent consultants, and creators.
+                  For solo consultants and small boutique agencies automating their client ops.
                 </p>
               </div>
 
-              {/* Price */}
               <div className="py-2 border-y border-zinc-100">
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">
-                    {currency === 'INR' ? '₹0' : '$0'}
+                    {currency === 'INR' ? (billingCycle === 'annual' ? '₹699' : '₹799') : (billingCycle === 'annual' ? '$7' : '$9')}
                   </span>
-                  <span className="text-xs text-zinc-400 font-mono">/forever</span>
+                  <span className="text-xs text-zinc-400 font-mono">/month</span>
                 </div>
                 <div className="text-[11px] text-zinc-500 font-mono mt-0.5">
-                  1,000 AI runs / month included
+                  {billingCycle === 'annual' ? 'Billed annually + Free Domain' : 'Billed monthly'} &bull; 5K AI runs/mo
                 </div>
               </div>
 
-              {/* Feature Checklist */}
-              <div className="space-y-2.5 text-xs text-zinc-700">
+              <div className="space-y-2 text-xs text-zinc-700">
                 <div className="font-semibold text-zinc-900 text-[11px] uppercase tracking-wider font-mono">
-                  What&apos;s included:
+                  Features included:
                 </div>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span><strong>1,000</strong> AI agent runs/month</span>
+                    <span><strong>5,000</strong> AI agent runs/month</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Google Gemini 2.5 Flash reasoning</span>
+                    <span>Free Custom Domain on Annual Billing</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Unlimited SHA-256 E-Sign Vault</span>
+                    <span>Automated GST/Tax Invoices with QR</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Automated 18% GST tax calculation</span>
+                    <span>SHA-256 E-Sign Vault with Audit Logs</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Kanban CRM &amp; Lead Funnel</span>
+                    <span>Meta WhatsApp notification templates</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>1 Workspace &amp; Community support</span>
+                    <span>Up to 2 Team Seats included</span>
                   </li>
                 </ul>
               </div>
@@ -237,68 +320,57 @@ export default function PricingPage() {
 
             <div className="pt-6 mt-6 border-t border-zinc-100">
               <a
-                href="https://app.heycora.in/workspace/login?plan=free"
+                href="https://app.heycora.in/workspace/login?plan=starter"
                 className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors"
               >
-                <span>Get Started Free</span>
+                <span>Start 14-Day Trial</span>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
               </a>
             </div>
           </div>
 
-          {/* ══════════════════════════════════════════════════════════════
-              PLAN 2: INDIA ONLY EDITION / LOCALIZED GROWTH
-          ══════════════════════════════════════════════════════════════ */}
+          {/* TIER B: $19 / mo (MOST POPULAR) */}
           <div className="bg-[#0E1115] text-white border-2 border-zinc-800 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-xl relative overflow-hidden">
-            {/* Highlight Ribbon */}
             <div className="absolute top-3 right-3">
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-800 border border-zinc-700 text-[10px] font-mono font-bold text-white uppercase tracking-wider">
                 <Flame className="w-3 h-3 text-zinc-300" />
-                <span>{isIndia ? 'INDIA MSME' : 'POPULAR'}</span>
+                <span>MOST POPULAR</span>
               </span>
             </div>
 
             <div className="space-y-4">
               <div>
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400">
-                  {isIndia ? 'INDIA EDITION' : 'ESSENTIALS'}
+                  STUDIO &amp; AGENCY
                 </span>
                 <h3 className="font-display text-2xl font-bold text-white mt-1">
-                  {isIndia ? 'Bharat Growth' : 'Starter Growth'}
+                  Professional Plan
                 </h3>
                 <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                  {isIndia 
-                    ? 'Optimized for Indian agencies, consultancies, studios & MSMEs with annual billing.'
-                    : 'Complete operating suite for growing agencies and independent practices.'}
+                  The complete autonomous operating backbone for growing commercial practices.
                 </p>
               </div>
 
-              {/* Price */}
               <div className="py-2 border-y border-zinc-800">
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl sm:text-4xl font-display font-bold text-white">
-                    {currency === 'INR'
-                      ? (billingCycle === 'annual' ? '₹999' : '₹1,499')
-                      : (billingCycle === 'annual' ? '$15' : '$19')}
+                    {currency === 'INR' ? (billingCycle === 'annual' ? '₹1,399' : '₹1,599') : (billingCycle === 'annual' ? '$15' : '$19')}
                   </span>
                   <span className="text-xs text-zinc-400 font-mono">/month</span>
                 </div>
                 <div className="text-[11px] text-zinc-400 font-mono mt-0.5">
-                  {billingCycle === 'annual' 
-                    ? (currency === 'INR' ? 'Billed annually (₹11,988/yr)' : 'Billed annually ($180/yr)') 
-                    : 'Billed monthly'} &bull; 10K runs/mo
+                  {billingCycle === 'annual' ? 'Billed annually + Free Domain' : 'Billed monthly'} &bull; 20K AI runs/mo
                 </div>
               </div>
 
-              {/* Feature Checklist */}
-              <div className="space-y-2.5 text-xs text-zinc-300">
+              <div className="space-y-2 text-xs text-zinc-300">
                 <div className="font-semibold text-zinc-200 text-[11px] uppercase tracking-wider font-mono">
-                  Everything in Free, plus:
+                  Everything in Starter, plus:
                 </div>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span><strong>10,000</strong> AI agent runs/month</span>
+                    <span><strong>20,000</strong> AI agent runs/month</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
@@ -306,15 +378,15 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>{isIndia ? 'Full GSTIN verification & tax splits' : 'Multi-currency invoicing & tax engine'}</span>
+                    <span>Free Custom Domain on Annual Billing</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>{isIndia ? 'Dynamic UPI QR code on all invoices' : 'Instant online client payment links'}</span>
+                    <span>Meta WhatsApp Cloud automated dispatch</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>WhatsApp automated client notifications</span>
+                    <span>Full GSTIN splits &amp; Dynamic UPI QR</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
@@ -326,7 +398,7 @@ export default function PricingPage() {
 
             <div className="pt-6 mt-6 border-t border-zinc-800">
               <a
-                href={`https://app.heycora.in/workspace/login?plan=${isIndia ? 'india_annual' : 'growth'}`}
+                href="https://app.heycora.in/workspace/login?plan=pro"
                 className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-950 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors shadow-sm"
               >
                 <span>Start 14-Day Free Trial</span>
@@ -335,47 +407,41 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* ══════════════════════════════════════════════════════════════
-              PLAN 3: PRO / GLOBAL GROWTH
-          ══════════════════════════════════════════════════════════════ */}
+          {/* TIER C: $29 / mo */}
           <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-2xs hover:border-zinc-300 transition-all">
             <div className="space-y-4">
               <div>
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500">
-                  GROWTH
+                  SCALE &amp; SPEED
                 </span>
                 <h3 className="font-display text-2xl font-bold text-zinc-950 mt-1">
-                  Global Pro
+                  Scale Plan
                 </h3>
                 <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
-                  For scaling professional services firms managing high client throughput and custom workflows.
+                  High-throughput infrastructure for multi-member teams and enterprise workflows.
                 </p>
               </div>
 
-              {/* Price */}
               <div className="py-2 border-y border-zinc-100">
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">
-                    {currency === 'INR' 
-                      ? (billingCycle === 'annual' ? '₹3,199' : '₹3,999')
-                      : (billingCycle === 'annual' ? '$39' : '$49')}
+                    {currency === 'INR' ? (billingCycle === 'annual' ? '₹2,199' : '₹2,499') : (billingCycle === 'annual' ? '$23' : '$29')}
                   </span>
                   <span className="text-xs text-zinc-400 font-mono">/month</span>
                 </div>
                 <div className="text-[11px] text-zinc-500 font-mono mt-0.5">
-                  {billingCycle === 'annual' ? 'Billed annually (Save 20%)' : 'Billed monthly'} &bull; 50K runs/mo
+                  {billingCycle === 'annual' ? 'Billed annually + Free Domain' : 'Billed monthly'} &bull; 60K AI runs/mo
                 </div>
               </div>
 
-              {/* Feature Checklist */}
-              <div className="space-y-2.5 text-xs text-zinc-700">
+              <div className="space-y-2 text-xs text-zinc-700">
                 <div className="font-semibold text-zinc-900 text-[11px] uppercase tracking-wider font-mono">
-                  Everything in {isIndia ? 'Bharat' : 'Growth'}, plus:
+                  Everything in Pro, plus:
                 </div>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span><strong>50,000</strong> AI reasoning runs/month</span>
+                    <span><strong>60,000</strong> AI reasoning runs/month</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
@@ -383,7 +449,11 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Autonomous Proposal &amp; Research Agent</span>
+                    <span>Free Custom Domain on Annual Billing</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
+                    <span>Autonomous AI Proposal &amp; Research Agent</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
@@ -393,17 +463,13 @@ export default function PricingPage() {
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
                     <span>Custom Webhook Automations &amp; API</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>24/7 Priority engineering queue</span>
-                  </li>
                 </ul>
               </div>
             </div>
 
             <div className="pt-6 mt-6 border-t border-zinc-100">
               <a
-                href="https://app.heycora.in/workspace/login?plan=pro"
+                href="https://app.heycora.in/workspace/login?plan=scale"
                 className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors shadow-xs"
               >
                 <span>Start 14-Day Free Trial</span>
@@ -412,78 +478,87 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* ══════════════════════════════════════════════════════════════
-              PLAN 4: ENTERPRISE & SCALE
-          ══════════════════════════════════════════════════════════════ */}
-          <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-2xs hover:border-zinc-300 transition-all">
-            <div className="space-y-4">
-              <div>
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500">
-                  ORGANIZATION
-                </span>
-                <h3 className="font-display text-2xl font-bold text-zinc-950 mt-1">
-                  Enterprise
-                </h3>
-                <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
-                  For multi-branch organizations requiring bespoke AI quota, dedicated DPAs, and SSO.
-                </p>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          ROW 3: INDIA ONLY PLAN (BHARAT EDITION - RS 499/MO ANNUAL ONLY)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-20">
+        <div className="bg-gradient-to-b from-zinc-900 to-zinc-950 text-white border-2 border-zinc-800 rounded-[32px] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            <div className="lg:col-span-5 space-y-3">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800 border border-zinc-700 text-[10px] font-mono font-bold text-zinc-200 uppercase tracking-wider">
+                <Flame className="w-3.5 h-3.5 text-zinc-300" />
+                <span>INDIA MSME EDITION &bull; ANNUAL COMMITMENT ONLY</span>
               </div>
 
-              {/* Price */}
-              <div className="py-2 border-y border-zinc-100">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">
-                    Custom
-                  </span>
-                </div>
-                <div className="text-[11px] text-zinc-500 font-mono mt-0.5">
-                  Volume actions &bull; Dedicated SLA
-                </div>
-              </div>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-white">
+                Bharat Growth Plan
+              </h2>
 
-              {/* Feature Checklist */}
-              <div className="space-y-2.5 text-xs text-zinc-700">
-                <div className="font-semibold text-zinc-900 text-[11px] uppercase tracking-wider font-mono">
-                  Everything in Pro, plus:
+              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                A heavily subsidized operating system built exclusively for Indian founders, MSMEs, agencies, and consultancies. Includes complete GST tax math, instant UPI QR payments, and WhatsApp dispatch.
+              </p>
+
+              <div className="pt-2">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl sm:text-4xl font-display font-bold text-white">₹499</span>
+                  <span className="text-xs text-zinc-400 font-mono">/month</span>
                 </div>
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Custom AI run volume &amp; fine-tuned models</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>SAML / SSO &amp; Advanced RBAC</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Custom DPA &amp; DPDP Act 2023 Compliance</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>White-label client portal &amp; custom domain</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Dedicated Solutions Architect</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>99.98% Uptime SLA Agreement</span>
-                  </li>
-                </ul>
+                <div className="text-[11px] text-zinc-400 font-mono mt-1">
+                  Billed annually at ₹5,988/year &bull; <em>Strictly annual commitment only (no monthly option)</em>
+                </div>
               </div>
             </div>
 
-            <div className="pt-6 mt-6 border-t border-zinc-100">
-              <Link
-                href="/contact"
-                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors"
+            <div className="lg:col-span-4 space-y-2.5 text-xs text-zinc-300">
+              <div className="font-semibold text-zinc-200 text-[11px] uppercase tracking-wider font-mono">
+                India Edition Features:
+              </div>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
+                  <span><strong>10,000</strong> AI agent reasoning runs/month</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
+                  <span><strong>Free Custom Domain</strong> (.in / .com) with SSL</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
+                  <span>Automated 18% CGST/SGST/IGST tax splits</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
+                  <span>Dynamic UPI QR code on all invoices</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
+                  <span>Meta WhatsApp automated client notifications</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
+                  <span>Up to 5 Team Seats &amp; Priority IST Support</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="lg:col-span-3 flex flex-col justify-center space-y-3">
+              <a
+                href="https://app.heycora.in/workspace/login?plan=india_annual_499"
+                className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-950 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-colors shadow-sm"
               >
-                <span>Talk to Solutions Team</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
-              </Link>
+                <span>Claim India MSME Plan</span>
+                <ArrowRight className="w-4 h-4 text-zinc-950" />
+              </a>
+              <p className="text-[11px] text-zinc-500 text-center font-mono">
+                UDYAM / GSTIN verification supported &bull; Instant activation
+              </p>
             </div>
+
           </div>
 
         </div>
@@ -508,18 +583,19 @@ export default function PricingPage() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-zinc-50 border-b border-zinc-200 text-zinc-950 font-bold">
-                    <th className="p-4 sm:p-5 w-2/5">Capabilities &amp; Modules</th>
-                    <th className="p-4 sm:p-5 w-[15%] text-center">Free Forever</th>
-                    <th className="p-4 sm:p-5 w-[15%] text-center bg-zinc-100/70">{isIndia ? 'Bharat Growth' : 'Starter Growth'}</th>
-                    <th className="p-4 sm:p-5 w-[15%] text-center">Global Pro</th>
-                    <th className="p-4 sm:p-5 w-[15%] text-center">Enterprise</th>
+                    <th className="p-4 sm:p-5 w-2/6">Capabilities &amp; Modules</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center">Free Forever</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center bg-zinc-100/70 font-bold">India Edition (₹499/mo)</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center">Starter ($9/mo)</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center">Professional ($19/mo)</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center">Scale ($29/mo)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
                   
                   {/* Category 1: AI Operations */}
                   <tr className="bg-zinc-100/50">
-                    <td colSpan={5} className="p-3.5 font-mono font-bold uppercase tracking-wider text-[11px] text-zinc-600">
+                    <td colSpan={6} className="p-3.5 font-mono font-bold uppercase tracking-wider text-[11px] text-zinc-600">
                       1. AI Intelligence &amp; Autonomous Scoping
                     </td>
                   </tr>
@@ -527,106 +603,79 @@ export default function PricingPage() {
                     <td className="p-4 font-medium text-zinc-800">Monthly AI Runs</td>
                     <td className="p-4 text-center font-mono">1,000</td>
                     <td className="p-4 text-center font-mono bg-zinc-50 font-bold">10,000</td>
-                    <td className="p-4 text-center font-mono">50,000</td>
-                    <td className="p-4 text-center font-mono">Custom</td>
+                    <td className="p-4 text-center font-mono">5,000</td>
+                    <td className="p-4 text-center font-mono">20,000</td>
+                    <td className="p-4 text-center font-mono">60,000</td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-medium text-zinc-800">Free Custom Domain (Annual)</td>
+                    <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Supported LLM Models</td>
                     <td className="p-4 text-center text-zinc-600">Gemini 2.5 Flash</td>
                     <td className="p-4 text-center text-zinc-900 font-medium bg-zinc-50">Claude 3.5 + GPT-4o mini</td>
+                    <td className="p-4 text-center text-zinc-600">Gemini 2.5 Flash</td>
+                    <td className="p-4 text-center text-zinc-900 font-medium">Claude 3.5 + GPT-4o mini</td>
                     <td className="p-4 text-center text-zinc-900 font-medium">All Frontier Models</td>
-                    <td className="p-4 text-center text-zinc-900 font-medium">Fine-tuned &amp; Dedicated</td>
-                  </tr>
-                  <tr>
-                    <td className="p-4 font-medium text-zinc-800">Autonomous Proposal Builder</td>
-                    <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
 
-                  {/* Category 2: CRM & Lead Management */}
+                  {/* Category 2: Invoicing & Taxes */}
                   <tr className="bg-zinc-100/50">
-                    <td colSpan={5} className="p-3.5 font-mono font-bold uppercase tracking-wider text-[11px] text-zinc-600">
-                      2. CRM, Pipelines &amp; Dispatch
+                    <td colSpan={6} className="p-3.5 font-mono font-bold uppercase tracking-wider text-[11px] text-zinc-600">
+                      2. Invoicing, Payments &amp; Indian GST Math
                     </td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-medium text-zinc-800">Kanban Lead Pipeline</td>
+                    <td className="p-4 font-medium text-zinc-800">18% GST Calculation &amp; Invoices</td>
+                    <td className="p-4 text-center text-zinc-900">Basic</td>
+                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold">Auto CGST/SGST/IGST</td>
+                    <td className="p-4 text-center text-zinc-900">Included</td>
+                    <td className="p-4 text-center text-zinc-900">Automated Splits</td>
+                    <td className="p-4 text-center text-zinc-900">Custom Formats</td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-medium text-zinc-800">Dynamic UPI QR Code Payment</td>
+                    <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">WhatsApp Automated Dispatch</td>
                     <td className="p-4 text-center text-zinc-400">Manual templates</td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-medium">Meta Cloud API</td>
+                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold">Meta Cloud API</td>
+                    <td className="p-4 text-center text-zinc-900">Templates</td>
                     <td className="p-4 text-center text-zinc-900 font-medium">Meta Cloud API</td>
-                    <td className="p-4 text-center text-zinc-900 font-medium">Dedicated Number Routing</td>
-                  </tr>
-                  <tr>
-                    <td className="p-4 font-medium text-zinc-800">Team Seats Included</td>
-                    <td className="p-4 text-center font-mono">1 seat</td>
-                    <td className="p-4 text-center font-mono bg-zinc-50 font-bold">5 seats</td>
-                    <td className="p-4 text-center font-mono">Unlimited</td>
-                    <td className="p-4 text-center font-mono">Unlimited</td>
+                    <td className="p-4 text-center text-zinc-900 font-medium">Meta Cloud API</td>
                   </tr>
 
-                  {/* Category 3: Invoicing & Finance */}
+                  {/* Category 3: Legal & Contracts */}
                   <tr className="bg-zinc-100/50">
-                    <td colSpan={5} className="p-3.5 font-mono font-bold uppercase tracking-wider text-[11px] text-zinc-600">
-                      3. Finance &amp; Tax Engine
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="p-4 font-medium text-zinc-800">{isIndia ? '18% GST Invoicing & Math' : 'Tax & Automated Invoicing'}</td>
-                    <td className="p-4 text-center text-zinc-900">Basic</td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-medium">{isIndia ? 'Auto CGST/SGST/IGST' : 'Automated Tax Engine'}</td>
-                    <td className="p-4 text-center text-zinc-900 font-medium">Multi-Currency &amp; Tax</td>
-                    <td className="p-4 text-center text-zinc-900 font-medium">Custom ERP Sync</td>
-                  </tr>
-                  <tr>
-                    <td className="p-4 font-medium text-zinc-800">{isIndia ? 'Dynamic UPI QR Code Payment' : 'Online Client Payments'}</td>
-                    <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                  </tr>
-                  <tr>
-                    <td className="p-4 font-medium text-zinc-800">{isIndia ? 'CA Tax Export (GSTR-1 Ready)' : 'Financial Accounting Export'}</td>
-                    <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                  </tr>
-
-                  {/* Category 4: Contracts & Security */}
-                  <tr className="bg-zinc-100/50">
-                    <td colSpan={5} className="p-3.5 font-mono font-bold uppercase tracking-wider text-[11px] text-zinc-600">
-                      4. Legal, E-Sign &amp; Enterprise Governance
+                    <td colSpan={6} className="p-3.5 font-mono font-bold uppercase tracking-wider text-[11px] text-zinc-600">
+                      3. Legal, E-Sign &amp; Governance
                     </td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">SHA-256 E-Sign Vault</td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                  </tr>
-                  <tr>
-                    <td className="p-4 font-medium text-zinc-800">Compliance &amp; Audit Trail</td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-medium text-zinc-800">Support &amp; Account SLA</td>
-                    <td className="p-4 text-center text-zinc-500">Community</td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-medium">Priority ({isIndia ? 'IST < 2 hr' : '< 4 hr'})</td>
-                    <td className="p-4 text-center text-zinc-900 font-medium">24/7 Priority Queue</td>
-                    <td className="p-4 text-center text-zinc-900 font-medium">Dedicated Solutions Architect</td>
+                    <td className="p-4 font-medium text-zinc-800">Team Seats</td>
+                    <td className="p-4 text-center font-mono">1 seat</td>
+                    <td className="p-4 text-center font-mono bg-zinc-50 font-bold">5 seats</td>
+                    <td className="p-4 text-center font-mono">2 seats</td>
+                    <td className="p-4 text-center font-mono">5 seats</td>
+                    <td className="p-4 text-center font-mono">Unlimited</td>
                   </tr>
 
                 </tbody>
