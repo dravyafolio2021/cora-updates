@@ -19,8 +19,7 @@ import {
   Mail,
   Layout,
   Zap,
-  Lock,
-  ArrowUpRight
+  Lock
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -96,8 +95,8 @@ export default function PricingPage() {
   return (
     <main className="w-full relative pb-24 overflow-hidden bg-white text-zinc-900">
       
-      {/* ── Ethereal Pure Cloud Sky Hero Section ── */}
-      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#56a2e8] via-[#cae4fc] to-white pt-28 sm:pt-36 pb-12 sm:pb-16">
+      {/* ── Ethereal Pure Cloud Sky Hero Section (Uncluttered & Clean) ── */}
+      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#56a2e8] via-[#cae4fc] to-white pt-28 sm:pt-36 pb-14 sm:pb-20">
         
         {/* Background Pure Sky Artwork */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
@@ -137,61 +136,9 @@ export default function PricingPage() {
           </h1>
 
           {/* Body */}
-          <p className="text-zinc-700 text-base sm:text-lg font-normal leading-relaxed max-w-[540px] mx-auto mb-6">
+          <p className="text-zinc-700 text-base sm:text-lg font-normal leading-relaxed max-w-[540px] mx-auto">
             Start free forever with 1,000 monthly AI runs. Upgrade anytime as you grow.
           </p>
-
-          {/* ── Cadence Selector (Zero-CLS Fixed Dimensions) ── */}
-          <div className="flex flex-col items-center justify-center gap-2.5 w-full max-w-[540px]">
-            <div className="inline-flex items-center p-1 bg-white/95 backdrop-blur-md rounded-2xl border border-zinc-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.06)] w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={() => {
-                  setBillingCycle('monthly');
-                  trackEvent('pricing_cycle_change', { cycle: 'monthly' });
-                }}
-                className={`flex-1 sm:flex-initial px-6 sm:px-8 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                  billingCycle === 'monthly'
-                    ? 'bg-zinc-950 text-white shadow-sm'
-                    : 'text-zinc-600 hover:text-zinc-950'
-                }`}
-              >
-                Monthly Billing
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setBillingCycle('annual');
-                  trackEvent('pricing_cycle_change', { cycle: 'annual' });
-                }}
-                className={`flex-1 sm:flex-initial px-6 sm:px-8 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                  billingCycle === 'annual'
-                    ? 'bg-zinc-950 text-white shadow-sm'
-                    : 'text-zinc-600 hover:text-zinc-950'
-                }`}
-              >
-                Annual Billing
-              </button>
-            </div>
-            
-            {/* Dedicated Zero-CLS Subline */}
-            <div className="h-8 flex items-center justify-center w-full">
-              {billingCycle === 'annual' ? (
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white/95 backdrop-blur-md rounded-full border border-zinc-200/80 shadow-2xs text-zinc-900 font-medium text-[11px] animate-in fade-in duration-150">
-                  <Gift className="w-3.5 h-3.5 text-zinc-950 shrink-0" />
-                  <span className="font-semibold">Annual Perks:</span>
-                  <span className="bg-zinc-100 px-2 py-0.5 rounded text-zinc-800 font-mono">Free Custom Domain</span>
-                  <span className="text-zinc-300">&bull;</span>
-                  <span className="bg-zinc-100 px-2 py-0.5 rounded text-zinc-800 font-mono">+12,000 Bonus Runs</span>
-                </div>
-              ) : (
-                <div className="text-xs text-zinc-500 font-mono flex items-center justify-center animate-in fade-in duration-150">
-                  No credit card required for Free Forever &bull; Cancel anytime
-                </div>
-              )}
-            </div>
-
-          </div>
 
         </div>
       </section>
@@ -199,7 +146,7 @@ export default function PricingPage() {
       {/* ══════════════════════════════════════════════════════════════════════
           ROW 1: FREE FOREVER USP SHOWCASE (REFINED & EFFORTLESS CRAFT)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 -mt-3 relative z-10">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 -mt-6 sm:-mt-10 relative z-10">
         <div className="bg-white border border-zinc-200 rounded-[28px] p-6 sm:p-8 shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.05)] transition-all">
           
           {/* Header Row: Clean, Confident Hierarchy */}
@@ -325,23 +272,76 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 2: 3-TIER GLOBAL SAAS PRICING ($9, $19, $29 / ₹999, ₹1999, ₹2999)
+          ROW 2: 3-TIER GLOBAL SAAS PRICING WITH CADENCE TOGGLE RIGHT HERE
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12">
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        
+        {/* Section Header & Cadence Toggle (Sits Directly Above Paid Growth Plans) */}
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-zinc-100">
+          
           <div>
             <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400">
               GROWTH PLANS
             </div>
-            <h2 className="font-display text-2xl font-bold text-zinc-950">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 mt-1">
               High-Throughput Operating Plans
             </h2>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1">
+              Scale your client operations with frontier AI models, custom domains, and automated client communications.
+            </p>
           </div>
-          <div className="text-xs text-zinc-500 font-mono">
-            {billingCycle === 'annual' 
-              ? '✦ Free custom domain + 12,000 bonus AI runs included on annual plans' 
-              : 'Switch to annual billing to unlock a free custom domain & 12K bonus AI runs'}
+
+          {/* Cadence Switcher & Annual Perks Badge */}
+          <div className="flex flex-col sm:items-end gap-2 shrink-0">
+            <div className="inline-flex items-center p-1 bg-zinc-100/90 rounded-2xl border border-zinc-200/80 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => {
+                  setBillingCycle('monthly');
+                  trackEvent('pricing_cycle_change', { cycle: 'monthly' });
+                }}
+                className={`px-5 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  billingCycle === 'monthly'
+                    ? 'bg-zinc-950 text-white shadow-xs'
+                    : 'text-zinc-600 hover:text-zinc-950'
+                }`}
+              >
+                Monthly Billing
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setBillingCycle('annual');
+                  trackEvent('pricing_cycle_change', { cycle: 'annual' });
+                }}
+                className={`px-5 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  billingCycle === 'annual'
+                    ? 'bg-zinc-950 text-white shadow-xs'
+                    : 'text-zinc-600 hover:text-zinc-950'
+                }`}
+              >
+                Annual Billing
+              </button>
+            </div>
+
+            {/* Zero-CLS Perk Indicator Line */}
+            <div className="h-6 flex items-center text-xs">
+              {billingCycle === 'annual' ? (
+                <div className="inline-flex items-center gap-1.5 text-zinc-900 font-medium text-[11px] animate-in fade-in duration-150">
+                  <Gift className="w-3.5 h-3.5 text-zinc-900" />
+                  <span className="font-semibold">Annual Perks:</span>
+                  <span className="bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded text-zinc-800 font-mono text-[10px]">Free Custom Domain</span>
+                  <span className="text-zinc-300">&bull;</span>
+                  <span className="bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded text-zinc-800 font-mono text-[10px]">+12K Bonus Runs</span>
+                </div>
+              ) : (
+                <div className="text-[11px] text-zinc-400 font-mono animate-in fade-in duration-150">
+                  Switch to annual for a free custom domain &bull; Cancel anytime
+                </div>
+              )}
+            </div>
           </div>
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
