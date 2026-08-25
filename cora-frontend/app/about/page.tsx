@@ -324,17 +324,21 @@ export default function AboutPage() {
           </a>
         </div>
 
-        {/* ── Architectural Circular Portal Visual Stage ── */}
-        <div className="relative w-full max-w-[1100px] mx-auto rounded-[32px] sm:rounded-[44px] overflow-hidden aspect-[16/9] shadow-2xl border border-zinc-200/80 mb-14 sm:mb-16 bg-white">
+        {/* ── Architectural Circular Portal (Seamlessly Blended into Canvas) ── */}
+        <div className="relative w-full max-w-[1080px] mx-auto aspect-[16/9] mb-12 sm:mb-16 overflow-hidden">
           <Image
-            src="/images/about_mission_portal_hd.jpg"
+            src="/images/about_mission_portal_blended.png"
             alt="Cora Mission Horizon Portal"
             fill
             priority
-            sizes="(max-width: 1240px) 100vw, 1100px"
-            className="object-cover object-center"
+            sizes="(max-width: 1240px) 100vw, 1080px"
+            className="object-contain object-center filter contrast-102"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-white/10 via-transparent to-transparent pointer-events-none" />
+          {/* Subtle multi-directional gradients for seamless canvas integration */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white via-white/30 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/60 to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white via-white/40 to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white via-white/40 to-transparent pointer-events-none" />
         </div>
 
         {/* ── Brand Trust / Client Ticker at bottom ── */}
