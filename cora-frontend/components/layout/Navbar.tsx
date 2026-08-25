@@ -214,7 +214,15 @@ export function Navbar() {
                   Pricing
                 </Link>
 
-                {/* 5. Company Small Dropdown */}
+                {/* 5. Direct Get A Demo Link */}
+                <Link
+                  href="/demo"
+                  className="px-3 py-1.5 rounded-lg text-zinc-800 hover:text-zinc-950 hover:bg-zinc-100/60 transition-colors font-semibold"
+                >
+                  Get A Demo
+                </Link>
+
+                {/* 6. Company Small Dropdown */}
                 <div
                   className="relative py-1.5"
                   onMouseEnter={() => handleMouseEnter('company')}
@@ -249,12 +257,21 @@ export function Navbar() {
                       </Link>
 
                       <Link
+                        href="/brand"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-zinc-50 text-xs font-semibold text-zinc-800 hover:text-zinc-950 transition-colors"
+                      >
+                        <Layers className="w-3.5 h-3.5 text-zinc-500" />
+                        <span>Brand &amp; Design Assets</span>
+                      </Link>
+
+                      <Link
                         href="/about#founder"
                         onClick={() => setActiveDropdown(null)}
                         className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-zinc-50 text-xs font-semibold text-zinc-800 hover:text-zinc-950 transition-colors"
                       >
                         <User className="w-3.5 h-3.5 text-zinc-500" />
-                        <span>Co-Founder: Dravya Bansal</span>
+                        <span>Founder: Dravya Bansal</span>
                       </Link>
 
                       <Link
@@ -267,7 +284,7 @@ export function Navbar() {
                       </Link>
 
                       <Link
-                        href="/about#security"
+                        href="/security"
                         onClick={() => setActiveDropdown(null)}
                         className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-zinc-50 text-xs font-semibold text-zinc-800 hover:text-zinc-950 transition-colors border-t border-zinc-100 mt-1 pt-2"
                       >
@@ -877,20 +894,36 @@ export function Navbar() {
               {/* Level 1: Main Category List (Clay style) */}
               {!activeMobileSubmenu && (
                 <div className="space-y-1 text-base font-semibold text-zinc-900">
-                  {/* AI Co-Founders Featured Pill on Mobile */}
-                  <Link
-                    href="/ai-agent"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full mb-2 p-3.5 rounded-2xl bg-zinc-950 text-white flex items-center justify-between shadow-sm transition-all"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Sparkles className="w-4 h-4 text-amber-400" />
-                      <span className="font-bold text-sm">AI Co-Founders™</span>
-                    </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/90 text-white">
-                      NEW
-                    </span>
-                  </Link>
+                  {/* AI Co-Founders & Get A Demo Featured Row on Mobile */}
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <Link
+                      href="/ai-agent"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="p-3 rounded-2xl bg-zinc-950 text-white flex flex-col justify-between shadow-sm transition-all min-h-[72px]"
+                    >
+                      <div className="flex items-center justify-between">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">
+                          AI
+                        </span>
+                      </div>
+                      <span className="font-bold text-xs">AI Co-Founder</span>
+                    </Link>
+
+                    <Link
+                      href="/demo"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="p-3 rounded-2xl bg-white border border-zinc-200 text-zinc-950 flex flex-col justify-between shadow-2xs transition-all min-h-[72px] hover:bg-zinc-50"
+                    >
+                      <div className="flex items-center justify-between">
+                        <ArrowRight className="w-4 h-4 text-zinc-500" />
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-700">
+                          LIVE
+                        </span>
+                      </div>
+                      <span className="font-bold text-xs">Get A Demo</span>
+                    </Link>
+                  </div>
 
                   <button
                     type="button"
@@ -1115,6 +1148,10 @@ export function Navbar() {
                   </span>
                   <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
                     <div><div className="text-sm font-bold text-zinc-950">About &amp; Story</div><div className="text-xs text-zinc-500">Mission and Dravya Bansal</div></div>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  </Link>
+                  <Link href="/brand" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
+                    <div><div className="text-sm font-bold text-zinc-950">Brand &amp; Design Assets</div><div className="text-xs text-zinc-500">Logos, tokens &amp; SVG kit</div></div>
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                   </Link>
                   <Link href="/security" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
