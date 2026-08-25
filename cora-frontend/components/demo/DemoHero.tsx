@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  Play, 
   ArrowRight, 
   Calendar, 
   FileText, 
@@ -19,8 +18,8 @@ import {
   ChevronRight,
   Star,
   Users,
-  Camera,
-  Film
+  Building,
+  Briefcase
 } from 'lucide-react';
 
 interface DemoHeroProps {
@@ -29,14 +28,13 @@ interface DemoHeroProps {
 
 export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
   const [activeTab, setActiveTab] = useState<'pipeline' | 'calendar' | 'gst' | 'vault'>('pipeline');
-  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
 
   return (
     <section className="relative pt-12 sm:pt-16 pb-16 sm:pb-24 overflow-hidden">
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         
         {/* ── Top Hero Copy ── */}
-        <div className="text-center max-w-[820px] mx-auto space-y-5 mb-10 sm:mb-14">
+        <div className="text-center max-w-[840px] mx-auto space-y-5 mb-10 sm:mb-14">
           
           {/* Eyebrow Pill */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-zinc-100 border border-zinc-200/80 text-xs font-mono font-medium text-zinc-700 shadow-2xs">
@@ -50,8 +48,8 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
           </h1>
 
           {/* Subtitle */}
-          <p className="font-sans text-base sm:text-lg md:text-xl text-zinc-600 font-normal leading-relaxed max-w-[640px] mx-auto">
-            Explore the complete autonomous solution for modern creative studios, production houses, and agency teams—no signup or credit card required.
+          <p className="font-sans text-base sm:text-lg md:text-xl text-zinc-600 font-normal leading-relaxed max-w-[680px] mx-auto">
+            Experience the complete autonomous operating system for creative agencies, consultancies, commercial studios, and growing service businesses—no signup or credit card required.
           </p>
 
           {/* CTAs */}
@@ -80,7 +78,7 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
                 <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               ))}
             </div>
-            <span><strong>2,500+</strong> studio founders &amp; production crews trust Cora</span>
+            <span><strong>2,500+</strong> business founders &amp; agency teams trust Cora</span>
             <span className="text-zinc-300 hidden sm:inline">•</span>
             <span className="font-mono text-[11px] text-zinc-400 uppercase tracking-wider hidden sm:inline">
               ISO 27001 • SOC 2 Ready • 100% Data Residency
@@ -109,9 +107,9 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
             {/* Interactive Tab Switcher */}
             <div className="flex items-center gap-1 bg-zinc-800/90 p-1 rounded-xl border border-zinc-700/80 overflow-x-auto scrollbar-none">
               {[
-                { id: 'pipeline', label: 'Pipeline & CRM', icon: Layers },
-                { id: 'calendar', label: 'Call Sheets & Slots', icon: Calendar },
-                { id: 'gst', label: '18% GST Invoicing', icon: DollarSign },
+                { id: 'pipeline', label: 'Client Pipeline & CRM', icon: Layers },
+                { id: 'calendar', label: 'Bookings & Calendar', icon: Calendar },
+                { id: 'gst', label: '18% GST & Invoicing', icon: DollarSign },
                 { id: 'vault', label: 'E-Sign Legal Vault', icon: ShieldCheck }
               ].map((tab) => {
                 const Icon = tab.icon;
@@ -144,12 +142,12 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
               <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="flex items-center justify-between flex-wrap gap-4 border-b border-zinc-200 pb-4">
                   <div>
-                    <h3 className="font-display text-xl font-bold text-zinc-950">Commercial Shoot Pipeline</h3>
-                    <p className="text-xs text-zinc-500 font-normal">Active production projects across multi-camera sets &amp; campaign deliverables.</p>
+                    <h3 className="font-display text-xl font-bold text-zinc-950">Commercial Client Pipeline</h3>
+                    <p className="text-xs text-zinc-500 font-normal">Cross-industry deals spanning creative retainers, advisory projects, and enterprise engagements.</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="px-3 py-1 rounded-lg bg-zinc-200/80 text-zinc-800 text-xs font-mono font-medium">
-                      Total Pipeline: ₹34.8 Lakhs
+                      Active Pipeline: ₹42.6 Lakhs
                     </span>
                   </div>
                 </div>
@@ -157,34 +155,34 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   {[
                     {
-                      stage: 'New Discovery Scope',
+                      stage: 'Discovery & AI Scoping',
                       count: '3 Deals',
                       items: [
-                        { client: 'Nykaa Beauty', project: 'Summer Glow Film', val: '₹4.5L', tag: 'AI Scope Gen' },
-                        { client: 'Zepto Labs', project: 'Brand Campaign Shoot', val: '₹2.8L', tag: 'Awaiting Sign' }
+                        { client: 'Zepto Labs', project: 'Growth Campaign Retainer', val: '₹4.5L', tag: 'AI Scope Gen' },
+                        { client: 'DLF Luxury', project: 'Commercial Showcase Deal', val: '₹6.8L', tag: 'Awaiting Sign' }
                       ]
                     },
                     {
-                      stage: 'Shoot Booked',
+                      stage: 'Confirmed & Scheduled',
                       count: '2 Active',
                       items: [
-                        { client: 'Boat Audio', project: 'Studio Bay 1 & 2', val: '₹6.2L', tag: 'Call Sheets Sent' },
-                        { client: 'Myntra Studio', project: 'Spring Catalog E-Comm', val: '₹3.9L', tag: 'Crew Confirmed' }
+                        { client: 'Nykaa Brands', project: 'Q3 Brand Campaign', val: '₹8.2L', tag: 'Contract Executed' },
+                        { client: 'Urban Company', project: 'Advisory Consultation', val: '₹3.5L', tag: 'Milestone 1 Paid' }
                       ]
                     },
                     {
-                      stage: 'Post-Production',
-                      count: '4 In Progress',
+                      stage: 'In Execution',
+                      count: '4 Projects',
                       items: [
-                        { client: 'Licious', project: 'Commercial TVC Cut', val: '₹8.0L', tag: 'Color Grading' },
-                        { client: 'Cult.Fit', project: 'Hero Training Reel', val: '₹3.4L', tag: 'VFX Review' }
+                        { client: 'Licious D2C', project: 'Brand TVC & Digital Cut', val: '₹7.0L', tag: 'Reviewing Proofs' },
+                        { client: 'Cult.Fit Wellness', project: 'Annual Creative Strategy', val: '₹5.4L', tag: 'Sprint 2 In Progress' }
                       ]
                     },
                     {
-                      stage: 'Invoiced & Completed',
-                      count: '6 Delivered',
+                      stage: 'Invoiced & Settled',
+                      count: '8 Delivered',
                       items: [
-                        { client: 'Tata CliQ Luxury', project: 'Watch Campaign 4K', val: '₹6.0L', tag: 'GST Paid • Instant UPI' }
+                        { client: 'Tata CliQ Luxury', project: 'Enterprise Production Sprint', val: '₹9.2L', tag: 'GST Paid • Instant UPI' }
                       ]
                     }
                   ].map((col, idx) => (
@@ -218,53 +216,53 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
               <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="flex items-center justify-between flex-wrap gap-4 border-b border-zinc-200 pb-4">
                   <div>
-                    <h3 className="font-display text-xl font-bold text-zinc-950">Dynamic Call-Time &amp; Studio Bay Schedule</h3>
-                    <p className="text-xs text-zinc-500 font-normal">Real-time studio bay occupancy, call sheet dispatches, and equipment rosters.</p>
+                    <h3 className="font-display text-xl font-bold text-zinc-950">Dynamic Booking &amp; Client Appointment Calendar</h3>
+                    <p className="text-xs text-zinc-500 font-normal">Real-time scheduling for client strategy calls, on-site walkthroughs, and production sessions.</p>
                   </div>
                   <span className="px-3 py-1 rounded-lg bg-zinc-200/80 text-zinc-800 text-xs font-mono font-medium">
-                    Today: 4 Bays Booked • 0 Conflicts
+                    Today: 6 Sessions Confirmed • 0 Conflicts
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <div className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-2xs space-y-3">
                     <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
-                      <span>STUDIO BAY A (CYC WALL)</span>
+                      <span>CLIENT STRATEGY SPRINT</span>
                       <span className="text-emerald-600 font-bold">IN SESSION</span>
                     </div>
-                    <h4 className="font-display font-bold text-zinc-950 text-base">Vogue India Editorial Shoot</h4>
-                    <p className="text-xs text-zinc-600">Call-Time: 08:30 AM | Wrap: 06:00 PM</p>
+                    <h4 className="font-display font-bold text-zinc-950 text-base">Fintech Brand Positioning &amp; GTM</h4>
+                    <p className="text-xs text-zinc-600">Time: 10:00 AM - 11:30 AM IST</p>
                     <div className="p-3 bg-zinc-50 rounded-xl text-xs space-y-1 font-mono text-zinc-600">
-                      <div>Director: Rohan Sen</div>
-                      <div>Cam: Sony FX9 + Cooke Primes</div>
-                      <div>Status: Call sheets confirmed by 14 crew</div>
+                      <div>Lead: Partner Strategy Team</div>
+                      <div>Format: Interactive Video Conference</div>
+                      <div>Status: Notes auto-transcribed by Cora AI</div>
                     </div>
                   </div>
 
                   <div className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-2xs space-y-3">
                     <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
-                      <span>STUDIO BAY B (PRODUCT SET)</span>
-                      <span className="text-zinc-700 font-bold">CALL TIME 02:00 PM</span>
+                      <span>ON-SITE COMMERCIAL SESSION</span>
+                      <span className="text-zinc-700 font-bold">02:00 PM IST</span>
                     </div>
-                    <h4 className="font-display font-bold text-zinc-950 text-base">D2C Beverage Commercial 4K</h4>
-                    <p className="text-xs text-zinc-600">Call-Time: 02:00 PM | Wrap: 09:30 PM</p>
+                    <h4 className="font-display font-bold text-zinc-950 text-base">Architectural Space Walkthrough</h4>
+                    <p className="text-xs text-zinc-600">Time: 02:00 PM - 05:00 PM IST</p>
                     <div className="p-3 bg-zinc-50 rounded-xl text-xs space-y-1 font-mono text-zinc-600">
-                      <div>Lead: Ananya Iyer</div>
-                      <div>Lighting: 4x Aputure 600d Pro Grid</div>
+                      <div>Client: Prestige Estates Luxury Wing</div>
+                      <div>Team: Lead Architect + 3 Spatial Reviewers</div>
                       <div>Status: Automated WhatsApp reminder sent</div>
                     </div>
                   </div>
 
                   <div className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-2xs space-y-3">
                     <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
-                      <span>EDIT SUITE 01</span>
-                      <span className="text-purple-700 font-bold">LOCKED &amp; RENDERING</span>
+                      <span>DELIVERABLE REVIEW</span>
+                      <span className="text-purple-700 font-bold">READY FOR SIGNOFF</span>
                     </div>
-                    <h4 className="font-display font-bold text-zinc-950 text-base">Zomato TVC Master Cut</h4>
-                    <p className="text-xs text-zinc-600">DaVinci Color Grade + Dolby 5.1 Mix</p>
+                    <h4 className="font-display font-bold text-zinc-950 text-base">Annual Retainer Campaign Assets</h4>
+                    <p className="text-xs text-zinc-600">Final Deliverable Milestone Verification</p>
                     <div className="p-3 bg-zinc-50 rounded-xl text-xs space-y-1 font-mono text-zinc-600">
-                      <div>Editor: Tanya Varma</div>
-                      <div>Deliverable: 9:16 + 16:9 ProRes 4444</div>
+                      <div>Stakeholder: VP of Marketing (Swiggy)</div>
+                      <div>Deliverable: Master Creative Suite + 18% GST Bill</div>
                       <div>Status: Auto-synced to Client Vault</div>
                     </div>
                   </div>
@@ -278,10 +276,10 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
                 <div className="flex items-center justify-between flex-wrap gap-4 border-b border-zinc-200 pb-4">
                   <div>
                     <h3 className="font-display text-xl font-bold text-zinc-950">Automated Indian GST &amp; UPI Invoicing Engine</h3>
-                    <p className="text-xs text-zinc-500 font-normal">Real-time SAC 998311 tax splits, automated CGST/SGST/IGST, and instant QR settlement.</p>
+                    <p className="text-xs text-zinc-500 font-normal">Real-time SAC professional service tax splits, automated CGST/SGST/IGST, and instant QR settlement.</p>
                   </div>
                   <span className="px-3 py-1 rounded-lg bg-zinc-200/80 text-zinc-800 text-xs font-mono font-medium">
-                    SAC Code: 998311 (Photography &amp; Video Production)
+                    SAC Code: 998311 / 998314 (Professional &amp; Creative Services)
                   </span>
                 </div>
 
@@ -299,11 +297,11 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
 
                     <div className="space-y-2 text-xs font-mono">
                       <div className="flex justify-between text-zinc-600">
-                        <span>Commercial Production Fee (3 Days)</span>
+                        <span>Professional Creative &amp; Advisory Services</span>
                         <span className="font-semibold text-zinc-950">₹3,50,000.00</span>
                       </div>
                       <div className="flex justify-between text-zinc-600">
-                        <span>Studio Bay &amp; Lighting Grip Rental</span>
+                        <span>Digital Asset Production &amp; Licensing</span>
                         <span className="font-semibold text-zinc-950">₹75,000.00</span>
                       </div>
                       <div className="flex justify-between text-zinc-600">
@@ -324,7 +322,7 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
                   <div className="md:col-span-5 bg-zinc-900 text-white rounded-2xl p-6 border border-zinc-800 space-y-4">
                     <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      <span>ZERO AR CHAOS</span>
+                      <span>ZERO AR HEADACHES</span>
                     </div>
                     <h4 className="font-display text-lg font-bold text-white">Instant UPI Settlement Rail</h4>
                     <p className="text-xs text-zinc-300 leading-relaxed font-normal">
@@ -344,7 +342,7 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
                 <div className="flex items-center justify-between flex-wrap gap-4 border-b border-zinc-200 pb-4">
                   <div>
                     <h3 className="font-display text-xl font-bold text-zinc-950">Cryptographic E-Sign Legal Vault</h3>
-                    <p className="text-xs text-zinc-500 font-normal">Legally binding master service agreements, commercial usage rights, and non-disclosure certificates.</p>
+                    <p className="text-xs text-zinc-500 font-normal">Legally binding master service agreements, retainer contracts, NDAs, and commercial usage certificates.</p>
                   </div>
                   <span className="px-3 py-1 rounded-lg bg-zinc-200/80 text-zinc-800 text-xs font-mono font-medium">
                     SHA-256 Audit Trail • IT Act 2000 Compliant
@@ -357,8 +355,8 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
                       <span className="text-xs font-mono text-zinc-400">AGREEMENT #CORA-LGL-089</span>
                       <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-bold">EXECUTED</span>
                     </div>
-                    <h4 className="font-display font-bold text-zinc-950 text-base">Commercial Model Release &amp; Broadcast Rights</h4>
-                    <p className="text-xs text-zinc-600">Client: Spotify India | Talent: 6 Featured Artists</p>
+                    <h4 className="font-display font-bold text-zinc-950 text-base">Annual Master Service Agreement (MSA)</h4>
+                    <p className="text-xs text-zinc-600">Client: Spotify India | Engagement: Enterprise Retainer</p>
                     <div className="p-3 bg-zinc-50 rounded-xl space-y-1 text-xs font-mono text-zinc-600">
                       <div>Signer: Legal Counsel (legal@spotify.com)</div>
                       <div>Timestamp: Today, 11:24:08 AM IST</div>
@@ -371,11 +369,11 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
                       <span className="text-xs font-mono text-zinc-400">AGREEMENT #CORA-LGL-090</span>
                       <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-bold">PENDING SIGNATURE</span>
                     </div>
-                    <h4 className="font-display font-bold text-zinc-950 text-base">Master Production Services &amp; Cancellation Terms</h4>
-                    <p className="text-xs text-zinc-600">Client: Red Bull Media House | Project: Mountain Series</p>
+                    <h4 className="font-display font-bold text-zinc-950 text-base">Commercial Scope of Work &amp; Retainer Terms</h4>
+                    <p className="text-xs text-zinc-600">Client: Red Bull Media House | Project: Enterprise Campaign</p>
                     <div className="p-3 bg-zinc-50 rounded-xl space-y-1 text-xs font-mono text-zinc-600">
                       <div>Sent to: procurement@redbull.com</div>
-                      <div>Clauses: 50% Non-Refundable Advance, Weather Day Policy</div>
+                      <div>Clauses: 50% Milestone Advance, IP Licensing Terms</div>
                       <div>Action: Auto-reminder scheduled in 4 hours</div>
                     </div>
                   </div>
@@ -394,7 +392,7 @@ export function DemoHero({ onOpenDrawer }: DemoHeroProps) {
                 onClick={onOpenDrawer}
                 className="inline-flex items-center gap-1.5 font-sans font-semibold text-zinc-950 hover:underline"
               >
-                <span>Request personalized studio configuration</span>
+                <span>Request personalized workflow configuration</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

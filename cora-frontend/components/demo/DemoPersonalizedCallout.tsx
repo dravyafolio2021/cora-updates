@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { ArrowRight, Sparkles, Shield, Clock } from 'lucide-react';
+import { ArrowRight, Clock } from 'lucide-react';
 
 interface DemoPersonalizedCalloutProps {
   onOpenDrawer: () => void;
@@ -34,7 +34,7 @@ export function DemoPersonalizedCallout({ onOpenDrawer }: DemoPersonalizedCallou
                 </span>
                 <span className="text-zinc-500">•</span>
                 <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
-                  1:1 Enterprise Walkthrough
+                  1:1 Tailored Walkthrough
                 </span>
               </div>
 
@@ -43,7 +43,7 @@ export function DemoPersonalizedCallout({ onOpenDrawer }: DemoPersonalizedCallou
               </h2>
 
               <p className="text-sm sm:text-base text-zinc-300 font-normal leading-relaxed max-w-[480px]">
-                See how Cora boosts studio productivity, automates 18% GST billing, and streamlines commercial shoot agreements with a dedicated workflow specialist.
+                See how Cora streamlines your business operations, automates 18% GST billing, and unifies client contracts with a dedicated workflow specialist.
               </p>
 
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
@@ -58,7 +58,7 @@ export function DemoPersonalizedCallout({ onOpenDrawer }: DemoPersonalizedCallou
 
                 <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
                   <Clock className="w-3.5 h-3.5" />
-                  <span>30 mins • Personalized to your studio</span>
+                  <span>30 mins • Tailored to your business model</span>
                 </div>
               </div>
 
@@ -69,7 +69,7 @@ export function DemoPersonalizedCallout({ onOpenDrawer }: DemoPersonalizedCallou
               <div className="relative w-full max-w-[480px] h-[280px] sm:h-[320px] rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl bg-zinc-900">
                 <Image
                   src="/images/cora_unified_hub_sprawl_clean.png"
-                  alt="Cora Studio Workspace Dashboard"
+                  alt="Cora Operating System Dashboard"
                   fill
                   sizes="(max-width: 768px) 100vw, 480px"
                   className="object-cover object-left-top filter contrast-105"
@@ -80,9 +80,9 @@ export function DemoPersonalizedCallout({ onOpenDrawer }: DemoPersonalizedCallou
                 <div className="absolute bottom-4 left-4 right-4 bg-zinc-950/90 backdrop-blur-md p-3 rounded-xl border border-zinc-700/80 flex items-center justify-between text-xs font-mono">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-zinc-200 font-bold">Studio OS v4.0</span>
+                    <span className="text-zinc-200 font-bold">Cora OS v4.0</span>
                   </div>
-                  <span className="text-zinc-400">All Modules Integrated</span>
+                  <span className="text-zinc-400">Multi-Industry Workspaces</span>
                 </div>
               </div>
             </div>

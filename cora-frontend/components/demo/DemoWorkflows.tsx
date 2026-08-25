@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { ArrowRight, Play, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface DemoWorkflowsProps {
   onOpenDrawer: () => void;
@@ -10,25 +10,37 @@ interface DemoWorkflowsProps {
 
 const WORKFLOW_CARDS = [
   {
-    role: 'Teams & Crews',
+    role: 'Teams & Operators',
     image: '/images/usecase_solo_creator.jpg',
-    tag: 'ON-SET EXECUTION',
-    desc: 'Check out how Cora helps your team easily coordinate call-times, equipment checklists, and ensure nothing falls through the cracks on set.',
-    points: ['Real-time digital call sheets', 'Equipment allocation & bay check-ins', 'Instant asset proofing galleries']
+    tag: 'OPERATIONS & EXECUTION',
+    desc: 'Check out how Cora helps your team coordinate daily deliverables, track client milestones, and ensure zero task chaos across active projects.',
+    points: [
+      'Visual Kanban & project stage tracking',
+      'Automated client approval & asset proofing',
+      'Instant WhatsApp client & schedule notifications'
+    ]
   },
   {
-    role: 'Executives & Founders',
+    role: 'Founders & Executives',
     image: '/images/usecase_production_house.jpg',
     tag: 'BUSINESS INTELLIGENCE',
-    desc: 'Discover how Cora gives you full visibility into high-value shoot pipelines, 18% GST tax splits, and instant cryptographic contract signoffs.',
-    points: ['Automated 18% GST & TDS ledgers', 'Legally binding SHA-256 e-signatures', 'Instant UPI client milestone payouts']
+    desc: 'Discover how Cora gives you complete visibility over high-value client pipelines, 18% GST tax splits, and instant cryptographic contract signoffs.',
+    points: [
+      'Automated 18% GST & TDS ledger reconciliation',
+      'Legally binding SHA-256 e-signatures & MSAs',
+      'Instant UPI & net-banking milestone payouts'
+    ]
   },
   {
-    role: 'Managers & Producers',
+    role: 'Managers & Team Leads',
     image: '/images/usecase_commercial_studio.jpg',
-    tag: 'STUDIO OPERATIONS',
-    desc: 'See how Cora helps you boost studio bay utilization, dispatch call sheets to WhatsApp automatically, and manage resources effortlessly.',
-    points: ['Conflict-free booking calendar', 'Automated client quote generation', 'Freelancer roster & rate management']
+    tag: 'RESOURCE ALLOCATION',
+    desc: 'See how Cora helps you balance team capacity, automate client scope generation, and eliminate double-booking across client schedules.',
+    points: [
+      'Conflict-free multi-calendar scheduling',
+      'AI-powered discovery quote & proposal generator',
+      'Vendor & freelance contractor roster management'
+    ]
   }
 ];
 
@@ -46,7 +58,7 @@ export function DemoWorkflows({ onOpenDrawer }: DemoWorkflowsProps) {
             Experience a day in the life with Cora.
           </h2>
           <p className="text-sm sm:text-base text-zinc-600 font-normal leading-relaxed">
-            Learn how Cora makes your studio operations better, whether you&apos;re an executive founder, lead producer, or on-set creator.
+            See how Cora eliminates administrative friction across your entire business—whether you&apos;re an executive founder, project manager, or team operator.
           </p>
         </div>
 
