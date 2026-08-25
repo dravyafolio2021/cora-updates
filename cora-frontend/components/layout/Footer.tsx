@@ -134,6 +134,7 @@ export function Footer() {
                 <li><Link href="/integrations" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-900">Integrations</Link></li>
                 <li><Link href="/tools/embed-builder" className="hover:text-zinc-950 transition-colors">Embed Builder</Link></li>
                 <li><Link href="/tools/gst-calculator" className="hover:text-zinc-950 transition-colors">18% GST Calculator</Link></li>
+                <li><Link href="/brand" className="hover:text-zinc-950 transition-colors">Brand &amp; Assets</Link></li>
                 <li><Link href="/about" className="hover:text-zinc-950 transition-colors">About &amp; Story</Link></li>
               </ul>
             </div>
