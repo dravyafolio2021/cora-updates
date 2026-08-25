@@ -12,7 +12,10 @@ import {
   Flame,
   Gift,
   Globe,
-  Sparkles
+  Sparkles,
+  ShieldCheck,
+  FileCheck,
+  Receipt
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -190,70 +193,83 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 1: FREE FOREVER PLAN (HERO BANNER CARD)
+          ROW 1: FREE FOREVER PLAN (COMPACT 2-ROW HORIZONTAL SLEEK CARD)
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12 -mt-3 relative z-10">
-        <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-8 shadow-[0_12px_36px_rgba(0,0,0,0.04)] hover:border-zinc-300 transition-all">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-            
-            <div className="lg:col-span-4 space-y-2">
+        <div className="bg-white border border-zinc-200/90 rounded-[24px] p-5 sm:p-6 shadow-[0_8px_24px_rgba(0,0,0,0.03)] hover:border-zinc-300 transition-all">
+          
+          {/* Header Row: Title, Price, Summary & Instant CTA */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-100">
+            <div className="flex flex-wrap items-center gap-3">
               <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[10px] font-mono font-bold text-zinc-700 uppercase tracking-wider">
-                <span>FREE FOREVER</span>
-                <span>&bull;</span>
-                <span>NO CARD REQUIRED</span>
+                FREE FOREVER &bull; NO CARD
               </div>
-              <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950">
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-950">
                 Free Forever Plan
               </h2>
-              <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed">
-                Everything you need to launch, manage leads, send proposals, and execute legally binding e-contracts for your business.
-              </p>
-              <div className="pt-1 flex items-baseline gap-1.5">
-                <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">
+              <div className="flex items-baseline gap-1 bg-zinc-50 border border-zinc-200/80 px-2.5 py-0.5 rounded-lg">
+                <span className="text-xl sm:text-2xl font-display font-bold text-zinc-950">
                   {currency === 'INR' ? '₹0' : '$0'}
                 </span>
-                <span className="text-xs text-zinc-400 font-mono">/forever free</span>
+                <span className="text-[11px] text-zinc-400 font-mono">/forever</span>
+              </div>
+              <span className="text-xs text-zinc-500 hidden lg:inline">
+                Launch, manage leads, and execute legally binding e-contracts.
+              </span>
+            </div>
+
+            <a
+              href="https://app.heycora.in/workspace/login?plan=free"
+              className="inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-sm shrink-0"
+            >
+              <span>Get Started Free</span>
+              <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+            </a>
+          </div>
+
+          {/* Second Row: Benefits & Limitations Badges */}
+          <div className="pt-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+            
+            {/* Real Core Benefits */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400">
+                INCLUDED:
+              </span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-50 border border-zinc-200/60 text-zinc-800 font-medium text-[11px]">
+                <Sparkles className="w-3.5 h-3.5 text-zinc-800" />
+                <span><strong>1,000</strong> AI runs/mo (Gemini 2.5)</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-50 border border-zinc-200/60 text-zinc-800 font-medium text-[11px]">
+                <FileCheck className="w-3.5 h-3.5 text-zinc-800" />
+                <span>Unlimited SHA-256 E-Sign</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-50 border border-zinc-200/60 text-zinc-800 font-medium text-[11px]">
+                <Receipt className="w-3.5 h-3.5 text-zinc-800" />
+                <span>18% GST Invoicing</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-50 border border-zinc-200/60 text-zinc-800 font-medium text-[11px]">
+                <ShieldCheck className="w-3.5 h-3.5 text-zinc-800" />
+                <span>Kanban CRM &amp; 1 Seat</span>
               </div>
             </div>
 
-            <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-zinc-700">
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                <span><strong>1,000</strong> AI agent runs/month</span>
+            {/* Clear Limitations */}
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400">
+                LIMITS:
+              </span>
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-500 text-[11px] font-mono">
+                <Minus className="w-3 h-3 text-zinc-400" />
+                <span>No Custom Domain</span>
               </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                <span>Google Gemini 2.5 Flash LLM</span>
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-500 text-[11px] font-mono">
+                <Minus className="w-3 h-3 text-zinc-400" />
+                <span>Standard Email Only</span>
               </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                <span>Unlimited SHA-256 E-Sign Vault</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                <span>Automated 18% GST Invoicing</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                <span>Kanban CRM &amp; Lead Registry</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                <span>1 Workspace &amp; Community Support</span>
-              </div>
-            </div>
-
-            <div className="lg:col-span-3 flex lg:justify-end">
-              <a
-                href="https://app.heycora.in/workspace/login?plan=free"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-sm"
-              >
-                <span>Get Started Free</span>
-                <ArrowRight className="w-4 h-4 text-zinc-400" />
-              </a>
             </div>
 
           </div>
+
         </div>
       </section>
 
