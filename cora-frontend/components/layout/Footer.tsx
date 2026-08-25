@@ -165,7 +165,7 @@ export function Footer() {
           {/* ── Sub-Footer ── */}
           <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
             <div className="text-center md:text-left">
-              &copy; {new Date().getFullYear()} Cora Platforms Inc. All rights reserved. Indian IT Act 2000 &amp; GST compliant.
+              &copy; {new Date().getFullYear()} Cora. All rights reserved. UDYAM Registered MSME (Govt. of India) &bull; Indian IT Act 2000 compliant.
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 font-medium">

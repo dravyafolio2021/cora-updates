@@ -98,8 +98,8 @@ export default function TermsPage() {
               Cora offers monthly and annual subscription tiers. Subscriptions renew automatically unless cancelled prior to the billing date.
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-600">
-              <li><strong>Indian Accounts:</strong> Invoices include statutory 18% GST (CGST/SGST or IGST) with GSTIN input tax credit.</li>
-              <li><strong>International Accounts:</strong> Invoices are billed in USD without local VAT/GST withholding.</li>
+              <li><strong>Indian Accounts:</strong> Billed in INR. Cora operates as a registered enterprise under the UDYAM MSME framework (Ministry of Micro, Small and Medium Enterprises, Govt. of India). Tax invoices and receipts are issued in compliance with Indian regulatory standards.</li>
+              <li><strong>International Accounts:</strong> Invoices are billed in USD via authorized payment gateways.</li>
               <li><strong>Cancellation:</strong> You can cancel anytime inside your workspace dashboard with 1 click. Access continues until the current billing cycle expires.</li>
             </ul>
           </section>
