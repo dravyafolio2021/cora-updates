@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Check, 
@@ -11,11 +11,7 @@ import {
   HelpCircle, 
   ChevronDown, 
   ChevronUp, 
-  Building2, 
-  Layers, 
-  CheckCircle2, 
   Minus,
-  Info,
   Flame,
   Globe,
   Gift
@@ -36,8 +32,8 @@ const FAQS = [
     a: 'Yes, 100% free forever. It includes 1,000 complimentary AI agent runs every month, unlimited tamper-evident SHA-256 e-signatures, automated GST invoicing, and Kanban CRM access with zero credit card required.'
   },
   {
-    q: 'How does the Free Domain on annual plans work?',
-    a: 'When you subscribe to any of our annual plans ($9/mo, $19/mo, $29/mo, or the India ₹499/mo plan), you receive a complimentary custom domain registration (.com, .in, or .co) with automatic SSL and DNS configuration.'
+    q: 'What perks come with an Annual plan?',
+    a: 'When you choose an Annual plan, you receive a complimentary 1-year custom domain registration (.com, .in, or .co) with automated SSL, plus 12,000 additional AI agent runs distributed evenly (+1,000 bonus runs every month) across the year.'
   },
   {
     q: 'Why is the India Only plan strictly annual?',
@@ -55,8 +51,41 @@ const FAQS = [
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
+  const [currency, setCurrency] = useState<'INR' | 'USD'>('USD');
+  const [isIndia, setIsIndia] = useState(false);
   const [showTable, setShowTable] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  // Dynamic Geolocation detection
+  useEffect(() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      const isIndiaTz = tz.includes('Kolkata') || tz.includes('Calcutta') || tz.includes('India');
+      if (isIndiaTz) {
+        setCurrency('INR');
+        setIsIndia(true);
+      } else {
+        setCurrency('USD');
+        setIsIndia(false);
+      }
+
+      fetch('https://api.country.is')
+        .then(res => res.json())
+        .then(data => {
+          if (data?.country === 'IN') {
+            setCurrency('INR');
+            setIsIndia(true);
+          } else if (data?.country) {
+            setCurrency('USD');
+            setIsIndia(false);
+          }
+        })
+        .catch(() => {});
+    } catch (e) {
+      setCurrency('USD');
+      setIsIndia(false);
+    }
+  }, []);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -77,10 +106,10 @@ export default function PricingPage() {
         </h1>
 
         <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[640px] mx-auto mb-8">
-          Start for free with 1,000 complimentary AI runs. Upgrade to high-throughput reasoning with a complimentary custom domain on annual plans.
+          Start for free with 1,000 complimentary AI runs. Upgrade to annual plans for a complimentary custom domain and 12,000 bonus AI runs.
         </p>
 
-        {/* ── Cadence Selector (Monthly / Annual) with Free Domain Badge ── */}
+        {/* ── Cadence Selector (Monthly / Annual) with Free Domain & 12K Bonus Runs Badge ── */}
         <div className="flex flex-col items-center justify-center gap-2 mb-10">
           <div className="inline-flex items-center p-1 bg-zinc-100 rounded-xl border border-zinc-200 shadow-2xs">
             <button
@@ -110,16 +139,16 @@ export default function PricingPage() {
               }`}
             >
               <span>Annual Billing</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-200 text-zinc-900 font-bold">
-                FREE DOMAIN + SAVE 20%
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-200 text-zinc-900 font-bold">
+                FREE DOMAIN + 12K BONUS AI RUNS
               </span>
             </button>
           </div>
           
           {billingCycle === 'annual' && (
-            <div className="inline-flex items-center gap-1.5 text-xs text-zinc-500 font-mono animate-in fade-in duration-200">
+            <div className="inline-flex items-center gap-1.5 text-xs text-zinc-600 font-mono animate-in fade-in duration-200">
               <Gift className="w-3.5 h-3.5 text-zinc-900" />
-              <span>Includes 1 year free custom domain (.com / .in / .co) on all annual plans</span>
+              <span>Includes 1 year free custom domain (.com / .in) + 12,000 additional AI runs (+1K/mo)</span>
             </div>
           )}
         </div>
@@ -159,7 +188,9 @@ export default function PricingPage() {
                 Everything you need to launch, manage leads, send proposals, and execute legally binding e-contracts for your business.
               </p>
               <div className="pt-1 flex items-baseline gap-1.5">
-                <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">$0</span>
+                <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">
+                  {currency === 'INR' ? '₹0' : '$0'}
+                </span>
                 <span className="text-xs text-zinc-400 font-mono">/forever free</span>
               </div>
             </div>
@@ -206,7 +237,7 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 2: 3-TIER GLOBAL SAAS PRICING ($9, $19, $29)
+          ROW 2: 3-TIER GLOBAL SAAS PRICING ($9, $19, $29 / ₹999, ₹1999, ₹2999)
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
@@ -219,13 +250,15 @@ export default function PricingPage() {
             </h2>
           </div>
           <div className="text-xs text-zinc-500 font-mono">
-            {billingCycle === 'annual' ? '🎉 Free custom domain included with all annual plans' : 'Switch to annual for a free custom domain'}
+            {billingCycle === 'annual' 
+              ? 'Free custom domain + 12,000 bonus AI runs included with annual billing' 
+              : 'Switch to annual for a free custom domain & 12K bonus AI runs'}
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           
-          {/* TIER A: $9 / mo */}
+          {/* TIER A: $9 / mo (or ₹999 / mo) */}
           <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-2xs hover:border-zinc-300 transition-all">
             <div className="space-y-4">
               <div>
@@ -243,12 +276,16 @@ export default function PricingPage() {
               <div className="py-2 border-y border-zinc-100">
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">
-                    {billingCycle === 'annual' ? '$7' : '$9'}
+                    {currency === 'INR' ? '₹999' : '$9'}
                   </span>
                   <span className="text-xs text-zinc-400 font-mono">/month</span>
                 </div>
                 <div className="text-[11px] text-zinc-500 font-mono mt-0.5">
-                  {billingCycle === 'annual' ? 'Billed annually ($84/yr) • Free Domain' : 'Billed monthly ($9/mo)'} &bull; 5K runs/mo
+                  {billingCycle === 'annual'
+                    ? (currency === 'INR' 
+                        ? 'Billed annually (₹11,988/yr) • Free Domain + 12K Runs' 
+                        : 'Billed annually ($108/yr) • Free Domain + 12K Runs')
+                    : 'Billed monthly'} &bull; {billingCycle === 'annual' ? '6,000' : '5,000'} runs/mo
                 </div>
               </div>
 
@@ -259,7 +296,10 @@ export default function PricingPage() {
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span><strong>5,000</strong> AI agent runs/month</span>
+                    <span>
+                      <strong>{billingCycle === 'annual' ? '6,000' : '5,000'}</strong> AI agent runs/month
+                      {billingCycle === 'annual' && <span className="text-[10px] font-mono text-zinc-900 font-bold ml-1">(+1K/mo bonus)</span>}
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
@@ -296,7 +336,7 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* TIER B: $19 / mo (MOST POPULAR) */}
+          {/* TIER B: $19 / mo (or ₹1,999 / mo) - MOST POPULAR */}
           <div className="bg-[#0E1115] text-white border-2 border-zinc-800 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-xl relative overflow-hidden">
             <div className="absolute top-3 right-3">
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-800 border border-zinc-700 text-[10px] font-mono font-bold text-white uppercase tracking-wider">
@@ -321,12 +361,16 @@ export default function PricingPage() {
               <div className="py-2 border-y border-zinc-800">
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl sm:text-4xl font-display font-bold text-white">
-                    {billingCycle === 'annual' ? '$15' : '$19'}
+                    {currency === 'INR' ? '₹1,999' : '$19'}
                   </span>
                   <span className="text-xs text-zinc-400 font-mono">/month</span>
                 </div>
                 <div className="text-[11px] text-zinc-400 font-mono mt-0.5">
-                  {billingCycle === 'annual' ? 'Billed annually ($180/yr) • Free Domain' : 'Billed monthly ($19/mo)'} &bull; 20K runs/mo
+                  {billingCycle === 'annual'
+                    ? (currency === 'INR' 
+                        ? 'Billed annually (₹23,988/yr) • Free Domain + 12K Runs' 
+                        : 'Billed annually ($228/yr) • Free Domain + 12K Runs')
+                    : 'Billed monthly'} &bull; {billingCycle === 'annual' ? '21,000' : '20,000'} runs/mo
                 </div>
               </div>
 
@@ -337,7 +381,10 @@ export default function PricingPage() {
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span><strong>20,000</strong> AI agent runs/month</span>
+                    <span>
+                      <strong>{billingCycle === 'annual' ? '21,000' : '20,000'}</strong> AI agent runs/month
+                      {billingCycle === 'annual' && <span className="text-[10px] font-mono text-white font-bold ml-1">(+1K/mo bonus)</span>}
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
@@ -353,7 +400,7 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>Instant online client payment links</span>
+                    <span>Full GSTIN tax splits &amp; Dynamic UPI QR</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
@@ -374,7 +421,7 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* TIER C: $29 / mo */}
+          {/* TIER C: $29 / mo (or ₹2,999 / mo) */}
           <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-2xs hover:border-zinc-300 transition-all">
             <div className="space-y-4">
               <div>
@@ -392,12 +439,16 @@ export default function PricingPage() {
               <div className="py-2 border-y border-zinc-100">
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">
-                    {billingCycle === 'annual' ? '$23' : '$29'}
+                    {currency === 'INR' ? '₹2,999' : '$29'}
                   </span>
                   <span className="text-xs text-zinc-400 font-mono">/month</span>
                 </div>
                 <div className="text-[11px] text-zinc-500 font-mono mt-0.5">
-                  {billingCycle === 'annual' ? 'Billed annually ($276/yr) • Free Domain' : 'Billed monthly ($29/mo)'} &bull; 60K runs/mo
+                  {billingCycle === 'annual'
+                    ? (currency === 'INR' 
+                        ? 'Billed annually (₹35,988/yr) • Free Domain + 12K Runs' 
+                        : 'Billed annually ($348/yr) • Free Domain + 12K Runs')
+                    : 'Billed monthly'} &bull; {billingCycle === 'annual' ? '61,000' : '60,000'} runs/mo
                 </div>
               </div>
 
@@ -408,7 +459,10 @@ export default function PricingPage() {
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span><strong>60,000</strong> AI reasoning runs/month</span>
+                    <span>
+                      <strong>{billingCycle === 'annual' ? '61,000' : '60,000'}</strong> AI reasoning runs/month
+                      {billingCycle === 'annual' && <span className="text-[10px] font-mono text-zinc-900 font-bold ml-1">(+1K/mo bonus)</span>}
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
@@ -553,9 +607,9 @@ export default function PricingPage() {
                     <th className="p-4 sm:p-5 w-2/6">Capabilities &amp; Modules</th>
                     <th className="p-4 sm:p-5 w-1/6 text-center">Free Forever</th>
                     <th className="p-4 sm:p-5 w-1/6 text-center bg-zinc-100/70 font-bold">India Edition (₹499/mo)</th>
-                    <th className="p-4 sm:p-5 w-1/6 text-center">Starter ($9/mo)</th>
-                    <th className="p-4 sm:p-5 w-1/6 text-center">Professional ($19/mo)</th>
-                    <th className="p-4 sm:p-5 w-1/6 text-center">Scale ($29/mo)</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center">Starter ({currency === 'INR' ? '₹999' : '$9'})</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center">Professional ({currency === 'INR' ? '₹1,999' : '$19'})</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center">Scale ({currency === 'INR' ? '₹2,999' : '$29'})</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
@@ -570,14 +624,22 @@ export default function PricingPage() {
                     <td className="p-4 font-medium text-zinc-800">Monthly AI Runs</td>
                     <td className="p-4 text-center font-mono">1,000</td>
                     <td className="p-4 text-center font-mono bg-zinc-50 font-bold">10,000</td>
-                    <td className="p-4 text-center font-mono">5,000</td>
-                    <td className="p-4 text-center font-mono">20,000</td>
-                    <td className="p-4 text-center font-mono">60,000</td>
+                    <td className="p-4 text-center font-mono">{billingCycle === 'annual' ? '6,000' : '5,000'}</td>
+                    <td className="p-4 text-center font-mono">{billingCycle === 'annual' ? '21,000' : '20,000'}</td>
+                    <td className="p-4 text-center font-mono">{billingCycle === 'annual' ? '61,000' : '60,000'}</td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Free Custom Domain (Annual)</td>
                     <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-medium text-zinc-800">12,000 Bonus Runs (Annual)</td>
+                    <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-400 bg-zinc-50"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
