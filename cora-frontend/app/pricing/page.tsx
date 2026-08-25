@@ -323,15 +323,15 @@ export default function PricingPage() {
           </div>
 
           {/* Primary Cadence Switcher with 2 Months Free badge */}
-          <div ref={topToggleRef} className="flex flex-col sm:items-end gap-2 shrink-0">
-            <div className="inline-flex items-center p-1 bg-zinc-100/90 rounded-full border border-zinc-200/80 shadow-2xs">
+          <div ref={topToggleRef} className="flex flex-col items-start sm:items-end gap-2 shrink-0">
+            <div className="w-fit inline-flex items-center p-1 bg-zinc-100/90 rounded-full border border-zinc-200/80 shadow-2xs">
               <button
                 type="button"
                 onClick={() => {
                   setBillingCycle('monthly');
                   trackEvent('pricing_cycle_change', { cycle: 'monthly' });
                 }}
-                className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   billingCycle === 'monthly'
                     ? 'bg-zinc-950 text-white shadow-xs'
                     : 'text-zinc-600 hover:text-zinc-950'
@@ -345,7 +345,7 @@ export default function PricingPage() {
                   setBillingCycle('annual');
                   trackEvent('pricing_cycle_change', { cycle: 'annual' });
                 }}
-                className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                   billingCycle === 'annual'
                     ? 'bg-zinc-950 text-white shadow-xs'
                     : 'text-zinc-600 hover:text-zinc-950'
