@@ -4108,32 +4108,99 @@ jQuery(document).ready(function($) {
     coraSwitchRolePreview(savedPreviewRole || activeCurrentRole);
 
     // ============================================================
-    // CORA PWA VERSION & APP ICON UPDATE MANAGER
+    // UNIVERSAL IN-APP UPDATE & ASSET SYNC ENGINE
     // ============================================================
-    window.coraShowPwaUpdateBanner = function(oldVer, newVer) {
-        const banner = document.getElementById('cora-pwa-update-banner');
-        if (!banner) return;
-        const targetVer = newVer || (window.coraREData && window.coraREData.version) || '4.0.0';
-        const tag = document.getElementById('cora-pwa-update-version-tag');
-        if (tag) tag.textContent = 'v' + targetVer;
+    window.coraOpenPwaUpdateDrawer = function(targetVer) {
+        const backdrop = document.getElementById('cora-pwa-update-drawer-backdrop');
+        const drawer = document.getElementById('cora-pwa-update-drawer');
+        if (!drawer) return;
+
+        const currentVersion = (window.coraREData && window.coraREData.version) || '4.0.0';
+        const finalVer = targetVer || currentVersion;
         
-        banner.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
-        banner.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        const titleEl = document.getElementById('cora-drawer-version-title');
+        if (titleEl) titleEl.textContent = 'v' + finalVer;
+
+        // Device-specific guidance detection
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /android/i.test(navigator.userAgent);
+        const guidanceTitle = document.getElementById('cora-device-guidance-title');
+        const guidanceText = document.getElementById('cora-device-guidance-text');
+
+        if (guidanceTitle && guidanceText) {
+            if (isIOS) {
+                guidanceTitle.textContent = "Apple iOS Device Notice";
+                guidanceText.textContent = "In-app assets, templates, and database cache update immediately. To update the springboard icon on your iOS home screen, tap Share ⎋ → Add to Home Screen.";
+            } else if (isAndroid) {
+                guidanceTitle.textContent = "Android WebAPK Notice";
+                guidanceText.textContent = "Android Chrome automatically synchronizes and updates your home screen app icon in the background.";
+            } else {
+                guidanceTitle.textContent = "Desktop Browser & PWA Notice";
+                guidanceText.textContent = "Your workspace will perform a zero-downtime cache invalidation and instantaneous asset refresh.";
+            }
+        }
+
+        if (backdrop) {
+            backdrop.classList.remove('hidden');
+            backdrop.style.opacity = '1';
+        }
+
+        drawer.classList.remove('hidden', 'translate-x-full');
+        drawer.style.transform = 'translateX(0)';
+
+        // Hide floating pill when drawer is open
+        const pill = document.getElementById('cora-pwa-update-pill');
+        if (pill) pill.classList.add('hidden');
+    };
+
+    window.coraClosePwaUpdateDrawer = function() {
+        const backdrop = document.getElementById('cora-pwa-update-drawer-backdrop');
+        const drawer = document.getElementById('cora-pwa-update-drawer');
+        if (!drawer) return;
+
+        drawer.style.transform = 'translateX(100%)';
+        if (backdrop) {
+            backdrop.style.opacity = '0';
+            setTimeout(() => backdrop.classList.add('hidden'), 300);
+        }
+        setTimeout(() => drawer.classList.add('hidden', 'translate-x-full'), 310);
+    };
+
+    window.coraShowPwaUpdateBanner = function(oldVer, newVer) {
+        const targetVer = newVer || (window.coraREData && window.coraREData.version) || '4.0.0';
+        
+        // Show floating pill
+        const pill = document.getElementById('cora-pwa-update-pill');
+        if (pill) {
+            const pillTag = document.getElementById('cora-pwa-pill-version-tag');
+            if (pillTag) pillTag.textContent = 'v' + targetVer;
+            pill.classList.remove('hidden');
+        }
+
+        // Show banner
+        const banner = document.getElementById('cora-pwa-update-banner');
+        if (banner) {
+            const tag = document.getElementById('cora-pwa-update-version-tag');
+            if (tag) tag.textContent = 'v' + targetVer;
+            banner.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+            banner.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        }
     };
 
     window.coraDismissPwaUpdateBanner = function() {
         const banner = document.getElementById('cora-pwa-update-banner');
-        if (!banner) return;
-        banner.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
-        banner.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        if (banner) {
+            banner.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+            banner.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        }
     };
 
     window.coraApplyPwaUpdate = function() {
-        const btn = document.getElementById('cora-pwa-apply-update-btn');
-        if (btn) {
-            btn.textContent = 'Updating & Reloading...';
+        const applyBtns = document.querySelectorAll('#cora-pwa-apply-update-btn, #cora-drawer-apply-btn');
+        applyBtns.forEach(btn => {
+            btn.innerHTML = '<svg class="animate-spin" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path></svg> Syncing & Upgrading...';
             btn.disabled = true;
-        }
+        });
 
         const currentVersion = (window.coraREData && window.coraREData.version) || '4.0.0';
         try {
@@ -4151,7 +4218,7 @@ jQuery(document).ready(function($) {
             });
         }
 
-        // Clear dynamic caches for old version
+        // Purge old version caches
         if ('caches' in window) {
             caches.keys().then(function(names) {
                 return Promise.all(
@@ -4169,20 +4236,47 @@ jQuery(document).ready(function($) {
         }, 300);
     };
 
-    window.coraShowPwaIconSyncGuide = function() {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        if (isIOS) {
-            if (window.coraShowToast) {
-                window.coraShowToast("iOS Notice: To refresh your Home Screen springboard icon, tap Share ⎋ → Add to Home Screen.");
-            }
-        } else {
-            if (window.coraShowToast) {
-                window.coraShowToast("Android Notice: Chrome automatically synchronizes your WebAPK Home Screen icon in the background.");
-            }
+    window.coraCheckForUpdates = function(showFeedback) {
+        const btn = document.getElementById('cora-btn-check-updates');
+        if (btn && showFeedback) {
+            btn.innerHTML = '<svg class="animate-spin" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path></svg> Checking...';
+            btn.disabled = true;
         }
+
+        fetch('/wp-json/cora-pwa/v1/version-check')
+            .then(res => res.json())
+            .then(data => {
+                if (btn && showFeedback) {
+                    btn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Check for Updates';
+                    btn.disabled = false;
+                }
+
+                if (data && data.success && data.version) {
+                    let installed = null;
+                    try {
+                        installed = localStorage.getItem('cora_pwa_installed_version');
+                    } catch(e) {}
+
+                    if (installed && installed !== data.version) {
+                        window.coraOpenPwaUpdateDrawer(data.version);
+                    } else if (showFeedback && window.coraShowToast) {
+                        window.coraShowToast(`You're on the latest version (v${data.version}). All assets and icons are synchronized.`);
+                    }
+                }
+            })
+            .catch(() => {
+                if (btn && showFeedback) {
+                    btn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Check for Updates';
+                    btn.disabled = false;
+                    if (window.coraShowToast) window.coraShowToast("Could not reach update server. Checking local service worker...");
+                }
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.ready.then(reg => reg.update());
+                }
+            });
     };
 
-    // Auto-detect updates from Service Worker or platform version mismatch
+    // Auto-detect updates on launch, visibility change, and ServiceWorker events
     (function initPwaUpdateWatcher() {
         const currentVersion = (window.coraREData && window.coraREData.version) || '4.0.0';
         let installedVersion = null;
@@ -4195,12 +4289,9 @@ jQuery(document).ready(function($) {
                 localStorage.setItem('cora_pwa_installed_version', currentVersion);
             } catch(e) {}
         } else if (installedVersion !== currentVersion) {
-            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-            if (isStandalone || window.innerWidth < 768) {
-                setTimeout(function() {
-                    window.coraShowPwaUpdateBanner(installedVersion, currentVersion);
-                }, 1000);
-            }
+            setTimeout(function() {
+                window.coraShowPwaUpdateBanner(installedVersion, currentVersion);
+            }, 1200);
         }
 
         if ('serviceWorker' in navigator) {
@@ -4218,6 +4309,13 @@ jQuery(document).ready(function($) {
                 });
             });
         }
+
+        // Silent check on tab re-focus / app foregrounding
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                window.coraCheckForUpdates(false);
+            }
+        });
     })();
 
     // ============================================================

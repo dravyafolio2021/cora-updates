@@ -93,10 +93,19 @@ To preserve screen layout context and maintain workspace continuity, modal overl
 #### Standalone PWA In-App Navigation Engine (Breakout Prevention)
 * **iOS Safari & Android PWA Link Retention**: Standalone mode (`navigator.standalone === true` or `(display-mode: standalone)`) captures all internal anchor clicks (`/workspace/**`, `/docs/**`, `?page=cora-workspace`) and retains execution inside the installed PWA window using `window.location.assign()`, preventing external browser tab popouts.
 
+#### Universal In-App Update & Asset Sync Engine
+* **Multi-Device Lifecycle Prompting**: All platforms (iOS Safari WebClip, Android Chrome WebAPK, Desktop PWA, and browser tabs) support the universal monochromatic in-app update prompt system (`#cora-pwa-update-banner`, `#cora-pwa-update-pill`, and `#cora-pwa-update-drawer`).
+* **Zero-Downtime Cache Invalidation**: On applying an update (`window.coraApplyPwaUpdate`), the client purges all version-mismatched caches, activates the new Service Worker via `skipWaiting`, synchronizes dynamic touch icons/favicons, and smoothly reloads the active screen within 300ms.
+* **REST Version Heartbeat**: The system provides `/wp-json/cora-pwa/v1/version-check` returning active version metadata, release notes, and manifest URLs.
+* **Device-Aware Guidance**: The update drawer dynamically detects the client OS:
+  * **Apple iOS**: Explains springboard icon refresh via Share ⎋ → Add to Home Screen.
+  * **Android**: Confirms background automatic WebAPK icon synchronization.
+  * **Desktop Browser / PWA**: 1-click instantaneous cache purge and refresh.
+
 #### Service Worker Lifecycle & High-Speed Cache Strategy (v4.0.0)
 | Request Type | Strategy | Latency Target | Description |
 | :--- | :--- | :--- | :--- |
-| **HTML Navigation** | `Fast Network-First with Instant Fallback` | `<400ms` / `<50ms` cached | Races network with 400ms timeout; immediately serves cached shell on slower connections and updates cache in background. |
+| **HTML Navigation** | `Network-First with Offline Fallback` | `Real-time / Instant` | Always fetches the exact live requested URL from the network; cleanly falls back to offline cache only if disconnected. |
 | **Core JS & CSS** | `Stale-While-Revalidate` | `Instant (<10ms)` | Instant delivery from dynamic cache with background asset freshness updates. |
 | **Fonts (Inter / Mono)** | `Cache-First` | `Instant (<5ms)` | Cached permanently in dedicated font cache. |
 | **API & AJAX** | `Network-Only` | `Real-time` | Bypasses service worker for real-time live database synchronization. |

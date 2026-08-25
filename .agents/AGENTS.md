@@ -60,3 +60,8 @@ The Cora platform enforces a full 5-level Atomic Component Architecture defined 
 - **Standalone In-App Link Retention**: In standalone PWA mode (`navigator.standalone === true` or `(display-mode: standalone)`), all internal navigation MUST be retained inside the standalone WebApp window via the PWA link retention engine to prevent browser breakouts.
 - **Mobile Touch Snappiness**: Maintain `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` across all interactive elements (buttons, inputs, island nav, drawer sheets) to eliminate the mobile 300ms tap delay.
 
+## 10. Universal In-App Update & Asset Sync Standard Operating Procedure (SOP)
+- **Multi-Device Lifecycle Prompting**: All platforms (iOS WebClip, Android WebAPK, Desktop PWA, and standard browsers) must support the universal monochromatic in-app update prompt system (`#cora-pwa-update-banner`, `#cora-pwa-update-pill`, and `#cora-pwa-update-drawer`).
+- **Zero-Downtime Cache Invalidation**: On applying an update (`window.coraApplyPwaUpdate`), the client purges all version-mismatched caches, activates the new Service Worker via `skipWaiting`, synchronizes dynamic touch icons/favicons, and smoothly reloads the active screen within 300ms.
+- **REST Version Heartbeat**: The system provides `/wp-json/cora-pwa/v1/version-check` returning active version metadata and changelog highlights. In-app checks run automatically on launch, tab re-focus (`visibilitychange`), and manually via the admin profile popover.
+

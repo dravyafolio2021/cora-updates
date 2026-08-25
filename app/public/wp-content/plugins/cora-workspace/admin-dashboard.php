@@ -4170,21 +4170,27 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                 <div class="border-t border-zinc-100"></div>
 
-                <!-- PWA & Push Notifications Settings -->
+                <!-- PWA & App Version Updates Settings -->
                 <div class="px-2.5 py-3 bg-zinc-50 border border-zinc-200/60 rounded-xl space-y-2.5 select-none">
                     <div class="flex items-center justify-between px-0.5">
-                        <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">App & Push (PWA)</span>
-                        <span id="cora-pwa-badge" class="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-400 text-white rounded uppercase">Inactive</span>
+                        <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">App Version &amp; PWA</span>
+                        <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-zinc-900 text-white rounded uppercase">v<?php echo CORA_WORKSPACE_VERSION; ?></span>
                     </div>
                     
                     <div class="flex flex-col gap-1.5">
+                        <!-- Check for Updates Button -->
+                        <button type="button" id="cora-btn-check-updates" class="w-full py-1.5 bg-zinc-950 hover:opacity-85 text-white font-bold rounded-lg text-[10px] transition-colors cursor-pointer text-center select-none shadow-3xs border-none outline-none flex items-center justify-center gap-1.5" onclick="coraCheckForUpdates(true)">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            Check for Updates
+                        </button>
+
                         <!-- Install Button -->
-                        <button type="button" id="cora-pwa-install-btn" class="hidden w-full py-1.5 bg-zinc-950 hover:opacity-85 text-white font-bold rounded-lg text-[10px] transition-colors cursor-pointer text-center select-none shadow-3xs border-none outline-none">
+                        <button type="button" id="cora-pwa-install-btn" class="hidden w-full py-1.5 bg-white hover:bg-zinc-100 text-zinc-800 font-semibold rounded-lg text-[10px] transition-colors cursor-pointer text-center select-none shadow-3xs border border-zinc-200 outline-none">
                             Install Desktop/Phone App
                         </button>
                         
                         <!-- Push Notifications Button -->
-                        <button type="button" id="cora-pwa-push-btn" class="w-full py-1.5 bg-zinc-950 hover:opacity-85 text-white font-bold rounded-lg text-[10px] transition-colors cursor-pointer text-center select-none shadow-3xs border-none outline-none" onclick="coraRequestPushSubscription()">
+                        <button type="button" id="cora-pwa-push-btn" class="w-full py-1.5 bg-white hover:bg-zinc-100 text-zinc-800 font-semibold rounded-lg text-[10px] transition-colors cursor-pointer text-center select-none shadow-3xs border border-zinc-200 outline-none" onclick="coraRequestPushSubscription()">
                             Enable Push Notifications
                         </button>
 
@@ -4193,7 +4199,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             Send Test Notification
                         </button>
                         
-                        <p id="cora-pwa-status-text" class="text-[9px] text-zinc-500 text-center leading-normal font-medium m-0">Install app & enable alerts for immediate updates.</p>
+                        <p id="cora-pwa-status-text" class="text-[9px] text-zinc-500 text-center leading-normal font-medium m-0">Zero-downtime automatic asset &amp; icon sync.</p>
                     </div>
                 </div>
 
@@ -15704,7 +15710,20 @@ jQuery(document).ready(function($) {
             </button>
 </div>
 
-<!-- Dynamic PWA Version & App Icon Update Banner -->
+<!-- Universal Floating Update Pill -->
+<div id="cora-pwa-update-pill" class="hidden fixed bottom-6 right-6 z-[100001] bg-white border border-zinc-200 rounded-full shadow-lg px-3.5 py-2 flex items-center gap-2.5 transition-all duration-300 font-sans cursor-pointer hover:border-zinc-400 select-none" onclick="window.coraOpenPwaUpdateDrawer()">
+    <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+    </span>
+    <span class="text-xs font-bold text-zinc-900">Update Ready</span>
+    <span id="cora-pwa-pill-version-tag" class="text-[10px] font-mono font-bold px-1.5 py-0.2 bg-zinc-100 text-zinc-800 rounded border border-zinc-200">v<?php echo CORA_WORKSPACE_VERSION; ?></span>
+    <button type="button" class="px-2.5 py-1 bg-zinc-950 text-white text-[10px] font-bold rounded-full hover:bg-zinc-800 transition-colors ml-1 shadow-3xs" onclick="event.stopPropagation(); window.coraApplyPwaUpdate();">
+        Update Now
+    </button>
+</div>
+
+<!-- Dynamic PWA Version & App Icon Update Banner (Quick Notification) -->
 <div id="cora-pwa-update-banner" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[100002] w-full max-w-md px-4 transition-all duration-300 transform translate-y-24 opacity-0 pointer-events-none font-sans select-none">
     <div class="bg-white border border-zinc-200 rounded-2xl p-4 shadow-2xl flex flex-col gap-3">
         <div class="flex items-start gap-3">
@@ -15717,10 +15736,10 @@ jQuery(document).ready(function($) {
             </div>
             <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                    <h4 class="text-xs font-bold text-zinc-900 tracking-tight m-0">App Update Available</h4>
+                    <h4 class="text-xs font-bold text-zinc-900 tracking-tight m-0">Platform Update Available</h4>
                     <span id="cora-pwa-update-version-tag" class="text-[10px] font-mono font-bold px-1.5 py-0.5 bg-zinc-100 text-zinc-800 rounded border border-zinc-200">v<?php echo CORA_WORKSPACE_VERSION; ?></span>
                 </div>
-                <p class="text-[11px] text-zinc-500 mt-0.5 leading-normal m-0">A new version with updated app icon, faster performance, and features is ready.</p>
+                <p class="text-[11px] text-zinc-500 mt-0.5 leading-normal m-0">A new version with updated app icon, faster performance, and zero-lag experience is ready.</p>
             </div>
             <button type="button" onclick="window.coraDismissPwaUpdateBanner()" class="text-zinc-400 hover:text-zinc-700 p-1 rounded-md transition-colors cursor-pointer border-0 bg-transparent">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -15730,10 +15749,118 @@ jQuery(document).ready(function($) {
             <button type="button" id="cora-pwa-apply-update-btn" onclick="window.coraApplyPwaUpdate()" class="flex-1 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer text-center">
                 Update Now &amp; Sync Icon
             </button>
-            <button type="button" onclick="window.coraShowPwaIconSyncGuide()" class="py-2 px-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl transition-all cursor-pointer">
-                Icon Info
+            <button type="button" onclick="window.coraOpenPwaUpdateDrawer()" class="py-2 px-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl transition-all cursor-pointer">
+                What's New ↗
             </button>
         </div>
+    </div>
+</div>
+
+<!-- Universal In-App Update Details Drawer Sheet -->
+<div id="cora-pwa-update-drawer-backdrop" onclick="window.coraClosePwaUpdateDrawer()" class="hidden fixed inset-0 z-[100010] bg-black/40 backdrop-blur-xs transition-opacity duration-300"></div>
+
+<div id="cora-pwa-update-drawer" class="hidden fixed top-0 right-0 h-full w-[440px] max-w-[95vw] bg-white border-l border-zinc-200 z-[100015] shadow-2xl flex flex-col transition-transform duration-300 translate-x-full font-sans select-none">
+    <!-- Header -->
+    <div class="px-6 py-5 border-b border-zinc-150 flex items-center justify-between bg-zinc-50/70 shrink-0">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center shadow-xs">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-xs font-extrabold text-zinc-900 uppercase tracking-wider m-0">Platform Release</h3>
+                <p class="text-[10px] text-zinc-400 font-mono m-0">Zero-Downtime Migration</p>
+            </div>
+        </div>
+        <button type="button" onclick="window.coraClosePwaUpdateDrawer()" class="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer border-0 bg-transparent flex items-center justify-center">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <!-- Body -->
+    <div class="flex-1 p-6 overflow-y-auto space-y-5">
+        <!-- Version Hero Card -->
+        <div class="p-4 bg-zinc-50 border border-zinc-200/80 rounded-2xl flex items-center justify-between">
+            <div>
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Target Version</span>
+                <span id="cora-drawer-version-title" class="text-base font-extrabold text-zinc-950 font-mono">v<?php echo CORA_WORKSPACE_VERSION; ?></span>
+            </div>
+            <div class="text-right">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Status</span>
+                <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Ready to Apply
+                </span>
+            </div>
+        </div>
+
+        <!-- Release Highlights -->
+        <div class="space-y-3">
+            <h4 class="text-xs font-bold text-zinc-900 uppercase tracking-wider m-0">Release Highlights</h4>
+            <div class="space-y-2.5">
+                <div class="p-3 bg-white border border-zinc-200 rounded-xl flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div>
+                        <h5 class="text-xs font-bold text-zinc-900 m-0">Instant Pure Light Mode Splash</h5>
+                        <p class="text-[11px] text-zinc-500 leading-normal m-0 mt-0.5">Eliminates native splash freeze and dark-mode flashes on mobile startup.</p>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white border border-zinc-200 rounded-xl flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div>
+                        <h5 class="text-xs font-bold text-zinc-900 m-0">Dynamic App Icon Synchronization</h5>
+                        <p class="text-[11px] text-zinc-500 leading-normal m-0 mt-0.5">Automatic version query stamping triggers OS-level icon refreshes without re-installation.</p>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white border border-zinc-200 rounded-xl flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div>
+                        <h5 class="text-xs font-bold text-zinc-900 m-0">Standalone In-App Link Retention</h5>
+                        <p class="text-[11px] text-zinc-500 leading-normal m-0 mt-0.5">Retains all navigation and document links inside the installed app window.</p>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white border border-zinc-200 rounded-xl flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div>
+                        <h5 class="text-xs font-bold text-zinc-900 m-0">Fast-Tap Touch &amp; Zero Delay</h5>
+                        <p class="text-[11px] text-zinc-500 leading-normal m-0 mt-0.5">0ms touch action response and safe-area notch padding on all devices.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Device-Specific Guidance Card -->
+        <div id="cora-device-guidance-card" class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-1.5">
+            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block" id="cora-device-guidance-title">Device Notice</span>
+            <p class="text-xs text-zinc-650 leading-relaxed m-0" id="cora-device-guidance-text">
+                Your application caches and assets will update immediately upon tapping the button below.
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="p-5 border-t border-zinc-150 bg-zinc-50/50 flex flex-col gap-2 shrink-0">
+        <button type="button" id="cora-drawer-apply-btn" onclick="window.coraApplyPwaUpdate()" class="w-full py-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer text-center select-none flex items-center justify-center gap-2">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            Update Workspace &amp; Sync Now
+        </button>
+        <button type="button" onclick="window.coraClosePwaUpdateDrawer()" class="w-full py-2 bg-transparent text-zinc-500 hover:text-zinc-800 text-xs font-semibold rounded-xl transition-colors cursor-pointer text-center">
+            Remind Me Later
+        </button>
     </div>
 </div>
 

@@ -45337,6 +45337,33 @@ function cora_pwa_register_routes() {
         'callback'            => 'cora_pwa_get_notification_endpoint',
         'permission_callback' => '__return_true' // Auth verified internally via token
     ) );
+
+    register_rest_route( 'cora-pwa/v1', '/version-check', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_pwa_version_check_endpoint',
+        'permission_callback' => '__return_true'
+    ) );
+}
+}
+
+if ( ! function_exists( 'cora_pwa_version_check_endpoint' ) ) {
+function cora_pwa_version_check_endpoint() {
+    return new WP_REST_Response( array(
+        'success'       => true,
+        'version'       => CORA_WORKSPACE_VERSION,
+        'platform'      => 'Cora Workspace',
+        'release_title' => 'Cora Platform v' . CORA_WORKSPACE_VERSION . ' Release',
+        'release_notes' => array(
+            'High performance pure light mode native splash screen.',
+            'Universal in-app update engine with automatic asset and cache synchronization.',
+            'Dynamic PWA manifest icon auto-updating across mobile and desktop.',
+            'Standalone in-app link retention (zero external browser redirects).',
+            'Sub-50ms instant hydration and mobile fast-tap response.'
+        ),
+        'manifest_url'  => home_url( '/cora-manifest.json?v=' . CORA_WORKSPACE_VERSION ),
+        'icon_url'      => CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . CORA_WORKSPACE_VERSION,
+        'timestamp'     => time(),
+    ), 200 );
 }
 }
 

@@ -35,6 +35,17 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         expect(text).not.toContain('%%PLUGIN_URL%%');
     });
 
+    test('verify version-check REST endpoint returns accurate platform release details', async ({ request }) => {
+        const response = await request.get('http://cora.local/wp-json/cora-pwa/v1/version-check');
+        expect(response.status()).toBe(200);
+        
+        const data = await response.json();
+        expect(data.success).toBe(true);
+        expect(data.version).toBe('4.0.0');
+        expect(data.release_notes.length).toBeGreaterThan(0);
+        expect(data.icon_url).toContain('icon_192.png?v=4.0.0');
+    });
+
     test('verify mobile viewport responsiveness and zero horizontal scroll at 375px', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 812 });
         
@@ -72,7 +83,7 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         expect(page.url()).not.toContain('/workspace/bookings');
     });
 
-    test('verify PWA dynamic update banner display and dismiss controls', async ({ page }) => {
+    test('verify PWA dynamic update banner and floating pill', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 812 });
         await login(page);
         await page.goto('http://cora.local/workspace/dashboard');
@@ -88,10 +99,40 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         await expect(banner).toContainText('v4.0.0');
         await expect(banner).toContainText('Update Now & Sync Icon');
         
+        const pill = page.locator('#cora-pwa-update-pill');
+        await expect(pill).toBeVisible();
+        await expect(pill).toContainText('v4.0.0');
+        
         // Dismiss banner
         await page.evaluate(() => {
             window.coraDismissPwaUpdateBanner();
         });
         await expect(banner).toHaveClass(/translate-y-24/);
+    });
+
+    test('verify universal in-app update drawer sheet functionality and device detection', async ({ page }) => {
+        await login(page);
+        await page.goto('http://cora.local/workspace/dashboard');
+        await page.waitForSelector('#cora-workspace');
+        
+        // Open drawer
+        await page.evaluate(() => {
+            window.coraOpenPwaUpdateDrawer('4.0.0');
+        });
+        
+        const drawer = page.locator('#cora-pwa-update-drawer');
+        await expect(drawer).toBeVisible();
+        await expect(drawer).toContainText('v4.0.0');
+        await expect(drawer).toContainText('Release Highlights');
+        await expect(drawer).toContainText('Update Workspace & Sync Now');
+        
+        const guidanceCard = page.locator('#cora-device-guidance-card');
+        await expect(guidanceCard).toBeVisible();
+        
+        // Close drawer
+        await page.evaluate(() => {
+            window.coraClosePwaUpdateDrawer();
+        });
+        await expect(drawer).toHaveClass(/translate-x-full/);
     });
 });
