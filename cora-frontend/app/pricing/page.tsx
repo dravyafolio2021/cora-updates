@@ -17,7 +17,10 @@ import {
   FileCheck,
   Receipt,
   Mail,
-  Layout
+  Layout,
+  Infinity as InfinityIcon,
+  Zap,
+  Lock
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -195,73 +198,147 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 1: FREE FOREVER PLAN (COMPACT 2-ROW CLEAN FEATURE GRID)
+          ROW 1: FREE FOREVER USP SHOWCASE (POWERFUL SIGNATURE HERO CARD)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12 -mt-3 relative z-10">
-        <div className="bg-white border border-zinc-200/90 rounded-[28px] p-5 sm:p-7 shadow-[0_8px_28px_rgba(0,0,0,0.03)] hover:border-zinc-300 transition-all">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 -mt-4 relative z-10">
+        <div className="relative bg-[#090C10] text-white border border-zinc-800/90 rounded-[32px] p-6 sm:p-9 shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden">
           
-          {/* Header Row: Title, Price, Summary & Instant CTA */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-100">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[10px] font-mono font-bold text-zinc-700 uppercase tracking-wider">
-                FREE FOREVER &bull; NO CARD REQUIRED
+          {/* Subtle Ambient Radial Glow */}
+          <div className="absolute top-0 right-1/4 w-96 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 w-80 h-36 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Top Banner: Core USP Statement & Action */}
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-zinc-800/80">
+            
+            {/* Left Identity & USP Hook */}
+            <div className="space-y-3 max-w-[680px]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-800/90 border border-zinc-700/80 text-xs font-mono font-bold text-zinc-200">
+                <InfinityIcon className="w-4 h-4 text-emerald-400" />
+                <span className="tracking-wide">OUR CORE PROMISE: FREE FOREVER</span>
+                <span className="text-zinc-500">&bull;</span>
+                <span className="text-zinc-400 font-normal">NO CREDIT CARD EVER</span>
               </div>
-              <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-950">
-                Free Forever Plan
-              </h2>
-              <div className="flex items-baseline gap-1 bg-zinc-50 border border-zinc-200/80 px-2.5 py-0.5 rounded-lg">
-                <span className="text-xl sm:text-2xl font-display font-bold text-zinc-950">
-                  {currency === 'INR' ? '₹0' : '$0'}
-                </span>
-                <span className="text-[11px] text-zinc-400 font-mono">/forever free</span>
+
+              <div className="flex flex-wrap items-baseline gap-3.5">
+                <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                  Free Forever Plan
+                </h2>
+                <div className="inline-flex items-baseline gap-1.5 px-3.5 py-1 rounded-xl bg-zinc-800/70 border border-zinc-700/60">
+                  <span className="text-3xl sm:text-4xl font-display font-extrabold text-white">
+                    {currency === 'INR' ? '₹0' : '$0'}
+                  </span>
+                  <span className="text-xs font-mono text-zinc-400 font-medium">/forever</span>
+                </div>
               </div>
-              <span className="text-xs text-zinc-500 hidden xl:inline">
-                Build your site, manage client pipeline, and execute e-contracts at zero cost.
-              </span>
+
+              <p className="text-sm text-zinc-400 leading-relaxed">
+                No 14-day trials. No hidden expiry. Launch your studio website, manage unlimited clients, and execute legally binding contracts with full data ownership.
+              </p>
             </div>
 
-            <a
-              href="https://app.heycora.in/workspace/login?plan=free"
-              className="inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-sm shrink-0"
-            >
-              <span>Get Started Free</span>
-              <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-            </a>
+            {/* Right Action & Frictionless Guarantees */}
+            <div className="flex flex-col sm:items-end justify-center gap-3 shrink-0">
+              <a
+                href="https://app.heycora.in/workspace/login?plan=free"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white hover:bg-zinc-100 text-zinc-950 px-7 py-3.5 rounded-2xl text-sm font-bold transition-all shadow-lg hover:shadow-xl hover:scale-[1.01]"
+              >
+                <span>Claim Free Forever Workspace</span>
+                <ArrowRight className="w-4 h-4 text-zinc-950" />
+              </a>
+              <div className="flex items-center gap-3 text-[11px] font-mono text-zinc-400">
+                <span className="flex items-center gap-1">
+                  <Zap className="w-3 h-3 text-amber-400" /> 30-Sec Setup
+                </span>
+                <span>&bull;</span>
+                <span className="flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-emerald-400" /> 100% Yours
+                </span>
+              </div>
+            </div>
+
           </div>
 
-          {/* Second Row: 6 Core Features in a Responsive Horizontal Grid */}
-          <div className="pt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 text-xs">
+          {/* Bottom Grid: 6 Core Superpowers */}
+          <div className="relative z-10 pt-6">
+            <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-500 mb-3.5">
+              INCLUDED LIFETIME CAPABILITIES:
+            </div>
             
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/60 text-zinc-800 font-medium hover:bg-zinc-100/70 transition-colors">
-              <Layout className="w-4 h-4 text-zinc-900 shrink-0" />
-              <span className="truncate">Website Builder</span>
-            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              
+              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 hover:border-zinc-700 transition-colors">
+                <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <Layout className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <div className="font-semibold text-white text-xs">Website Builder</div>
+                  <div className="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                    Studio portfolio &amp; booking pages live on the web
+                  </div>
+                </div>
+              </div>
 
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/60 text-zinc-800 font-medium hover:bg-zinc-100/70 transition-colors">
-              <ShieldCheck className="w-4 h-4 text-zinc-900 shrink-0" />
-              <span className="truncate">Kanban CRM</span>
-            </div>
+              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 hover:border-zinc-700 transition-colors">
+                <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <ShieldCheck className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <div className="font-semibold text-white text-xs">Kanban CRM Pipeline</div>
+                  <div className="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                    Track inquiries, stages, and project bookings seamlessly
+                  </div>
+                </div>
+              </div>
 
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/60 text-zinc-800 font-medium hover:bg-zinc-100/70 transition-colors">
-              <Sparkles className="w-4 h-4 text-zinc-900 shrink-0" />
-              <span className="truncate"><strong>1,000</strong> AI Credits/mo</span>
-            </div>
+              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 hover:border-zinc-700 transition-colors">
+                <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                </div>
+                <div>
+                  <div className="font-semibold text-white text-xs">1,000 AI Credits / month</div>
+                  <div className="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                    Powered by Google Gemini 2.5 Flash for proposals &amp; briefs
+                  </div>
+                </div>
+              </div>
 
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/60 text-zinc-800 font-medium hover:bg-zinc-100/70 transition-colors">
-              <FileCheck className="w-4 h-4 text-zinc-900 shrink-0" />
-              <span className="truncate">SHA-256 E-Sign</span>
-            </div>
+              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 hover:border-zinc-700 transition-colors">
+                <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <FileCheck className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <div className="font-semibold text-white text-xs">SHA-256 E-Sign Vault</div>
+                  <div className="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                    Unlimited tamper-evident contracts with audit trail
+                  </div>
+                </div>
+              </div>
 
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/60 text-zinc-800 font-medium hover:bg-zinc-100/70 transition-colors">
-              <Receipt className="w-4 h-4 text-zinc-900 shrink-0" />
-              <span className="truncate">18% GST Invoicing</span>
-            </div>
+              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 hover:border-zinc-700 transition-colors">
+                <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <Receipt className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <div className="font-semibold text-white text-xs">18% GST Invoicing</div>
+                  <div className="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                    Compliant tax calculation &amp; professional PDF generation
+                  </div>
+                </div>
+              </div>
 
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/60 text-zinc-800 font-medium hover:bg-zinc-100/70 transition-colors">
-              <Mail className="w-4 h-4 text-zinc-900 shrink-0" />
-              <span className="truncate">Domain &amp; Email Connect</span>
-            </div>
+              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 hover:border-zinc-700 transition-colors">
+                <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <Mail className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <div className="font-semibold text-white text-xs">Domain &amp; Email Connect</div>
+                  <div className="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                    Connect your own custom domain and email DNS freely
+                  </div>
+                </div>
+              </div>
 
+            </div>
           </div>
 
         </div>
