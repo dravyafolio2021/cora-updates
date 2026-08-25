@@ -18,7 +18,10 @@ import {
   Globe,
   Zap,
   Lock,
-  Star
+  Star,
+  QrCode,
+  MessageCircle,
+  Building2
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -28,16 +31,16 @@ const FAQS = [
     a: 'Yes, 100% free forever. It includes 1,000 complimentary AI agent runs every month, website builder (on heycora.in/your-name subdomain), Kanban CRM, unlimited tamper-evident SHA-256 e-signatures, and automated GST invoicing with zero credit card required. Custom domain and custom email connection require an upgrade to a paid Growth plan.'
   },
   {
-    q: 'What is the main difference between Starter and Professional?',
+    q: 'What is the India Only Plan and who is eligible?',
+    a: 'The India Only Plan is an exclusive, heavily subsidized operating system at ₹499/month built specifically for Indian founders, MSMEs, agencies, and studios. It includes 10,000 monthly AI runs, a free custom domain (.in or .com), dynamic UPI QR code payments on all invoices, automated 18% CGST/SGST/IGST tax math, and Meta WhatsApp automated client dispatch. It is available strictly as an annual commitment (₹5,988/year).'
+  },
+  {
+    q: 'What is the difference between Starter and Professional?',
     a: 'Starter gives you custom domain connection (yourbrand.com), custom email dispatch, and 5,000 monthly AI runs. Professional upgrades your AI intelligence to Claude 3.5 Sonnet & GPT-4o mini, increases runs to 20,000/mo, adds Meta WhatsApp automated client dispatch, Dynamic UPI QR codes on invoices, and expands team seats to 5.'
   },
   {
     q: 'What perks come with an Annual plan?',
     a: 'When you choose an Annual plan on any paid tier, you receive a complimentary 1-year custom domain registration (.com, .in, or .co) with automated SSL, plus 12,000 additional AI agent runs distributed evenly (+1,000 bonus runs every month) across the year.'
-  },
-  {
-    q: 'Why is the India Only plan strictly annual?',
-    a: 'The India MSME Edition is heavily subsidised at ₹499/month specifically to support registered Indian businesses and founders with long-term operational infrastructure. It is only available as an annual commitment (₹5,988/year) and cannot be billed monthly.'
   },
   {
     q: 'Can I upgrade, downgrade, or cancel anytime?',
@@ -344,7 +347,7 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* 3-Tier SaaS Cards: High Value & Recommended Badge */}
+        {/* 3-Tier SaaS Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch pt-3">
           
           {/* CARD 1: STARTER */}
@@ -359,7 +362,6 @@ export default function PricingPage() {
                 Establish your independent brand with custom domains, email, and 5x AI capacity.
               </p>
 
-              {/* Price Block with Value Anchor */}
               <div className="mb-5">
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
@@ -374,7 +376,6 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              {/* Action CTA */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=starter"
                 className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 py-3 px-4 rounded-xl text-xs font-bold transition-all mb-6"
@@ -383,7 +384,6 @@ export default function PricingPage() {
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-600" />
               </a>
 
-              {/* Clean Feature Bullets */}
               <div className="space-y-3 pt-2 border-t border-zinc-100">
                 <div className="text-xs font-semibold text-zinc-900">
                   Includes:
@@ -420,10 +420,9 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* CARD 2: PROFESSIONAL (HIGH VALUE & RECOMMENDED BADGE) */}
+          {/* CARD 2: PROFESSIONAL */}
           <div className="bg-white border-2 border-zinc-950 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_12px_40px_rgba(0,0,0,0.08)] relative mt-0 md:-mt-3">
             
-            {/* High-Impact Top Recommended Banner */}
             <div className="absolute -top-3.5 inset-x-0 flex justify-center">
               <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-zinc-950 text-white text-[11px] font-bold tracking-wide shadow-md">
                 <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
@@ -432,7 +431,6 @@ export default function PricingPage() {
             </div>
 
             <div>
-              {/* Header */}
               <div className="flex items-center justify-between gap-2 mb-2 mt-1">
                 <h3 className="font-display text-2xl font-bold text-zinc-950">
                   Professional
@@ -445,7 +443,6 @@ export default function PricingPage() {
                 Autonomous operating backbone with Claude 3.5 Sonnet, WhatsApp, and UPI QR.
               </p>
 
-              {/* Price Block with High-Value Savings */}
               <div className="mb-5">
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
@@ -463,7 +460,6 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              {/* Action CTA (High-Converting Solid Black) */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=pro"
                 className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3.5 px-4 rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg mb-6"
@@ -472,7 +468,6 @@ export default function PricingPage() {
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
               </a>
 
-              {/* Clean Feature Bullets */}
               <div className="space-y-3 pt-2 border-t border-zinc-100">
                 <div className="text-xs font-semibold text-zinc-900">
                   Everything in Starter, plus:
@@ -525,7 +520,6 @@ export default function PricingPage() {
                 High-throughput infrastructure for agencies &amp; multi-member teams.
               </p>
 
-              {/* Price */}
               <div className="mb-5">
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
@@ -540,7 +534,6 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              {/* Action CTA */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=scale"
                 className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 py-3 px-4 rounded-xl text-xs font-bold transition-all mb-6"
@@ -549,7 +542,6 @@ export default function PricingPage() {
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-600" />
               </a>
 
-              {/* Clean Feature Bullets */}
               <div className="space-y-3 pt-2 border-t border-zinc-100">
                 <div className="text-xs font-semibold text-zinc-900">
                   Everything in Professional, plus:
@@ -634,7 +626,7 @@ export default function PricingPage() {
                     <th className="p-4 sm:p-5 w-1/6 text-center">Starter ({currency === 'INR' ? '₹999' : '$9'})</th>
                     <th className="p-4 sm:p-5 w-1/6 text-center bg-zinc-100/70 font-bold">Professional ({currency === 'INR' ? '₹1,999' : '$19'})</th>
                     <th className="p-4 sm:p-5 w-1/6 text-center">Scale ({currency === 'INR' ? '₹2,999' : '$29'})</th>
-                    <th className="p-4 sm:p-5 w-1/6 text-center font-bold">Bharat (₹499/mo)</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center font-bold bg-amber-50/50">India Only (₹499/mo)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
@@ -651,7 +643,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center font-mono">{billingCycle === 'annual' ? '6,000' : '5,000'}</td>
                     <td className="p-4 text-center font-mono bg-zinc-50 font-bold">{billingCycle === 'annual' ? '21,000' : '20,000'}</td>
                     <td className="p-4 text-center font-mono">{billingCycle === 'annual' ? '61,000' : '60,000'}</td>
-                    <td className="p-4 text-center font-mono font-bold">10,000</td>
+                    <td className="p-4 text-center font-mono font-bold bg-amber-50/30">10,000</td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Supported LLM Engines</td>
@@ -659,7 +651,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-600">Gemini 2.5 Flash</td>
                     <td className="p-4 text-center text-zinc-900 font-bold bg-zinc-50">Claude 3.5 + GPT-4o mini</td>
                     <td className="p-4 text-center text-zinc-900 font-bold">All Frontier Models</td>
-                    <td className="p-4 text-center text-zinc-900 font-medium">Claude 3.5 + GPT-4o mini</td>
+                    <td className="p-4 text-center text-zinc-900 font-medium bg-amber-50/30">Claude 3.5 + GPT-4o mini</td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Autonomous Proposal Research Agent</td>
@@ -667,7 +659,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-medium"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-400 bg-amber-50/30"><Minus className="w-4 h-4 mx-auto" /></td>
                   </tr>
 
                   {/* Category 2: Branding & Web Presence */}
@@ -682,7 +674,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Custom Domain Connection</td>
@@ -690,7 +682,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Free 1-Yr Domain on Annual</td>
@@ -698,7 +690,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">White-label &amp; Cora Badge Removal</td>
@@ -706,7 +698,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
 
                   {/* Category 3: Client Operations & Legal */}
@@ -721,7 +713,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Team Seats</td>
@@ -729,7 +721,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center font-mono">2 seats</td>
                     <td className="p-4 text-center font-mono bg-zinc-50 font-bold">5 seats</td>
                     <td className="p-4 text-center font-mono font-bold">Unlimited</td>
-                    <td className="p-4 text-center font-mono">5 seats</td>
+                    <td className="p-4 text-center font-mono bg-amber-50/30 font-bold">5 seats</td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Meta WhatsApp Cloud Automated Dispatch</td>
@@ -737,7 +729,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-400 font-mono text-[11px]">Templates</td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
 
                   {/* Category 4: Invoicing & Indian GST */}
@@ -752,15 +744,15 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-900">Included</td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold">Auto Splits</td>
                     <td className="p-4 text-center text-zinc-900">Custom Math</td>
-                    <td className="p-4 text-center text-zinc-900 font-bold">Auto CGST/SGST/IGST</td>
+                    <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold">Auto CGST/SGST/IGST</td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Dynamic UPI QR Code on Invoices</td>
                     <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Custom Webhooks &amp; API Integration</td>
@@ -768,7 +760,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-400 bg-zinc-50"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-400 bg-amber-50/30"><Minus className="w-4 h-4 mx-auto" /></td>
                   </tr>
 
                 </tbody>
@@ -779,82 +771,137 @@ export default function PricingPage() {
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 3: INDIA ONLY PLAN (BHARAT EDITION)
+          ROW 3: INDIA ONLY PLAN (PREMIUM SIGNATURE LIGHT SHOWCASE)
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-20">
-        <div className="bg-[#0A0D10] text-white border-2 border-zinc-800 rounded-[32px] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-zinc-50/90 via-white to-amber-50/20 border-2 border-zinc-200/90 hover:border-zinc-300 rounded-[32px] p-6 sm:p-9 shadow-[0_8px_32px_rgba(0,0,0,0.04)] transition-all relative overflow-hidden">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Top Row: Identity, Subsidized Price & Primary CTA */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-zinc-200/80">
             
-            <div className="lg:col-span-5 space-y-3">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800 border border-zinc-700 text-[10px] font-mono font-bold text-zinc-200 uppercase tracking-wider">
-                <span>INDIA MSME EDITION &bull; ANNUAL COMMITMENT ONLY</span>
+            <div className="space-y-2.5 max-w-[680px]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/70 border border-amber-200 text-xs font-bold text-amber-900">
+                <Building2 className="w-3.5 h-3.5 text-amber-700" />
+                <span>INDIA ONLY PLAN &bull; EXCLUSIVE ANNUAL COMMITMENT</span>
               </div>
 
-              <h2 className="font-display text-2xl sm:text-3xl font-bold text-white">
-                Bharat Growth Plan
+              <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
+                India Only Plan
               </h2>
 
-              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-                A heavily subsidized operating system built exclusively for Indian founders, MSMEs, agencies, and consultancies. Includes complete GST tax math, instant UPI QR payments, and WhatsApp dispatch.
+              <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                A heavily subsidized operating system built exclusively for Indian founders, MSMEs, agencies, and creative studios. Everything you need &mdash; from GSTIN compliance and dynamic UPI QR to WhatsApp client notifications.
               </p>
-
-              <div className="pt-2">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-display font-bold text-white">₹499</span>
-                  <span className="text-xs text-zinc-400 font-mono">/month</span>
-                </div>
-                <div className="text-[11px] text-zinc-400 font-mono mt-1">
-                  Billed annually at ₹5,988/year &bull; <em>Strictly annual commitment only (Monthly not available)</em>
-                </div>
-              </div>
             </div>
 
-            <div className="lg:col-span-4 space-y-2.5 text-xs text-zinc-300">
-              <div className="font-semibold text-zinc-200 text-[11px] uppercase tracking-wider font-mono">
-                India Edition Features:
+            {/* Price & Action */}
+            <div className="flex flex-col sm:items-end justify-center gap-3 shrink-0">
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-display font-extrabold text-zinc-950">₹499</span>
+                <span className="text-xs text-zinc-500 font-medium">/ month</span>
+                <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full font-mono">
+                  Subsidized
+                </span>
               </div>
-              <ul className="space-y-2">
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                  <span><strong>10,000</strong> AI agent reasoning runs/month</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                  <span><strong>Free Custom Domain</strong> (.in / .com) with SSL</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                  <span>Automated 18% CGST/SGST/IGST tax splits</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                  <span>Dynamic UPI QR code on all invoices</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                  <span>Meta WhatsApp automated client notifications</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                  <span>Up to 5 Team Seats &amp; Priority IST Support</span>
-                </li>
-              </ul>
-            </div>
+              <div className="text-[11px] text-zinc-500 font-mono text-left sm:text-right">
+                Billed annually at ₹5,988/year &bull; <em>Annual commitment only</em>
+              </div>
 
-            <div className="lg:col-span-3 flex flex-col justify-center space-y-3">
               <a
                 href="https://app.heycora.in/workspace/login?plan=india_annual_499"
-                className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-950 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-colors shadow-sm"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-zinc-950 hover:bg-zinc-800 text-white px-7 py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm hover:shadow-md"
               >
-                <span>Get Started</span>
-                <ArrowRight className="w-4 h-4 text-zinc-950" />
+                <span>Claim India Only Plan</span>
+                <ArrowRight className="w-4 h-4 text-zinc-400" />
               </a>
-              <p className="text-[11px] text-zinc-500 text-center font-mono">
-                UDYAM / GSTIN verification supported &bull; Instant activation
-              </p>
+              <div className="text-[11px] text-zinc-400 font-mono flex items-center gap-1.5">
+                <span>UDYAM / GSTIN Supported &bull; Instant Activation</span>
+              </div>
             </div>
 
+          </div>
+
+          {/* Bottom Grid: 6 Indian Superpower Capabilities */}
+          <div className="pt-6">
+            <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 mb-3.5">
+              INDIA EDITION INCLUDED CAPABILITIES:
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200/60 flex items-center justify-center shrink-0 mt-0.5 text-amber-800">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-semibold text-zinc-950 text-xs">Free Custom Domain</div>
+                  <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                    Complimentary 1-year <span className="font-mono text-zinc-800 font-semibold">.in</span> or <span className="font-mono text-zinc-800 font-semibold">.com</span> with auto SSL
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200/60 flex items-center justify-center shrink-0 mt-0.5 text-emerald-800">
+                  <QrCode className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-semibold text-zinc-950 text-xs">Dynamic UPI QR Code</div>
+                  <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                    Zero gateway fees &mdash; direct bank settlement on all invoices
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-green-50 border border-green-200/60 flex items-center justify-center shrink-0 mt-0.5 text-green-800">
+                  <MessageCircle className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-semibold text-zinc-950 text-xs">WhatsApp Client Dispatch</div>
+                  <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                    Auto-send proposals, e-sign links &amp; payment receipts
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0 mt-0.5 text-blue-800">
+                  <Receipt className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-semibold text-zinc-950 text-xs">18% GST Invoicing Engine</div>
+                  <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                    Auto CGST, SGST, IGST tax breakdown &amp; GSTIN audit logs
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-purple-50 border border-purple-200/60 flex items-center justify-center shrink-0 mt-0.5 text-purple-800">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-semibold text-zinc-950 text-xs">10,000 AI Runs / month</div>
+                  <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                    Claude 3.5 Sonnet &amp; GPT-4o mini for briefs &amp; contracts
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0 mt-0.5 text-zinc-900">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-semibold text-zinc-950 text-xs">5 Team Seats &amp; IST Support</div>
+                  <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                    Role permissions for crew &amp; priority Indian support desk
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
 
         </div>
