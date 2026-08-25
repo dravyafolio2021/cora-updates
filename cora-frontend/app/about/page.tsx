@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { DynamicWeekCalendar } from '@/components/about/DynamicWeekCalendar';
 import { CoreValuesSection } from '@/components/about/CoreValuesSection';
+import { ScrollDrivenTimeline } from '@/components/about/ScrollDrivenTimeline';
 
 export const metadata: Metadata = {
   title: 'About Cora — The Convergence of Software, AI & Humans',
@@ -375,73 +376,10 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 5: OUR JOURNEY (Minimal Unboxed Timeline)
+          SECTION 5: OUR JOURNEY (Scroll-Driven Connected Timeline)
       ───────────────────────────────────────────────────────────── */}
       <section className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
-        <div className="space-y-14 sm:space-y-16">
-          
-          <div className="text-center space-y-3">
-            <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-500 block">
-              OUR EVOLUTION
-            </span>
-            <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
-              Our journey.
-            </h2>
-          </div>
-
-          {/* Timeline Row with Subtle Top Rule */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
-            
-            {/* Step 1 */}
-            <div className="border-t border-zinc-200 pt-6 space-y-3">
-              <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                Q1 2024
-              </span>
-              <h4 className="font-display text-lg font-bold text-zinc-950">Genesis &amp; Studio Sets</h4>
-              <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-                Founded to solve chaotic WhatsApp booking pipelines and manual proposal generation for Indian creators.
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="border-t border-zinc-200 pt-6 space-y-3">
-              <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                Q3 2024
-              </span>
-              <h4 className="font-display text-lg font-bold text-zinc-950">18% GST &amp; UPI Engine</h4>
-              <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-                Engineered India-first tax calculators, dynamic rate cards, and instant UPI soundbox confirmation webhooks.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="border-t border-zinc-200 pt-6 space-y-3">
-              <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                Q2 2025
-              </span>
-              <h4 className="font-display text-lg font-bold text-zinc-950">SHA-256 E-Sign Vault</h4>
-              <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-                Released legally binding digital signature registries compliant with the Information Technology Act 2000.
-              </p>
-            </div>
-
-            {/* Step 4 */}
-            <div className="border-t-2 border-zinc-950 pt-6 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-zinc-950 uppercase tracking-wider">
-                  2026 &amp; Beyond
-                </span>
-                <span className="w-2 h-2 rounded-full bg-zinc-950" />
-              </div>
-              <h4 className="font-display text-lg font-bold text-zinc-950">AI Co-Founder &amp; Agents</h4>
-              <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-                Full convergence of frontier autonomous reasoning models with end-to-end multi-tenant studio management.
-              </p>
-            </div>
-
-          </div>
-
-        </div>
+        <ScrollDrivenTimeline />
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
