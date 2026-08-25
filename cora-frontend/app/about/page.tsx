@@ -63,7 +63,7 @@ const TEAM_MEMBERS = [
     role: 'Product & Design',
     image: '/images/about_team_tanya.jpg',
     bg: 'bg-[#F3E8FF]', // Soft Lavender
-    border: 'border-purple-100',
+    border: 'border-zinc-200',
   },
   {
     name: 'Dev Singhania',
@@ -122,16 +122,16 @@ export default function AboutPage() {
     <main className="w-full relative pt-28 sm:pt-36 pb-24 overflow-hidden bg-white selection:bg-zinc-950 selection:text-white">
       
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 1: HERO STAGE (ClickUp Style Indian Team Mosaic Grid)
+          SECTION 1: HERO STAGE (Indian Team Mosaic Grid)
       ───────────────────────────────────────────────────────────── */}
       <section className="w-full max-w-[1400px] mx-auto px-3 xs:px-4 sm:px-6 text-center mb-24 sm:mb-32">
         
-        {/* Eyebrow */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 text-[11px] xs:text-xs sm:text-[13px] font-mono font-bold uppercase tracking-widest text-[#7B2BF9] mb-3 sm:mb-4">
+        {/* Eyebrow (Cora Design System Token: Monochromatic / Neutral) */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-100 rounded-md text-[11px] xs:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-700 border border-zinc-200/80 mb-3 sm:mb-4">
           <span>MAXIMIZE HUMAN PRODUCTIVITY</span>
         </div>
 
-        {/* Main Headline (Reduced font weight, uppercase CORA) */}
+        {/* Main Headline (Strict Cora Monochromatic Tokens) */}
         <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl lg:text-[76px] font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em] max-w-[960px] mx-auto mb-6 sm:mb-8">
           We are <span className="font-bold text-zinc-950">CORA</span>.
         </h1>
@@ -140,7 +140,7 @@ export default function AboutPage() {
         <div className="flex items-center justify-center mb-12 sm:mb-16">
           <a
             href="#manifesto"
-            className="inline-flex items-center gap-2 bg-zinc-950 text-white hover:bg-zinc-900 border border-zinc-800 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm font-semibold tracking-tight shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group"
+            className="inline-flex items-center gap-2 bg-zinc-950 text-white hover:bg-zinc-850 border border-zinc-800 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm font-semibold tracking-tight shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group"
           >
             <Play className="w-3.5 h-3.5 fill-white text-white group-hover:scale-110 transition-transform" />
             <span>Learn more about us</span>
@@ -290,18 +290,18 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 2: OUR MISSION (Matching Reference Architecture)
+          SECTION 2: OUR MISSION (Strict Cora Monochromatic Tokens)
       ───────────────────────────────────────────────────────────── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40 text-center">
         
-        {/* Eyebrow */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 text-[11px] xs:text-xs sm:text-[13px] font-mono font-bold uppercase tracking-widest text-[#7B2BF9] mb-3 sm:mb-4">
+        {/* Eyebrow (Monochromatic Token) */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-100 rounded-md text-[11px] xs:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-700 border border-zinc-200/80 mb-3 sm:mb-4">
           <span>MAXIMIZE HUMAN PRODUCTIVITY</span>
         </div>
 
-        {/* Main Title */}
+        {/* Main Title (Pure Monochromatic Black/Zinc) */}
         <h2 className="font-display text-5xl xs:text-6xl sm:text-7xl lg:text-[84px] font-bold text-zinc-950 leading-[1.05] tracking-[-0.035em] mb-4 sm:mb-5">
-          Our <span className="text-[#8B5CF6]">mission.</span>
+          Our mission.
         </h2>
 
         {/* Subtitle */}
@@ -318,7 +318,7 @@ export default function AboutPage() {
         <div className="flex items-center justify-center mb-10 sm:mb-14">
           <a
             href="#manifesto"
-            className="inline-flex items-center gap-2 bg-[#18181B] text-white hover:bg-black px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm font-semibold tracking-tight shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group"
+            className="inline-flex items-center gap-2 bg-zinc-950 text-white hover:bg-zinc-850 border border-zinc-800 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm font-semibold tracking-tight shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group"
           >
             <span>Learn more about us</span>
           </a>
@@ -361,7 +361,7 @@ export default function AboutPage() {
         <div className="bg-zinc-50 border border-zinc-200/90 rounded-[36px] sm:rounded-[44px] p-8 sm:p-14 md:p-16 space-y-10 shadow-2xs">
           
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#7B2BF9]">
+            <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
               <span>OUR MOTTO</span>
             </div>
             <h3 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[56px] font-bold text-zinc-950 tracking-tight">
@@ -389,9 +389,9 @@ export default function AboutPage() {
               </div>
 
               {/* Highlighted Day (Saved Day - Thursday) */}
-              <div className="bg-zinc-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-800 text-center flex flex-col items-center justify-center gap-1 shadow-lg ring-4 ring-purple-500/20 scale-105 transition-transform">
+              <div className="bg-zinc-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-800 text-center flex flex-col items-center justify-center gap-1 shadow-lg ring-4 ring-zinc-900/10 scale-105 transition-transform">
                 <span className="font-display text-2xl sm:text-3xl font-extrabold text-white">13</span>
-                <span className="text-xs font-mono text-purple-400 font-bold uppercase">Thurs</span>
+                <span className="text-xs font-mono text-zinc-300 font-bold uppercase">Thurs</span>
               </div>
 
               <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
@@ -421,7 +421,7 @@ export default function AboutPage() {
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
         
         <div className="text-center mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-mono font-bold uppercase tracking-widest text-[#7B2BF9] mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-100 rounded-md text-xs font-mono font-semibold uppercase tracking-widest text-zinc-700 border border-zinc-200/80 mb-3">
             <span>DNA &amp; PRINCIPLES</span>
           </div>
           <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
@@ -484,11 +484,10 @@ export default function AboutPage() {
 
           {/* Value 6: Center High-Impact Dark Card */}
           <div className="bg-zinc-950 border border-zinc-800 rounded-[28px] p-7 sm:p-8 flex flex-col justify-between text-white shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
             <h3 className="font-display text-xl sm:text-2xl font-bold text-white leading-tight mb-6">
               Be fun to<br />work with
             </h3>
-            <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider">
+            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
               #FUN
             </span>
           </div>
@@ -534,7 +533,7 @@ export default function AboutPage() {
         <div className="space-y-12">
           
           <div className="text-center max-w-[620px] mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#7B2BF9]">
+            <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
               <span>OUR EVOLUTION</span>
             </div>
             <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
@@ -548,8 +547,8 @@ export default function AboutPage() {
             {/* Step 1 */}
             <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-8 space-y-3 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-purple-600 uppercase">Q1 2024</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+                <span className="text-xs font-mono font-bold text-zinc-950 uppercase">Q1 2024</span>
+                <span className="w-2 h-2 rounded-full bg-zinc-950" />
               </div>
               <h4 className="font-display text-lg font-bold text-zinc-950">Genesis &amp; Studio Sets</h4>
               <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
@@ -560,8 +559,8 @@ export default function AboutPage() {
             {/* Step 2 */}
             <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-8 space-y-3 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-purple-600 uppercase">Q3 2024</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+                <span className="text-xs font-mono font-bold text-zinc-950 uppercase">Q3 2024</span>
+                <span className="w-2 h-2 rounded-full bg-zinc-950" />
               </div>
               <h4 className="font-display text-lg font-bold text-zinc-950">18% GST &amp; UPI Engine</h4>
               <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
@@ -572,8 +571,8 @@ export default function AboutPage() {
             {/* Step 3 */}
             <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-8 space-y-3 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-purple-600 uppercase">Q2 2025</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+                <span className="text-xs font-mono font-bold text-zinc-950 uppercase">Q2 2025</span>
+                <span className="w-2 h-2 rounded-full bg-zinc-950" />
               </div>
               <h4 className="font-display text-lg font-bold text-zinc-950">SHA-256 E-Sign Vault</h4>
               <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
@@ -584,7 +583,7 @@ export default function AboutPage() {
             {/* Step 4: Active / Latest */}
             <div className="bg-zinc-950 text-white border border-zinc-800 rounded-[28px] p-6 sm:p-8 space-y-3 shadow-xl relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-purple-400 uppercase">2026 &amp; Beyond</span>
+                <span className="text-xs font-mono font-bold text-zinc-400 uppercase">2026 &amp; Beyond</span>
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
               </div>
               <h4 className="font-display text-lg font-bold text-white">Super Agents &amp; Co-Founder</h4>
