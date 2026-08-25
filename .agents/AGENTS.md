@@ -52,3 +52,11 @@ The Cora platform enforces a full 5-level Atomic Component Architecture defined 
 - **Photography Studio Workspace Owner**: Email: `owner.studio@cora.local` | Username: `studio_owner` | Password: `cora_secure_pass_123` | Direct URL: `http://cora.local/workspace/dashboard?industry=photography_studio`
 - **Provisioning Utility Script**: `php scripts/setup_local_accounts.php`
 
+## 9. PWA & Mobile Performance Standard Operating Procedure (SOP)
+- **Pure Light Mode PWA Splash**: `cora-manifest.json` and `<meta name="theme-color">` must always specify `#ffffff` to guarantee immediate zero-lag native splash screen rendering without jarring dark-to-light flash transitions.
+- **Dynamic Versioned Icon Sync**: All PWA manifest icons, favicons, and Apple touch icons MUST include dynamic `?v=CORA_WORKSPACE_VERSION` query stamps. `cora-manifest.json` dynamically outputs versioned URLs to force OS and browser WebAPKs to auto-refresh app icons immediately on release.
+- **Service Worker Cache Lifecycle**: The service worker (`cora-service-worker.js`) must automatically interpolate `CORA_WORKSPACE_VERSION` into cache namespace keys (`cora-workspace-v{VERSION}`, `cora-dynamic-v{VERSION}`). On activation, outdated version caches are purged immediately. HTML navigation uses sub-400ms network-first with instant cache fallback for sub-50ms screen painting.
+- **Zero Artificial Delays**: Never add artificial `setTimeout` preloading or skeleton blocking delays to page loads or navigation handlers (`window.coraNavigateTo`). Hydration must occur instantaneously on `DOMContentLoaded`.
+- **Standalone In-App Link Retention**: In standalone PWA mode (`navigator.standalone === true` or `(display-mode: standalone)`), all internal navigation MUST be retained inside the standalone WebApp window via the PWA link retention engine to prevent browser breakouts.
+- **Mobile Touch Snappiness**: Maintain `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` across all interactive elements (buttons, inputs, island nav, drawer sheets) to eliminate the mobile 300ms tap delay.
+

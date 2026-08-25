@@ -359,10 +359,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     
     <!-- PWA Manifest & Mobile App Capabilities -->
     <link rel="manifest" href="<?php echo home_url('/cora-manifest.json?v=' . CORA_WORKSPACE_VERSION); ?>">
-    <meta name="theme-color" content="#09090b">
+    <meta name="theme-color" content="#ffffff">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="CORA">
     <meta name="application-name" content="CORA">
     <script>

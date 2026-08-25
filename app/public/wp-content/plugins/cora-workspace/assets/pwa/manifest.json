@@ -5,9 +5,15 @@
   "start_url": "/workspace/dashboard",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
   "orientation": "portrait-primary",
-  "background_color": "#09090b",
-  "theme_color": "#09090b",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  "capture_links": "existing-client-navigate",
   "categories": ["business", "productivity", "finance"],
   "icons": [
     {

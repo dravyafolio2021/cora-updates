@@ -10,24 +10,9 @@ if (typeof window.coraREData === 'undefined') {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Show skeleton on initial load
-    if (typeof window.coraShowSkeleton === 'function') {
-        const urlParams = new URLSearchParams(window.location.search);
-        let currentView = urlParams.get('sub_page') || 'dashboard';
-        // Extract from path if permalinks are used
-        if (!urlParams.has('sub_page')) {
-            const parts = window.location.pathname.split('/').filter(Boolean);
-            if (parts.length > 0) {
-                const possibleView = parts[parts.length - 1];
-                if (['dashboard', 'bookings', 'leads', 'equipment', 'vault', 'financials', 'team-roles', 'settings', 'portfolio', 'gbp'].includes(possibleView)) {
-                    currentView = possibleView;
-                }
-            }
-        }
-        window.coraShowSkeleton(currentView);
-        setTimeout(function() {
-            window.coraHideSkeleton();
-        }, 600);
+    // Instant hydration on initial load — zero artificial delay
+    if (typeof window.coraHideSkeleton === 'function') {
+        window.coraHideSkeleton();
     }
 });
 
@@ -398,30 +383,57 @@ jQuery(document).ready(function($) {
     window.coraNavigateTo = function(targetPageId) {
         if (!targetPageId) return;
 
-        window.coraShowSkeleton(targetPageId);
-        setTimeout(function() {
-            window.coraHideSkeleton();
-            if (window.location.pathname.indexOf('admin.php') !== -1 || window.location.search.indexOf('page=cora-workspace') !== -1) {
-                window.location.href = window.location.origin + window.location.pathname + '?page=cora-workspace&sub_page=' + encodeURIComponent(targetPageId);
+        if (window.location.pathname.indexOf('admin.php') !== -1 || window.location.search.indexOf('page=cora-workspace') !== -1) {
+            window.location.assign(window.location.origin + window.location.pathname + '?page=cora-workspace&sub_page=' + encodeURIComponent(targetPageId));
+            return;
+        }
+
+        const activeData = (window.coraREData && window.coraREData.currentRole) ? window.coraREData : (window.coraData || {});
+        let siteUrl = activeData.siteUrl || window.location.origin;
+        if (siteUrl.endsWith('/')) {
+            siteUrl = siteUrl.slice(0, -1);
+        }
+        
+        let activeWsSlug = 'workspace';
+        if (window.coraREData && window.coraREData.activeWorkspace && window.coraREData.activeWorkspace.slug) {
+            activeWsSlug = window.coraREData.activeWorkspace.slug;
+        } else if (window.coraAppData && window.coraAppData.activeWorkspace && window.coraAppData.activeWorkspace.slug) {
+            activeWsSlug = window.coraAppData.activeWorkspace.slug;
+        }
+
+        window.location.assign(siteUrl + '/' + encodeURIComponent(activeWsSlug) + '/' + encodeURIComponent(targetPageId));
+    };
+
+    // ─── PWA Standalone Mode In-App Navigation Engine ────────────────────────
+    (function initPwaLinkRetention() {
+        const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+        if (!isStandalone) return;
+
+        document.addEventListener('click', function(e) {
+            const anchor = e.target.closest('a');
+            if (!anchor) return;
+
+            const href = anchor.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('tel:') || href.startsWith('mailto:') || href.startsWith('sms:') || href.startsWith('https://wa.me')) {
                 return;
             }
 
-            const activeData = (window.coraREData && window.coraREData.currentRole) ? window.coraREData : (window.coraData || {});
-            let siteUrl = activeData.siteUrl || window.location.origin;
-            if (siteUrl.endsWith('/')) {
-                siteUrl = siteUrl.slice(0, -1);
+            try {
+                const targetUrl = new URL(anchor.href, window.location.origin);
+                // If internal origin and workspace path, retain inside the standalone PWA window
+                if (targetUrl.origin === window.location.origin) {
+                    const isInternalWorkspace = targetUrl.pathname.includes('/workspace') || targetUrl.pathname.includes('/docs') || targetUrl.search.includes('page=cora-workspace');
+                    if (isInternalWorkspace) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.location.assign(anchor.href);
+                    }
+                }
+            } catch (err) {
+                // Ignore URL parse errors
             }
-            
-            let activeWsSlug = 'workspace';
-            if (window.coraREData && window.coraREData.activeWorkspace && window.coraREData.activeWorkspace.slug) {
-                activeWsSlug = window.coraREData.activeWorkspace.slug;
-            } else if (window.coraAppData && window.coraAppData.activeWorkspace && window.coraAppData.activeWorkspace.slug) {
-                activeWsSlug = window.coraAppData.activeWorkspace.slug;
-            }
-
-            window.location.href = siteUrl + '/' + encodeURIComponent(activeWsSlug) + '/' + encodeURIComponent(targetPageId);
-        }, 350);
-    };
+        }, true);
+    })();
 
     $(document).on('click', '.cora-nav-item, .cora-bottom-nav-item', function(e) {
         const item = $(this).closest('.cora-nav-item, .cora-bottom-nav-item');

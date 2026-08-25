@@ -1,19 +1,20 @@
 // Service worker for Cora Admin PWA — High Performance Engine
-const CACHE_NAME = 'cora-workspace-v3.5.0';
-const DYNAMIC_CACHE = 'cora-dynamic-v3.5.0';
-const FONT_CACHE = 'cora-fonts-v3.5.0';
-const MAX_DYNAMIC_CACHE_ITEMS = 150;
+const CORA_VERSION = '%%VERSION%%';
+const CACHE_NAME = 'cora-workspace-v' + CORA_VERSION;
+const DYNAMIC_CACHE = 'cora-dynamic-v' + CORA_VERSION;
+const FONT_CACHE = 'cora-fonts-v' + CORA_VERSION;
+const MAX_DYNAMIC_CACHE_ITEMS = 200;
 
 const STATIC_ASSETS = [
-  '/wp-content/plugins/cora-workspace/assets/pwa/manifest.json',
-  '/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png',
-  '/wp-content/plugins/cora-workspace/assets/pwa/icon_512.png',
-  '/wp-content/plugins/cora-workspace/assets/images/cora-favicon.png',
-  '/wp-content/plugins/cora-workspace/assets/images/apple-touch-icon.png',
-  '/wp-content/plugins/cora-workspace/assets/css/tailwind-built.css',
-  '/wp-content/plugins/cora-workspace/assets/css/admin-style.css',
-  '/wp-content/plugins/cora-workspace/assets/js/admin-script.js',
-  '/wp-content/plugins/cora-workspace/assets/js/cora-autosave-engine.js',
+  '/cora-manifest.json?v=' + CORA_VERSION,
+  '%%PLUGIN_URL%%assets/pwa/icon_192.png?v=' + CORA_VERSION,
+  '%%PLUGIN_URL%%assets/pwa/icon_512.png?v=' + CORA_VERSION,
+  '%%PLUGIN_URL%%assets/images/cora-favicon.png?v=' + CORA_VERSION,
+  '%%PLUGIN_URL%%assets/images/apple-touch-icon.png?v=' + CORA_VERSION,
+  '%%PLUGIN_URL%%assets/css/tailwind-built.css?v=' + CORA_VERSION,
+  '%%PLUGIN_URL%%assets/css/admin-style.css?v=' + CORA_VERSION,
+  '%%PLUGIN_URL%%assets/js/admin-script.js?v=' + CORA_VERSION,
+  '%%PLUGIN_URL%%assets/js/cora-autosave-engine.js?v=' + CORA_VERSION,
   '/cora-offline.html'
 ];
 
@@ -109,9 +110,7 @@ self.addEventListener('fetch', event => {
   if (/\.(css|js|woff2?|ttf|otf|eot|png|jpg|jpeg|svg|webp|ico)(\?.*)?$/i.test(url.pathname)) {
     event.respondWith(
       caches.open(DYNAMIC_CACHE).then(async cache => {
-        // Strip query string for matching static assets
-        const cleanUrl = url.origin + url.pathname;
-        const cached = (await cache.match(req)) || (await cache.match(cleanUrl)) || (await caches.match(req));
+        const cached = (await cache.match(req)) || (await caches.match(req));
         
         const fetchPromise = fetch(req)
           .then(networkRes => {
@@ -131,20 +130,20 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 6. HTML Navigation (Workspace Dashboard & Views) -> Fast Network-First with Timeout Fallback
+  // 6. HTML Navigation (Workspace Dashboard & Views) -> Fast Network with Instant Cache Fallback (Sub-400ms)
   if (req.headers.get('accept')?.includes('text/html') || req.mode === 'navigate') {
     event.respondWith(
       new Promise(resolve => {
         let timedOut = false;
         
-        // 1.8s timeout on mobile networks to fall back to cached shell
+        // Fast 400ms timeout on mobile networks to fall back to cached shell immediately
         const timeoutId = setTimeout(async () => {
           timedOut = true;
           const cached = await caches.match(req);
           if (cached) {
             resolve(cached);
           }
-        }, 1800);
+        }, 400);
 
         fetch(req)
           .then(async networkRes => {
@@ -182,8 +181,8 @@ self.addEventListener('push', event => {
           const notif = data.notification;
           return self.registration.showNotification(notif.title, {
             body: notif.body,
-            icon: notif.icon || '/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png',
-            badge: notif.badge || '/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png',
+            icon: notif.icon || ('%%PLUGIN_URL%%assets/pwa/icon_192.png?v=' + CORA_VERSION),
+            badge: notif.badge || ('%%PLUGIN_URL%%assets/pwa/icon_192.png?v=' + CORA_VERSION),
             data: { url: notif.url || '/workspace/dashboard' }
           });
         }

@@ -1125,23 +1125,86 @@ function cora_workspace_handle_workspace_route() {
     // Intercept PWA Manifest and Service Worker to serve them from the root scope
     if ( $path === 'cora-service-worker.js' ) {
         status_header( 200 );
-        header( 'Content-Type: application/javascript' );
+        header( 'Content-Type: application/javascript; charset=UTF-8' );
         header( 'Service-Worker-Allowed: /' );
-        // Service workers should be re-validated on every navigation per W3C spec
-        header( 'Cache-Control: no-cache, must-revalidate' );
-        echo file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/service-worker.js' );
+        header( 'Cache-Control: no-cache, no-store, must-revalidate, max-age=0' );
+        header( 'Pragma: no-cache' );
+        header( 'Expires: 0' );
+        
+        $sw = file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/service-worker.js' );
+        $sw = str_replace( '%%VERSION%%', CORA_WORKSPACE_VERSION, $sw );
+        $sw = str_replace( '%%PLUGIN_URL%%', CORA_WORKSPACE_URL, $sw );
+        echo $sw;
         exit;
     }
     if ( $path === 'cora-manifest.json' ) {
         status_header( 200 );
-        header( 'Content-Type: application/json; charset=UTF-8' );
+        header( 'Content-Type: application/manifest+json; charset=UTF-8' );
         header( 'Cache-Control: no-cache, no-store, must-revalidate, max-age=0' );
         header( 'Pragma: no-cache' );
         header( 'Expires: 0' );
-        $manifest = file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/manifest.json' );
-        $manifest = str_replace( '"icon_192.png"', '"' . CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . CORA_WORKSPACE_VERSION . '"', $manifest );
-        $manifest = str_replace( '"icon_512.png"', '"' . CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . CORA_WORKSPACE_VERSION . '"', $manifest );
-        echo $manifest;
+        
+        $manifest_raw = file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/manifest.json' );
+        $manifest_data = json_decode( $manifest_raw, true );
+        if ( ! is_array( $manifest_data ) ) {
+            $manifest_data = array();
+        }
+        
+        $icon_192 = CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . CORA_WORKSPACE_VERSION;
+        $icon_512 = CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . CORA_WORKSPACE_VERSION;
+        
+        $manifest_data['name']             = 'CORA Workspace';
+        $manifest_data['short_name']        = 'CORA';
+        $manifest_data['start_url']         = '/workspace/dashboard';
+        $manifest_data['scope']             = '/';
+        $manifest_data['display']           = 'standalone';
+        $manifest_data['display_override']  = array( 'standalone', 'window-controls-overlay' );
+        $manifest_data['background_color']  = '#ffffff';
+        $manifest_data['theme_color']       = '#ffffff';
+        $manifest_data['launch_handler']    = array( 'client_mode' => 'navigate-existing' );
+        $manifest_data['handle_links']      = 'preferred';
+        $manifest_data['capture_links']     = 'existing-client-navigate';
+        
+        $manifest_data['icons'] = array(
+            array(
+                'src'     => $icon_192,
+                'sizes'   => '192x192',
+                'type'    => 'image/png',
+                'purpose' => 'any',
+            ),
+            array(
+                'src'     => $icon_192,
+                'sizes'   => '192x192',
+                'type'    => 'image/png',
+                'purpose' => 'maskable',
+            ),
+            array(
+                'src'     => $icon_512,
+                'sizes'   => '512x512',
+                'type'    => 'image/png',
+                'purpose' => 'any',
+            ),
+            array(
+                'src'     => $icon_512,
+                'sizes'   => '512x512',
+                'type'    => 'image/png',
+                'purpose' => 'maskable',
+            ),
+        );
+        
+        if ( ! empty( $manifest_data['shortcuts'] ) && is_array( $manifest_data['shortcuts'] ) ) {
+            foreach ( $manifest_data['shortcuts'] as &$shortcut ) {
+                $shortcut['icons'] = array(
+                    array(
+                        'src'   => $icon_192,
+                        'sizes' => '192x192',
+                        'type'  => 'image/png',
+                    ),
+                );
+            }
+        }
+        
+        echo json_encode( $manifest_data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
         exit;
     }
     if ( $path === 'cora-offline.html' ) {

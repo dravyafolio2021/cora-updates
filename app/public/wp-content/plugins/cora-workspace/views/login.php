@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light">
-    <meta name="theme-color" content="#09090b">
+    <meta name="theme-color" content="#ffffff">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Cora — Login</title>
     
-    <link rel="manifest" href="/cora-manifest.json?v=<?php echo defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '3.5.0'; ?>">
-    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png' ); ?>">
-    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png' ); ?>">
-    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png' ); ?>">
+    <link rel="manifest" href="/cora-manifest.json?v=<?php echo defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0'; ?>">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . ( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0' ) ); ?>">
+    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . ( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0' ) ); ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon.png?v=' . ( defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.0' ) ); ?>">
     
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

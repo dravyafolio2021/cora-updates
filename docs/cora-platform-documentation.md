@@ -80,26 +80,27 @@ To preserve screen layout context and maintain workspace continuity, modal overl
 
 ---
 
-### 1.5 PWA Architecture & Onboarding (v3.3.0+)
+### 1.5 PWA Architecture & Mobile Performance Engine (v4.0.0 SOP Standard)
 
-#### PWA Onboarding Wizard (v3.3.0)
-When a workspace is first accessed on a mobile device, Cora displays a premium PWA onboarding wizard that guides users through the "Add to Home Screen" installation flow:
-* **Animated Loading Splash Screen**: Full-screen premium branded splash during initial asset load.
-* **Step-by-Step Install Instructions**: Visual guide for iOS Safari Share and Android Chrome Install App flows.
-* **Persistent Preference Storage**: Tracks `cora-pwa-installed` in `localStorage` to prevent repeat prompts.
+#### Pure Light Mode Native Splash & Theme Color
+* **Instant Light Splash Screen**: Both `/cora-manifest.json` and `<meta name="theme-color">` enforce `#ffffff` and `apple-mobile-web-app-status-bar-style: default` to eliminate dark-to-light flash delays and render the native OS mobile splash instantaneously.
+* **Zero Artificial Delays**: Page load and route transitions execute with zero artificial `setTimeout` preloader holds. Server-rendered HTML hydrides immediately on `DOMContentLoaded`.
 
-#### Screen Orientation Lock (v3.2.85)
-1. **Manifest Lock**: `"orientation": "portrait-primary"` in `/cora-manifest.json`.
-2. **JavaScript Screen Orientation API Lock**: Executed during service worker boot.
-3. **Landscape Shield Overlay (v3.3.0)**: A full-screen blocking overlay with rotation icon displayed when users rotate to landscape.
+#### Dynamic Manifest & Version-Stamped Icon Synchronization
+* **Automatic App Icon Refresh**: `/cora-manifest.json` dynamically injects full absolute URLs with version stamps (`?v=CORA_WORKSPACE_VERSION`) across all icon definitions (`192x192`, `512x512`, `any`, `maskable`, and shortcut icons) to trigger automatic OS and browser WebAPK icon updates on release.
+* **Modern PWA Launch Handlers**: Configured with `display_override: ["standalone", "window-controls-overlay"]`, `launch_handler: { "client_mode": "navigate-existing" }`, `capture_links: "existing-client-navigate"`, and `handle_links: "preferred"`.
 
-#### Service Worker Dynamic Cache Eviction (v3.2.84)
-| Request Type | Caching Strategy | Target Assets / Routes |
-| :--- | :--- | :--- |
-| **Scripts & Styles** | `Stale-While-Revalidate` | `.css`, `.js`, `.woff2`, `.ttf` |
-| **HTML Navigation** | `Network-First` | Full HTML page views (`/workspace/*`) |
-| **API & AJAX** | `Network-Only` | `admin-ajax.php`, `/wp-json/*` |
-| **Static Assets** | `Cache-First` | Images, icons, static graphics (FIFO eviction at 150 items) |
+#### Standalone PWA In-App Navigation Engine (Breakout Prevention)
+* **iOS Safari & Android PWA Link Retention**: Standalone mode (`navigator.standalone === true` or `(display-mode: standalone)`) captures all internal anchor clicks (`/workspace/**`, `/docs/**`, `?page=cora-workspace`) and retains execution inside the installed PWA window using `window.location.assign()`, preventing external browser tab popouts.
+
+#### Service Worker Lifecycle & High-Speed Cache Strategy (v4.0.0)
+| Request Type | Strategy | Latency Target | Description |
+| :--- | :--- | :--- | :--- |
+| **HTML Navigation** | `Fast Network-First with Instant Fallback` | `<400ms` / `<50ms` cached | Races network with 400ms timeout; immediately serves cached shell on slower connections and updates cache in background. |
+| **Core JS & CSS** | `Stale-While-Revalidate` | `Instant (<10ms)` | Instant delivery from dynamic cache with background asset freshness updates. |
+| **Fonts (Inter / Mono)** | `Cache-First` | `Instant (<5ms)` | Cached permanently in dedicated font cache. |
+| **API & AJAX** | `Network-Only` | `Real-time` | Bypasses service worker for real-time live database synchronization. |
+| **Auto Cache Eviction** | `On Activate` | `Immediate` | Purges all prior version cache partitions when `CORA_WORKSPACE_VERSION` increments. |
 
 ---
 

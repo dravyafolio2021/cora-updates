@@ -513,3 +513,32 @@ body,
         transform: translateY(0);
     }
 }
+
+/* === CORA MOBILE PWA HIGH-PERFORMANCE ENGINE === */
+html, body {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: none;
+}
+
+button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-island-nav-link, .cora-island-btn-menu, .cora-island-btn-ai, .cora-island-view {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile Smooth Scroll */
+.cora-main, .cora-sidebar, .cora-drawer-scrollable {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* Standalone PWA Notch & Safe-Area Padding Support */
+@supports (padding-top: env(safe-area-inset-top)) {
+    #cora-workspace {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
