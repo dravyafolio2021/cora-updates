@@ -232,135 +232,62 @@ export function Navbar() {
                     <ChevronDown className={`w-3.5 h-3.5 stroke-[2.4] text-zinc-600 group-hover:text-zinc-950 transition-transform duration-200 ${activeDropdown === 'company' ? 'rotate-180 text-zinc-950' : ''}`} />
                   </button>
 
-                  {/* ── High-End Structured Company Dropdown Card ── */}
+                  {/* ── Minimal Clean Company Dropdown ── */}
                   {activeDropdown === 'company' && (
                     <div
-                      className="absolute top-full -left-20 sm:left-0 mt-2 w-[540px] max-w-[90vw] rounded-[24px] bg-white border border-zinc-200 shadow-[0px_25px_60px_rgba(0,0,0,0.12)] p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                      className="absolute top-full right-0 mt-2 w-52 rounded-2xl bg-white border border-zinc-200/90 shadow-[0px_12px_32px_rgba(0,0,0,0.08)] p-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
                       onMouseEnter={() => handleMouseEnter('company')}
                       onMouseLeave={handleMouseLeave}
                     >
-                      <div className="grid grid-cols-12 gap-5 items-stretch">
-                        
-                        {/* Left Column: Navigation Items with Icon Badges & Descriptions */}
-                        <div className="col-span-7 space-y-1">
-                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block px-2.5 pb-1">
-                            COMPANY &amp; ECOSYSTEM
-                          </span>
+                      <Link
+                        href="/about"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/80 transition-colors"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-zinc-500" />
+                        <span>About</span>
+                      </Link>
 
-                          <Link
-                            href="/about"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 border border-zinc-200/80 group-hover:bg-zinc-950 group-hover:text-white transition-colors">
-                              <Sparkles className="w-4 h-4" />
-                            </div>
-                            <div className="space-y-0.5">
-                              <div className="text-xs font-bold text-zinc-950 group-hover:text-black">About Our Mission</div>
-                              <div className="text-[11px] text-zinc-500 font-normal leading-tight">The thesis behind autonomous business software.</div>
-                            </div>
-                          </Link>
+                      <Link
+                        href="/brand"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/80 transition-colors"
+                      >
+                        <Layers className="w-3.5 h-3.5 text-zinc-500" />
+                        <span>Brand &amp; Assets</span>
+                      </Link>
 
-                          <Link
-                            href="/brand"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 border border-zinc-200/80 group-hover:bg-zinc-950 group-hover:text-white transition-colors">
-                              <Layers className="w-4 h-4" />
-                            </div>
-                            <div className="space-y-0.5">
-                              <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Brand &amp; Design Assets</div>
-                              <div className="text-[11px] text-zinc-500 font-normal leading-tight">Logos, tokens, vector SVGs &amp; typography.</div>
-                            </div>
-                          </Link>
+                      <Link
+                        href="/security"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/80 transition-colors"
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5 text-zinc-500" />
+                        <span>Security</span>
+                      </Link>
 
-                          <Link
-                            href="/security"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200/70 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                              <ShieldCheck className="w-4 h-4" />
-                            </div>
-                            <div className="space-y-0.5">
-                              <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Security &amp; Standards</div>
-                              <div className="text-[11px] text-zinc-500 font-normal leading-tight">AES-256 encryption, RLS &amp; Indian DPDP.</div>
-                            </div>
-                          </Link>
+                      <Link
+                        href="/contact"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/80 transition-colors"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 text-zinc-500" />
+                        <span>Contact</span>
+                      </Link>
 
-                          <Link
-                            href="/contact"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 border border-zinc-200/80 group-hover:bg-zinc-950 group-hover:text-white transition-colors">
-                              <MessageSquare className="w-4 h-4" />
-                            </div>
-                            <div className="space-y-0.5">
-                              <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Advisory Desk &amp; Contact</div>
-                              <div className="text-[11px] text-zinc-500 font-normal leading-tight">Direct founder desk &amp; enterprise support.</div>
-                            </div>
-                          </Link>
-                        </div>
+                      <div className="my-1 border-t border-zinc-100" />
 
-                        {/* Right Column: Founder Spotlight & Status Card */}
-                        <div className="col-span-5 rounded-2xl bg-zinc-950 text-white p-4 flex flex-col justify-between border border-zinc-800 shadow-sm">
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400">
-                                FOUNDER
-                              </span>
-                              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                            </div>
-
-                            <div className="space-y-1">
-                              <div className="text-xs font-bold text-white">Dravya Bansal</div>
-                              <p className="text-[11px] text-zinc-400 font-normal leading-relaxed">
-                                &ldquo;Built for creators &amp; service businesses, not spreadsheets.&rdquo;
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="space-y-2 pt-3 border-t border-zinc-800/80">
-                            <Link
-                              href="/about#founder"
-                              onClick={() => setActiveDropdown(null)}
-                              className="inline-flex items-center gap-1.5 text-xs font-bold text-white hover:text-zinc-200 transition-colors"
-                            >
-                              <span>Read Founder Story</span>
-                              <ArrowRight className="w-3.5 h-3.5" />
-                            </Link>
-
-                            <Link
-                              href="/status"
-                              onClick={() => setActiveDropdown(null)}
-                              className="flex items-center gap-1.5 text-[11px] text-zinc-400 hover:text-emerald-400 transition-colors font-mono"
-                            >
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                              <span>Systems 99.98% Live</span>
-                            </Link>
-                          </div>
-                        </div>
-
-                      </div>
-
-                      {/* Bottom Quick Links Bar */}
-                      <div className="mt-3.5 pt-3 border-t border-zinc-100 flex items-center justify-between text-[11px] font-medium text-zinc-500 px-1">
-                        <Link href="/changelog" onClick={() => setActiveDropdown(null)} className="hover:text-zinc-950 transition-colors">
-                          Changelog v2.4 &rarr;
-                        </Link>
-                        <div className="flex items-center gap-3">
-                          <Link href="/sla" onClick={() => setActiveDropdown(null)} className="hover:text-zinc-950 transition-colors">
-                            99.95% SLA
-                          </Link>
-                          <span>&bull;</span>
-                          <Link href="/terms" onClick={() => setActiveDropdown(null)} className="hover:text-zinc-950 transition-colors">
-                            Legal &amp; Terms
-                          </Link>
-                        </div>
-                      </div>
-
+                      <Link
+                        href="/status"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-950 hover:bg-zinc-50 transition-colors"
+                      >
+                        <span>System Status</span>
+                        <span className="flex items-center gap-1.5 text-[11px] font-mono text-emerald-600 font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          99.98%
+                        </span>
+                      </Link>
                     </div>
                   )}
                 </div>
