@@ -21,6 +21,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { DynamicWeekCalendar } from '@/components/about/DynamicWeekCalendar';
+import { CoreValuesSection } from '@/components/about/CoreValuesSection';
 
 export const metadata: Metadata = {
   title: 'About Cora — The Convergence of Software, AI & Humans',
@@ -367,106 +368,10 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 4: OUR CORE VALUES (Minimal Unboxed Editorial Layout)
+          SECTION 4: OUR CORE VALUES (Responsive Mobile Strip & Desktop Grid)
       ───────────────────────────────────────────────────────────── */}
       <section className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
-        
-        {/* Section Header */}
-        <div className="text-center space-y-3 mb-14 sm:mb-20">
-          <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-500 block">
-            DNA &amp; PRINCIPLES
-          </span>
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
-            Our core values.
-          </h2>
-          <p className="text-sm sm:text-base text-zinc-600 max-w-[520px] mx-auto font-normal">
-            The fundamental beliefs that guide how we build products, support creators, and grow together.
-          </p>
-        </div>
-
-        {/* Minimal Unboxed Editorial Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12 sm:gap-y-16">
-          
-          {/* Principle 01 */}
-          <div className="border-t border-zinc-200 pt-6 space-y-3">
-            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-              01 / CRAFT
-            </span>
-            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              Be in the details.
-            </h3>
-            <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-              We obsess over typography, micro-interactions, and visual polish so every touchpoint feels effortless and intentional.
-            </p>
-          </div>
-
-          {/* Principle 02 */}
-          <div className="border-t border-zinc-200 pt-6 space-y-3">
-            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-              02 / SPEED
-            </span>
-            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              Move with intent.
-            </h3>
-            <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-              We eliminate administrative friction so studio founders and creative teams can operate at the speed of thought.
-            </p>
-          </div>
-
-          {/* Principle 03 */}
-          <div className="border-t border-zinc-200 pt-6 space-y-3">
-            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-              03 / CLARITY
-            </span>
-            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              Radical simplicity.
-            </h3>
-            <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-              No bloated menus or fragmented tools. We replace dozens of disconnected apps with one unified, calm workspace.
-            </p>
-          </div>
-
-          {/* Principle 04 */}
-          <div className="border-t border-zinc-200 pt-6 space-y-3">
-            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-              04 / EMPATHY
-            </span>
-            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              Built for creators.
-            </h3>
-            <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-              We design specifically for real-world studio sets, production houses, and the creators who run them every day.
-            </p>
-          </div>
-
-          {/* Principle 05 */}
-          <div className="border-t border-zinc-200 pt-6 space-y-3">
-            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-              05 / ITERATION
-            </span>
-            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              Grow 1% every day.
-            </h3>
-            <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-              Continuous refinement through listening closely to our community, fixing nuances quickly, and raising the standard.
-            </p>
-          </div>
-
-          {/* Principle 06 */}
-          <div className="border-t border-zinc-200 pt-6 space-y-3">
-            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-              06 / EXPERIENCE
-            </span>
-            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              Customer delight first.
-            </h3>
-            <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-              Our success is measured solely by the time, freedom, and joy our creators gain back for their actual creative work.
-            </p>
-          </div>
-
-        </div>
-
+        <CoreValuesSection />
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
