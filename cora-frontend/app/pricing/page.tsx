@@ -17,7 +17,8 @@ import {
   Receipt,
   Globe,
   Zap,
-  Lock
+  Lock,
+  Star
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -275,7 +276,7 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 2: CLEAN, SCANNABLE PRICING CARDS (ARCADE STYLE CRAFT)
+          ROW 2: VALUE-FOR-MONEY PRICING CARDS WITH HIGH-IMPACT RECOMMENDED BADGE
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16">
         
@@ -343,13 +344,12 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* 3-Tier SaaS Cards: Arcade-Style Clean Hierarchy */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        {/* 3-Tier SaaS Cards: High Value & Recommended Badge */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch pt-3">
           
           {/* CARD 1: STARTER */}
           <div className="bg-white border border-zinc-200 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:border-zinc-300 hover:shadow-md transition-all">
             <div>
-              {/* Header */}
               <div className="flex items-center justify-between gap-2 mb-2">
                 <h3 className="font-display text-2xl font-bold text-zinc-950">
                   Starter
@@ -359,9 +359,9 @@ export default function PricingPage() {
                 Establish your independent brand with custom domains, email, and 5x AI capacity.
               </p>
 
-              {/* Price */}
+              {/* Price Block with Value Anchor */}
               <div className="mb-5">
-                <div className="flex items-baseline gap-1">
+                <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
                     {currency === 'INR' ? '₹999' : '$9'}
                   </span>
@@ -420,43 +420,55 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* CARD 2: PROFESSIONAL (POPULAR) */}
-          <div className="bg-white border-2 border-zinc-950 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.08)] relative">
+          {/* CARD 2: PROFESSIONAL (HIGH VALUE & RECOMMENDED BADGE) */}
+          <div className="bg-white border-2 border-zinc-950 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_12px_40px_rgba(0,0,0,0.08)] relative mt-0 md:-mt-3">
+            
+            {/* High-Impact Top Recommended Banner */}
+            <div className="absolute -top-3.5 inset-x-0 flex justify-center">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-zinc-950 text-white text-[11px] font-bold tracking-wide shadow-md">
+                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                <span>RECOMMENDED &bull; BEST VALUE</span>
+              </span>
+            </div>
+
             <div>
-              {/* Header with Popular Pill */}
-              <div className="flex items-center justify-between gap-2 mb-2">
+              {/* Header */}
+              <div className="flex items-center justify-between gap-2 mb-2 mt-1">
                 <h3 className="font-display text-2xl font-bold text-zinc-950">
                   Professional
                 </h3>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-950 text-white text-[10px] font-bold uppercase tracking-wider">
-                  Popular
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200/80 text-[10px] font-bold text-amber-800 uppercase tracking-wider">
+                  Save 40%
                 </span>
               </div>
               <p className="text-xs text-zinc-500 leading-relaxed mb-5 min-h-[34px]">
-                Autonomous operating backbone for high-growth commercial studios.
+                Autonomous operating backbone with Claude 3.5 Sonnet, WhatsApp, and UPI QR.
               </p>
 
-              {/* Price */}
+              {/* Price Block with High-Value Savings */}
               <div className="mb-5">
-                <div className="flex items-baseline gap-1">
+                <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
                     {currency === 'INR' ? '₹1,999' : '$19'}
                   </span>
                   <span className="text-xs text-zinc-500 font-medium">/ month</span>
+                  <span className="text-xs text-zinc-400 line-through font-mono">
+                    {currency === 'INR' ? '₹2,999' : '$29'}
+                  </span>
                 </div>
                 <div className="text-[11px] text-zinc-400 mt-1 font-mono">
                   {billingCycle === 'annual'
-                    ? (currency === 'INR' ? 'Billed annually (₹23,988/yr)' : 'Billed annually ($228/yr)')
+                    ? (currency === 'INR' ? 'Billed annually (₹23,988/yr) • Includes Free Domain' : 'Billed annually ($228/yr) • Includes Free Domain')
                     : 'Billed monthly'}
                 </div>
               </div>
 
-              {/* Action CTA (Solid Black) */}
+              {/* Action CTA (High-Converting Solid Black) */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=pro"
-                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3 px-4 rounded-xl text-xs font-bold transition-all shadow-sm hover:shadow-md mb-6"
+                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3.5 px-4 rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg mb-6"
               >
-                <span>Get started</span>
+                <span>Get started with Professional</span>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
               </a>
 
@@ -504,7 +516,6 @@ export default function PricingPage() {
           {/* CARD 3: SCALE */}
           <div className="bg-white border border-zinc-200 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:border-zinc-300 hover:shadow-md transition-all">
             <div>
-              {/* Header */}
               <div className="flex items-center justify-between gap-2 mb-2">
                 <h3 className="font-display text-2xl font-bold text-zinc-950">
                   Scale
@@ -516,7 +527,7 @@ export default function PricingPage() {
 
               {/* Price */}
               <div className="mb-5">
-                <div className="flex items-baseline gap-1">
+                <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
                     {currency === 'INR' ? '₹2,999' : '$29'}
                   </span>
