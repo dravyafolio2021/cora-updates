@@ -11,9 +11,24 @@ export const metadata: Metadata = {
 export default function ChangelogPage() {
   const releases = [
     {
+      version: 'v4.0.0',
+      date: 'August 25, 2026',
+      badge: 'LATEST RELEASE',
+      title: 'Unified Platform Consolidation & Clean Slate Multi-Module Engine',
+      description: 'Major milestone release consolidating all creative and business operations into a unified platform architecture. Features complete workspace tenant isolation, dynamic data bridges, autonomous AI co-founder deck, and responsive client portals.',
+      highlights: [
+        'Complete platform-wide v4.0.0 consolidation with 100% test passing rate across E2E and unit test suites.',
+        'Redesigned Mountain Mission summit, Our Motto calendar, and Core Values bento matrix on the About suite.',
+        'Unified 5-pillar Autonomous AI Co-Founder Command Deck with real-time telemetry execution stream.',
+        'Multi-tenant workspace isolation across CRM, Document Vault, Media Studio, and Financial Co-Founder.',
+      ],
+      icon: Layers,
+      accent: 'indigo',
+    },
+    {
       version: 'v2.4.0',
       date: 'August 20, 2026',
-      badge: 'LATEST RELEASE',
+      badge: 'PREVIOUS RELEASE',
       title: 'Autonomous AI Co-Founder OS & Competitor Comparison Suite',
       description: 'Launched full multi-turn memory AI voice-to-scope routing, automated shoot quote generation, and 8 dedicated head-to-head competitor comparison benchmarks.',
       highlights: [
