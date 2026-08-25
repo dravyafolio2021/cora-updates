@@ -21,7 +21,6 @@ import {
   Building2,
   Users,
   Send,
-  Sliders,
   LifeBuoy,
   Leaf,
   Rocket,
@@ -106,7 +105,7 @@ export default function PricingPage() {
   // Floating sticky cadence toggle scroll listener
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 420) {
+      if (window.scrollY > 380) {
         setShowFloatingToggle(true);
       } else {
         setShowFloatingToggle(false);
@@ -328,7 +327,7 @@ export default function PricingPage() {
                   setBillingCycle('monthly');
                   trackEvent('pricing_cycle_change', { cycle: 'monthly' });
                 }}
-                className={`px-5 py-2 rounded-full text-xs font-semibold transition-all ${
+                className={`px-5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   billingCycle === 'monthly'
                     ? 'bg-zinc-950 text-white shadow-xs'
                     : 'text-zinc-600 hover:text-zinc-950'
@@ -342,7 +341,7 @@ export default function PricingPage() {
                   setBillingCycle('annual');
                   trackEvent('pricing_cycle_change', { cycle: 'annual' });
                 }}
-                className={`px-5 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`px-5 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                   billingCycle === 'annual'
                     ? 'bg-zinc-950 text-white shadow-xs'
                     : 'text-zinc-600 hover:text-zinc-950'
@@ -1198,11 +1197,12 @@ export default function PricingPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
               
+              {/* Card 1 */}
               <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
                 <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200/60 flex items-center justify-center shrink-0 mt-0.5 text-amber-800">
                   <Globe className="w-4 h-4" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="font-semibold text-zinc-950 text-xs">Free .in Custom Domain</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
                     Complimentary 1-year <span className="font-mono text-zinc-800 font-bold">.in domain</span> with automated SSL
@@ -1210,11 +1210,12 @@ export default function PricingPage() {
                 </div>
               </div>
 
+              {/* Card 2 */}
               <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
                 <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200/60 flex items-center justify-center shrink-0 mt-0.5 text-emerald-800">
                   <QrCode className="w-4 h-4" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="font-semibold text-zinc-950 text-xs">Dynamic UPI QR Code</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
                     Zero gateway fees &mdash; direct bank settlement on all invoices
@@ -1222,11 +1223,12 @@ export default function PricingPage() {
                 </div>
               </div>
 
+              {/* Card 3 */}
               <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
                 <div className="w-8 h-8 rounded-lg bg-green-50 border border-green-200/60 flex items-center justify-center shrink-0 mt-0.5 text-[#25D366]">
                   <WhatsAppIcon className="w-4 h-4" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="font-semibold text-zinc-950 text-xs flex items-center gap-1">
                     <span>WhatsApp Client Dispatch</span>
                   </div>
@@ -1236,11 +1238,12 @@ export default function PricingPage() {
                 </div>
               </div>
 
+              {/* Card 4 */}
               <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
                 <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0 mt-0.5 text-blue-800">
                   <Receipt className="w-4 h-4" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="font-semibold text-zinc-950 text-xs">18% GST Invoicing Engine</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
                     Auto CGST, SGST, IGST tax breakdown &amp; GSTIN audit logs
@@ -1248,11 +1251,12 @@ export default function PricingPage() {
                 </div>
               </div>
 
+              {/* Card 5 */}
               <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
                 <div className="w-8 h-8 rounded-lg bg-purple-50 border border-purple-200/60 flex items-center justify-center shrink-0 mt-0.5 text-purple-800">
                   <Sparkles className="w-4 h-4" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="font-semibold text-zinc-950 text-xs">10,000 AI Runs / month</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
                     High-speed autonomous AI for client scoping &amp; briefs
@@ -1260,13 +1264,16 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200 flex items-center justify-center shrink-0 mt-0.5 text-zinc-900">
-                <ShieldCheck className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="font-semibold text-zinc-950 text-xs">5 Team Seats &amp; IST Support</div>
-                <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                  Role permissions for crew &amp; priority Indian support desk
+              {/* Card 6 */}
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0 mt-0.5 text-zinc-900">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="font-semibold text-zinc-950 text-xs">5 Team Seats &amp; IST Support</div>
+                  <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                    Role permissions for crew &amp; priority Indian support desk
+                  </div>
                 </div>
               </div>
 
@@ -1298,7 +1305,7 @@ export default function PricingPage() {
                 <button
                   type="button"
                   onClick={() => toggleFaq(idx)}
-                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-semibold text-xs sm:text-sm text-zinc-950 hover:bg-zinc-50/70 transition-colors"
+                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-semibold text-xs sm:text-sm text-zinc-950 hover:bg-zinc-50/70 transition-colors cursor-pointer"
                 >
                   <span>{faq.q}</span>
                   {isOpen ? (
