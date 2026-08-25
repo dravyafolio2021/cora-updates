@@ -15702,6 +15702,37 @@ jQuery(document).ready(function($) {
             <button id="cora-pwa-prompt-never" class="mt-2.5 block text-[10px] text-zinc-400 hover:text-zinc-650 transition underline">
                 Don't ask me again
             </button>
+</div>
+
+<!-- Dynamic PWA Version & App Icon Update Banner -->
+<div id="cora-pwa-update-banner" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[100002] w-full max-w-md px-4 transition-all duration-300 transform translate-y-24 opacity-0 pointer-events-none font-sans select-none">
+    <div class="bg-white border border-zinc-200 rounded-2xl p-4 shadow-2xl flex flex-col gap-3">
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                    <h4 class="text-xs font-bold text-zinc-900 tracking-tight m-0">App Update Available</h4>
+                    <span id="cora-pwa-update-version-tag" class="text-[10px] font-mono font-bold px-1.5 py-0.5 bg-zinc-100 text-zinc-800 rounded border border-zinc-200">v<?php echo CORA_WORKSPACE_VERSION; ?></span>
+                </div>
+                <p class="text-[11px] text-zinc-500 mt-0.5 leading-normal m-0">A new version with updated app icon, faster performance, and features is ready.</p>
+            </div>
+            <button type="button" onclick="window.coraDismissPwaUpdateBanner()" class="text-zinc-400 hover:text-zinc-700 p-1 rounded-md transition-colors cursor-pointer border-0 bg-transparent">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="flex items-center gap-2 pt-1">
+            <button type="button" id="cora-pwa-apply-update-btn" onclick="window.coraApplyPwaUpdate()" class="flex-1 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer text-center">
+                Update Now &amp; Sync Icon
+            </button>
+            <button type="button" onclick="window.coraShowPwaIconSyncGuide()" class="py-2 px-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl transition-all cursor-pointer">
+                Icon Info
+            </button>
         </div>
     </div>
 </div>

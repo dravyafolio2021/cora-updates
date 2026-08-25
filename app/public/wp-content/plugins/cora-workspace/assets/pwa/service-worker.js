@@ -130,39 +130,22 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 6. HTML Navigation (Workspace Dashboard & Views) -> Fast Network with Instant Cache Fallback (Sub-400ms)
+  // 6. HTML Navigation (Workspace Dashboard & Views) -> Robust Network-First with Offline Fallback
   if (req.headers.get('accept')?.includes('text/html') || req.mode === 'navigate') {
     event.respondWith(
-      new Promise(resolve => {
-        let timedOut = false;
-        
-        // Fast 400ms timeout on mobile networks to fall back to cached shell immediately
-        const timeoutId = setTimeout(async () => {
-          timedOut = true;
-          const cached = await caches.match(req);
-          if (cached) {
-            resolve(cached);
+      fetch(req)
+        .then(async networkRes => {
+          if (networkRes && networkRes.status === 200) {
+            const cacheCopy = networkRes.clone();
+            const cache = await caches.open(CACHE_NAME);
+            cache.put(req, cacheCopy);
           }
-        }, 400);
-
-        fetch(req)
-          .then(async networkRes => {
-            clearTimeout(timeoutId);
-            if (networkRes.status === 200) {
-              const cacheCopy = networkRes.clone();
-              const cache = await caches.open(CACHE_NAME);
-              cache.put(req, cacheCopy);
-            }
-            if (!timedOut) {
-              resolve(networkRes);
-            }
-          })
-          .catch(async () => {
-            clearTimeout(timeoutId);
-            const cached = (await caches.match(req)) || (await caches.match('/cora-offline.html'));
-            resolve(cached || new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } }));
-          });
-      })
+          return networkRes;
+        })
+        .catch(async () => {
+          const cached = (await caches.match(req)) || (await caches.match('/cora-offline.html'));
+          return cached || new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } });
+        })
     );
     return;
   }

@@ -4055,12 +4055,6 @@ jQuery(document).ready(function($) {
             }
         });
 
-        // Redirect to first allowed screen if unauthorized
-        const currentActiveTab = $('.cora-nav-item.cora-active').data('target');
-        if (currentActiveTab && currentActiveTab !== 'feature-hub' && !enterpriseNewModules.includes(currentActiveTab) && !allowed.includes(currentActiveTab)) {
-            const firstAllowed = allowed[0] || 'dashboard';
-            coraNavigateTo(firstAllowed);
-        }
     };
 
     // Global Role Switcher Preview Engine
@@ -4099,19 +4093,132 @@ jQuery(document).ready(function($) {
     };
 
     window.coraResetRolePreview = function() {
+        try {
+            sessionStorage.removeItem('cora_preview_role');
+        } catch(e) {}
         coraSwitchRolePreview('administrator');
     };
 
-    // Initialize capabilities enforcement with preview role persistence
-    let initialRole = (window.coraREData && window.coraREData.currentRole) ? window.coraREData.currentRole : 'administrator';
+    // Initialize capabilities enforcement safely
+    const activeCurrentRole = (window.coraREData && window.coraREData.currentRole) ? window.coraREData.currentRole : 'administrator';
     let savedPreviewRole = null;
     try {
         savedPreviewRole = sessionStorage.getItem('cora_preview_role');
     } catch(e) {}
-    if (savedPreviewRole) {
-        initialRole = savedPreviewRole;
-    }
-    coraSwitchRolePreview(initialRole);
+    coraSwitchRolePreview(savedPreviewRole || activeCurrentRole);
+
+    // ============================================================
+    // CORA PWA VERSION & APP ICON UPDATE MANAGER
+    // ============================================================
+    window.coraShowPwaUpdateBanner = function(oldVer, newVer) {
+        const banner = document.getElementById('cora-pwa-update-banner');
+        if (!banner) return;
+        const targetVer = newVer || (window.coraREData && window.coraREData.version) || '4.0.0';
+        const tag = document.getElementById('cora-pwa-update-version-tag');
+        if (tag) tag.textContent = 'v' + targetVer;
+        
+        banner.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+        banner.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+    };
+
+    window.coraDismissPwaUpdateBanner = function() {
+        const banner = document.getElementById('cora-pwa-update-banner');
+        if (!banner) return;
+        banner.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+        banner.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+    };
+
+    window.coraApplyPwaUpdate = function() {
+        const btn = document.getElementById('cora-pwa-apply-update-btn');
+        if (btn) {
+            btn.textContent = 'Updating & Reloading...';
+            btn.disabled = true;
+        }
+
+        const currentVersion = (window.coraREData && window.coraREData.version) || '4.0.0';
+        try {
+            localStorage.setItem('cora_pwa_installed_version', currentVersion);
+        } catch(e) {}
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                registrations.forEach(function(registration) {
+                    if (registration.waiting) {
+                        registration.waiting.postMessage({ type: 'skipWaiting' });
+                    }
+                    registration.update();
+                });
+            });
+        }
+
+        // Clear dynamic caches for old version
+        if ('caches' in window) {
+            caches.keys().then(function(names) {
+                return Promise.all(
+                    names.map(function(name) {
+                        if (!name.includes(currentVersion)) {
+                            return caches.delete(name);
+                        }
+                    })
+                );
+            }).catch(function() {});
+        }
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 300);
+    };
+
+    window.coraShowPwaIconSyncGuide = function() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+            if (window.coraShowToast) {
+                window.coraShowToast("iOS Notice: To refresh your Home Screen springboard icon, tap Share ⎋ → Add to Home Screen.");
+            }
+        } else {
+            if (window.coraShowToast) {
+                window.coraShowToast("Android Notice: Chrome automatically synchronizes your WebAPK Home Screen icon in the background.");
+            }
+        }
+    };
+
+    // Auto-detect updates from Service Worker or platform version mismatch
+    (function initPwaUpdateWatcher() {
+        const currentVersion = (window.coraREData && window.coraREData.version) || '4.0.0';
+        let installedVersion = null;
+        try {
+            installedVersion = localStorage.getItem('cora_pwa_installed_version');
+        } catch(e) {}
+
+        if (!installedVersion) {
+            try {
+                localStorage.setItem('cora_pwa_installed_version', currentVersion);
+            } catch(e) {}
+        } else if (installedVersion !== currentVersion) {
+            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+            if (isStandalone || window.innerWidth < 768) {
+                setTimeout(function() {
+                    window.coraShowPwaUpdateBanner(installedVersion, currentVersion);
+                }, 1000);
+            }
+        }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(function(registration) {
+                registration.update();
+                registration.addEventListener('updatefound', function() {
+                    const newWorker = registration.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', function() {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                window.coraShowPwaUpdateBanner(installedVersion, currentVersion);
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    })();
 
     // ============================================================
     // GOOGLE BUSINESS PROFILE — REAL OAUTH 2.0 INTEGRATION

@@ -50,4 +50,48 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
         expect(scrollWidth).toBeLessThanOrEqual(375);
     });
+
+    test('verify mobile page refresh retains exact current page and does not hijack to CRM', async ({ page }) => {
+        await page.setViewportSize({ width: 375, height: 812 });
+        await login(page);
+        
+        // Test 1: Refreshing Dashboard stays on Dashboard
+        await page.goto('http://cora.local/workspace/dashboard');
+        await page.waitForSelector('#cora-workspace');
+        await page.reload();
+        await page.waitForSelector('#cora-workspace');
+        expect(page.url()).toContain('/workspace/dashboard');
+        
+        // Test 2: Refreshing Financials stays on Financials
+        await page.goto('http://cora.local/workspace/financials');
+        await page.waitForSelector('#cora-workspace');
+        await page.reload();
+        await page.waitForSelector('#cora-workspace');
+        expect(page.url()).toContain('/workspace/financials');
+        expect(page.url()).not.toContain('/workspace/leads');
+        expect(page.url()).not.toContain('/workspace/bookings');
+    });
+
+    test('verify PWA dynamic update banner display and dismiss controls', async ({ page }) => {
+        await page.setViewportSize({ width: 375, height: 812 });
+        await login(page);
+        await page.goto('http://cora.local/workspace/dashboard');
+        await page.waitForSelector('#cora-workspace');
+        
+        // Trigger update banner
+        await page.evaluate(() => {
+            window.coraShowPwaUpdateBanner('3.9.0', '4.0.0');
+        });
+        
+        const banner = page.locator('#cora-pwa-update-banner');
+        await expect(banner).toBeVisible();
+        await expect(banner).toContainText('v4.0.0');
+        await expect(banner).toContainText('Update Now & Sync Icon');
+        
+        // Dismiss banner
+        await page.evaluate(() => {
+            window.coraDismissPwaUpdateBanner();
+        });
+        await expect(banner).toHaveClass(/translate-y-24/);
+    });
 });
