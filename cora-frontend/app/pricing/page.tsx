@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -69,6 +69,7 @@ export default function PricingPage() {
   const [currency, setCurrency] = useState<'INR' | 'USD'>('USD');
   const [isIndia, setIsIndia] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
+  const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // Dynamic Geolocation detection
@@ -100,6 +101,20 @@ export default function PricingPage() {
       setCurrency('USD');
       setIsIndia(false);
     }
+  }, []);
+
+  // Floating sticky cadence toggle scroll listener
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 420) {
+        setShowFloatingToggle(true);
+      } else {
+        setShowFloatingToggle(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const toggleFaq = (index: number) => {
@@ -650,12 +665,12 @@ export default function PricingPage() {
         </div>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            ACCORDION COMPARISON MATRIX (STICKY SCROLL HEADER WITH IN-HEADER CTAS)
+            ACCORDION COMPARISON MATRIX (PERFECTLY ALIGNED STICKY CARDS & IN-CARD CTAS)
         ══════════════════════════════════════════════════════════════════════ */}
         {showComparison && (
           <div className="mt-12 bg-white border border-zinc-200/90 rounded-[32px] p-4 sm:p-7 shadow-[0_8px_32px_rgba(0,0,0,0.03)] animate-in fade-in slide-in-from-top-3 duration-200">
             
-            {/* Top Heading Block with Sticky Cadence Switcher */}
+            {/* Top Heading Block */}
             <div className="text-center max-w-[700px] mx-auto mb-8 pt-2">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-[11px] font-mono font-semibold uppercase tracking-wider text-emerald-800 mb-3">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
@@ -667,182 +682,167 @@ export default function PricingPage() {
               <p className="text-xs sm:text-sm text-zinc-500 mt-2 leading-relaxed">
                 Everything included in each tier, from AI quota and custom domains to WhatsApp automations and GST tax compliance.
               </p>
-
-              {/* Floating In-Table Cadence Switcher */}
-              <div className="mt-6 inline-flex items-center p-1 bg-zinc-100/90 rounded-full border border-zinc-200/80 shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() => setBillingCycle('monthly')}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                    billingCycle === 'monthly'
-                      ? 'bg-zinc-950 text-white shadow-xs'
-                      : 'text-zinc-600 hover:text-zinc-950'
-                  }`}
-                >
-                  Monthly Billing
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBillingCycle('annual')}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                    billingCycle === 'annual'
-                      ? 'bg-zinc-950 text-white shadow-xs'
-                      : 'text-zinc-600 hover:text-zinc-950'
-                  }`}
-                >
-                  <span>Annual Billing</span>
-                  <span className="bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">
-                    2 Mo. Free
-                  </span>
-                </button>
-              </div>
             </div>
 
-            {/* Scrollable Responsive Table with STICKY HEADER & IN-HEADER CTAS */}
+            {/* Scrollable Responsive Table with PERFECTLY ALIGNED STICKY HEADER CARDS */}
             <div className="overflow-x-auto relative">
-              <table className="w-full text-left border-collapse text-xs min-w-[880px]">
+              <table className="w-full text-left border-collapse text-xs min-w-[900px]">
                 
-                {/* ── Sticky Top Columns with Header Cards & Action CTAs ── */}
+                {/* ── Perfectly Aligned Sticky Header with In-Card CTAs ── */}
                 <thead className="sticky top-16 z-20 bg-white/95 backdrop-blur-md transition-all shadow-[0_4px_12px_rgba(0,0,0,0.03)] border-b border-zinc-200/80">
-                  <tr className="align-bottom">
+                  <tr className="align-top">
                     
                     {/* Left title column */}
-                    <th className="p-3 w-[24%] align-top bg-white">
-                      <div className="font-bold text-sm sm:text-base text-zinc-950">Plans &amp; features</div>
-                      <div className="text-xs text-zinc-500 font-normal mt-1 leading-snug">
-                        All plans include core platform modules and 24/7 support.
+                    <th className="p-2.5 w-[24%] align-top bg-white">
+                      <div className="h-[210px] p-3 flex flex-col justify-between">
+                        <div>
+                          <div className="h-5 mb-1" /> {/* Spacer aligning with badge row */}
+                          <div className="font-bold text-sm sm:text-base text-zinc-950">Plans &amp; features</div>
+                          <div className="text-xs text-zinc-500 font-normal mt-1 leading-snug">
+                            All plans include core platform modules, regular updates, and 24/7 support.
+                          </div>
+                        </div>
+                        <div className="text-[11px] font-mono text-zinc-400">
+                          Toggle billing above or below ↕
+                        </div>
                       </div>
                     </th>
 
-                    {/* Free Forever Header Card with CTA */}
+                    {/* Free Forever Header Card */}
                     <th className="p-2.5 w-[15%] align-top bg-white">
-                      <div className="bg-zinc-50/90 border border-zinc-200/80 rounded-2xl p-3.5 h-full flex flex-col justify-between hover:border-zinc-300 transition-all">
+                      <div className="h-[210px] bg-zinc-50/90 border border-zinc-200/80 rounded-2xl p-3.5 flex flex-col justify-between hover:border-zinc-300 transition-all">
                         <div>
-                          <div className="flex items-center justify-between gap-1 mb-1">
+                          <div className="h-5 mb-1 flex items-center" /> {/* Spacer */}
+                          <div className="flex items-center justify-between gap-1">
                             <span className="font-bold text-xs sm:text-sm text-zinc-950">Free Forever</span>
                             <span className="w-5 h-5 rounded-full bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0">
                               <Leaf className="w-3 h-3" />
                             </span>
                           </div>
-                          <div className="font-mono text-emerald-600 font-semibold text-xs mt-0.5">₹0 / Free</div>
-                          <div className="text-[10px] text-zinc-500 font-normal mt-1 leading-tight">
+                          <div className="font-mono text-emerald-600 font-bold text-xs mt-1">₹0 / Free</div>
+                          <div className="text-[10px] text-zinc-500 font-normal mt-1 h-7 line-clamp-2 leading-tight">
                             For individuals getting started
                           </div>
                         </div>
 
                         <a
                           href="https://app.heycora.in/workspace/login?plan=free"
-                          className="mt-3 w-full inline-flex items-center justify-center py-1.5 px-2 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-[11px] font-semibold transition-all shadow-2xs"
+                          className="w-full inline-flex items-center justify-center py-2 px-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-[11px] font-semibold transition-all shadow-2xs"
                         >
                           Start Free
                         </a>
                       </div>
                     </th>
 
-                    {/* Starter Header Card with CTA */}
+                    {/* Starter Header Card */}
                     <th className="p-2.5 w-[15%] align-top bg-white">
-                      <div className="bg-zinc-50/90 border border-zinc-200/80 rounded-2xl p-3.5 h-full flex flex-col justify-between hover:border-zinc-300 transition-all">
+                      <div className="h-[210px] bg-zinc-50/90 border border-zinc-200/80 rounded-2xl p-3.5 flex flex-col justify-between hover:border-zinc-300 transition-all">
                         <div>
-                          <div className="flex items-center justify-between gap-1 mb-1">
+                          <div className="h-5 mb-1 flex items-center" /> {/* Spacer */}
+                          <div className="flex items-center justify-between gap-1">
                             <span className="font-bold text-xs sm:text-sm text-zinc-950">Starter</span>
                             <span className="w-5 h-5 rounded-full bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0">
                               <Rocket className="w-3 h-3" />
                             </span>
                           </div>
-                          <div className="font-mono text-zinc-950 font-bold text-xs mt-0.5">
+                          <div className="font-mono text-zinc-950 font-bold text-xs mt-1">
                             {billingCycle === 'annual' ? (currency === 'INR' ? '₹833/mo' : '$7.50/mo') : (currency === 'INR' ? '₹999/mo' : '$9/mo')}
                           </div>
-                          <div className="text-[10px] text-zinc-500 font-normal mt-1 leading-tight">
+                          <div className="text-[10px] text-zinc-500 font-normal mt-1 h-7 line-clamp-2 leading-tight">
                             For small teams &amp; early stage
                           </div>
                         </div>
 
                         <a
                           href="https://app.heycora.in/workspace/login?plan=starter"
-                          className="mt-3 w-full inline-flex items-center justify-center py-1.5 px-2 rounded-lg bg-zinc-200/80 hover:bg-zinc-300 text-zinc-950 text-[11px] font-semibold transition-all"
+                          className="w-full inline-flex items-center justify-center py-2 px-2 rounded-xl bg-zinc-200/80 hover:bg-zinc-300 text-zinc-950 text-[11px] font-semibold transition-all"
                         >
                           Get Starter
                         </a>
                       </div>
                     </th>
 
-                    {/* Professional Header (Featured Highlighted Card with CTA) */}
+                    {/* Professional Header (Featured Highlighted Card with MOST POPULAR Badge) */}
                     <th className="p-2.5 w-[16%] align-top bg-white">
-                      <div className="relative bg-white border-2 border-emerald-500 rounded-2xl p-3.5 h-full flex flex-col justify-between shadow-[0_4px_20px_rgba(16,185,129,0.08)]">
-                        {/* Top Most Popular Badge */}
-                        <div className="absolute -top-3 inset-x-0 flex justify-center">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-zinc-950 text-white text-[9px] font-mono font-bold tracking-wider uppercase shadow-xs">
-                            <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                            <span>MOST POPULAR</span>
-                          </span>
-                        </div>
-                        <div className="mt-0.5">
-                          <div className="flex items-center justify-between gap-1 mb-1">
+                      <div className="h-[210px] relative bg-white border-2 border-emerald-500 rounded-2xl p-3.5 flex flex-col justify-between shadow-[0_4px_20px_rgba(16,185,129,0.08)]">
+                        <div>
+                          <div className="h-5 mb-1 flex items-center justify-center">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-950 text-white text-[9px] font-mono font-bold tracking-wider uppercase shadow-xs">
+                              <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                              <span>MOST POPULAR</span>
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between gap-1">
                             <span className="font-bold text-xs sm:text-sm text-zinc-950">Professional</span>
                           </div>
-                          <div className="font-mono text-zinc-950 font-extrabold text-xs sm:text-sm mt-0.5">
+                          <div className="font-mono text-zinc-950 font-extrabold text-xs sm:text-sm mt-1">
                             {billingCycle === 'annual' ? (currency === 'INR' ? '₹1,665/mo' : '$15.80/mo') : (currency === 'INR' ? '₹1,999/mo' : '$19/mo')}
                           </div>
-                          <div className="text-[10px] text-zinc-500 font-normal mt-1 leading-tight">
+                          <div className="text-[10px] text-zinc-500 font-normal mt-1 h-7 line-clamp-2 leading-tight">
                             For growing businesses
                           </div>
                         </div>
 
                         <a
                           href="https://app.heycora.in/workspace/login?plan=pro"
-                          className="mt-3 w-full inline-flex items-center justify-center py-1.5 px-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all shadow-xs"
+                          className="w-full inline-flex items-center justify-center py-2 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all shadow-xs"
                         >
                           Get Pro
                         </a>
                       </div>
                     </th>
 
-                    {/* Scale Header Card with CTA */}
+                    {/* Scale Header Card */}
                     <th className="p-2.5 w-[15%] align-top bg-white">
-                      <div className="bg-zinc-50/90 border border-zinc-200/80 rounded-2xl p-3.5 h-full flex flex-col justify-between hover:border-zinc-300 transition-all">
+                      <div className="h-[210px] bg-zinc-50/90 border border-zinc-200/80 rounded-2xl p-3.5 flex flex-col justify-between hover:border-zinc-300 transition-all">
                         <div>
-                          <div className="flex items-center justify-between gap-1 mb-1">
+                          <div className="h-5 mb-1 flex items-center" /> {/* Spacer */}
+                          <div className="flex items-center justify-between gap-1">
                             <span className="font-bold text-xs sm:text-sm text-zinc-950">Scale</span>
                             <span className="w-5 h-5 rounded-full bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0">
                               <TrendingUp className="w-3 h-3" />
                             </span>
                           </div>
-                          <div className="font-mono text-zinc-950 font-bold text-xs mt-0.5">
+                          <div className="font-mono text-zinc-950 font-bold text-xs mt-1">
                             {billingCycle === 'annual' ? (currency === 'INR' ? '₹2,499/mo' : '$24/mo') : (currency === 'INR' ? '₹2,999/mo' : '$29/mo')}
                           </div>
-                          <div className="text-[10px] text-zinc-500 font-normal mt-1 leading-tight">
+                          <div className="text-[10px] text-zinc-500 font-normal mt-1 h-7 line-clamp-2 leading-tight">
                             For high-growth &amp; teams
                           </div>
                         </div>
 
                         <a
                           href="https://app.heycora.in/workspace/login?plan=scale"
-                          className="mt-3 w-full inline-flex items-center justify-center py-1.5 px-2 rounded-lg bg-zinc-200/80 hover:bg-zinc-300 text-zinc-950 text-[11px] font-semibold transition-all"
+                          className="w-full inline-flex items-center justify-center py-2 px-2 rounded-xl bg-zinc-200/80 hover:bg-zinc-300 text-zinc-950 text-[11px] font-semibold transition-all"
                         >
                           Get Scale
                         </a>
                       </div>
                     </th>
 
-                    {/* India Plan Header (Warm Tinted Card with CTA) */}
+                    {/* India Plan Header (Warm Tinted Card with INDIA EDITION Badge) */}
                     <th className="p-2.5 w-[15%] align-top bg-white">
-                      <div className="bg-gradient-to-b from-amber-50/70 to-amber-50/30 border border-amber-200/90 rounded-2xl p-3.5 h-full flex flex-col justify-between">
+                      <div className="h-[210px] bg-gradient-to-b from-amber-50/70 to-amber-50/30 border border-amber-200/90 rounded-2xl p-3.5 flex flex-col justify-between">
                         <div>
-                          <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-100/80 text-[9px] font-mono font-bold text-amber-900 uppercase tracking-wide mb-1">
-                            <span>🇮🇳 INDIA EDITION</span>
+                          <div className="h-5 mb-1 flex items-center justify-center">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-100/80 text-[9px] font-mono font-bold text-amber-900 uppercase tracking-wide">
+                              <span>🇮🇳 INDIA EDITION</span>
+                            </span>
                           </div>
-                          <div className="font-bold text-xs sm:text-sm text-amber-950">India Plan</div>
-                          <div className="font-mono text-amber-900 font-bold text-xs mt-0.5">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-bold text-xs sm:text-sm text-amber-950">India Plan</span>
+                          </div>
+                          <div className="font-mono text-amber-900 font-bold text-xs mt-1">
                             ₹499/mo <span className="font-normal text-amber-700 text-[9px]">(Annual)</span>
                           </div>
-                          <div className="text-[10px] text-zinc-500 font-normal mt-1 leading-tight">
+                          <div className="text-[10px] text-zinc-500 font-normal mt-1 h-7 line-clamp-2 leading-tight">
                             Local compliance &amp; UPI
                           </div>
                         </div>
 
                         <a
                           href="https://app.heycora.in/workspace/login?plan=india_annual_499"
-                          className="mt-3 w-full inline-flex items-center justify-center py-1.5 px-2 rounded-lg bg-amber-950 hover:bg-amber-900 text-white text-[11px] font-bold transition-all shadow-2xs"
+                          className="w-full inline-flex items-center justify-center py-2 px-2 rounded-xl bg-amber-950 hover:bg-amber-900 text-white text-[11px] font-bold transition-all shadow-2xs"
                         >
                           Claim India
                         </a>
@@ -1260,15 +1260,13 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
-                <div className="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0 mt-0.5 text-zinc-900">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="font-semibold text-zinc-950 text-xs">5 Team Seats &amp; IST Support</div>
-                  <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    Role permissions for crew &amp; priority Indian support desk
-                  </div>
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200 flex items-center justify-center shrink-0 mt-0.5 text-zinc-900">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="font-semibold text-zinc-950 text-xs">5 Team Seats &amp; IST Support</div>
+                <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                  Role permissions for crew &amp; priority Indian support desk
                 </div>
               </div>
 
@@ -1331,6 +1329,47 @@ export default function PricingPage() {
           </Link>
         </div>
       </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          FLOATING STICKY BILLING CADENCE TOGGLE (VISIBLE ON SCROLL)
+      ══════════════════════════════════════════════════════════════════════ */}
+      {showFloatingToggle && (
+        <div className="fixed bottom-6 inset-x-0 mx-auto w-fit z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="inline-flex items-center p-1.5 bg-white/95 backdrop-blur-xl rounded-full border border-zinc-200/90 shadow-[0_12px_40px_rgba(0,0,0,0.12)]">
+            <button
+              type="button"
+              onClick={() => {
+                setBillingCycle('monthly');
+                trackEvent('pricing_cycle_change_floating', { cycle: 'monthly' });
+              }}
+              className={`px-5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                billingCycle === 'monthly'
+                  ? 'bg-zinc-950 text-white shadow-xs'
+                  : 'text-zinc-600 hover:text-zinc-950'
+              }`}
+            >
+              Monthly Billing
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setBillingCycle('annual');
+                trackEvent('pricing_cycle_change_floating', { cycle: 'annual' });
+              }}
+              className={`px-5 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                billingCycle === 'annual'
+                  ? 'bg-zinc-950 text-white shadow-xs'
+                  : 'text-zinc-600 hover:text-zinc-950'
+              }`}
+            >
+              <span>Annual Billing</span>
+              <span className="bg-emerald-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-2xs">
+                2 Mo. Free
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
 
     </main>
   );
