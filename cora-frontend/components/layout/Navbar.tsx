@@ -214,15 +214,7 @@ export function Navbar() {
                   Pricing
                 </Link>
 
-                {/* 5. Direct Get A Demo Link */}
-                <Link
-                  href="/demo"
-                  className="px-3 py-1.5 rounded-lg text-zinc-800 hover:text-zinc-950 hover:bg-zinc-100/60 transition-colors font-semibold"
-                >
-                  Get A Demo
-                </Link>
-
-                {/* 6. Company Small Dropdown */}
+                {/* 5. Company Dropdown */}
                 <div
                   className="relative py-1.5"
                   onMouseEnter={() => handleMouseEnter('company')}
