@@ -22,7 +22,11 @@ import {
   Users,
   Send,
   Sliders,
-  LifeBuoy
+  LifeBuoy,
+  Leaf,
+  Rocket,
+  TrendingUp,
+  Shield
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -645,326 +649,288 @@ export default function PricingPage() {
         </div>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            ACCORDION COMPARISON MATRIX (CLEAN, MODERN, STRIPE/LINEAR GRADE UI)
+            ACCORDION COMPARISON MATRIX (EXACT BENCHMARK TO USER SPEC)
         ══════════════════════════════════════════════════════════════════════ */}
         {showComparison && (
-          <div className="mt-10 bg-white border border-zinc-200 rounded-[24px] shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="mt-12 bg-white border border-zinc-200/90 rounded-[32px] p-4 sm:p-7 shadow-[0_8px_32px_rgba(0,0,0,0.03)] animate-in fade-in slide-in-from-top-3 duration-200">
             
-            <div className="p-6 sm:p-8 border-b border-zinc-100 text-center sm:text-left flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-zinc-50/50">
-              <div>
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950">
-                  Feature Comparison Matrix
-                </h3>
-                <p className="text-xs sm:text-sm text-zinc-500 mt-0.5">
-                  Detailed side-by-side breakdown of capabilities, quotas, and integrations across all plans.
-                </p>
+            {/* Top Heading Block */}
+            <div className="text-center max-w-[700px] mx-auto mb-8 pt-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-[11px] font-mono font-semibold uppercase tracking-wider text-emerald-800 mb-3">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <span>SIDE-BY-SIDE FEATURE MATRIX</span>
               </div>
-              <div className="inline-flex items-center gap-2 text-xs font-mono text-zinc-500 self-center sm:self-auto">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span>All paid tiers include custom domain connection</span>
-              </div>
+              <h3 className="font-display text-2xl sm:text-4xl font-extrabold text-zinc-950 tracking-tight">
+                Compare plans at a glance
+              </h3>
+              <p className="text-xs sm:text-sm text-zinc-500 mt-2 leading-relaxed">
+                Everything included in each tier, from AI quota and custom domains to WhatsApp automations and GST tax compliance.
+              </p>
             </div>
 
+            {/* Scrollable Responsive Table */}
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs min-w-[800px]">
+              <table className="w-full text-left border-collapse text-xs min-w-[860px]">
                 
-                {/* Unified, Clean Table Header */}
+                {/* ── Table Top Columns with Header Cards ── */}
                 <thead>
-                  <tr className="border-b border-zinc-200 text-zinc-900 bg-zinc-50/90 font-semibold divide-x divide-zinc-200/60">
-                    <th className="p-4 sm:p-5 w-[28%] text-zinc-500 font-mono uppercase text-[11px] tracking-wider">
-                      Platform Modules
-                    </th>
-                    <th className="p-4 sm:p-5 w-[14%] text-center">
-                      <div className="font-bold text-xs sm:text-sm text-zinc-950">Free Forever</div>
-                      <div className="text-[11px] font-mono text-emerald-600 font-semibold mt-0.5">₹0 / Free</div>
-                    </th>
-                    <th className="p-4 sm:p-5 w-[14%] text-center">
-                      <div className="font-bold text-xs sm:text-sm text-zinc-950">Starter</div>
-                      <div className="text-[11px] font-mono text-zinc-600 mt-0.5">
-                        {billingCycle === 'annual' ? (currency === 'INR' ? '₹833/mo' : '$7.50/mo') : (currency === 'INR' ? '₹999/mo' : '$9/mo')}
+                  <tr className="align-bottom">
+                    
+                    {/* Left title column */}
+                    <th className="p-4 w-[24%] align-top">
+                      <div className="font-bold text-sm sm:text-base text-zinc-950">Plans &amp; features</div>
+                      <div className="text-xs text-zinc-500 font-normal mt-1 leading-snug">
+                        All plans include core platform modules and 24/7 support.
                       </div>
                     </th>
-                    <th className="p-4 sm:p-5 w-[16%] text-center bg-zinc-100/70">
-                      <div className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-full uppercase tracking-wider mb-1">
-                        <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
-                        <span>Recommended</span>
-                      </div>
-                      <div className="font-bold text-xs sm:text-sm text-zinc-950">Professional</div>
-                      <div className="text-[11px] font-mono text-zinc-900 font-bold mt-0.5">
-                        {billingCycle === 'annual' ? (currency === 'INR' ? '₹1,665/mo' : '$15.80/mo') : (currency === 'INR' ? '₹1,999/mo' : '$19/mo')}
-                      </div>
-                    </th>
-                    <th className="p-4 sm:p-5 w-[14%] text-center">
-                      <div className="font-bold text-xs sm:text-sm text-zinc-950">Scale</div>
-                      <div className="text-[11px] font-mono text-zinc-600 mt-0.5">
-                        {billingCycle === 'annual' ? (currency === 'INR' ? '₹2,499/mo' : '$24/mo') : (currency === 'INR' ? '₹2,999/mo' : '$29/mo')}
-                      </div>
-                    </th>
-                    <th className="p-4 sm:p-5 w-[14%] text-center bg-amber-50/40">
-                      <div className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-800 uppercase tracking-wider mb-1">
-                        <span>🇮🇳 India Only</span>
-                      </div>
-                      <div className="font-bold text-xs sm:text-sm text-amber-950">India Plan</div>
-                      <div className="text-[11px] font-mono text-amber-900 font-bold mt-0.5">
-                        ₹499/mo <span className="font-normal text-amber-700 text-[10px]">(Annual)</span>
+
+                    {/* Free Forever Header */}
+                    <th className="p-3 w-[15%] align-top">
+                      <div className="bg-zinc-50/70 border border-zinc-200/70 rounded-2xl p-4 h-full flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <span className="font-bold text-xs sm:text-sm text-zinc-950">Free Forever</span>
+                            <span className="w-5 h-5 rounded-full bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0">
+                              <Leaf className="w-3 h-3" />
+                            </span>
+                          </div>
+                          <div className="font-mono text-emerald-600 font-semibold text-xs mt-1">₹0 / Free</div>
+                        </div>
+                        <div className="text-[11px] text-zinc-500 font-normal mt-2 leading-tight">
+                          For individuals getting started
+                        </div>
                       </div>
                     </th>
+
+                    {/* Starter Header */}
+                    <th className="p-3 w-[15%] align-top">
+                      <div className="bg-zinc-50/70 border border-zinc-200/70 rounded-2xl p-4 h-full flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <span className="font-bold text-xs sm:text-sm text-zinc-950">Starter</span>
+                            <span className="w-5 h-5 rounded-full bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0">
+                              <Rocket className="w-3 h-3" />
+                            </span>
+                          </div>
+                          <div className="font-mono text-zinc-950 font-bold text-xs mt-1">
+                            {billingCycle === 'annual' ? (currency === 'INR' ? '₹833/mo' : '$7.50/mo') : (currency === 'INR' ? '₹999/mo' : '$9/mo')}
+                          </div>
+                        </div>
+                        <div className="text-[11px] text-zinc-500 font-normal mt-2 leading-tight">
+                          For small teams and early stage businesses
+                        </div>
+                      </div>
+                    </th>
+
+                    {/* Professional Header (Featured Highlighted Card) */}
+                    <th className="p-3 w-[16%] align-top">
+                      <div className="relative bg-white border-2 border-emerald-500/80 rounded-2xl p-4 h-full flex flex-col justify-between shadow-[0_4px_20px_rgba(16,185,129,0.08)]">
+                        {/* Top Most Popular Badge */}
+                        <div className="absolute -top-3 inset-x-0 flex justify-center">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-zinc-950 text-white text-[10px] font-mono font-bold tracking-wider uppercase shadow-xs">
+                            <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                            <span>MOST POPULAR</span>
+                          </span>
+                        </div>
+                        <div className="mt-1">
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <span className="font-bold text-xs sm:text-sm text-zinc-950">Professional</span>
+                          </div>
+                          <div className="font-mono text-zinc-950 font-extrabold text-xs sm:text-sm mt-1">
+                            {billingCycle === 'annual' ? (currency === 'INR' ? '₹1,665/mo' : '$15.80/mo') : (currency === 'INR' ? '₹1,999/mo' : '$19/mo')}
+                          </div>
+                        </div>
+                        <div className="text-[11px] text-zinc-500 font-normal mt-2 leading-tight">
+                          For growing businesses that need more power
+                        </div>
+                      </div>
+                    </th>
+
+                    {/* Scale Header */}
+                    <th className="p-3 w-[15%] align-top">
+                      <div className="bg-zinc-50/70 border border-zinc-200/70 rounded-2xl p-4 h-full flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <span className="font-bold text-xs sm:text-sm text-zinc-950">Scale</span>
+                            <span className="w-5 h-5 rounded-full bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0">
+                              <TrendingUp className="w-3 h-3" />
+                            </span>
+                          </div>
+                          <div className="font-mono text-zinc-950 font-bold text-xs mt-1">
+                            {billingCycle === 'annual' ? (currency === 'INR' ? '₹2,499/mo' : '$24/mo') : (currency === 'INR' ? '₹2,999/mo' : '$29/mo')}
+                          </div>
+                        </div>
+                        <div className="text-[11px] text-zinc-500 font-normal mt-2 leading-tight">
+                          For high-growth businesses and large teams
+                        </div>
+                      </div>
+                    </th>
+
+                    {/* India Plan Header (Warm Tinted Card) */}
+                    <th className="p-3 w-[15%] align-top">
+                      <div className="bg-gradient-to-b from-amber-50/60 to-amber-50/20 border border-amber-200/80 rounded-2xl p-4 h-full flex flex-col justify-between">
+                        <div>
+                          <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-100/70 text-[9px] font-mono font-bold text-amber-900 uppercase tracking-wide mb-1">
+                            <span>🇮🇳 INDIA EDITION</span>
+                          </div>
+                          <div className="font-bold text-xs sm:text-sm text-amber-950">India Plan</div>
+                          <div className="font-mono text-amber-900 font-bold text-xs mt-1">
+                            ₹499/mo <span className="font-normal text-amber-700 text-[10px]">(Annual)</span>
+                          </div>
+                        </div>
+                        <div className="text-[11px] text-zinc-500 font-normal mt-2 leading-tight">
+                          India-only plan with local compliance
+                        </div>
+                      </div>
+                    </th>
+
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-zinc-100 text-zinc-700">
+                <tbody className="text-zinc-700">
                   
-                  {/* ── 1. AI INTELLIGENCE ── */}
-                  <tr className="bg-zinc-100/70 border-t border-zinc-200">
-                    <td colSpan={6} className="px-5 py-3 text-xs font-bold text-zinc-900 uppercase font-mono tracking-wider">
-                      1. AI Intelligence &amp; Autonomous Scoping
+                  {/* ─────────────────────────────────────────────────────────────
+                      CATEGORY 1: AI & AUTOMATION
+                  ───────────────────────────────────────────────────────────── */}
+                  <tr>
+                    <td colSpan={6} className="pt-6 pb-2">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50/70 text-emerald-900 text-xs font-mono font-bold uppercase tracking-wider">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>AI &amp; AUTOMATION</span>
+                      </div>
                     </td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Monthly AI Runs</td>
-                    <td className="p-4 text-center font-mono text-xs">1,000</td>
-                    <td className="p-4 text-center font-mono text-xs">{billingCycle === 'annual' ? '6,000' : '5,000'}</td>
-                    <td className="p-4 text-center font-mono text-xs font-bold text-zinc-950 bg-zinc-50/80">{billingCycle === 'annual' ? '21,000' : '20,000'}</td>
-                    <td className="p-4 text-center font-mono text-xs">{billingCycle === 'annual' ? '61,000' : '60,000'}</td>
-                    <td className="p-4 text-center font-mono text-xs font-bold text-amber-950 bg-amber-50/20">10,000</td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">AI Intelligence Engine</td>
-                    <td className="p-4 text-center text-zinc-600">Standard AI</td>
-                    <td className="p-4 text-center text-zinc-600">Standard AI</td>
-                    <td className="p-4 text-center font-semibold text-zinc-950 bg-zinc-50/80">Advanced Reasoning</td>
-                    <td className="p-4 text-center font-semibold text-zinc-950">Frontier AI Engines</td>
-                    <td className="p-4 text-center font-semibold text-amber-950 bg-amber-50/20">Advanced Reasoning</td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">AI Proposal &amp; Brief Writer</td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-zinc-950 font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-900 font-bold" /></td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Autonomous Research Agent</td>
-                    <td className="p-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-zinc-950" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900 font-bold" /></td>
-                    <td className="p-4 text-center bg-amber-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
                   </tr>
 
-                  {/* ── 2. DOMAINS & BRANDING ── */}
-                  <tr className="bg-zinc-100/70 border-t border-zinc-200">
-                    <td colSpan={6} className="px-5 py-3 text-xs font-bold text-zinc-900 uppercase font-mono tracking-wider">
-                      2. Domains, Web Presence &amp; White-labeling
-                    </td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Portfolio &amp; Booking Website Builder</td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-zinc-950 font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-900 font-bold" /></td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Hosting URL Type</td>
-                    <td className="p-4 text-center font-mono text-[11px] text-zinc-500">heycora.in/you</td>
-                    <td className="p-4 text-center font-mono text-[11px] text-zinc-900">Custom Domain</td>
-                    <td className="p-4 text-center font-mono text-[11px] font-bold text-zinc-950 bg-zinc-50/80">Custom Domain</td>
-                    <td className="p-4 text-center font-mono text-[11px] text-zinc-900">Custom Domain</td>
-                    <td className="p-4 text-center font-mono text-[11px] font-bold text-amber-950 bg-amber-50/20">Custom .in Domain</td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Free 1-Yr Custom Domain (Annual)</td>
-                    <td className="p-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 font-bold" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-emerald-600 font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 font-bold" /></td>
-                    <td className="p-4 text-center font-mono text-[11px] font-bold text-amber-950 bg-amber-50/20">.in Domain</td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">White-label Client View</td>
-                    <td className="p-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-zinc-950 font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-900 font-bold" /></td>
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Monthly AI Runs</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-zinc-700">1,000 / mo</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-zinc-700">{billingCycle === 'annual' ? '6,000' : '5,000'} / mo</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-700 bg-emerald-50/20">{billingCycle === 'annual' ? '21,000' : '20,000'} / mo</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-zinc-700">{billingCycle === 'annual' ? '61,000' : '60,000'} / mo</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-amber-950 bg-amber-50/20">10,000 / mo</td>
                   </tr>
 
-                  {/* ── 3. CRM & TEAM ── */}
-                  <tr className="bg-zinc-100/70 border-t border-zinc-200">
-                    <td colSpan={6} className="px-5 py-3 text-xs font-bold text-zinc-900 uppercase font-mono tracking-wider">
-                      3. Client CRM, Funnel &amp; Team Collaboration
-                    </td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Kanban Lead Funnel</td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-zinc-950 font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-900 font-bold" /></td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Team Seats</td>
-                    <td className="p-4 text-center font-mono text-xs">1 seat</td>
-                    <td className="p-4 text-center font-mono text-xs">2 seats</td>
-                    <td className="p-4 text-center font-mono text-xs font-bold text-zinc-950 bg-zinc-50/80">5 seats</td>
-                    <td className="p-4 text-center font-mono text-xs font-bold text-zinc-950">Unlimited*</td>
-                    <td className="p-4 text-center font-mono text-xs font-bold text-amber-950 bg-amber-50/20">5 seats</td>
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">AI Intelligence Engine Tier</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-600">Standard AI</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-600">Standard AI</td>
+                    <td className="py-3.5 px-4 text-center font-semibold text-emerald-700 bg-emerald-50/20">Advanced AI Reasoning</td>
+                    <td className="py-3.5 px-4 text-center font-semibold text-zinc-950">All Frontier AI Engines</td>
+                    <td className="py-3.5 px-4 text-center font-semibold text-amber-950 bg-amber-50/20">Advanced AI Reasoning</td>
                   </tr>
 
-                  {/* ── 4. CONTRACTS & E-SIGN ── */}
-                  <tr className="bg-zinc-100/70 border-t border-zinc-200">
-                    <td colSpan={6} className="px-5 py-3 text-xs font-bold text-zinc-900 uppercase font-mono tracking-wider">
-                      4. Legal Contracts &amp; Cryptographic E-Sign
-                    </td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">SHA-256 Tamper-Evident Vault</td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-zinc-950 font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-900 font-bold" /></td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Legally Enforceable (Indian IT Act)</td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-zinc-950 font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-900 font-bold" /></td>
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Autonomous Proposal &amp; Brief Generator</td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
                   </tr>
 
-                  {/* ── 5. INVOICING & GST ── */}
-                  <tr className="bg-zinc-100/70 border-t border-zinc-200">
-                    <td colSpan={6} className="px-5 py-3 text-xs font-bold text-zinc-900 uppercase font-mono tracking-wider">
-                      5. Invoicing, Payments &amp; Indian GST Engine
-                    </td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">18% GST Invoicing Engine</td>
-                    <td className="p-4 text-center text-zinc-600">Basic Tax Math</td>
-                    <td className="p-4 text-center text-zinc-900">Standard GST</td>
-                    <td className="p-4 text-center font-semibold text-zinc-950 bg-zinc-50/80">Auto CGST / SGST / IGST</td>
-                    <td className="p-4 text-center font-semibold text-zinc-900">Custom Multi-State Math</td>
-                    <td className="p-4 text-center font-semibold text-amber-950 bg-amber-50/20">Auto CGST / SGST / IGST</td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Dynamic UPI QR Code (Zero Gateway Fees)</td>
-                    <td className="p-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-zinc-950 font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 font-bold" /></td>
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Autonomous AI Research Agent</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
                   </tr>
 
-                  {/* ── 6. DISPATCH & INTEGRATIONS ── */}
-                  <tr className="bg-zinc-100/70 border-t border-zinc-200">
-                    <td colSpan={6} className="px-5 py-3 text-xs font-bold text-zinc-900 uppercase font-mono tracking-wider">
-                      6. Client Dispatch &amp; Integrations
+                  {/* ─────────────────────────────────────────────────────────────
+                      CATEGORY 2: DOMAINS & WEB PRESENCE
+                  ───────────────────────────────────────────────────────────── */}
+                  <tr>
+                    <td colSpan={6} className="pt-6 pb-2">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50/70 text-emerald-900 text-xs font-mono font-bold uppercase tracking-wider">
+                        <Globe className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>DOMAINS &amp; WEB PRESENCE</span>
+                      </div>
                     </td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Official WhatsApp Client Dispatch</td>
-                    <td className="p-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="p-4 text-center font-mono text-[11px] text-zinc-500">Templates</td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-[#25D366] font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-[#25D366] font-bold" /></td>
-                    <td className="p-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-[#25D366] font-bold" /></td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Custom Email Dispatch (Your Domain)</td>
-                    <td className="p-4 text-center text-zinc-300 font-mono text-[11px]">System mail</td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-zinc-950 font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-900 font-bold" /></td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Custom Webhooks &amp; REST APIs</td>
-                    <td className="p-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900 font-bold" /></td>
-                    <td className="p-4 text-center bg-amber-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
                   </tr>
 
-                  {/* ── 7. SUPPORT ── */}
-                  <tr className="bg-zinc-100/70 border-t border-zinc-200">
-                    <td colSpan={6} className="px-5 py-3 text-xs font-bold text-zinc-900 uppercase font-mono tracking-wider">
-                      7. Security, Support &amp; SLA
-                    </td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Data Encryption &amp; DPDP 2023</td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-zinc-50/80"><Check className="w-4 h-4 mx-auto text-zinc-950 font-bold" /></td>
-                    <td className="p-4 text-center"><Check className="w-4 h-4 mx-auto text-zinc-900" /></td>
-                    <td className="p-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-900 font-bold" /></td>
-                  </tr>
-                  <tr className="divide-x divide-zinc-100/80 hover:bg-zinc-50/70 transition-colors">
-                    <td className="p-4 font-medium text-zinc-900">Support Level</td>
-                    <td className="p-4 text-center text-zinc-500">Community</td>
-                    <td className="p-4 text-center text-zinc-800">Email (24h)</td>
-                    <td className="p-4 text-center font-semibold text-zinc-950 bg-zinc-50/80">Priority Support</td>
-                    <td className="p-4 text-center font-semibold text-zinc-950">Dedicated SLA</td>
-                    <td className="p-4 text-center font-semibold text-amber-950 bg-amber-50/20">Priority IST Desk</td>
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Portfolio &amp; Booking Website Builder</td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
                   </tr>
 
-                  {/* ── FOOTER ROW CTAs ── */}
-                  <tr className="bg-zinc-50/90 divide-x divide-zinc-200/80 border-t border-zinc-200">
-                    <td className="p-4 sm:p-5 font-semibold text-zinc-900 text-xs sm:text-sm">
-                      Ready to get started?
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Website Hosting URL</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] text-zinc-500">heycora.in/you</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] text-zinc-800">Custom Domain</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-bold text-emerald-700 bg-emerald-50/20">Custom Domain</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] text-zinc-800">Custom Domain</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-bold text-amber-950 bg-amber-50/20">Custom .in Domain</td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Free 1-Year Custom Domain (Annual)</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-bold text-amber-950 bg-amber-50/20">Free .in Domain</td>
+                  </tr>
+
+                  {/* ─────────────────────────────────────────────────────────────
+                      CATEGORY 3: OPERATIONS / COMPLIANCE
+                  ───────────────────────────────────────────────────────────── */}
+                  <tr>
+                    <td colSpan={6} className="pt-6 pb-2">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50/70 text-emerald-900 text-xs font-mono font-bold uppercase tracking-wider">
+                        <Shield className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>OPERATIONS / COMPLIANCE</span>
+                      </div>
                     </td>
-                    <td className="p-4 text-center">
-                      <a
-                        href="https://app.heycora.in/workspace/login?plan=free"
-                        className="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-[11px] font-semibold transition-all w-full shadow-2xs"
-                      >
-                        Start Free
-                      </a>
-                    </td>
-                    <td className="p-4 text-center">
-                      <a
-                        href="https://app.heycora.in/workspace/login?plan=starter"
-                        className="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-950 text-[11px] font-semibold transition-all w-full"
-                      >
-                        Get Starter
-                      </a>
-                    </td>
-                    <td className="p-4 text-center bg-zinc-100/80">
-                      <a
-                        href="https://app.heycora.in/workspace/login?plan=pro"
-                        className="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-[11px] font-bold transition-all w-full shadow-sm"
-                      >
-                        Get Pro
-                      </a>
-                    </td>
-                    <td className="p-4 text-center">
-                      <a
-                        href="https://app.heycora.in/workspace/login?plan=scale"
-                        className="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-950 text-[11px] font-semibold transition-all w-full"
-                      >
-                        Get Scale
-                      </a>
-                    </td>
-                    <td className="p-4 text-center bg-amber-50/40">
-                      <a
-                        href="https://app.heycora.in/workspace/login?plan=india_annual_499"
-                        className="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-[11px] font-bold transition-all w-full shadow-2xs"
-                      >
-                        Claim India
-                      </a>
-                    </td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">WhatsApp Business Automation</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">GST Invoicing &amp; Compliance</td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Priority Support</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-500">Community</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-700">Standard</td>
+                    <td className="py-3.5 px-4 text-center font-semibold text-emerald-700 bg-emerald-50/20">Priority</td>
+                    <td className="py-3.5 px-4 text-center font-semibold text-zinc-950">Priority</td>
+                    <td className="py-3.5 px-4 text-center font-semibold text-amber-950 bg-amber-50/20">Priority</td>
                   </tr>
 
                 </tbody>
               </table>
             </div>
+
+            {/* ── Table Bottom Assurance Footer Bar ── */}
+            <div className="mt-6 rounded-2xl bg-emerald-50/40 border border-emerald-100 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-700">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>All plans include core platform modules, regular updates, and 24/7 support.</span>
+              </div>
+              <div className="flex items-center gap-2 text-zinc-600 shrink-0 font-medium">
+                <Shield className="w-4 h-4 text-zinc-700 shrink-0" />
+                <span>Secure. Compliant. Built for modern businesses.</span>
+              </div>
+            </div>
+
           </div>
         )}
 
