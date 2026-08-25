@@ -305,57 +305,52 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 2: OUR MISSION (Mountain Summit Stage)
+          SECTION 2: OUR MISSION (Open Canvas Stage - Inspired by Mountain Summit)
       ───────────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40 text-center">
         
-        {/* Mountain Visual Stage with Gradient Title */}
-        <div className="relative w-full rounded-[36px] sm:rounded-[48px] bg-gradient-to-b from-[#F8FAFC] via-[#F1F5F9] to-white border border-zinc-200/80 pt-12 sm:pt-20 px-4 sm:px-8 pb-4 overflow-hidden shadow-xs">
-          
-          {/* Gradient Mission Heading */}
-          <div className="text-center relative z-20 mb-2 sm:mb-4">
-            <h2 className="font-display text-4xl xs:text-5xl sm:text-7xl lg:text-[80px] font-extrabold tracking-[-0.035em]">
-              <span className="bg-gradient-to-r from-[#2563EB] via-[#9333EA] to-[#DB2777] bg-clip-text text-transparent">
-                Our mission.
-              </span>
-            </h2>
+        {/* Gradient Mission Heading on Open Canvas */}
+        <div className="mb-2 sm:mb-4">
+          <h2 className="font-display text-5xl xs:text-6xl sm:text-7xl lg:text-[84px] font-extrabold tracking-[-0.035em]">
+            <span className="bg-gradient-to-r from-[#2563EB] via-[#9333EA] to-[#DB2777] bg-clip-text text-transparent">
+              Our mission.
+            </span>
+          </h2>
+        </div>
+
+        {/* Mountain Graphic with CORA Summit Flag (Open Canvas, no bounding box) */}
+        <div className="relative w-full max-w-[1040px] mx-auto aspect-[16/9] -mt-6 xs:-mt-10 sm:-mt-14 overflow-hidden mb-12 sm:mb-16">
+          <Image
+            src="/images/about_mission_mountain_cora.png"
+            alt="Cora Mission Mountain Summit with Flag"
+            fill
+            priority
+            className="object-contain object-top filter contrast-105"
+          />
+          {/* Natural atmospheric bottom fade into pure white canvas */}
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+        </div>
+
+        {/* Mission Copy Container */}
+        <div className="max-w-[840px] mx-auto text-left space-y-8">
+          <h3 className="font-display text-2xl xs:text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight text-center sm:text-left">
+            Maximize human productivity.
+          </h3>
+
+          <div className="space-y-5 text-zinc-600 text-base sm:text-lg leading-relaxed font-normal">
+            <p>
+              We started Cora because the way creative studios, production sets, and agencies work is broken. Teams juggle dozens of disconnected tools — briefs in one place, conversations in WhatsApp, contracts somewhere else, and GST spreadsheets in Excel — and critical context gets lost in between. We always knew there had to be a better way. So we built one platform to replace them all. While others scramble to bundle fragmented tools or bolt on AI as an afterthought, we&apos;ve been building toward autonomous studio convergence from the start.
+            </p>
+            <p>
+              Today, we&apos;re at the most exciting inflection point in the history of software: the convergence of software, AI, and humans. For the first time, technology doesn&apos;t just organize your work — it understands it, anticipates it, and acts on it. Cora is where this convergence lives. Where studio founders, photographers, and creative directors work side by side with AI agents, in one place, with full context — and where every team can finally focus on the work that actually matters.
+            </p>
+            <p>
+              Thousands of creative professionals across India already rely on Cora to power all of their commercial production work. We&apos;re laser-focused on removing the administrative busywork — the constant toggling, the rate-card negotiations, the delayed client signatures that drain productivity every single day. We envision a world where creative business feels effortlessly organized, contagiously creative, and endlessly efficient.
+            </p>
+            <p>
+              Our mission is clear: maximize human productivity. Not by making people work harder, but by fundamentally reinventing how creative work gets done — through the convergence of everything.
+            </p>
           </div>
-
-          {/* Mountain Graphic with CORA Summit Flag */}
-          <div className="relative w-full max-w-[980px] mx-auto aspect-[16/9] -mt-6 xs:-mt-10 sm:-mt-16 overflow-hidden">
-            <Image
-              src="/images/about_mission_mountain_cora.png"
-              alt="Cora Mission Mountain Summit with Flag"
-              fill
-              priority
-              className="object-contain object-top filter contrast-105"
-            />
-            {/* Subtle bottom fade to seamlessly blend with content */}
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
-          </div>
-
-          {/* Mission Copy Container */}
-          <div className="relative z-20 max-w-[860px] mx-auto pt-6 pb-8 sm:pb-12 text-left space-y-8">
-            <h3 className="font-display text-2xl xs:text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight text-center sm:text-left">
-              Maximize human productivity.
-            </h3>
-
-            <div className="space-y-5 text-zinc-600 text-base sm:text-lg leading-relaxed font-normal">
-              <p>
-                We started Cora because the way creative studios, production sets, and agencies work is broken. Teams juggle dozens of disconnected tools — briefs in one place, conversations in WhatsApp, contracts somewhere else, and GST spreadsheets in Excel — and critical context gets lost in between. We always knew there had to be a better way. So we built one platform to replace them all. While others scramble to bundle fragmented tools or bolt on AI as an afterthought, we&apos;ve been building toward autonomous studio convergence from the start.
-              </p>
-              <p>
-                Today, we&apos;re at the most exciting inflection point in the history of software: the convergence of software, AI, and humans. For the first time, technology doesn&apos;t just organize your work — it understands it, anticipates it, and acts on it. Cora is where this convergence lives. Where studio founders, photographers, and creative directors work side by side with AI agents, in one place, with full context — and where every team can finally focus on the work that actually matters.
-              </p>
-              <p>
-                Thousands of creative professionals across India already rely on Cora to power all of their commercial production work. We&apos;re laser-focused on removing the administrative busywork — the constant toggling, the rate-card negotiations, the delayed client signatures that drain productivity every single day. We envision a world where creative business feels effortlessly organized, contagiously creative, and endlessly efficient.
-              </p>
-              <p>
-                Our mission is clear: maximize human productivity. Not by making people work harder, but by fundamentally reinventing how creative work gets done — through the convergence of everything.
-              </p>
-            </div>
-          </div>
-
         </div>
 
       </section>
