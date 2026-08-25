@@ -431,13 +431,13 @@ export default function AboutPage() {
             </span>
 
             {/* Single Powerful Heading */}
-            <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-950 leading-[1.15] tracking-tight">
-              &ldquo;Eliminating administrative overhead so creative founders never touch spreadsheets again.&rdquo;
+            <h2 className="font-display text-2xl xs:text-3xl sm:text-[32px] lg:text-[36px] font-bold text-zinc-950 leading-[1.2] tracking-tight">
+              &ldquo;Built for creators, not spreadsheets.&rdquo;
             </h2>
 
             {/* Oneliner Description */}
-            <p className="text-base sm:text-lg text-zinc-600 font-normal leading-relaxed max-w-[560px]">
-              Cora unifies client discovery, automated 18% GST billing, and legally binding digital contracts into one effortless operating system.
+            <p className="text-sm sm:text-base text-zinc-600 font-normal leading-relaxed max-w-[520px]">
+              Cora unifies client discovery, automated GST billing, and digital agreements into one calm, intelligent operating system.
             </p>
 
             {/* The CTA & Minimal Channels */}
