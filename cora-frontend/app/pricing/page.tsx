@@ -82,34 +82,34 @@ export default function PricingPage() {
   return (
     <main className="w-full relative pb-24 overflow-hidden bg-white text-zinc-900">
       
-      {/* ── Bespoke Luminous Horizon Hero Section ── */}
-      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#eaf3fc] via-[#f7f9fd] to-white pt-28 sm:pt-36 pb-16 sm:pb-24">
+      {/* ── Vibrant Sunlit Sky Hero Section (Distinct Artwork) ── */}
+      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#4a9ee2] via-[#bfe0fc] to-white pt-28 sm:pt-36 pb-16 sm:pb-24">
         
-        {/* Background Horizon Artwork */}
+        {/* Background Sky Artwork */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
           <Image
-            src="/images/cora_pricing_horizon.jpg"
-            alt="Cora Luminous Horizon Artwork"
+            src="/images/cora_pricing_sky.jpg"
+            alt="Cora Vibrant Sunlit Sky Artwork"
             fill
             priority
-            className="object-cover object-center opacity-85"
+            className="object-cover object-[center_30%] sm:object-[center_20%]"
             sizes="100vw"
           />
-          {/* Subtle Multi-Stop Light Mesh Overlay */}
+          {/* Subtle Atmosphere & Multi-Stop Pure White Fade */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(180deg, rgba(234, 243, 252, 0.25) 0%, rgba(255, 255, 255, 0.30) 40%, rgba(255, 255, 255, 0.85) 80%, #ffffff 100%)',
+              background: 'linear-gradient(180deg, rgba(74, 158, 226, 0.20) 0%, rgba(255, 255, 255, 0.25) 45%, rgba(255, 255, 255, 0.88) 82%, #ffffff 100%)',
             }}
           />
-          <div className="absolute inset-x-0 bottom-0 h-40 sm:h-56 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-44 sm:h-60 bg-gradient-to-t from-white via-white/85 to-transparent pointer-events-none" />
         </div>
 
         {/* Hero Content */}
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
           
           {/* Announcement Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-white/90 text-xs font-semibold text-zinc-900 mb-5">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-[0px_2px_8px_rgba(0,0,0,0.06)] border border-white/80 text-xs font-semibold text-zinc-900 mb-5">
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-900 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-zinc-950"></span>
@@ -123,7 +123,7 @@ export default function PricingPage() {
             Predictable pricing that scales with your business
           </h1>
 
-          <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[620px] mx-auto mb-8">
+          <p className="text-zinc-700 text-base sm:text-lg font-normal leading-relaxed max-w-[620px] mx-auto mb-8">
             Start for free with 1,000 complimentary AI agent runs. Upgrade to annual plans for a complimentary custom domain and 12,000 bonus runs.
           </p>
 
