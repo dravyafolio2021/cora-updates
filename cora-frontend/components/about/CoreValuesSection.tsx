@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const VALUES = [
   {
@@ -36,133 +37,139 @@ const VALUES = [
 ];
 
 export function CoreValuesSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      // Calculate how far we have scrolled through the sticky section
-      const totalScrollable = rect.height - windowHeight;
-      if (totalScrollable <= 0) return;
+  const handleScroll = () => {
+    if (!carouselRef.current) return;
+    const { scrollLeft, clientWidth } = carouselRef.current;
+    const cardWidth = clientWidth * 0.85;
+    const index = Math.round(scrollLeft / cardWidth);
+    setActiveIndex(Math.min(Math.max(index, 0), VALUES.length - 1));
+  };
 
-      const currentScroll = -rect.top;
-      const progress = Math.min(Math.max(currentScroll / totalScrollable, 0), 1);
-      
-      setScrollProgress(progress);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Calculate current active card index
-  const activeIndex = Math.min(
-    Math.floor(scrollProgress * VALUES.length),
-    VALUES.length - 1
-  );
+  const scrollToIndex = (index: number) => {
+    if (!carouselRef.current) return;
+    const { clientWidth } = carouselRef.current;
+    const cardWidth = clientWidth * 0.85;
+    carouselRef.current.scrollTo({
+      left: index * cardWidth,
+      behavior: 'smooth'
+    });
+    setActiveIndex(index);
+  };
 
   return (
-    <div ref={sectionRef} className="relative w-full h-[240vh] md:h-auto">
+    <div className="w-full space-y-8 sm:space-y-12">
       
+      {/* Header */}
+      <div className="text-center space-y-2.5">
+        <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-500 block">
+          DNA &amp; PRINCIPLES
+        </span>
+        <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
+          Our core values.
+        </h2>
+        <p className="text-sm sm:text-base text-zinc-600 max-w-[520px] mx-auto font-normal">
+          The fundamental beliefs that guide how we build products, support creators, and grow together.
+        </p>
+      </div>
+
       {/* 
-        Sticky Container on Mobile (Pins while scrolling vertically, translating horizontally like GSAP)
-        Static Grid on Desktop (Standard 3-column layout)
+        Mobile: Native Snap-Scroll Carousel (No vertical space bloat, clean snap cards)
+        Desktop: Unboxed 3-column grid
       */}
-      <div className="sticky top-20 sm:top-28 md:static w-full space-y-8 sm:space-y-12 overflow-hidden md:overflow-visible">
+      <div className="relative w-full">
         
-        {/* Section Header */}
-        <div className="text-center space-y-2.5">
-          <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-500 block">
-            DNA &amp; PRINCIPLES
-          </span>
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
-            Our core values.
-          </h2>
-          <p className="text-sm sm:text-base text-zinc-600 max-w-[520px] mx-auto font-normal">
-            The fundamental beliefs that guide how we build products, support creators, and grow together.
-          </p>
+        {/* Mobile Swipe Strip */}
+        <div
+          ref={carouselRef}
+          onScroll={handleScroll}
+          className="flex md:hidden overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 px-4 -mx-4 pb-2"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          {VALUES.map((val, idx) => (
+            <div
+              key={idx}
+              className="w-[85vw] max-w-[340px] shrink-0 snap-start border-t border-zinc-200 pt-5 space-y-2.5 select-none"
+            >
+              <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
+                {val.num}
+              </span>
+              <h3 className="font-display text-xl font-bold text-zinc-950 tracking-tight">
+                {val.title}
+              </h3>
+              <p className="text-sm text-zinc-600 leading-relaxed font-normal">
+                {val.desc}
+              </p>
+            </div>
+          ))}
         </div>
 
-        {/* 
-          Mobile: Translated track automatically driven by vertical page scroll
-          Desktop: Clean 3-column grid
-        */}
-        <div className="relative w-full overflow-hidden md:overflow-visible">
-          
-          {/* Mobile Animated Horizontal Track (Translates automatically on vertical scroll) */}
-          <div
-            className="flex md:hidden gap-6 transition-transform duration-75 ease-out px-4"
-            style={{
-              transform: `translateX(calc(-${scrollProgress * (VALUES.length - 1) * 82}vw))`
-            }}
+        {/* Desktop 3-Column Grid */}
+        <div className="hidden md:grid md:grid-cols-3 gap-x-12 gap-y-16">
+          {VALUES.map((val, idx) => (
+            <div
+              key={idx}
+              className="border-t border-zinc-200 pt-6 space-y-3"
+            >
+              <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
+                {val.num}
+              </span>
+              <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
+                {val.title}
+              </h3>
+              <p className="text-sm text-zinc-600 leading-relaxed font-normal">
+                {val.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+
+      </div>
+
+      {/* Mobile Indicator & Nav Controls */}
+      <div className="flex md:hidden items-center justify-between px-1">
+        <span className="text-xs font-mono font-medium text-zinc-400">
+          0{activeIndex + 1} / 0{VALUES.length}
+        </span>
+
+        {/* Minimal Progress Dots */}
+        <div className="flex items-center gap-1.5">
+          {VALUES.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => scrollToIndex(i)}
+              aria-label={`Go to principle ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all duration-200 ${
+                activeIndex === i ? 'w-5 bg-zinc-950' : 'w-1.5 bg-zinc-300'
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Arrows */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => scrollToIndex(Math.max(0, activeIndex - 1))}
+            disabled={activeIndex === 0}
+            className="w-7 h-7 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-600 disabled:opacity-30 transition-opacity"
+            aria-label="Previous"
           >
-            {VALUES.map((val, idx) => (
-              <div
-                key={idx}
-                className="w-[80vw] xs:w-[75vw] shrink-0 border-t border-zinc-200 pt-6 space-y-3"
-              >
-                <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                  {val.num}
-                </span>
-                <h3 className="font-display text-xl xs:text-2xl font-bold text-zinc-950 tracking-tight">
-                  {val.title}
-                </h3>
-                <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-                  {val.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Desktop 3-Column Grid */}
-          <div className="hidden md:grid md:grid-cols-3 gap-x-12 gap-y-16">
-            {VALUES.map((val, idx) => (
-              <div
-                key={idx}
-                className="border-t border-zinc-200 pt-6 space-y-3"
-              >
-                <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                  {val.num}
-                </span>
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-                  {val.title}
-                </h3>
-                <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-                  {val.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollToIndex(Math.min(VALUES.length - 1, activeIndex + 1))}
+            disabled={activeIndex === VALUES.length - 1}
+            className="w-7 h-7 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-600 disabled:opacity-30 transition-opacity"
+            aria-label="Next"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
         </div>
-
-        {/* Mobile Live Scroll Progress Tracker (Only on Mobile) */}
-        <div className="flex md:hidden items-center justify-between pt-2 px-4">
-          <span className="text-xs font-mono font-medium text-zinc-400">
-            0{activeIndex + 1} / 0{VALUES.length}
-          </span>
-
-          <div className="flex items-center gap-1.5">
-            {VALUES.map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 rounded-full transition-all duration-200 ${
-                  activeIndex === i ? 'w-6 bg-zinc-950' : 'w-1.5 bg-zinc-300'
-                }`}
-              />
-            ))}
-          </div>
-
-          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
-            Scroll to explore ↓
-          </span>
-        </div>
-
       </div>
 
     </div>
