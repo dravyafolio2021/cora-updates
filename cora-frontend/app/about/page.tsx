@@ -383,100 +383,96 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 6: CO-FOUNDER SPOTLIGHT & MANIFESTO
+          SECTION 6: CO-FOUNDER SPOTLIGHT (Light Mode & Natural Canvas Blend)
       ───────────────────────────────────────────────────────────── */}
-      <section id="manifesto" className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-36 scroll-mt-28">
-        <div className="w-full rounded-[36px] bg-[#0A0D10] text-white p-8 sm:p-14 md:p-16 border border-zinc-800 shadow-2xl relative overflow-hidden">
+      <section id="manifesto" className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32 scroll-mt-28">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
-          {/* Ambient Glow */}
-          <div
-            className="absolute top-0 right-1/4 w-[600px] h-[600px] pointer-events-none opacity-20"
-            style={{
-              background: 'radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%)',
-            }}
-          />
-
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            
-            {/* Founder Portrait Column */}
-            <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-[280px] xs:w-[320px] sm:w-[360px] h-[400px] sm:h-[480px] rounded-[32px] overflow-hidden border border-zinc-800 shadow-2xl bg-zinc-900 group">
+          {/* Founder Portrait with Gradient Alpha Cloud Blending */}
+          <div className="lg:col-span-5 flex flex-col items-center lg:items-start">
+            <div className="relative w-[280px] xs:w-[320px] sm:w-[360px] h-[380px] sm:h-[440px]">
+              {/* Soft Atmospheric Glow Behind Portrait */}
+              <div 
+                className="absolute inset-0 rounded-full blur-3xl opacity-40 bg-zinc-200 pointer-events-none -z-10"
+              />
+              
+              {/* Cutout Image with Bottom Dissolve Gradient */}
+              <div className="relative w-full h-full">
                 <Image
                   src="/images/dravya_bansal_cutout_clean.png"
                   alt="Dravya Bansal — Co-Founder of Cora"
                   fill
-                  sizes="(max-width: 768px) 320px, 400px"
-                  className="object-cover object-top filter brightness-95 contrast-105 group-hover:scale-102 transition-transform duration-500"
+                  priority
+                  sizes="(max-width: 768px) 320px, 360px"
+                  className="object-contain object-bottom filter contrast-[1.02]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0D10] via-transparent to-transparent pointer-events-none" />
-
-                {/* Verified Founder Badge */}
-                <div className="absolute bottom-5 inset-x-5 z-10">
-                  <div className="bg-zinc-950/90 backdrop-blur-md rounded-xl p-3 border border-zinc-700/80 flex items-center justify-between shadow-xs">
-                    <div>
-                      <div className="text-sm font-bold text-white">Dravya Bansal</div>
-                      <div className="text-[11px] text-emerald-400 font-mono">Co-founder &amp; Product Architect</div>
-                    </div>
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  </div>
-                </div>
+                {/* Natural White Mist / Cloud Gradient Over Bottom */}
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white/60 to-transparent pointer-events-none" />
+                <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white/60 to-transparent pointer-events-none" />
               </div>
             </div>
 
-            {/* Founder Manifesto Column */}
-            <div className="lg:col-span-7 space-y-7">
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-zinc-900 rounded-lg text-xs font-mono text-zinc-300 border border-zinc-800">
-                  <span>FOUNDER MANIFESTO</span>
-                </div>
+            {/* Clean Attribution */}
+            <div className="mt-2 text-center lg:text-left space-y-0.5">
+              <h3 className="font-display font-bold text-zinc-950 text-base sm:text-lg">
+                Dravya Bansal
+              </h3>
+              <p className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
+                Co-Founder &amp; Product Architect
+              </p>
+            </div>
+          </div>
 
-                <h2 className="font-display text-2xl xs:text-3xl sm:text-[38px] font-bold text-white leading-[1.15] tracking-tight">
-                  &ldquo;Our mission is simple: eliminate administrative overhead so creative founders never have to touch a spreadsheet again.&rdquo;
-                </h2>
-              </div>
+          {/* Founder Manifesto Text Column */}
+          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-500 block">
+              FOUNDER MANIFESTO
+            </span>
 
-              <div className="space-y-4 text-zinc-300 text-sm sm:text-base font-normal leading-relaxed">
-                <p>
-                  Having worked directly with commercial production sets, photographers, and high-growth creative agencies, we saw brilliant founders spending over 20 hours every week writing repetitive scopes, chasing client contract signatures, and manually computing 18% GST tax splits.
-                </p>
-                <p>
-                  At Claraverse Inc., we engineered <strong className="text-white">Cora</strong> as a complete autonomous backbone. By connecting frontier AI reasoning models with legally binding cryptographic signature rails and instant UPI payment infrastructure, we give studio founders the freedom to focus entirely on their craft.
-                </p>
-              </div>
+            {/* Single Powerful Heading */}
+            <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-950 leading-[1.15] tracking-tight">
+              &ldquo;Eliminating administrative overhead so creative founders never touch spreadsheets again.&rdquo;
+            </h2>
 
-              {/* Verified Social Channels */}
-              <div className="flex items-center flex-wrap gap-3 pt-2">
-                <a
-                  href="https://x.com/dravyafolio"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 bg-zinc-900 text-zinc-200 border border-zinc-700/80 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-xs"
-                >
-                  <span>Follow on X</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
-                </a>
+            {/* Oneliner Description */}
+            <p className="text-base sm:text-lg text-zinc-600 font-normal leading-relaxed max-w-[560px]">
+              Cora unifies client discovery, automated 18% GST billing, and legally binding digital contracts into one effortless operating system.
+            </p>
 
-                <a
-                  href="https://linkedin.com/in/dravyafolio"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 bg-zinc-900 text-zinc-200 border border-zinc-700/80 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-xs"
-                >
-                  <span>LinkedIn</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
-                </a>
+            {/* The CTA & Minimal Channels */}
+            <div className="flex items-center justify-center lg:justify-start flex-wrap gap-3.5 pt-2">
+              <Link
+                href="/workspace/login"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-950 text-white text-xs sm:text-sm font-semibold hover:bg-zinc-850 transition-all shadow-sm"
+              >
+                <span>Launch Cora Workspace</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
 
-                <a
-                  href="mailto:dravya.bansal@heycora.in"
-                  className="inline-flex items-center gap-1.5 bg-zinc-900 text-zinc-200 border border-zinc-700/80 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-xs"
-                >
-                  <span>Direct Email</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
-                </a>
-              </div>
+              <a
+                href="https://x.com/dravyafolio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl border border-zinc-200/90 text-zinc-700 text-xs sm:text-sm font-semibold hover:bg-zinc-100 transition-all"
+              >
+                <span>Follow on X</span>
+                <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
+              </a>
+
+              <a
+                href="https://linkedin.com/in/dravyafolio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl border border-zinc-200/90 text-zinc-700 text-xs sm:text-sm font-semibold hover:bg-zinc-100 transition-all"
+              >
+                <span>LinkedIn</span>
+                <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
+              </a>
             </div>
 
           </div>
+
         </div>
       </section>
 
