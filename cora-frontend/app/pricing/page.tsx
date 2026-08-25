@@ -936,12 +936,37 @@ export default function PricingPage() {
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
-                    <td className="py-3.5 px-4 font-medium text-zinc-900">Free 1-Year Custom Domain (Annual)</td>
-                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="py-3.5 px-4 text-center bg-zinc-50/40 font-mono text-[11px] font-bold text-zinc-950">Free (.com / .in)</td>
-                    <td className="py-3.5 px-4 text-center bg-emerald-50/20 font-mono text-[11px] font-bold text-emerald-800">Free (.com / .in)</td>
-                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-bold text-zinc-950">Free (.com / .in)</td>
-                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-semibold text-amber-950 bg-amber-50/20">Free .in Domain</td>
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">
+                      <span>Free 1-Year Custom Domain</span>
+                      <span className="text-[10px] text-zinc-400 font-normal block">Annual plans only</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300">
+                      <Minus className="w-3.5 h-3.5 mx-auto" />
+                    </td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40">
+                      {billingCycle === 'annual' ? (
+                        <span className="font-mono text-[11px] font-bold text-zinc-950">Free (.com / .in)</span>
+                      ) : (
+                        <Minus className="w-3.5 h-3.5 mx-auto text-zinc-300" />
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20">
+                      {billingCycle === 'annual' ? (
+                        <span className="font-mono text-[11px] font-bold text-emerald-700">Free (.com / .in)</span>
+                      ) : (
+                        <Minus className="w-3.5 h-3.5 mx-auto text-zinc-300" />
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      {billingCycle === 'annual' ? (
+                        <span className="font-mono text-[11px] font-bold text-zinc-950">Free (.com / .in)</span>
+                      ) : (
+                        <Minus className="w-3.5 h-3.5 mx-auto text-zinc-300" />
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20">
+                      <span className="font-mono text-[11px] font-semibold text-amber-950">Free .in Domain</span>
+                    </td>
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
