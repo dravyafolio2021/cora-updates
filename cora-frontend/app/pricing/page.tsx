@@ -46,12 +46,12 @@ const FAQS = [
     a: 'When you choose Annual billing on Starter, Professional, or Scale, you only pay for 10 months instead of 12 (giving you 2 full months completely free). In addition, you receive a free 1-year custom domain with SSL and +12,000 bonus AI runs across the year.'
   },
   {
-    q: 'What is the India Only Plan and who is eligible?',
-    a: 'The India Only Plan is an exclusive, heavily subsidized operating system at ₹499/month built specifically for Indian founders, MSMEs, agencies, and studios. It includes 10,000 monthly AI runs, a free custom .in domain, dynamic UPI QR code payments on all invoices, automated 18% CGST/SGST/IGST tax math, and official WhatsApp automated client dispatch. It is available strictly as an annual commitment (₹5,988/year).'
+    q: 'What is the India Only Plan and how does it compare to Starter?',
+    a: 'The India Only Plan is an entry-level subsidized operating system at ₹499/month built specifically for single Indian freelancers, solopreneurs, and local studios. It includes 3,500 monthly AI runs, a free 1-year .in domain, dynamic UPI QR code payments on all invoices, 18% GST tax breakdown, and WhatsApp client dispatch. Starter (₹833/mo annual) is designed for growing teams, offering 5,000-6,000 monthly AI runs, global custom domain support (.com/.in), custom business email dispatch, and 2 team seats.'
   },
   {
     q: 'What is the difference between Starter and Professional?',
-    a: 'Starter gives you custom domain connection (yourbrand.in), custom email dispatch, and 5,000 monthly AI runs. Professional upgrades your AI reasoning capacity to 20,000 runs/mo, adds official WhatsApp automated client dispatch, Dynamic UPI QR codes on invoices, and expands team seats to 5.'
+    a: 'Starter gives you custom domain connection (yourbrand.com/.in), custom email dispatch, 2 team seats, and 5,000-6,000 monthly AI runs. Professional upgrades your AI reasoning capacity to 20,000-21,000 runs/mo with Advanced AI Reasoning, adds full automated WhatsApp client workflows, Dynamic UPI QR codes on invoices, and expands team seats to 5.'
   },
   {
     q: 'Can I upgrade, downgrade, or cancel anytime?',
@@ -104,12 +104,11 @@ export default function PricingPage() {
     }
   }, []);
 
-  // Strict zero-duplication toggle visibility: Only show floating toggle when top toggle is scrolled out of viewport
+  // Strict single toggle visibility
   useEffect(() => {
     const handleScroll = () => {
       if (topToggleRef.current) {
         const rect = topToggleRef.current.getBoundingClientRect();
-        // Show floating toggle ONLY when the top toggle has scrolled completely off-screen above the viewport
         if (rect.bottom < -20) {
           setShowFloatingToggle(true);
         } else {
@@ -396,7 +395,7 @@ export default function PricingPage() {
                 )}
               </div>
               <p className="text-xs text-zinc-500 leading-relaxed mb-5 min-h-[34px]">
-                Establish your independent brand with custom domains, email, and 5x AI capacity.
+                Establish your independent brand with custom domains (.com/.in), business email, and 5x AI capacity.
               </p>
 
               {/* Price Block */}
@@ -442,11 +441,11 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0" />
-                    <span>Connect custom domain</span>
+                    <span>Connect custom domain (.com / .in)</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0" />
-                    <span>Custom email sending</span>
+                    <span>Custom business email sending</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0" />
@@ -841,7 +840,7 @@ export default function PricingPage() {
                             ₹499/mo <span className="font-normal text-amber-700 text-[9px]">(Annual)</span>
                           </div>
                           <div className="text-[10px] text-zinc-500 font-normal mt-1 h-7 line-clamp-2 leading-tight">
-                            Local compliance &amp; UPI
+                            Entry solopreneur &amp; UPI
                           </div>
                         </div>
 
@@ -874,25 +873,25 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Monthly AI Runs</td>
                     <td className="py-3.5 px-4 text-center font-mono text-zinc-700">1,000 / mo</td>
-                    <td className="py-3.5 px-4 text-center font-mono text-zinc-700">{billingCycle === 'annual' ? '6,000' : '5,000'} / mo</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-zinc-900 bg-zinc-50/40">{billingCycle === 'annual' ? '6,000' : '5,000'} / mo</td>
                     <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-700 bg-emerald-50/20">{billingCycle === 'annual' ? '21,000' : '20,000'} / mo</td>
                     <td className="py-3.5 px-4 text-center font-mono text-zinc-700">{billingCycle === 'annual' ? '61,000' : '60,000'} / mo</td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-amber-950 bg-amber-50/20">10,000 / mo</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-semibold text-amber-950 bg-amber-50/20">3,500 / mo</td>
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">AI Intelligence Engine Tier</td>
                     <td className="py-3.5 px-4 text-center text-zinc-600">Standard AI</td>
-                    <td className="py-3.5 px-4 text-center text-zinc-600">Standard AI</td>
+                    <td className="py-3.5 px-4 text-center font-medium text-zinc-900 bg-zinc-50/40">Standard AI</td>
                     <td className="py-3.5 px-4 text-center font-semibold text-emerald-700 bg-emerald-50/20">Advanced AI Reasoning</td>
                     <td className="py-3.5 px-4 text-center font-semibold text-zinc-950">All Frontier AI Engines</td>
-                    <td className="py-3.5 px-4 text-center font-semibold text-amber-950 bg-amber-50/20">Advanced AI Reasoning</td>
+                    <td className="py-3.5 px-4 text-center text-amber-950 bg-amber-50/20">Standard AI</td>
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Autonomous Proposal &amp; Brief Generator</td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
@@ -901,7 +900,7 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Autonomous AI Research Agent</td>
                     <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300 bg-zinc-50/40"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
@@ -922,7 +921,7 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Portfolio &amp; Booking Website Builder</td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
@@ -931,25 +930,25 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Website Hosting URL</td>
                     <td className="py-3.5 px-4 text-center font-mono text-[11px] text-zinc-500">heycora.in/you</td>
-                    <td className="py-3.5 px-4 text-center font-mono text-[11px] text-zinc-800">Custom Domain</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-bold text-zinc-900 bg-zinc-50/40">Custom Domain (.com/.in)</td>
                     <td className="py-3.5 px-4 text-center font-mono text-[11px] font-bold text-emerald-700 bg-emerald-50/20">Custom Domain</td>
                     <td className="py-3.5 px-4 text-center font-mono text-[11px] text-zinc-800">Custom Domain</td>
-                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-bold text-amber-950 bg-amber-50/20">Custom .in Domain</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-semibold text-amber-950 bg-amber-50/20">Custom .in Domain</td>
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Free 1-Year Custom Domain (Annual)</td>
                     <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-bold text-amber-950 bg-amber-50/20">Free .in Domain</td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40 font-mono text-[11px] font-bold text-zinc-950">Free (.com / .in)</td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20 font-mono text-[11px] font-bold text-emerald-800">Free (.com / .in)</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-bold text-zinc-950">Free (.com / .in)</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] font-semibold text-amber-950 bg-amber-50/20">Free .in Domain</td>
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">White-label &amp; Remove Cora Branding</td>
                     <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
@@ -970,7 +969,7 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Kanban Lead Funnel</td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
@@ -979,16 +978,16 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Team Seats</td>
                     <td className="py-3.5 px-4 text-center font-mono text-zinc-700">1 seat</td>
-                    <td className="py-3.5 px-4 text-center font-mono text-zinc-700">2 seats</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-zinc-950 bg-zinc-50/40">2 seats</td>
                     <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-700 bg-emerald-50/20">5 seats</td>
                     <td className="py-3.5 px-4 text-center font-mono font-bold text-zinc-950">Unlimited*</td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-amber-950 bg-amber-50/20">5 seats</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-zinc-700 bg-amber-50/20">1 seat</td>
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Shoot Schedules &amp; Call-Sheets</td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
@@ -1009,7 +1008,7 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">SHA-256 Tamper-Evident Vault</td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
@@ -1018,7 +1017,7 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Legally Enforceable (Indian IT Act &amp; UETA)</td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
@@ -1039,16 +1038,16 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">18% GST Invoicing Engine</td>
                     <td className="py-3.5 px-4 text-center text-zinc-600">Basic Tax Math</td>
-                    <td className="py-3.5 px-4 text-center text-zinc-900">Standard GST</td>
+                    <td className="py-3.5 px-4 text-center font-medium text-zinc-900 bg-zinc-50/40">Auto CGST / SGST / IGST</td>
                     <td className="py-3.5 px-4 text-center font-semibold text-emerald-700 bg-emerald-50/20">Auto CGST / SGST / IGST</td>
                     <td className="py-3.5 px-4 text-center font-semibold text-zinc-900">Custom Multi-State Math</td>
-                    <td className="py-3.5 px-4 text-center font-semibold text-amber-950 bg-amber-50/20">Auto CGST / SGST / IGST</td>
+                    <td className="py-3.5 px-4 text-center font-medium text-amber-950 bg-amber-50/20">Auto CGST / SGST / IGST</td>
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Dynamic UPI QR Code (Zero Gateway Fees)</td>
                     <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
@@ -1069,25 +1068,25 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">WhatsApp Business Automation</td>
                     <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="py-3.5 px-4 text-center font-mono text-[11px] text-zinc-500">Templates</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-[11px] text-zinc-600 bg-zinc-50/40">Quick Dispatch</td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-[#25D366] stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-[#25D366] stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-[#25D366] stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20 font-mono text-[11px] text-amber-950">Quick Dispatch</td>
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Custom Email Dispatch (Your Domain)</td>
                     <td className="py-3.5 px-4 text-center text-zinc-300 font-mono text-[11px]">System mail</td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20 font-mono text-[11px] text-zinc-400">System mail</td>
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Custom Webhooks &amp; REST APIs</td>
                     <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
-                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300 bg-zinc-50/40"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
@@ -1108,7 +1107,7 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Data Encryption &amp; DPDP 2023</td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
-                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
@@ -1117,10 +1116,10 @@ export default function PricingPage() {
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Support Channel</td>
                     <td className="py-3.5 px-4 text-center text-zinc-500">Community</td>
-                    <td className="py-3.5 px-4 text-center text-zinc-700">Email (24h)</td>
+                    <td className="py-3.5 px-4 text-center font-medium text-zinc-800 bg-zinc-50/40">Email (24h)</td>
                     <td className="py-3.5 px-4 text-center font-semibold text-emerald-700 bg-emerald-50/20">Priority Support</td>
                     <td className="py-3.5 px-4 text-center font-semibold text-zinc-950">Dedicated SLA</td>
-                    <td className="py-3.5 px-4 text-center font-semibold text-amber-950 bg-amber-50/20">Priority IST Desk</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-700 bg-amber-50/20">Email + IST Desk</td>
                   </tr>
 
                 </tbody>
@@ -1145,7 +1144,7 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 3: INDIA ONLY PLAN (REVAMPED SIGNATURE LIGHT SHOWCASE)
+          ROW 3: INDIA ONLY PLAN (BALANCED ENTRY-LEVEL SOLOPRENEUR SHOWCASE)
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-20">
         <div className="bg-gradient-to-br from-zinc-50/90 via-white to-amber-50/20 border-2 border-zinc-200/90 hover:border-zinc-300 rounded-[32px] p-6 sm:p-9 shadow-[0_8px_32px_rgba(0,0,0,0.04)] transition-all relative overflow-hidden">
@@ -1164,7 +1163,7 @@ export default function PricingPage() {
               </h2>
 
               <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
-                A heavily subsidized operating system built exclusively for Indian founders, MSMEs, agencies, and creative studios. Everything you need &mdash; from GSTIN compliance and dynamic UPI QR to official WhatsApp client notifications.
+                A heavily subsidized entry-level operating system built exclusively for Indian solopreneurs, freelancers, and creative studios. Everything you need to operate locally &mdash; from GSTIN compliance and dynamic UPI QR to official WhatsApp notifications.
               </p>
             </div>
 
@@ -1263,9 +1262,9 @@ export default function PricingPage() {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <div className="font-semibold text-zinc-950 text-xs">10,000 AI Runs / month</div>
+                  <div className="font-semibold text-zinc-950 text-xs">3,500 AI Runs / month</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    High-speed autonomous AI for client scoping &amp; briefs
+                    Standard AI reasoning for client proposals &amp; briefs
                   </div>
                 </div>
               </div>
@@ -1276,9 +1275,9 @@ export default function PricingPage() {
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <div className="font-semibold text-zinc-950 text-xs">5 Team Seats &amp; IST Support</div>
+                  <div className="font-semibold text-zinc-950 text-xs">1 Seat &amp; IST Desk</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    Role permissions for crew &amp; priority Indian support desk
+                    Built for solopreneurs with standard email &amp; Indian helpdesk
                   </div>
                 </div>
               </div>
