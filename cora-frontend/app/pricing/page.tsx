@@ -10,7 +10,9 @@ import {
   ChevronUp, 
   Minus,
   Flame,
-  Gift
+  Gift,
+  Globe,
+  Sparkles
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -123,26 +125,26 @@ export default function PricingPage() {
           </h1>
 
           {/* Effortless 1-Line Body */}
-          <p className="text-zinc-700 text-base sm:text-lg font-normal leading-relaxed max-w-[540px] mx-auto mb-7">
+          <p className="text-zinc-700 text-base sm:text-lg font-normal leading-relaxed max-w-[540px] mx-auto mb-8">
             Start free forever with 1,000 monthly AI runs. Upgrade anytime as you grow.
           </p>
 
-          {/* ── Cadence Selector (Monthly / Annual) ── */}
-          <div className="flex flex-col items-center justify-center gap-2.5">
-            <div className="inline-flex items-center p-1.5 bg-white/95 backdrop-blur-md rounded-2xl border border-zinc-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
+          {/* ── Cadence Selector (Clean, Zero-Wrapping) ── */}
+          <div className="flex flex-col items-center justify-center gap-3 w-full max-w-[480px]">
+            <div className="inline-flex items-center p-1 bg-white/95 backdrop-blur-md rounded-2xl border border-zinc-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.06)] w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => {
                   setBillingCycle('monthly');
                   trackEvent('pricing_cycle_change', { cycle: 'monthly' });
                 }}
-                className={`px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                className={`flex-1 sm:flex-initial px-6 sm:px-8 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                   billingCycle === 'monthly'
                     ? 'bg-zinc-950 text-white shadow-sm'
                     : 'text-zinc-600 hover:text-zinc-950'
                 }`}
               >
-                Monthly
+                Monthly Billing
               </button>
               <button
                 type="button"
@@ -150,26 +152,35 @@ export default function PricingPage() {
                   setBillingCycle('annual');
                   trackEvent('pricing_cycle_change', { cycle: 'annual' });
                 }}
-                className={`px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ${
+                className={`flex-1 sm:flex-initial px-6 sm:px-8 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                   billingCycle === 'annual'
                     ? 'bg-zinc-950 text-white shadow-sm'
                     : 'text-zinc-600 hover:text-zinc-950'
                 }`}
               >
-                <span>Annual</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-200 text-zinc-900 font-bold">
-                  FREE DOMAIN + 12K RUNS
-                </span>
+                Annual Billing
               </button>
             </div>
             
+            {/* ── Prominent, Crisp Annual Perks Highlights Card ── */}
             {billingCycle === 'annual' ? (
-              <div className="inline-flex items-center gap-1.5 text-xs text-zinc-600 font-mono animate-in fade-in duration-200">
-                <Gift className="w-3.5 h-3.5 text-zinc-900" />
-                <span>Includes 1-yr free custom domain + 12,000 bonus AI runs</span>
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-4 py-2 bg-white/90 backdrop-blur-md rounded-xl border border-zinc-200/70 shadow-2xs text-xs animate-in fade-in zoom-in-95 duration-200">
+                <span className="font-semibold text-zinc-900 flex items-center gap-1.5">
+                  <Gift className="w-3.5 h-3.5 text-zinc-950" />
+                  <span>Annual Perks:</span>
+                </span>
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-900 font-medium text-[11px]">
+                  <Globe className="w-3 h-3 text-zinc-700" />
+                  <span>Free Custom Domain</span>
+                </div>
+                <span className="text-zinc-300 hidden sm:inline">&bull;</span>
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-900 font-medium text-[11px]">
+                  <Sparkles className="w-3 h-3 text-zinc-700" />
+                  <span>+12,000 Bonus AI Runs</span>
+                </div>
               </div>
             ) : (
-              <div className="text-xs text-zinc-500 font-mono">
+              <div className="text-xs text-zinc-500 font-mono py-1">
                 No credit card required for Free Forever &bull; Cancel anytime
               </div>
             )}
@@ -261,8 +272,8 @@ export default function PricingPage() {
           </div>
           <div className="text-xs text-zinc-500 font-mono">
             {billingCycle === 'annual' 
-              ? 'Free custom domain + 12,000 bonus AI runs included with annual billing' 
-              : 'Switch to annual for a free custom domain & 12K bonus AI runs'}
+              ? '✦ Free custom domain + 12,000 bonus AI runs included on annual plans' 
+              : 'Switch to annual billing to unlock a free custom domain & 12K bonus AI runs'}
           </div>
         </div>
 
