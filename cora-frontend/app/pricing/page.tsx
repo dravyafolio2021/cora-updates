@@ -9,23 +9,15 @@ import {
   ChevronDown, 
   ChevronUp, 
   Minus,
-  Flame,
-  Gift,
-  Globe,
   Sparkles,
+  Gift,
+  Layout,
   ShieldCheck,
   FileCheck,
   Receipt,
-  Mail,
-  Layout,
+  Globe,
   Zap,
-  Lock,
-  ArrowDown,
-  Cpu,
-  Users,
-  MessageSquare,
-  Key,
-  HelpCircle
+  Lock
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -125,7 +117,6 @@ export default function PricingPage() {
             className="object-cover object-top"
             sizes="100vw"
           />
-          {/* Soft Luminous Overlay & Multi-Stop Pure White Fade */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -161,14 +152,12 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 1: FREE FOREVER USP SHOWCASE (REFINED & EFFORTLESS CRAFT)
+          ROW 1: FREE FOREVER USP SHOWCASE
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 -mt-6 sm:-mt-10 relative z-10">
         <div className="bg-white border border-zinc-200 rounded-[28px] p-6 sm:p-8 shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.05)] transition-all">
           
-          {/* Header Row: Clean, Confident Hierarchy */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-zinc-100">
-            
             <div className="space-y-2 max-w-[700px]">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50/80 border border-emerald-200/60 text-xs font-semibold text-emerald-800">
                 <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -186,7 +175,6 @@ export default function PricingPage() {
               </p>
             </div>
 
-            {/* Action CTA with Guarantee */}
             <div className="flex flex-col sm:items-end justify-center gap-2.5 shrink-0">
               <a
                 href="https://app.heycora.in/workspace/login?plan=free"
@@ -201,10 +189,8 @@ export default function PricingPage() {
                 <span>🔒 Full Data Ownership</span>
               </div>
             </div>
-
           </div>
 
-          {/* 6 Refined Capabilities Grid */}
           <div className="pt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
               
@@ -289,13 +275,12 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 2: 3-TIER GLOBAL SAAS PRICING WITH CRYSTAL CLEAR DIFFERENTIATION
+          ROW 2: CLEAN, SCANNABLE PRICING CARDS (ARCADE STYLE CRAFT)
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16">
         
-        {/* Section Header & Cadence Toggle */}
+        {/* Section Header & Cadence Switcher */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-zinc-100">
-          
           <div>
             <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400">
               GROWTH PLANS
@@ -308,7 +293,6 @@ export default function PricingPage() {
             </p>
           </div>
 
-          {/* Cadence Switcher & Annual Perks Badge */}
           <div className="flex flex-col sm:items-end gap-2 shrink-0">
             <div className="inline-flex items-center p-1 bg-zinc-100/90 rounded-2xl border border-zinc-200/80 shadow-2xs">
               <button
@@ -341,7 +325,6 @@ export default function PricingPage() {
               </button>
             </div>
 
-            {/* Zero-CLS Perk Indicator Line */}
             <div className="h-6 flex items-center text-xs">
               {billingCycle === 'annual' ? (
                 <div className="inline-flex items-center gap-1.5 text-zinc-900 font-medium text-[11px] animate-in fade-in duration-150">
@@ -358,268 +341,241 @@ export default function PricingPage() {
               )}
             </div>
           </div>
-
         </div>
 
-        {/* 3-Tier SaaS Cards with Crisp Superpowers */}
+        {/* 3-Tier SaaS Cards: Arcade-Style Clean Hierarchy */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           
-          {/* TIER 1: STARTER */}
+          {/* CARD 1: STARTER */}
           <div className="bg-white border border-zinc-200 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:border-zinc-300 hover:shadow-md transition-all">
-            <div className="space-y-4">
-              <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded">
-                  FOR SOLO FOUNDERS
-                </span>
-                <h3 className="font-display text-2xl font-bold text-zinc-950 mt-2">
-                  Starter Plan
+            <div>
+              {/* Header */}
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <h3 className="font-display text-2xl font-bold text-zinc-950">
+                  Starter
                 </h3>
-                <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
-                  Establish your independent brand with custom domains, professional email, and 5x AI capacity.
-                </p>
               </div>
+              <p className="text-xs text-zinc-500 leading-relaxed mb-5 min-h-[34px]">
+                Establish your independent brand with custom domains, email, and 5x AI capacity.
+              </p>
 
-              {/* Price Block */}
-              <div className="py-2.5 border-y border-zinc-100">
+              {/* Price */}
+              <div className="mb-5">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">
+                  <span className="text-4xl font-display font-extrabold text-zinc-950">
                     {currency === 'INR' ? '₹999' : '$9'}
                   </span>
-                  <span className="text-xs text-zinc-400 font-mono">/month</span>
+                  <span className="text-xs text-zinc-500 font-medium">/ month</span>
                 </div>
-                <div className="text-[11px] text-zinc-500 font-mono mt-0.5">
+                <div className="text-[11px] text-zinc-400 mt-1 font-mono">
                   {billingCycle === 'annual'
-                    ? (currency === 'INR' 
-                        ? 'Billed annually (₹11,988/yr) • Free Domain + 12K Runs' 
-                        : 'Billed annually ($108/yr) • Free Domain + 12K Runs')
-                    : 'Billed monthly'} &bull; {billingCycle === 'annual' ? '6,000' : '5,000'} runs/mo
+                    ? (currency === 'INR' ? 'Billed annually (₹11,988/yr)' : 'Billed annually ($108/yr)')
+                    : 'Billed monthly'}
                 </div>
               </div>
 
-              {/* What makes Starter valuable */}
-              <div className="space-y-2.5 text-xs text-zinc-700">
-                <div className="font-semibold text-zinc-900 text-[11px] uppercase tracking-wider font-mono">
-                  Why upgrade to Starter:
-                </div>
-                <ul className="space-y-2.5">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Connect Custom Domain</strong> &mdash; host website on <span className="font-mono text-zinc-900">yourbrand.com</span>
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Custom Email Dispatch</strong> &mdash; send contracts from your own domain
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>{billingCycle === 'annual' ? '6,000' : '5,000'} AI Runs/mo</strong> &mdash; 5x higher AI scoping &amp; proposals
-                      {billingCycle === 'annual' && <span className="text-[10px] font-mono text-emerald-700 font-bold ml-1">(+1K/mo bonus)</span>}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Up to 2 Team Seats</strong> &mdash; invite partner or assistant
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Remove Cora Branding</strong> &mdash; 100% white-label client view
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="pt-6 mt-6 border-t border-zinc-100">
+              {/* Action CTA */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=starter"
-                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 px-4 py-3 rounded-xl text-xs font-semibold transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 py-3 px-4 rounded-xl text-xs font-bold transition-all mb-6"
               >
-                <span>Get Started with Starter</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
+                <span>Get started</span>
+                <ArrowRight className="w-3.5 h-3.5 text-zinc-600" />
               </a>
+
+              {/* Clean Feature Bullets */}
+              <div className="space-y-3 pt-2 border-t border-zinc-100">
+                <div className="text-xs font-semibold text-zinc-900">
+                  Includes:
+                </div>
+                <ul className="space-y-2.5 text-xs text-zinc-700">
+                  <li className="flex items-center gap-2.5">
+                    <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                    <span><strong>{billingCycle === 'annual' ? '6,000' : '5,000'}</strong> AI Runs / month</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Connect custom domain</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Custom email sending</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Up to 2 team seats</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>100% white-label client view</span>
+                  </li>
+                  {billingCycle === 'annual' && (
+                    <li className="flex items-center gap-2.5 text-emerald-800 font-medium">
+                      <Gift className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Free 1-Yr Custom Domain</span>
+                    </li>
+                  )}
+                </ul>
+              </div>
             </div>
           </div>
 
-          {/* TIER 2: PROFESSIONAL (MOST POPULAR) */}
-          <div className="bg-[#0E1115] text-white border-2 border-zinc-800 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-xl relative overflow-hidden">
-            <div className="absolute top-3 right-3">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-800 border border-zinc-700 text-[10px] font-mono font-bold text-white uppercase tracking-wider">
-                <Flame className="w-3 h-3 text-amber-400" />
-                <span>MOST POPULAR</span>
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded">
-                  FOR COMMERCIAL STUDIOS
-                </span>
-                <h3 className="font-display text-2xl font-bold text-white mt-2">
-                  Professional Plan
+          {/* CARD 2: PROFESSIONAL (POPULAR) */}
+          <div className="bg-white border-2 border-zinc-950 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.08)] relative">
+            <div>
+              {/* Header with Popular Pill */}
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <h3 className="font-display text-2xl font-bold text-zinc-950">
+                  Professional
                 </h3>
-                <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                  Autonomous operating backbone with Claude 3.5 Sonnet, WhatsApp client dispatch, and Dynamic UPI QR.
-                </p>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-950 text-white text-[10px] font-bold uppercase tracking-wider">
+                  Popular
+                </span>
               </div>
+              <p className="text-xs text-zinc-500 leading-relaxed mb-5 min-h-[34px]">
+                Autonomous operating backbone for high-growth commercial studios.
+              </p>
 
-              {/* Price Block */}
-              <div className="py-2.5 border-y border-zinc-800">
+              {/* Price */}
+              <div className="mb-5">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl sm:text-4xl font-display font-bold text-white">
+                  <span className="text-4xl font-display font-extrabold text-zinc-950">
                     {currency === 'INR' ? '₹1,999' : '$19'}
                   </span>
-                  <span className="text-xs text-zinc-400 font-mono">/month</span>
+                  <span className="text-xs text-zinc-500 font-medium">/ month</span>
                 </div>
-                <div className="text-[11px] text-zinc-400 font-mono mt-0.5">
+                <div className="text-[11px] text-zinc-400 mt-1 font-mono">
                   {billingCycle === 'annual'
-                    ? (currency === 'INR' 
-                        ? 'Billed annually (₹23,988/yr) • Free Domain + 12K Runs' 
-                        : 'Billed annually ($228/yr) • Free Domain + 12K Runs')
-                    : 'Billed monthly'} &bull; {billingCycle === 'annual' ? '21,000' : '20,000'} runs/mo
+                    ? (currency === 'INR' ? 'Billed annually (₹23,988/yr)' : 'Billed annually ($228/yr)')
+                    : 'Billed monthly'}
                 </div>
               </div>
 
-              {/* What makes Pro valuable over Starter */}
-              <div className="space-y-2.5 text-xs text-zinc-300">
-                <div className="font-semibold text-zinc-200 text-[11px] uppercase tracking-wider font-mono">
-                  Everything in Starter, plus:
-                </div>
-                <ul className="space-y-2.5">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Claude 3.5 Sonnet &amp; GPT-4o mini</strong> &mdash; deep contextual contract &amp; proposal drafting
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>
-                      <strong>{billingCycle === 'annual' ? '21,000' : '20,000'} AI Runs/mo</strong> &mdash; 4x volume for high-velocity teams
-                      {billingCycle === 'annual' && <span className="text-[10px] font-mono text-emerald-400 font-bold ml-1">(+1K/mo bonus)</span>}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Meta WhatsApp Cloud Dispatch</strong> &mdash; auto-send contract links &amp; payment reminders to WhatsApp
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Dynamic UPI QR &amp; Auto Tax Splits</strong> &mdash; instant scan-to-pay on all PDF invoices
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Up to 5 Team Seats</strong> &mdash; custom role permissions for crew &amp; accountants
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="pt-6 mt-6 border-t border-zinc-800">
+              {/* Action CTA (Solid Black) */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=pro"
-                className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-950 px-4 py-3 rounded-xl text-xs font-bold transition-colors shadow-sm"
+                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3 px-4 rounded-xl text-xs font-bold transition-all shadow-sm hover:shadow-md mb-6"
               >
-                <span>Get Started with Pro</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-950" />
+                <span>Get started</span>
+                <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
               </a>
+
+              {/* Clean Feature Bullets */}
+              <div className="space-y-3 pt-2 border-t border-zinc-100">
+                <div className="text-xs font-semibold text-zinc-900">
+                  Everything in Starter, plus:
+                </div>
+                <ul className="space-y-2.5 text-xs text-zinc-700">
+                  <li className="flex items-center gap-2.5">
+                    <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+                    <span><strong>Claude 3.5 Sonnet &amp; GPT-4o</strong></span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                    <span><strong>{billingCycle === 'annual' ? '21,000' : '20,000'}</strong> AI Runs / month</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Meta WhatsApp automated dispatch</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Dynamic UPI QR code on invoices</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Automated GST tax splits (CGST/SGST/IGST)</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Up to 5 team seats &amp; roles</span>
+                  </li>
+                  {billingCycle === 'annual' && (
+                    <li className="flex items-center gap-2.5 text-emerald-800 font-medium">
+                      <Gift className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Free 1-Yr Custom Domain</span>
+                    </li>
+                  )}
+                </ul>
+              </div>
             </div>
           </div>
 
-          {/* TIER 3: SCALE */}
+          {/* CARD 3: SCALE */}
           <div className="bg-white border border-zinc-200 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:border-zinc-300 hover:shadow-md transition-all">
-            <div className="space-y-4">
-              <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded">
-                  FOR ENTERPRISE &amp; AGENCIES
-                </span>
-                <h3 className="font-display text-2xl font-bold text-zinc-950 mt-2">
-                  Scale Plan
+            <div>
+              {/* Header */}
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <h3 className="font-display text-2xl font-bold text-zinc-950">
+                  Scale
                 </h3>
-                <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
-                  High-throughput infrastructure with all Frontier Models, autonomous research agents, and custom webhooks.
-                </p>
               </div>
+              <p className="text-xs text-zinc-500 leading-relaxed mb-5 min-h-[34px]">
+                High-throughput infrastructure for agencies &amp; multi-member teams.
+              </p>
 
-              {/* Price Block */}
-              <div className="py-2.5 border-y border-zinc-100">
+              {/* Price */}
+              <div className="mb-5">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950">
+                  <span className="text-4xl font-display font-extrabold text-zinc-950">
                     {currency === 'INR' ? '₹2,999' : '$29'}
                   </span>
-                  <span className="text-xs text-zinc-400 font-mono">/month</span>
+                  <span className="text-xs text-zinc-500 font-medium">/ month</span>
                 </div>
-                <div className="text-[11px] text-zinc-500 font-mono mt-0.5">
+                <div className="text-[11px] text-zinc-400 mt-1 font-mono">
                   {billingCycle === 'annual'
-                    ? (currency === 'INR' 
-                        ? 'Billed annually (₹35,988/yr) • Free Domain + 12K Runs' 
-                        : 'Billed annually ($348/yr) • Free Domain + 12K Runs')
-                    : 'Billed monthly'} &bull; {billingCycle === 'annual' ? '61,000' : '60,000'} runs/mo
+                    ? (currency === 'INR' ? 'Billed annually (₹35,988/yr)' : 'Billed annually ($348/yr)')
+                    : 'Billed monthly'}
                 </div>
               </div>
 
-              {/* What makes Scale valuable over Pro */}
-              <div className="space-y-2.5 text-xs text-zinc-700">
-                <div className="font-semibold text-zinc-900 text-[11px] uppercase tracking-wider font-mono">
-                  Everything in Pro, plus:
-                </div>
-                <ul className="space-y-2.5">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>All Frontier Models</strong> &mdash; unmetered access to Claude 3.5 Sonnet &amp; GPT-4o
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>{billingCycle === 'annual' ? '61,000' : '60,000'} AI Runs/mo</strong> &mdash; unlimited autonomous agency throughput
-                      {billingCycle === 'annual' && <span className="text-[10px] font-mono text-emerald-700 font-bold ml-1">(+1K/mo bonus)</span>}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Autonomous AI Research Agent</strong> &mdash; automatically inspects client websites &amp; customizes bids
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Unlimited Team Seats</strong> &mdash; invite entire studio crew &amp; external collaborators
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Custom Webhooks &amp; API Access</strong> &mdash; sync with Zapier, Slack, and internal CRMs
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="pt-6 mt-6 border-t border-zinc-100">
+              {/* Action CTA */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=scale"
-                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-4 py-3 rounded-xl text-xs font-semibold transition-colors shadow-xs"
+                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 py-3 px-4 rounded-xl text-xs font-bold transition-all mb-6"
               >
-                <span>Get Started with Scale</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                <span>Get started</span>
+                <ArrowRight className="w-3.5 h-3.5 text-zinc-600" />
               </a>
+
+              {/* Clean Feature Bullets */}
+              <div className="space-y-3 pt-2 border-t border-zinc-100">
+                <div className="text-xs font-semibold text-zinc-900">
+                  Everything in Professional, plus:
+                </div>
+                <ul className="space-y-2.5 text-xs text-zinc-700">
+                  <li className="flex items-center gap-2.5">
+                    <Sparkles className="w-4 h-4 text-purple-600 shrink-0" />
+                    <span><strong>All Frontier LLM Models</strong></span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                    <span><strong>{billingCycle === 'annual' ? '61,000' : '60,000'}</strong> AI Runs / month</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Autonomous AI Research Agent</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Unlimited team seats</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Custom Webhooks &amp; API access</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
+                    <span>Dedicated account manager &amp; SLA</span>
+                  </li>
+                  {billingCycle === 'annual' && (
+                    <li className="flex items-center gap-2.5 text-emerald-800 font-medium">
+                      <Gift className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Free 1-Yr Custom Domain</span>
+                    </li>
+                  )}
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -632,7 +588,7 @@ export default function PricingPage() {
             onClick={handleToggleTable}
             className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-zinc-100 hover:bg-zinc-200 text-xs font-bold text-zinc-900 transition-all border border-zinc-200/80 shadow-2xs hover:shadow-xs"
           >
-            <span>{showTable ? 'Hide full comparison matrix' : 'Compare all features in detail'}</span>
+            <span>{showTable ? 'Hide full feature comparison' : 'Compare all features in detail'}</span>
             {showTable ? (
               <ChevronUp className="w-4 h-4 text-zinc-600" />
             ) : (
@@ -812,7 +768,7 @@ export default function PricingPage() {
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 3: INDIA ONLY PLAN (BHARAT EDITION - RS 499/MO ANNUAL ONLY)
+          ROW 3: INDIA ONLY PLAN (BHARAT EDITION)
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-20">
         <div className="bg-[#0A0D10] text-white border-2 border-zinc-800 rounded-[32px] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
@@ -821,7 +777,6 @@ export default function PricingPage() {
             
             <div className="lg:col-span-5 space-y-3">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800 border border-zinc-700 text-[10px] font-mono font-bold text-zinc-200 uppercase tracking-wider">
-                <Flame className="w-3.5 h-3.5 text-zinc-300" />
                 <span>INDIA MSME EDITION &bull; ANNUAL COMMITMENT ONLY</span>
               </div>
 
@@ -935,7 +890,6 @@ export default function PricingPage() {
           })}
         </div>
 
-        {/* Bottom Help Note */}
         <div className="mt-12 text-center text-xs text-zinc-500 font-mono">
           <span>Need custom contract terms or have specific compliance questions? </span>
           <Link href="/contact" className="text-zinc-950 font-bold underline underline-offset-2 hover:text-zinc-700">
