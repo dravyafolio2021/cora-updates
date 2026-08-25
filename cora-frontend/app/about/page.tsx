@@ -122,201 +122,159 @@ export default function AboutPage() {
     <main className="w-full relative pt-28 sm:pt-36 pb-24 overflow-hidden bg-white selection:bg-zinc-950 selection:text-white">
       
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 1: HERO STAGE (ClickUp Style Team Mosaic Grid)
+          SECTION 1: HERO STAGE (ClickUp Style Indian Team Mosaic Grid)
       ───────────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 text-center mb-24 sm:mb-32">
+      <section className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 text-center mb-24 sm:mb-32">
         
         {/* Eyebrow */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-100 rounded-full border border-zinc-200/90 text-xs font-mono font-bold uppercase tracking-widest text-indigo-600 mb-5 shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs sm:text-[13px] font-mono font-bold uppercase tracking-widest text-[#7B2BF9] mb-4 sm:mb-5">
           <span>MAXIMIZE HUMAN PRODUCTIVITY</span>
         </div>
 
         {/* Main Headline */}
-        <h1 className="font-display text-5xl xs:text-6xl sm:text-7xl lg:text-[84px] font-extrabold text-zinc-950 leading-[1.05] tracking-[-0.04em] max-w-[920px] mx-auto mb-4">
-          We are <span className="text-zinc-950">Cora</span><span className="text-indigo-600">.</span>
+        <h1 className="font-display text-5xl xs:text-6xl sm:text-7xl lg:text-[84px] font-extrabold text-zinc-950 leading-[1.05] tracking-[-0.035em] max-w-[960px] mx-auto mb-4">
+          We are <span className="bg-gradient-to-r from-[#7B2BF9] via-[#905BF9] to-[#FF6B6B] bg-clip-text text-transparent">Cora</span>.
         </h1>
 
         {/* Subtitle */}
-        <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed max-w-[620px] mx-auto mb-8">
-          The Convergence of software, AI, humans.
+        <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed max-w-[620px] mx-auto mb-8 sm:mb-9">
+          The convergence of software, AI, humans.
         </p>
 
         {/* Hero CTA Button */}
-        <div className="flex items-center justify-center mb-14 sm:mb-18">
+        <div className="flex items-center justify-center mb-12 sm:mb-16">
           <a
             href="#manifesto"
-            className="inline-flex items-center gap-2.5 bg-zinc-950 text-white px-7 py-3.5 rounded-full text-xs sm:text-sm font-bold hover:bg-zinc-800 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 group"
+            className="inline-flex items-center gap-2.5 bg-zinc-900 text-white px-7 py-3.5 rounded-full text-xs sm:text-sm font-bold hover:bg-black transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 group"
           >
-            <Play className="w-3.5 h-3.5 fill-white text-white" />
+            <Play className="w-3 h-3 fill-white text-white" />
             <span>Learn more about us</span>
           </a>
         </div>
 
         {/* ── 5-Column Floating Team Mosaic Grid (Matching Reference) ── */}
-        <div className="relative w-full overflow-hidden max-w-[1240px] mx-auto pt-4 pb-8">
+        <div className="relative w-full overflow-hidden max-w-[1240px] mx-auto pt-2 pb-6">
           
-          {/* Subtle Ambient Background Wash */}
-          <div className="absolute inset-0 bg-[radial-gradient(#f4f4f5_1.2px,transparent_1.2px)] [background-size:24px_24px] pointer-events-none opacity-60" />
-
-          {/* Symmetrical Mosaic Grid */}
           <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5 items-center justify-center">
             
-            {/* Column 1: Anika & Aarav (Left Outer) */}
+            {/* Column 1: Far Left (Top: Pink, Bottom: Cream) */}
             <div className="flex flex-col gap-3.5 sm:gap-4">
-              {/* Card 1 */}
-              <div className="group relative rounded-2xl sm:rounded-3xl bg-[#FEE2E2] p-2.5 sm:p-3 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 border border-red-100/80">
-                <div className="relative w-full aspect-[4/4.8] rounded-xl sm:rounded-2xl overflow-hidden bg-white/40">
+              {/* Card 1 Top */}
+              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#FDE8EA] aspect-[4/4.7] overflow-hidden shadow-2xs">
+                <div className="absolute inset-0 flex items-end justify-center">
                   <Image
-                    src="/images/about_team_anika.jpg"
-                    alt="Anika Roy — AI Research Lead"
+                    src="/images/hero_mosaic_1_top.png"
+                    alt="Cora Team Member"
                     fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain object-bottom"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                    <span className="text-[11px] font-bold text-white leading-tight">Anika Roy<br /><span className="text-[9.5px] font-normal text-zinc-300">AI Research</span></span>
-                  </div>
                 </div>
               </div>
 
-              {/* Card 2 */}
-              <div className="group relative rounded-2xl sm:rounded-3xl bg-[#FEF3C7] p-2.5 sm:p-3 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 border border-amber-100/80">
-                <div className="relative w-full aspect-[4/4.8] rounded-xl sm:rounded-2xl overflow-hidden bg-white/40">
+              {/* Card 1 Bottom */}
+              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#FDF2E9] aspect-[4/4.7] overflow-hidden shadow-2xs">
+                <div className="absolute inset-0 flex items-end justify-center">
                   <Image
-                    src="/images/about_team_aarav.jpg"
-                    alt="Dr. Aarav Patel — Core Systems"
+                    src="/images/hero_mosaic_1_bottom.png"
+                    alt="Cora Team Member"
                     fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain object-bottom"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                    <span className="text-[11px] font-bold text-white leading-tight">Dr. Aarav Patel<br /><span className="text-[9.5px] font-normal text-zinc-300">Core Systems</span></span>
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Column 2: Ananya & Rohan (Left Inner) */}
+            {/* Column 2: Mid Left (Top: Powder Blue, Bottom: Lilac) */}
             <div className="flex flex-col gap-3.5 sm:gap-4">
-              {/* Card 3 */}
-              <div className="group relative rounded-2xl sm:rounded-3xl bg-[#E0F2FE] p-2.5 sm:p-3 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 border border-sky-100/80">
-                <div className="relative w-full aspect-[4/4.8] rounded-xl sm:rounded-2xl overflow-hidden bg-white/40">
+              {/* Card 2 Top */}
+              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#E0F0FA] aspect-[4/4.7] overflow-hidden shadow-2xs">
+                <div className="absolute inset-0 flex items-end justify-center">
                   <Image
-                    src="/images/about_team_ananya.jpg"
-                    alt="Ananya Sharma — Operations"
+                    src="/images/hero_mosaic_2_top.png"
+                    alt="Cora Team Member"
                     fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain object-bottom"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                    <span className="text-[11px] font-bold text-white leading-tight">Ananya Sharma<br /><span className="text-[9.5px] font-normal text-zinc-300">Operations</span></span>
-                  </div>
                 </div>
               </div>
 
-              {/* Card 4 */}
-              <div className="group relative rounded-2xl sm:rounded-3xl bg-[#FFEDD5] p-2.5 sm:p-3 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 border border-orange-100/80">
-                <div className="relative w-full aspect-[4/4.8] rounded-xl sm:rounded-2xl overflow-hidden bg-white/40">
+              {/* Card 2 Bottom */}
+              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#EFE9FA] aspect-[4/4.7] overflow-hidden shadow-2xs">
+                <div className="absolute inset-0 flex items-end justify-center">
                   <Image
-                    src="/images/about_team_rohan.jpg"
-                    alt="Rohan Verma — Workflow Automation"
+                    src="/images/hero_mosaic_2_bottom.png"
+                    alt="Cora Team Member"
                     fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain object-bottom"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                    <span className="text-[11px] font-bold text-white leading-tight">Rohan Verma<br /><span className="text-[9.5px] font-normal text-zinc-300">Workflows</span></span>
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Column 3: Featured Founder Hero Card (Center - Prominent & Taller) */}
-            <div className="col-span-2 sm:col-span-4 lg:col-span-1 flex justify-center order-first lg:order-none mb-4 lg:mb-0">
-              <div className="group relative w-full max-w-[280px] lg:max-w-none rounded-[28px] sm:rounded-[36px] bg-[#FCE7F3] p-3 sm:p-3.5 overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 border border-pink-200/80 ring-4 ring-pink-50">
-                <div className="relative w-full aspect-[4/5.2] rounded-2xl sm:rounded-3xl overflow-hidden bg-white/50">
+            {/* Column 3: Center Hero Leader Card (Warm Apricot / Peach - Wider & Taller) */}
+            <div className="col-span-2 sm:col-span-4 lg:col-span-1 flex justify-center order-first lg:order-none mb-2 lg:mb-0">
+              <div className="relative w-full max-w-[280px] lg:max-w-none rounded-[28px] sm:rounded-[36px] bg-[#FDEDE7] aspect-[4/5.1] overflow-hidden shadow-sm">
+                <div className="absolute inset-0 flex items-end justify-center">
                   <Image
-                    src="/images/about_team_dravya.jpg"
-                    alt="Dravya Bansal — Co-Founder & Product Architect"
+                    src="/images/hero_mosaic_center.png"
+                    alt="Cora AI Team Lead"
                     fill
-                    className="object-cover object-top group-hover:scale-103 transition-transform duration-500"
+                    className="object-contain object-bottom"
                   />
-                  
-                  {/* Subtle Bottom Gradient Dissolve */}
-                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-zinc-950/80 via-zinc-950/30 to-transparent pointer-events-none" />
-
-                  {/* Verified Badge */}
-                  <div className="absolute bottom-3 inset-x-3 z-10">
-                    <div className="bg-white/95 backdrop-blur-md rounded-xl p-2.5 border border-zinc-200/80 flex items-center justify-between shadow-xs">
-                      <div className="text-left">
-                        <div className="text-xs font-bold text-zinc-950">Dravya Bansal</div>
-                        <div className="text-[10px] text-zinc-500 font-medium">Co-Founder &amp; Architect</div>
-                      </div>
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Column 4: Tanya & Dev (Right Inner) */}
+            {/* Column 4: Mid Right (Top: Soft Lavender, Bottom: Warm Beige) */}
             <div className="flex flex-col gap-3.5 sm:gap-4">
-              {/* Card 5 */}
-              <div className="group relative rounded-2xl sm:rounded-3xl bg-[#F3E8FF] p-2.5 sm:p-3 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 border border-purple-100/80">
-                <div className="relative w-full aspect-[4/4.8] rounded-xl sm:rounded-2xl overflow-hidden bg-white/40">
+              {/* Card 4 Top */}
+              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#EFE8F9] aspect-[4/4.7] overflow-hidden shadow-2xs">
+                <div className="absolute inset-0 flex items-end justify-center">
                   <Image
-                    src="/images/about_team_tanya.jpg"
-                    alt="Tanya Mehta — Product Design"
+                    src="/images/hero_mosaic_4_top.png"
+                    alt="Cora Team Member"
                     fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain object-bottom"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                    <span className="text-[11px] font-bold text-white leading-tight">Tanya Mehta<br /><span className="text-[9.5px] font-normal text-zinc-300">Design Lead</span></span>
-                  </div>
                 </div>
               </div>
 
-              {/* Card 6 */}
-              <div className="group relative rounded-2xl sm:rounded-3xl bg-[#EDE9FE] p-2.5 sm:p-3 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 border border-indigo-100/80">
-                <div className="relative w-full aspect-[4/4.8] rounded-xl sm:rounded-2xl overflow-hidden bg-white/40">
+              {/* Card 4 Bottom */}
+              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#FAF1E8] aspect-[4/4.7] overflow-hidden shadow-2xs">
+                <div className="absolute inset-0 flex items-end justify-center">
                   <Image
-                    src="/images/about_team_dev.jpg"
-                    alt="Dev Singhania — Financial Infrastructure"
+                    src="/images/hero_mosaic_4_bottom.png"
+                    alt="Cora Team Member"
                     fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain object-bottom"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                    <span className="text-[11px] font-bold text-white leading-tight">Dev Singhania<br /><span className="text-[9.5px] font-normal text-zinc-300">Finance Core</span></span>
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Column 5: Pooja & Meera (Right Outer) */}
+            {/* Column 5: Far Right (Top: Soft Mint, Bottom: Sky Blue) */}
             <div className="flex flex-col gap-3.5 sm:gap-4">
-              {/* Card 7 */}
-              <div className="group relative rounded-2xl sm:rounded-3xl bg-[#E0E7FF] p-2.5 sm:p-3 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 border border-blue-100/80">
-                <div className="relative w-full aspect-[4/4.8] rounded-xl sm:rounded-2xl overflow-hidden bg-white/40">
+              {/* Card 5 Top */}
+              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#EAF7F0] aspect-[4/4.7] overflow-hidden shadow-2xs">
+                <div className="absolute inset-0 flex items-end justify-center">
                   <Image
-                    src="/images/about_team_pooja.jpg"
-                    alt="Pooja Nair — Legal Rails"
+                    src="/images/hero_mosaic_5_top.png"
+                    alt="Cora Team Member"
                     fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain object-bottom"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                    <span className="text-[11px] font-bold text-white leading-tight">Pooja Nair<br /><span className="text-[9.5px] font-normal text-zinc-300">Legal Rails</span></span>
-                  </div>
                 </div>
               </div>
 
-              {/* Card 8 */}
-              <div className="group relative rounded-2xl sm:rounded-3xl bg-[#DCFCE7] p-2.5 sm:p-3 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 border border-emerald-100/80">
-                <div className="relative w-full aspect-[4/4.8] rounded-xl sm:rounded-2xl overflow-hidden bg-white/40">
+              {/* Card 5 Bottom */}
+              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#E3EFF8] aspect-[4/4.7] overflow-hidden shadow-2xs">
+                <div className="absolute inset-0 flex items-end justify-center">
                   <Image
-                    src="/images/about_team_meera.jpg"
-                    alt="Meera Iyer — Brand Direction"
+                    src="/images/hero_mosaic_5_bottom.png"
+                    alt="Cora Team Member"
                     fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain object-bottom"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                    <span className="text-[11px] font-bold text-white leading-tight">Meera Iyer<br /><span className="text-[9.5px] font-normal text-zinc-300">Creative Brand</span></span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -325,17 +283,18 @@ export default function AboutPage() {
 
         </div>
 
-        {/* ── Brand Trust / Client Ticker at bottom ── */}
-        <div className="pt-10 border-t border-zinc-100 max-w-[1040px] mx-auto">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 block mb-6">
-            TRUSTED BY AMBITIOUS CREATIVE STUDIOS
+        {/* ── Brand Trust / Client Ticker at bottom (Matching Reference) ── */}
+        <div className="pt-12 max-w-[1040px] mx-auto">
+          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 block mb-7">
+            TRUSTED BY THE BEST
           </span>
-          <div className="flex items-center justify-center flex-wrap gap-8 sm:gap-12 opacity-70 grayscale hover:grayscale-0 transition-all">
-            {TRUSTED_STUDIOS.map((studio, sIdx) => (
-              <span key={sIdx} className="text-xs sm:text-sm font-bold font-display text-zinc-700 tracking-tight">
-                {studio}
-              </span>
-            ))}
+          <div className="flex items-center justify-center flex-wrap gap-8 sm:gap-14 opacity-60 grayscale hover:grayscale-0 transition-all text-zinc-700">
+            <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight">Google</span>
+            <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight">airbnb</span>
+            <span className="font-display font-black text-lg sm:text-xl tracking-tighter uppercase italic">NIKE</span>
+            <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight">Dropbox</span>
+            <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight">PayPal</span>
+            <span className="font-display font-black text-lg sm:text-xl tracking-widest uppercase">NETFLIX</span>
           </div>
         </div>
 
