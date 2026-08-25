@@ -15,7 +15,8 @@ export function Footer() {
     '/privacy',
     '/refund-policy',
     '/security',
-    '/sla'
+    '/sla',
+    '/contact'
   ].includes(pathname || '');
 
   return (

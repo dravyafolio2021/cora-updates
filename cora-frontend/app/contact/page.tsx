@@ -43,11 +43,11 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="w-full relative pt-32 sm:pt-40 pb-24 overflow-hidden bg-[#FBFaf7] text-zinc-900">
+    <main className="w-full relative pt-32 sm:pt-40 pb-24 overflow-hidden bg-white text-zinc-900">
       
       {/* ── Top Hero Section ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center mb-16 sm:mb-20">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white rounded-full border border-zinc-200/90 text-xs font-semibold text-zinc-900 mb-4 shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-100 rounded-full border border-zinc-200/90 text-xs font-semibold text-zinc-900 mb-4 shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>CONTACT &amp; SALES DESK</span>
         </div>
@@ -152,7 +152,7 @@ export default function ContactPage() {
             <div className="p-4 rounded-xl bg-zinc-100/80 border border-zinc-200/80 text-[11px] text-zinc-500 space-y-1 font-mono">
               <div className="text-zinc-900 font-bold">Cora Platforms</div>
               <div>UDYAM Registered MSME &bull; Govt. of India</div>
-              <div>Bengaluru &amp; Mumbai, India</div>
+              <div>Mumbai, India</div>
             </div>
 
           </div>
