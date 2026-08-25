@@ -62,25 +62,62 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         expect(scrollWidth).toBeLessThanOrEqual(375);
     });
 
-    test('verify mobile page refresh retains exact current page and does not hijack to CRM', async ({ page }) => {
+    test('verify mobile URL is never mutated to sub_page=leads and refresh stays strictly on active view', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 812 });
         await login(page);
         
-        // Test 1: Refreshing Dashboard stays on Dashboard
+        // 1. Dashboard View
         await page.goto('http://cora.local/workspace/dashboard');
         await page.waitForSelector('#cora-workspace');
-        await page.reload();
-        await page.waitForSelector('#cora-workspace');
-        expect(page.url()).toContain('/workspace/dashboard');
+        await page.waitForTimeout(500); // Allow DOM ready and subtab auto-selectors to run
         
-        // Test 2: Refreshing Financials stays on Financials
-        await page.goto('http://cora.local/workspace/financials');
-        await page.waitForSelector('#cora-workspace');
+        // URL must stay clean without rogue sub_page=leads query param
+        expect(page.url()).toBe('http://cora.local/workspace/dashboard');
+        expect(page.url()).not.toContain('sub_page=leads');
+        expect(page.url()).not.toContain('subtab=directory');
+        
+        // Refresh and verify retention
         await page.reload();
         await page.waitForSelector('#cora-workspace');
-        expect(page.url()).toContain('/workspace/financials');
+        expect(page.url()).toBe('http://cora.local/workspace/dashboard');
         expect(page.url()).not.toContain('/workspace/leads');
         expect(page.url()).not.toContain('/workspace/bookings');
+        
+        // 2. Financials View
+        await page.goto('http://cora.local/workspace/financials');
+        await page.waitForSelector('#cora-workspace');
+        await page.waitForTimeout(500);
+        expect(page.url()).toBe('http://cora.local/workspace/financials');
+        expect(page.url()).not.toContain('sub_page=leads');
+        
+        await page.reload();
+        await page.waitForSelector('#cora-workspace');
+        expect(page.url()).toBe('http://cora.local/workspace/financials');
+        expect(page.url()).not.toContain('/workspace/leads');
+        
+        // 3. Vault View
+        await page.goto('http://cora.local/workspace/vault');
+        await page.waitForSelector('#cora-workspace');
+        await page.waitForTimeout(500);
+        expect(page.url()).toBe('http://cora.local/workspace/vault');
+        expect(page.url()).not.toContain('sub_page=leads');
+        
+        await page.reload();
+        await page.waitForSelector('#cora-workspace');
+        expect(page.url()).toBe('http://cora.local/workspace/vault');
+        expect(page.url()).not.toContain('/workspace/leads');
+        
+        // 4. Blogs View
+        await page.goto('http://cora.local/workspace/blogs');
+        await page.waitForSelector('#cora-workspace');
+        await page.waitForTimeout(500);
+        expect(page.url()).toContain('/workspace/blogs');
+        expect(page.url()).not.toContain('sub_page=leads');
+        
+        await page.reload();
+        await page.waitForSelector('#cora-workspace');
+        expect(page.url()).toContain('/workspace/blogs');
+        expect(page.url()).not.toContain('/workspace/leads');
     });
 
     test('verify PWA dynamic update banner and floating pill', async ({ page }) => {

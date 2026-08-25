@@ -48,8 +48,8 @@ window.coraSwitchLeadSubtab = function(tabName) {
     if (window.history && window.history.replaceState) {
         try {
             const url = new URL(window.location);
-            url.searchParams.set('sub_page', 'leads');
             url.searchParams.set('subtab', tabName);
+            url.searchParams.delete('sub_page'); // Never inject or pollute sub_page
             window.history.replaceState(null, '', url);
         } catch(e){}
     }

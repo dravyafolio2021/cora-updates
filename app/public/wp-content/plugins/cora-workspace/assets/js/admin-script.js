@@ -12510,11 +12510,16 @@ jQuery(document).ready(function($) {
         $('.cora-lead-tab-pane').addClass('hidden');
         $(`#cora-lead-pane-${tabName}`).removeClass('hidden');
 
-        if (window.history && window.history.replaceState) {
-            const url = new URL(window.location);
-            url.searchParams.set('sub_page', 'leads');
-            url.searchParams.set('subtab', tabName);
-            window.history.replaceState(null, '', url);
+        // Only persist subtab in URL if the lead panes actually exist on the page
+        if ($('#cora-lead-pane-directory, #cora-lead-pane-kanban').length > 0) {
+            if (window.history && window.history.replaceState) {
+                try {
+                    const url = new URL(window.location);
+                    url.searchParams.set('subtab', tabName);
+                    url.searchParams.delete('sub_page'); // Never inject or pollute sub_page
+                    window.history.replaceState(null, '', url);
+                } catch(e){}
+            }
         }
     };
 
@@ -13731,14 +13736,16 @@ jQuery(document).ready(function($) {
         });
     };
 
-    // Auto-Select Sub-Tab from URL on DOM Ready
+    // Auto-Select Sub-Tab from URL on DOM Ready (only when viewing Leads CRM)
     $(document).ready(function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const subtab = urlParams.get('subtab');
-        if (subtab && ['kanban', 'directory', 'analytics', 'activity'].includes(subtab)) {
-            window.coraSwitchLeadSubtab(subtab);
-        } else if (window.innerWidth < 768) {
-            window.coraSwitchLeadSubtab('directory');
+        if ($('#cora-lead-pane-directory, #cora-lead-pane-kanban').length > 0) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const subtab = urlParams.get('subtab');
+            if (subtab && ['kanban', 'directory', 'analytics', 'activity'].includes(subtab)) {
+                window.coraSwitchLeadSubtab(subtab);
+            } else if (window.innerWidth < 768) {
+                window.coraSwitchLeadSubtab('directory');
+            }
         }
 
         // Initialize Settings Suite Accordion

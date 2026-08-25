@@ -2630,14 +2630,15 @@ window.coraJumpToWizardStep = function(targetStep, isInit) {
 
     // Update URL query parameter using replaceState (?cora_view=editor&step=X)
     var urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('sub_page', 'vault');
+    urlParams.delete('sub_page');
     urlParams.set('vtab', 'editor');
     urlParams.set('cora_view', 'editor');
     urlParams.set('step', targetStep);
     var docId = document.getElementById('studio-doc-id') ? document.getElementById('studio-doc-id').value : '';
     if (docId) urlParams.set('doc_id', docId);
 
-    var updateUrl = window.location.pathname + '?' + urlParams.toString();
+    var qs = urlParams.toString();
+    var updateUrl = window.location.pathname + (qs ? '?' + qs : '');
     window.history.replaceState({}, '', updateUrl);
 
     coraRenderWizardStepUI();
@@ -4194,20 +4195,28 @@ window.coraSwitchVaultView = function(view, docId, forceStep) {
     if (isNaN(stepNum) || stepNum < 1 || stepNum > 6) stepNum = 1;
 
     var newParams = new URLSearchParams(window.location.search);
-    newParams.set('sub_page', 'vault');
-    newParams.set('vtab', view);
-    newParams.set('cora_view', view);
+    newParams.delete('sub_page');
     if (docId) newParams.set('doc_id', docId);
 
     if (view === 'editor') {
+        newParams.set('vtab', 'editor');
+        newParams.set('cora_view', 'editor');
         newParams.set('step', stepNum);
         localStorage.setItem('cora_vault_tab', 'editor');
-    } else {
+    } else if (view === 'esign') {
+        newParams.set('vtab', 'esign');
+        newParams.set('cora_view', 'esign');
         newParams.delete('step');
-        localStorage.setItem('cora_vault_tab', view);
+        localStorage.setItem('cora_vault_tab', 'esign');
+    } else {
+        newParams.delete('vtab');
+        newParams.delete('cora_view');
+        newParams.delete('step');
+        localStorage.setItem('cora_vault_tab', 'vault');
     }
 
-    var newUrl = window.location.pathname + '?' + newParams.toString();
+    var qs = newParams.toString();
+    var newUrl = window.location.pathname + (qs ? '?' + qs : '');
     window.history.replaceState({vtab: view, docId: docId, step: stepNum}, '', newUrl);
     if (docId) localStorage.setItem('cora_vault_doc_id', docId);
 

@@ -1534,14 +1534,15 @@ function cora_workspace_handle_workspace_route() {
             $has_access = true;
         }
 
-        // Parse sub-page (support path segment /workspace/blogs and query param ?sub_page=blogs)
-        $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : 'dashboard';
-        if ( ! empty( $_GET['sub_page'] ) ) {
+        // Parse sub-page (prioritize explicit path segment /workspace/blogs, fall back to query param ?sub_page=blogs)
+        $path_sub = isset( $path_parts[1] ) && ! empty( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
+        if ( ! empty( $path_sub ) ) {
+            $sub_page = $path_sub;
+        } elseif ( ! empty( $_GET['sub_page'] ) ) {
             $sub_page = sanitize_title( $_GET['sub_page'] );
         } elseif ( ! empty( $_GET['sub'] ) ) {
             $sub_page = sanitize_title( $_GET['sub'] );
-        }
-        if ( empty( $sub_page ) ) {
+        } else {
             $sub_page = 'dashboard';
         }
         $GLOBALS['sub_page'] = $sub_page;
