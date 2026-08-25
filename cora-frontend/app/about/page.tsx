@@ -362,10 +362,8 @@ export default function AboutPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 3: OUR MOTTO (Dynamic Live Week Calendar & Telemetry)
       ───────────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
-        <div className="bg-zinc-50 border border-zinc-200/90 rounded-[36px] sm:rounded-[44px] p-8 sm:p-14 md:p-16 shadow-2xs">
-          <DynamicWeekCalendar />
-        </div>
+      <section className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
+        <DynamicWeekCalendar />
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
