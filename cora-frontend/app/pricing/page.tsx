@@ -1144,7 +1144,7 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 3: INDIA ONLY PLAN (BALANCED ENTRY-LEVEL SOLOPRENEUR SHOWCASE)
+          ROW 3: INDIA ONLY PLAN (CLEAN, PROFESSIONAL & EXCLUSIVE ANNUAL PLAN)
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-20">
         <div className="bg-gradient-to-br from-zinc-50/90 via-white to-amber-50/20 border-2 border-zinc-200/90 hover:border-zinc-300 rounded-[32px] p-6 sm:p-9 shadow-[0_8px_32px_rgba(0,0,0,0.04)] transition-all relative overflow-hidden">
@@ -1152,10 +1152,10 @@ export default function PricingPage() {
           {/* Top Row: Identity, Subsidized Price & Primary CTA */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-zinc-200/80">
             
-            <div className="space-y-2.5 max-w-[680px]">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/70 border border-amber-200 text-xs font-bold text-amber-900">
+            <div className="space-y-2.5 max-w-[660px]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200/80 text-xs font-bold text-amber-900">
                 <Building2 className="w-3.5 h-3.5 text-amber-700" />
-                <span>INDIA ONLY PLAN &bull; EXCLUSIVE ANNUAL COMMITMENT</span>
+                <span>INDIA ONLY &bull; ANNUAL COMMITMENT ONLY</span>
               </div>
 
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
@@ -1169,27 +1169,27 @@ export default function PricingPage() {
 
             {/* Price & Action */}
             <div className="flex flex-col sm:items-end justify-center gap-3 shrink-0">
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-display font-extrabold text-zinc-950">₹499</span>
-                <span className="text-xs text-zinc-500 font-medium">/ month</span>
-                <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full font-mono">
-                  Subsidized
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-4xl font-display font-extrabold text-zinc-950">₹499</span>
+                  <span className="text-xs text-zinc-500 font-medium">/ month</span>
+                </div>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-bold tracking-wide">
+                  Annual Plan Only
                 </span>
               </div>
-              <div className="text-[11px] text-zinc-500 font-mono text-left sm:text-right">
-                Billed annually at ₹5,988/year &bull; <em>Annual commitment only</em>
+
+              <div className="text-xs text-zinc-500 font-mono text-left sm:text-right">
+                Billed as <span className="text-zinc-950 font-semibold">₹5,988/year</span> &bull; 1-Year Commitment
               </div>
 
               <a
                 href="https://app.heycora.in/workspace/login?plan=india_annual_499"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-zinc-950 hover:bg-zinc-800 text-white px-7 py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm hover:shadow-md"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-zinc-950 hover:bg-zinc-800 text-white px-7 py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm hover:shadow-md cursor-pointer"
               >
                 <span>Claim India Only Plan</span>
                 <ArrowRight className="w-4 h-4 text-zinc-400" />
               </a>
-              <div className="text-[11px] text-zinc-400 font-mono flex items-center gap-1.5">
-                <span>UDYAM / GSTIN Supported &bull; Instant Activation</span>
-              </div>
             </div>
 
           </div>
