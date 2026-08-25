@@ -82,24 +82,24 @@ export default function PricingPage() {
   return (
     <main className="w-full relative pb-24 overflow-hidden bg-white text-zinc-900">
       
-      {/* ── Serene Greenfield Nature Hero Section (Simplified & Crisp) ── */}
-      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#e8f3e5] via-[#f4faf1] to-white pt-28 sm:pt-36 pb-14 sm:pb-20">
+      {/* ── Ethereal Pure Cloud Sky Hero Section (Uncluttered & High Legibility) ── */}
+      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#56a2e8] via-[#cae4fc] to-white pt-28 sm:pt-36 pb-14 sm:pb-20">
         
-        {/* Background Greenfield Nature Artwork */}
+        {/* Background Pure Sky Artwork (Framing Clouds on Edges, Clean Open Center) */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
           <Image
-            src="/images/cora_pricing_greenfield.jpg"
-            alt="Cora Serene Greenfield Landscape"
+            src="/images/cora_pricing_pure_sky.jpg"
+            alt="Cora Pure Cloud Sky Background"
             fill
             priority
-            className="object-cover object-[center_35%] sm:object-[center_25%]"
+            className="object-cover object-top"
             sizes="100vw"
           />
-          {/* Soft Nature Light Overlay & Multi-Stop Pure White Fade */}
+          {/* Soft Luminous Overlay & Multi-Stop Pure White Fade */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(180deg, rgba(232, 243, 229, 0.20) 0%, rgba(255, 255, 255, 0.35) 40%, rgba(255, 255, 255, 0.92) 80%, #ffffff 100%)',
+              background: 'linear-gradient(180deg, rgba(86, 162, 232, 0.12) 0%, rgba(255, 255, 255, 0.20) 40%, rgba(255, 255, 255, 0.88) 80%, #ffffff 100%)',
             }}
           />
           <div className="absolute inset-x-0 bottom-0 h-40 sm:h-52 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none" />
@@ -109,10 +109,10 @@ export default function PricingPage() {
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
           
           {/* Simplified Crisp Announcement Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-emerald-900/10 text-xs font-medium text-zinc-800 mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-[0px_2px_8px_rgba(0,0,0,0.05)] border border-white/80 text-xs font-medium text-zinc-800 mb-4">
             <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-600 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-700"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
             </span>
             <span>Simple, transparent plans &bull; No hidden fees</span>
           </div>
@@ -123,7 +123,7 @@ export default function PricingPage() {
           </h1>
 
           {/* Effortless 1-Line Body */}
-          <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[540px] mx-auto mb-7">
+          <p className="text-zinc-700 text-base sm:text-lg font-normal leading-relaxed max-w-[540px] mx-auto mb-7">
             Start free forever with 1,000 monthly AI runs. Upgrade anytime as you grow.
           </p>
 
