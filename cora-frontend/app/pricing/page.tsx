@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Check, 
@@ -55,8 +55,43 @@ const FAQS = [
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
+  const [isIndia, setIsIndia] = useState(true);
   const [showTable, setShowTable] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  // Dynamic Geolocation detection
+  useEffect(() => {
+    try {
+      // 1. Instant synchronous browser timezone check (0ms latency, zero layout shift)
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      const isIndiaTz = tz.includes('Kolkata') || tz.includes('Calcutta') || tz.includes('India');
+      if (isIndiaTz) {
+        setCurrency('INR');
+        setIsIndia(true);
+      } else {
+        setCurrency('USD');
+        setIsIndia(false);
+      }
+
+      // 2. Fast background Geo-IP verification
+      fetch('https://api.country.is')
+        .then(res => res.json())
+        .then(data => {
+          if (data?.country === 'IN') {
+            setCurrency('INR');
+            setIsIndia(true);
+          } else if (data?.country) {
+            setCurrency('USD');
+            setIsIndia(false);
+          }
+        })
+        .catch(() => {});
+    } catch (e) {
+      // Graceful fallback to INR
+      setCurrency('INR');
+      setIsIndia(true);
+    }
+  }, []);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -80,10 +115,8 @@ export default function PricingPage() {
           Start for free with 1,000 complimentary AI runs and e-signatures. Upgrade as your team, client volume, and automated workflows scale.
         </p>
 
-        {/* ── Controls: Billing Cadence & Currency ── */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-10">
-          
-          {/* Monthly / Annual Toggle */}
+        {/* ── Cadence Selector (Monthly / Annual) ── */}
+        <div className="flex items-center justify-center gap-3 mb-10">
           <div className="inline-flex items-center p-1 bg-zinc-100 rounded-xl border border-zinc-200 shadow-2xs">
             <button
               type="button"
@@ -91,7 +124,7 @@ export default function PricingPage() {
                 setBillingCycle('monthly');
                 trackEvent('pricing_cycle_change', { cycle: 'monthly' });
               }}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-5 py-2 rounded-lg text-xs font-semibold transition-all ${
                 billingCycle === 'monthly'
                   ? 'bg-zinc-950 text-white shadow-xs'
                   : 'text-zinc-600 hover:text-zinc-950'
@@ -105,7 +138,7 @@ export default function PricingPage() {
                 setBillingCycle('annual');
                 trackEvent('pricing_cycle_change', { cycle: 'annual' });
               }}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${
                 billingCycle === 'annual'
                   ? 'bg-zinc-950 text-white shadow-xs'
                   : 'text-zinc-600 hover:text-zinc-950'
@@ -117,39 +150,6 @@ export default function PricingPage() {
               </span>
             </button>
           </div>
-
-          {/* Currency Switcher */}
-          <div className="inline-flex items-center p-1 bg-zinc-100 rounded-xl border border-zinc-200 shadow-2xs">
-            <button
-              type="button"
-              onClick={() => {
-                setCurrency('INR');
-                trackEvent('currency_switch', { currency: 'INR' });
-              }}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                currency === 'INR'
-                  ? 'bg-zinc-950 text-white shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-950'
-              }`}
-            >
-              INR (₹) India
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setCurrency('USD');
-                trackEvent('currency_switch', { currency: 'USD' });
-              }}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                currency === 'USD'
-                  ? 'bg-zinc-950 text-white shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-950'
-              }`}
-            >
-              USD ($) Global
-            </button>
-          </div>
-
         </div>
 
         {/* ── Marquee / Client Quotes Strip ── */}
@@ -247,27 +247,29 @@ export default function PricingPage() {
           </div>
 
           {/* ══════════════════════════════════════════════════════════════
-              PLAN 2: INDIA ONLY EDITION (ANNUAL COMMITMENT)
+              PLAN 2: INDIA ONLY EDITION / LOCALIZED GROWTH
           ══════════════════════════════════════════════════════════════ */}
           <div className="bg-[#0E1115] text-white border-2 border-zinc-800 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-xl relative overflow-hidden">
             {/* Highlight Ribbon */}
             <div className="absolute top-3 right-3">
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-800 border border-zinc-700 text-[10px] font-mono font-bold text-white uppercase tracking-wider">
                 <Flame className="w-3 h-3 text-zinc-300" />
-                <span>INDIA MSME</span>
+                <span>{isIndia ? 'INDIA MSME' : 'POPULAR'}</span>
               </span>
             </div>
 
             <div className="space-y-4">
               <div>
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400">
-                  INDIA EDITION
+                  {isIndia ? 'INDIA EDITION' : 'ESSENTIALS'}
                 </span>
                 <h3 className="font-display text-2xl font-bold text-white mt-1">
-                  Bharat Growth
+                  {isIndia ? 'Bharat Growth' : 'Starter Growth'}
                 </h3>
                 <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                  Optimized for Indian agencies, consultancies, studios &amp; MSMEs with annual billing.
+                  {isIndia 
+                    ? 'Optimized for Indian agencies, consultancies, studios & MSMEs with annual billing.'
+                    : 'Complete operating suite for growing agencies and independent practices.'}
                 </p>
               </div>
 
@@ -275,12 +277,16 @@ export default function PricingPage() {
               <div className="py-2 border-y border-zinc-800">
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl sm:text-4xl font-display font-bold text-white">
-                    {billingCycle === 'annual' ? '₹999' : '₹1,499'}
+                    {currency === 'INR'
+                      ? (billingCycle === 'annual' ? '₹999' : '₹1,499')
+                      : (billingCycle === 'annual' ? '$15' : '$19')}
                   </span>
                   <span className="text-xs text-zinc-400 font-mono">/month</span>
                 </div>
                 <div className="text-[11px] text-zinc-400 font-mono mt-0.5">
-                  {billingCycle === 'annual' ? 'Billed annually (₹11,988/yr)' : 'Billed monthly'} &bull; 10K runs/mo
+                  {billingCycle === 'annual' 
+                    ? (currency === 'INR' ? 'Billed annually (₹11,988/yr)' : 'Billed annually ($180/yr)') 
+                    : 'Billed monthly'} &bull; 10K runs/mo
                 </div>
               </div>
 
@@ -300,11 +306,11 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>Full GSTIN verification &amp; tax splits</span>
+                    <span>{isIndia ? 'Full GSTIN verification & tax splits' : 'Multi-currency invoicing & tax engine'}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>Dynamic UPI QR code on all invoices</span>
+                    <span>{isIndia ? 'Dynamic UPI QR code on all invoices' : 'Instant online client payment links'}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
@@ -312,7 +318,7 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                    <span>Up to 5 Team Seats &amp; Priority IST Support</span>
+                    <span>Up to 5 Team Seats &amp; Priority Support</span>
                   </li>
                 </ul>
               </div>
@@ -320,7 +326,7 @@ export default function PricingPage() {
 
             <div className="pt-6 mt-6 border-t border-zinc-800">
               <a
-                href="https://app.heycora.in/workspace/login?plan=india_annual"
+                href={`https://app.heycora.in/workspace/login?plan=${isIndia ? 'india_annual' : 'growth'}`}
                 className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-950 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors shadow-sm"
               >
                 <span>Start 14-Day Free Trial</span>
@@ -364,7 +370,7 @@ export default function PricingPage() {
               {/* Feature Checklist */}
               <div className="space-y-2.5 text-xs text-zinc-700">
                 <div className="font-semibold text-zinc-900 text-[11px] uppercase tracking-wider font-mono">
-                  Everything in Bharat, plus:
+                  Everything in {isIndia ? 'Bharat' : 'Growth'}, plus:
                 </div>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
@@ -451,7 +457,7 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Custom DPA &amp; Indian DPDP 2023 Compliance</span>
+                    <span>Custom DPA &amp; DPDP Act 2023 Compliance</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
@@ -459,7 +465,7 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Dedicated Solutions Architect (Mumbai)</span>
+                    <span>Dedicated Solutions Architect</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
@@ -504,7 +510,7 @@ export default function PricingPage() {
                   <tr className="bg-zinc-50 border-b border-zinc-200 text-zinc-950 font-bold">
                     <th className="p-4 sm:p-5 w-2/5">Capabilities &amp; Modules</th>
                     <th className="p-4 sm:p-5 w-[15%] text-center">Free Forever</th>
-                    <th className="p-4 sm:p-5 w-[15%] text-center bg-zinc-100/70">Bharat Growth</th>
+                    <th className="p-4 sm:p-5 w-[15%] text-center bg-zinc-100/70">{isIndia ? 'Bharat Growth' : 'Starter Growth'}</th>
                     <th className="p-4 sm:p-5 w-[15%] text-center">Global Pro</th>
                     <th className="p-4 sm:p-5 w-[15%] text-center">Enterprise</th>
                   </tr>
@@ -570,25 +576,25 @@ export default function PricingPage() {
                   {/* Category 3: Invoicing & Finance */}
                   <tr className="bg-zinc-100/50">
                     <td colSpan={5} className="p-3.5 font-mono font-bold uppercase tracking-wider text-[11px] text-zinc-600">
-                      3. Finance &amp; Indian Tax Engine
+                      3. Finance &amp; Tax Engine
                     </td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-medium text-zinc-800">18% GST Invoicing &amp; Math</td>
+                    <td className="p-4 font-medium text-zinc-800">{isIndia ? '18% GST Invoicing & Math' : 'Tax & Automated Invoicing'}</td>
                     <td className="p-4 text-center text-zinc-900">Basic</td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-medium">Auto CGST/SGST/IGST</td>
-                    <td className="p-4 text-center text-zinc-900 font-medium">Multi-Currency &amp; GST</td>
+                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-medium">{isIndia ? 'Auto CGST/SGST/IGST' : 'Automated Tax Engine'}</td>
+                    <td className="p-4 text-center text-zinc-900 font-medium">Multi-Currency &amp; Tax</td>
                     <td className="p-4 text-center text-zinc-900 font-medium">Custom ERP Sync</td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-medium text-zinc-800">Dynamic UPI QR Code Payment</td>
+                    <td className="p-4 font-medium text-zinc-800">{isIndia ? 'Dynamic UPI QR Code Payment' : 'Online Client Payments'}</td>
                     <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-medium text-zinc-800">CA Tax Export (GSTR-1 Ready)</td>
+                    <td className="p-4 font-medium text-zinc-800">{isIndia ? 'CA Tax Export (GSTR-1 Ready)' : 'Financial Accounting Export'}</td>
                     <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
@@ -609,7 +615,7 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-medium text-zinc-800">Indian IT Act 2000 Audit Trail</td>
+                    <td className="p-4 font-medium text-zinc-800">Compliance &amp; Audit Trail</td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
@@ -618,9 +624,9 @@ export default function PricingPage() {
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Support &amp; Account SLA</td>
                     <td className="p-4 text-center text-zinc-500">Community</td>
-                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-medium">Priority IST (&lt; 2 hr)</td>
+                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-medium">Priority ({isIndia ? 'IST < 2 hr' : '< 4 hr'})</td>
                     <td className="p-4 text-center text-zinc-900 font-medium">24/7 Priority Queue</td>
-                    <td className="p-4 text-center text-zinc-900 font-medium">Dedicated CSM (Mumbai)</td>
+                    <td className="p-4 text-center text-zinc-900 font-medium">Dedicated Solutions Architect</td>
                   </tr>
 
                 </tbody>
