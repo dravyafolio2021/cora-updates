@@ -305,7 +305,307 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 2: CO-FOUNDER SPOTLIGHT & MANIFESTO
+          SECTION 2: OUR MISSION (Mountain Summit Stage)
+      ───────────────────────────────────────────────────────────── */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
+        
+        {/* Mountain Visual Stage with Gradient Title */}
+        <div className="relative w-full rounded-[36px] sm:rounded-[48px] bg-gradient-to-b from-[#F8FAFC] via-[#F1F5F9] to-white border border-zinc-200/80 pt-12 sm:pt-20 px-4 sm:px-8 pb-4 overflow-hidden shadow-xs">
+          
+          {/* Gradient Mission Heading */}
+          <div className="text-center relative z-20 mb-2 sm:mb-4">
+            <h2 className="font-display text-4xl xs:text-5xl sm:text-7xl lg:text-[80px] font-extrabold tracking-[-0.035em]">
+              <span className="bg-gradient-to-r from-[#2563EB] via-[#9333EA] to-[#DB2777] bg-clip-text text-transparent">
+                Our mission.
+              </span>
+            </h2>
+          </div>
+
+          {/* Mountain Graphic with CORA Summit Flag */}
+          <div className="relative w-full max-w-[980px] mx-auto aspect-[16/9] -mt-6 xs:-mt-10 sm:-mt-16 overflow-hidden">
+            <Image
+              src="/images/about_mission_mountain_cora.png"
+              alt="Cora Mission Mountain Summit with Flag"
+              fill
+              priority
+              className="object-contain object-top filter contrast-105"
+            />
+            {/* Subtle bottom fade to seamlessly blend with content */}
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+          </div>
+
+          {/* Mission Copy Container */}
+          <div className="relative z-20 max-w-[860px] mx-auto pt-6 pb-8 sm:pb-12 text-left space-y-8">
+            <h3 className="font-display text-2xl xs:text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight text-center sm:text-left">
+              Maximize human productivity.
+            </h3>
+
+            <div className="space-y-5 text-zinc-600 text-base sm:text-lg leading-relaxed font-normal">
+              <p>
+                We started Cora because the way creative studios, production sets, and agencies work is broken. Teams juggle dozens of disconnected tools — briefs in one place, conversations in WhatsApp, contracts somewhere else, and GST spreadsheets in Excel — and critical context gets lost in between. We always knew there had to be a better way. So we built one platform to replace them all. While others scramble to bundle fragmented tools or bolt on AI as an afterthought, we&apos;ve been building toward autonomous studio convergence from the start.
+              </p>
+              <p>
+                Today, we&apos;re at the most exciting inflection point in the history of software: the convergence of software, AI, and humans. For the first time, technology doesn&apos;t just organize your work — it understands it, anticipates it, and acts on it. Cora is where this convergence lives. Where studio founders, photographers, and creative directors work side by side with AI agents, in one place, with full context — and where every team can finally focus on the work that actually matters.
+              </p>
+              <p>
+                Thousands of creative professionals across India already rely on Cora to power all of their commercial production work. We&apos;re laser-focused on removing the administrative busywork — the constant toggling, the rate-card negotiations, the delayed client signatures that drain productivity every single day. We envision a world where creative business feels effortlessly organized, contagiously creative, and endlessly efficient.
+              </p>
+              <p>
+                Our mission is clear: maximize human productivity. Not by making people work harder, but by fundamentally reinventing how creative work gets done — through the convergence of everything.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 3: OUR MOTTO (Weekly Calendar Highlight Strip)
+      ───────────────────────────────────────────────────────────── */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
+        <div className="bg-zinc-50 border border-zinc-200/90 rounded-[36px] sm:rounded-[44px] p-8 sm:p-14 md:p-16 space-y-10 shadow-2xs">
+          
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#7B2BF9]">
+              <span>OUR MOTTO</span>
+            </div>
+            <h3 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[56px] font-bold text-zinc-950 tracking-tight">
+              Save one day, Every week.
+            </h3>
+          </div>
+
+          {/* Interactive 7-Day Calendar Strip */}
+          <div className="w-full overflow-x-auto pb-2 scrollbar-none">
+            <div className="min-w-[640px] grid grid-cols-7 gap-3 sm:gap-4">
+              
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
+                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">10</span>
+                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Mon</span>
+              </div>
+
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
+                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">11</span>
+                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Tue</span>
+              </div>
+
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
+                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">12</span>
+                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Wed</span>
+              </div>
+
+              {/* Highlighted Day (Saved Day - Thursday) */}
+              <div className="bg-zinc-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-800 text-center flex flex-col items-center justify-center gap-1 shadow-lg ring-4 ring-purple-500/20 scale-105 transition-transform">
+                <span className="font-display text-2xl sm:text-3xl font-extrabold text-white">13</span>
+                <span className="text-xs font-mono text-purple-400 font-bold uppercase">Thurs</span>
+              </div>
+
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
+                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">14</span>
+                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Fri</span>
+              </div>
+
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
+                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">15</span>
+                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Sat</span>
+              </div>
+
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
+                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">16</span>
+                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Sun</span>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 4: OUR CORE VALUES (10-Card Bento Grid with Center Title)
+      ───────────────────────────────────────────────────────────── */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
+        
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-mono font-bold uppercase tracking-widest text-[#7B2BF9] mb-3">
+            <span>DNA &amp; PRINCIPLES</span>
+          </div>
+          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
+            Our core values
+          </h2>
+        </div>
+
+        {/* 3-Column / Bento Values Matrix */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
+          
+          {/* Value 1 */}
+          <div className="bg-zinc-50 border border-zinc-200/90 rounded-[28px] p-7 sm:p-8 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 leading-tight mb-6">
+              Normal<br />sucks
+            </h3>
+            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+              #SCRAPPY
+            </span>
+          </div>
+
+          {/* Value 2 */}
+          <div className="bg-zinc-50 border border-zinc-200/90 rounded-[28px] p-7 sm:p-8 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 leading-tight mb-6">
+              Challenge the norms,<br />push boundaries
+            </h3>
+            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+              #GREATNESS
+            </span>
+          </div>
+
+          {/* Value 3 */}
+          <div className="bg-zinc-50 border border-zinc-200/90 rounded-[28px] p-7 sm:p-8 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 leading-tight mb-6">
+              Embrace hard work,<br />do hard things
+            </h3>
+            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+              #RESILIENCY
+            </span>
+          </div>
+
+          {/* Value 4 */}
+          <div className="bg-zinc-50 border border-zinc-200/90 rounded-[28px] p-7 sm:p-8 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 leading-tight mb-6">
+              Drive<br />urgency
+            </h3>
+            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+              #URGENCY
+            </span>
+          </div>
+
+          {/* Value 5 */}
+          <div className="bg-zinc-50 border border-zinc-200/90 rounded-[28px] p-7 sm:p-8 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 leading-tight mb-6">
+              Grow 1%<br />every day
+            </h3>
+            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+              #GROWTHMINDSET
+            </span>
+          </div>
+
+          {/* Value 6: Center High-Impact Dark Card */}
+          <div className="bg-zinc-950 border border-zinc-800 rounded-[28px] p-7 sm:p-8 flex flex-col justify-between text-white shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-white leading-tight mb-6">
+              Be fun to<br />work with
+            </h3>
+            <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider">
+              #FUN
+            </span>
+          </div>
+
+          {/* Value 7 */}
+          <div className="bg-zinc-50 border border-zinc-200/90 rounded-[28px] p-7 sm:p-8 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 leading-tight mb-6">
+              Be in<br />the details
+            </h3>
+            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+              #DETAILSMATTER
+            </span>
+          </div>
+
+          {/* Value 8 */}
+          <div className="bg-zinc-50 border border-zinc-200/90 rounded-[28px] p-7 sm:p-8 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 leading-tight mb-6">
+              Stay hungry,<br />stay nimble
+            </h3>
+            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+              #HARDWORK
+            </span>
+          </div>
+
+          {/* Value 9 */}
+          <div className="bg-zinc-50 border border-zinc-200/90 rounded-[28px] p-7 sm:p-8 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all">
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 leading-tight mb-6">
+              Deliver the best<br />customer experience
+            </h3>
+            <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+              #BESTCX
+            </span>
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 5: OUR JOURNEY (Interactive Timeline)
+      ───────────────────────────────────────────────────────────── */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
+        <div className="space-y-12">
+          
+          <div className="text-center max-w-[620px] mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#7B2BF9]">
+              <span>OUR EVOLUTION</span>
+            </div>
+            <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
+              Our journey.
+            </h2>
+          </div>
+
+          {/* Timeline Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+            
+            {/* Step 1 */}
+            <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-8 space-y-3 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-purple-600 uppercase">Q1 2024</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+              </div>
+              <h4 className="font-display text-lg font-bold text-zinc-950">Genesis &amp; Studio Sets</h4>
+              <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
+                Founded to solve chaotic WhatsApp booking pipelines and manual proposal generation for Indian creators.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-8 space-y-3 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-purple-600 uppercase">Q3 2024</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+              </div>
+              <h4 className="font-display text-lg font-bold text-zinc-950">18% GST &amp; UPI Engine</h4>
+              <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
+                Engineered India-first tax calculators, dynamic rate cards, and instant UPI soundbox confirmation webhooks.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-8 space-y-3 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-purple-600 uppercase">Q2 2025</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+              </div>
+              <h4 className="font-display text-lg font-bold text-zinc-950">SHA-256 E-Sign Vault</h4>
+              <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
+                Released legally binding digital signature registries compliant with the Information Technology Act 2000.
+              </p>
+            </div>
+
+            {/* Step 4: Active / Latest */}
+            <div className="bg-zinc-950 text-white border border-zinc-800 rounded-[28px] p-6 sm:p-8 space-y-3 shadow-xl relative overflow-hidden">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-purple-400 uppercase">2026 &amp; Beyond</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+              </div>
+              <h4 className="font-display text-lg font-bold text-white">Super Agents &amp; Co-Founder</h4>
+              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
+                Full convergence of frontier autonomous reasoning models with end-to-end multi-tenant studio management.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 6: CO-FOUNDER SPOTLIGHT & MANIFESTO
       ───────────────────────────────────────────────────────────── */}
       <section id="manifesto" className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-36 scroll-mt-28">
         <div className="w-full rounded-[36px] bg-[#0A0D10] text-white p-8 sm:p-14 md:p-16 border border-zinc-800 shadow-2xl relative overflow-hidden">
@@ -404,40 +704,7 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 3: 4 CORE OPERATING PRINCIPLES
-      ───────────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-36">
-        <div className="text-center max-w-[680px] mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-100 rounded-xl border border-zinc-200/90 text-xs font-semibold text-zinc-800 mb-3 shadow-2xs">
-            <span>Operating Principles</span>
-          </div>
-          <h2 className="font-display text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
-            How we design and build software
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-          {VALUES.map((val, i) => (
-            <div
-              key={i}
-              className="bg-zinc-50 border border-zinc-200/90 rounded-[28px] p-7 sm:p-9 space-y-3 shadow-2xs hover:bg-white hover:shadow-md transition-all duration-300"
-            >
-              <div className="font-mono text-xs font-bold text-zinc-400 uppercase">
-                Principle 0{i + 1}
-              </div>
-              <h3 className="font-display text-xl font-bold text-zinc-950 tracking-tight">
-                {val.title}
-              </h3>
-              <p className="text-zinc-600 text-sm leading-relaxed font-normal">
-                {val.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          SECTION 4: ENTERPRISE SECURITY & COMPLIANCE SUMMARY
+          SECTION 7: ENTERPRISE SECURITY & COMPLIANCE SUMMARY
       ───────────────────────────────────────────────────────────── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24">
         <div className="bg-white border border-zinc-200/90 rounded-[36px] p-8 sm:p-12 shadow-[0px_20px_50px_rgba(0,0,0,0.04)] text-center space-y-8">
@@ -479,7 +746,7 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 5: BOTTOM CTA BANNER
+          SECTION 8: BOTTOM CTA BANNER
       ───────────────────────────────────────────────────────────── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         <div className="bg-zinc-950 text-white rounded-[36px] p-8 sm:p-14 text-center space-y-6 relative overflow-hidden shadow-xl">
