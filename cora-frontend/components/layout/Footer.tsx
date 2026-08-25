@@ -10,12 +10,19 @@ import { trackEvent } from '../analytics/Analytics';
 export function Footer() {
   const pathname = usePathname();
   const is404 = pathname === '/404' || pathname?.includes('_not-found');
+  const isLegalPage = [
+    '/terms',
+    '/privacy',
+    '/refund-policy',
+    '/security',
+    '/sla'
+  ].includes(pathname || '');
 
   return (
     <footer className="relative w-full overflow-hidden pt-12 sm:pt-16 pb-12">
       
-      {/* ── Background Landscape Horizon (Hidden on 404) ── */}
-      {!is404 && (
+      {/* ── Background Landscape Horizon (Hidden on 404 & Legal Pages) ── */}
+      {!is404 && !isLegalPage && (
         <div className="absolute inset-0 pointer-events-none select-none z-0">
           <Image
             src="/images/cora_hero_landscape.jpg"
@@ -31,8 +38,8 @@ export function Footer() {
 
       <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6">
         
-        {/* ── Top Conversion CTA Banner (Hidden on 404) ── */}
-        {!is404 && (
+        {/* ── Top Conversion CTA Banner (Hidden on 404 & Legal Pages) ── */}
+        {!is404 && !isLegalPage && (
           <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20">
             <h2 className="font-display text-3xl xs:text-4xl sm:text-[48px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-4">
               Ready to simplify your business?

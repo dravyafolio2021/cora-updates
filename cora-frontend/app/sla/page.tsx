@@ -4,8 +4,8 @@ import { Activity, Clock, ShieldCheck, CheckCircle2, ArrowLeft, ArrowRight, Aler
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Service Level Agreement (SLA) | Cora Studio OS',
-  description: 'Our 99.95% uptime commitment, response times, and service credit guarantees for studio workspaces.',
+  title: 'Service Level Agreement (SLA) | Cora Platform',
+  description: 'Our 99.95% uptime commitment, response times, and service credit guarantees for professional business workspaces.',
 };
 
 export default function SLAPage() {
@@ -48,7 +48,7 @@ export default function SLAPage() {
               99.95%
             </div>
             <p className="text-xs sm:text-sm text-zinc-600 mt-2 max-w-[460px]">
-              Cora guarantees at least 99.95% monthly uptime for core workspace services including E-Sign Vaults, CRM Pipelines, and Invoicing Engines.
+              Cora guarantees at least 99.95% monthly uptime for core workspace services including E-Sign Vaults, CRM Pipelines, and Invoicing Engines across all professional service workspaces.
             </p>
           </div>
 
@@ -100,40 +100,18 @@ export default function SLAPage() {
             </div>
           </section>
 
-          <section className="space-y-4">
-            <h2 className="text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              2. Support Response Time Tiers
-            </h2>
-            <p>
-              Our operations engineering desk responds to incidents based on severity priority:
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-4 rounded-xl bg-white border border-zinc-200">
-                <div className="text-xs font-bold text-rose-600 uppercase">Critical (P1)</div>
-                <div className="text-base font-bold text-zinc-950 mt-1">&lt; 1 Hour Response</div>
-                <div className="text-xs text-zinc-500 mt-1">Platform outage or contract execution blockage.</div>
-              </div>
-              <div className="p-4 rounded-xl bg-white border border-zinc-200">
-                <div className="text-xs font-bold text-amber-600 uppercase">High (P2)</div>
-                <div className="text-base font-bold text-zinc-950 mt-1">&lt; 4 Hours Response</div>
-                <div className="text-xs text-zinc-500 mt-1">Impaired functionality with temporary workaround.</div>
-              </div>
-              <div className="p-4 rounded-xl bg-white border border-zinc-200">
-                <div className="text-xs font-bold text-blue-600 uppercase">Normal (P3)</div>
-                <div className="text-base font-bold text-zinc-950 mt-1">&lt; 24 Hours Response</div>
-                <div className="text-xs text-zinc-500 mt-1">General inquiries and account assistance.</div>
-              </div>
-            </div>
-          </section>
-
           <section className="space-y-3">
             <h2 className="text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              3. Scheduled Maintenance Windows
+              2. Support Response Times
             </h2>
             <p>
-              Routine infrastructure updates and database patches occur during low-traffic windows (typically Sundays between 02:00 – 04:00 AM IST) and are announced at least 48 hours in advance via our status feed.
+              We maintain tier-based response metrics for enterprise business operations:
             </p>
+            <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-600">
+              <li><strong>Critical Incidents (Service Disruption):</strong> &lt; 30 minutes (24/7 dedicated escalation).</li>
+              <li><strong>High Priority (Billing / E-Sign Delays):</strong> &lt; 2 hours during standard business hours.</li>
+              <li><strong>General Inquiries:</strong> &lt; 6 hours.</li>
+            </ul>
           </section>
 
         </div>
@@ -144,14 +122,14 @@ export default function SLAPage() {
             href="/status" 
             className="text-xs font-semibold text-zinc-700 hover:text-zinc-950 flex items-center gap-1.5"
           >
-            <span>Check Live Status &amp; Past Incidents</span>
+            <span>Check Real-Time Incident Status</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
           <a
-            href="mailto:support@heycora.in"
+            href="https://app.heycora.in/workspace/login"
             className="inline-flex items-center gap-2 bg-zinc-950 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-zinc-800 transition-all"
           >
-            <span>Contact Support Desk</span>
+            <span>Open Workspace</span>
             <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
           </a>
         </div>

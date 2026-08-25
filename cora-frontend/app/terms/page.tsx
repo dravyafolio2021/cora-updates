@@ -4,8 +4,8 @@ import { ShieldCheck, FileText, ArrowLeft, ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | Cora Studio OS',
-  description: 'Read the Terms of Service governing the use of Cora Studio OS, our AI workspaces, contracts, and financial tools.',
+  title: 'Terms of Service | Cora Platform',
+  description: 'Read the Terms of Service governing the use of Cora Platform, our AI workspaces, contracts, and financial tools for professional service businesses.',
 };
 
 export default function TermsPage() {
@@ -45,7 +45,7 @@ export default function TermsPage() {
             <span>Executive Summary</span>
           </div>
           <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
-            By accessing or using <strong>Cora Studio OS</strong> (&ldquo;Cora&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;), you agree to these Terms. You retain 100% intellectual property ownership of all your uploaded media, client data, generated contracts, and business records. We never sell your data or train foundation models on your proprietary content.
+            By accessing or using <strong>Cora Platform</strong> (&ldquo;Cora&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;), you agree to these Terms. Cora is the autonomous business operating system designed for professional service businesses, creative agencies, consultancies, commercial studios, legal &amp; financial advisory firms, healthcare clinics, and independent service founders. You retain 100% intellectual property ownership of all your uploaded deliverables, client data, contracts, and business records. We never sell your data or train foundation models on your proprietary content.
           </p>
         </div>
 
@@ -58,7 +58,7 @@ export default function TermsPage() {
               1. Acceptance of Terms &amp; Eligibility
             </h2>
             <p>
-              By creating an account, subscribing to any paid plan, or accessing the Cora platform at <code className="text-xs bg-zinc-100 px-1.5 py-0.5 rounded text-zinc-900">heycora.in</code> or <code className="text-xs bg-zinc-100 px-1.5 py-0.5 rounded text-zinc-900">app.heycora.in</code>, you acknowledge that you are at least 18 years of age and authorized to bind your studio, brokerage, agency, or corporate entity.
+              By creating an account, subscribing to any paid plan, or accessing the Cora platform at <code className="text-xs bg-zinc-100 px-1.5 py-0.5 rounded text-zinc-900">heycora.in</code> or <code className="text-xs bg-zinc-100 px-1.5 py-0.5 rounded text-zinc-900">app.heycora.in</code>, you acknowledge that you are at least 18 years of age and authorized to bind your agency, studio, consultancy, clinic, brokerage, or corporate entity.
             </p>
           </section>
 
@@ -68,11 +68,11 @@ export default function TermsPage() {
               2. Workspace Services &amp; AI Agents
             </h2>
             <p>
-              Cora provides an autonomous operating system including AI voice-to-scope, Kanban lead pipelines, 18% GST tax calculation engines, SHA-256 e-signature registries, and asset management. You understand that:
+              Cora provides an autonomous operating system including AI discovery scoping, Kanban lead pipelines, 18% GST tax calculation engines, SHA-256 e-signature registries, booking schedules, and project asset vaults. You understand that:
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-600">
-              <li>AI-generated draft scopes, proposals, and summaries are assistance tools and should be reviewed prior to client execution.</li>
-              <li>You are solely responsible for ensuring shoot contracts and financial invoices comply with your jurisdiction&apos;s commercial law.</li>
+              <li>AI-generated draft scopes, client proposals, and summaries are assistance tools and should be reviewed prior to formal execution.</li>
+              <li>You are solely responsible for ensuring commercial agreements, client retainers, and financial invoices comply with your jurisdiction&apos;s commercial law.</li>
             </ul>
           </section>
 
@@ -82,7 +82,7 @@ export default function TermsPage() {
               3. Intellectual Property &amp; Content Ownership
             </h2>
             <p>
-              <strong>Your Content Remains Yours:</strong> All photos, 4K RAW footage, client rosters, legal contracts, and financial receipts uploaded to Cora remain your sole exclusive property. Cora claims zero copyright or licensing rights over your creative assets.
+              <strong>Your Content Remains Yours:</strong> All business documents, client rosters, project deliverables, creative media, legal contracts, and financial receipts uploaded to Cora remain your sole exclusive property. Cora claims zero copyright, licensing, or IP rights over your business assets.
             </p>
             <p>
               <strong>Platform IP:</strong> The Cora software, user interface design system, vector components, and autonomous AI orchestration engine are protected by copyright and intellectual property laws.
@@ -98,7 +98,7 @@ export default function TermsPage() {
               Cora offers monthly and annual subscription tiers. Subscriptions renew automatically unless cancelled prior to the billing date.
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-600">
-              <li><strong>Indian Accounts:</strong> Invoices include statutory 18% GST (CGST/SGST or IGST) with GSTIN input credit.</li>
+              <li><strong>Indian Accounts:</strong> Invoices include statutory 18% GST (CGST/SGST or IGST) with GSTIN input tax credit.</li>
               <li><strong>International Accounts:</strong> Invoices are billed in USD without local VAT/GST withholding.</li>
               <li><strong>Cancellation:</strong> You can cancel anytime inside your workspace dashboard with 1 click. Access continues until the current billing cycle expires.</li>
             </ul>
@@ -120,7 +120,7 @@ export default function TermsPage() {
               6. Limitation of Liability
             </h2>
             <p>
-              To the maximum extent permitted by law, Cora shall not be liable for indirect, incidental, or consequential damages resulting from downtime, cloud storage outages, or client payment disputes. Our aggregate liability is limited to the fees paid by you in the 12 months preceding the claim.
+              To the maximum extent permitted by law, Cora shall not be liable for indirect, incidental, or consequential damages resulting from third-party network downtime, cloud storage outages, or client payment disputes. Our aggregate liability is limited to the fees paid by you in the 12 months preceding the claim.
             </p>
           </section>
 

@@ -4,8 +4,8 @@ import { ShieldCheck, Lock, Key, Server, Cpu, FileCheck, ArrowLeft, ArrowRight, 
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Security & Compliance | Cora Studio OS',
-  description: 'Enterprise-grade encryption, SOC-2 readiness, SHA-256 e-signatures, and Indian IT Act 2000 compliance.',
+  title: 'Security & Compliance | Cora Platform',
+  description: 'Enterprise-grade encryption, SOC-2 readiness, SHA-256 e-signatures, and Indian IT Act 2000 compliance across all professional services.',
 };
 
 export default function SecurityPage() {
@@ -34,7 +34,7 @@ export default function SecurityPage() {
             Enterprise Security Standards
           </h1>
           <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
-            How Cora protects commercial shoot media, contract vaults, and financial ledgers with military-grade encryption.
+            How Cora protects professional business records, contract vaults, client documents, and financial ledgers with military-grade encryption.
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export default function SecurityPage() {
             </div>
             <h3 className="text-sm font-bold text-zinc-950">AES-256 &amp; TLS 1.3 Encryption</h3>
             <p className="text-xs text-zinc-600 leading-relaxed font-normal">
-              Every shoot photo, 4K video asset, and PDF invoice is encrypted using 256-bit Advanced Encryption Standard at rest and enforced via TLS 1.3 in transit.
+              Every business record, client document, asset deliverable, and PDF invoice is encrypted using 256-bit Advanced Encryption Standard at rest and enforced via TLS 1.3 in transit.
             </p>
           </div>
 
@@ -63,65 +63,45 @@ export default function SecurityPage() {
 
           <div className="p-6 rounded-2xl bg-white border border-zinc-200/90 shadow-sm space-y-2.5">
             <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200/60">
-              <Server className="w-4 h-4" />
-            </div>
-            <h3 className="text-sm font-bold text-zinc-950">Multi-Tenant Row Level Isolation</h3>
-            <p className="text-xs text-zinc-600 leading-relaxed font-normal">
-              Zero cross-tenant data leakage. Database queries enforce strict tenant boundaries and granular role-based permissions (Super Admin, Studio Owner, Crew Member).
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white border border-zinc-200/90 shadow-sm space-y-2.5">
-            <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-200/60">
               <Cpu className="w-4 h-4" />
             </div>
             <h3 className="text-sm font-bold text-zinc-950">Zero AI Training Guarantee</h3>
             <p className="text-xs text-zinc-600 leading-relaxed font-normal">
-              Proprietary contracts, rate cards, and financial balances are strictly segregated and never submitted into training sets for public AI models.
+              Your business proposals, financial ledgers, and client records are zero-retention processed. We never use proprietary tenant data to train base models.
+            </p>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-white border border-zinc-200/90 shadow-sm space-y-2.5">
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200/60">
+              <Server className="w-4 h-4" />
+            </div>
+            <h3 className="text-sm font-bold text-zinc-950">100% Indian Data Residency</h3>
+            <p className="text-xs text-zinc-600 leading-relaxed font-normal">
+              Primary production databases and file storage are hosted in Tier-4 data centers in Mumbai, complying strictly with Indian DPDP Act 2023 guidelines.
             </p>
           </div>
 
         </div>
 
-        {/* Security Deep Dive */}
+        {/* Security Technical Specifications */}
         <div className="space-y-10 text-sm sm:text-base text-zinc-700 leading-relaxed font-normal">
           
           <section className="space-y-3">
             <h2 className="text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              1. Compliance &amp; Regulatory Standards
+              1. Multi-Tenant Row-Level Isolation (RLS)
             </h2>
             <p>
-              Cora is engineered to meet stringent global and Indian regulatory requirements:
-            </p>
-            <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-600">
-              <li><strong>Indian IT Act 2000 (Section 65B):</strong> Digital contract admissibility in commercial arbitration and legal courts.</li>
-              <li><strong>GST Tax Engine Verification:</strong> 18% CGST/SGST/IGST tax calculation engine adheres to CBIC invoicing guidelines.</li>
-              <li><strong>SOC-2 Type II Readiness:</strong> Continuous internal controls monitoring for security, availability, and confidentiality.</li>
-              <li><strong>GDPR &amp; DPDP Act 2023:</strong> Full user rights to data portability, export, and complete workspace deletion.</li>
-            </ul>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              2. Infrastructure &amp; Data Center Resilience
-            </h2>
-            <p>
-              Our production infrastructure is hosted across Tier-4 data centers with automated daily offsite snapshots, geo-redundant backups, and 99.95% guaranteed uptime.
+              Cora utilizes database-level Row Level Security (RLS). Every query executed by our application layer is bounded by your unique <code className="text-xs bg-zinc-100 px-1.5 py-0.5 rounded text-zinc-900">workspace_id</code>. It is mathematically impossible for one business tenant to view, leak, or mutate records from another organization.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              3. Responsible Vulnerability Disclosure
+              2. Vulnerability Testing &amp; Bug Bounty
             </h2>
             <p>
-              We welcome reports from independent security researchers. If you discover a potential vulnerability, please email our security engineering desk:
+              We conduct automated static analysis, dynamic AST penetration testing, and annual third-party security audits. If you discover a security vulnerability, please report it responsibly to <a href="mailto:security@heycora.in" className="text-emerald-700 underline font-semibold">security@heycora.in</a> for immediate escalation.
             </p>
-            <div className="p-4 rounded-xl bg-white border border-zinc-200 font-mono text-xs text-zinc-800 space-y-1">
-              <div>Cora Security Response Team</div>
-              <div>Email: <a href="mailto:security@heycora.in" className="text-emerald-700 underline">security@heycora.in</a></div>
-              <div>PGP Fingerprint Available Upon Request &bull; Coordinated Disclosure Policy</div>
-            </div>
           </section>
 
         </div>
@@ -132,7 +112,7 @@ export default function SecurityPage() {
             href="/sla" 
             className="text-xs font-semibold text-zinc-700 hover:text-zinc-950 flex items-center gap-1.5"
           >
-            <span>View Service Level Agreement (SLA)</span>
+            <span>Review our 99.95% Service Level Agreement (SLA)</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
           <a

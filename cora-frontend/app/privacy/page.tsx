@@ -4,8 +4,8 @@ import { Lock, ShieldCheck, ArrowLeft, ArrowRight, EyeOff, KeyRound, Database, S
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Cora Studio OS',
-  description: 'Understand how Cora protects your creative media, client roster, and financial data with bank-grade encryption and zero AI training.',
+  title: 'Privacy Policy | Cora Platform',
+  description: 'Understand how Cora protects your client roster, project deliverables, and financial data with bank-grade encryption and zero AI training across all professional services.',
 };
 
 export default function PrivacyPage() {
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
               <span>Zero AI Model Training</span>
             </div>
             <p className="text-xs text-zinc-600 leading-relaxed font-normal">
-              Your shoot briefs, rate cards, and client proposals are <strong>never</strong> used to train public LLMs or proprietary foundation models. Your data remains isolated to your tenant.
+              Your client briefs, fee schedules, contracts, and proposals are <strong>never</strong> used to train public LLMs or third-party foundation models. Your data remains isolated strictly to your tenant.
             </p>
           </div>
 
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
               <span>AES-256 Bank Grade Encryption</span>
             </div>
             <p className="text-xs text-zinc-600 leading-relaxed font-normal">
-              All documents, signed contracts, and GST invoices are encrypted with <strong>AES-256</strong> at rest and transmitted strictly over <strong>TLS 1.3</strong> protocols.
+              All documents, signed agreements, client records, and GST invoices are encrypted with <strong>AES-256</strong> at rest and transmitted strictly over <strong>TLS 1.3</strong> protocols.
             </p>
           </div>
         </div>
@@ -72,8 +72,8 @@ export default function PrivacyPage() {
               When you operate your workspace on Cora, we collect only the minimum required data to provide our autonomous operating services:
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-600">
-              <li><strong>Account Credentials:</strong> Name, work email, studio name, and phone number for 2FA authentication.</li>
-              <li><strong>Workspace Records:</strong> Leads in CRM pipelines, shoot dates, crew roster assignments, and contract signatories.</li>
+              <li><strong>Account Credentials:</strong> Name, work email, business name, and phone number for secure 2FA authentication.</li>
+              <li><strong>Workspace Records:</strong> Leads in CRM pipelines, client appointments, team assignments, and contract signatories.</li>
               <li><strong>Financial Identifiers:</strong> Business GSTIN, PAN, billing address, and bank payout details for invoice rendering.</li>
               <li><strong>Technical Metadata:</strong> IP addresses, browser user-agents, and audit timestamps for SHA-256 e-signature validity.</li>
             </ul>
@@ -84,13 +84,13 @@ export default function PrivacyPage() {
               2. How We Use Your Data
             </h2>
             <p>
-              Your data is processed strictly to power your day-to-day studio operations:
+              Your data is processed strictly to power your day-to-day business operations across all professional service workflows:
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-600">
               <li>Generating automated 18% CGST/SGST/IGST tax invoices and calculation breakdowns.</li>
-              <li>Orchestrating autonomous AI workflows (proposals, voice-to-scope, and shoot call sheets).</li>
+              <li>Orchestrating autonomous AI workflows (proposals, voice-to-scope, and appointment scheduling).</li>
               <li>Cryptographically sealing legal contracts and recording immutable SHA-256 audit logs.</li>
-              <li>Delivering automated WhatsApp and email reminders to your clients and crew.</li>
+              <li>Delivering automated WhatsApp and email updates to your clients and team members.</li>
             </ul>
           </section>
 
@@ -99,7 +99,7 @@ export default function PrivacyPage() {
               3. Data Isolation &amp; Multi-Tenant Architecture
             </h2>
             <p>
-              Every studio workspace is logically separated in our multi-tenant database using strict row-level security (RLS). No other studio, operator, or team can ever query, view, or access your files or financial ledgers.
+              Every business workspace is logically separated in our multi-tenant database using strict row-level security (RLS). No other business, operator, or team can ever query, view, or access your files, client lists, or financial ledgers.
             </p>
           </section>
 
@@ -135,7 +135,7 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-600">
               <li><strong>One-Click JSON/CSV Export:</strong> Download your entire lead history, contracts, and invoices anytime.</li>
-              <li><strong>Permanent Workspace Erasure:</strong> Upon request, all database records, backups, and storage buckets are permanently shredded within 30 days.</li>
+              <li><strong>Permanent Workspace Erasure:</strong> Upon request, all database records, backups, and storage buckets are permanently deleted within 30 days.</li>
             </ul>
           </section>
 
