@@ -48,7 +48,7 @@ export default function ContactPage() {
       {/* ── Top Hero Section ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center mb-16 sm:mb-20">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-100 rounded-full border border-zinc-200/90 text-xs font-semibold text-zinc-900 mb-4 shadow-2xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-zinc-800" />
           <span>CONTACT &amp; SALES DESK</span>
         </div>
 
@@ -71,7 +71,7 @@ export default function ContactPage() {
             {/* Department Card 1: Sales & Demos */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center border border-zinc-200/70 shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center border border-zinc-200/80 shrink-0">
                   <Building2 className="w-4 h-4" />
                 </div>
                 <div>
@@ -80,7 +80,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="pt-1 flex items-center justify-between text-xs">
-                <a href="mailto:sales@heycora.in" className="font-mono text-zinc-900 hover:text-emerald-700 font-semibold underline underline-offset-2">
+                <a href="mailto:sales@heycora.in" className="font-mono text-zinc-900 hover:text-zinc-600 font-semibold underline underline-offset-2">
                   sales@heycora.in
                 </a>
                 <span className="text-zinc-400 font-mono text-[11px]">&lt; 2 hr response</span>
@@ -90,7 +90,7 @@ export default function ContactPage() {
             {/* Department Card 2: Technical Support */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center border border-sky-200/70 shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center border border-zinc-200/80 shrink-0">
                   <Headphones className="w-4 h-4" />
                 </div>
                 <div>
@@ -99,7 +99,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="pt-1 flex items-center justify-between text-xs">
-                <a href="mailto:support@heycora.in" className="font-mono text-zinc-900 hover:text-emerald-700 font-semibold underline underline-offset-2">
+                <a href="mailto:support@heycora.in" className="font-mono text-zinc-900 hover:text-zinc-600 font-semibold underline underline-offset-2">
                   support@heycora.in
                 </a>
                 <span className="text-zinc-400 font-mono text-[11px]">24/7 priority</span>
@@ -109,7 +109,7 @@ export default function ContactPage() {
             {/* Department Card 3: Security & Legal */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200/70 shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center border border-zinc-200/80 shrink-0">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
@@ -118,20 +118,20 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="pt-1 flex items-center justify-between text-xs">
-                <a href="mailto:security@heycora.in" className="font-mono text-zinc-900 hover:text-emerald-700 font-semibold underline underline-offset-2">
+                <a href="mailto:security@heycora.in" className="font-mono text-zinc-900 hover:text-zinc-600 font-semibold underline underline-offset-2">
                   security@heycora.in
                 </a>
                 <span className="text-zinc-400 font-mono text-[11px]">Direct escalation</span>
               </div>
             </div>
 
-            {/* Instant Self-Serve Workspace Banner */}
-            <div className="p-6 rounded-2xl bg-zinc-950 text-white space-y-3 shadow-md">
+            {/* Instant Self-Serve Workspace Banner (Strict Monochrome) */}
+            <div className="p-6 rounded-2xl bg-zinc-950 text-white space-y-3 border border-zinc-800 shadow-md">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400">
                   INSTANT ACCESS
                 </span>
-                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <Sparkles className="w-4 h-4 text-zinc-400" />
               </div>
               <h4 className="font-display text-base font-bold text-white">
                 Want to test Cora right now?
