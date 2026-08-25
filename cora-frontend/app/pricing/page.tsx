@@ -27,7 +27,11 @@ import { trackEvent } from '@/components/analytics/Analytics';
 const FAQS = [
   {
     q: 'Is the Free Forever plan really free?',
-    a: 'Yes, 100% free forever. It includes 1,000 complimentary AI agent runs every month, website builder, Kanban CRM, unlimited tamper-evident SHA-256 e-signatures, automated GST invoicing, and custom domain/email connection with zero credit card required.'
+    a: 'Yes, 100% free forever. It includes 1,000 complimentary AI agent runs every month, website builder (on heycora.in/studio subdomain), Kanban CRM, unlimited tamper-evident SHA-256 e-signatures, and automated GST invoicing with zero credit card required. Custom domain and custom email connection require an upgrade to a paid Growth plan.'
+  },
+  {
+    q: 'Can I connect my own custom domain on Free Forever?',
+    a: 'No. The Free Forever plan includes a free branded subdomain (heycora.in/your-studio). Custom domain connection (.com, .in) and custom email integration are unlocked on Starter, Pro, Scale, and Bharat Growth plans.'
   },
   {
     q: 'What perks come with an Annual plan?',
@@ -93,7 +97,7 @@ export default function PricingPage() {
     <main className="w-full relative pb-24 overflow-hidden bg-white text-zinc-900">
       
       {/* ── Ethereal Pure Cloud Sky Hero Section ── */}
-      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#56a2e8] via-[#cae4fc] to-white pt-28 sm:pt-36 pb-14 sm:pb-20">
+      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#56a2e8] via-[#cae4fc] to-white pt-28 sm:pt-36 pb-12 sm:pb-16">
         
         {/* Background Pure Sky Artwork */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
@@ -133,12 +137,12 @@ export default function PricingPage() {
           </h1>
 
           {/* Body */}
-          <p className="text-zinc-700 text-base sm:text-lg font-normal leading-relaxed max-w-[540px] mx-auto mb-8">
+          <p className="text-zinc-700 text-base sm:text-lg font-normal leading-relaxed max-w-[540px] mx-auto mb-6">
             Start free forever with 1,000 monthly AI runs. Upgrade anytime as you grow.
           </p>
 
-          {/* ── Cadence Selector ── */}
-          <div className="flex flex-col items-center justify-center gap-3 w-full max-w-[480px]">
+          {/* ── Cadence Selector (Zero-CLS Fixed Dimensions) ── */}
+          <div className="flex flex-col items-center justify-center gap-2.5 w-full max-w-[540px]">
             <div className="inline-flex items-center p-1 bg-white/95 backdrop-blur-md rounded-2xl border border-zinc-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.06)] w-full sm:w-auto">
               <button
                 type="button"
@@ -170,28 +174,23 @@ export default function PricingPage() {
               </button>
             </div>
             
-            {/* Annual Perks Card */}
-            {billingCycle === 'annual' ? (
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-4 py-2 bg-white/90 backdrop-blur-md rounded-xl border border-zinc-200/70 shadow-2xs text-xs animate-in fade-in zoom-in-95 duration-200">
-                <span className="font-semibold text-zinc-900 flex items-center gap-1.5">
-                  <Gift className="w-3.5 h-3.5 text-zinc-950" />
-                  <span>Annual Perks:</span>
-                </span>
-                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-900 font-medium text-[11px]">
-                  <Globe className="w-3 h-3 text-zinc-700" />
-                  <span>Free Custom Domain</span>
+            {/* Dedicated Zero-CLS Subline (Consistent 32px height to eliminate any layout jumping) */}
+            <div className="h-8 flex items-center justify-center w-full">
+              {billingCycle === 'annual' ? (
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white/95 backdrop-blur-md rounded-full border border-zinc-200/80 shadow-2xs text-zinc-900 font-medium text-[11px] animate-in fade-in duration-150">
+                  <Gift className="w-3.5 h-3.5 text-zinc-950 shrink-0" />
+                  <span className="font-semibold">Annual Perks:</span>
+                  <span className="bg-zinc-100 px-2 py-0.5 rounded text-zinc-800 font-mono">Free Custom Domain</span>
+                  <span className="text-zinc-300">&bull;</span>
+                  <span className="bg-zinc-100 px-2 py-0.5 rounded text-zinc-800 font-mono">+12,000 Bonus Runs</span>
                 </div>
-                <span className="text-zinc-300 hidden sm:inline">&bull;</span>
-                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-900 font-medium text-[11px]">
-                  <Sparkles className="w-3 h-3 text-zinc-700" />
-                  <span>+12,000 Bonus AI Runs</span>
+              ) : (
+                <div className="text-xs text-zinc-500 font-mono flex items-center justify-center animate-in fade-in duration-150">
+                  No credit card required for Free Forever &bull; Cancel anytime
                 </div>
-              </div>
-            ) : (
-              <div className="text-xs text-zinc-500 font-mono py-1">
-                No credit card required for Free Forever &bull; Cancel anytime
-              </div>
-            )}
+              )}
+            </div>
+
           </div>
 
         </div>
@@ -200,7 +199,7 @@ export default function PricingPage() {
       {/* ══════════════════════════════════════════════════════════════════════
           ROW 1: FREE FOREVER USP SHOWCASE (ELEGANT LIGHT MODE SIGNATURE CARD)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 -mt-4 relative z-10">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16 -mt-3 relative z-10">
         <div className="bg-white border border-zinc-200/90 rounded-[32px] p-6 sm:p-9 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:border-zinc-300 transition-all">
           
           {/* Top Banner: Core USP Statement & Action */}
@@ -220,7 +219,7 @@ export default function PricingPage() {
               </h2>
 
               <p className="text-sm text-zinc-600 leading-relaxed">
-                No 14-day trials. No hidden expiry. Launch your studio website, manage unlimited clients, and execute legally binding contracts with full data ownership.
+                No 14-day trials. No hidden expiry. Launch your studio website on <code className="bg-zinc-100 text-zinc-900 px-1.5 py-0.5 rounded font-mono text-xs font-semibold">heycora.in/studio</code>, manage unlimited clients, and execute legally binding contracts with full data ownership.
               </p>
             </div>
 
@@ -246,7 +245,7 @@ export default function PricingPage() {
 
           </div>
 
-          {/* Bottom Grid: 6 Core Capabilities in Light Mode */}
+          {/* Bottom Grid: 6 Core Capabilities with Explicit Subdomain & Limits */}
           <div className="pt-6">
             <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 mb-3.5">
               INCLUDED LIFETIME CAPABILITIES:
@@ -261,7 +260,7 @@ export default function PricingPage() {
                 <div>
                   <div className="font-semibold text-zinc-950 text-xs">Website Builder</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    Studio portfolio &amp; booking pages live on the web
+                    Studio portfolio &amp; booking pages live on <span className="font-mono text-zinc-800 font-semibold">heycora.in/studio</span>
                   </div>
                 </div>
               </div>
@@ -316,12 +315,14 @@ export default function PricingPage() {
 
               <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-50/80 border border-zinc-200/70 hover:bg-zinc-100/70 transition-colors">
                 <div className="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 shadow-2xs flex items-center justify-center shrink-0 mt-0.5">
-                  <Mail className="w-4 h-4 text-zinc-900" />
+                  <Globe className="w-4 h-4 text-zinc-500" />
                 </div>
                 <div>
-                  <div className="font-semibold text-zinc-950 text-xs">Domain &amp; Email Connect</div>
+                  <div className="font-semibold text-zinc-950 text-xs flex items-center gap-1.5">
+                    <span>Free Cora Subdomain</span>
+                  </div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    Connect your own custom domain and email DNS freely
+                    <span className="text-zinc-700 font-medium">No custom domain or email</span> &bull; Upgrade to connect your own
                   </div>
                 </div>
               </div>
@@ -399,6 +400,10 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
+                    <span><strong>Connect Custom Domain &amp; Email</strong></span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
                     <span>Free Custom Domain on Annual Plans</span>
                   </li>
                   <li className="flex items-start gap-2">
@@ -408,10 +413,6 @@ export default function PricingPage() {
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
                     <span>SHA-256 E-Sign Vault with Audit Logs</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
-                    <span>Meta WhatsApp notification templates</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0 mt-0.5" />
@@ -723,6 +724,14 @@ export default function PricingPage() {
                     <td className="p-4 text-center font-mono">{billingCycle === 'annual' ? '6,000' : '5,000'}</td>
                     <td className="p-4 text-center font-mono">{billingCycle === 'annual' ? '21,000' : '20,000'}</td>
                     <td className="p-4 text-center font-mono">{billingCycle === 'annual' ? '61,000' : '60,000'}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-4 font-medium text-zinc-800">Custom Domain Connection</td>
+                    <td className="p-4 text-center text-zinc-400 font-mono text-[11px]">Subdomain only</td>
+                    <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">Free Custom Domain (Annual)</td>
