@@ -5,15 +5,10 @@ import Link from 'next/link';
 import { 
   Check, 
   ArrowRight, 
-  Sparkles, 
-  Zap, 
-  ShieldCheck, 
-  HelpCircle, 
   ChevronDown, 
   ChevronUp, 
   Minus,
   Flame,
-  Globe,
   Gift
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
@@ -41,7 +36,7 @@ const FAQS = [
   },
   {
     q: 'Can I upgrade, downgrade, or cancel anytime?',
-    a: 'Yes. You can manage your tier anytime directly in your workspace settings. If you downgrade, your historical contracts, invoices, and clients remain fully accessible and protected.'
+    a: 'Yes. You can manage your tier anytime directly in your workspace settings. If you change plans, your historical contracts, invoices, and clients remain fully accessible and protected.'
   },
   {
     q: 'Is our financial and client data secure?',
@@ -227,7 +222,7 @@ export default function PricingPage() {
                 href="https://app.heycora.in/workspace/login?plan=free"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-sm"
               >
-                <span>Start Free — No Card Needed</span>
+                <span>Get Started Free</span>
                 <ArrowRight className="w-4 h-4 text-zinc-400" />
               </a>
             </div>
@@ -328,9 +323,9 @@ export default function PricingPage() {
             <div className="pt-6 mt-6 border-t border-zinc-100">
               <a
                 href="https://app.heycora.in/workspace/login?plan=starter"
-                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 px-4 py-3 rounded-xl text-xs font-semibold transition-colors"
               >
-                <span>Start 14-Day Trial</span>
+                <span>Get Started</span>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
               </a>
             </div>
@@ -413,9 +408,9 @@ export default function PricingPage() {
             <div className="pt-6 mt-6 border-t border-zinc-800">
               <a
                 href="https://app.heycora.in/workspace/login?plan=pro"
-                className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-950 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors shadow-sm"
+                className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-950 px-4 py-3 rounded-xl text-xs font-bold transition-colors shadow-sm"
               >
-                <span>Start 14-Day Free Trial</span>
+                <span>Get Started</span>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-950" />
               </a>
             </div>
@@ -491,9 +486,9 @@ export default function PricingPage() {
             <div className="pt-6 mt-6 border-t border-zinc-100">
               <a
                 href="https://app.heycora.in/workspace/login?plan=scale"
-                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors shadow-xs"
+                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-4 py-3 rounded-xl text-xs font-semibold transition-colors shadow-xs"
               >
-                <span>Start 14-Day Free Trial</span>
+                <span>Get Started</span>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
               </a>
             </div>
@@ -572,7 +567,7 @@ export default function PricingPage() {
                 href="https://app.heycora.in/workspace/login?plan=india_annual_499"
                 className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-950 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-colors shadow-sm"
               >
-                <span>Claim India MSME Plan</span>
+                <span>Get Started</span>
                 <ArrowRight className="w-4 h-4 text-zinc-950" />
               </a>
               <p className="text-[11px] text-zinc-500 text-center font-mono">
