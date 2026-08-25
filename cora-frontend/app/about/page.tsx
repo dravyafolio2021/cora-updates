@@ -477,77 +477,10 @@ export default function AboutPage() {
             </div>
 
           </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          SECTION 7: ENTERPRISE SECURITY & COMPLIANCE SUMMARY
-      ───────────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24">
-        <div className="bg-white border border-zinc-200/90 rounded-[36px] p-8 sm:p-12 shadow-[0px_20px_50px_rgba(0,0,0,0.04)] text-center space-y-8">
-          <div className="max-w-[620px] mx-auto space-y-3">
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
-              Enterprise standards you can rely on
-            </h2>
-            <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed">
-              Every document signed and payment processed through Cora meets international security benchmarks.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-[840px] mx-auto">
-            <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-200/80">
-              <span className="text-[10px] font-mono text-zinc-400 uppercase block">SECURITY</span>
-              <span className="text-base font-bold text-zinc-950">SOC 2 Type II</span>
-              <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">COMPLIANT</span>
-            </div>
-
-            <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-200/80">
-              <span className="text-[10px] font-mono text-zinc-400 uppercase block">GLOBAL</span>
-              <span className="text-base font-bold text-zinc-950">ISO 27001</span>
-              <span className="text-[10px] text-zinc-600 font-semibold block mt-0.5">CERTIFIED</span>
-            </div>
-
-            <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-200/80">
-              <span className="text-[10px] font-mono text-zinc-400 uppercase block">LEGAL</span>
-              <span className="text-base font-bold text-zinc-950">IT Act 2000</span>
-              <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">E-SIGN HASH</span>
-            </div>
-
-            <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-200/80">
-              <span className="text-[10px] font-mono text-zinc-400 uppercase block">TAXATION</span>
-              <span className="text-base font-bold text-zinc-950">18% GST Math</span>
-              <span className="text-[10px] text-zinc-600 font-semibold block mt-0.5">READY</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          SECTION 8: BOTTOM CTA BANNER
-      ───────────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
-        <div className="bg-zinc-950 text-white rounded-[36px] p-8 sm:p-14 text-center space-y-6 relative overflow-hidden shadow-xl">
-          <div className="relative z-10 max-w-[580px] mx-auto space-y-4">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-              Ready to eliminate studio chaos?
-            </h2>
-            <p className="text-zinc-400 text-sm sm:text-base">
-              Deploy your autonomous AI co-founder in under 2 minutes with zero upfront fees.
-            </p>
-            <div className="pt-2 flex items-center justify-center gap-3.5 flex-wrap">
-              <Link
-                href="/workspace/login"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white text-zinc-950 font-bold hover:bg-zinc-100 transition-all shadow-md hover:-translate-y-0.5"
-              >
-                <span>Launch Cora Workspace</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
         </div>
       </section>
 
     </main>
   );
 }
+
