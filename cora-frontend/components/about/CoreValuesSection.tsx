@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const VALUES = [
   {
@@ -37,138 +36,133 @@ const VALUES = [
 ];
 
 export function CoreValuesSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
-  const carouselRef = useRef<HTMLDivElement>(null);
 
-  const handleScroll = () => {
-    if (!carouselRef.current) return;
-    const { scrollLeft, clientWidth } = carouselRef.current;
-    const cardWidth = clientWidth * 0.85;
-    const index = Math.round(scrollLeft / cardWidth);
-    setActiveIndex(Math.min(Math.max(index, 0), VALUES.length - 1));
-  };
+  useEffect(() => {
+    let animationFrameId: number;
 
-  const scrollToIndex = (index: number) => {
-    if (!carouselRef.current) return;
-    const { clientWidth } = carouselRef.current;
-    const cardWidth = clientWidth * 0.85;
-    carouselRef.current.scrollTo({
-      left: index * cardWidth,
-      behavior: 'smooth'
-    });
-    setActiveIndex(index);
-  };
+    const handleScroll = () => {
+      if (!containerRef.current || !trackRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const totalScrollDistance = rect.height - windowHeight;
+
+      if (totalScrollDistance <= 0) return;
+
+      const scrolled = -rect.top;
+      const progress = Math.max(0, Math.min(1, scrolled / totalScrollDistance));
+
+      setScrollProgress(progress);
+
+      const parentWidth = trackRef.current.parentElement?.clientWidth || window.innerWidth;
+      const trackWidth = trackRef.current.scrollWidth;
+      const maxTranslate = Math.max(0, trackWidth - parentWidth);
+
+      trackRef.current.style.transform = `translateX(-${progress * maxTranslate}px)`;
+
+      const currentIndex = Math.min(
+        Math.round(progress * (VALUES.length - 1)),
+        VALUES.length - 1
+      );
+      setActiveIndex(currentIndex);
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(handleScroll);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', handleScroll);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
 
   return (
-    <div className="w-full space-y-8 sm:space-y-12">
+    <div ref={containerRef} className="relative w-full h-[320vh]">
       
-      {/* Header */}
-      <div className="text-center space-y-2.5">
-        <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-500 block">
-          DNA &amp; PRINCIPLES
-        </span>
-        <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
-          Our core values.
-        </h2>
-        <p className="text-sm sm:text-base text-zinc-600 max-w-[520px] mx-auto font-normal">
-          The fundamental beliefs that guide how we build products, support creators, and grow together.
-        </p>
-      </div>
+      {/* Pinned Viewport Container (GSAP Parallax Style) */}
+      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden py-12">
+        <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 space-y-10 sm:space-y-14">
+          
+          {/* Section Header */}
+          <div className="text-center space-y-2.5 max-w-[620px] mx-auto">
+            <span className="text-[11px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-zinc-500 block">
+              DNA &amp; PRINCIPLES
+            </span>
+            <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
+              Our core values.
+            </h2>
+            <p className="text-sm sm:text-base text-zinc-600 font-normal">
+              The fundamental beliefs that guide how we build products, support creators, and grow together.
+            </p>
+          </div>
 
-      {/* 
-        Mobile: Native Snap-Scroll Carousel (No vertical space bloat, clean snap cards)
-        Desktop: Unboxed 3-column grid
-      */}
-      <div className="relative w-full">
-        
-        {/* Mobile Swipe Strip */}
-        <div
-          ref={carouselRef}
-          onScroll={handleScroll}
-          className="flex md:hidden overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 px-4 -mx-4 pb-2"
-          style={{ WebkitOverflowScrolling: 'touch' }}
-        >
-          {VALUES.map((val, idx) => (
+          {/* Horizontal Translating Track */}
+          <div className="relative w-full overflow-hidden">
             <div
-              key={idx}
-              className="w-[85vw] max-w-[340px] shrink-0 snap-start border-t border-zinc-200 pt-5 space-y-2.5 select-none"
+              ref={trackRef}
+              className="flex gap-8 sm:gap-12 will-change-transform transition-transform duration-75 ease-out pr-12"
             >
-              <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                {val.num}
-              </span>
-              <h3 className="font-display text-xl font-bold text-zinc-950 tracking-tight">
-                {val.title}
-              </h3>
-              <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-                {val.desc}
-              </p>
+              {VALUES.map((val, idx) => {
+                const isActive = activeIndex === idx;
+
+                return (
+                  <div
+                    key={idx}
+                    className={`w-[82vw] sm:w-[420px] shrink-0 border-t-2 pt-6 space-y-3 transition-opacity duration-300 ${
+                      isActive ? 'border-zinc-950 opacity-100' : 'border-zinc-200 opacity-60'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                        {val.num}
+                      </span>
+                      {isActive && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-950 animate-pulse" />
+                      )}
+                    </div>
+
+                    <h3 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
+                      {val.title}
+                    </h3>
+
+                    <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
+                      {val.desc}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
+          </div>
 
-        {/* Desktop 3-Column Grid */}
-        <div className="hidden md:grid md:grid-cols-3 gap-x-12 gap-y-16">
-          {VALUES.map((val, idx) => (
-            <div
-              key={idx}
-              className="border-t border-zinc-200 pt-6 space-y-3"
-            >
-              <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                {val.num}
-              </span>
-              <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-                {val.title}
-              </h3>
-              <p className="text-sm text-zinc-600 leading-relaxed font-normal">
-                {val.desc}
-              </p>
+          {/* Progress Bar & Stage Indicator */}
+          <div className="flex items-center justify-between max-w-[420px] mx-auto w-full pt-2">
+            <span className="text-xs font-mono font-bold text-zinc-950">
+              0{activeIndex + 1} / 0{VALUES.length}
+            </span>
+
+            {/* Continuous Fill Bar */}
+            <div className="flex-1 mx-6 h-1 bg-zinc-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-zinc-950 transition-all duration-100 rounded-full"
+                style={{ width: `${Math.max(8, scrollProgress * 100)}%` }}
+              />
             </div>
-          ))}
-        </div>
 
-      </div>
+            <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
+              Scroll ↓
+            </span>
+          </div>
 
-      {/* Mobile Indicator & Nav Controls */}
-      <div className="flex md:hidden items-center justify-between px-1">
-        <span className="text-xs font-mono font-medium text-zinc-400">
-          0{activeIndex + 1} / 0{VALUES.length}
-        </span>
-
-        {/* Minimal Progress Dots */}
-        <div className="flex items-center gap-1.5">
-          {VALUES.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => scrollToIndex(i)}
-              aria-label={`Go to principle ${i + 1}`}
-              className={`h-1.5 rounded-full transition-all duration-200 ${
-                activeIndex === i ? 'w-5 bg-zinc-950' : 'w-1.5 bg-zinc-300'
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Arrows */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => scrollToIndex(Math.max(0, activeIndex - 1))}
-            disabled={activeIndex === 0}
-            className="w-7 h-7 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-600 disabled:opacity-30 transition-opacity"
-            aria-label="Previous"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToIndex(Math.min(VALUES.length - 1, activeIndex + 1))}
-            disabled={activeIndex === VALUES.length - 1}
-            className="w-7 h-7 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-600 disabled:opacity-30 transition-opacity"
-            aria-label="Next"
-          >
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
         </div>
       </div>
 
