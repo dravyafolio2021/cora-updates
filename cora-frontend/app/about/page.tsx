@@ -20,6 +20,7 @@ import {
   Layers,
   ChevronRight
 } from 'lucide-react';
+import { DynamicWeekCalendar } from '@/components/about/DynamicWeekCalendar';
 
 export const metadata: Metadata = {
   title: 'About Cora — The Convergence of Software, AI & Humans',
@@ -324,21 +325,21 @@ export default function AboutPage() {
           </a>
         </div>
 
-        {/* ── Architectural Circular Portal (Seamlessly Blended into Canvas) ── */}
-        <div className="relative w-full max-w-[1080px] mx-auto aspect-[16/9] mb-12 sm:mb-16 overflow-hidden">
+        {/* ── Architectural Circular Portal (Background Removed & Seamlessly Blended) ── */}
+        <div className="relative w-full max-w-[960px] mx-auto aspect-[16/9] mb-12 sm:mb-16 overflow-hidden">
           <Image
-            src="/images/about_mission_portal_blended.png"
+            src="/images/about_mission_portal_clean.png"
             alt="Cora Mission Horizon Portal"
             fill
             priority
-            sizes="(max-width: 1240px) 100vw, 1080px"
+            sizes="(max-width: 1240px) 100vw, 960px"
             className="object-contain object-center filter contrast-102"
           />
           {/* Subtle multi-directional gradients for seamless canvas integration */}
-          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white via-white/30 to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/60 to-transparent pointer-events-none" />
-          <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white via-white/40 to-transparent pointer-events-none" />
-          <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white via-white/40 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-white via-white/20 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/60 to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-white via-white/30 to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white via-white/30 to-transparent pointer-events-none" />
         </div>
 
         {/* ── Brand Trust / Client Ticker at bottom ── */}
@@ -359,63 +360,11 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION 3: OUR MOTTO (Weekly Calendar Highlight Strip)
+          SECTION 3: OUR MOTTO (Dynamic Live Week Calendar & Telemetry)
       ───────────────────────────────────────────────────────────── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 sm:mb-40">
-        <div className="bg-zinc-50 border border-zinc-200/90 rounded-[36px] sm:rounded-[44px] p-8 sm:p-14 md:p-16 space-y-10 shadow-2xs">
-          
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
-              <span>OUR MOTTO</span>
-            </div>
-            <h3 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[56px] font-bold text-zinc-950 tracking-tight">
-              Save one day, Every week.
-            </h3>
-          </div>
-
-          {/* Interactive 7-Day Calendar Strip */}
-          <div className="w-full overflow-x-auto pb-2 scrollbar-none">
-            <div className="min-w-[640px] grid grid-cols-7 gap-3 sm:gap-4">
-              
-              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
-                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">10</span>
-                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Mon</span>
-              </div>
-
-              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
-                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">11</span>
-                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Tue</span>
-              </div>
-
-              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
-                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">12</span>
-                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Wed</span>
-              </div>
-
-              {/* Highlighted Day (Saved Day - Thursday) */}
-              <div className="bg-zinc-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-800 text-center flex flex-col items-center justify-center gap-1 shadow-lg ring-4 ring-zinc-900/10 scale-105 transition-transform">
-                <span className="font-display text-2xl sm:text-3xl font-extrabold text-white">13</span>
-                <span className="text-xs font-mono text-zinc-300 font-bold uppercase">Thurs</span>
-              </div>
-
-              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
-                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">14</span>
-                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Fri</span>
-              </div>
-
-              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
-                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">15</span>
-                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Sat</span>
-              </div>
-
-              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200/80 text-center flex flex-col items-center justify-center gap-1 shadow-2xs">
-                <span className="font-display text-2xl sm:text-3xl font-bold text-zinc-800">16</span>
-                <span className="text-xs font-mono text-zinc-500 font-semibold uppercase">Sun</span>
-              </div>
-
-            </div>
-          </div>
-
+        <div className="bg-zinc-50 border border-zinc-200/90 rounded-[36px] sm:rounded-[44px] p-8 sm:p-14 md:p-16 shadow-2xs">
+          <DynamicWeekCalendar />
         </div>
       </section>
 
