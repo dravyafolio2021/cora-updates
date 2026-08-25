@@ -124,60 +124,62 @@ export default function AboutPage() {
       {/* ─────────────────────────────────────────────────────────────
           SECTION 1: HERO STAGE (ClickUp Style Indian Team Mosaic Grid)
       ───────────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 text-center mb-24 sm:mb-32">
+      <section className="w-full max-w-[1400px] mx-auto px-3 xs:px-4 sm:px-6 text-center mb-24 sm:mb-32">
         
         {/* Eyebrow */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs sm:text-[13px] font-mono font-bold uppercase tracking-widest text-[#7B2BF9] mb-4 sm:mb-5">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 text-[11px] xs:text-xs sm:text-[13px] font-mono font-bold uppercase tracking-widest text-[#7B2BF9] mb-3 sm:mb-5">
           <span>MAXIMIZE HUMAN PRODUCTIVITY</span>
         </div>
 
-        {/* Main Headline */}
-        <h1 className="font-display text-5xl xs:text-6xl sm:text-7xl lg:text-[84px] font-extrabold text-zinc-950 leading-[1.05] tracking-[-0.035em] max-w-[960px] mx-auto mb-4">
-          We are <span className="bg-gradient-to-r from-[#7B2BF9] via-[#905BF9] to-[#FF6B6B] bg-clip-text text-transparent">Cora</span>.
+        {/* Main Headline (Reduced font weight, uppercase CORA) */}
+        <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl lg:text-[76px] font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em] max-w-[960px] mx-auto mb-3.5 sm:mb-4">
+          We are <span className="font-bold text-zinc-950">CORA</span>.
         </h1>
 
         {/* Subtitle */}
-        <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed max-w-[620px] mx-auto mb-8 sm:mb-9">
-          The convergence of software, AI, humans.
+        <p className="text-zinc-600 text-sm xs:text-base sm:text-xl font-normal leading-relaxed max-w-[620px] mx-auto mb-7 sm:mb-9">
+          The Convergence of software, AI, humans.
         </p>
 
         {/* Hero CTA Button */}
-        <div className="flex items-center justify-center mb-12 sm:mb-16">
+        <div className="flex items-center justify-center mb-10 sm:mb-16">
           <a
             href="#manifesto"
-            className="inline-flex items-center gap-2.5 bg-zinc-900 text-white px-7 py-3.5 rounded-full text-xs sm:text-sm font-bold hover:bg-black transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 group"
+            className="inline-flex items-center gap-2.5 bg-[#18181B] text-white px-6 sm:px-7 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-bold hover:bg-black transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 group"
           >
             <Play className="w-3 h-3 fill-white text-white" />
             <span>Learn more about us</span>
           </a>
         </div>
 
-        {/* ── 5-Column Floating Team Mosaic Grid (Matching Reference) ── */}
-        <div className="relative w-full overflow-hidden max-w-[1240px] mx-auto pt-2 pb-6">
+        {/* ── 5-Column Floating Team Mosaic Grid (Single Formation on Mobile & Desktop) ── */}
+        <div className="relative w-full overflow-hidden max-w-[1240px] mx-auto pt-1 pb-4">
           
-          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5 items-center justify-center">
+          <div className="relative z-10 grid grid-cols-5 gap-1.5 xs:gap-2.5 sm:gap-4 lg:gap-5 items-center justify-center">
             
             {/* Column 1: Far Left (Top: Pink, Bottom: Cream) */}
-            <div className="flex flex-col gap-3.5 sm:gap-4">
+            <div className="flex flex-col gap-1.5 xs:gap-2.5 sm:gap-4">
               {/* Card 1 Top */}
-              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#FDE8EA] aspect-[4/4.7] overflow-hidden shadow-2xs">
+              <div className="relative rounded-xl xs:rounded-2xl sm:rounded-[32px] bg-[#FDE8EA] aspect-[4/4.7] overflow-hidden shadow-2xs">
                 <div className="absolute inset-0 flex items-end justify-center">
                   <Image
                     src="/images/hero_mosaic_1_top.png"
                     alt="Cora Team Member"
                     fill
+                    sizes="(max-width: 640px) 20vw, 240px"
                     className="object-contain object-bottom"
                   />
                 </div>
               </div>
 
               {/* Card 1 Bottom */}
-              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#FDF2E9] aspect-[4/4.7] overflow-hidden shadow-2xs">
+              <div className="relative rounded-xl xs:rounded-2xl sm:rounded-[32px] bg-[#FDF2E9] aspect-[4/4.7] overflow-hidden shadow-2xs">
                 <div className="absolute inset-0 flex items-end justify-center">
                   <Image
                     src="/images/hero_mosaic_1_bottom.png"
                     alt="Cora Team Member"
                     fill
+                    sizes="(max-width: 640px) 20vw, 240px"
                     className="object-contain object-bottom"
                   />
                 </div>
@@ -185,26 +187,28 @@ export default function AboutPage() {
             </div>
 
             {/* Column 2: Mid Left (Top: Powder Blue, Bottom: Lilac) */}
-            <div className="flex flex-col gap-3.5 sm:gap-4">
+            <div className="flex flex-col gap-1.5 xs:gap-2.5 sm:gap-4">
               {/* Card 2 Top */}
-              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#E0F0FA] aspect-[4/4.7] overflow-hidden shadow-2xs">
+              <div className="relative rounded-xl xs:rounded-2xl sm:rounded-[32px] bg-[#E0F0FA] aspect-[4/4.7] overflow-hidden shadow-2xs">
                 <div className="absolute inset-0 flex items-end justify-center">
                   <Image
                     src="/images/hero_mosaic_2_top.png"
                     alt="Cora Team Member"
                     fill
+                    sizes="(max-width: 640px) 20vw, 240px"
                     className="object-contain object-bottom"
                   />
                 </div>
               </div>
 
               {/* Card 2 Bottom */}
-              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#EFE9FA] aspect-[4/4.7] overflow-hidden shadow-2xs">
+              <div className="relative rounded-xl xs:rounded-2xl sm:rounded-[32px] bg-[#EFE9FA] aspect-[4/4.7] overflow-hidden shadow-2xs">
                 <div className="absolute inset-0 flex items-end justify-center">
                   <Image
                     src="/images/hero_mosaic_2_bottom.png"
                     alt="Cora Team Member"
                     fill
+                    sizes="(max-width: 640px) 20vw, 240px"
                     className="object-contain object-bottom"
                   />
                 </div>
@@ -212,13 +216,14 @@ export default function AboutPage() {
             </div>
 
             {/* Column 3: Center Hero Leader Card (Warm Apricot / Peach - Wider & Taller) */}
-            <div className="col-span-2 sm:col-span-4 lg:col-span-1 flex justify-center order-first lg:order-none mb-2 lg:mb-0">
-              <div className="relative w-full max-w-[280px] lg:max-w-none rounded-[28px] sm:rounded-[36px] bg-[#FDEDE7] aspect-[4/5.1] overflow-hidden shadow-sm">
+            <div className="col-span-1 flex justify-center">
+              <div className="relative w-full rounded-2xl xs:rounded-3xl sm:rounded-[36px] bg-[#FDEDE7] aspect-[4/5.1] overflow-hidden shadow-xs">
                 <div className="absolute inset-0 flex items-end justify-center">
                   <Image
                     src="/images/hero_mosaic_center.png"
                     alt="Cora AI Team Lead"
                     fill
+                    sizes="(max-width: 640px) 25vw, 320px"
                     className="object-contain object-bottom"
                   />
                 </div>
@@ -226,26 +231,28 @@ export default function AboutPage() {
             </div>
 
             {/* Column 4: Mid Right (Top: Soft Lavender, Bottom: Warm Beige) */}
-            <div className="flex flex-col gap-3.5 sm:gap-4">
+            <div className="flex flex-col gap-1.5 xs:gap-2.5 sm:gap-4">
               {/* Card 4 Top */}
-              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#EFE8F9] aspect-[4/4.7] overflow-hidden shadow-2xs">
+              <div className="relative rounded-xl xs:rounded-2xl sm:rounded-[32px] bg-[#EFE8F9] aspect-[4/4.7] overflow-hidden shadow-2xs">
                 <div className="absolute inset-0 flex items-end justify-center">
                   <Image
                     src="/images/hero_mosaic_4_top.png"
                     alt="Cora Team Member"
                     fill
+                    sizes="(max-width: 640px) 20vw, 240px"
                     className="object-contain object-bottom"
                   />
                 </div>
               </div>
 
               {/* Card 4 Bottom */}
-              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#FAF1E8] aspect-[4/4.7] overflow-hidden shadow-2xs">
+              <div className="relative rounded-xl xs:rounded-2xl sm:rounded-[32px] bg-[#FAF1E8] aspect-[4/4.7] overflow-hidden shadow-2xs">
                 <div className="absolute inset-0 flex items-end justify-center">
                   <Image
                     src="/images/hero_mosaic_4_bottom.png"
                     alt="Cora Team Member"
                     fill
+                    sizes="(max-width: 640px) 20vw, 240px"
                     className="object-contain object-bottom"
                   />
                 </div>
@@ -253,26 +260,28 @@ export default function AboutPage() {
             </div>
 
             {/* Column 5: Far Right (Top: Soft Mint, Bottom: Sky Blue) */}
-            <div className="flex flex-col gap-3.5 sm:gap-4">
+            <div className="flex flex-col gap-1.5 xs:gap-2.5 sm:gap-4">
               {/* Card 5 Top */}
-              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#EAF7F0] aspect-[4/4.7] overflow-hidden shadow-2xs">
+              <div className="relative rounded-xl xs:rounded-2xl sm:rounded-[32px] bg-[#EAF7F0] aspect-[4/4.7] overflow-hidden shadow-2xs">
                 <div className="absolute inset-0 flex items-end justify-center">
                   <Image
                     src="/images/hero_mosaic_5_top.png"
                     alt="Cora Team Member"
                     fill
+                    sizes="(max-width: 640px) 20vw, 240px"
                     className="object-contain object-bottom"
                   />
                 </div>
               </div>
 
               {/* Card 5 Bottom */}
-              <div className="relative rounded-[26px] sm:rounded-[32px] bg-[#E3EFF8] aspect-[4/4.7] overflow-hidden shadow-2xs">
+              <div className="relative rounded-xl xs:rounded-2xl sm:rounded-[32px] bg-[#E3EFF8] aspect-[4/4.7] overflow-hidden shadow-2xs">
                 <div className="absolute inset-0 flex items-end justify-center">
                   <Image
                     src="/images/hero_mosaic_5_bottom.png"
                     alt="Cora Team Member"
                     fill
+                    sizes="(max-width: 640px) 20vw, 240px"
                     className="object-contain object-bottom"
                   />
                 </div>
@@ -284,17 +293,17 @@ export default function AboutPage() {
         </div>
 
         {/* ── Brand Trust / Client Ticker at bottom (Matching Reference) ── */}
-        <div className="pt-12 max-w-[1040px] mx-auto">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 block mb-7">
+        <div className="pt-10 sm:pt-12 max-w-[1040px] mx-auto">
+          <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 block mb-5 sm:mb-7">
             TRUSTED BY THE BEST
           </span>
-          <div className="flex items-center justify-center flex-wrap gap-8 sm:gap-14 opacity-60 grayscale hover:grayscale-0 transition-all text-zinc-700">
-            <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight">Google</span>
-            <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight">airbnb</span>
-            <span className="font-display font-black text-lg sm:text-xl tracking-tighter uppercase italic">NIKE</span>
-            <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight">Dropbox</span>
-            <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight">PayPal</span>
-            <span className="font-display font-black text-lg sm:text-xl tracking-widest uppercase">NETFLIX</span>
+          <div className="flex items-center justify-center flex-wrap gap-6 sm:gap-14 opacity-60 grayscale hover:grayscale-0 transition-all text-zinc-700">
+            <span className="font-display font-extrabold text-base sm:text-xl tracking-tight">Google</span>
+            <span className="font-display font-extrabold text-base sm:text-xl tracking-tight">airbnb</span>
+            <span className="font-display font-black text-base sm:text-xl tracking-tighter uppercase italic">NIKE</span>
+            <span className="font-display font-extrabold text-base sm:text-xl tracking-tight">Dropbox</span>
+            <span className="font-display font-extrabold text-base sm:text-xl tracking-tight">PayPal</span>
+            <span className="font-display font-black text-base sm:text-xl tracking-widest uppercase">NETFLIX</span>
           </div>
         </div>
 
