@@ -127,27 +127,22 @@ export default function AboutPage() {
       <section className="w-full max-w-[1400px] mx-auto px-3 xs:px-4 sm:px-6 text-center mb-24 sm:mb-32">
         
         {/* Eyebrow */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 text-[11px] xs:text-xs sm:text-[13px] font-mono font-bold uppercase tracking-widest text-[#7B2BF9] mb-3 sm:mb-5">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 text-[11px] xs:text-xs sm:text-[13px] font-mono font-bold uppercase tracking-widest text-[#7B2BF9] mb-3 sm:mb-4">
           <span>MAXIMIZE HUMAN PRODUCTIVITY</span>
         </div>
 
         {/* Main Headline (Reduced font weight, uppercase CORA) */}
-        <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl lg:text-[76px] font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em] max-w-[960px] mx-auto mb-3.5 sm:mb-4">
+        <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl lg:text-[76px] font-bold text-zinc-950 leading-[1.08] tracking-[-0.03em] max-w-[960px] mx-auto mb-6 sm:mb-8">
           We are <span className="font-bold text-zinc-950">CORA</span>.
         </h1>
 
-        {/* Subtitle */}
-        <p className="text-zinc-600 text-sm xs:text-base sm:text-xl font-normal leading-relaxed max-w-[620px] mx-auto mb-7 sm:mb-9">
-          The Convergence of software, AI, humans.
-        </p>
-
-        {/* Hero CTA Button */}
-        <div className="flex items-center justify-center mb-10 sm:mb-16">
+        {/* Hero CTA Button (Strictly following Cora Design System Tokens: rounded-xl, monochromatic) */}
+        <div className="flex items-center justify-center mb-12 sm:mb-16">
           <a
             href="#manifesto"
-            className="inline-flex items-center gap-2.5 bg-[#18181B] text-white px-6 sm:px-7 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-bold hover:bg-black transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 group"
+            className="inline-flex items-center gap-2 bg-zinc-950 text-white hover:bg-zinc-900 border border-zinc-800 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm font-semibold tracking-tight shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group"
           >
-            <Play className="w-3 h-3 fill-white text-white" />
+            <Play className="w-3.5 h-3.5 fill-white text-white group-hover:scale-110 transition-transform" />
             <span>Learn more about us</span>
           </a>
         </div>
