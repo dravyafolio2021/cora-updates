@@ -20,27 +20,35 @@ import {
   Lock,
   Star,
   QrCode,
-  MessageCircle,
-  Building2
+  Building2,
+  Users,
+  BadgeCheck
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
+
+// Official Vector WhatsApp SVG Icon
+const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+  </svg>
+);
 
 const FAQS = [
   {
     q: 'Is the Free Forever plan really free?',
-    a: 'Yes, 100% free forever. It includes 1,000 complimentary AI agent runs every month, website builder (on heycora.in/your-name subdomain), Kanban CRM, unlimited tamper-evident SHA-256 e-signatures, and automated GST invoicing with zero credit card required. Custom domain and custom email connection require an upgrade to a paid Growth plan.'
+    a: 'Yes, 100% free forever. It includes 1,000 complimentary AI agent runs every month, website builder (on heycora.in/your-name subdomain), Kanban CRM, unlimited* tamper-evident SHA-256 e-signatures, and automated GST invoicing with zero credit card required. Custom domain and custom email connection require an upgrade to a paid Growth plan.'
   },
   {
     q: 'How does the 2 Months Free on Annual plans work?',
-    a: 'When you choose Annual billing on Starter, Professional, or Scale, you only pay for 10 months instead of 12 (giving you 2 full months completely free). In addition, you receive a free 1-year custom domain (.com, .in, or .co) with SSL and +12,000 bonus AI runs across the year.'
+    a: 'When you choose Annual billing on Starter, Professional, or Scale, you only pay for 10 months instead of 12 (giving you 2 full months completely free). In addition, you receive a free 1-year custom domain with SSL and +12,000 bonus AI runs across the year.'
   },
   {
     q: 'What is the India Only Plan and who is eligible?',
-    a: 'The India Only Plan is an exclusive, heavily subsidized operating system at ₹499/month built specifically for Indian founders, MSMEs, agencies, and studios. It includes 10,000 monthly AI runs, a free custom domain (.in or .com), dynamic UPI QR code payments on all invoices, automated 18% CGST/SGST/IGST tax math, and Meta WhatsApp automated client dispatch. It is available strictly as an annual commitment (₹5,988/year).'
+    a: 'The India Only Plan is an exclusive, heavily subsidized operating system at ₹499/month built specifically for Indian founders, MSMEs, agencies, and studios. It includes 10,000 monthly AI runs, a free custom .in domain, dynamic UPI QR code payments on all invoices, automated 18% CGST/SGST/IGST tax math, and official WhatsApp automated client dispatch. It is available strictly as an annual commitment (₹5,988/year).'
   },
   {
     q: 'What is the difference between Starter and Professional?',
-    a: 'Starter gives you custom domain connection (yourbrand.com), custom email dispatch, and 5,000 monthly AI runs. Professional upgrades your AI intelligence to Claude 3.5 Sonnet & GPT-4o mini, increases runs to 20,000/mo, adds Meta WhatsApp automated client dispatch, Dynamic UPI QR codes on invoices, and expands team seats to 5.'
+    a: 'Starter gives you custom domain connection (yourbrand.in), custom email dispatch, and 5,000 monthly AI runs. Professional upgrades your AI reasoning capacity to 20,000 runs/mo, adds official WhatsApp automated client dispatch, Dynamic UPI QR codes on invoices, and expands team seats to 5.'
   },
   {
     q: 'Can I upgrade, downgrade, or cancel anytime?',
@@ -229,7 +237,7 @@ export default function PricingPage() {
                 <div className="min-w-0">
                   <div className="font-semibold text-zinc-900 text-xs">1,000 AI Credits / month</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    Google Gemini 2.5 Flash for proposals &amp; client briefs
+                    Automated proposal drafting &amp; project brief generator
                   </div>
                 </div>
               </div>
@@ -241,7 +249,7 @@ export default function PricingPage() {
                 <div className="min-w-0">
                   <div className="font-semibold text-zinc-900 text-xs">SHA-256 E-Sign Vault</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    Unlimited legally binding contracts with audit trail
+                    Unlimited* legally binding contracts with audit trail
                   </div>
                 </div>
               </div>
@@ -293,7 +301,7 @@ export default function PricingPage() {
               High-Throughput Operating Plans
             </h2>
             <p className="text-xs sm:text-sm text-zinc-500 mt-1">
-              Connect your custom domain, automate client communications, and supercharge operations with frontier AI.
+              Connect your custom domain, automate client communications, and supercharge operations with advanced AI.
             </p>
           </div>
 
@@ -351,7 +359,7 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* 3-Tier SaaS Cards: 2 Months Free Calculations */}
+        {/* 3-Tier SaaS Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch pt-3">
           
           {/* CARD 1: STARTER */}
@@ -371,7 +379,7 @@ export default function PricingPage() {
                 Establish your independent brand with custom domains, email, and 5x AI capacity.
               </p>
 
-              {/* Price Block: Reflecting 2 Months Free on Annual */}
+              {/* Price Block */}
               <div className="mb-5">
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
@@ -389,7 +397,7 @@ export default function PricingPage() {
                 <div className="text-[11px] text-zinc-500 mt-1 font-mono">
                   {billingCycle === 'annual'
                     ? (currency === 'INR' ? 'Billed annually at ₹9,990/yr (Save ₹1,998)' : 'Billed annually at $90/yr (Save $18)')
-                    : 'Billed monthly (₹999/mo)'}
+                    : 'Billed monthly'}
                 </div>
               </div>
 
@@ -439,7 +447,7 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* CARD 2: PROFESSIONAL (HIGH VALUE & RECOMMENDED BADGE) */}
+          {/* CARD 2: PROFESSIONAL */}
           <div className="bg-white border-2 border-zinc-950 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_12px_40px_rgba(0,0,0,0.08)] relative mt-0 md:-mt-3">
             
             <div className="absolute -top-3.5 inset-x-0 flex justify-center">
@@ -459,10 +467,10 @@ export default function PricingPage() {
                 </span>
               </div>
               <p className="text-xs text-zinc-500 leading-relaxed mb-5 min-h-[34px]">
-                Autonomous operating backbone with Claude 3.5 Sonnet, WhatsApp, and UPI QR.
+                Autonomous operating backbone with advanced AI, official WhatsApp dispatch, and UPI QR.
               </p>
 
-              {/* Price Block: Reflecting 2 Months Free on Annual */}
+              {/* Price Block */}
               <div className="mb-5">
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
@@ -480,11 +488,11 @@ export default function PricingPage() {
                 <div className="text-[11px] text-zinc-500 mt-1 font-mono">
                   {billingCycle === 'annual'
                     ? (currency === 'INR' ? 'Billed annually at ₹19,990/yr (Save ₹3,998)' : 'Billed annually at $190/yr (Save $38)')
-                    : 'Billed monthly (₹1,999/mo)'}
+                    : 'Billed monthly'}
                 </div>
               </div>
 
-              {/* Action CTA (High-Converting Solid Black) */}
+              {/* Action CTA */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=pro"
                 className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3.5 px-4 rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg mb-6"
@@ -501,15 +509,15 @@ export default function PricingPage() {
                 <ul className="space-y-2.5 text-xs text-zinc-700">
                   <li className="flex items-center gap-2.5">
                     <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
-                    <span><strong>Claude 3.5 Sonnet &amp; GPT-4o</strong></span>
+                    <span><strong>Advanced AI Reasoning Engine</strong></span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
                     <span><strong>{billingCycle === 'annual' ? '21,000' : '20,000'}</strong> AI Runs / month</span>
                   </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-zinc-950 shrink-0" />
-                    <span>Meta WhatsApp automated dispatch</span>
+                  <li className="flex items-center gap-2.5 text-zinc-950 font-medium">
+                    <WhatsAppIcon className="w-4 h-4 text-[#25D366] shrink-0" />
+                    <span>Official WhatsApp automated dispatch</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0" />
@@ -551,7 +559,7 @@ export default function PricingPage() {
                 High-throughput infrastructure for agencies &amp; multi-member teams.
               </p>
 
-              {/* Price Block: Reflecting 2 Months Free on Annual */}
+              {/* Price Block */}
               <div className="mb-5">
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
@@ -569,7 +577,7 @@ export default function PricingPage() {
                 <div className="text-[11px] text-zinc-500 mt-1 font-mono">
                   {billingCycle === 'annual'
                     ? (currency === 'INR' ? 'Billed annually at ₹29,990/yr (Save ₹5,998)' : 'Billed annually at $290/yr (Save $58)')
-                    : 'Billed monthly (₹2,999/mo)'}
+                    : 'Billed monthly'}
                 </div>
               </div>
 
@@ -590,7 +598,7 @@ export default function PricingPage() {
                 <ul className="space-y-2.5 text-xs text-zinc-700">
                   <li className="flex items-center gap-2.5">
                     <Sparkles className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span><strong>All Frontier LLM Models</strong></span>
+                    <span><strong>All Frontier AI Engines</strong></span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
@@ -602,7 +610,7 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0" />
-                    <span>Unlimited team seats</span>
+                    <span>Unlimited* team seats</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-zinc-950 shrink-0" />
@@ -653,7 +661,7 @@ export default function PricingPage() {
               Complete Feature Comparison Matrix
             </h3>
             <p className="text-xs text-zinc-500 mt-1">
-              Detailed breakdown of quotas, models, branding, and integrations across all Cora tiers.
+              Detailed breakdown of quotas, capabilities, branding, and integrations across all Cora tiers.
             </p>
           </div>
 
@@ -687,14 +695,6 @@ export default function PricingPage() {
                     <td className="p-4 text-center font-mono font-bold bg-amber-50/30">10,000</td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-medium text-zinc-800">Supported LLM Engines</td>
-                    <td className="p-4 text-center text-zinc-600">Gemini 2.5 Flash</td>
-                    <td className="p-4 text-center text-zinc-600">Gemini 2.5 Flash</td>
-                    <td className="p-4 text-center text-zinc-900 font-bold bg-zinc-50">Claude 3.5 + GPT-4o mini</td>
-                    <td className="p-4 text-center text-zinc-900 font-bold">All Frontier Models</td>
-                    <td className="p-4 text-center text-zinc-900 font-medium bg-amber-50/30">Claude 3.5 + GPT-4o mini</td>
-                  </tr>
-                  <tr>
                     <td className="p-4 font-medium text-zinc-800">Autonomous Proposal Research Agent</td>
                     <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
@@ -726,12 +726,12 @@ export default function PricingPage() {
                     <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-medium text-zinc-800">Free 1-Yr Domain on Annual</td>
+                    <td className="p-4 font-medium text-zinc-800">Free 1-Yr Custom Domain</td>
                     <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-900"><Check className="w-4 h-4 mx-auto" /></td>
-                    <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
+                    <td className="p-4 text-center text-zinc-900 bg-amber-50/30 font-bold">.in Domain</td>
                   </tr>
                   <tr>
                     <td className="p-4 font-medium text-zinc-800">White-label &amp; Cora Badge Removal</td>
@@ -761,11 +761,11 @@ export default function PricingPage() {
                     <td className="p-4 text-center font-mono">1 seat</td>
                     <td className="p-4 text-center font-mono">2 seats</td>
                     <td className="p-4 text-center font-mono bg-zinc-50 font-bold">5 seats</td>
-                    <td className="p-4 text-center font-mono font-bold">Unlimited</td>
+                    <td className="p-4 text-center font-mono font-bold">Unlimited*</td>
                     <td className="p-4 text-center font-mono bg-amber-50/30 font-bold">5 seats</td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-medium text-zinc-800">Meta WhatsApp Cloud Automated Dispatch</td>
+                    <td className="p-4 font-medium text-zinc-800">Official WhatsApp Automated Dispatch</td>
                     <td className="p-4 text-center text-zinc-400"><Minus className="w-4 h-4 mx-auto" /></td>
                     <td className="p-4 text-center text-zinc-400 font-mono text-[11px]">Templates</td>
                     <td className="p-4 text-center text-zinc-900 bg-zinc-50 font-bold"><Check className="w-4 h-4 mx-auto" /></td>
@@ -812,7 +812,7 @@ export default function PricingPage() {
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 3: INDIA ONLY PLAN (PREMIUM SIGNATURE LIGHT SHOWCASE)
+          ROW 3: INDIA ONLY PLAN (REVAMPED SIGNATURE LIGHT SHOWCASE)
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-20">
         <div className="bg-gradient-to-br from-zinc-50/90 via-white to-amber-50/20 border-2 border-zinc-200/90 hover:border-zinc-300 rounded-[32px] p-6 sm:p-9 shadow-[0_8px_32px_rgba(0,0,0,0.04)] transition-all relative overflow-hidden">
@@ -831,7 +831,7 @@ export default function PricingPage() {
               </h2>
 
               <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
-                A heavily subsidized operating system built exclusively for Indian founders, MSMEs, agencies, and creative studios. Everything you need &mdash; from GSTIN compliance and dynamic UPI QR to WhatsApp client notifications.
+                A heavily subsidized operating system built exclusively for Indian founders, MSMEs, agencies, and creative studios. Everything you need &mdash; from GSTIN compliance and dynamic UPI QR to official WhatsApp client notifications.
               </p>
             </div>
 
@@ -875,9 +875,9 @@ export default function PricingPage() {
                   <Globe className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="font-semibold text-zinc-950 text-xs">Free Custom Domain</div>
+                  <div className="font-semibold text-zinc-950 text-xs">Free .in Custom Domain</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    Complimentary 1-year <span className="font-mono text-zinc-800 font-semibold">.in</span> or <span className="font-mono text-zinc-800 font-semibold">.com</span> with auto SSL
+                    Complimentary 1-year <span className="font-mono text-zinc-800 font-bold">.in domain</span> with automated SSL
                   </div>
                 </div>
               </div>
@@ -895,13 +895,15 @@ export default function PricingPage() {
               </div>
 
               <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs hover:border-zinc-300 transition-all">
-                <div className="w-8 h-8 rounded-lg bg-green-50 border border-green-200/60 flex items-center justify-center shrink-0 mt-0.5 text-green-800">
-                  <MessageCircle className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-lg bg-green-50 border border-green-200/60 flex items-center justify-center shrink-0 mt-0.5 text-[#25D366]">
+                  <WhatsAppIcon className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="font-semibold text-zinc-950 text-xs">WhatsApp Client Dispatch</div>
+                  <div className="font-semibold text-zinc-950 text-xs flex items-center gap-1">
+                    <span>WhatsApp Client Dispatch</span>
+                  </div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    Auto-send proposals, e-sign links &amp; payment receipts
+                    Official WhatsApp dispatch for proposals, contracts &amp; receipts
                   </div>
                 </div>
               </div>
@@ -925,7 +927,7 @@ export default function PricingPage() {
                 <div>
                   <div className="font-semibold text-zinc-950 text-xs">10,000 AI Runs / month</div>
                   <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    Claude 3.5 Sonnet &amp; GPT-4o mini for briefs &amp; contracts
+                    High-speed autonomous AI for client scoping &amp; briefs
                   </div>
                 </div>
               </div>
@@ -989,7 +991,12 @@ export default function PricingPage() {
           })}
         </div>
 
-        <div className="mt-12 text-center text-xs text-zinc-500 font-mono">
+        {/* Disclaimer Note */}
+        <div className="mt-8 text-center text-[11px] text-zinc-400 font-mono">
+          * Fair usage policy applies to unlimited capabilities. All prices exclude applicable local taxes.
+        </div>
+
+        <div className="mt-6 text-center text-xs text-zinc-500 font-mono">
           <span>Need custom contract terms or have specific compliance questions? </span>
           <Link href="/contact" className="text-zinc-950 font-bold underline underline-offset-2 hover:text-zinc-700">
             Contact our Mumbai solutions desk &rarr;
