@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -71,6 +71,8 @@ export default function PricingPage() {
   const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
+  const topToggleRef = useRef<HTMLDivElement>(null);
+
   // Dynamic Geolocation detection
   useEffect(() => {
     try {
@@ -102,13 +104,17 @@ export default function PricingPage() {
     }
   }, []);
 
-  // Floating sticky cadence toggle scroll listener
+  // Strict zero-duplication toggle visibility: Only show floating toggle when top toggle is scrolled out of viewport
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 380) {
-        setShowFloatingToggle(true);
-      } else {
-        setShowFloatingToggle(false);
+      if (topToggleRef.current) {
+        const rect = topToggleRef.current.getBoundingClientRect();
+        // Show floating toggle ONLY when the top toggle has scrolled completely off-screen above the viewport
+        if (rect.bottom < -20) {
+          setShowFloatingToggle(true);
+        } else {
+          setShowFloatingToggle(false);
+        }
       }
     };
 
@@ -304,7 +310,7 @@ export default function PricingPage() {
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16">
         
-        {/* Section Header & Cadence Switcher */}
+        {/* Section Header & Primary Cadence Switcher */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-zinc-100">
           <div>
             <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400">
@@ -318,8 +324,8 @@ export default function PricingPage() {
             </p>
           </div>
 
-          {/* Cadence Switcher with 2 Months Free badge */}
-          <div className="flex flex-col sm:items-end gap-2 shrink-0">
+          {/* Primary Cadence Switcher with 2 Months Free badge */}
+          <div ref={topToggleRef} className="flex flex-col sm:items-end gap-2 shrink-0">
             <div className="inline-flex items-center p-1 bg-zinc-100/90 rounded-full border border-zinc-200/80 shadow-2xs">
               <button
                 type="button"
@@ -1338,7 +1344,7 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          FLOATING STICKY BILLING CADENCE TOGGLE (VISIBLE ON SCROLL)
+          FLOATING STICKY BILLING CADENCE TOGGLE (ONLY WHEN TOP TOGGLE IS OFF-SCREEN)
       ══════════════════════════════════════════════════════════════════════ */}
       {showFloatingToggle && (
         <div className="fixed bottom-6 inset-x-0 mx-auto w-fit z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
