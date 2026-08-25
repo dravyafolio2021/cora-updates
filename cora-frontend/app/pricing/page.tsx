@@ -323,7 +323,7 @@ export default function PricingPage() {
           </div>
 
           {/* Primary Cadence Switcher with 2 Months Free badge */}
-          <div ref={topToggleRef} className="flex flex-col sm:items-end gap-1.5 sm:gap-2 shrink-0">
+          <div ref={topToggleRef} className="flex flex-col sm:items-end gap-2 shrink-0">
             <div className="inline-flex items-center p-1 bg-zinc-100/90 rounded-full border border-zinc-200/80 shadow-2xs">
               <button
                 type="button"
@@ -352,25 +352,21 @@ export default function PricingPage() {
                 }`}
               >
                 <span>Annual Billing</span>
-                <span className="bg-emerald-500 text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full">
+                <span className="bg-emerald-500 text-white text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full shadow-2xs">
                   2 Mo. Free
                 </span>
               </button>
             </div>
 
-            <div className="h-5 sm:h-6 flex items-center text-xs">
+            <div className="text-[11px] sm:text-xs text-zinc-500 sm:text-right min-h-[20px] flex items-center">
               {billingCycle === 'annual' ? (
-                <div className="inline-flex items-center gap-1.5 text-zinc-900 font-medium text-[10px] sm:text-[11px] animate-in fade-in duration-150">
-                  <Gift className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="font-bold text-emerald-800">2 Months Free</span>
-                  <span className="text-zinc-300">&bull;</span>
-                  <span className="bg-zinc-100 border border-zinc-200 px-1.5 sm:px-2 py-0.5 rounded text-zinc-800 font-mono text-[9px] sm:text-[10px]">Free Custom Domain</span>
-                  <span className="text-zinc-300">&bull;</span>
-                  <span className="bg-zinc-100 border border-zinc-200 px-1.5 sm:px-2 py-0.5 rounded text-zinc-800 font-mono text-[9px] sm:text-[10px]">+12K Bonus Runs</span>
+                <div className="inline-flex items-center gap-1.5 text-emerald-800 font-medium animate-in fade-in duration-150">
+                  <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Includes 2 months free + 1-year custom domain</span>
                 </div>
               ) : (
-                <div className="text-[10px] sm:text-[11px] text-zinc-400 font-mono animate-in fade-in duration-150">
-                  Switch to annual for 2 months free + free custom domain
+                <div className="text-zinc-400 font-normal animate-in fade-in duration-150">
+                  Save 2 months + get a free domain with annual billing
                 </div>
               )}
             </div>
