@@ -82,14 +82,14 @@ export default function PricingPage() {
   return (
     <main className="w-full relative pb-24 overflow-hidden bg-white text-zinc-900">
       
-      {/* ── Serene Greenfield Grassland Nature Hero Section ── */}
-      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#e8f3e5] via-[#f4faf1] to-white pt-28 sm:pt-36 pb-16 sm:pb-24">
+      {/* ── Serene Greenfield Nature Hero Section (Simplified & Crisp) ── */}
+      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#e8f3e5] via-[#f4faf1] to-white pt-28 sm:pt-36 pb-14 sm:pb-20">
         
         {/* Background Greenfield Nature Artwork */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
           <Image
             src="/images/cora_pricing_greenfield.jpg"
-            alt="Cora Serene Greenfield Grassland Landscape"
+            alt="Cora Serene Greenfield Landscape"
             fill
             priority
             className="object-cover object-[center_35%] sm:object-[center_25%]"
@@ -99,36 +99,36 @@ export default function PricingPage() {
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(180deg, rgba(232, 243, 229, 0.25) 0%, rgba(255, 255, 255, 0.30) 40%, rgba(255, 255, 255, 0.90) 80%, #ffffff 100%)',
+              background: 'linear-gradient(180deg, rgba(232, 243, 229, 0.20) 0%, rgba(255, 255, 255, 0.35) 40%, rgba(255, 255, 255, 0.92) 80%, #ffffff 100%)',
             }}
           />
-          <div className="absolute inset-x-0 bottom-0 h-44 sm:h-60 bg-gradient-to-t from-white via-white/85 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-40 sm:h-52 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none" />
         </div>
 
         {/* Hero Content */}
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
           
-          {/* Announcement Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-[0px_2px_8px_rgba(0,0,0,0.05)] border border-emerald-900/10 text-xs font-semibold text-zinc-900 mb-5">
+          {/* Simplified Crisp Announcement Pill */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-emerald-900/10 text-xs font-medium text-zinc-800 mb-4">
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-600 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-700"></span>
             </span>
-            <span className="font-mono text-[11px] uppercase tracking-wider text-emerald-900/70 font-bold">TRANSPARENT PLANS</span>
-            <span className="text-zinc-300">&bull;</span>
-            <span className="text-zinc-800 font-medium">1,000 Free AI Runs Every Month</span>
+            <span>Simple, transparent plans &bull; No hidden fees</span>
           </div>
 
-          <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl font-bold text-zinc-950 leading-[1.08] tracking-[-0.035em] max-w-[880px] mx-auto mb-4">
-            Predictable pricing that scales with your business
+          {/* Punchy Simplified Heading */}
+          <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl font-bold text-zinc-950 leading-[1.1] tracking-[-0.035em] max-w-[760px] mx-auto mb-3">
+            Plans that fit your business
           </h1>
 
-          <p className="text-zinc-700 text-base sm:text-lg font-normal leading-relaxed max-w-[620px] mx-auto mb-8">
-            Start for free with 1,000 complimentary AI agent runs. Upgrade to annual plans for a complimentary custom domain and 12,000 bonus runs.
+          {/* Effortless 1-Line Body */}
+          <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[540px] mx-auto mb-7">
+            Start free forever with 1,000 monthly AI runs. Upgrade anytime as you grow.
           </p>
 
-          {/* ── Cadence Selector (Monthly / Annual) with Free Domain & 12K Bonus Runs Badge ── */}
-          <div className="flex flex-col items-center justify-center gap-3">
+          {/* ── Cadence Selector (Monthly / Annual) ── */}
+          <div className="flex flex-col items-center justify-center gap-2.5">
             <div className="inline-flex items-center p-1.5 bg-white/95 backdrop-blur-md rounded-2xl border border-zinc-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
               <button
                 type="button"
@@ -136,13 +136,13 @@ export default function PricingPage() {
                   setBillingCycle('monthly');
                   trackEvent('pricing_cycle_change', { cycle: 'monthly' });
                 }}
-                className={`px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                className={`px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                   billingCycle === 'monthly'
                     ? 'bg-zinc-950 text-white shadow-sm'
                     : 'text-zinc-600 hover:text-zinc-950'
                 }`}
               >
-                Monthly Billing
+                Monthly
               </button>
               <button
                 type="button"
@@ -150,13 +150,13 @@ export default function PricingPage() {
                   setBillingCycle('annual');
                   trackEvent('pricing_cycle_change', { cycle: 'annual' });
                 }}
-                className={`px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ${
+                className={`px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ${
                   billingCycle === 'annual'
                     ? 'bg-zinc-950 text-white shadow-sm'
                     : 'text-zinc-600 hover:text-zinc-950'
                 }`}
               >
-                <span>Annual Billing</span>
+                <span>Annual</span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-200 text-zinc-900 font-bold">
                   FREE DOMAIN + 12K RUNS
                 </span>
@@ -166,11 +166,11 @@ export default function PricingPage() {
             {billingCycle === 'annual' ? (
               <div className="inline-flex items-center gap-1.5 text-xs text-zinc-600 font-mono animate-in fade-in duration-200">
                 <Gift className="w-3.5 h-3.5 text-zinc-900" />
-                <span>Includes 1 year free custom domain (.com / .in) + 12,000 additional AI runs (+1K/mo)</span>
+                <span>Includes 1-yr free custom domain + 12,000 bonus AI runs</span>
               </div>
             ) : (
               <div className="text-xs text-zinc-500 font-mono">
-                No setup fees &bull; Instant activation &bull; Switch or cancel anytime
+                No credit card required for Free Forever &bull; Cancel anytime
               </div>
             )}
           </div>
@@ -181,7 +181,7 @@ export default function PricingPage() {
       {/* ══════════════════════════════════════════════════════════════════════
           ROW 1: FREE FOREVER PLAN (HERO BANNER CARD)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12 -mt-4 relative z-10">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12 -mt-3 relative z-10">
         <div className="bg-white border border-zinc-200/90 rounded-[28px] p-6 sm:p-8 shadow-[0_12px_36px_rgba(0,0,0,0.04)] hover:border-zinc-300 transition-all">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
