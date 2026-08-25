@@ -82,24 +82,24 @@ export default function PricingPage() {
   return (
     <main className="w-full relative pb-24 overflow-hidden bg-white text-zinc-900">
       
-      {/* ── Architectural Studio Spatial Hero Section (Distinct from Homepage Sky) ── */}
-      <section className="relative w-full overflow-hidden bg-[#FAF8F5] pt-28 sm:pt-36 pb-16 sm:pb-24">
+      {/* ── Serene Greenfield Grassland Nature Hero Section ── */}
+      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#e8f3e5] via-[#f4faf1] to-white pt-28 sm:pt-36 pb-16 sm:pb-24">
         
-        {/* Background Architectural Studio Artwork */}
+        {/* Background Greenfield Nature Artwork */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
           <Image
-            src="/images/cora_pricing_hero_studio.jpg"
-            alt="Cora Minimalist Architectural Studio Space"
+            src="/images/cora_pricing_greenfield.jpg"
+            alt="Cora Serene Greenfield Grassland Landscape"
             fill
             priority
-            className="object-cover object-center opacity-90"
+            className="object-cover object-[center_35%] sm:object-[center_25%]"
             sizes="100vw"
           />
-          {/* Warm Studio Light Overlay & Multi-Stop Pure White Fade */}
+          {/* Soft Nature Light Overlay & Multi-Stop Pure White Fade */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(180deg, rgba(250, 248, 245, 0.35) 0%, rgba(250, 248, 245, 0.45) 40%, rgba(255, 255, 255, 0.88) 80%, #ffffff 100%)',
+              background: 'linear-gradient(180deg, rgba(232, 243, 229, 0.25) 0%, rgba(255, 255, 255, 0.30) 40%, rgba(255, 255, 255, 0.90) 80%, #ffffff 100%)',
             }}
           />
           <div className="absolute inset-x-0 bottom-0 h-44 sm:h-60 bg-gradient-to-t from-white via-white/85 to-transparent pointer-events-none" />
@@ -109,12 +109,12 @@ export default function PricingPage() {
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
           
           {/* Announcement Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-zinc-200/70 text-xs font-semibold text-zinc-900 mb-5">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-[0px_2px_8px_rgba(0,0,0,0.05)] border border-emerald-900/10 text-xs font-semibold text-zinc-900 mb-5">
             <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-900 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-zinc-950"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-600 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-700"></span>
             </span>
-            <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500 font-bold">TRANSPARENT PLANS</span>
+            <span className="font-mono text-[11px] uppercase tracking-wider text-emerald-900/70 font-bold">TRANSPARENT PLANS</span>
             <span className="text-zinc-300">&bull;</span>
             <span className="text-zinc-800 font-medium">1,000 Free AI Runs Every Month</span>
           </div>
