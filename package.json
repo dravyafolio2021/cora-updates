@@ -1,6 +1,6 @@
 {
   "name": "cora-e2e-tests",
-  "version": "1.0.0",
+  "version": "4.0.0",
   "description": "E2E tests for Cora Real Estate Platform using Playwright",
   "main": "index.js",
   "scripts": {

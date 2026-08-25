@@ -8,8 +8,8 @@
 
 Cora is a full-stack WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards for Indian service agencies. Each workspace is an isolated business environment with CRM, content management, financial tools, team scheduling, and AI-powered assistants.
 
-**Current Version**: `v3.4.0`  
-**Stack**: WordPress 6.x, PHP 8.2, Vanilla CSS/Tailwind, JavaScript (ES6+), Quill.js, Elementor  
+**Current Version**: `v4.0.0`  
+**Stack**: WordPress 6.x, PHP 8.2, Vanilla CSS/Tailwind, JavaScript (ES6+), Next.js, Quill.js, Elementor  
 **AI Providers**: Google Gemini 3.5 Flash, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o
 
 ---
@@ -19,7 +19,7 @@ Cora is a full-stack WordPress-based SaaS platform that provides white-labeled, 
 ```
 cora/
 ├── app/public/wp-content/plugins/
-│   ├── cora-workspace/          # Core platform plugin (v3.4.0)
+│   ├── cora-workspace/          # Core platform plugin (v4.0.0)
 │   │   ├── admin-dashboard.php  # Main dashboard controller & routing
 │   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB functions
 │   │   ├── includes/            # Backend engines (docs, RAG, MCP)

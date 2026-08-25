@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v3.4.28).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.0.0).
 
 ---
 
@@ -470,6 +470,6 @@ The Deal Simulator drawer (`#cora-fin-sim-drawer`) allows solo founders to stres
 
 ---
 
-*Cora Platform v3.4.44 — Last updated: August 15, 2026.*
+*Cora Platform v4.0.0 — Last updated: August 25, 2026.*
 
 

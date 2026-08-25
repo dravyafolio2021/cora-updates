@@ -1,11 +1,11 @@
 /**
- * Cora Platform & Marketing Design Tokens (v2.4.0)
+ * Cora Platform & Marketing Design Tokens (v4.0.0)
  * Monochromatic Notion / Shopify Visual System Standard
  * Core User: Shruti (Studio Administrator)
  */
 
 const CoraDesignTokens = {
-  version: "2.4.0",
+  version: "4.0.0",
   systemOwner: "Shruti",
   palette: {
     neutral: {
