@@ -31,16 +31,16 @@ const FAQS = [
     a: 'Yes, 100% free forever. It includes 1,000 complimentary AI agent runs every month, website builder (on heycora.in/your-name subdomain), Kanban CRM, unlimited tamper-evident SHA-256 e-signatures, and automated GST invoicing with zero credit card required. Custom domain and custom email connection require an upgrade to a paid Growth plan.'
   },
   {
+    q: 'How does the 2 Months Free on Annual plans work?',
+    a: 'When you choose Annual billing on Starter, Professional, or Scale, you only pay for 10 months instead of 12 (giving you 2 full months completely free). In addition, you receive a free 1-year custom domain (.com, .in, or .co) with SSL and +12,000 bonus AI runs across the year.'
+  },
+  {
     q: 'What is the India Only Plan and who is eligible?',
     a: 'The India Only Plan is an exclusive, heavily subsidized operating system at ₹499/month built specifically for Indian founders, MSMEs, agencies, and studios. It includes 10,000 monthly AI runs, a free custom domain (.in or .com), dynamic UPI QR code payments on all invoices, automated 18% CGST/SGST/IGST tax math, and Meta WhatsApp automated client dispatch. It is available strictly as an annual commitment (₹5,988/year).'
   },
   {
     q: 'What is the difference between Starter and Professional?',
     a: 'Starter gives you custom domain connection (yourbrand.com), custom email dispatch, and 5,000 monthly AI runs. Professional upgrades your AI intelligence to Claude 3.5 Sonnet & GPT-4o mini, increases runs to 20,000/mo, adds Meta WhatsApp automated client dispatch, Dynamic UPI QR codes on invoices, and expands team seats to 5.'
-  },
-  {
-    q: 'What perks come with an Annual plan?',
-    a: 'When you choose an Annual plan on any paid tier, you receive a complimentary 1-year custom domain registration (.com, .in, or .co) with automated SSL, plus 12,000 additional AI agent runs distributed evenly (+1,000 bonus runs every month) across the year.'
   },
   {
     q: 'Can I upgrade, downgrade, or cancel anytime?',
@@ -279,7 +279,7 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 2: VALUE-FOR-MONEY PRICING CARDS WITH HIGH-IMPACT RECOMMENDED BADGE
+          ROW 2: VALUE-FOR-MONEY PRICING CARDS WITH 2 MONTHS FREE ON ANNUAL
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16">
         
@@ -319,35 +319,39 @@ export default function PricingPage() {
                   setBillingCycle('annual');
                   trackEvent('pricing_cycle_change', { cycle: 'annual' });
                 }}
-                className={`px-5 py-2 rounded-xl text-xs font-semibold transition-all ${
+                className={`px-5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
                   billingCycle === 'annual'
                     ? 'bg-zinc-950 text-white shadow-xs'
                     : 'text-zinc-600 hover:text-zinc-950'
                 }`}
               >
-                Annual Billing
+                <span>Annual Billing</span>
+                <span className="bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                  2 Mo. Free
+                </span>
               </button>
             </div>
 
             <div className="h-6 flex items-center text-xs">
               {billingCycle === 'annual' ? (
                 <div className="inline-flex items-center gap-1.5 text-zinc-900 font-medium text-[11px] animate-in fade-in duration-150">
-                  <Gift className="w-3.5 h-3.5 text-zinc-900" />
-                  <span className="font-semibold">Annual Perks:</span>
+                  <Gift className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="font-bold text-emerald-800">2 Months Free</span>
+                  <span className="text-zinc-300">&bull;</span>
                   <span className="bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded text-zinc-800 font-mono text-[10px]">Free Custom Domain</span>
                   <span className="text-zinc-300">&bull;</span>
                   <span className="bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded text-zinc-800 font-mono text-[10px]">+12K Bonus Runs</span>
                 </div>
               ) : (
                 <div className="text-[11px] text-zinc-400 font-mono animate-in fade-in duration-150">
-                  Switch to annual for a free custom domain &bull; Cancel anytime
+                  Switch to annual for 2 months free + free custom domain
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* 3-Tier SaaS Cards */}
+        {/* 3-Tier SaaS Cards: 2 Months Free Calculations */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch pt-3">
           
           {/* CARD 1: STARTER */}
@@ -357,25 +361,39 @@ export default function PricingPage() {
                 <h3 className="font-display text-2xl font-bold text-zinc-950">
                   Starter
                 </h3>
+                {billingCycle === 'annual' && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-bold text-emerald-800 uppercase tracking-wider">
+                    2 Mo. Free
+                  </span>
+                )}
               </div>
               <p className="text-xs text-zinc-500 leading-relaxed mb-5 min-h-[34px]">
                 Establish your independent brand with custom domains, email, and 5x AI capacity.
               </p>
 
+              {/* Price Block: Reflecting 2 Months Free on Annual */}
               <div className="mb-5">
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
-                    {currency === 'INR' ? '₹999' : '$9'}
+                    {billingCycle === 'annual'
+                      ? (currency === 'INR' ? '₹833' : '$7.50')
+                      : (currency === 'INR' ? '₹999' : '$9')}
                   </span>
                   <span className="text-xs text-zinc-500 font-medium">/ month</span>
+                  {billingCycle === 'annual' && (
+                    <span className="text-xs text-zinc-400 line-through font-mono">
+                      {currency === 'INR' ? '₹999' : '$9'}
+                    </span>
+                  )}
                 </div>
-                <div className="text-[11px] text-zinc-400 mt-1 font-mono">
+                <div className="text-[11px] text-zinc-500 mt-1 font-mono">
                   {billingCycle === 'annual'
-                    ? (currency === 'INR' ? 'Billed annually (₹11,988/yr)' : 'Billed annually ($108/yr)')
-                    : 'Billed monthly'}
+                    ? (currency === 'INR' ? 'Billed annually at ₹9,990/yr (Save ₹1,998)' : 'Billed annually at $90/yr (Save $18)')
+                    : 'Billed monthly (₹999/mo)'}
                 </div>
               </div>
 
+              {/* Action CTA */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=starter"
                 className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 py-3 px-4 rounded-xl text-xs font-bold transition-all mb-6"
@@ -384,6 +402,7 @@ export default function PricingPage() {
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-600" />
               </a>
 
+              {/* Clean Feature Bullets */}
               <div className="space-y-3 pt-2 border-t border-zinc-100">
                 <div className="text-xs font-semibold text-zinc-900">
                   Includes:
@@ -420,7 +439,7 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* CARD 2: PROFESSIONAL */}
+          {/* CARD 2: PROFESSIONAL (HIGH VALUE & RECOMMENDED BADGE) */}
           <div className="bg-white border-2 border-zinc-950 rounded-[28px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_12px_40px_rgba(0,0,0,0.08)] relative mt-0 md:-mt-3">
             
             <div className="absolute -top-3.5 inset-x-0 flex justify-center">
@@ -435,31 +454,37 @@ export default function PricingPage() {
                 <h3 className="font-display text-2xl font-bold text-zinc-950">
                   Professional
                 </h3>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200/80 text-[10px] font-bold text-amber-800 uppercase tracking-wider">
-                  Save 40%
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-bold text-emerald-800 uppercase tracking-wider">
+                  2 Mo. Free
                 </span>
               </div>
               <p className="text-xs text-zinc-500 leading-relaxed mb-5 min-h-[34px]">
                 Autonomous operating backbone with Claude 3.5 Sonnet, WhatsApp, and UPI QR.
               </p>
 
+              {/* Price Block: Reflecting 2 Months Free on Annual */}
               <div className="mb-5">
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
-                    {currency === 'INR' ? '₹1,999' : '$19'}
+                    {billingCycle === 'annual'
+                      ? (currency === 'INR' ? '₹1,665' : '$15.80')
+                      : (currency === 'INR' ? '₹1,999' : '$19')}
                   </span>
                   <span className="text-xs text-zinc-500 font-medium">/ month</span>
-                  <span className="text-xs text-zinc-400 line-through font-mono">
-                    {currency === 'INR' ? '₹2,999' : '$29'}
-                  </span>
+                  {billingCycle === 'annual' && (
+                    <span className="text-xs text-zinc-400 line-through font-mono">
+                      {currency === 'INR' ? '₹1,999' : '$19'}
+                    </span>
+                  )}
                 </div>
-                <div className="text-[11px] text-zinc-400 mt-1 font-mono">
+                <div className="text-[11px] text-zinc-500 mt-1 font-mono">
                   {billingCycle === 'annual'
-                    ? (currency === 'INR' ? 'Billed annually (₹23,988/yr) • Includes Free Domain' : 'Billed annually ($228/yr) • Includes Free Domain')
-                    : 'Billed monthly'}
+                    ? (currency === 'INR' ? 'Billed annually at ₹19,990/yr (Save ₹3,998)' : 'Billed annually at $190/yr (Save $38)')
+                    : 'Billed monthly (₹1,999/mo)'}
                 </div>
               </div>
 
+              {/* Action CTA (High-Converting Solid Black) */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=pro"
                 className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3.5 px-4 rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg mb-6"
@@ -468,6 +493,7 @@ export default function PricingPage() {
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
               </a>
 
+              {/* Clean Feature Bullets */}
               <div className="space-y-3 pt-2 border-t border-zinc-100">
                 <div className="text-xs font-semibold text-zinc-900">
                   Everything in Starter, plus:
@@ -515,25 +541,39 @@ export default function PricingPage() {
                 <h3 className="font-display text-2xl font-bold text-zinc-950">
                   Scale
                 </h3>
+                {billingCycle === 'annual' && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-bold text-emerald-800 uppercase tracking-wider">
+                    2 Mo. Free
+                  </span>
+                )}
               </div>
               <p className="text-xs text-zinc-500 leading-relaxed mb-5 min-h-[34px]">
                 High-throughput infrastructure for agencies &amp; multi-member teams.
               </p>
 
+              {/* Price Block: Reflecting 2 Months Free on Annual */}
               <div className="mb-5">
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-display font-extrabold text-zinc-950">
-                    {currency === 'INR' ? '₹2,999' : '$29'}
+                    {billingCycle === 'annual'
+                      ? (currency === 'INR' ? '₹2,499' : '$24.10')
+                      : (currency === 'INR' ? '₹2,999' : '$29')}
                   </span>
                   <span className="text-xs text-zinc-500 font-medium">/ month</span>
+                  {billingCycle === 'annual' && (
+                    <span className="text-xs text-zinc-400 line-through font-mono">
+                      {currency === 'INR' ? '₹2,999' : '$29'}
+                    </span>
+                  )}
                 </div>
-                <div className="text-[11px] text-zinc-400 mt-1 font-mono">
+                <div className="text-[11px] text-zinc-500 mt-1 font-mono">
                   {billingCycle === 'annual'
-                    ? (currency === 'INR' ? 'Billed annually (₹35,988/yr)' : 'Billed annually ($348/yr)')
-                    : 'Billed monthly'}
+                    ? (currency === 'INR' ? 'Billed annually at ₹29,990/yr (Save ₹5,998)' : 'Billed annually at $290/yr (Save $58)')
+                    : 'Billed monthly (₹2,999/mo)'}
                 </div>
               </div>
 
+              {/* Action CTA */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=scale"
                 className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 py-3 px-4 rounded-xl text-xs font-bold transition-all mb-6"
@@ -542,6 +582,7 @@ export default function PricingPage() {
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-600" />
               </a>
 
+              {/* Clean Feature Bullets */}
               <div className="space-y-3 pt-2 border-t border-zinc-100">
                 <div className="text-xs font-semibold text-zinc-900">
                   Everything in Professional, plus:
@@ -623,9 +664,9 @@ export default function PricingPage() {
                   <tr className="bg-zinc-50 border-b border-zinc-200 text-zinc-950 font-bold">
                     <th className="p-4 sm:p-5 w-2/6">Capabilities &amp; Modules</th>
                     <th className="p-4 sm:p-5 w-1/6 text-center">Free Forever</th>
-                    <th className="p-4 sm:p-5 w-1/6 text-center">Starter ({currency === 'INR' ? '₹999' : '$9'})</th>
-                    <th className="p-4 sm:p-5 w-1/6 text-center bg-zinc-100/70 font-bold">Professional ({currency === 'INR' ? '₹1,999' : '$19'})</th>
-                    <th className="p-4 sm:p-5 w-1/6 text-center">Scale ({currency === 'INR' ? '₹2,999' : '$29'})</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center">Starter ({billingCycle === 'annual' ? (currency === 'INR' ? '₹833/mo' : '$7.50/mo') : (currency === 'INR' ? '₹999/mo' : '$9/mo')})</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center bg-zinc-100/70 font-bold">Professional ({billingCycle === 'annual' ? (currency === 'INR' ? '₹1,665/mo' : '$15.80/mo') : (currency === 'INR' ? '₹1,999/mo' : '$19/mo')})</th>
+                    <th className="p-4 sm:p-5 w-1/6 text-center">Scale ({billingCycle === 'annual' ? (currency === 'INR' ? '₹2,499/mo' : '$24/mo') : (currency === 'INR' ? '₹2,999/mo' : '$29/mo')})</th>
                     <th className="p-4 sm:p-5 w-1/6 text-center font-bold bg-amber-50/50">India Only (₹499/mo)</th>
                   </tr>
                 </thead>
