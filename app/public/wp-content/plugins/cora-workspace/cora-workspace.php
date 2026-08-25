@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.0.0
+ * Version: 4.0.1
  * Author: Cora AI Platform
  * Author URI: https://heycora.in
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.0.0' );
+    define( 'CORA_WORKSPACE_VERSION', '4.0.1' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );

@@ -29,7 +29,7 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         expect(response.headers()['cache-control']).toContain('no-cache');
         
         const text = await response.text();
-        expect(text).toContain("const CORA_VERSION = '4.0.0';");
+        expect(text).toContain("const CORA_VERSION = '4.0.1';");
         expect(text).toContain("const CACHE_NAME = 'cora-workspace-v' + CORA_VERSION;");
         expect(text).not.toContain('%%VERSION%%');
         expect(text).not.toContain('%%PLUGIN_URL%%');
@@ -41,9 +41,9 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         
         const data = await response.json();
         expect(data.success).toBe(true);
-        expect(data.version).toBe('4.0.0');
+        expect(data.version).toBe('4.0.1');
         expect(data.release_notes.length).toBeGreaterThan(0);
-        expect(data.icon_url).toContain('icon_192.png?v=4.0.0');
+        expect(data.icon_url).toContain('icon_192.png?v=4.0.1');
     });
 
     test('verify mobile viewport responsiveness and zero horizontal scroll at 375px', async ({ page }) => {
@@ -128,17 +128,17 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         
         // Trigger update banner
         await page.evaluate(() => {
-            window.coraShowPwaUpdateBanner('3.9.0', '4.0.0');
+            window.coraShowPwaUpdateBanner('4.0.0', '4.0.1');
         });
         
         const banner = page.locator('#cora-pwa-update-banner');
         await expect(banner).toBeVisible();
-        await expect(banner).toContainText('v4.0.0');
+        await expect(banner).toContainText('v4.0.1');
         await expect(banner).toContainText('Update Now & Sync Icon');
         
         const pill = page.locator('#cora-pwa-update-pill');
         await expect(pill).toBeVisible();
-        await expect(pill).toContainText('v4.0.0');
+        await expect(pill).toContainText('v4.0.1');
         
         // Dismiss banner
         await page.evaluate(() => {
@@ -154,12 +154,12 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         
         // Open drawer
         await page.evaluate(() => {
-            window.coraOpenPwaUpdateDrawer('4.0.0');
+            window.coraOpenPwaUpdateDrawer('4.0.1');
         });
         
         const drawer = page.locator('#cora-pwa-update-drawer');
         await expect(drawer).toBeVisible();
-        await expect(drawer).toContainText('v4.0.0');
+        await expect(drawer).toContainText('v4.0.1');
         await expect(drawer).toContainText('Release Highlights');
         await expect(drawer).toContainText('Update Workspace & Sync Now');
         
