@@ -1,10 +1,18 @@
 import { MetadataRoute } from 'next';
+import { BUILT_MODULES } from '@/lib/features-data';
 
 export const dynamic = 'force-static';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://heycora.in';
   const now = new Date();
+
+  const featureUrls = BUILT_MODULES.map((mod) => ({
+    url: `${baseUrl}/features/${mod.slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }));
 
   return [
     {
@@ -19,6 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.95,
     },
+    ...featureUrls,
     {
       url: `${baseUrl}/ai-agent`,
       lastModified: now,
@@ -128,6 +137,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     {
+      url: `${baseUrl}/tools/embed-builder`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
       url: `${baseUrl}/integrations`,
       lastModified: now,
       changeFrequency: 'weekly',
@@ -162,12 +177,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/tools/embed-builder`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.85,
     },
     {
       url: `${baseUrl}/terms`,

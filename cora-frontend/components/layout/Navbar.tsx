@@ -363,7 +363,7 @@ export function Navbar() {
                       </span>
                       <div className="space-y-1.5">
                         <Link
-                          href="/features#ai-cofounder"
+                          href="/features/ai-cofounder"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -374,7 +374,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#content-ai"
+                          href="/features/content-ai"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -385,7 +385,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#rag-mcp"
+                          href="/features/rag-mcp"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -396,7 +396,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/ai-agent"
+                          href="/features/voice-to-scope"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -415,7 +415,7 @@ export function Navbar() {
                       </span>
                       <div className="space-y-1.5">
                         <Link
-                          href="/features#lead-crm"
+                          href="/features/lead-crm"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -426,7 +426,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#canvas-builder"
+                          href="/features/canvas-builder"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -437,7 +437,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#form-builder"
+                          href="/features/form-builder"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -448,7 +448,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#review-portal"
+                          href="/features/review-portal"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -467,7 +467,7 @@ export function Navbar() {
                       </span>
                       <div className="space-y-1.5">
                         <Link
-                          href="/features#esign-vault"
+                          href="/features/esign-vault"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -478,7 +478,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#crew-dispatch"
+                          href="/features/crew-dispatch"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -489,7 +489,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#master-calendar"
+                          href="/features/master-calendar"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -500,7 +500,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#task-board"
+                          href="/features/task-board"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -519,7 +519,7 @@ export function Navbar() {
                       </span>
                       <div className="space-y-1.5">
                         <Link
-                          href="/features#gst-invoicing"
+                          href="/features/gst-invoicing"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -530,7 +530,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#asset-gear"
+                          href="/features/asset-gear"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -541,7 +541,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#media-hub"
+                          href="/features/media-hub"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -552,7 +552,7 @@ export function Navbar() {
                         </Link>
 
                         <Link
-                          href="/features#rbac-system"
+                          href="/features/rbac-system"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
@@ -771,7 +771,7 @@ export function Navbar() {
 
                     {/* Card 2: Guides & Playbooks (Solid Soft Sky Blue) */}
                     <Link
-                      href="/features#esign-vault"
+                      href="/features/esign-vault"
                       onClick={() => setActiveDropdown(null)}
                       className="group relative rounded-[28px] bg-[#E0F2FE] hover:bg-[#BAE6FD] border-0 p-6 sm:p-7 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[270px]"
                     >
@@ -996,19 +996,19 @@ export function Navbar() {
                     <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/70"><Sparkles className="w-4 h-4" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">AI Agent Workspace</div><div className="text-xs text-zinc-500">Autonomous co-founder &amp; memory</div></div>
                   </Link>
-                  <Link href="/features#gst-invoicing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                  <Link href="/features/gst-invoicing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
                     <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/70"><Receipt className="w-4 h-4" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">18% GST Invoicing</div><div className="text-xs text-zinc-500">CGST/SGST automated splitting</div></div>
                   </Link>
-                  <Link href="/features#esign-vault" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                  <Link href="/features/esign-vault" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
                     <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200/70"><FileText className="w-4 h-4" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">SHA-256 E-Sign Vault</div><div className="text-xs text-zinc-500">IT Act 2000 digital contracts</div></div>
                   </Link>
-                  <Link href="/features#crm-leads" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                  <Link href="/features/lead-crm" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
                     <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200/70"><Kanban className="w-4 h-4" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">Kanban Lead CRM</div><div className="text-xs text-zinc-500">Milestones &amp; WhatsApp dispatch</div></div>
                   </Link>
-                  <Link href="/features#crew-dispatch" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                  <Link href="/features/crew-dispatch" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
                     <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-200/70"><Send className="w-4 h-4" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">Crew &amp; Gear Dispatch</div><div className="text-xs text-zinc-500">Automated shoot call sheets</div></div>
                   </Link>
