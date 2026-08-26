@@ -534,31 +534,33 @@ export default function PricingPage() {
         {/* 3-Tier SaaS Cards: Swipeable Snap Row on Mobile, Snug 3-Col Grid on Desktop */}
         <div 
           ref={cardsContainerRef}
-          className="flex md:grid md:grid-cols-3 gap-3 md:gap-3 lg:gap-3.5 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-pl-4 scroll-pr-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden px-4 sm:px-0 -mx-4 sm:mx-0 py-3 sm:py-4 items-stretch"
+          className="flex md:grid md:grid-cols-3 gap-3 md:gap-3 lg:gap-3.5 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-pl-4 scroll-pr-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden px-4 sm:px-0 -mx-4 sm:mx-0 py-6 sm:py-8 items-stretch"
         >
           
           {/* CARD 1: STARTER */}
           <div className="w-[82vw] max-w-[305px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
             <div>
               {/* Top Header Banner in Vibrant Emerald Green */}
-              <div className="bg-[#0b7a4d] p-5 text-white relative">
-                <div className="flex items-center justify-between gap-2 mb-2.5">
+              <div className="bg-[#0b7a4d] h-[155px] p-5 text-white flex flex-col justify-between relative">
+                <div className="flex items-center justify-between gap-2 h-7">
                   <div className="w-9 h-9 rounded-xl bg-[#a7f3d0] text-[#065f46] shadow-xs flex items-center justify-center">
                     <Rocket className="w-4 h-4" />
                   </div>
                 </div>
-                <h3 className="font-display text-xl font-bold text-white tracking-tight">
-                  Starter
-                </h3>
-                <p className="text-xs text-emerald-50/90 mt-1 leading-relaxed min-h-[34px]">
-                  For independent operators establishing their brand with custom domains.
-                </p>
+                <div>
+                  <h3 className="font-display text-xl font-bold text-white tracking-tight">
+                    Starter
+                  </h3>
+                  <p className="text-xs text-emerald-50/90 mt-1 leading-relaxed line-clamp-2 h-[34px]">
+                    For independent operators establishing their brand with custom domains.
+                  </p>
+                </div>
               </div>
 
               {/* Card Body */}
               <div className="p-5 sm:p-5.5">
                 {/* Price Block */}
-                <div className="mb-4">
+                <div className="h-[68px] mb-4 flex flex-col justify-center">
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
                       {billingCycle === 'annual'
@@ -572,7 +574,7 @@ export default function PricingPage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-zinc-500 mt-1 flex items-center gap-1.5">
+                  <div className="text-[11px] text-zinc-500 mt-1.5 flex items-center gap-1.5 h-4">
                     {billingCycle === 'annual' ? (
                       <>
                         <span className="text-emerald-700 font-medium">
@@ -592,7 +594,7 @@ export default function PricingPage() {
                 {/* Action CTA */}
                 <a
                   href="https://app.heycora.in/workspace/login?plan=starter"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 py-2.5 px-4 rounded-xl text-xs font-semibold transition-all mb-5 cursor-pointer"
+                  className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer"
                 >
                   <span>Get started</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
@@ -637,11 +639,11 @@ export default function PricingPage() {
           </div>
 
           {/* CARD 2: PROFESSIONAL (RECOMMENDED) */}
-          <div className="w-[82vw] max-w-[305px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col justify-between shadow-[0_10px_30px_rgba(190,0,107,0.12)] hover:shadow-2xl transition-all relative">
+          <div className="w-[82vw] max-w-[305px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col justify-between shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all relative">
             <div>
               {/* Top Header Banner in Vibrant Magenta / Fuchsia */}
-              <div className="bg-[#be006b] p-5 text-white relative">
-                <div className="flex items-center justify-between gap-2 mb-2.5">
+              <div className="bg-[#be006b] h-[155px] p-5 text-white flex flex-col justify-between relative">
+                <div className="flex items-center justify-between gap-2 h-7">
                   <div className="w-9 h-9 rounded-xl bg-[#fbcfe8] text-[#9d174d] shadow-xs flex items-center justify-center">
                     <Sparkles className="w-4 h-4" />
                   </div>
@@ -649,18 +651,20 @@ export default function PricingPage() {
                     Recommended
                   </span>
                 </div>
-                <h3 className="font-display text-xl font-bold text-white tracking-tight">
-                  Professional
-                </h3>
-                <p className="text-xs text-pink-50/90 mt-1 leading-relaxed min-h-[34px]">
-                  Autonomous backbone with advanced AI, official WhatsApp dispatch &amp; UPI QR.
-                </p>
+                <div>
+                  <h3 className="font-display text-xl font-bold text-white tracking-tight">
+                    Professional
+                  </h3>
+                  <p className="text-xs text-pink-50/90 mt-1 leading-relaxed line-clamp-2 h-[34px]">
+                    Autonomous backbone with advanced AI, official WhatsApp dispatch &amp; UPI QR.
+                  </p>
+                </div>
               </div>
 
               {/* Card Body */}
               <div className="p-5 sm:p-5.5">
                 {/* Price Block */}
-                <div className="mb-4">
+                <div className="h-[68px] mb-4 flex flex-col justify-center">
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
                       {billingCycle === 'annual'
@@ -674,7 +678,7 @@ export default function PricingPage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-zinc-500 mt-1 flex items-center gap-1.5">
+                  <div className="text-[11px] text-zinc-500 mt-1.5 flex items-center gap-1.5 h-4">
                     {billingCycle === 'annual' ? (
                       <>
                         <span className="text-emerald-700 font-medium">
@@ -694,7 +698,7 @@ export default function PricingPage() {
                 {/* Action CTA */}
                 <a
                   href="https://app.heycora.in/workspace/login?plan=pro"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3 px-4 rounded-xl text-xs font-semibold transition-all shadow-sm hover:shadow-md mb-5 cursor-pointer"
+                  className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-4 rounded-xl text-xs font-bold transition-all shadow-sm hover:shadow-md mb-5 cursor-pointer"
                 >
                   <span>Get started with Professional</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
@@ -746,26 +750,28 @@ export default function PricingPage() {
           <div className="w-[82vw] max-w-[305px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
             <div>
               {/* Top Header Banner in Vibrant Royal Violet / Indigo */}
-              <div className="bg-[#5438dc] p-5 text-white relative">
-                <div className="flex items-center justify-between gap-2 mb-2.5">
+              <div className="bg-[#5438dc] h-[155px] p-5 text-white flex flex-col justify-between relative">
+                <div className="flex items-center justify-between gap-2 h-7">
                   <div className="w-9 h-9 rounded-xl bg-[#ddd6fe] text-[#4c1d95] shadow-xs flex items-center justify-center">
                     <TrendingUp className="w-4 h-4" />
                   </div>
                 </div>
-                <h3 className="font-display text-xl font-bold text-white tracking-tight">
-                  Scale
-                </h3>
-                <p className="text-xs text-indigo-50/90 mt-1 leading-relaxed min-h-[34px]">
-                  High-throughput infrastructure for agencies &amp; multi-member teams.
-                </p>
+                <div>
+                  <h3 className="font-display text-xl font-bold text-white tracking-tight">
+                    Scale
+                  </h3>
+                  <p className="text-xs text-indigo-50/90 mt-1 leading-relaxed line-clamp-2 h-[34px]">
+                    High-throughput infrastructure for agencies &amp; multi-member teams.
+                  </p>
+                </div>
               </div>
 
               {/* Card Body */}
-              <div className="p-6 sm:p-7">
+              <div className="p-5 sm:p-5.5">
                 {/* Price Block */}
-                <div className="mb-5">
+                <div className="h-[68px] mb-4 flex flex-col justify-center">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-4xl font-display font-bold text-zinc-950 tracking-tight">
+                    <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
                       {billingCycle === 'annual'
                         ? (currency === 'INR' ? '₹2,499' : '$24.10')
                         : (currency === 'INR' ? '₹2,999' : '$29')}
@@ -777,11 +783,11 @@ export default function PricingPage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-zinc-500 mt-1 flex items-center gap-1.5">
+                  <div className="text-[11px] text-zinc-500 mt-1.5 flex items-center gap-1.5 h-4">
                     {billingCycle === 'annual' ? (
                       <>
                         <span className="text-emerald-700 font-medium">
-                          {currency === 'INR' ? '₹29,990 / year' : '$290 / year'}
+                          {currency === 'INR' ? '₹29,990 / yr' : '$290 / yr'}
                         </span>
                         <span className="text-zinc-300">&bull;</span>
                         <span className="text-zinc-500">
@@ -797,45 +803,45 @@ export default function PricingPage() {
                 {/* Action CTA */}
                 <a
                   href="https://app.heycora.in/workspace/login?plan=scale"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 py-3 px-4 rounded-xl text-xs font-semibold transition-all mb-6 cursor-pointer"
+                  className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer"
                 >
                   <span>Get started</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
                 </a>
 
                 {/* Features List */}
-                <div className="space-y-3 pt-2 border-t border-zinc-100">
+                <div className="space-y-2.5 pt-2 border-t border-zinc-100">
                   <div className="text-xs font-semibold text-zinc-900">
                     Everything in Professional, plus:
                   </div>
-                  <ul className="space-y-2.5 text-xs text-zinc-700">
+                  <ul className="space-y-2 text-xs text-zinc-700">
                     <li className="flex items-center gap-2.5">
-                      <Sparkles className="w-4 h-4 text-purple-600 shrink-0" />
+                      <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                       <span><strong>All Frontier AI Engines</strong></span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span><strong>{billingCycle === 'annual' ? '61,000' : '60,000'}</strong> AI Runs / month</span>
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span><strong>{billingCycle === 'annual' ? '61,000' : '60,000'}</strong> AI Runs / mo</span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <Check className="w-4 h-4 text-zinc-900 stroke-[2] shrink-0" />
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
                       <span>Autonomous AI Research Agent</span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <Check className="w-4 h-4 text-zinc-900 stroke-[2] shrink-0" />
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
                       <span>Unlimited* team seats</span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <Check className="w-4 h-4 text-zinc-900 stroke-[2] shrink-0" />
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
                       <span>Custom Webhooks &amp; API access</span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <Check className="w-4 h-4 text-zinc-900 stroke-[2] shrink-0" />
+                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
                       <span>Dedicated account manager &amp; SLA</span>
                     </li>
                     {billingCycle === 'annual' && (
                       <li className="flex items-center gap-2.5 text-emerald-800 font-medium">
-                        <Gift className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                         <span>Free 1-Yr Custom Domain</span>
                       </li>
                     )}
