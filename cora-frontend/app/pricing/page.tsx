@@ -41,63 +41,70 @@ const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   </svg>
 );
 
-interface StudioWorkflow {
+interface ServiceTool {
   id: string;
-  title: string;
+  name: string;
   category: string;
-  currentChaos: string;
-  coraFix: string;
-  hoursLostPerWeek: number;
+  replacedApp: string;
+  monthlyCostINR: number;
+  monthlyCostUSD: number;
+  hoursSavedWeekly: number;
 }
 
-const STUDIO_WORKFLOWS: StudioWorkflow[] = [
+const SERVICE_TOOLS: ServiceTool[] = [
   {
-    id: 'galleries',
-    title: 'Client Galleries & Expiring Links',
-    category: 'Delivery & Proofing',
-    currentChaos: 'Juggling 3+ free 15GB Google Drives or expiring 7-day WeTransfer links ("link expired" complaints)',
-    coraFix: 'Permanent branded gallery portal with client photo proofing & high-res delivery',
-    hoursLostPerWeek: 4.5
+    id: 'contracts',
+    name: 'Contracts & E-Signatures',
+    category: 'Legal Agreements',
+    replacedApp: 'DocuSign / PandaDoc / Paper',
+    monthlyCostINR: 1500,
+    monthlyCostUSD: 18,
+    hoursSavedWeekly: 3.0
+  },
+  {
+    id: 'portals',
+    name: 'Client Portals & File Vault',
+    category: 'Asset Delivery',
+    replacedApp: 'Drive / WeTransfer / Dropbox',
+    monthlyCostINR: 1800,
+    monthlyCostUSD: 22,
+    hoursSavedWeekly: 4.5
   },
   {
     id: 'whatsapp',
-    title: 'WhatsApp Call-Sheets & Manual Reminders',
+    name: 'WhatsApp CRM & Auto-Pings',
     category: 'Client Communications',
-    currentChaos: 'Manually typing venue directions, shoot call times & balance reminders at 11 PM',
-    coraFix: 'Automated WhatsApp shoot confirmations, crew call-sheets & payment reminders',
-    hoursLostPerWeek: 6.0
-  },
-  {
-    id: 'payments',
-    title: 'GPay/PhonePe Screenshot Chasing',
-    category: 'Payment Matching',
-    currentChaos: 'Sharing UPI ID, asking for screenshot, manually matching bank SMS and UTR numbers',
-    coraFix: 'Dynamic UPI QR on invoices with automated payment match & instant digital receipts',
-    hoursLostPerWeek: 3.5
-  },
-  {
-    id: 'contracts',
-    title: 'Unsigned Contracts & WhatsApp Deals',
-    category: 'Legal Agreements',
-    currentChaos: 'Sending Word/Canva PDF on WhatsApp or typing "Agreed", leading to raw-file & overtime disputes',
-    coraFix: '1-Click SHA-256 legally binding digital contract signing (IT Act 2000 compliant)',
-    hoursLostPerWeek: 3.0
+    replacedApp: 'Wati / Interakt / Manual Chat',
+    monthlyCostINR: 2499,
+    monthlyCostUSD: 29,
+    hoursSavedWeekly: 5.5
   },
   {
     id: 'invoicing',
-    title: 'Excel & Canva GST Invoicing',
-    category: 'Billing & Taxes',
-    currentChaos: 'Typing bills in Excel templates and manually calculating 18% CGST, SGST, and IGST',
-    coraFix: 'Automated 1-click GST-compliant invoices with instant tax splits & PDF generation',
-    hoursLostPerWeek: 2.5
+    name: 'GST Invoicing & UPI QR',
+    category: 'Billing & Reconciliation',
+    replacedApp: 'Zoho Invoice / Khatabook / Excel',
+    monthlyCostINR: 1200,
+    monthlyCostUSD: 15,
+    hoursSavedWeekly: 3.5
   },
   {
-    id: 'proposals',
-    title: 'Proposal & Brief Drafting from Scratch',
-    category: 'Commercial Briefs',
-    currentChaos: 'Copy-pasting ChatGPT prompts back and forth to write commercial quotes and moodboards',
-    coraFix: 'Cora AI Assistant drafts custom proposals, shoot briefs, and listing copy in 10s',
-    hoursLostPerWeek: 3.0
+    id: 'scheduling',
+    name: 'Bookings & Project Kanban',
+    category: 'Operations & Calendar',
+    replacedApp: 'Calendly / HoneyBook / Trello',
+    monthlyCostINR: 1800,
+    monthlyCostUSD: 20,
+    hoursSavedWeekly: 4.0
+  },
+  {
+    id: 'ai_proposals',
+    name: 'AI Proposals & Briefs',
+    category: 'Sales & Scoping',
+    replacedApp: 'ChatGPT Plus / Copy AI',
+    monthlyCostINR: 1999,
+    monthlyCostUSD: 20,
+    hoursSavedWeekly: 3.5
   }
 ];
 
@@ -136,36 +143,37 @@ export default function PricingPage() {
   const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   
-  // Studio Workflow Time Recovery Calculator State
-  const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([
-    'galleries',
-    'whatsapp',
-    'payments',
+  // Interactive ROI, Cost & Additional Revenue Calculator State
+  const [selectedTools, setSelectedTools] = useState<string[]>([
     'contracts',
+    'portals',
+    'whatsapp',
     'invoicing',
-    'proposals'
+    'scheduling',
+    'ai_proposals'
   ]);
-  const [monthlyShoots, setMonthlyShoots] = useState<number>(6);
+  const [clientVolume, setClientVolume] = useState<number>(6);
+  const [avgProjectValue, setAvgProjectValue] = useState<number>(25000);
 
-  const toggleWorkflow = (workflowId: string) => {
-    setSelectedWorkflows(prev => {
-      const next = prev.includes(workflowId) 
-        ? prev.filter(id => id !== workflowId) 
-        : [...prev, workflowId];
-      trackEvent('roi_calculator_workflow_toggle', { workflowId, selected: !prev.includes(workflowId), total: next.length });
+  const toggleTool = (toolId: string) => {
+    setSelectedTools(prev => {
+      const next = prev.includes(toolId) 
+        ? prev.filter(id => id !== toolId) 
+        : [...prev, toolId];
+      trackEvent('roi_calculator_tool_toggle', { toolId, selected: !prev.includes(toolId), total: next.length });
       return next;
     });
   };
 
-  const handleSelectAllWorkflows = () => {
-    const allIds = STUDIO_WORKFLOWS.map(w => w.id);
-    setSelectedWorkflows(allIds);
+  const handleSelectAllTools = () => {
+    const allIds = SERVICE_TOOLS.map(t => t.id);
+    setSelectedTools(allIds);
     trackEvent('roi_calculator_select_all', { total: allIds.length });
   };
 
-  const handleResetWorkflows = () => {
-    const defaultIds = ['galleries', 'whatsapp', 'payments', 'contracts', 'invoicing', 'proposals'];
-    setSelectedWorkflows(defaultIds);
+  const handleResetTools = () => {
+    const defaultIds = ['contracts', 'portals', 'whatsapp', 'invoicing', 'scheduling', 'ai_proposals'];
+    setSelectedTools(defaultIds);
     trackEvent('roi_calculator_reset', { total: defaultIds.length });
   };
 
@@ -245,16 +253,33 @@ export default function PricingPage() {
     trackEvent('pricing_comparison_toggle', { open: nextState });
   };
 
-  // Time & Stack Calculations
-  const totalHoursWeekly = selectedWorkflows.reduce((sum, id) => {
-    const item = STUDIO_WORKFLOWS.find(w => w.id === id);
+  // 1. Time Saved Calculations
+  const totalWeeklyHours = selectedTools.reduce((sum, id) => {
+    const item = SERVICE_TOOLS.find(t => t.id === id);
     if (!item) return sum;
-    const volumeMultiplier = monthlyShoots > 4 ? 1 + (monthlyShoots - 4) * 0.07 : 1;
-    return sum + item.hoursLostPerWeek * volumeMultiplier;
+    const volumeMultiplier = clientVolume > 4 ? 1 + (clientVolume - 4) * 0.06 : 1;
+    return sum + item.hoursSavedWeekly * volumeMultiplier;
   }, 0);
 
-  const roundedWeeklyHours = Math.round(totalHoursWeekly * 10) / 10;
-  const totalHoursMonthly = Math.round(totalHoursWeekly * 4.3);
+  const weeklyHoursFormatted = Math.round(totalWeeklyHours * 10) / 10;
+  const monthlyHoursSaved = Math.round(totalWeeklyHours * 4.3);
+
+  // 2. Cost Saved Calculations
+  const monthlyToolsCost = selectedTools.reduce((sum, id) => {
+    const item = SERVICE_TOOLS.find(t => t.id === id);
+    if (!item) return sum;
+    const cost = currency === 'INR' ? item.monthlyCostINR : item.monthlyCostUSD;
+    return sum + cost;
+  }, 0);
+  const annualToolsCost = monthlyToolsCost * 12;
+  const coraAnnualPro = currency === 'INR' ? 19990 : 190;
+  const netAnnualCostSaved = Math.max(0, annualToolsCost - coraAnnualPro);
+
+  // 3. Additional Revenue Potential from Recovered Hours
+  const projectVal = currency === 'INR' ? avgProjectValue : Math.round(avgProjectValue / 75);
+  const extraProjects = monthlyHoursSaved >= 50 ? 2 : 1;
+  const additionalMonthlyRevenue = selectedTools.length >= 3 ? extraProjects * projectVal : 0;
+  const additionalAnnualRevenue = additionalMonthlyRevenue * 12;
 
   return (
     <main className="w-full relative pb-16 sm:pb-24 overflow-hidden bg-white text-zinc-900">
@@ -1488,44 +1513,44 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 4: STUDIO TIME RECOVERY & WORKFLOW CONSOLIDATION CALCULATOR
+          ROW 4: SERVICE BUSINESS ROI & REVENUE IMPACT CALCULATOR
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1140px] mx-auto px-3.5 sm:px-6 mb-16 sm:mb-24">
         
         {/* Section Header */}
-        <div className="text-center max-w-[760px] mx-auto mb-8 sm:mb-12">
+        <div className="text-center max-w-[760px] mx-auto mb-8 sm:mb-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200/80 text-zinc-800 text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider mb-2.5">
-            <Clock className="w-3.5 h-3.5 text-zinc-600" />
-            <span>TIME RECOVERY &amp; WORKFLOW CONSOLIDATION</span>
+            <Calculator className="w-3.5 h-3.5 text-zinc-600" />
+            <span>ROI &amp; REVENUE IMPACT CALCULATOR</span>
           </div>
           <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
-            The True Cost of Free-Tier Hacks &amp; Manual Chaos
+            Calculate Your Cost, Time &amp; Revenue ROI
           </h2>
           <p className="text-xs sm:text-sm text-zinc-500 mt-2 leading-relaxed max-w-2xl mx-auto">
-            Juggling 3 free Google Drive accounts, typing WhatsApp messages at 11 PM, and matching UPI screenshots saves ₹0 in subscriptions, but drains 18+ hours every month in lost client focus.
+            See how much software spend you save, hours you recover, and extra client revenue you unlock by consolidating your stack into Cora.
           </p>
         </div>
 
         {/* 2-Column Monochromatic Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start bg-white border border-zinc-200/80 rounded-2xl sm:rounded-[28px] p-4 sm:p-7 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-7 items-start bg-white border border-zinc-200/80 rounded-2xl sm:rounded-[28px] p-4 sm:p-7 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
           
-          {/* LEFT PANEL: SELECT CURRENT WORKFLOWS & VOLUME (7 Cols) */}
+          {/* LEFT PANEL: SELECT CURRENT TOOLS & WORKSPACE PARAMS (7 Cols) */}
           <div className="lg:col-span-7 space-y-5">
             
             {/* Header with Quick Actions */}
-            <div className="flex items-center justify-between gap-3 pb-3 border-b border-zinc-100">
+            <div className="flex items-center justify-between gap-3 pb-2.5 border-b border-zinc-100">
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-zinc-950">
-                  Select Your Current Studio Workarounds
+                  Select Tools &amp; Workflows You Use Today
                 </h3>
                 <p className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">
-                  See how much time manual juggling costs your business each week:
+                  Applicable to creative agencies, media studios, architects &amp; service firms:
                 </p>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   type="button"
-                  onClick={handleSelectAllWorkflows}
+                  onClick={handleSelectAllTools}
                   className="px-2.5 py-1 rounded-md text-[11px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer"
                 >
                   Select All
@@ -1533,7 +1558,7 @@ export default function PricingPage() {
                 <span className="text-zinc-300">&bull;</span>
                 <button
                   type="button"
-                  onClick={handleResetWorkflows}
+                  onClick={handleResetTools}
                   className="px-2.5 py-1 rounded-md text-[11px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer"
                 >
                   Reset
@@ -1541,19 +1566,20 @@ export default function PricingPage() {
               </div>
             </div>
 
-            {/* Workflow Items List */}
-            <div className="space-y-2.5">
-              {STUDIO_WORKFLOWS.map(item => {
-                const isSelected = selectedWorkflows.includes(item.id);
+            {/* Compact Tool Cards Grid (2 Columns, Non-Text-Heavy) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {SERVICE_TOOLS.map(tool => {
+                const isSelected = selectedTools.includes(tool.id);
+                const cost = currency === 'INR' ? `₹${tool.monthlyCostINR.toLocaleString('en-IN')}` : `$${tool.monthlyCostUSD}`;
 
                 return (
                   <button
-                    key={item.id}
+                    key={tool.id}
                     type="button"
-                    onClick={() => toggleWorkflow(item.id)}
-                    className={`w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all relative flex items-start gap-3 cursor-pointer ${
+                    onClick={() => toggleTool(tool.id)}
+                    className={`p-3 rounded-xl border text-left transition-all relative flex items-start gap-2.5 cursor-pointer ${
                       isSelected
-                        ? 'border-zinc-950 bg-zinc-50/70 shadow-2xs'
+                        ? 'border-zinc-950 bg-zinc-50/80 shadow-2xs'
                         : 'border-zinc-200/80 bg-white hover:border-zinc-300 opacity-60 hover:opacity-100'
                     }`}
                   >
@@ -1565,129 +1591,167 @@ export default function PricingPage() {
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="font-semibold text-xs text-zinc-950">
-                          {item.title}
-                        </div>
-                        <span className="text-[10px] font-mono text-zinc-700 bg-zinc-100/90 border border-zinc-200/60 px-2 py-0.5 rounded-md font-medium shrink-0">
-                          ~{item.hoursLostPerWeek}h / wk drained
-                        </span>
+                      <div className="font-semibold text-xs text-zinc-950 line-clamp-1">
+                        {tool.name}
+                      </div>
+                      <div className="text-[10px] text-zinc-500 font-mono mt-0.5 line-clamp-1">
+                        {tool.replacedApp}
                       </div>
 
-                      {/* The Reality Friction */}
-                      <p className="text-[11px] text-zinc-500 mt-1 leading-snug">
-                        <strong className="font-medium text-zinc-700">Today:</strong> {item.currentChaos}
-                      </p>
-
-                      {/* With Cora */}
-                      <p className="text-[11px] text-zinc-900 font-medium mt-1 leading-snug flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-900 shrink-0" />
-                        <span><strong>Cora Fix:</strong> {item.coraFix}</span>
-                      </p>
+                      <div className="mt-2 flex items-center justify-between text-[10px] pt-1.5 border-t border-zinc-200/60">
+                        <span className="font-semibold text-zinc-800 font-mono">{cost}/mo</span>
+                        <span className="text-zinc-600 font-mono bg-zinc-100 px-1.5 py-0.5 rounded">
+                          +{tool.hoursSavedWeekly}h/wk
+                        </span>
+                      </div>
                     </div>
                   </button>
                 );
               })}
             </div>
 
-            {/* Monthly Shoot / Project Volume Slider */}
-            <div className="p-4 rounded-2xl bg-zinc-50/80 border border-zinc-200/80 space-y-2.5">
-              <div className="flex items-center justify-between gap-2">
-                <div>
-                  <div className="text-xs sm:text-sm font-bold text-zinc-950">
-                    Monthly Shoot / Client Volume
-                  </div>
-                  <div className="text-[10px] sm:text-[11px] text-zinc-500">
-                    Calculates cumulative coordination and file dispatch time
-                  </div>
+            {/* Interactive Sliders Container */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              
+              {/* Slider 1: Monthly Client Volume */}
+              <div className="p-3.5 rounded-xl bg-zinc-50/80 border border-zinc-200/80 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-semibold text-zinc-900">Monthly Client Projects</span>
+                  <span className="text-xs font-mono font-bold text-zinc-950 bg-white px-2 py-0.5 rounded border border-zinc-200">
+                    {clientVolume} Projects
+                  </span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-200 text-xs font-bold font-mono text-zinc-950 shadow-2xs">
-                  <span>{monthlyShoots} Shoots / mo</span>
+                <input
+                  type="range"
+                  min="2"
+                  max="25"
+                  step="1"
+                  value={clientVolume}
+                  onChange={e => setClientVolume(parseInt(e.target.value, 10))}
+                  className="w-full h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950"
+                />
+                <div className="flex justify-between text-[9px] text-zinc-400 font-mono">
+                  <span>2 Solo</span>
+                  <span>10 Agency</span>
+                  <span>25+ Scale</span>
                 </div>
               </div>
 
-              <input
-                type="range"
-                min="2"
-                max="25"
-                step="1"
-                value={monthlyShoots}
-                onChange={e => setMonthlyShoots(parseInt(e.target.value, 10))}
-                className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950"
-              />
-
-              <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
-                <span>2 (Solopreneur)</span>
-                <span>8 (Active Studio)</span>
-                <span>25+ (Production House)</span>
+              {/* Slider 2: Average Project Value */}
+              <div className="p-3.5 rounded-xl bg-zinc-50/80 border border-zinc-200/80 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-semibold text-zinc-900">Avg. Project Value</span>
+                  <span className="text-xs font-mono font-bold text-zinc-950 bg-white px-2 py-0.5 rounded border border-zinc-200">
+                    {currency === 'INR' ? `₹${avgProjectValue.toLocaleString('en-IN')}` : `$${Math.round(avgProjectValue / 75).toLocaleString('en-US')}`}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="5000"
+                  max="100000"
+                  step="5000"
+                  value={avgProjectValue}
+                  onChange={e => setAvgProjectValue(parseInt(e.target.value, 10))}
+                  className="w-full h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950"
+                />
+                <div className="flex justify-between text-[9px] text-zinc-400 font-mono">
+                  <span>{currency === 'INR' ? '₹5k' : '$65'}</span>
+                  <span>{currency === 'INR' ? '₹50k' : '$650'}</span>
+                  <span>{currency === 'INR' ? '₹100k' : '$1.3k'}</span>
+                </div>
               </div>
+
             </div>
 
           </div>
 
-          {/* RIGHT PANEL: MONOCHROMATIC TIME RECOVERY & CONSOLIDATION SUMMARY (5 Cols) */}
-          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
+          {/* RIGHT PANEL: 3 CORE ROI PILLARS (TIME + COST + REVENUE) (5 Cols) */}
+          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-3.5">
             
-            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-[26px] bg-zinc-50/90 border border-zinc-200/90 text-zinc-900 shadow-2xs space-y-5">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-[24px] bg-zinc-50/90 border border-zinc-200/90 text-zinc-900 shadow-2xs space-y-4">
               
-              <div className="flex items-center justify-between gap-2 pb-3 border-b border-zinc-200/80">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500">
-                  Consolidated Impact
+              <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-zinc-200/80">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500">
+                  Consolidated ROI Breakdown
                 </span>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-200 text-zinc-900 text-[11px] font-bold">
-                  {selectedWorkflows.length} Workflows Unified
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-200 text-zinc-900 text-[10px] font-bold">
+                  {selectedTools.length} Workflows Unified
                 </span>
               </div>
 
-              {/* Primary Time Recovered Highlight */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs space-y-1.5 text-center sm:text-left">
-                <div className="text-[10px] sm:text-[11px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
-                  Studio Time Recovered
+              {/* 3 Metric Cards */}
+              <div className="space-y-2.5">
+                
+                {/* Metric 1: Time Saved */}
+                <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs">
+                  <div className="flex items-center justify-between text-xs text-zinc-500">
+                    <span className="font-medium flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-zinc-700" />
+                      <span>Time Saved:</span>
+                    </span>
+                    <span className="text-[11px] font-mono text-zinc-400">~{monthlyHoursSaved} hrs / mo</span>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-display font-extrabold text-zinc-950 mt-1 tracking-tight">
+                    ~{weeklyHoursFormatted} Hours <span className="text-xs text-zinc-500 font-normal font-sans">/ week</span>
+                  </div>
                 </div>
-                <div className="text-3xl sm:text-4xl font-display font-extrabold text-zinc-950 tracking-tight">
-                  ~{roundedWeeklyHours} Hours
-                  <span className="text-xs text-zinc-500 font-normal ml-1.5 font-sans">/ week</span>
-                </div>
-                <p className="text-[11px] text-zinc-500 leading-snug pt-1">
-                  That is <strong className="text-zinc-900 font-semibold">~{totalHoursMonthly} hours every month</strong> back for shooting, editing, and closing high-ticket clients instead of administrative chaos.
-                </p>
-              </div>
 
-              {/* All In One Single Backbone */}
-              <div className="space-y-2 text-xs">
-                <div className="font-bold text-zinc-950 flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-zinc-950 stroke-[3]" />
-                  <span>Everything Replaced by One Workspace:</span>
+                {/* Metric 2: Cost Saved */}
+                <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs">
+                  <div className="flex items-center justify-between text-xs text-zinc-500">
+                    <span className="font-medium flex items-center gap-1.5">
+                      <Receipt className="w-3.5 h-3.5 text-zinc-700" />
+                      <span>Software Cost Saved:</span>
+                    </span>
+                    <span className="text-[11px] font-mono text-zinc-400">vs. Cora Pro</span>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-display font-extrabold text-zinc-950 mt-1 tracking-tight">
+                    {currency === 'INR' ? `₹${netAnnualCostSaved.toLocaleString('en-IN')}` : `$${netAnnualCostSaved.toLocaleString('en-US')}`}
+                    <span className="text-xs text-zinc-500 font-normal ml-1 font-sans">/ year</span>
+                  </div>
                 </div>
-                <ul className="space-y-2 text-[11px] text-zinc-600 pl-4 list-disc">
-                  <li><strong>Permanent Gallery Portal:</strong> No 15GB Drive juggling or expired links</li>
-                  <li><strong>WhatsApp Automation:</strong> Call-sheets &amp; advance balance pings</li>
-                  <li><strong>Dynamic UPI QR:</strong> Auto-reconciliation with zero screenshot chasing</li>
-                  <li><strong>SHA-256 E-Sign:</strong> Legally binding shoot contracts in 1 click</li>
-                  <li><strong>Instant GST Math:</strong> Automated 18% CGST/SGST PDF invoices</li>
-                </ul>
+
+                {/* Metric 3: Additional Revenue Potential */}
+                <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs">
+                  <div className="flex items-center justify-between text-xs text-zinc-500">
+                    <span className="font-medium flex items-center gap-1.5">
+                      <TrendingUp className="w-3.5 h-3.5 text-zinc-950" />
+                      <span>Additional Revenue Potential:</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded font-bold">
+                      +{extraProjects} Client Deal/mo
+                    </span>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-display font-extrabold text-zinc-950 mt-1 tracking-tight">
+                    +{currency === 'INR' ? `₹${additionalMonthlyRevenue.toLocaleString('en-IN')}` : `$${additionalMonthlyRevenue.toLocaleString('en-US')}`}
+                    <span className="text-xs text-zinc-500 font-normal ml-1 font-sans">/ mo</span>
+                  </div>
+                  <p className="text-[10px] text-zinc-500 mt-1">
+                    Unlocking <strong>{currency === 'INR' ? `+₹${additionalAnnualRevenue.toLocaleString('en-IN')}` : `+$${additionalAnnualRevenue.toLocaleString('en-US')}`} / year</strong> from unbilled administrative capacity.
+                  </p>
+                </div>
+
               </div>
 
               {/* Price Callout */}
-              <div className="pt-3 border-t border-zinc-200/80 flex items-baseline justify-between">
-                <span className="text-xs text-zinc-500">Starting from:</span>
-                <div className="text-right">
-                  <span className="font-display text-lg font-bold text-zinc-950">₹499</span>
-                  <span className="text-xs text-zinc-500"> / mo (India Plan)</span>
-                </div>
+              <div className="pt-2 border-t border-zinc-200/80 flex items-baseline justify-between text-xs">
+                <span className="text-zinc-500">Cora Unified Backbone:</span>
+                <span className="font-semibold text-zinc-950 font-mono">
+                  From ₹499/mo (India Plan) or ₹1,665/mo (Pro)
+                </span>
               </div>
 
               {/* Action Conversion CTA */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=pro"
-                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3.5 px-4 rounded-xl text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3 px-4 rounded-xl text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
               >
-                <span>Consolidate your studio on Cora</span>
+                <span>Consolidate your business on Cora</span>
                 <ArrowRight className="w-4 h-4 text-white" />
               </a>
 
               <div className="text-center text-[10px] text-zinc-400 space-y-0.5">
-                <div>✓ 100% white-label for your clients &bull; No setup fee</div>
+                <div>✓ 100% white-label for your clients &bull; No setup fees</div>
                 <div>✓ Free onboarding &amp; data migration support</div>
               </div>
             </div>
