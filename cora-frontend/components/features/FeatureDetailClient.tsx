@@ -283,44 +283,44 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
               return (
                 <div
                   key={idx}
-                  className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 items-center"
+                  className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 items-stretch"
                 >
                   {/* Left Column */}
-                  <div className={`p-8 sm:p-12 lg:p-14 flex flex-col justify-center ${isEven ? 'order-1' : 'order-2 lg:order-1'}`}>
+                  <div className={`${isEven ? 'p-6 sm:p-10 lg:p-12 flex flex-col justify-center order-1' : 'p-4 sm:p-6 lg:p-8 bg-zinc-50/40 flex items-center justify-center order-2 lg:order-1'}`}>
                     {isEven ? (
-                      <div className="space-y-3.5 max-w-[480px]">
+                      <div className="space-y-3 max-w-[480px]">
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600">
                           {cap.tag}
                         </span>
                         <h3 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
                           {cap.title}
                         </h3>
-                        <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
+                        <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
                           {cap.description}
                         </p>
                       </div>
                     ) : (
-                      <div className="w-full flex items-center justify-center py-4 sm:py-6">
+                      <div className="w-full flex items-center justify-center">
                         <CapabilityVisualCard cap={cap} feature={feature} index={idx} />
                       </div>
                     )}
                   </div>
 
                   {/* Right Column */}
-                  <div className={`p-8 sm:p-12 lg:p-14 flex flex-col justify-center ${isEven ? 'order-2' : 'order-1 lg:order-2'}`}>
+                  <div className={`${isEven ? 'p-4 sm:p-6 lg:p-8 bg-zinc-50/40 flex items-center justify-center order-2' : 'p-6 sm:p-10 lg:p-12 flex flex-col justify-center order-1 lg:order-2'}`}>
                     {isEven ? (
-                      <div className="w-full flex items-center justify-center py-4 sm:py-6">
+                      <div className="w-full flex items-center justify-center">
                         <CapabilityVisualCard cap={cap} feature={feature} index={idx} />
                       </div>
                     ) : (
-                      <div className="space-y-3.5 max-w-[480px]">
+                      <div className="space-y-3 max-w-[480px]">
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600">
                           {cap.tag}
                         </span>
                         <h3 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
                           {cap.title}
                         </h3>
-                        <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
+                        <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
                           {cap.description}
                         </p>
                       </div>

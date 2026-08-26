@@ -32,7 +32,7 @@ export function CapabilityVisualCard({ cap, feature, index }: CapabilityVisualCa
   // ── CARD 0: ENTITY DETAILS & CUSTOM STUDIO FIELDS (CLICKUP ROW 1 REFERENCE) ──
   if (cardType === 0) {
     return (
-      <div className="w-full max-w-[440px] bg-white rounded-2xl border border-zinc-200/90 p-5 sm:p-6 shadow-[0_12px_32px_rgba(0,0,0,0.06)] space-y-4 select-none">
+      <div className="w-full max-w-[480px] bg-white rounded-2xl border border-zinc-200/90 p-5 sm:p-6 shadow-[0_8px_24px_rgba(0,0,0,0.05)] space-y-4 select-none">
         
         {/* Breadcrumb & Sub-meta */}
         <div className="flex items-center justify-between text-[11px] text-zinc-500 pb-2 border-b border-zinc-100">
@@ -99,7 +99,7 @@ export function CapabilityVisualCard({ cap, feature, index }: CapabilityVisualCa
   // ── CARD 1: RELATIONSHIPS & CONNECTED WORKSPACE (CLICKUP ROW 2 REFERENCE) ──
   if (cardType === 1) {
     return (
-      <div className="w-full max-w-[440px] bg-white rounded-2xl border border-zinc-200/90 p-5 sm:p-6 shadow-[0_12px_32px_rgba(0,0,0,0.06)] space-y-4 select-none">
+      <div className="w-full max-w-[480px] bg-white rounded-2xl border border-zinc-200/90 p-5 sm:p-6 shadow-[0_8px_24px_rgba(0,0,0,0.05)] space-y-4 select-none">
         
         {/* Tabs Bar */}
         <div className="flex items-center gap-2 pb-2 border-b border-zinc-100">
@@ -171,7 +171,7 @@ export function CapabilityVisualCard({ cap, feature, index }: CapabilityVisualCa
   // ── CARD 2: AUTOMATED WORKFLOW TRIGGER ENGINE ──
   if (cardType === 2) {
     return (
-      <div className="w-full max-w-[440px] bg-white rounded-2xl border border-zinc-200/90 p-5 sm:p-6 shadow-[0_12px_32px_rgba(0,0,0,0.06)] space-y-4 select-none">
+      <div className="w-full max-w-[480px] bg-white rounded-2xl border border-zinc-200/90 p-5 sm:p-6 shadow-[0_8px_24px_rgba(0,0,0,0.05)] space-y-4 select-none">
         
         <div className="flex items-center justify-between text-[11px] text-zinc-500 pb-2 border-b border-zinc-100">
           <span className="font-bold text-zinc-900 flex items-center gap-1.5">
@@ -213,7 +213,7 @@ export function CapabilityVisualCard({ cap, feature, index }: CapabilityVisualCa
 
   // ── CARD 3: SECURITY, AUDIT & LEGAL SEAL ──
   return (
-    <div className="w-full max-w-[440px] bg-white rounded-2xl border border-zinc-200/90 p-5 sm:p-6 shadow-[0_12px_32px_rgba(0,0,0,0.06)] space-y-4 select-none">
+    <div className="w-full max-w-[480px] bg-white rounded-2xl border border-zinc-200/90 p-5 sm:p-6 shadow-[0_8px_24px_rgba(0,0,0,0.05)] space-y-4 select-none">
       
       <div className="flex items-center justify-between text-[11px] text-zinc-500 pb-2 border-b border-zinc-100">
         <span className="font-bold text-zinc-950 flex items-center gap-1.5">
