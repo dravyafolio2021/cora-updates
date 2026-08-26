@@ -66,6 +66,7 @@ export interface FeatureModule {
   iconName: string;
   status: 'Live in Product' | 'Building Soon';
   tags: string[];
+  industries?: string[];
   stats: FeatureStat[];
   theOldWay: string[];
   theCoraWay: string[];
@@ -90,7 +91,23 @@ export interface RoadmapModule {
   eta: string;
   status: string;
   categoryLabel: string;
+  industries?: string[];
 }
+
+export interface IndustryItem {
+  id: string;
+  label: string;
+  iconName: string;
+}
+
+export const INDUSTRIES: IndustryItem[] = [
+  { id: 'all', label: 'All Industries', iconName: 'Briefcase' },
+  { id: 'photography', label: 'Photography Studios', iconName: 'Camera' },
+  { id: 'film_production', label: 'Film & Video Houses', iconName: 'Clapperboard' },
+  { id: 'real_estate', label: 'Real Estate Media', iconName: 'Building' },
+  { id: 'wedding_events', label: 'Wedding & Event Cinema', iconName: 'Heart' },
+  { id: 'creative_agencies', label: 'Creative & Digital Agencies', iconName: 'Palette' },
+];
 
 export const CATEGORIES = [
   { id: 'all', label: 'All (28)' },

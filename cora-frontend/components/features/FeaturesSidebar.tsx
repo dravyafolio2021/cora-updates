@@ -15,20 +15,29 @@ import {
   Clock, 
   ArrowRight,
   Filter,
-  Sparkles
+  Sparkles,
+  Briefcase,
+  Camera,
+  Clapperboard,
+  Building,
+  Heart,
+  Palette
 } from 'lucide-react';
-import { CATEGORIES } from '@/lib/features-data';
+import { CATEGORIES, INDUSTRIES, IndustryItem } from '@/lib/features-data';
 import Link from 'next/link';
 
 interface FeaturesSidebarProps {
   activeCategory: string;
   onSelectCategory: (id: string) => void;
+  selectedIndustry: string;
+  onSelectIndustry: (id: string) => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
   statusFilter: 'all' | 'live' | 'roadmap';
   onStatusFilterChange: (status: 'all' | 'live' | 'roadmap') => void;
   totalBuiltCount: number;
   totalRoadmapCount: number;
+  industryCounts: Record<string, number>;
   onCloseMobileDrawer?: () => void;
 }
 
@@ -53,15 +62,37 @@ const getCategoryIcon = (id: string) => {
   }
 };
 
+// Icon mapper for industries
+const getIndustryIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'Camera':
+      return <Camera className="w-4 h-4" />;
+    case 'Clapperboard':
+      return <Clapperboard className="w-4 h-4" />;
+    case 'Building':
+      return <Building className="w-4 h-4" />;
+    case 'Heart':
+      return <Heart className="w-4 h-4" />;
+    case 'Palette':
+      return <Palette className="w-4 h-4" />;
+    case 'Briefcase':
+    default:
+      return <Briefcase className="w-4 h-4" />;
+  }
+};
+
 export function FeaturesSidebar({
   activeCategory,
   onSelectCategory,
+  selectedIndustry,
+  onSelectIndustry,
   searchQuery,
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
   totalBuiltCount,
   totalRoadmapCount,
+  industryCounts,
   onCloseMobileDrawer
 }: FeaturesSidebarProps) {
 
@@ -86,7 +117,7 @@ export function FeaturesSidebar({
             <button
               type="button"
               onClick={() => onSearchChange('')}
-              className="absolute right-2.5 p-1 rounded-md text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-colors"
+              className="absolute right-2.5 p-1 rounded-md text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-colors cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -137,7 +168,51 @@ export function FeaturesSidebar({
         </nav>
       </div>
 
-      {/* ── 3. STATUS FILTER ── */}
+      {/* ── 3. TARGET INDUSTRY FILTERS ── */}
+      <div className="pt-4 border-t border-zinc-100">
+        <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2.5 px-1 flex items-center justify-between">
+          <span>Target Industry</span>
+          <span className="text-[10px] text-zinc-400 font-normal">Workflows</span>
+        </div>
+
+        <div className="space-y-1" role="group" aria-label="Industry filters">
+          {INDUSTRIES.map((ind) => {
+            const isSelected = selectedIndustry === ind.id;
+            const count = industryCounts[ind.id] ?? 28;
+            return (
+              <button
+                key={ind.id}
+                onClick={() => {
+                  onSelectIndustry(ind.id);
+                  if (onCloseMobileDrawer) onCloseMobileDrawer();
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group text-left ${
+                  isSelected
+                    ? 'bg-zinc-900 text-white shadow-xs font-bold'
+                    : 'text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950'
+                }`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className={`${isSelected ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-700'}`}>
+                    {getIndustryIcon(ind.iconName)}
+                  </span>
+                  <span className="truncate">{ind.label}</span>
+                </div>
+
+                <span className={`text-[11px] font-mono px-2 py-0.5 rounded-md shrink-0 ${
+                  isSelected 
+                    ? 'bg-white/20 text-white' 
+                    : 'bg-zinc-100 text-zinc-500 group-hover:bg-zinc-200/70 group-hover:text-zinc-800'
+                }`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── 4. RELEASE STATUS ── */}
       <div className="pt-4 border-t border-zinc-100">
         <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2.5 px-1">
           Release Status
@@ -188,7 +263,7 @@ export function FeaturesSidebar({
         </div>
       </div>
 
-      {/* ── 4. STACK REPLACEMENT HIGHLIGHT CARD ── */}
+      {/* ── 5. STACK REPLACEMENT HIGHLIGHT CARD ── */}
       <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 text-zinc-900">
         <div className="flex items-center gap-2 mb-2 text-xs font-bold text-zinc-950">
           <Sparkles className="w-3.5 h-3.5 text-zinc-700" />

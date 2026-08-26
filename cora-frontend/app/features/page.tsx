@@ -17,9 +17,15 @@ import {
   PanelLeftOpen,
   X,
   SlidersHorizontal,
-  RotateCcw
+  RotateCcw,
+  Briefcase,
+  Camera,
+  Clapperboard,
+  Building,
+  Heart,
+  Palette
 } from 'lucide-react';
-import { BUILT_MODULES, UPCOMING_MODULES, CATEGORIES, FeatureModule } from '@/lib/features-data';
+import { BUILT_MODULES, UPCOMING_MODULES, CATEGORIES, INDUSTRIES, FeatureModule } from '@/lib/features-data';
 import { FeatureIcon } from '@/components/features/FeatureIcon';
 import { FeaturesSidebar } from '@/components/features/FeaturesSidebar';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
@@ -27,15 +33,36 @@ import { trackEvent } from '@/components/analytics/Analytics';
 
 export default function FeaturesPage() {
   const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedIndustry, setSelectedIndustry] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'live' | 'roadmap'>('all');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
-  // Active Category Label Helper
+  // Active Category & Industry Object Helpers
   const activeCategoryObject = useMemo(() => {
     return CATEGORIES.find(c => c.id === activeCategory) || CATEGORIES[0];
   }, [activeCategory]);
+
+  const selectedIndustryObject = useMemo(() => {
+    return INDUSTRIES.find(i => i.id === selectedIndustry) || INDUSTRIES[0];
+  }, [selectedIndustry]);
+
+  // Dynamic Industry Counts
+  const industryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: BUILT_MODULES.length + UPCOMING_MODULES.length };
+    INDUSTRIES.forEach((ind) => {
+      if (ind.id === 'all') return;
+      const builtMatches = BUILT_MODULES.filter(
+        m => !m.industries || m.industries.includes('all') || m.industries.includes(ind.id)
+      ).length;
+      const roadmapMatches = UPCOMING_MODULES.filter(
+        m => !m.industries || m.industries.includes('all') || m.industries.includes(ind.id)
+      ).length;
+      counts[ind.id] = builtMatches + roadmapMatches;
+    });
+    return counts;
+  }, []);
 
   // Filtered 20 Built Modules
   const filteredBuiltModules = useMemo(() => {
@@ -48,6 +75,10 @@ export default function FeaturesPage() {
           ? false
           : mod.category === activeCategory;
 
+      const matchesIndustry = selectedIndustry === 'all'
+        ? true
+        : !mod.industries || mod.industries.includes('all') || mod.industries.includes(selectedIndustry);
+
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch = !q || (
         mod.title.toLowerCase().includes(q) ||
@@ -58,9 +89,9 @@ export default function FeaturesPage() {
         mod.categoryLabel.toLowerCase().includes(q)
       );
 
-      return matchesCategory && matchesSearch;
+      return matchesCategory && matchesIndustry && matchesSearch;
     });
-  }, [activeCategory, searchQuery, statusFilter]);
+  }, [activeCategory, selectedIndustry, searchQuery, statusFilter]);
 
   // Filtered 8 Roadmap Modules
   const filteredRoadmapModules = useMemo(() => {
@@ -70,20 +101,27 @@ export default function FeaturesPage() {
       return [];
     }
 
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return UPCOMING_MODULES;
+    return UPCOMING_MODULES.filter((m) => {
+      const matchesIndustry = selectedIndustry === 'all'
+        ? true
+        : !m.industries || m.industries.includes('all') || m.industries.includes(selectedIndustry);
 
-    return UPCOMING_MODULES.filter((m) => 
-      m.title.toLowerCase().includes(q) ||
-      m.desc.toLowerCase().includes(q) ||
-      m.categoryLabel.toLowerCase().includes(q)
-    );
-  }, [activeCategory, searchQuery, statusFilter]);
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch = !q || (
+        m.title.toLowerCase().includes(q) ||
+        m.desc.toLowerCase().includes(q) ||
+        m.categoryLabel.toLowerCase().includes(q)
+      );
+
+      return matchesIndustry && matchesSearch;
+    });
+  }, [activeCategory, selectedIndustry, searchQuery, statusFilter]);
 
   const totalResultsCount = filteredBuiltModules.length + filteredRoadmapModules.length;
 
   const handleResetFilters = () => {
     setActiveCategory('all');
+    setSelectedIndustry('all');
     setSearchQuery('');
     setStatusFilter('all');
     trackEvent('features_filters_reset');
@@ -168,17 +206,18 @@ export default function FeaturesPage() {
             >
               <Filter className="w-3.5 h-3.5 text-zinc-700" />
               <span>Filters &amp; Search</span>
-              {(activeCategory !== 'all' || statusFilter !== 'all' || searchQuery) && (
+              {(activeCategory !== 'all' || selectedIndustry !== 'all' || statusFilter !== 'all' || searchQuery) && (
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
               )}
             </button>
 
             <div className="h-4 w-px bg-zinc-200 hidden sm:block" />
 
-            {/* Active Category Scope Title */}
+            {/* Active Category & Industry Scope Title */}
             <div className="flex items-center gap-2 truncate">
               <span className="text-xs font-bold text-zinc-950 truncate">
-                {activeCategoryObject.label.replace(/\s*\(\d+\)$/, '')}
+                {activeCategory !== 'all' ? activeCategoryObject.label.replace(/\s*\(\d+\)$/, '') : 'All Modules'}
+                {selectedIndustry !== 'all' && ` • ${selectedIndustryObject.label}`}
               </span>
               <span className="text-[11px] font-mono text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-md hidden sm:inline-block">
                 {totalResultsCount} available
@@ -213,6 +252,18 @@ export default function FeaturesPage() {
               </span>
             )}
 
+            {selectedIndustry !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-800 text-[11px] font-medium border border-zinc-200">
+                <span>{selectedIndustryObject.label}</span>
+                <button
+                  onClick={() => setSelectedIndustry('all')}
+                  className="hover:text-zinc-950 cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
             {statusFilter !== 'all' && (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-800 text-[11px] font-medium border border-zinc-200">
                 <span className="capitalize">{statusFilter}</span>
@@ -225,7 +276,7 @@ export default function FeaturesPage() {
               </span>
             )}
 
-            {(activeCategory !== 'all' || statusFilter !== 'all' || searchQuery) && (
+            {(activeCategory !== 'all' || selectedIndustry !== 'all' || statusFilter !== 'all' || searchQuery) && (
               <button
                 onClick={handleResetFilters}
                 className="text-[11px] font-semibold text-zinc-500 hover:text-zinc-950 flex items-center gap-1 pl-1 cursor-pointer"
@@ -247,12 +298,15 @@ export default function FeaturesPage() {
               <FeaturesSidebar
                 activeCategory={activeCategory}
                 onSelectCategory={setActiveCategory}
+                selectedIndustry={selectedIndustry}
+                onSelectIndustry={setSelectedIndustry}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 statusFilter={statusFilter}
                 onStatusFilterChange={setStatusFilter}
                 totalBuiltCount={BUILT_MODULES.length}
                 totalRoadmapCount={UPCOMING_MODULES.length}
+                industryCounts={industryCounts}
               />
             </div>
           )}
@@ -270,7 +324,7 @@ export default function FeaturesPage() {
                   No modules match your query
                 </h3>
                 <p className="text-xs text-zinc-500 max-w-sm mx-auto mb-6">
-                  We couldn&apos;t find any modules matching &ldquo;{searchQuery}&rdquo;. Try another keyword or reset filters.
+                  We couldn&apos;t find any modules matching &ldquo;{searchQuery || selectedIndustryObject.label}&rdquo;. Try another filter or reset.
                 </p>
                 <button
                   type="button"
@@ -473,12 +527,15 @@ export default function FeaturesPage() {
               <FeaturesSidebar 
                 activeCategory={activeCategory}
                 onSelectCategory={setActiveCategory}
+                selectedIndustry={selectedIndustry}
+                onSelectIndustry={setSelectedIndustry}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 statusFilter={statusFilter}
                 onStatusFilterChange={setStatusFilter}
                 totalBuiltCount={BUILT_MODULES.length}
                 totalRoadmapCount={UPCOMING_MODULES.length}
+                industryCounts={industryCounts}
                 onCloseMobileDrawer={() => setIsMobileDrawerOpen(false)}
               />
             </div>
