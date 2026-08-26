@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { FeatureModule, BUILT_MODULES } from '@/lib/features-data';
 import { FeatureIcon } from './FeatureIcon';
+import { ArtisticHeroBackground } from './ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
 interface FeatureDetailClientProps {
@@ -39,88 +40,100 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
     }
   };
 
+  // Dynamic artistic tone mapped to module category
+  const toneMap: Record<string, 'blue' | 'emerald' | 'purple' | 'zinc' | 'amber'> = {
+    intelligence: 'purple',
+    sales: 'blue',
+    operations: 'zinc',
+    finance: 'emerald',
+    platform: 'blue'
+  };
+  const categoryTone = toneMap[feature.category] || 'blue';
+
   return (
     <div className="w-full">
-      {/* ── BREADCRUMBS ── */}
-      <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-6">
-        <nav className="flex items-center gap-1.5 text-xs text-zinc-500 font-medium overflow-x-auto whitespace-nowrap scrollbar-none py-1">
-          <Link href="/" className="hover:text-zinc-950 transition-colors">
-            Home
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-          <Link href="/features" className="hover:text-zinc-950 transition-colors">
-            Features
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-          <span className="text-zinc-400 uppercase tracking-wider text-[10px] font-mono">
-            {feature.categoryLabel}
-          </span>
-          <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-          <span className="text-zinc-950 font-semibold truncate max-w-[200px] sm:max-w-none">
-            {feature.shortTitle}
-          </span>
-        </nav>
-      </div>
+      {/* ── ARTISTIC BLENDED HERO SECTION ── */}
+      <section className="relative w-full pt-28 sm:pt-36 pb-16 sm:pb-24 overflow-hidden">
+        {/* Soft Organic Background & Gradient Veil that melts down into the page */}
+        <ArtisticHeroBackground tone={categoryTone} />
 
-      {/* ── HERO SECTION ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 pb-12 sm:pb-16">
-        <div className="flex flex-col items-start gap-5 max-w-[880px]">
-          
-          {/* Status & Category Badge */}
-          <div className="flex items-center flex-wrap gap-2.5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-950 text-white rounded-lg text-xs font-semibold shadow-2xs">
-              <FeatureIcon name={feature.iconName} className="w-3.5 h-3.5 text-white" />
-              <span>{feature.categoryLabel}</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200/80 rounded-lg text-[11px] font-mono font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              {feature.status}
-            </span>
-          </div>
-
-          {/* Main Title */}
-          <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.1]">
-            {feature.title}
-          </h1>
-
-          {/* Value Tagline */}
-          <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed">
-            {feature.heroDescription}
-          </p>
-
-          {/* Stats Bar */}
-          <div className="grid grid-cols-3 gap-3 sm:gap-6 w-full py-4 my-2 border-y border-zinc-100">
-            {feature.stats.map((stat, idx) => (
-              <div key={idx} className="space-y-0.5">
-                <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
-                  {stat.metric}
-                </div>
-                <div className="text-[11px] sm:text-xs text-zinc-500 font-medium">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Dual Action Buttons */}
-          <div className="flex items-center flex-wrap gap-3.5 pt-1">
-            <a
-              href={`https://app.heycora.in/workspace/login?feature=${feature.slug}`}
-              onClick={() => trackEvent('feature_detail_try_free', { slug: feature.slug })}
-              className="inline-flex items-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm group cursor-pointer"
-            >
-              <span>Launch {feature.shortTitle} Free</span>
-              <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-2 bg-white text-zinc-900 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50/80 px-5 py-3.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs"
-            >
-              <span>View Included Plans</span>
+        <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center gap-1.5 text-xs text-zinc-600 font-medium overflow-x-auto whitespace-nowrap scrollbar-none py-1 mb-8">
+            <Link href="/" className="hover:text-zinc-950 transition-colors">
+              Home
             </Link>
-          </div>
+            <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <Link href="/features" className="hover:text-zinc-950 transition-colors">
+              Features
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <span className="text-zinc-500 uppercase tracking-wider text-[10px] font-mono">
+              {feature.categoryLabel}
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <span className="text-zinc-950 font-semibold truncate max-w-[200px] sm:max-w-none">
+              {feature.shortTitle}
+            </span>
+          </nav>
 
+          <div className="flex flex-col items-start gap-5 max-w-[880px]">
+            {/* Status & Category Badge */}
+            <div className="flex items-center flex-wrap gap-2.5">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200/90 rounded-full text-xs font-semibold shadow-2xs">
+                <FeatureIcon name={feature.iconName} className="w-3.5 h-3.5 text-zinc-800" />
+                <span>{feature.categoryLabel}</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 rounded-full text-[11px] font-mono font-bold backdrop-blur-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                {feature.status}
+              </span>
+            </div>
+
+            {/* Main Title */}
+            <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.1]">
+              {feature.title}
+            </h1>
+
+            {/* Value Tagline */}
+            <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed">
+              {feature.heroDescription}
+            </p>
+
+            {/* Stats Bar */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 w-full py-4 my-2 border-y border-zinc-200/70">
+              {feature.stats.map((stat, idx) => (
+                <div key={idx} className="space-y-0.5">
+                  <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
+                    {stat.metric}
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-zinc-500 font-medium">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Dual Action Buttons */}
+            <div className="flex items-center flex-wrap gap-3.5 pt-1">
+              <a
+                href={`https://app.heycora.in/workspace/login?feature=${feature.slug}`}
+                onClick={() => trackEvent('feature_detail_try_free', { slug: feature.slug })}
+                className="inline-flex items-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm group cursor-pointer"
+              >
+                <span>Launch {feature.shortTitle} Free</span>
+                <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+              </a>
+
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-2 bg-white text-zinc-900 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50/80 px-5 py-3.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs"
+              >
+                <span>View Included Plans</span>
+              </Link>
+            </div>
+
+          </div>
         </div>
       </section>
 

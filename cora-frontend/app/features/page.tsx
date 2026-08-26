@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { BUILT_MODULES, UPCOMING_MODULES, CATEGORIES, FeatureModule } from '@/lib/features-data';
 import { FeatureIcon } from '@/components/features/FeatureIcon';
+import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
 export default function FeaturesPage() {
@@ -58,86 +59,98 @@ export default function FeaturesPage() {
   }, [activeCategory, searchQuery]);
 
   return (
-    <main className="w-full relative pt-28 sm:pt-36 pb-24 overflow-hidden bg-white text-zinc-900">
+    <main className="w-full relative pb-24 overflow-hidden bg-white text-zinc-900">
       
-      {/* ── TOP HERO SECTION ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center mb-12 sm:mb-16">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-100 rounded-xl border border-zinc-200/80 text-xs font-semibold text-zinc-900 mb-4 shadow-2xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>20 Built Modules Live • 8 In Active Development</span>
-        </div>
+      {/* ── ARTISTIC BLENDED HERO & INTRO SECTION ── */}
+      <section className="relative w-full pt-32 sm:pt-40 pb-20 sm:pb-28 overflow-hidden">
+        {/* Soft Organic Background & Gradient Veil that melts down into the page */}
+        <ArtisticHeroBackground tone="blue" />
 
-        <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl font-extrabold text-zinc-950 leading-[1.1] tracking-[-0.035em] max-w-[940px] mx-auto mb-5">
-          The complete 20-in-1 autonomous operating system for creative studios
-        </h1>
-
-        <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed max-w-[760px] mx-auto mb-8">
-          Replace 8+ fragmented SaaS tools with one unified, high-velocity workspace. From multi-model AI reasoning and Kanban CRM to legal e-signatures, 18% GST tax invoices, and crew dispatch.
-        </p>
-
-        <div className="flex items-center justify-center flex-wrap gap-3.5">
-          <a
-            href="https://app.heycora.in/workspace/login?source=features_hero"
-            onClick={() => trackEvent('features_page_cta_clicked')}
-            className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-sm border border-zinc-800 group cursor-pointer"
-          >
-            <span>Get started for Free</span>
-            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
-          </a>
-
-          <Link
-            href="/pricing"
-            className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
-          >
-            <span>Explore Pricing &amp; ROI</span>
-          </Link>
-        </div>
-      </section>
-
-      {/* ── SEARCH & CATEGORY FILTER TABS ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-10">
-        
-        {/* Search Bar */}
-        <div className="max-w-[480px] mx-auto mb-6">
-          <div className="relative flex items-center">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search features (e.g. GST, E-Signs, CRM, Calendar, MCP)..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 hover:bg-white focus:bg-white border border-zinc-200 focus:border-zinc-950 rounded-xl text-xs sm:text-sm font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all shadow-2xs"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 text-xs text-zinc-400 hover:text-zinc-700 font-mono"
-              >
-                Clear
-              </button>
-            )}
+        <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
+          
+          {/* Status Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/80 backdrop-blur-md rounded-full border border-blue-200/80 text-xs font-semibold text-zinc-900 mb-6 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>20 Built Modules Live • 8 In Active Development</span>
           </div>
-        </div>
 
-        {/* Category Pills matching the 4 Vertical Pillars */}
-        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-3 scrollbar-none border-b border-zinc-100">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                setActiveCategory(cat.id);
-                trackEvent('features_category_filter', { category: cat.id });
-              }}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                activeCategory === cat.id
-                  ? 'bg-zinc-950 text-white shadow-sm'
-                  : 'bg-zinc-100/80 text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/60'
-              }`}
+          {/* Clean Headline */}
+          <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl font-extrabold text-zinc-950 leading-[1.12] tracking-[-0.035em] max-w-[920px] mx-auto mb-5">
+            One Operating System, Every Creative Workflow
+          </h1>
+
+          {/* Tagline */}
+          <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed max-w-[720px] mx-auto mb-9">
+            An autonomous, unified workspace replacing 8+ disconnected tools with native AI reasoning, Kanban CRM, SHA-256 contracts, and 18% GST invoicing.
+          </p>
+
+          {/* ── FLOATING ARTISTIC PILL BAR (Inspired by Media Reference) ── */}
+          <div className="max-w-[920px] mx-auto mb-8">
+            <div className="inline-flex items-center justify-center p-1.5 bg-white/75 backdrop-blur-md border border-zinc-200/80 rounded-full shadow-sm max-w-full overflow-x-auto scrollbar-none gap-1">
+              {CATEGORIES.map((cat) => {
+                const isActive = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      setActiveCategory(cat.id);
+                      trackEvent('features_category_filter', { category: cat.id });
+                    }}
+                    className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                      isActive
+                        ? 'bg-white text-zinc-950 shadow-md border border-zinc-200/90 font-bold scale-[1.02]'
+                        : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/40'
+                    }`}
+                  >
+                    <span>{cat.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Search Bar sitting harmoniously in the hero */}
+          <div className="max-w-[460px] mx-auto mb-6">
+            <div className="relative flex items-center">
+              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search capabilities (e.g. GST, E-Signs, CRM, Calendar, MCP)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-white/90 focus:bg-white border border-zinc-200/90 focus:border-zinc-950 rounded-2xl text-xs sm:text-sm font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all shadow-sm"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 text-xs text-zinc-400 hover:text-zinc-700 font-mono"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Quick CTAs */}
+          <div className="flex items-center justify-center flex-wrap gap-3 pt-2">
+            <a
+              href="https://app.heycora.in/workspace/login?source=features_hero"
+              onClick={() => trackEvent('features_page_cta_clicked')}
+              className="inline-flex items-center gap-2 bg-zinc-950 text-white px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-sm border border-zinc-800 group cursor-pointer"
             >
-              {cat.label}
-            </button>
-          ))}
+              <span>Get started for Free</span>
+              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+            </a>
+
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-200/90 hover:border-zinc-300 px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
+            >
+              <span>View Pricing &amp; ROI</span>
+            </Link>
+          </div>
+
         </div>
       </section>
 
