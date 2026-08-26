@@ -280,31 +280,6 @@ export default async function IntegrationDetailPage({
           </div>
         </section>
 
-        {/* ── 6. Bottom Conversion CTA ──────────────────────────────────── */}
-        <section className="mt-20 p-8 sm:p-12 rounded-3xl bg-zinc-950 text-white text-center space-y-6 shadow-xl">
-          <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight">
-            Ready to supercharge your {integration.name} website?
-          </h2>
-          <p className="text-sm sm:text-base text-zinc-400 max-w-xl mx-auto leading-relaxed">
-            Get started in 2 minutes with our Free Forever plan. No credit card required.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <a
-              href="https://app.heycora.in/workspace/login?source=integration_footer"
-              className="inline-flex items-center gap-2 bg-white text-zinc-950 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-bold hover:bg-zinc-100 transition-all shadow-sm"
-            >
-              <span>Launch Free Workspace</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
-            <Link
-              href="/tools/embed-builder"
-              className="inline-flex items-center gap-2 bg-zinc-900 text-zinc-200 border border-zinc-800 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all"
-            >
-              <span>Test Embed Builder</span>
-            </Link>
-          </div>
-        </section>
-
       </div>
     </main>
   );

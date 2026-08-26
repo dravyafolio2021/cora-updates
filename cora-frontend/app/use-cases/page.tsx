@@ -257,37 +257,6 @@ export default function UseCasesPage() {
         })}
       </section>
 
-      {/* ── Bottom Section CTA ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mt-28 sm:mt-36">
-        <div className="w-full rounded-[36px] bg-zinc-950 text-white p-8 sm:p-14 text-center relative overflow-hidden border border-zinc-800 shadow-xl">
-          <div className="relative z-10 max-w-[680px] mx-auto space-y-6">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-              Scale your studio without the administrative overhead
-            </h2>
-            <p className="text-zinc-400 text-sm sm:text-base leading-relaxed font-normal">
-              Join 1,200+ creative agencies and photography studios who have transitioned to Cora.
-            </p>
-
-            <div className="flex items-center justify-center flex-wrap gap-3.5 pt-2">
-              <a
-                href="https://app.heycora.in/workspace/login?source=usecases_bottom"
-                className="inline-flex items-center gap-2 bg-white text-zinc-950 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-100 transition-all shadow-sm group"
-              >
-                <span>Get started for Free</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-600 group-hover:translate-x-0.5 transition-transform" />
-              </a>
-
-              <a
-                href="mailto:dravya.bansal@heycora.in?subject=Industry%20Inquiry%20from%20Cora"
-                className="inline-flex items-center gap-2 bg-zinc-900 text-white border border-zinc-700 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
-              >
-                <span>Chat with Founder</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
     </main>
   );
 }

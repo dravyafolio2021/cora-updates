@@ -507,37 +507,6 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
         </section>
       )}
 
-      {/* ── BOTTOM CONVERSION CTA ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-16">
-        <div className="w-full rounded-[36px] bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0A0D12] text-white p-8 sm:p-14 text-center relative overflow-hidden border border-zinc-800 shadow-xl">
-          <div className="relative z-10 max-w-[680px] mx-auto space-y-6">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-              Ready to automate your studio with {feature.shortTitle}?
-            </h2>
-            <p className="text-zinc-400 text-sm sm:text-base leading-relaxed font-normal">
-              Activate your workspace now with 1,000 free operations and full access to all 20 built modules. No credit card required.
-            </p>
-
-            <div className="flex items-center justify-center flex-wrap gap-3.5 pt-2">
-              <a
-                href={`https://app.heycora.in/workspace/login?feature=${feature.slug}&source=cta_bottom`}
-                className="inline-flex items-center gap-2 bg-white text-zinc-950 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-100 transition-all shadow-sm group cursor-pointer"
-              >
-                <span>Get started for Free</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-600 group-hover:translate-x-0.5 transition-transform" />
-              </a>
-
-              <Link
-                href="/pricing"
-                className="inline-flex items-center gap-2 bg-zinc-900 text-white border border-zinc-700 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
-              >
-                <span>Explore Pricing Plans</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
     </div>
   );
 }
