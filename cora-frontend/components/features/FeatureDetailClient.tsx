@@ -20,6 +20,7 @@ import {
 import { FeatureModule, BUILT_MODULES } from '@/lib/features-data';
 import { FeatureIcon } from './FeatureIcon';
 import { FeatureVisualMockup } from './FeatureVisualMockup';
+import { CapabilityVisualCard } from './CapabilityVisualCard';
 import { ArtisticHeroBackground } from './ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -261,40 +262,76 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
 
       </section>
 
-      {/* ── DEEP CAPABILITIES GRID (4-6 PILLARS) ── */}
+      {/* ── SECTION 3: THE FOUNDATION FOR EVERY WORKFLOW (CLICKUP 2-COLUMN ALTERNATING GRID) ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
-        <div className="text-center max-w-[680px] mx-auto mb-14">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400 block mb-2">
-            GRANULAR ARCHITECTURE
-          </span>
-          <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
-            Engineered Capabilities for High-Velocity Studios
+        
+        {/* Section Heading */}
+        <div className="text-center max-w-[760px] mx-auto mb-12 sm:mb-16">
+          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-zinc-950 mb-3 sm:mb-4">
+            The foundation for every <span className="text-zinc-400 font-semibold">workflow</span>
           </h2>
-          <p className="text-zinc-600 text-sm sm:text-base mt-2">
-            Every feature in {feature.shortTitle} is built to withstand demanding production loads with zero friction.
+          <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
+            {feature.shortTitle} powers critical operations across your workspace, keeping your projects organized, connected, and moving no matter how complex the production.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {feature.capabilities.map((cap, idx) => (
-            <div
-              key={idx}
-              className="bg-white rounded-[24px] border border-zinc-200/90 p-6 flex flex-col justify-between hover:shadow-lg hover:border-zinc-300 transition-all group"
-            >
-              <div className="space-y-3">
-                <span className="text-[10px] font-mono font-bold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-md border border-zinc-200/60 inline-block">
-                  {cap.tag}
-                </span>
-                <h3 className="font-display text-base font-bold text-zinc-950 group-hover:text-zinc-800 transition-colors">
-                  {cap.title}
-                </h3>
-                <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed">
-                  {cap.description}
-                </p>
-              </div>
-            </div>
-          ))}
+        {/* 2-Column Alternating Grid with Clean Dividing Lines */}
+        <div className="w-full bg-white rounded-3xl sm:rounded-[36px] border border-zinc-200 shadow-xs overflow-hidden">
+          <div className="divide-y divide-zinc-200">
+            {feature.capabilities.map((cap, idx) => {
+              const isEven = idx % 2 === 0;
+              return (
+                <div
+                  key={idx}
+                  className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 items-center"
+                >
+                  {/* Left Column */}
+                  <div className={`p-8 sm:p-12 lg:p-14 flex flex-col justify-center ${isEven ? 'order-1' : 'order-2 lg:order-1'}`}>
+                    {isEven ? (
+                      <div className="space-y-3.5 max-w-[480px]">
+                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600">
+                          {cap.tag}
+                        </span>
+                        <h3 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
+                          {cap.title}
+                        </h3>
+                        <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
+                          {cap.description}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="w-full flex items-center justify-center py-4 sm:py-6">
+                        <CapabilityVisualCard cap={cap} feature={feature} index={idx} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Column */}
+                  <div className={`p-8 sm:p-12 lg:p-14 flex flex-col justify-center ${isEven ? 'order-2' : 'order-1 lg:order-2'}`}>
+                    {isEven ? (
+                      <div className="w-full flex items-center justify-center py-4 sm:py-6">
+                        <CapabilityVisualCard cap={cap} feature={feature} index={idx} />
+                      </div>
+                    ) : (
+                      <div className="space-y-3.5 max-w-[480px]">
+                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600">
+                          {cap.tag}
+                        </span>
+                        <h3 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
+                          {cap.title}
+                        </h3>
+                        <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
+                          {cap.description}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
+
       </section>
 
       {/* ── 3-STEP WORKFLOW STEPPER ── */}
