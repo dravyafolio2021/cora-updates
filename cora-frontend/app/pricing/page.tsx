@@ -183,6 +183,33 @@ const renderToolIcon = (type: ServiceTool['iconType']) => {
   }
 };
 
+const ROI_PRESETS = [
+  {
+    id: 'solo',
+    label: 'Solopreneur',
+    volume: 3,
+    avgValueINR: 15000,
+    avgValueUSD: 250,
+    tools: ['contracts', 'portals', 'invoicing']
+  },
+  {
+    id: 'studio',
+    label: 'Media Studio',
+    volume: 7,
+    avgValueINR: 35000,
+    avgValueUSD: 500,
+    tools: ['contracts', 'portals', 'whatsapp', 'invoicing', 'scheduling']
+  },
+  {
+    id: 'agency',
+    label: 'Full Agency',
+    volume: 16,
+    avgValueINR: 75000,
+    avgValueUSD: 1200,
+    tools: ['contracts', 'portals', 'whatsapp', 'invoicing', 'scheduling', 'ai_proposals']
+  }
+];
+
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
   const [currency, setCurrency] = useState<'INR' | 'USD'>('USD');
@@ -192,6 +219,7 @@ export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   
   // Interactive ROI, Cost & Additional Revenue Calculator State
+  const [activePreset, setActivePreset] = useState<string | null>('studio');
   const [selectedTools, setSelectedTools] = useState<string[]>([
     'contracts',
     'portals',
@@ -203,7 +231,18 @@ export default function PricingPage() {
   const [clientVolume, setClientVolume] = useState<number>(6);
   const [avgProjectValue, setAvgProjectValue] = useState<number>(25000);
 
+  const applyPreset = (presetId: string) => {
+    const p = ROI_PRESETS.find(item => item.id === presetId);
+    if (!p) return;
+    setActivePreset(presetId);
+    setSelectedTools(p.tools);
+    setClientVolume(p.volume);
+    setAvgProjectValue(currency === 'INR' ? p.avgValueINR : p.avgValueUSD * 75);
+    trackEvent('roi_calculator_preset_select', { presetId });
+  };
+
   const toggleTool = (toolId: string) => {
+    setActivePreset(null);
     setSelectedTools(prev => {
       const next = prev.includes(toolId) 
         ? prev.filter(id => id !== toolId) 
@@ -214,15 +253,19 @@ export default function PricingPage() {
   };
 
   const handleSelectAllTools = () => {
+    setActivePreset(null);
     const allIds = SERVICE_TOOLS.map(t => t.id);
     setSelectedTools(allIds);
     trackEvent('roi_calculator_select_all', { total: allIds.length });
   };
 
   const handleResetTools = () => {
-    const defaultIds = ['contracts', 'portals', 'whatsapp', 'invoicing', 'scheduling', 'ai_proposals'];
-    setSelectedTools(defaultIds);
-    trackEvent('roi_calculator_reset', { total: defaultIds.length });
+    setActivePreset('studio');
+    const studioPreset = ROI_PRESETS.find(p => p.id === 'studio')!;
+    setSelectedTools(studioPreset.tools);
+    setClientVolume(studioPreset.volume);
+    setAvgProjectValue(currency === 'INR' ? studioPreset.avgValueINR : studioPreset.avgValueUSD * 75);
+    trackEvent('roi_calculator_reset', { total: studioPreset.tools.length });
   };
 
   const topToggleRef = useRef<HTMLDivElement>(null);
@@ -1586,7 +1629,7 @@ export default function PricingPage() {
           <div className="lg:col-span-7 space-y-5">
             
             {/* Header with Quick Actions */}
-            <div className="flex items-center justify-between gap-3 pb-2.5 border-b border-zinc-100">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b border-zinc-100">
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-zinc-950">
                   Select Tools &amp; Workflows You Use Today
@@ -1614,7 +1657,31 @@ export default function PricingPage() {
               </div>
             </div>
 
-            {/* Visual Icon Tool Cards Grid (2 Columns) */}
+            {/* Quick Presets Bar (Effortless 1-Tap on Mobile & Desktop) */}
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-100/90 border border-zinc-200/60 overflow-x-auto">
+              <span className="text-[10px] font-mono text-zinc-500 uppercase px-2 font-semibold shrink-0">
+                Presets:
+              </span>
+              {ROI_PRESETS.map(p => {
+                const isActive = activePreset === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => applyPreset(p.id)}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                      isActive
+                        ? 'bg-white text-zinc-950 shadow-xs border border-zinc-200 font-bold'
+                        : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/60'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Non-Truncating 2-Row Visual Icon Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
               {SERVICE_TOOLS.map(tool => {
                 const isSelected = selectedTools.includes(tool.id);
@@ -1625,36 +1692,40 @@ export default function PricingPage() {
                     key={tool.id}
                     type="button"
                     onClick={() => toggleTool(tool.id)}
-                    className={`p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border text-left transition-all relative flex items-center justify-between gap-2.5 cursor-pointer ${
+                    className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all relative flex flex-col justify-between cursor-pointer select-none active:scale-[0.98] ${
                       isSelected
                         ? 'border-zinc-950 bg-zinc-50/90 shadow-2xs ring-1 ring-zinc-950'
                         : 'border-zinc-200/80 bg-white hover:border-zinc-300 opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      {/* Prominent Visual Squircle Icon */}
-                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 border ${tool.iconBg} ${tool.iconBorder} ${tool.iconText} shadow-2xs`}>
-                        {renderToolIcon(tool.iconType)}
+                    {/* Top Row: Icon + Title + Checkbox */}
+                    <div className="flex items-start justify-between gap-2 mb-2.5">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 border ${tool.iconBg} ${tool.iconBorder} ${tool.iconText} shadow-2xs`}>
+                          {renderToolIcon(tool.iconType)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-bold text-xs sm:text-sm text-zinc-950 leading-tight">
+                            {tool.name}
+                          </div>
+                          <div className="text-[10px] sm:text-[11px] text-zinc-500 font-medium leading-tight mt-0.5">
+                            {tool.replacedApp}
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="min-w-0">
-                        <div className="font-bold text-xs sm:text-[13px] text-zinc-950 truncate">
-                          {tool.name}
-                        </div>
-                        <div className="text-[10px] sm:text-[11px] text-zinc-500 font-medium truncate mt-0.5">
-                          {tool.replacedApp}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-end shrink-0 pl-1.5">
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center mb-1 ${
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
                         isSelected ? 'bg-zinc-950 text-white' : 'border border-zinc-300 bg-white'
                       }`}>
                         {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                       </div>
-                      <span className="text-[10px] font-mono text-zinc-700 bg-zinc-100 border border-zinc-200/60 px-1.5 py-0.5 rounded font-medium">
-                        {cost}/mo
+                    </div>
+
+                    {/* Bottom Row: Cost & Time Drained */}
+                    <div className="flex items-center justify-between pt-2 border-t border-zinc-200/60 text-[10px] sm:text-[11px] font-mono">
+                      <span className="font-semibold text-zinc-800">{cost} / mo</span>
+                      <span className="text-zinc-600 bg-zinc-100/90 border border-zinc-200/60 px-1.5 py-0.5 rounded font-medium">
+                        +{tool.hoursSavedWeekly}h/wk saved
                       </span>
                     </div>
                   </button>
@@ -1666,10 +1737,10 @@ export default function PricingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               
               {/* Slider 1: Monthly Client Volume */}
-              <div className="p-3.5 rounded-xl bg-zinc-50/80 border border-zinc-200/80 space-y-2">
+              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-zinc-50/80 border border-zinc-200/80 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-semibold text-zinc-900">Monthly Client Projects</span>
-                  <span className="text-xs font-mono font-bold text-zinc-950 bg-white px-2 py-0.5 rounded border border-zinc-200">
+                  <span className="text-xs font-mono font-bold text-zinc-950 bg-white px-2.5 py-0.5 rounded-md border border-zinc-200 shadow-2xs">
                     {clientVolume} Projects
                   </span>
                 </div>
@@ -1679,21 +1750,24 @@ export default function PricingPage() {
                   max="25"
                   step="1"
                   value={clientVolume}
-                  onChange={e => setClientVolume(parseInt(e.target.value, 10))}
-                  className="w-full h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950"
+                  onChange={e => {
+                    setActivePreset(null);
+                    setClientVolume(parseInt(e.target.value, 10));
+                  }}
+                  className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950 touch-manipulation"
                 />
-                <div className="flex justify-between text-[9px] text-zinc-400 font-mono">
+                <div className="flex justify-between text-[9px] sm:text-[10px] text-zinc-400 font-mono">
                   <span>2 Solo</span>
-                  <span>10 Agency</span>
-                  <span>25+ Scale</span>
+                  <span>10 Active Studio</span>
+                  <span>25+ Agency Scale</span>
                 </div>
               </div>
 
               {/* Slider 2: Average Project Value */}
-              <div className="p-3.5 rounded-xl bg-zinc-50/80 border border-zinc-200/80 space-y-2">
+              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-zinc-50/80 border border-zinc-200/80 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-semibold text-zinc-900">Avg. Project Value</span>
-                  <span className="text-xs font-mono font-bold text-zinc-950 bg-white px-2 py-0.5 rounded border border-zinc-200">
+                  <span className="text-xs font-mono font-bold text-zinc-950 bg-white px-2.5 py-0.5 rounded-md border border-zinc-200 shadow-2xs">
                     {currency === 'INR' ? `₹${avgProjectValue.toLocaleString('en-IN')}` : `$${Math.round(avgProjectValue / 75).toLocaleString('en-US')}`}
                   </span>
                 </div>
@@ -1703,10 +1777,13 @@ export default function PricingPage() {
                   max="100000"
                   step="5000"
                   value={avgProjectValue}
-                  onChange={e => setAvgProjectValue(parseInt(e.target.value, 10))}
-                  className="w-full h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950"
+                  onChange={e => {
+                    setActivePreset(null);
+                    setAvgProjectValue(parseInt(e.target.value, 10));
+                  }}
+                  className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950 touch-manipulation"
                 />
-                <div className="flex justify-between text-[9px] text-zinc-400 font-mono">
+                <div className="flex justify-between text-[9px] sm:text-[10px] text-zinc-400 font-mono">
                   <span>{currency === 'INR' ? '₹5k' : '$65'}</span>
                   <span>{currency === 'INR' ? '₹50k' : '$650'}</span>
                   <span>{currency === 'INR' ? '₹100k' : '$1.3k'}</span>
