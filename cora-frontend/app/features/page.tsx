@@ -71,21 +71,21 @@ export default function FeaturesPage() {
           {/* Status Pill */}
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full border border-blue-200/70 text-[11px] font-semibold text-zinc-800 mb-3.5 shadow-2xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>20 Built Modules Ready • 8 In Roadmap</span>
+            <span>20 Features Live • 8 In Roadmap</span>
           </div>
 
-          {/* Simple, Direct Heading for Non-Tech Users */}
+          {/* Simple, Universal Industry-Agnostic Heading */}
           <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl font-extrabold text-zinc-950 leading-tight tracking-[-0.03em] max-w-[800px] mx-auto mb-2.5">
-            Everything you need to run your studio
+            Everything you need to run your business
           </h1>
 
           {/* Plain English Subtitle */}
-          <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[620px] mx-auto mb-6">
-            Inquiries, shoot calendar, legal contracts, and GST bills. Built for photographers, filmmakers, and creative agencies.
+          <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[640px] mx-auto mb-6">
+            Client inquiries, CRM, digital contracts, billing, team workflows, and AI automations — all in one simple workspace.
           </p>
 
-          {/* ── RESPONSIVE COMPACT PILL BAR ── */}
-          <div className="w-full max-w-[820px] mx-auto mb-4 px-1">
+          {/* ── RESPONSIVE COMPACT PILL BAR (BUSINESS VERTICALS) ── */}
+          <div className="w-full max-w-[860px] mx-auto mb-4 px-1">
             <div className="flex items-center justify-start sm:justify-center p-1 bg-white/85 backdrop-blur-md border border-zinc-200/80 rounded-full shadow-2xs overflow-x-auto scrollbar-none gap-1">
               {CATEGORIES.map((cat) => {
                 const isActive = activeCategory === cat.id;
@@ -115,7 +115,7 @@ export default function FeaturesPage() {
               <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search tools (e.g. GST, E-Sign, CRM, Calendar)..."
+                placeholder="Search features (e.g. Invoicing, CRM, Contracts, AI)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-3.5 py-1.5 bg-white/90 focus:bg-white border border-zinc-200/90 focus:border-zinc-950 rounded-xl text-xs font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all shadow-2xs"
