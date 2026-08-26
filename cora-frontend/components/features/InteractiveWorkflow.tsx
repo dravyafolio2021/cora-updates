@@ -130,19 +130,19 @@ export function InteractiveWorkflow() {
             </div>
           </div>
 
-          {/* Code / State Terminal */}
-          <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5 shadow-inner">
-            <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-800">
+          {/* Code / State Box */}
+          <div className="bg-zinc-50 border border-zinc-200/90 rounded-2xl p-5 shadow-xs">
+            <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-200">
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-red-500/80" />
-                <div className="w-2 h-2 rounded-full bg-amber-500/80" />
-                <div className="w-2 h-2 rounded-full bg-emerald-500/80" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200 border border-zinc-300" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200 border border-zinc-300" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-200 border border-zinc-300" />
               </div>
-              <span className="text-[0.625rem] font-mono text-zinc-500 uppercase tracking-widest">
+              <span className="text-[0.625rem] font-mono text-zinc-400 uppercase tracking-widest">
                 Execution State
               </span>
             </div>
-            <pre className="font-mono text-xs text-emerald-400 overflow-x-auto leading-relaxed scrollbar-none">
+            <pre className="font-mono text-xs text-zinc-800 bg-white p-3.5 rounded-xl border border-zinc-200/70 overflow-x-auto leading-relaxed scrollbar-none">
               <code>{workflowSteps[activeStep].code}</code>
             </pre>
           </div>

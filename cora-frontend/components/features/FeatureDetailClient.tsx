@@ -137,45 +137,50 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
         </div>
       </section>
 
-      {/* ── INTERACTIVE WORKSPACE WINDOW MOCKUP ── */}
+      {/* ── INTERACTIVE WORKSPACE WINDOW MOCKUP (PURE LIGHT MONOCHROMATIC AESTHETIC) ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-20 sm:mb-28">
-        <div className="w-full rounded-2xl sm:rounded-[32px] bg-zinc-900 border border-zinc-800 p-2 sm:p-3 shadow-2xl overflow-hidden">
+        <div className="w-full rounded-2xl sm:rounded-[32px] bg-zinc-100/90 border border-zinc-200/90 p-2 sm:p-3 shadow-[0_20px_50px_rgba(0,0,0,0.06)] overflow-hidden">
           
           {/* macOS Browser Header Frame */}
-          <div className="bg-zinc-950 rounded-xl sm:rounded-[24px] border border-zinc-800/80 overflow-hidden text-zinc-100">
+          <div className="bg-white rounded-xl sm:rounded-[24px] border border-zinc-200/90 overflow-hidden text-zinc-900 shadow-xs">
             
             {/* Top Window Bar */}
-            <div className="px-4 py-3 bg-zinc-900/90 border-b border-zinc-800 flex items-center justify-between gap-4">
+            <div className="px-4 py-3 bg-zinc-50/90 border-b border-zinc-200/80 flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]/50 block" />
-                <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]/50 block" />
-                <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]/50 block" />
+                <span className="w-3 h-3 rounded-full bg-zinc-200 border border-zinc-300 block" />
+                <span className="w-3 h-3 rounded-full bg-zinc-200 border border-zinc-300 block" />
+                <span className="w-3 h-3 rounded-full bg-zinc-200 border border-zinc-300 block" />
               </div>
-              <div className="text-[11px] font-mono text-zinc-400 truncate flex items-center gap-1.5">
-                <Laptop className="w-3.5 h-3.5 text-zinc-500" />
+              <div className="text-[11px] font-mono text-zinc-500 truncate flex items-center gap-1.5">
+                <Laptop className="w-3.5 h-3.5 text-zinc-400" />
                 <span>{feature.mockup.windowTitle}</span>
               </div>
-              <div className="w-12 text-right">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+              <div className="w-12 text-right flex items-center justify-end gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+                <span className="text-[10px] font-mono text-zinc-400 hidden sm:inline">Active</span>
               </div>
             </div>
 
             {/* Mockup Workspace Tabs Header */}
-            <div className="px-4 sm:px-6 pt-4 pb-3 bg-zinc-950 border-b border-zinc-800/80 flex items-center justify-between flex-wrap gap-3">
-              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+            <div className="px-4 sm:px-6 pt-3.5 pb-3 bg-white border-b border-zinc-100 flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
                 {feature.mockup.tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveMockupTab(tab.id)}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
                       activeMockupTab === tab.id
-                        ? 'bg-zinc-800 text-white shadow-xs'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                        ? 'bg-zinc-950 text-white shadow-xs'
+                        : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'
                     }`}
                   >
                     <span>{tab.label}</span>
                     {tab.badge && (
-                      <span className="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-mono rounded font-normal">
+                      <span className={`px-1.5 py-0.5 text-[10px] font-mono rounded font-normal ${
+                        activeMockupTab === tab.id
+                          ? 'bg-zinc-800 text-zinc-300'
+                          : 'bg-zinc-100 text-zinc-600 border border-zinc-200/80'
+                      }`}>
                         {tab.badge}
                       </span>
                     )}
@@ -185,70 +190,70 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
 
               <button
                 type="button"
-                className="px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-all shadow-xs cursor-default shrink-0"
+                className="px-3.5 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-all shadow-xs cursor-default shrink-0"
               >
                 {feature.mockup.primaryActionLabel}
               </button>
             </div>
 
             {/* Mockup Operational Content Panel */}
-            <div className="p-4 sm:p-6 sm:p-8 space-y-6 bg-zinc-950">
+            <div className="p-5 sm:p-8 space-y-6 bg-[#FCFCFD]">
               
               {/* Header Info & Live Metric Pills */}
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-zinc-800/80">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-zinc-200/80">
                 <div>
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-white">
+                  <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950">
                     {feature.mockup.headerTitle}
                   </h3>
-                  <p className="text-xs text-zinc-400 mt-0.5">
+                  <p className="text-xs text-zinc-500 mt-0.5">
                     {feature.mockup.headerSubtitle}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3 shrink-0">
-                  <div className="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-left">
-                    <span className="text-[10px] font-mono text-zinc-500 block">{feature.mockup.metric1.label}</span>
-                    <span className="text-xs font-mono font-bold text-emerald-400">{feature.mockup.metric1.value}</span>
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <div className="px-3 py-1.5 rounded-xl bg-white border border-zinc-200 shadow-2xs text-left">
+                    <span className="text-[10px] font-mono text-zinc-400 block">{feature.mockup.metric1.label}</span>
+                    <span className="text-xs font-mono font-bold text-zinc-950">{feature.mockup.metric1.value}</span>
                   </div>
-                  <div className="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-left">
-                    <span className="text-[10px] font-mono text-zinc-500 block">{feature.mockup.metric2.label}</span>
-                    <span className="text-xs font-mono font-bold text-zinc-200">{feature.mockup.metric2.value}</span>
+                  <div className="px-3 py-1.5 rounded-xl bg-white border border-zinc-200 shadow-2xs text-left">
+                    <span className="text-[10px] font-mono text-zinc-400 block">{feature.mockup.metric2.label}</span>
+                    <span className="text-xs font-mono font-bold text-zinc-950">{feature.mockup.metric2.value}</span>
                   </div>
                 </div>
               </div>
 
               {/* Data Table Matrix Preview */}
-              <div className="w-full overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900/50">
+              <div className="w-full overflow-x-auto rounded-2xl border border-zinc-200/90 bg-white shadow-2xs">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b border-zinc-800 bg-zinc-900/90 text-zinc-400 font-mono text-[11px] uppercase">
+                    <tr className="border-b border-zinc-200 bg-zinc-50/80 text-zinc-500 font-mono text-[11px] uppercase">
                       {feature.mockup.tableHeaders.map((header, idx) => (
                         <th key={idx} className="py-3 px-4 font-semibold">{header}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-800/60 font-medium">
+                  <tbody className="divide-y divide-zinc-100 font-medium">
                     {feature.mockup.rows.map((row, rIdx) => (
-                      <tr key={rIdx} className="hover:bg-zinc-800/40 transition-colors">
-                        <td className="py-3.5 px-4 text-zinc-200 font-semibold">{row.col1}</td>
-                        <td className="py-3.5 px-4 text-zinc-400">{row.col2}</td>
-                        <td className="py-3.5 px-4 text-zinc-300 font-mono">{row.col3}</td>
+                      <tr key={rIdx} className="hover:bg-zinc-50/80 transition-colors">
+                        <td className="py-3.5 px-4 text-zinc-900 font-semibold">{row.col1}</td>
+                        <td className="py-3.5 px-4 text-zinc-600">{row.col2}</td>
+                        <td className="py-3.5 px-4 text-zinc-700 font-mono text-[11px]">{row.col3}</td>
                         <td className="py-3.5 px-4">
-                          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${
-                            row.statusType === 'success' 
-                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                              : row.statusType === 'warning'
-                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                : row.statusType === 'info'
-                                  ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
-                                  : 'bg-zinc-800 text-zinc-400'
-                          }`}>
-                            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-zinc-100 text-zinc-800 border border-zinc-200">
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              row.statusType === 'success' 
+                                ? 'bg-emerald-500' 
+                                : row.statusType === 'warning'
+                                  ? 'bg-amber-500'
+                                  : row.statusType === 'info'
+                                    ? 'bg-sky-500'
+                                    : 'bg-zinc-400'
+                            }`} />
                             {row.statusText}
                           </span>
                         </td>
                         <td className="py-3.5 px-4 text-right">
-                          <span className="text-[11px] font-bold text-zinc-300 hover:text-white transition-colors cursor-default underline underline-offset-4">
+                          <span className="text-[11px] font-bold text-zinc-950 hover:text-zinc-600 transition-colors cursor-default underline underline-offset-4">
                             {row.actionText} →
                           </span>
                         </td>
@@ -259,7 +264,7 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
               </div>
 
               {/* Mockup Footer Caption */}
-              <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-1 font-mono">
+              <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1 font-mono">
                 <span>⚡ Powered by Cora Atomic UI Engine</span>
                 <span>SHA-256 Verified • AES-256 Encrypted</span>
               </div>
@@ -304,16 +309,16 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
           </div>
 
           {/* THE CORA WAY (Solutions) */}
-          <div className="p-6 sm:p-8 rounded-[28px] bg-zinc-950 text-white border border-zinc-800 space-y-5 shadow-xl">
-            <div className="flex items-center gap-2.5 text-emerald-400 font-bold text-sm uppercase tracking-wider font-mono">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <div className="p-6 sm:p-8 rounded-[28px] bg-white text-zinc-950 border-2 border-zinc-950 space-y-5 shadow-sm">
+            <div className="flex items-center gap-2.5 text-zinc-950 font-bold text-sm uppercase tracking-wider font-mono">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>The Cora OS Solution</span>
             </div>
 
             <ul className="space-y-4">
               {feature.theCoraWay.map((point, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shrink-0" />
+                <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-zinc-700 leading-relaxed">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 mt-2 shrink-0" />
                   <span>{point}</span>
                 </li>
               ))}
