@@ -382,7 +382,7 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
             </div>
 
             <div className="flex items-center justify-between pt-1">
-              <span className="font-serif italic text-xs text-zinc-800">Shruti Sharma ✓</span>
+              <span className="font-serif italic text-xs text-zinc-800">Kavya Patel ✓</span>
               <span className="text-[9px] font-mono font-bold text-emerald-600 bg-white px-2 py-0.5 rounded border border-emerald-200">
                 TIMESTAMPED
               </span>
@@ -516,7 +516,7 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
           <div className="text-[10px] font-bold text-purple-800 mb-2">Studio Access Roles</div>
           <div className="space-y-1.5 text-[10px]">
             <div className="flex items-center justify-between p-1.5 bg-purple-50 rounded-lg">
-              <span className="font-bold text-zinc-900">Admin (Shruti)</span>
+              <span className="font-bold text-zinc-900">Studio Admin</span>
               <span className="text-[9px] font-bold text-purple-700">Full Access</span>
             </div>
             <div className="flex items-center justify-between p-1.5 bg-zinc-50 rounded-lg">

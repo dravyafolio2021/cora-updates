@@ -2254,7 +2254,7 @@ export const BUILT_MODULES: FeatureModule[] = [
       tableHeaders: ['User Name / Email', 'Studio Role', 'Financial Visibility', 'Assigned Modules', 'Status'],
       rows: [
         {
-          col1: 'Shruti Anand (admin@cora.local)',
+          col1: 'Studio Director (admin@cora.local)',
           col2: 'Super Administrator',
           col3: 'Full Access (P&L, GST)',
           statusText: 'All 20 Modules',
@@ -2732,7 +2732,7 @@ export const BUILT_MODULES: FeatureModule[] = [
       {
         step: '01',
         title: 'Access Admin Console',
-        description: 'Open the sticky sidebar admin popover widget (Shruti, Avatar S) and launch the Governance Suite.'
+        description: 'Open the sticky sidebar admin popover widget and launch the Governance Suite.'
       },
       {
         step: '02',
@@ -2778,7 +2778,7 @@ export const BUILT_MODULES: FeatureModule[] = [
         { id: 'audit', label: 'Security Event Logs' }
       ],
       headerTitle: 'Global Multi-Tenant Platform Governance',
-      headerSubtitle: 'Super Admin: Shruti Anand (admin@cora.local) • Status: Healthy (0.36s Response)',
+      headerSubtitle: 'Super Admin: Platform Admin (admin@cora.local) • Status: Healthy (0.36s Response)',
       primaryActionLabel: '+ Provision Workspace',
       metric1: { label: 'Active Workspaces', value: '4 Tenants' },
       metric2: { label: 'Monthly AI Runs', value: '142,800 Runs' },
