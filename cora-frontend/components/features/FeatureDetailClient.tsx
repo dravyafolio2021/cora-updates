@@ -21,8 +21,34 @@ import { FeatureModule, BUILT_MODULES } from '@/lib/features-data';
 import { FeatureIcon } from './FeatureIcon';
 import { FeatureVisualMockup } from './FeatureVisualMockup';
 import { CapabilityVisualCard } from './CapabilityVisualCard';
+import { ModuleCardVisual } from './ModuleCardVisual';
 import { ArtisticHeroBackground } from './ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
+
+// Concise 5-6 word punchy descriptions for related module cards
+const MODULE_MICRO_DESCRIPTIONS: Record<string, string> = {
+  'ai-cofounder': 'Automate proposals and daily studio operations.',
+  'content-ai': 'Generate viral scripts and social copy.',
+  'rag-mcp': 'Self-learning memory with living studio context.',
+  'voice-to-scope': 'Convert audio briefs into structured scopes.',
+  'lead-crm': 'Track deals and automated client outreach.',
+  'canvas-builder': 'Build high-converting landing pages visually.',
+  'form-builder': 'Capture qualified leads with embeddable forms.',
+  'review-portal': 'Collect 5-star Google client reviews automatically.',
+  'esign-vault': 'Legally binding digital contracts and signatures.',
+  'crew-dispatch': 'Schedule crew call sheets without conflicts.',
+  'master-calendar': 'Manage multi-location shoot bookings seamlessly.',
+  'task-board': 'Track milestones and post-production workflows.',
+  'gst-invoicing': 'Automated Indian B2B tax invoice calculations.',
+  'asset-gear': 'Track equipment check-ins and studio inventory.',
+  'media-hub': 'Store and deliver 8K RAW footage.',
+  'rbac-system': 'Role-based permissions with audit activity logs.',
+  'email-smtp': 'Custom domain email with verified deliverability.',
+  'pwa-push': 'Instant shoot alerts across mobile devices.',
+  'docs-portal': 'Interactive API docs and testing playground.',
+  'super-admin': 'Govern studio branches from one hub.',
+  'onboarding-wizard': 'Launch your workspace in 3 minutes.',
+};
 
 interface FeatureDetailClientProps {
   feature: FeatureModule;
@@ -473,33 +499,37 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
             {relatedModules.map((rel) => (
               <Link
                 key={rel.slug}
                 href={`/features/${rel.slug}`}
-                className="bg-white rounded-[24px] border border-zinc-200/90 p-6 flex flex-col justify-between hover:shadow-lg hover:border-zinc-300 transition-all group"
+                className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer block"
               >
-                <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-                    <FeatureIcon name={rel.iconName} className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                      {rel.categoryLabel}
-                    </span>
-                    <h4 className="font-display text-base font-bold text-zinc-950 group-hover:text-zinc-800 transition-colors">
-                      {rel.title}
-                    </h4>
-                  </div>
-                  <p className="text-zinc-600 text-xs line-clamp-2 leading-relaxed">
-                    {rel.tagline}
-                  </p>
+                {/* Top Tactile 3D UI Illustration Area */}
+                <div className="w-full h-[195px] sm:h-[210px] overflow-hidden border-b border-zinc-100 relative group-hover:scale-[1.02] transition-transform duration-300 select-none">
+                  <ModuleCardVisual slug={rel.slug} category={rel.category} title={rel.shortTitle} />
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-zinc-100 flex items-center justify-between text-xs font-bold text-zinc-950 group-hover:translate-x-0.5 transition-transform">
-                  <span>Deep Dive</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                {/* Bottom Content Body */}
+                <div className="p-5 sm:p-6 flex flex-col justify-between flex-1 space-y-3.5">
+                  <div>
+                    <h4 className="font-display text-lg sm:text-xl font-bold text-zinc-950 leading-snug group-hover:text-zinc-700 transition-colors">
+                      {rel.shortTitle}
+                    </h4>
+
+                    <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mt-1.5 font-normal">
+                      {MODULE_MICRO_DESCRIPTIONS[rel.slug] || rel.tagline}
+                    </p>
+                  </div>
+
+                  {/* Explore Feature CTA */}
+                  <div className="pt-2 border-t border-zinc-100">
+                    <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-zinc-950 group-hover:text-zinc-600 transition-colors">
+                      <span>Explore Feature</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </div>
                 </div>
               </Link>
             ))}
