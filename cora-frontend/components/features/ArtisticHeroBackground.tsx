@@ -1,41 +1,45 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface ArtisticHeroBackgroundProps {
   className?: string;
-  tone?: 'neutral' | 'blue' | 'emerald' | 'purple' | 'zinc' | 'amber';
+  imageSrc?: string;
+  tone?: string;
 }
 
 export function ArtisticHeroBackground({ 
   className = '', 
-  tone = 'neutral' 
+  imageSrc = '/images/cora_pricing_pure_sky.jpg',
+  tone = 'neutral'
 }: ArtisticHeroBackgroundProps) {
   return (
     <div 
-      className={`absolute inset-0 pointer-events-none overflow-hidden select-none ${className}`}
+      className={`absolute inset-0 pointer-events-none overflow-hidden select-none z-0 ${className}`}
       aria-hidden="true"
     >
-      {/* Subtle, High-Confidence Monochromatic Atmospheric Canvas */}
-      <div className="absolute inset-0 bg-gradient-to-b from-zinc-100/70 via-zinc-50/50 to-white" />
+      {/* Base Sky Tint Fallback */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#56a2e8] via-[#cae4fc] to-white" />
 
-      {/* Gentle Radial Ambient Illumination */}
-      <div 
-        className="absolute -top-24 left-1/2 -translate-x-1/2 w-[850px] h-[360px] rounded-full blur-3xl opacity-40"
+      {/* Signature Ethereal Pure Sky Artwork */}
+      <Image
+        src={imageSrc}
+        alt="Cora Atmospheric Background"
+        fill
+        priority
+        className="object-cover object-top"
+        sizes="100vw"
+      />
+
+      {/* Radiant Multi-Stop Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(228, 228, 231, 0.8) 0%, rgba(244, 244, 245, 0.4) 50%, rgba(255, 255, 255, 0) 80%)'
+          background: 'linear-gradient(180deg, rgba(86, 162, 232, 0.14) 0%, rgba(255, 255, 255, 0.20) 35%, rgba(255, 255, 255, 0.88) 75%, #ffffff 100%)',
         }}
       />
 
-      {/* Ultra-Subtle Dot Matrix Grid for Clean Architectural Feel */}
-      <div 
-        className="absolute inset-0 opacity-[0.035]"
-        style={{
-          backgroundImage: 'radial-gradient(#000000 1px, transparent 1px)',
-          backgroundSize: '24px 24px'
-        }}
-      />
-
-      {/* Silky Smooth Bottom Fade Veil (Buttery merge directly into page background) */}
-      <div className="absolute bottom-0 left-0 right-0 h-28 sm:h-36 bg-gradient-to-b from-transparent via-white/80 to-white" />
+      {/* Silky Smooth Bottom Fade Veil (Melt naturally into page) */}
+      <div className="absolute inset-x-0 bottom-0 h-28 sm:h-40 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none z-[2]" />
     </div>
   );
 }
