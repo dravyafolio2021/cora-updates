@@ -379,17 +379,17 @@ export default function PricingPage() {
           {/* CARD 1: STARTER */}
           <div className="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
             <div>
-              {/* Top Header Banner in Deep Racing Forest */}
-              <div className="bg-[#064e3b] p-6 text-white relative">
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-white text-emerald-950 shadow-xs flex items-center justify-center">
-                    <Rocket className="w-4 h-4" />
+              {/* Top Header Banner in Vibrant Emerald Green */}
+              <div className="bg-[#0b7a4d] p-6 text-white relative">
+                <div className="flex items-center justify-between gap-2 mb-3.5">
+                  <div className="w-10 h-10 rounded-2xl bg-[#a7f3d0] text-[#065f46] shadow-xs flex items-center justify-center">
+                    <Rocket className="w-5 h-5" />
                   </div>
                 </div>
                 <h3 className="font-display text-2xl font-bold text-white tracking-tight">
                   Starter
                 </h3>
-                <p className="text-xs text-emerald-100/80 mt-1 leading-relaxed min-h-[34px]">
+                <p className="text-xs text-emerald-50/90 mt-1 leading-relaxed min-h-[34px]">
                   For independent operators establishing their brand with custom domains.
                 </p>
               </div>
@@ -476,22 +476,22 @@ export default function PricingPage() {
           </div>
 
           {/* CARD 2: PROFESSIONAL (RECOMMENDED) */}
-          <div className="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all relative">
+          <div className="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_12px_36px_rgba(190,0,107,0.12)] hover:shadow-2xl transition-all relative">
             <div>
-              {/* Top Header Banner in Deep Berry Mulberry */}
-              <div className="bg-[#831843] p-6 text-white relative">
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-white text-rose-950 shadow-xs flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-rose-900" />
+              {/* Top Header Banner in Vibrant Magenta / Fuchsia */}
+              <div className="bg-[#be006b] p-6 text-white relative">
+                <div className="flex items-center justify-between gap-2 mb-3.5">
+                  <div className="w-10 h-10 rounded-2xl bg-[#fbcfe8] text-[#9d174d] shadow-xs flex items-center justify-center">
+                    <Sparkles className="w-5 h-5" />
                   </div>
-                  <span className="inline-flex items-center px-3 py-0.5 rounded-full bg-white text-zinc-950 text-[11px] font-bold tracking-wide shadow-xs">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-white text-zinc-950 text-[11px] font-bold tracking-wide shadow-xs">
                     Recommended
                   </span>
                 </div>
                 <h3 className="font-display text-2xl font-bold text-white tracking-tight">
                   Professional
                 </h3>
-                <p className="text-xs text-pink-100/80 mt-1 leading-relaxed min-h-[34px]">
+                <p className="text-xs text-pink-50/90 mt-1 leading-relaxed min-h-[34px]">
                   Autonomous backbone with advanced AI, official WhatsApp dispatch &amp; UPI QR.
                 </p>
               </div>
@@ -584,17 +584,17 @@ export default function PricingPage() {
           {/* CARD 3: SCALE */}
           <div className="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
             <div>
-              {/* Top Header Banner in Deep Midnight Indigo */}
-              <div className="bg-[#1e1b4b] p-6 text-white relative">
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-white text-indigo-950 shadow-xs flex items-center justify-center">
-                    <TrendingUp className="w-4 h-4" />
+              {/* Top Header Banner in Vibrant Royal Violet / Indigo */}
+              <div className="bg-[#5438dc] p-6 text-white relative">
+                <div className="flex items-center justify-between gap-2 mb-3.5">
+                  <div className="w-10 h-10 rounded-2xl bg-[#ddd6fe] text-[#4c1d95] shadow-xs flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5" />
                   </div>
                 </div>
                 <h3 className="font-display text-2xl font-bold text-white tracking-tight">
                   Scale
                 </h3>
-                <p className="text-xs text-indigo-100/80 mt-1 leading-relaxed min-h-[34px]">
+                <p className="text-xs text-indigo-50/90 mt-1 leading-relaxed min-h-[34px]">
                   High-throughput infrastructure for agencies &amp; multi-member teams.
                 </p>
               </div>
