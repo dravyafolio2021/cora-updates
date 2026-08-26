@@ -321,7 +321,7 @@ export default function PricingPage() {
       {/* ══════════════════════════════════════════════════════════════════════
           ROW 2: VALUE-FOR-MONEY PRICING CARDS WITH 2 MONTHS FREE ON ANNUAL
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="w-full max-w-[1240px] mx-auto px-3.5 sm:px-6 mb-12 sm:mb-16">
+      <section className="w-full max-w-[1140px] mx-auto px-3.5 sm:px-6 mb-12 sm:mb-16">
         
         {/* Section Header & Primary Cadence Switcher */}
         <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 pb-4 border-b border-zinc-100 text-center md:text-left">
@@ -391,20 +391,20 @@ export default function PricingPage() {
         {/* 3-Tier SaaS Cards: Swipeable Snap Row on Mobile, 3-Col Grid on Desktop */}
         <div 
           ref={cardsContainerRef}
-          className="flex md:grid md:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 py-2 sm:py-4 items-stretch"
+          className="flex md:grid md:grid-cols-3 gap-3 md:gap-4 lg:gap-5 overflow-x-auto md:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4 sm:mx-0 sm:px-0 py-2 sm:py-4 items-stretch"
         >
           
           {/* CARD 1: STARTER */}
-          <div className="w-[84vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
+          <div className="w-[80vw] max-w-[315px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[24px] overflow-hidden flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
             <div>
               {/* Top Header Banner in Vibrant Emerald Green */}
-              <div className="bg-[#0b7a4d] p-6 text-white relative">
-                <div className="flex items-center justify-between gap-2 mb-3.5">
-                  <div className="w-10 h-10 rounded-2xl bg-[#a7f3d0] text-[#065f46] shadow-xs flex items-center justify-center">
-                    <Rocket className="w-5 h-5" />
+              <div className="bg-[#0b7a4d] p-5 sm:p-6 text-white relative">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#a7f3d0] text-[#065f46] shadow-xs flex items-center justify-center">
+                    <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                 </div>
-                <h3 className="font-display text-2xl font-bold text-white tracking-tight">
+                <h3 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight">
                   Starter
                 </h3>
                 <p className="text-xs text-emerald-50/90 mt-1 leading-relaxed min-h-[34px]">
@@ -413,11 +413,11 @@ export default function PricingPage() {
               </div>
 
               {/* Card Body */}
-              <div className="p-6 sm:p-7">
+              <div className="p-5 sm:p-7">
                 {/* Price Block */}
                 <div className="mb-5">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-4xl font-display font-bold text-zinc-950 tracking-tight">
+                    <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950 tracking-tight">
                       {billingCycle === 'annual'
                         ? (currency === 'INR' ? '₹833' : '$7.50')
                         : (currency === 'INR' ? '₹999' : '$9')}
@@ -433,7 +433,7 @@ export default function PricingPage() {
                     {billingCycle === 'annual' ? (
                       <>
                         <span className="text-emerald-700 font-medium">
-                          {currency === 'INR' ? '₹9,990 / year' : '$90 / year'}
+                          {currency === 'INR' ? '₹9,990 / yr' : '$90 / yr'}
                         </span>
                         <span className="text-zinc-300">&bull;</span>
                         <span className="text-zinc-500">
@@ -463,7 +463,7 @@ export default function PricingPage() {
                   <ul className="space-y-2.5 text-xs text-zinc-700">
                     <li className="flex items-center gap-2.5">
                       <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span><strong>{billingCycle === 'annual' ? '6,000' : '5,000'}</strong> AI Runs / month</span>
+                      <span><strong>{billingCycle === 'annual' ? '6,000' : '5,000'}</strong> AI Runs / mo</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <Check className="w-4 h-4 text-zinc-900 stroke-[2] shrink-0" />
@@ -494,19 +494,19 @@ export default function PricingPage() {
           </div>
 
           {/* CARD 2: PROFESSIONAL (RECOMMENDED) */}
-          <div className="w-[84vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_12px_36px_rgba(190,0,107,0.12)] hover:shadow-2xl transition-all relative">
+          <div className="w-[80vw] max-w-[315px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[24px] overflow-hidden flex flex-col justify-between shadow-[0_10px_30px_rgba(190,0,107,0.12)] hover:shadow-2xl transition-all relative">
             <div>
               {/* Top Header Banner in Vibrant Magenta / Fuchsia */}
-              <div className="bg-[#be006b] p-6 text-white relative">
-                <div className="flex items-center justify-between gap-2 mb-3.5">
-                  <div className="w-10 h-10 rounded-2xl bg-[#fbcfe8] text-[#9d174d] shadow-xs flex items-center justify-center">
-                    <Sparkles className="w-5 h-5" />
+              <div className="bg-[#be006b] p-5 sm:p-6 text-white relative">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#fbcfe8] text-[#9d174d] shadow-xs flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-white text-zinc-950 text-[11px] font-bold tracking-wide shadow-xs">
+                  <span className="inline-flex items-center px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white text-zinc-950 text-[10px] sm:text-[11px] font-bold tracking-wide shadow-xs">
                     Recommended
                   </span>
                 </div>
-                <h3 className="font-display text-2xl font-bold text-white tracking-tight">
+                <h3 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight">
                   Professional
                 </h3>
                 <p className="text-xs text-pink-50/90 mt-1 leading-relaxed min-h-[34px]">
@@ -515,11 +515,11 @@ export default function PricingPage() {
               </div>
 
               {/* Card Body */}
-              <div className="p-6 sm:p-7">
+              <div className="p-5 sm:p-7">
                 {/* Price Block */}
                 <div className="mb-5">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-4xl font-display font-bold text-zinc-950 tracking-tight">
+                    <span className="text-3xl sm:text-4xl font-display font-bold text-zinc-950 tracking-tight">
                       {billingCycle === 'annual'
                         ? (currency === 'INR' ? '₹1,665' : '$15.80')
                         : (currency === 'INR' ? '₹1,999' : '$19')}
@@ -535,7 +535,7 @@ export default function PricingPage() {
                     {billingCycle === 'annual' ? (
                       <>
                         <span className="text-emerald-700 font-medium">
-                          {currency === 'INR' ? '₹19,990 / year' : '$190 / year'}
+                          {currency === 'INR' ? '₹19,990 / yr' : '$190 / yr'}
                         </span>
                         <span className="text-zinc-300">&bull;</span>
                         <span className="text-zinc-500">
@@ -569,7 +569,7 @@ export default function PricingPage() {
                     </li>
                     <li className="flex items-center gap-2.5">
                       <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span><strong>{billingCycle === 'annual' ? '21,000' : '20,000'}</strong> AI Runs / month</span>
+                      <span><strong>{billingCycle === 'annual' ? '21,000' : '20,000'}</strong> AI Runs / mo</span>
                     </li>
                     <li className="flex items-center gap-2.5 text-zinc-950 font-medium">
                       <WhatsAppIcon className="w-4 h-4 text-[#25D366] shrink-0" />
@@ -600,16 +600,16 @@ export default function PricingPage() {
           </div>
 
           {/* CARD 3: SCALE */}
-          <div className="w-[84vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
+          <div className="w-[80vw] max-w-[315px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[24px] overflow-hidden flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
             <div>
               {/* Top Header Banner in Vibrant Royal Violet / Indigo */}
-              <div className="bg-[#5438dc] p-6 text-white relative">
-                <div className="flex items-center justify-between gap-2 mb-3.5">
-                  <div className="w-10 h-10 rounded-2xl bg-[#ddd6fe] text-[#4c1d95] shadow-xs flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5" />
+              <div className="bg-[#5438dc] p-5 sm:p-6 text-white relative">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#ddd6fe] text-[#4c1d95] shadow-xs flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                 </div>
-                <h3 className="font-display text-2xl font-bold text-white tracking-tight">
+                <h3 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight">
                   Scale
                 </h3>
                 <p className="text-xs text-indigo-50/90 mt-1 leading-relaxed min-h-[34px]">
