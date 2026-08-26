@@ -206,37 +206,9 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
         </div>
       </section>
 
-      {/* ── SECTION 2: TRUSTED BY THE BEST & "A BETTER WAY TO WORK" COMPARISON (CLICKUP AESTHETIC) ── */}
+      {/* ── SECTION 2: "A BETTER WAY TO WORK" COMPARISON (CLICKUP AESTHETIC) ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
         
-        {/* Trusted By The Best Monochromatic Brand Row */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-12 sm:pb-16 border-b border-zinc-200/70 mb-12 sm:mb-16">
-          <span className="text-[11px] font-mono font-semibold uppercase tracking-widest text-zinc-400 shrink-0">
-            TRUSTED BY THE BEST
-          </span>
-
-          <div className="flex items-center flex-wrap justify-center md:justify-end gap-6 sm:gap-10 text-zinc-400 select-none">
-            <span className="font-serif font-black text-sm tracking-tight text-zinc-500 hover:text-zinc-900 transition-colors">
-              Kraft Heinz
-            </span>
-            <span className="font-display font-black text-sm tracking-tight text-zinc-600 hover:text-zinc-950 transition-colors flex items-baseline">
-              <span>Deloitte</span><span className="text-emerald-600 font-black">.</span>
-            </span>
-            <span className="font-serif italic font-extrabold text-sm tracking-wider text-zinc-500 hover:text-zinc-900 transition-colors">
-              Pfizer
-            </span>
-            <span className="font-display font-extrabold text-sm tracking-tighter text-zinc-600 hover:text-zinc-950 transition-colors">
-              Adobe
-            </span>
-            <span className="font-sans font-bold text-xs sm:text-sm tracking-normal text-zinc-500 hover:text-zinc-900 transition-colors">
-              American Airlines
-            </span>
-            <span className="font-display font-bold text-xs sm:text-sm tracking-wide text-zinc-500 hover:text-zinc-900 transition-colors">
-              NBCUniversal
-            </span>
-          </div>
-        </div>
-
         {/* Section Heading: "A better way to work" */}
         <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-14">
           <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-zinc-950">
