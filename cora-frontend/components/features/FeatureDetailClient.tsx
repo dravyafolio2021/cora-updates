@@ -286,16 +286,25 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
                   className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 items-stretch"
                 >
                   {/* Left Column */}
-                  <div className={`${isEven ? 'p-6 sm:p-10 lg:p-12 flex flex-col justify-center order-1' : 'p-4 sm:p-6 lg:p-8 bg-zinc-50/40 flex items-center justify-center order-2 lg:order-1'}`}>
+                  <div className={`${isEven ? 'p-6 sm:p-10 lg:p-14 flex flex-col justify-center order-1' : 'p-4 sm:p-6 lg:p-10 bg-[#FAFAFA]/70 flex items-center justify-center order-2 lg:order-1'}`}>
                     {isEven ? (
-                      <div className="space-y-3 max-w-[480px]">
-                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600">
+                      <div className="space-y-4 max-w-[480px]">
+                        <span className={`inline-flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border ${
+                          idx === 0 
+                            ? 'text-amber-800 bg-amber-50 border-amber-200' 
+                            : idx === 1 
+                              ? 'text-emerald-800 bg-emerald-50 border-emerald-200' 
+                              : idx === 2 
+                                ? 'text-blue-800 bg-blue-50 border-blue-200' 
+                                : 'text-purple-800 bg-purple-50 border-purple-200'
+                        }`}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-current" />
                           {cap.tag}
                         </span>
                         <h3 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
                           {cap.title}
                         </h3>
-                        <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
+                        <p className="text-zinc-600 text-sm sm:text-base leading-relaxed font-normal">
                           {cap.description}
                         </p>
                       </div>
@@ -307,20 +316,29 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
                   </div>
 
                   {/* Right Column */}
-                  <div className={`${isEven ? 'p-4 sm:p-6 lg:p-8 bg-zinc-50/40 flex items-center justify-center order-2' : 'p-6 sm:p-10 lg:p-12 flex flex-col justify-center order-1 lg:order-2'}`}>
+                  <div className={`${isEven ? 'p-4 sm:p-6 lg:p-10 bg-[#FAFAFA]/70 flex items-center justify-center order-2' : 'p-6 sm:p-10 lg:p-14 flex flex-col justify-center order-1 lg:order-2'}`}>
                     {isEven ? (
                       <div className="w-full flex items-center justify-center">
                         <CapabilityVisualCard cap={cap} feature={feature} index={idx} />
                       </div>
                     ) : (
-                      <div className="space-y-3 max-w-[480px]">
-                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600">
+                      <div className="space-y-4 max-w-[480px]">
+                        <span className={`inline-flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border ${
+                          idx === 0 
+                            ? 'text-amber-800 bg-amber-50 border-amber-200' 
+                            : idx === 1 
+                              ? 'text-emerald-800 bg-emerald-50 border-emerald-200' 
+                              : idx === 2 
+                                ? 'text-blue-800 bg-blue-50 border-blue-200' 
+                                : 'text-purple-800 bg-purple-50 border-purple-200'
+                        }`}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-current" />
                           {cap.tag}
                         </span>
                         <h3 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
                           {cap.title}
                         </h3>
-                        <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
+                        <p className="text-zinc-600 text-sm sm:text-base leading-relaxed font-normal">
                           {cap.description}
                         </p>
                       </div>
