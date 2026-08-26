@@ -28,7 +28,7 @@ import { BUILT_MODULES, UPCOMING_MODULES, CATEGORIES, INDUSTRIES, FeatureModule 
 import { FeatureIcon } from '@/components/features/FeatureIcon';
 import { FeaturesSidebar } from '@/components/features/FeaturesSidebar';
 import { ModuleCardVisual } from '@/components/features/ModuleCardVisual';
-import { RoadmapNotifyDrawer } from '@/components/features/RoadmapNotifyDrawer';
+import { RoadmapNotifyModal } from '@/components/features/RoadmapNotifyModal';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -84,7 +84,7 @@ export default function FeaturesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'live' | 'roadmap'>('all');
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  const [isNotifyDrawerOpen, setIsNotifyDrawerOpen] = useState(false);
+  const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
   const [selectedNotifyModuleId, setSelectedNotifyModuleId] = useState<string>('whatsapp-cloud');
 
   // Accessibility & iOS Mobile Scroll Lock: 100% prevent background page scrolling when drawer is open
@@ -507,7 +507,7 @@ export default function FeaturesPage() {
                             type="button"
                             onClick={() => {
                               setSelectedNotifyModuleId(item.id);
-                              setIsNotifyDrawerOpen(true);
+                              setIsNotifyModalOpen(true);
                               trackEvent('roadmap_notify_card_clicked', { module_id: item.id });
                             }}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 active:scale-95 transition-all shadow-xs cursor-pointer group/notify"
@@ -702,11 +702,11 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* ── 6. ROADMAP INTENT & EARLY ACCESS NOTIFY DRAWER ── */}
-      <RoadmapNotifyDrawer
-        isOpen={isNotifyDrawerOpen}
-        onClose={() => setIsNotifyDrawerOpen(false)}
-        initialModuleId={selectedNotifyModuleId}
+      {/* ── 6. ROADMAP INTENT & EARLY ACCESS NOTIFY POP-UP ── */}
+      <RoadmapNotifyModal
+        isOpen={isNotifyModalOpen}
+        onClose={() => setIsNotifyModalOpen(false)}
+        moduleId={selectedNotifyModuleId}
       />
 
     </main>
