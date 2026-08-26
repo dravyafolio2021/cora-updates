@@ -149,7 +149,7 @@ export default function FeaturesPage() {
   };
 
   return (
-    <main className="w-full relative pb-24 overflow-hidden bg-white text-zinc-900">
+    <main className="w-full relative pb-24 bg-white text-zinc-900">
       
       {/* ── 1. COMPACT HERO SECTION (MAX 40VH) ── */}
       <section className="relative w-full pt-24 sm:pt-28 pb-10 sm:pb-12 overflow-hidden">
@@ -188,16 +188,13 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* ── 2. CATALOG CONTROLS BAR & 2-COLUMN DYNAMIC SIDEBAR LAYOUT ── */}
-      <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 mb-24">
-        
-        {/* Top Sticky Toolbar */}
-        <div className="flex items-center justify-between gap-4 py-3.5 mb-8 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md sticky top-20 z-20">
+      {/* ── 2. STICKY CATALOG CONTROLS BAR (ALWAYS STICKS ON SCROLL) ── */}
+      <div className="sticky top-16 sm:top-20 z-30 bg-white/95 backdrop-blur-md border-y border-zinc-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.03)] mb-8">
+        <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           
-          {/* Left: Desktop Toggle / Mobile Drawer Trigger & Active Scope */}
-          <div className="flex items-center gap-3 min-w-0">
-            
-            {/* Desktop Sidebar Hide/Show Toggle */}
+          {/* Left: Sidebar Toggle & Mobile Trigger */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            {/* Desktop Sidebar Toggle */}
             <button
               type="button"
               onClick={() => {
@@ -205,8 +202,8 @@ export default function FeaturesPage() {
                 setIsSidebarOpen(nextState);
                 trackEvent('features_sidebar_toggled', { open: nextState });
               }}
-              className="hidden lg:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-zinc-300 text-xs font-semibold text-zinc-800 transition-all shadow-2xs cursor-pointer active:scale-95"
-              title={isSidebarOpen ? "Hide sidebar filters" : "Show sidebar filters"}
+              className="hidden lg:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-800 transition-all shadow-2xs cursor-pointer"
+              title={isSidebarOpen ? "Hide filters sidebar" : "Show filters sidebar"}
             >
               {isSidebarOpen ? (
                 <PanelLeftClose className="w-3.5 h-3.5 text-zinc-600" />
@@ -216,49 +213,69 @@ export default function FeaturesPage() {
               <span>{isSidebarOpen ? 'Hide Filters' : 'Show Filters'}</span>
             </button>
 
-            {/* Mobile Filter & Search Bottom Sheet Trigger */}
+            {/* Mobile Filter Trigger */}
             <button
               type="button"
               onClick={() => {
                 setIsMobileDrawerOpen(true);
                 trackEvent('features_mobile_drawer_opened');
               }}
-              className="lg:hidden inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-900 shadow-2xs cursor-pointer active:scale-95"
+              className="lg:hidden inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-900 shadow-2xs cursor-pointer"
               aria-haspopup="dialog"
               aria-expanded={isMobileDrawerOpen}
             >
               <Filter className="w-3.5 h-3.5 text-zinc-700" />
-              <span>Filters &amp; Search</span>
+              <span>Filters</span>
               {(activeCategory !== 'all' || selectedIndustry !== 'all' || statusFilter !== 'all' || searchQuery) && (
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
               )}
             </button>
-
-            <div className="h-4 w-px bg-zinc-200 hidden sm:block" />
-
-            {/* Active Category & Industry Scope Title */}
-            <div className="flex items-center gap-2 truncate">
-              <span className="text-xs font-bold text-zinc-950 truncate">
-                {activeCategory !== 'all' ? activeCategoryObject.label.replace(/\s*\(\d+\)$/, '') : 'All Modules'}
-                {selectedIndustry !== 'all' && ` • ${selectedIndustryObject.label}`}
-              </span>
-              <span className="text-[11px] font-mono text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-md hidden sm:inline-block">
-                {totalResultsCount} available
-              </span>
-            </div>
-
           </div>
 
-          {/* Right: Active Filter Badges with Quick Clear */}
+          {/* Center: Creative Studio Workspace Switcher (Quick Pill Segment) */}
+          <div className="hidden md:flex items-center gap-1 bg-zinc-100/90 p-1 rounded-xl border border-zinc-200/80 overflow-x-auto scrollbar-none">
+            {INDUSTRIES.map((ind) => {
+              const isSelected = selectedIndustry === ind.id;
+              const count = industryCounts[ind.id] ?? 28;
+              return (
+                <button
+                  key={ind.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedIndustry(ind.id);
+                    trackEvent('features_industry_switch', { industry: ind.id });
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    isSelected
+                      ? 'bg-white text-zinc-950 shadow-2xs font-bold'
+                      : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/50'
+                  }`}
+                >
+                  {ind.id === 'photo_film' && <Clapperboard className="w-3.5 h-3.5 text-zinc-700" />}
+                  {ind.id === 'real_estate' && <Building className="w-3.5 h-3.5 text-zinc-700" />}
+                  {ind.id === 'creative_agencies' && <Palette className="w-3.5 h-3.5 text-zinc-700" />}
+                  {ind.id === 'all' && <Briefcase className="w-3.5 h-3.5 text-zinc-700" />}
+                  <span>{ind.shortLabel}</span>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${
+                    isSelected ? 'bg-zinc-100 text-zinc-950 font-bold' : 'text-zinc-400'
+                  }`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right: Active Badges / Clear All */}
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
             {searchQuery && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-800 text-[11px] font-medium border border-zinc-200 shrink-0">
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-zinc-100 text-zinc-800 text-[11px] font-medium border border-zinc-200 shrink-0">
                 <span>&ldquo;{searchQuery}&rdquo;</span>
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
                   className="hover:text-zinc-950 cursor-pointer"
-                  aria-label="Remove search filter"
+                  aria-label="Clear search"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -266,41 +283,13 @@ export default function FeaturesPage() {
             )}
 
             {activeCategory !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-800 text-[11px] font-medium border border-zinc-200 shrink-0">
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-zinc-100 text-zinc-800 text-[11px] font-medium border border-zinc-200 shrink-0">
                 <span>{activeCategoryObject.label.replace(/\s*\(\d+\)$/, '')}</span>
                 <button
                   type="button"
                   onClick={() => setActiveCategory('all')}
                   className="hover:text-zinc-950 cursor-pointer"
-                  aria-label="Remove category filter"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {selectedIndustry !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-800 text-[11px] font-medium border border-zinc-200 shrink-0">
-                <span>{selectedIndustryObject.label}</span>
-                <button
-                  type="button"
-                  onClick={() => setSelectedIndustry('all')}
-                  className="hover:text-zinc-950 cursor-pointer"
-                  aria-label="Remove industry filter"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {statusFilter !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-800 text-[11px] font-medium border border-zinc-200 shrink-0">
-                <span className="capitalize">{statusFilter}</span>
-                <button
-                  type="button"
-                  onClick={() => setStatusFilter('all')}
-                  className="hover:text-zinc-950 cursor-pointer"
-                  aria-label="Remove status filter"
+                  aria-label="Clear category"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -314,19 +303,25 @@ export default function FeaturesPage() {
                 className="text-[11px] font-semibold text-zinc-500 hover:text-zinc-950 flex items-center gap-1 pl-1 cursor-pointer shrink-0"
               >
                 <RotateCcw className="w-3 h-3" />
-                <span>Reset</span>
+                <span className="hidden sm:inline">Reset</span>
               </button>
             )}
+
+            <span className="text-[11px] font-mono text-zinc-500 bg-zinc-100 px-2 py-1 rounded-lg shrink-0">
+              {totalResultsCount} modules
+            </span>
           </div>
 
         </div>
+      </div>
 
-        {/* 2-Column Desktop Layout */}
+      {/* ── 3. 2-COLUMN DYNAMIC SIDEBAR + CATALOG CARDS GRID ── */}
+      <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 mb-24">
         <div className="flex items-start gap-8 relative">
           
-          {/* ── LEFT DYNAMIC SIDEBAR (DESKTOP) ── */}
+          {/* ── LEFT DYNAMIC STICKY SIDEBAR (GLIDES ALONG PAGE SCROLL) ── */}
           {isSidebarOpen && (
-            <div className="hidden lg:block w-72 shrink-0 sticky top-36">
+            <div className="hidden lg:block w-72 shrink-0 sticky top-[136px] z-20 self-start max-h-[calc(100vh-160px)] overflow-y-auto pr-1 scrollbar-none">
               <FeaturesSidebar
                 activeCategory={activeCategory}
                 onSelectCategory={setActiveCategory}
@@ -528,7 +523,7 @@ export default function FeaturesPage() {
 
       </div>
 
-      {/* ── 3. MOBILE ACCESSIBLE BOTTOM SHEET DRAWER (FULL TOUCH & A11Y OPTIMIZED) ── */}
+      {/* ── 4. MOBILE ACCESSIBLE BOTTOM SHEET DRAWER ── */}
       {isMobileDrawerOpen && (
         <div 
           className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end"
@@ -556,7 +551,7 @@ export default function FeaturesPage() {
               <div className="flex items-center gap-2">
                 <Filter className="w-4 h-4 text-zinc-900" />
                 <h2 id="mobile-filters-title" className="font-display text-base font-bold text-zinc-950">
-                  Filters &amp; Search
+                  Filters &amp; Workspaces
                 </h2>
                 <span className="text-[11px] font-mono font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-md">
                   {totalResultsCount}
@@ -619,7 +614,7 @@ export default function FeaturesPage() {
         </div>
       )}
 
-      {/* ── 4. WHY CORA REPLACES 8+ SUBSCRIPTIONS ── */}
+      {/* ── 5. WHY CORA REPLACES 8+ SUBSCRIPTIONS ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 text-center">
         <div className="max-w-[720px] mx-auto mb-14">
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight mb-4">
@@ -661,7 +656,7 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* ── 5. BOTTOM CALL TO ACTION ── */}
+      {/* ── 6. BOTTOM CALL TO ACTION ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         <div className="w-full rounded-[36px] bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0A0D12] text-white p-8 sm:p-14 text-center relative overflow-hidden border border-zinc-800 shadow-xl">
           <div className="relative z-10 max-w-[680px] mx-auto space-y-6">

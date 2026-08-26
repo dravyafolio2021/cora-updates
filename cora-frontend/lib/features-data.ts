@@ -97,16 +97,45 @@ export interface RoadmapModule {
 export interface IndustryItem {
   id: string;
   label: string;
+  shortLabel: string;
+  subtitle: string;
   iconName: string;
+  badge: string;
 }
 
 export const INDUSTRIES: IndustryItem[] = [
-  { id: 'all', label: 'All Industries', iconName: 'Briefcase' },
-  { id: 'photography', label: 'Photography Studios', iconName: 'Camera' },
-  { id: 'film_production', label: 'Film & Video Houses', iconName: 'Clapperboard' },
-  { id: 'real_estate', label: 'Real Estate Media', iconName: 'Building' },
-  { id: 'wedding_events', label: 'Wedding & Event Cinema', iconName: 'Heart' },
-  { id: 'creative_agencies', label: 'Creative & Digital Agencies', iconName: 'Palette' },
+  { 
+    id: 'all', 
+    label: 'All Workspaces', 
+    shortLabel: 'All', 
+    subtitle: 'Universal Business Stack', 
+    iconName: 'Briefcase',
+    badge: 'Universal'
+  },
+  { 
+    id: 'photo_film', 
+    label: 'Photo & Film Production', 
+    shortLabel: 'Photo & Film', 
+    subtitle: 'Commercial, Video & Wedding Studios', 
+    iconName: 'Clapperboard',
+    badge: 'Call Sheets • Gear'
+  },
+  { 
+    id: 'real_estate', 
+    label: 'Real Estate Media', 
+    shortLabel: 'Real Estate', 
+    subtitle: 'Architecture, MLS & Drone Walkthroughs', 
+    iconName: 'Building',
+    badge: 'MLS • GEO SEO'
+  },
+  { 
+    id: 'creative_agencies', 
+    label: 'Creative & Content Agencies', 
+    shortLabel: 'Agencies', 
+    subtitle: 'Design, Content & Social Media Teams', 
+    iconName: 'Palette',
+    badge: 'Portals • White-Label'
+  },
 ];
 
 export const CATEGORIES = [
@@ -1328,6 +1357,7 @@ export const BUILT_MODULES: FeatureModule[] = [
     badgeColor: 'indigo',
     iconName: 'Send',
     status: 'Live in Product',
+    industries: ['photo_film', 'real_estate'],
     tags: ['Timeline Crew Grid', 'Call-Time Slot Pickers', 'GPS Shoot Pins', 'Conflict Guard'],
     stats: [
       { metric: '0 Conflicting', label: 'Double Bookings' },
@@ -1860,6 +1890,7 @@ export const BUILT_MODULES: FeatureModule[] = [
     badgeColor: 'sky',
     iconName: 'Camera',
     status: 'Live in Product',
+    industries: ['photo_film', 'real_estate'],
     tags: ['Gear Check-In/Out', 'Barcode & QR Tracking', 'Property Listing MLS', 'Maintenance Logs'],
     stats: [
       { metric: '0 Missing', label: 'Gear Tracking Accuracy' },
@@ -1993,6 +2024,7 @@ export const BUILT_MODULES: FeatureModule[] = [
     badgeColor: 'blue',
     iconName: 'HardDrive',
     status: 'Live in Product',
+    industries: ['photo_film', 'real_estate'],
     tags: ['Folder Cloud Library', 'Aspect Crop Presets', 'SEO Tagging', 'RAW Storage Vault'],
     stats: [
       { metric: '0 Quality Loss', label: 'Full Resolution RAW' },
@@ -2932,7 +2964,8 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
     iconName: 'ImageIcon',
     eta: 'Q3 2026',
     status: 'Building Soon',
-    categoryLabel: 'Finance & Media'
+    categoryLabel: 'Finance & Media',
+    industries: ['photo_film', 'real_estate']
   },
   {
     id: 'integrated-payments',
@@ -2950,7 +2983,8 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
     iconName: 'Video',
     eta: 'Q4 2026',
     status: 'Building Soon',
-    categoryLabel: 'Intelligence & AI'
+    categoryLabel: 'Intelligence & AI',
+    industries: ['photo_film', 'creative_agencies']
   },
   {
     id: 'multi-branch',
