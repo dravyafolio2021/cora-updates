@@ -61,64 +61,81 @@ export default function FeaturesPage() {
   return (
     <main className="w-full relative pb-24 overflow-hidden bg-white text-zinc-900">
       
-      {/* ── COMPACT ARTISTIC INTRO SECTION (MAX 40VH) ── */}
-      <section className="relative w-full pt-24 sm:pt-28 pb-8 sm:pb-10 overflow-hidden">
-        {/* Soft Organic Background & Gradient Veil merging seamlessly down */}
-        <ArtisticHeroBackground tone="blue" />
+      {/* ── COMPACT MONOCHROMATIC HERO SECTION (MAX 40VH) ── */}
+      <section className="relative w-full pt-24 sm:pt-28 pb-10 sm:pb-12 overflow-hidden">
+        {/* Monochromatic Atmospheric Background with smooth bottom gradient fade */}
+        <ArtisticHeroBackground tone="neutral" />
 
-        <div className="relative z-10 w-full max-w-[1100px] mx-auto px-4 sm:px-6 text-center">
+        <div className="relative z-10 w-full max-w-[1000px] mx-auto px-4 sm:px-6 text-center">
           
           {/* Status Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full border border-blue-200/70 text-[11px] font-semibold text-zinc-800 mb-3.5 shadow-2xs">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full border border-zinc-200/80 text-[11px] font-semibold text-zinc-800 mb-3.5 shadow-2xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>20 Features Live • 8 In Roadmap</span>
           </div>
 
-          {/* Simple, Universal Industry-Agnostic Heading */}
-          <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl font-extrabold text-zinc-950 leading-tight tracking-[-0.03em] max-w-[800px] mx-auto mb-2.5">
+          {/* Clean, Refined Heading matching Design System (font-semibold) */}
+          <h1 className="font-display text-3xl sm:text-4xl md:text-[46px] font-semibold text-zinc-950 leading-[1.18] tracking-[-0.03em] max-w-[760px] mx-auto mb-3">
             Everything you need to run your business
           </h1>
 
-          {/* Plain English Subtitle */}
-          <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[640px] mx-auto mb-6">
+          {/* Subtitle */}
+          <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[620px] mx-auto mb-6">
             Client inquiries, CRM, digital contracts, billing, team workflows, and AI automations — all in one simple workspace.
           </p>
 
-          {/* ── RESPONSIVE COMPACT PILL BAR (BUSINESS VERTICALS) ── */}
-          <div className="w-full max-w-[860px] mx-auto mb-4 px-1">
-            <div className="flex items-center justify-start sm:justify-center p-1 bg-white/85 backdrop-blur-md border border-zinc-200/80 rounded-full shadow-2xs overflow-x-auto scrollbar-none gap-1">
-              {CATEGORIES.map((cat) => {
-                const isActive = activeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      setActiveCategory(cat.id);
-                      trackEvent('features_category_filter', { category: cat.id });
-                    }}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer shrink-0 ${
-                      isActive
-                        ? 'bg-zinc-950 text-white shadow-xs font-bold'
-                        : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/60'
-                    }`}
-                  >
-                    <span>{cat.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+          {/* Primary Action Button */}
+          <div className="flex items-center justify-center gap-3">
+            <a
+              href="https://app.heycora.in/workspace/login?source=features_hero"
+              onClick={() => trackEvent('features_page_cta_clicked')}
+              className="inline-flex items-center gap-2 bg-zinc-950 text-white px-7 py-3 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-sm group cursor-pointer"
+            >
+              <span>Get Started Free Forever</span>
+              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+            </a>
           </div>
 
-          {/* Sleek Compact Search Bar */}
-          <div className="max-w-[380px] mx-auto">
+        </div>
+      </section>
+
+      {/* ── TOOLBAR: CATEGORY PILL TABS + SEARCH BAR ── */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-8 sm:mb-10">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-zinc-100">
+          
+          {/* Category Filter Pills (Business Verticals) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    setActiveCategory(cat.id);
+                    trackEvent('features_category_filter', { category: cat.id });
+                  }}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                    isActive
+                      ? 'bg-zinc-950 text-white shadow-xs font-bold'
+                      : 'bg-zinc-100/80 text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/60'
+                  }`}
+                >
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Search Bar on the Right */}
+          <div className="w-full lg:w-[300px] shrink-0">
             <div className="relative flex items-center">
               <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search features (e.g. Invoicing, CRM, Contracts, AI)..."
+                placeholder="Search features..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3.5 py-1.5 bg-white/90 focus:bg-white border border-zinc-200/90 focus:border-zinc-950 rounded-xl text-xs font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all shadow-2xs"
+                className="w-full pl-9 pr-3.5 py-2 bg-zinc-50 hover:bg-white focus:bg-white border border-zinc-200 focus:border-zinc-950 rounded-xl text-xs font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all shadow-2xs"
               />
               {searchQuery && (
                 <button

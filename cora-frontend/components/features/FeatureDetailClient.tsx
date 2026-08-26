@@ -54,8 +54,8 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
     <div className="w-full">
       {/* ── ARTISTIC BLENDED HERO SECTION (COMPACT <=40VH) ── */}
       <section className="relative w-full pt-20 sm:pt-24 pb-8 sm:pb-12 overflow-hidden">
-        {/* Soft Organic Background & Gradient Veil that melts down into the page */}
-        <ArtisticHeroBackground tone={categoryTone} />
+        {/* Monochromatic Background & Gradient Veil that melts down into the page */}
+        <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6">
           {/* Breadcrumbs */}
@@ -84,14 +84,14 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
                 <FeatureIcon name={feature.iconName} className="w-3.5 h-3.5 text-zinc-800" />
                 <span>{feature.categoryLabel}</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 rounded-full text-[10px] font-mono font-bold backdrop-blur-md">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 rounded-full text-[10px] font-mono font-bold backdrop-blur-md">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 {feature.status}
               </span>
             </div>
 
             {/* Main Title */}
-            <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.15]">
+            <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-semibold text-zinc-950 tracking-[-0.03em] leading-[1.15]">
               {feature.title}
             </h1>
 
