@@ -41,88 +41,63 @@ const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   </svg>
 );
 
-interface ReplacementApp {
+interface StudioWorkflow {
   id: string;
-  name: string;
+  title: string;
   category: string;
-  monthlyCostINR: number;
-  monthlyCostUSD: number;
-  hoursSavedPerWeek: number;
-  freeTierHackNote: string;
+  currentChaos: string;
+  coraFix: string;
+  hoursLostPerWeek: number;
 }
 
-const REPLACEMENT_APPS: ReplacementApp[] = [
+const STUDIO_WORKFLOWS: StudioWorkflow[] = [
   {
-    id: 'esign',
-    name: 'DocuSign / PandaDoc',
-    category: 'Contracts & E-Signatures',
-    monthlyCostINR: 1500,
-    monthlyCostUSD: 18,
-    hoursSavedPerWeek: 3.5,
-    freeTierHackNote: 'Bypassing 3 docs/mo limits with multiple trial emails'
-  },
-  {
-    id: 'proofing',
-    name: 'Pixieset / WeTransfer Pro',
-    category: 'Client Galleries & Delivery',
-    monthlyCostINR: 2200,
-    monthlyCostUSD: 25,
-    hoursSavedPerWeek: 5.0,
-    freeTierHackNote: 'Managing 3+ separate 15GB Google Drive Gmail accounts'
+    id: 'galleries',
+    title: 'Client Galleries & Expiring Links',
+    category: 'Delivery & Proofing',
+    currentChaos: 'Juggling 3+ free 15GB Google Drives or expiring 7-day WeTransfer links ("link expired" complaints)',
+    coraFix: 'Permanent branded gallery portal with client photo proofing & high-res delivery',
+    hoursLostPerWeek: 4.5
   },
   {
     id: 'whatsapp',
-    name: 'Wati / AiSensy / WhatsApp API',
-    category: 'Automated Reminders & Dispatch',
-    monthlyCostINR: 2499,
-    monthlyCostUSD: 29,
-    hoursSavedPerWeek: 6.0,
-    freeTierHackNote: 'Manually typing payment & shoot reminders for hours every night'
+    title: 'WhatsApp Call-Sheets & Manual Reminders',
+    category: 'Client Communications',
+    currentChaos: 'Manually typing venue directions, shoot call times & balance reminders at 11 PM',
+    coraFix: 'Automated WhatsApp shoot confirmations, crew call-sheets & payment reminders',
+    hoursLostPerWeek: 6.0
   },
   {
-    id: 'crm',
-    name: 'HoneyBook / Studio Ninja',
-    category: 'Studio Booking & Client Vault',
-    monthlyCostINR: 2999,
-    monthlyCostUSD: 35,
-    hoursSavedPerWeek: 4.5,
-    freeTierHackNote: 'Fragmented client history across WhatsApp, Notes & Excel'
+    id: 'payments',
+    title: 'GPay/PhonePe Screenshot Chasing',
+    category: 'Payment Matching',
+    currentChaos: 'Sharing UPI ID, asking for screenshot, manually matching bank SMS and UTR numbers',
+    coraFix: 'Dynamic UPI QR on invoices with automated payment match & instant digital receipts',
+    hoursLostPerWeek: 3.5
+  },
+  {
+    id: 'contracts',
+    title: 'Unsigned Contracts & WhatsApp Deals',
+    category: 'Legal Agreements',
+    currentChaos: 'Sending Word/Canva PDF on WhatsApp or typing "Agreed", leading to raw-file & overtime disputes',
+    coraFix: '1-Click SHA-256 legally binding digital contract signing (IT Act 2000 compliant)',
+    hoursLostPerWeek: 3.0
   },
   {
     id: 'invoicing',
-    name: 'Zoho / Khatabook / Excel GST',
-    category: 'GST Invoicing & Dynamic UPI QR',
-    monthlyCostINR: 1200,
-    monthlyCostUSD: 15,
-    hoursSavedPerWeek: 3.5,
-    freeTierHackNote: 'Chasing manual UPI screenshot verifications & matching UTRs'
+    title: 'Excel & Canva GST Invoicing',
+    category: 'Billing & Taxes',
+    currentChaos: 'Typing bills in Excel templates and manually calculating 18% CGST, SGST, and IGST',
+    coraFix: 'Automated 1-click GST-compliant invoices with instant tax splits & PDF generation',
+    hoursLostPerWeek: 2.5
   },
   {
-    id: 'ai',
-    name: 'ChatGPT Plus / Copy AI',
-    category: 'Commercial Listing & Proposal AI',
-    monthlyCostINR: 1999,
-    monthlyCostUSD: 20,
-    hoursSavedPerWeek: 3.0,
-    freeTierHackNote: 'Copying prompts back and forth between ChatGPT and docs'
-  },
-  {
-    id: 'project_pm',
-    name: 'Trello / Notion / Monday',
-    category: 'Kanban Lead Pipeline & Tasks',
-    monthlyCostINR: 1400,
-    monthlyCostUSD: 16,
-    hoursSavedPerWeek: 3.5,
-    freeTierHackNote: 'Hitting free workspace member limits and disconnected boards'
-  },
-  {
-    id: 'custom_domain',
-    name: 'Domain & Business Email Relay',
-    category: 'Branded .com/.in & Email Relay',
-    monthlyCostINR: 800,
-    monthlyCostUSD: 10,
-    hoursSavedPerWeek: 1.5,
-    freeTierHackNote: 'Sending official quotes from an unprofessional @gmail.com'
+    id: 'proposals',
+    title: 'Proposal & Brief Drafting from Scratch',
+    category: 'Commercial Briefs',
+    currentChaos: 'Copy-pasting ChatGPT prompts back and forth to write commercial quotes and moodboards',
+    coraFix: 'Cora AI Assistant drafts custom proposals, shoot briefs, and listing copy in 10s',
+    hoursLostPerWeek: 3.0
   }
 ];
 
@@ -161,34 +136,36 @@ export default function PricingPage() {
   const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   
-  // Interactive App Stack Replacement & ROI Calculator State
-  const [selectedApps, setSelectedApps] = useState<string[]>([
-    'esign',
-    'proofing',
+  // Studio Workflow Time Recovery Calculator State
+  const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([
+    'galleries',
     'whatsapp',
-    'crm',
+    'payments',
+    'contracts',
     'invoicing',
-    'ai'
+    'proposals'
   ]);
-  const [teamSize, setTeamSize] = useState<number>(3);
+  const [monthlyShoots, setMonthlyShoots] = useState<number>(6);
 
-  const toggleApp = (appId: string) => {
-    setSelectedApps(prev => {
-      const next = prev.includes(appId) ? prev.filter(id => id !== appId) : [...prev, appId];
-      trackEvent('roi_calculator_app_toggle', { appId, selected: !prev.includes(appId), total: next.length });
+  const toggleWorkflow = (workflowId: string) => {
+    setSelectedWorkflows(prev => {
+      const next = prev.includes(workflowId) 
+        ? prev.filter(id => id !== workflowId) 
+        : [...prev, workflowId];
+      trackEvent('roi_calculator_workflow_toggle', { workflowId, selected: !prev.includes(workflowId), total: next.length });
       return next;
     });
   };
 
-  const handleSelectAllApps = () => {
-    const allIds = REPLACEMENT_APPS.map(a => a.id);
-    setSelectedApps(allIds);
+  const handleSelectAllWorkflows = () => {
+    const allIds = STUDIO_WORKFLOWS.map(w => w.id);
+    setSelectedWorkflows(allIds);
     trackEvent('roi_calculator_select_all', { total: allIds.length });
   };
 
-  const handleResetApps = () => {
-    const defaultIds = ['esign', 'proofing', 'whatsapp', 'crm', 'invoicing', 'ai'];
-    setSelectedApps(defaultIds);
+  const handleResetWorkflows = () => {
+    const defaultIds = ['galleries', 'whatsapp', 'payments', 'contracts', 'invoicing', 'proposals'];
+    setSelectedWorkflows(defaultIds);
     trackEvent('roi_calculator_reset', { total: defaultIds.length });
   };
 
@@ -268,26 +245,16 @@ export default function PricingPage() {
     trackEvent('pricing_comparison_toggle', { open: nextState });
   };
 
-  // Stack Calculator Metrics
-  const coraAnnualPrice = currency === 'INR' ? 19990 : 190;
-
-  const totalAppMonthlyCost = selectedApps.reduce((sum, appId) => {
-    const app = REPLACEMENT_APPS.find(a => a.id === appId);
-    if (!app) return sum;
-    const cost = currency === 'INR' ? app.monthlyCostINR : app.monthlyCostUSD;
-    const multiplier = teamSize > 1 ? 1 + (teamSize - 1) * 0.45 : 1;
-    return sum + Math.round(cost * multiplier);
+  // Time & Stack Calculations
+  const totalHoursWeekly = selectedWorkflows.reduce((sum, id) => {
+    const item = STUDIO_WORKFLOWS.find(w => w.id === id);
+    if (!item) return sum;
+    const volumeMultiplier = monthlyShoots > 4 ? 1 + (monthlyShoots - 4) * 0.07 : 1;
+    return sum + item.hoursLostPerWeek * volumeMultiplier;
   }, 0);
 
-  const totalAnnualAppCost = totalAppMonthlyCost * 12;
-  const netAnnualSavings = Math.max(0, totalAnnualAppCost - coraAnnualPrice);
-
-  const totalHoursSavedWeekly = selectedApps.reduce((sum, appId) => {
-    const app = REPLACEMENT_APPS.find(a => a.id === appId);
-    return sum + (app ? app.hoursSavedPerWeek : 0);
-  }, 0);
-
-  const monthlyHoursSaved = Math.round(totalHoursSavedWeekly * 4.3);
+  const roundedWeeklyHours = Math.round(totalHoursWeekly * 10) / 10;
+  const totalHoursMonthly = Math.round(totalHoursWeekly * 4.3);
 
   return (
     <main className="w-full relative pb-16 sm:pb-24 overflow-hidden bg-white text-zinc-900">
@@ -1521,44 +1488,44 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 4: INTERACTIVE APP STACK REPLACEMENT & "FREE-TIER TRAP" ROI CALCULATOR
+          ROW 4: STUDIO TIME RECOVERY & WORKFLOW CONSOLIDATION CALCULATOR
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1140px] mx-auto px-3.5 sm:px-6 mb-16 sm:mb-24">
         
         {/* Section Header */}
-        <div className="text-center max-w-[780px] mx-auto mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 text-white text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider mb-2.5 sm:mb-3 shadow-xs">
-            <Calculator className="w-3.5 h-3.5 text-emerald-400" />
-            <span>INTERACTIVE ROI &amp; STACK CONSOLIDATION CALCULATOR</span>
+        <div className="text-center max-w-[760px] mx-auto mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200/80 text-zinc-800 text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider mb-2.5">
+            <Clock className="w-3.5 h-3.5 text-zinc-600" />
+            <span>TIME RECOVERY &amp; WORKFLOW CONSOLIDATION</span>
           </div>
-          <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-zinc-950 tracking-tight">
-            Replace 6+ Fragmented Subscriptions &amp; Free-Tier Hacks
+          <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
+            The True Cost of Free-Tier Hacks &amp; Manual Chaos
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-600 mt-2 leading-relaxed">
-            Stop wasting hours juggling 3 separate Gmail drives, trial e-sign accounts, and manual WhatsApp follow-ups. See your exact annual money saved and time freedom recovered.
+          <p className="text-xs sm:text-sm text-zinc-500 mt-2 leading-relaxed max-w-2xl mx-auto">
+            Juggling 3 free Google Drive accounts, typing WhatsApp messages at 11 PM, and matching UPI screenshots saves ₹0 in subscriptions, but drains 18+ hours every month in lost client focus.
           </p>
         </div>
 
-        {/* 2-Column Interactive Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[32px] p-4 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.03)]">
+        {/* 2-Column Monochromatic Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start bg-white border border-zinc-200/80 rounded-2xl sm:rounded-[28px] p-4 sm:p-7 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
           
-          {/* LEFT PANEL: SELECT APPS & TEAM SIZE (7 Cols) */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* LEFT PANEL: SELECT CURRENT WORKFLOWS & VOLUME (7 Cols) */}
+          <div className="lg:col-span-7 space-y-5">
             
             {/* Header with Quick Actions */}
             <div className="flex items-center justify-between gap-3 pb-3 border-b border-zinc-100">
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-zinc-950">
-                  Your Current Tools &amp; Workarounds
+                  Select Your Current Studio Workarounds
                 </h3>
                 <p className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">
-                  Select what your studio or agency relies on today:
+                  See how much time manual juggling costs your business each week:
                 </p>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   type="button"
-                  onClick={handleSelectAllApps}
+                  onClick={handleSelectAllWorkflows}
                   className="px-2.5 py-1 rounded-md text-[11px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer"
                 >
                   Select All
@@ -1566,7 +1533,7 @@ export default function PricingPage() {
                 <span className="text-zinc-300">&bull;</span>
                 <button
                   type="button"
-                  onClick={handleResetApps}
+                  onClick={handleResetWorkflows}
                   className="px-2.5 py-1 rounded-md text-[11px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer"
                 >
                   Reset
@@ -1574,186 +1541,155 @@ export default function PricingPage() {
               </div>
             </div>
 
-            {/* App Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-              {REPLACEMENT_APPS.map(app => {
-                const isSelected = selectedApps.includes(app.id);
-                const cost = currency === 'INR' ? `₹${app.monthlyCostINR.toLocaleString('en-IN')}` : `$${app.monthlyCostUSD}`;
+            {/* Workflow Items List */}
+            <div className="space-y-2.5">
+              {STUDIO_WORKFLOWS.map(item => {
+                const isSelected = selectedWorkflows.includes(item.id);
 
                 return (
                   <button
-                    key={app.id}
+                    key={item.id}
                     type="button"
-                    onClick={() => toggleApp(app.id)}
-                    className={`w-full p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border text-left transition-all relative flex flex-col justify-between cursor-pointer ${
+                    onClick={() => toggleWorkflow(item.id)}
+                    className={`w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all relative flex items-start gap-3 cursor-pointer ${
                       isSelected
-                        ? 'border-zinc-950 bg-zinc-50/80 shadow-xs ring-1 ring-zinc-950'
-                        : 'border-zinc-200/80 bg-white hover:border-zinc-300 opacity-70 hover:opacity-100'
+                        ? 'border-zinc-950 bg-zinc-50/70 shadow-2xs'
+                        : 'border-zinc-200/80 bg-white hover:border-zinc-300 opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <div>
-                      <div className="flex items-start justify-between gap-2 mb-1.5">
-                        <div className="font-semibold text-xs text-zinc-950 line-clamp-1">
-                          {app.name}
-                        </div>
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                          isSelected ? 'bg-zinc-950 text-white' : 'border border-zinc-300 bg-white'
-                        }`}>
-                          {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                        </div>
-                      </div>
-
-                      <div className="text-[10px] sm:text-[11px] text-zinc-500 font-medium">
-                        {app.category}
-                      </div>
+                    {/* Monochromatic Checkbox */}
+                    <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                      isSelected ? 'bg-zinc-950 text-white' : 'border border-zinc-300 bg-white'
+                    }`}>
+                      {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                     </div>
 
-                    <div className="mt-2.5 pt-2 border-t border-zinc-200/60 flex items-center justify-between text-[10px] text-zinc-600">
-                      <span className="font-semibold text-zinc-950 font-mono">
-                        {cost} <span className="font-normal text-zinc-500">/ mo</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-emerald-700 font-medium bg-emerald-50 px-1.5 py-0.5 rounded-md">
-                        <Clock className="w-2.5 h-2.5" />
-                        <span>+{app.hoursSavedPerWeek}h/wk</span>
-                      </span>
-                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="font-semibold text-xs text-zinc-950">
+                          {item.title}
+                        </div>
+                        <span className="text-[10px] font-mono text-zinc-700 bg-zinc-100/90 border border-zinc-200/60 px-2 py-0.5 rounded-md font-medium shrink-0">
+                          ~{item.hoursLostPerWeek}h / wk drained
+                        </span>
+                      </div>
 
-                    {/* Subtle Workaround Hint */}
-                    <div className="mt-1.5 text-[9px] text-zinc-400 line-clamp-1 italic">
-                      💡 {app.freeTierHackNote}
+                      {/* The Reality Friction */}
+                      <p className="text-[11px] text-zinc-500 mt-1 leading-snug">
+                        <strong className="font-medium text-zinc-700">Today:</strong> {item.currentChaos}
+                      </p>
+
+                      {/* With Cora */}
+                      <p className="text-[11px] text-zinc-900 font-medium mt-1 leading-snug flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-900 shrink-0" />
+                        <span><strong>Cora Fix:</strong> {item.coraFix}</span>
+                      </p>
                     </div>
                   </button>
                 );
               })}
             </div>
 
-            {/* Team Size Slider */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-2.5">
+            {/* Monthly Shoot / Project Volume Slider */}
+            <div className="p-4 rounded-2xl bg-zinc-50/80 border border-zinc-200/80 space-y-2.5">
               <div className="flex items-center justify-between gap-2">
-                <div className="space-y-0.5">
+                <div>
                   <div className="text-xs sm:text-sm font-bold text-zinc-950">
-                    Active Team Size / Co-Operators
+                    Monthly Shoot / Client Volume
                   </div>
                   <div className="text-[10px] sm:text-[11px] text-zinc-500">
-                    Calculates scaled seat costs and team coordination overhead
+                    Calculates cumulative coordination and file dispatch time
                   </div>
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-200 text-xs font-bold font-mono text-zinc-950 shadow-2xs">
-                  <Users className="w-3.5 h-3.5 text-zinc-600" />
-                  <span>{teamSize} {teamSize === 1 ? 'Person' : 'People'}</span>
+                  <span>{monthlyShoots} Shoots / mo</span>
                 </div>
               </div>
 
               <input
                 type="range"
-                min="1"
-                max="10"
+                min="2"
+                max="25"
                 step="1"
-                value={teamSize}
-                onChange={e => setTeamSize(parseInt(e.target.value, 10))}
+                value={monthlyShoots}
+                onChange={e => setMonthlyShoots(parseInt(e.target.value, 10))}
                 className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950"
               />
 
               <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
-                <span>1 (Solopreneur)</span>
-                <span>5 (Studio Team)</span>
-                <span>10+ (Production Agency)</span>
-              </div>
-            </div>
-
-            {/* The "Free-Tier Trap" Callout */}
-            <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-50/60 border border-amber-200/80 flex items-start gap-3">
-              <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-700 shrink-0 mt-0.5" />
-              <div className="text-xs text-amber-900 leading-relaxed">
-                <strong>The &ldquo;3 Free Accounts&rdquo; Trap:</strong> Juggling multiple 15GB Google Drive accounts or trial e-sign portals saves ₹0 in subscriptions on paper, but drains an estimated <strong className="underline decoration-amber-400 decoration-2">{monthlyHoursSaved} hours every month</strong> in context-switching, hunting for broken client links, and manual WhatsApp follow-ups.
+                <span>2 (Solopreneur)</span>
+                <span>8 (Active Studio)</span>
+                <span>25+ (Production House)</span>
               </div>
             </div>
 
           </div>
 
-          {/* RIGHT PANEL: LIVE ROI & CONSOLIDATION SUMMARY (5 Cols) */}
-          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-4 sm:space-y-5">
+          {/* RIGHT PANEL: MONOCHROMATIC TIME RECOVERY & CONSOLIDATION SUMMARY (5 Cols) */}
+          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
             
-            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-[26px] bg-zinc-950 text-white shadow-xl relative overflow-hidden">
-              {/* Glow Accent */}
-              <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-[26px] bg-zinc-50/90 border border-zinc-200/90 text-zinc-900 shadow-2xs space-y-5">
               
-              <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-zinc-800">
-                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-400">
-                  Consolidation ROI
+              <div className="flex items-center justify-between gap-2 pb-3 border-b border-zinc-200/80">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500">
+                  Consolidated Impact
                 </span>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-bold">
-                  {selectedApps.length} Tools Replaced
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-200 text-zinc-900 text-[11px] font-bold">
+                  {selectedWorkflows.length} Workflows Unified
                 </span>
               </div>
 
-              {/* Stack Cost Comparison Breakdown */}
-              <div className="space-y-2.5 mb-5 text-xs">
-                <div className="flex items-center justify-between text-zinc-400">
-                  <span>Fragmented Tool Stack:</span>
-                  <span className="font-mono line-through text-zinc-400">
-                    {currency === 'INR' ? `₹${totalAppMonthlyCost.toLocaleString('en-IN')}` : `$${totalAppMonthlyCost.toLocaleString('en-US')}`} / mo
-                  </span>
+              {/* Primary Time Recovered Highlight */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs space-y-1.5 text-center sm:text-left">
+                <div className="text-[10px] sm:text-[11px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
+                  Studio Time Recovered
                 </div>
-
-                <div className="flex items-center justify-between text-zinc-200 font-semibold">
-                  <span className="flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Cora Unified Operating Backbone:</span>
-                  </span>
-                  <span className="font-mono text-emerald-400">
-                    {currency === 'INR' ? '₹1,665' : '$15.80'} / mo
-                  </span>
+                <div className="text-3xl sm:text-4xl font-display font-extrabold text-zinc-950 tracking-tight">
+                  ~{roundedWeeklyHours} Hours
+                  <span className="text-xs text-zinc-500 font-normal ml-1.5 font-sans">/ week</span>
                 </div>
+                <p className="text-[11px] text-zinc-500 leading-snug pt-1">
+                  That is <strong className="text-zinc-900 font-semibold">~{totalHoursMonthly} hours every month</strong> back for shooting, editing, and closing high-ticket clients instead of administrative chaos.
+                </p>
               </div>
 
-              {/* Big Impact Highlight Box */}
-              <div className="p-4 sm:p-5 rounded-xl bg-zinc-900/90 border border-zinc-800 space-y-3 mb-5">
-                <div>
-                  <div className="text-[10px] sm:text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
-                    Net Annual Financial Savings
-                  </div>
-                  <div className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight mt-0.5 text-emerald-400">
-                    {currency === 'INR' ? `₹${netAnnualSavings.toLocaleString('en-IN')}` : `$${netAnnualSavings.toLocaleString('en-US')}`}
-                    <span className="text-xs text-zinc-400 font-normal ml-1.5 font-sans">/ year</span>
-                  </div>
+              {/* All In One Single Backbone */}
+              <div className="space-y-2 text-xs">
+                <div className="font-bold text-zinc-950 flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-zinc-950 stroke-[3]" />
+                  <span>Everything Replaced by One Workspace:</span>
                 </div>
+                <ul className="space-y-2 text-[11px] text-zinc-600 pl-4 list-disc">
+                  <li><strong>Permanent Gallery Portal:</strong> No 15GB Drive juggling or expired links</li>
+                  <li><strong>WhatsApp Automation:</strong> Call-sheets &amp; advance balance pings</li>
+                  <li><strong>Dynamic UPI QR:</strong> Auto-reconciliation with zero screenshot chasing</li>
+                  <li><strong>SHA-256 E-Sign:</strong> Legally binding shoot contracts in 1 click</li>
+                  <li><strong>Instant GST Math:</strong> Automated 18% CGST/SGST PDF invoices</li>
+                </ul>
+              </div>
 
-                <div className="pt-2.5 border-t border-zinc-800/80 flex items-center justify-between text-xs">
-                  <span className="text-zinc-400">Time Recovered:</span>
-                  <span className="font-bold text-white font-mono bg-zinc-800 px-2 py-0.5 rounded-md text-[11px]">
-                    ~{totalHoursSavedWeekly} Hours / Week
-                  </span>
+              {/* Price Callout */}
+              <div className="pt-3 border-t border-zinc-200/80 flex items-baseline justify-between">
+                <span className="text-xs text-zinc-500">Starting from:</span>
+                <div className="text-right">
+                  <span className="font-display text-lg font-bold text-zinc-950">₹499</span>
+                  <span className="text-xs text-zinc-500"> / mo (India Plan)</span>
                 </div>
               </div>
 
               {/* Action Conversion CTA */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=pro"
-                className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-zinc-950 py-3.5 px-4 rounded-xl text-xs font-bold transition-all shadow-md active:scale-[0.98] cursor-pointer mb-3"
+                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3.5 px-4 rounded-xl text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
               >
-                <span>Replace your entire stack with Cora</span>
-                <ArrowRight className="w-4 h-4 text-zinc-900" />
+                <span>Consolidate your studio on Cora</span>
+                <ArrowRight className="w-4 h-4 text-white" />
               </a>
 
-              <div className="text-center text-[10px] text-zinc-400 space-y-1">
-                <div>✓ Zero migration downtime &bull; 100% white-label client view</div>
-                <div>✓ Import historical client records in minutes</div>
+              <div className="text-center text-[10px] text-zinc-400 space-y-0.5">
+                <div>✓ 100% white-label for your clients &bull; No setup fee</div>
+                <div>✓ Free onboarding &amp; data migration support</div>
               </div>
-            </div>
-
-            {/* Quick Feature Checklist */}
-            <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 text-xs space-y-2 text-zinc-700">
-              <div className="font-semibold text-zinc-950 flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[3]" />
-                <span>Everything consolidated in Cora:</span>
-              </div>
-              <ul className="space-y-1.5 text-[11px] text-zinc-600 pl-5 list-disc">
-                <li>Automated WhatsApp booking &amp; payment reminders</li>
-                <li>Dynamic UPI QR code on 18% GST invoices</li>
-                <li>Cryptographically sealed SHA-256 E-Signatures</li>
-                <li>Commercial AI reasoning engine for listing briefs</li>
-              </ul>
             </div>
 
           </div>
