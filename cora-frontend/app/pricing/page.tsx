@@ -70,8 +70,23 @@ export default function PricingPage() {
   const [showComparison, setShowComparison] = useState(false);
   const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-
   const topToggleRef = useRef<HTMLDivElement>(null);
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-center the middle Professional card on mobile screens
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768 && cardsContainerRef.current) {
+      const timer = setTimeout(() => {
+        const container = cardsContainerRef.current;
+        if (container && container.children[1]) {
+          const proCard = container.children[1] as HTMLElement;
+          const scrollPos = proCard.offsetLeft - (window.innerWidth - proCard.offsetWidth) / 2;
+          container.scrollTo({ left: Math.max(0, scrollPos), behavior: 'smooth' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Dynamic Geolocation detection
   useEffect(() => {
@@ -309,7 +324,7 @@ export default function PricingPage() {
       <section className="w-full max-w-[1240px] mx-auto px-3.5 sm:px-6 mb-12 sm:mb-16">
         
         {/* Section Header & Primary Cadence Switcher */}
-        <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 pb-4 border-b border-zinc-100">
+        <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 pb-4 border-b border-zinc-100 text-center md:text-left">
           <div>
             <div className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400">
               GROWTH PLANS
@@ -317,13 +332,13 @@ export default function PricingPage() {
             <h2 className="font-display text-xl sm:text-3xl font-bold text-zinc-950 mt-1">
               High-Throughput Operating Plans
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-500 mt-1">
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-xl mx-auto md:mx-0">
               Connect your custom domain, automate client communications, and supercharge operations with advanced AI.
             </p>
           </div>
 
           {/* Primary Cadence Switcher with 2 Months Free badge */}
-          <div ref={topToggleRef} className="flex flex-col items-start sm:items-end gap-2 shrink-0">
+          <div ref={topToggleRef} className="flex flex-col items-center md:items-end gap-2 shrink-0 mx-auto md:mx-0">
             <div className="w-fit inline-flex items-center p-1 bg-zinc-100/90 rounded-full border border-zinc-200/80 shadow-2xs">
               <button
                 type="button"
@@ -358,7 +373,7 @@ export default function PricingPage() {
               </button>
             </div>
 
-            <div className="text-[11px] sm:text-xs text-zinc-500 sm:text-right min-h-[20px] flex items-center">
+            <div className="text-[11px] sm:text-xs text-zinc-500 text-center md:text-right min-h-[20px] flex items-center justify-center md:justify-end">
               {billingCycle === 'annual' ? (
                 <div className="inline-flex items-center gap-1.5 text-emerald-800 font-medium animate-in fade-in duration-150">
                   <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -373,11 +388,14 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* 3-Tier SaaS Cards with Clean Top Header Banners */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch pt-2 sm:pt-4">
+        {/* 3-Tier SaaS Cards: Swipeable Snap Row on Mobile, 3-Col Grid on Desktop */}
+        <div 
+          ref={cardsContainerRef}
+          className="flex md:grid md:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 py-2 sm:py-4 items-stretch"
+        >
           
           {/* CARD 1: STARTER */}
-          <div className="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
+          <div className="w-[84vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
             <div>
               {/* Top Header Banner in Vibrant Emerald Green */}
               <div className="bg-[#0b7a4d] p-6 text-white relative">
@@ -476,7 +494,7 @@ export default function PricingPage() {
           </div>
 
           {/* CARD 2: PROFESSIONAL (RECOMMENDED) */}
-          <div className="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_12px_36px_rgba(190,0,107,0.12)] hover:shadow-2xl transition-all relative">
+          <div className="w-[84vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_12px_36px_rgba(190,0,107,0.12)] hover:shadow-2xl transition-all relative">
             <div>
               {/* Top Header Banner in Vibrant Magenta / Fuchsia */}
               <div className="bg-[#be006b] p-6 text-white relative">
@@ -582,7 +600,7 @@ export default function PricingPage() {
           </div>
 
           {/* CARD 3: SCALE */}
-          <div className="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
+          <div className="w-[84vw] max-w-[340px] md:w-auto shrink-0 snap-center bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[26px] overflow-hidden flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
             <div>
               {/* Top Header Banner in Vibrant Royal Violet / Indigo */}
               <div className="bg-[#5438dc] p-6 text-white relative">
@@ -684,6 +702,14 @@ export default function PricingPage() {
             </div>
           </div>
 
+        </div>
+
+        {/* Mobile Swipe Hint */}
+        <div className="flex md:hidden items-center justify-center gap-2 mt-4 text-[11px] text-zinc-400">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+          <span className="inline-block w-3.5 h-1.5 rounded-full bg-[#be006b]"></span>
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+          <span className="ml-1 text-zinc-500 font-medium">Swipe to explore other plans &rarr;</span>
         </div>
 
         {/* ── Compare All Features CTA Button ── */}
