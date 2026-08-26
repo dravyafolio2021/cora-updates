@@ -13,8 +13,6 @@ import {
   ArrowUpRight,
   Zap,
   Laptop,
-  PanelLeftClose,
-  PanelLeftOpen,
   X,
   SlidersHorizontal,
   RotateCcw,
@@ -36,15 +34,24 @@ export default function FeaturesPage() {
   const [selectedIndustry, setSelectedIndustry] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'live' | 'roadmap'>('all');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
-  // Accessibility: Lock background scroll & handle Escape key when mobile bottom sheet is open
+  // Accessibility & iOS Mobile Scroll Lock: 100% prevent background page scrolling when drawer is open
   useEffect(() => {
     if (!isMobileDrawerOpen) return;
 
-    const originalOverflow = document.body.style.overflow;
+    const scrollY = window.scrollY;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalBodyPosition = document.body.style.position;
+    const originalBodyTop = document.body.style.top;
+    const originalBodyWidth = document.body.style.width;
+
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -55,7 +62,12 @@ export default function FeaturesPage() {
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.body.style.overflow = originalOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.overflow = originalBodyOverflow;
+      document.body.style.position = originalBodyPosition;
+      document.body.style.top = originalBodyTop;
+      document.body.style.width = originalBodyWidth;
+      window.scrollTo(0, scrollY);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isMobileDrawerOpen]);
@@ -188,159 +200,141 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* ── 2. STICKY CATALOG CONTROLS BAR (ALWAYS STICKS ON SCROLL) ── */}
-      <div className="sticky top-16 sm:top-20 z-30 bg-white/95 backdrop-blur-md border-y border-zinc-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.03)] mb-8">
-        <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-          
-          {/* Left: Sidebar Toggle & Mobile Trigger */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            {/* Desktop Sidebar Toggle */}
-            <button
-              type="button"
-              onClick={() => {
-                const nextState = !isSidebarOpen;
-                setIsSidebarOpen(nextState);
-                trackEvent('features_sidebar_toggled', { open: nextState });
-              }}
-              className="hidden lg:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-800 transition-all shadow-2xs cursor-pointer"
-              title={isSidebarOpen ? "Hide filters sidebar" : "Show filters sidebar"}
-            >
-              {isSidebarOpen ? (
-                <PanelLeftClose className="w-3.5 h-3.5 text-zinc-600" />
-              ) : (
-                <PanelLeftOpen className="w-3.5 h-3.5 text-zinc-600" />
-              )}
-              <span>{isSidebarOpen ? 'Hide Filters' : 'Show Filters'}</span>
-            </button>
-
-            {/* Mobile Filter Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                setIsMobileDrawerOpen(true);
-                trackEvent('features_mobile_drawer_opened');
-              }}
-              className="lg:hidden inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-900 shadow-2xs cursor-pointer"
-              aria-haspopup="dialog"
-              aria-expanded={isMobileDrawerOpen}
-            >
-              <Filter className="w-3.5 h-3.5 text-zinc-700" />
-              <span>Filters</span>
-              {(activeCategory !== 'all' || selectedIndustry !== 'all' || statusFilter !== 'all' || searchQuery) && (
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              )}
-            </button>
-          </div>
-
-          {/* Center: Creative Studio Workspace Switcher (Quick Pill Segment) */}
-          <div className="hidden md:flex items-center gap-1 bg-zinc-100/90 p-1 rounded-xl border border-zinc-200/80 overflow-x-auto scrollbar-none">
-            {INDUSTRIES.map((ind) => {
-              const isSelected = selectedIndustry === ind.id;
-              const count = industryCounts[ind.id] ?? 28;
-              return (
-                <button
-                  key={ind.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedIndustry(ind.id);
-                    trackEvent('features_industry_switch', { industry: ind.id });
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                    isSelected
-                      ? 'bg-white text-zinc-950 shadow-2xs font-bold'
-                      : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/50'
-                  }`}
-                >
-                  {ind.id === 'photo_film' && <Clapperboard className="w-3.5 h-3.5 text-zinc-700" />}
-                  {ind.id === 'real_estate' && <Building className="w-3.5 h-3.5 text-zinc-700" />}
-                  {ind.id === 'creative_agencies' && <Palette className="w-3.5 h-3.5 text-zinc-700" />}
-                  {ind.id === 'all' && <Briefcase className="w-3.5 h-3.5 text-zinc-700" />}
-                  <span>{ind.shortLabel}</span>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${
-                    isSelected ? 'bg-zinc-100 text-zinc-950 font-bold' : 'text-zinc-400'
-                  }`}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Right: Active Badges / Clear All */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
-            {searchQuery && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-zinc-100 text-zinc-800 text-[11px] font-medium border border-zinc-200 shrink-0">
-                <span>&ldquo;{searchQuery}&rdquo;</span>
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="hover:text-zinc-950 cursor-pointer"
-                  aria-label="Clear search"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
+      {/* ── 2. TWO-COLUMN DIRECTORY: LEFT PERMANENT STICKY SIDEBAR + RIGHT CARDS ── */}
+      <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 mb-24 pt-4 sm:pt-6">
+        
+        {/* Mobile Filter Action Header (<lg only) */}
+        <div className="lg:hidden flex items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-200/80">
+          <button
+            type="button"
+            onClick={() => {
+              setIsMobileDrawerOpen(true);
+              trackEvent('features_mobile_drawer_opened');
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-950 text-white text-xs font-semibold shadow-xs hover:bg-zinc-800 active:scale-95 transition-all cursor-pointer"
+            aria-haspopup="dialog"
+            aria-expanded={isMobileDrawerOpen}
+          >
+            <Filter className="w-3.5 h-3.5" />
+            <span>Filters &amp; Workspaces</span>
+            {(activeCategory !== 'all' || selectedIndustry !== 'all' || statusFilter !== 'all' || searchQuery) && (
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             )}
+          </button>
 
-            {activeCategory !== 'all' && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-zinc-100 text-zinc-800 text-[11px] font-medium border border-zinc-200 shrink-0">
-                <span>{activeCategoryObject.label.replace(/\s*\(\d+\)$/, '')}</span>
-                <button
-                  type="button"
-                  onClick={() => setActiveCategory('all')}
-                  className="hover:text-zinc-950 cursor-pointer"
-                  aria-label="Clear category"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
+          <div className="flex items-center gap-2 text-xs font-medium text-zinc-600">
+            <span>{totalResultsCount} modules</span>
             {(activeCategory !== 'all' || selectedIndustry !== 'all' || statusFilter !== 'all' || searchQuery) && (
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="text-[11px] font-semibold text-zinc-500 hover:text-zinc-950 flex items-center gap-1 pl-1 cursor-pointer shrink-0"
+                className="text-[11px] font-semibold text-zinc-400 hover:text-zinc-900 underline"
               >
-                <RotateCcw className="w-3 h-3" />
-                <span className="hidden sm:inline">Reset</span>
+                Reset
               </button>
             )}
+          </div>
+        </div>
 
-            <span className="text-[11px] font-mono text-zinc-500 bg-zinc-100 px-2 py-1 rounded-lg shrink-0">
-              {totalResultsCount} modules
-            </span>
+        <div className="flex items-start gap-8 lg:gap-10 relative">
+          
+          {/* ── LEFT PERMANENT STICKY SIDEBAR (DESKTOP) ── */}
+          <div className="hidden lg:block w-72 shrink-0 sticky top-28 self-start max-h-[calc(100vh-130px)] overflow-y-auto pr-2 scrollbar-none">
+            <FeaturesSidebar
+              activeCategory={activeCategory}
+              onSelectCategory={setActiveCategory}
+              selectedIndustry={selectedIndustry}
+              onSelectIndustry={setSelectedIndustry}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
+              totalBuiltCount={BUILT_MODULES.length}
+              totalRoadmapCount={UPCOMING_MODULES.length}
+              industryCounts={industryCounts}
+            />
           </div>
 
-        </div>
-      </div>
-
-      {/* ── 3. 2-COLUMN DYNAMIC SIDEBAR + CATALOG CARDS GRID ── */}
-      <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 mb-24">
-        <div className="flex items-start gap-8 relative">
-          
-          {/* ── LEFT DYNAMIC STICKY SIDEBAR (GLIDES ALONG PAGE SCROLL) ── */}
-          {isSidebarOpen && (
-            <div className="hidden lg:block w-72 shrink-0 sticky top-[136px] z-20 self-start max-h-[calc(100vh-160px)] overflow-y-auto pr-1 scrollbar-none">
-              <FeaturesSidebar
-                activeCategory={activeCategory}
-                onSelectCategory={setActiveCategory}
-                selectedIndustry={selectedIndustry}
-                onSelectIndustry={setSelectedIndustry}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                statusFilter={statusFilter}
-                onStatusFilterChange={setStatusFilter}
-                totalBuiltCount={BUILT_MODULES.length}
-                totalRoadmapCount={UPCOMING_MODULES.length}
-                industryCounts={industryCounts}
-              />
-            </div>
-          )}
-
-          {/* ── RIGHT CONTENT: CARDS DIRECTORY & ROADMAP ── */}
+          {/* ── RIGHT CONTENT: MODULE CARDS DIRECTORY & ROADMAP ── */}
           <div className="flex-1 min-w-0 space-y-16">
             
+            {/* Active Scope & Filter Chips Header (Desktop / Tablet) */}
+            {(activeCategory !== 'all' || selectedIndustry !== 'all' || statusFilter !== 'all' || searchQuery) && (
+              <div className="hidden lg:flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200/80 mb-2">
+                <div className="flex items-center gap-2 flex-wrap text-xs">
+                  <span className="font-bold text-zinc-950">Active Filters:</span>
+                  
+                  {selectedIndustry !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-white border border-zinc-200 text-zinc-900 font-medium shadow-2xs">
+                      <span>{selectedIndustryObject.label}</span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedIndustry('all')}
+                        className="hover:text-zinc-600 cursor-pointer"
+                        aria-label="Clear industry"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+
+                  {activeCategory !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-white border border-zinc-200 text-zinc-900 font-medium shadow-2xs">
+                      <span>{activeCategoryObject.label.replace(/\s*\(\d+\)$/, '')}</span>
+                      <button
+                        type="button"
+                        onClick={() => setActiveCategory('all')}
+                        className="hover:text-zinc-600 cursor-pointer"
+                        aria-label="Clear category"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+
+                  {searchQuery && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-white border border-zinc-200 text-zinc-900 font-medium shadow-2xs">
+                      <span>&ldquo;{searchQuery}&rdquo;</span>
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery('')}
+                        className="hover:text-zinc-600 cursor-pointer"
+                        aria-label="Clear search"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+
+                  {statusFilter !== 'all' && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-white border border-zinc-200 text-zinc-900 font-medium capitalize shadow-2xs">
+                      <span>{statusFilter}</span>
+                      <button
+                        type="button"
+                        onClick={() => setStatusFilter('all')}
+                        className="hover:text-zinc-600 cursor-pointer"
+                        aria-label="Clear status"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-xs font-mono text-zinc-500">{totalResultsCount} modules</span>
+                  <button
+                    type="button"
+                    onClick={handleResetFilters}
+                    className="text-xs font-bold text-zinc-900 hover:text-zinc-600 flex items-center gap-1 cursor-pointer"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Reset</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* 0 Results Empty State */}
             {totalResultsCount === 0 && (
               <div className="bg-zinc-50 rounded-3xl border border-dashed border-zinc-300 p-12 text-center my-8">
@@ -376,11 +370,7 @@ export default function FeaturesPage() {
                   </div>
                 </div>
 
-                <div className={`grid gap-5 sm:gap-6 ${
-                  isSidebarOpen 
-                    ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' 
-                    : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                }`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
                   {filteredBuiltModules.map((mod) => (
                     <div
                       key={mod.slug}
@@ -469,11 +459,7 @@ export default function FeaturesPage() {
                   </p>
                 </div>
 
-                <div className={`grid gap-4 ${
-                  isSidebarOpen 
-                    ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' 
-                    : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                }`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {filteredRoadmapModules.map((item) => (
                     <div
                       key={item.id}
@@ -523,7 +509,7 @@ export default function FeaturesPage() {
 
       </div>
 
-      {/* ── 4. MOBILE ACCESSIBLE BOTTOM SHEET DRAWER ── */}
+      {/* ── 3. MOBILE ACCESSIBLE BOTTOM SHEET DRAWER (100% BACKGROUND SCROLL LOCKED) ── */}
       {isMobileDrawerOpen && (
         <div 
           className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end"
@@ -531,18 +517,22 @@ export default function FeaturesPage() {
           aria-modal="true"
           aria-labelledby="mobile-filters-title"
         >
-          {/* Darkened Blur Backdrop */}
+          {/* Darkened Backdrop (prevents touch propagation) */}
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in" 
             onClick={() => setIsMobileDrawerOpen(false)}
+            onTouchMove={(e) => e.preventDefault()}
             aria-hidden="true"
           />
 
           {/* Sliding Bottom Sheet Container */}
-          <div className="relative w-full max-h-[85vh] bg-white rounded-t-[28px] shadow-[0_-12px_40px_rgba(0,0,0,0.2)] border-t border-zinc-200 z-10 flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-300 ease-out">
+          <div 
+            className="relative w-full max-h-[85vh] bg-white rounded-t-[28px] shadow-[0_-12px_40px_rgba(0,0,0,0.25)] border-t border-zinc-200 z-10 flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-300 ease-out"
+            style={{ touchAction: 'pan-y' }}
+          >
             
             {/* Top Drag Indicator Handle */}
-            <div className="w-full pt-3 pb-1 flex items-center justify-center cursor-grab active:cursor-grabbing">
+            <div className="w-full pt-3 pb-1 flex items-center justify-center cursor-grab active:cursor-grabbing shrink-0">
               <span className="w-12 h-1.5 rounded-full bg-zinc-300 shrink-0" aria-hidden="true" />
             </div>
 
@@ -580,8 +570,11 @@ export default function FeaturesPage() {
               </div>
             </div>
 
-            {/* Scrollable Content Body */}
-            <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-6">
+            {/* Scrollable Content Body (ONLY this container scrolls) */}
+            <div 
+              className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-6"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
               <FeaturesSidebar 
                 activeCategory={activeCategory}
                 onSelectCategory={setActiveCategory}
@@ -614,7 +607,7 @@ export default function FeaturesPage() {
         </div>
       )}
 
-      {/* ── 5. WHY CORA REPLACES 8+ SUBSCRIPTIONS ── */}
+      {/* ── 4. WHY CORA REPLACES 8+ SUBSCRIPTIONS ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-28 text-center">
         <div className="max-w-[720px] mx-auto mb-14">
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight mb-4">
@@ -656,7 +649,7 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* ── 6. BOTTOM CALL TO ACTION ── */}
+      {/* ── 5. BOTTOM CALL TO ACTION ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         <div className="w-full rounded-[36px] bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0A0D12] text-white p-8 sm:p-14 text-center relative overflow-hidden border border-zinc-800 shadow-xl">
           <div className="relative z-10 max-w-[680px] mx-auto space-y-6">
