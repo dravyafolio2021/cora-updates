@@ -44,98 +44,240 @@ const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   </svg>
 );
 
-interface ServiceTool {
+interface ReplaceableApp {
   id: string;
   name: string;
   category: string;
-  replacedApp: string;
   monthlyCostINR: number;
   monthlyCostUSD: number;
   hoursSavedWeekly: number;
-  iconType: 'esign' | 'storage' | 'whatsapp' | 'invoicing' | 'scheduling' | 'ai';
-  iconBg: string;
-  iconBorder: string;
-  iconText: string;
+  renderLogo: (className?: string) => React.ReactNode;
 }
 
-const SERVICE_TOOLS: ServiceTool[] = [
-  {
-    id: 'contracts',
-    name: 'Contracts & E-Sign',
-    category: 'Legal Agreements',
-    replacedApp: 'DocuSign • PandaDoc',
-    monthlyCostINR: 1500,
-    monthlyCostUSD: 18,
-    hoursSavedWeekly: 3.0,
-    iconType: 'esign',
-    iconBg: 'bg-blue-50',
-    iconBorder: 'border-blue-200/70',
-    iconText: 'text-blue-600'
-  },
-  {
-    id: 'portals',
-    name: 'Client Galleries & Vault',
-    category: 'Delivery & Storage',
-    replacedApp: 'Google Drive • WeTransfer',
-    monthlyCostINR: 1800,
-    monthlyCostUSD: 22,
-    hoursSavedWeekly: 4.5,
-    iconType: 'storage',
-    iconBg: 'bg-amber-50',
-    iconBorder: 'border-amber-200/70',
-    iconText: 'text-amber-600'
-  },
+const REPLACEABLE_APPS: ReplaceableApp[] = [
   {
     id: 'whatsapp',
-    name: 'WhatsApp CRM & Alerts',
-    category: 'Client Communications',
-    replacedApp: 'WhatsApp Biz • Wati',
+    name: 'WhatsApp Biz',
+    category: 'Client CRM & Alerts',
     monthlyCostINR: 2499,
     monthlyCostUSD: 29,
     hoursSavedWeekly: 5.5,
-    iconType: 'whatsapp',
-    iconBg: 'bg-emerald-50',
-    iconBorder: 'border-emerald-200/70',
-    iconText: 'text-[#25D366]'
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="#25D366">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+      </svg>
+    )
   },
   {
-    id: 'invoicing',
-    name: 'GST Billing & UPI QR',
-    category: 'Payments & Invoicing',
-    replacedApp: 'Zoho Invoice • Khatabook',
-    monthlyCostINR: 1200,
-    monthlyCostUSD: 15,
-    hoursSavedWeekly: 3.5,
-    iconType: 'invoicing',
-    iconBg: 'bg-indigo-50',
-    iconBorder: 'border-indigo-200/70',
-    iconText: 'text-indigo-600'
-  },
-  {
-    id: 'scheduling',
-    name: 'Bookings & Kanban',
-    category: 'Operations & Calendar',
-    replacedApp: 'Calendly • HoneyBook',
+    id: 'gdrive',
+    name: 'Google Drive',
+    category: 'Storage & Portals',
     monthlyCostINR: 1800,
-    monthlyCostUSD: 20,
+    monthlyCostUSD: 13,
     hoursSavedWeekly: 4.0,
-    iconType: 'scheduling',
-    iconBg: 'bg-rose-50',
-    iconBorder: 'border-rose-200/70',
-    iconText: 'text-rose-600'
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="none">
+        <path d="M8.5 2h7l6.5 11.5-3.5 6.5h-7L8.5 2z" fill="#0066DA"/>
+        <path d="M1.5 13.5l3.5-6.5 6.5 11.5-3.5 6.5-6.5-11.5z" fill="#00AC47"/>
+        <path d="M1.5 20h14l3.5-6.5h-14L1.5 20z" fill="#FFBA00"/>
+        <path d="M8.5 2L1.5 13.5l3.5 6.5 7-12L8.5 2z" fill="#EA4335"/>
+      </svg>
+    )
   },
   {
-    id: 'ai_proposals',
-    name: 'AI Proposals & Briefs',
-    category: 'Sales Proposals',
-    replacedApp: 'ChatGPT Plus • Copy AI',
+    id: 'docusign',
+    name: 'DocuSign',
+    category: 'Contracts & E-Sign',
+    monthlyCostINR: 1500,
+    monthlyCostUSD: 18,
+    hoursSavedWeekly: 3.0,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="none">
+        <rect width="24" height="24" rx="6" fill="#213547"/>
+        <path d="M6 16.5h12M7.5 7.5l4.5 4.5 4.5-4.5" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    )
+  },
+  {
+    id: 'chatgpt',
+    name: 'ChatGPT Plus',
+    category: 'AI Proposals & Copy',
     monthlyCostINR: 1999,
     monthlyCostUSD: 20,
     hoursSavedWeekly: 3.5,
-    iconType: 'ai',
-    iconBg: 'bg-purple-50',
-    iconBorder: 'border-purple-200/70',
-    iconText: 'text-purple-600'
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="#10A37F">
+        <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.771-4.2057 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7467-7.0729v-.0002ZM13.2599 22.385c-.9503 0-1.8742-.2662-2.6715-.7682l.1424-.0808 4.4373-2.5622a.8454.8454 0 0 0 .4227-.729v-6.2628l1.8809 1.086a.071.071 0 0 1 .0379.0522v5.3344a4.4447 4.4447 0 0 1-4.2497 3.9304Zm-8.4984-3.7142a4.3973 4.3973 0 0 1-.5878-3.0565l.1424.0854 4.4373 2.5574a.8312.8312 0 0 0 .8454 0l5.424-3.1314v2.172a.071.071 0 0 1-.0332.0617l-4.6174 2.6666a4.4542 4.4542 0 0 1-5.6107-1.3552Zm-1.403-8.8789a4.402 4.402 0 0 1 2.0833-2.3168V12.63a.8312.8312 0 0 0 .4227.729l5.424 3.1314-1.8809 1.086a.071.071 0 0 1-.0711 0l-4.6174-2.6666a4.4542 4.4542 0 0 1-1.3606-5.6091v.0001Zm15.8239 3.141-5.424-3.1315 1.8809-1.086a.071.071 0 0 1 .0711 0l4.6174 2.6666a4.4542 4.4542 0 0 1 1.3606 5.6091 4.402 4.402 0 0 1-2.0833 2.3168V13.662a.8312.8312 0 0 0-.4227-.729v.0001Zm1.9901-3.6953-.1424-.0854-4.4373-2.5574a.8312.8312 0 0 0-.8454 0L10.3234 9.822V7.65a.071.071 0 0 1 .0332-.0617l4.6174-2.6666a4.4542 4.4542 0 0 1 5.6107 1.3552 4.3973 4.3973 0 0 1 .5878 3.0565v.0002Zm-11.455 2.1102 2.6715-1.5422 2.6715 1.5422v3.0844l-2.6715 1.5422-2.6715-1.5422v-3.0844Z" />
+      </svg>
+    )
+  },
+  {
+    id: 'calendly',
+    name: 'Calendly',
+    category: 'Booking & Meetings',
+    monthlyCostINR: 1500,
+    monthlyCostUSD: 16,
+    hoursSavedWeekly: 3.0,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="#006BFF">
+        <path d="M18.8 2.4a3.6 3.6 0 0 0-3.6 3.6v1.2H8.8V6a3.6 3.6 0 0 0-7.2 0v12a3.6 3.6 0 0 0 3.6 3.6h13.6a3.6 3.6 0 0 0 3.6-3.6V6a3.6 3.6 0 0 0-3.6-3.6zM5.2 4.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zm13.6 14.4H5.2a1.2 1.2 0 0 1-1.2-1.2V9.6h16v8.4a1.2 1.2 0 0 1-1.2 1.2z"/>
+      </svg>
+    )
+  },
+  {
+    id: 'notion',
+    name: 'Notion',
+    category: 'Client Portal & Docs',
+    monthlyCostINR: 999,
+    monthlyCostUSD: 12,
+    hoursSavedWeekly: 2.5,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="#000">
+        <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.047-.327L17.876 2.11c-.42-.326-.98-.7-2.054-.607L3.107 2.483c-.466.047-.56.327-.373.513l1.725 1.212zm-.42 2.658v13.52c0 .746.42 1.026 1.213.98l14.288-.84c.793-.047.933-.513.933-1.073V5.887c0-.56-.233-.84-.7-.793l-15.034.886c-.467.047-.7.373-.7.886zm13.12 1.492c.047.466-.14 1.073-.653 1.12l-1.026.186v7.324c-.793.42-1.586.653-2.333.653-.886 0-1.26-.28-1.913-1.073l-4.246-5.83v5.412l1.4.28c.047.513-.233.98-.746 1.026l-3.313.187c-.046-.467.14-1.073.653-1.12l1.027-.233V8.872l-1.353-.14c-.047-.513.233-.98.746-1.027l3.407-.186 4.386 5.876V8.406l-1.213-.233c-.047-.467.186-.98.7-.98l3.453-.187c.56 0 .747.42.84.887z"/>
+      </svg>
+    )
+  },
+  {
+    id: 'wetransfer',
+    name: 'WeTransfer',
+    category: 'Large File Sharing',
+    monthlyCostINR: 1400,
+    monthlyCostUSD: 15,
+    hoursSavedWeekly: 2.5,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="#1A1A1A">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm4 0h-2v-6h2v6zm-2-8c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/>
+      </svg>
+    )
+  },
+  {
+    id: 'zoho',
+    name: 'Zoho Invoice',
+    category: 'GST Invoicing',
+    monthlyCostINR: 1200,
+    monthlyCostUSD: 15,
+    hoursSavedWeekly: 2.5,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="none">
+        <rect width="11" height="11" rx="2.5" fill="#E42527"/>
+        <rect x="13" width="11" height="11" rx="2.5" fill="#00A040"/>
+        <rect y="13" width="11" height="11" rx="2.5" fill="#0079C1"/>
+        <rect x="13" y="13" width="11" height="11" rx="2.5" fill="#F8A51D"/>
+      </svg>
+    )
+  },
+  {
+    id: 'trello',
+    name: 'Trello',
+    category: 'Kanban Pipelines',
+    monthlyCostINR: 850,
+    monthlyCostUSD: 10,
+    hoursSavedWeekly: 2.0,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="none">
+        <rect width="24" height="24" rx="5" fill="#0079BF"/>
+        <rect x="3.5" y="3.5" width="7" height="13" rx="1.5" fill="#fff"/>
+        <rect x="13.5" y="3.5" width="7" height="8" rx="1.5" fill="#fff"/>
+      </svg>
+    )
+  },
+  {
+    id: 'slack',
+    name: 'Slack',
+    category: 'Team Chat',
+    monthlyCostINR: 800,
+    monthlyCostUSD: 9,
+    hoursSavedWeekly: 2.0,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="none">
+        <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z" fill="#E01E5A"/>
+        <path d="M8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312z" fill="#36C5F0"/>
+        <path d="M18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312z" fill="#2EB67D"/>
+        <path d="M15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.527 2.527 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" fill="#ECB22E"/>
+      </svg>
+    )
+  },
+  {
+    id: 'canva',
+    name: 'Canva Pro',
+    category: 'Proposals & Decks',
+    monthlyCostINR: 999,
+    monthlyCostUSD: 13,
+    hoursSavedWeekly: 2.0,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="none">
+        <circle cx="12" cy="12" r="12" fill="#00C4CC"/>
+        <path d="M14.8 8.2c-.8-.8-2-1.2-3.4-1.2-2.8 0-4.8 2-4.8 5 0 2.8 1.8 4.8 4.6 4.8 1.8 0 3-.6 3.8-1.5l-1.2-1.2c-.6.6-1.4 1-2.4 1-1.8 0-2.8-1.2-2.8-3.1 0-1.8 1.2-3.1 2.8-3.1.8 0 1.5.3 2 .8l1.4-1.5z" fill="#fff"/>
+      </svg>
+    )
+  },
+  {
+    id: 'dropbox',
+    name: 'Dropbox',
+    category: 'Photo/Video Vault',
+    monthlyCostINR: 1600,
+    monthlyCostUSD: 15,
+    hoursSavedWeekly: 3.0,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="#0061FF">
+        <path d="M6 3.5l6 3.9-6 3.9L0 7.4 6 3.5zm12 0l6 3.9-6 3.9-6-3.9 6-3.9zM0 15.2l6-3.9 6 3.9-6 3.9-6-3.9zm18-3.9l6 3.9-6 3.9-6-3.9 6-3.9zM6 20.5l6-3.9 6 3.9-6 3.5-6-3.5z"/>
+      </svg>
+    )
+  },
+  {
+    id: 'khatabook',
+    name: 'Khatabook',
+    category: 'UPI & Ledger Match',
+    monthlyCostINR: 800,
+    monthlyCostUSD: 10,
+    hoursSavedWeekly: 2.0,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="none">
+        <rect width="24" height="24" rx="5" fill="#0D6EFD"/>
+        <path d="M7 6h10v3H7zm0 5h10v3H7zm0 5h6v3H7z" fill="#fff"/>
+      </svg>
+    )
+  },
+  {
+    id: 'pandadoc',
+    name: 'PandaDoc',
+    category: 'Proposals & Signatures',
+    monthlyCostINR: 1800,
+    monthlyCostUSD: 20,
+    hoursSavedWeekly: 3.0,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="#4DDC97">
+        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm-3 8a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm6 0a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm-3 8a6 6 0 0 1-5-2.7 1 1 0 0 1 1.6-1.2 4 4 0 0 0 6.8 0 1 1 0 0 1 1.6 1.2A6 6 0 0 1 12 18z"/>
+      </svg>
+    )
+  },
+  {
+    id: 'honeybook',
+    name: 'HoneyBook',
+    category: 'Client Contracts',
+    monthlyCostINR: 1900,
+    monthlyCostUSD: 22,
+    hoursSavedWeekly: 3.5,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="none">
+        <rect width="24" height="24" rx="5" fill="#231F20"/>
+        <path d="M7 6h3v12H7zm7 0h3v12h-3zm-7 5h10v2H7z" fill="#FFC72C"/>
+      </svg>
+    )
+  },
+  {
+    id: 'wati',
+    name: 'Wati / Interakt',
+    category: 'WhatsApp Broadcasts',
+    monthlyCostINR: 2200,
+    monthlyCostUSD: 25,
+    hoursSavedWeekly: 4.0,
+    renderLogo: (cls = "w-7 h-7") => (
+      <svg viewBox="0 0 24 24" className={cls} fill="none">
+        <rect width="24" height="24" rx="5" fill="#004D40"/>
+        <path d="M12 4a8 8 0 0 0-8 8c0 1.6.5 3.1 1.3 4.4L4 20l3.8-1.2A7.9 7.9 0 0 0 12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8zm-1 11h-2v-4h2v4zm4 0h-2v-6h2v6z" fill="#00E676"/>
+      </svg>
+    )
   }
 ];
 
@@ -166,50 +308,6 @@ const FAQS = [
   }
 ];
 
-const renderToolIcon = (type: ServiceTool['iconType']) => {
-  switch (type) {
-    case 'esign':
-      return <FileSignature className="w-5 h-5" />;
-    case 'storage':
-      return <FolderUp className="w-5 h-5" />;
-    case 'whatsapp':
-      return <WhatsAppIcon className="w-5 h-5" />;
-    case 'invoicing':
-      return <Receipt className="w-5 h-5" />;
-    case 'scheduling':
-      return <Calendar className="w-5 h-5" />;
-    case 'ai':
-      return <Sparkles className="w-5 h-5" />;
-  }
-};
-
-const ROI_PRESETS = [
-  {
-    id: 'solo',
-    label: 'Solopreneur',
-    volume: 3,
-    avgValueINR: 15000,
-    avgValueUSD: 250,
-    tools: ['contracts', 'portals', 'invoicing']
-  },
-  {
-    id: 'studio',
-    label: 'Media Studio',
-    volume: 7,
-    avgValueINR: 35000,
-    avgValueUSD: 500,
-    tools: ['contracts', 'portals', 'whatsapp', 'invoicing', 'scheduling']
-  },
-  {
-    id: 'agency',
-    label: 'Full Agency',
-    volume: 16,
-    avgValueINR: 75000,
-    avgValueUSD: 1200,
-    tools: ['contracts', 'portals', 'whatsapp', 'invoicing', 'scheduling', 'ai_proposals']
-  }
-];
-
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
   const [currency, setCurrency] = useState<'INR' | 'USD'>('USD');
@@ -218,54 +316,38 @@ export default function PricingPage() {
   const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   
-  // Interactive ROI, Cost & Additional Revenue Calculator State
-  const [activePreset, setActivePreset] = useState<string | null>('studio');
-  const [selectedTools, setSelectedTools] = useState<string[]>([
-    'contracts',
-    'portals',
+  // Interactive App Replacement Calculator State
+  const [selectedApps, setSelectedApps] = useState<string[]>([
     'whatsapp',
-    'invoicing',
-    'scheduling',
-    'ai_proposals'
+    'gdrive',
+    'docusign',
+    'chatgpt',
+    'calendly',
+    'zoho'
   ]);
-  const [clientVolume, setClientVolume] = useState<number>(6);
-  const [avgProjectValue, setAvgProjectValue] = useState<number>(25000);
+  const [teamSize, setTeamSize] = useState<number>(3);
 
-  const applyPreset = (presetId: string) => {
-    const p = ROI_PRESETS.find(item => item.id === presetId);
-    if (!p) return;
-    setActivePreset(presetId);
-    setSelectedTools(p.tools);
-    setClientVolume(p.volume);
-    setAvgProjectValue(currency === 'INR' ? p.avgValueINR : p.avgValueUSD * 75);
-    trackEvent('roi_calculator_preset_select', { presetId });
-  };
-
-  const toggleTool = (toolId: string) => {
-    setActivePreset(null);
-    setSelectedTools(prev => {
-      const next = prev.includes(toolId) 
-        ? prev.filter(id => id !== toolId) 
-        : [...prev, toolId];
-      trackEvent('roi_calculator_tool_toggle', { toolId, selected: !prev.includes(toolId), total: next.length });
+  const toggleApp = (appId: string) => {
+    setSelectedApps(prev => {
+      const next = prev.includes(appId) 
+        ? prev.filter(id => id !== appId) 
+        : [...prev, appId];
+      trackEvent('roi_calculator_app_toggle', { appId, selected: !prev.includes(appId), total: next.length });
       return next;
     });
   };
 
-  const handleSelectAllTools = () => {
-    setActivePreset(null);
-    const allIds = SERVICE_TOOLS.map(t => t.id);
-    setSelectedTools(allIds);
+  const handleSelectAllApps = () => {
+    const allIds = REPLACEABLE_APPS.map(a => a.id);
+    setSelectedApps(allIds);
     trackEvent('roi_calculator_select_all', { total: allIds.length });
   };
 
-  const handleResetTools = () => {
-    setActivePreset('studio');
-    const studioPreset = ROI_PRESETS.find(p => p.id === 'studio')!;
-    setSelectedTools(studioPreset.tools);
-    setClientVolume(studioPreset.volume);
-    setAvgProjectValue(currency === 'INR' ? studioPreset.avgValueINR : studioPreset.avgValueUSD * 75);
-    trackEvent('roi_calculator_reset', { total: studioPreset.tools.length });
+  const handleResetApps = () => {
+    const defaultIds = ['whatsapp', 'gdrive', 'docusign', 'chatgpt', 'calendly', 'zoho'];
+    setSelectedApps(defaultIds);
+    setTeamSize(3);
+    trackEvent('roi_calculator_reset', { total: defaultIds.length });
   };
 
   const topToggleRef = useRef<HTMLDivElement>(null);
@@ -344,33 +426,28 @@ export default function PricingPage() {
     trackEvent('pricing_comparison_toggle', { open: nextState });
   };
 
-  // 1. Time Saved Calculations
-  const totalWeeklyHours = selectedTools.reduce((sum, id) => {
-    const item = SERVICE_TOOLS.find(t => t.id === id);
-    if (!item) return sum;
-    const volumeMultiplier = clientVolume > 4 ? 1 + (clientVolume - 4) * 0.06 : 1;
-    return sum + item.hoursSavedWeekly * volumeMultiplier;
+  // Stack Math Calculations
+  const totalMonthlyStackCost = selectedApps.reduce((sum, id) => {
+    const app = REPLACEABLE_APPS.find(a => a.id === id);
+    if (!app) return sum;
+    const baseCost = currency === 'INR' ? app.monthlyCostINR : app.monthlyCostUSD;
+    const multiplier = teamSize > 1 ? 1 + (teamSize - 1) * 0.35 : 1;
+    return sum + Math.round(baseCost * multiplier);
   }, 0);
 
-  const weeklyHoursFormatted = Math.round(totalWeeklyHours * 10) / 10;
+  const totalAnnualStackCost = totalMonthlyStackCost * 12;
+  const coraAnnualCost = currency === 'INR' ? 19990 : 190;
+  const costSavings = Math.max(0, totalAnnualStackCost - coraAnnualCost);
+
+  const totalWeeklyHours = selectedApps.reduce((sum, id) => {
+    const app = REPLACEABLE_APPS.find(a => a.id === id);
+    if (!app) return sum;
+    const multiplier = teamSize > 1 ? 1 + (teamSize - 1) * 0.2 : 1;
+    return sum + app.hoursSavedWeekly * multiplier;
+  }, 0);
+
+  const roundedWeeklyHours = Math.round(totalWeeklyHours * 10) / 10;
   const monthlyHoursSaved = Math.round(totalWeeklyHours * 4.3);
-
-  // 2. Cost Saved Calculations
-  const monthlyToolsCost = selectedTools.reduce((sum, id) => {
-    const item = SERVICE_TOOLS.find(t => t.id === id);
-    if (!item) return sum;
-    const cost = currency === 'INR' ? item.monthlyCostINR : item.monthlyCostUSD;
-    return sum + cost;
-  }, 0);
-  const annualToolsCost = monthlyToolsCost * 12;
-  const coraAnnualPro = currency === 'INR' ? 19990 : 190;
-  const netAnnualCostSaved = Math.max(0, annualToolsCost - coraAnnualPro);
-
-  // 3. Additional Revenue Potential from Recovered Hours
-  const projectVal = currency === 'INR' ? avgProjectValue : Math.round(avgProjectValue / 75);
-  const extraProjects = monthlyHoursSaved >= 50 ? 2 : 1;
-  const additionalMonthlyRevenue = selectedTools.length >= 3 ? extraProjects * projectVal : 0;
-  const additionalAnnualRevenue = additionalMonthlyRevenue * 12;
 
   return (
     <main className="w-full relative pb-16 sm:pb-24 overflow-hidden bg-white text-zinc-900">
@@ -1604,291 +1681,200 @@ export default function PricingPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          ROW 4: SERVICE BUSINESS ROI & REVENUE IMPACT CALCULATOR
+          ROW 4: CLICKUP-STYLE APP REPLACEMENT & ROI CALCULATOR
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="w-full max-w-[1140px] mx-auto px-3.5 sm:px-6 mb-16 sm:mb-24">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-[760px] mx-auto mb-8 sm:mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200/80 text-zinc-800 text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider mb-2.5">
-            <Calculator className="w-3.5 h-3.5 text-zinc-600" />
-            <span>ROI &amp; REVENUE IMPACT CALCULATOR</span>
-          </div>
-          <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
-            Calculate Your Cost, Time &amp; Revenue ROI
-          </h2>
-          <p className="text-xs sm:text-sm text-zinc-500 mt-2 leading-relaxed max-w-2xl mx-auto">
-            See how much software spend you save, hours you recover, and extra client revenue you unlock by consolidating your stack into Cora.
-          </p>
-        </div>
-
-        {/* 2-Column Monochromatic Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-7 items-start bg-white border border-zinc-200/80 rounded-2xl sm:rounded-[28px] p-4 sm:p-7 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
-          
-          {/* LEFT PANEL: SELECT CURRENT TOOLS & WORKSPACE PARAMS (7 Cols) */}
-          <div className="lg:col-span-7 space-y-5">
+        <div className="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 sm:p-10 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-start">
             
-            {/* Header with Quick Actions */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b border-zinc-100">
+            {/* LEFT COLUMN: YOUR APPS TODAY (6 Cols) */}
+            <div className="lg:col-span-6 space-y-6">
               <div>
-                <h3 className="text-sm sm:text-base font-bold text-zinc-950">
-                  Select Tools &amp; Workflows You Use Today
-                </h3>
-                <p className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">
-                  Applicable to creative agencies, media studios, architects &amp; service firms:
+                <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
+                  Your apps today
+                </h2>
+                <p className="text-xs sm:text-sm text-zinc-500 mt-1">
+                  Which apps do you use?
                 </p>
               </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={handleSelectAllTools}
-                  className="px-2.5 py-1 rounded-md text-[11px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer"
-                >
-                  Select All
-                </button>
-                <span className="text-zinc-300">&bull;</span>
-                <button
-                  type="button"
-                  onClick={handleResetTools}
-                  className="px-2.5 py-1 rounded-md text-[11px] font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer"
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
 
-            {/* Quick Presets Bar (Effortless 1-Tap on Mobile & Desktop) */}
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-100/90 border border-zinc-200/60 overflow-x-auto">
-              <span className="text-[10px] font-mono text-zinc-500 uppercase px-2 font-semibold shrink-0">
-                Presets:
-              </span>
-              {ROI_PRESETS.map(p => {
-                const isActive = activePreset === p.id;
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => applyPreset(p.id)}
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                      isActive
-                        ? 'bg-white text-zinc-950 shadow-xs border border-zinc-200 font-bold'
-                        : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/60'
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                );
-              })}
-            </div>
+              {/* Grid of 16 App Icon Squircles */}
+              <div className="grid grid-cols-4 sm:grid-cols-4 gap-2.5 sm:gap-3.5">
+                {REPLACEABLE_APPS.map(app => {
+                  const isSelected = selectedApps.includes(app.id);
 
-            {/* Non-Truncating 2-Row Visual Icon Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-              {SERVICE_TOOLS.map(tool => {
-                const isSelected = selectedTools.includes(tool.id);
-                const cost = currency === 'INR' ? `₹${tool.monthlyCostINR.toLocaleString('en-IN')}` : `$${tool.monthlyCostUSD}`;
-
-                return (
-                  <button
-                    key={tool.id}
-                    type="button"
-                    onClick={() => toggleTool(tool.id)}
-                    className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all relative flex flex-col justify-between cursor-pointer select-none active:scale-[0.98] ${
-                      isSelected
-                        ? 'border-zinc-950 bg-zinc-50/90 shadow-2xs ring-1 ring-zinc-950'
-                        : 'border-zinc-200/80 bg-white hover:border-zinc-300 opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    {/* Top Row: Icon + Title + Checkbox */}
-                    <div className="flex items-start justify-between gap-2 mb-2.5">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 border ${tool.iconBg} ${tool.iconBorder} ${tool.iconText} shadow-2xs`}>
-                          {renderToolIcon(tool.iconType)}
+                  return (
+                    <button
+                      key={app.id}
+                      type="button"
+                      onClick={() => toggleApp(app.id)}
+                      className={`group relative flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-2xl transition-all cursor-pointer select-none active:scale-95 ${
+                        isSelected
+                          ? 'bg-zinc-50/90 ring-2 ring-zinc-950 shadow-xs'
+                          : 'bg-white hover:bg-zinc-50/50 border border-zinc-200/80 opacity-60 hover:opacity-90'
+                      }`}
+                    >
+                      {/* Checkmark badge at top-right */}
+                      {isSelected && (
+                        <div className="w-4 h-4 rounded-full bg-zinc-950 text-white flex items-center justify-center absolute -top-1.5 -right-1.5 shadow-xs">
+                          <Check className="w-2.5 h-2.5 stroke-[3]" />
                         </div>
-                        <div className="min-w-0">
-                          <div className="font-bold text-xs sm:text-sm text-zinc-950 leading-tight">
-                            {tool.name}
-                          </div>
-                          <div className="text-[10px] sm:text-[11px] text-zinc-500 font-medium leading-tight mt-0.5">
-                            {tool.replacedApp}
-                          </div>
-                        </div>
+                      )}
+
+                      {/* App Icon Centered */}
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
+                        {app.renderLogo("w-7 h-7 sm:w-8 sm:h-8")}
                       </div>
 
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
-                        isSelected ? 'bg-zinc-950 text-white' : 'border border-zinc-300 bg-white'
+                      {/* Small Label */}
+                      <span className={`text-[10px] sm:text-[11px] font-medium text-center truncate max-w-full leading-tight mt-1 ${
+                        isSelected ? 'font-bold text-zinc-950' : 'text-zinc-500'
                       }`}>
-                        {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                      </div>
-                    </div>
-
-                    {/* Bottom Row: Cost & Time Drained */}
-                    <div className="flex items-center justify-between pt-2 border-t border-zinc-200/60 text-[10px] sm:text-[11px] font-mono">
-                      <span className="font-semibold text-zinc-800">{cost} / mo</span>
-                      <span className="text-zinc-600 bg-zinc-100/90 border border-zinc-200/60 px-1.5 py-0.5 rounded font-medium">
-                        +{tool.hoursSavedWeekly}h/wk saved
+                        {app.name}
                       </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    </button>
+                  );
+                })}
+              </div>
 
-            {/* Interactive Sliders Container */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              
-              {/* Slider 1: Monthly Client Volume */}
-              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-zinc-50/80 border border-zinc-200/80 space-y-2">
+              {/* Slider for People at Company / Active Projects */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50/80 border border-zinc-200/80 space-y-2.5">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-semibold text-zinc-900">Monthly Client Projects</span>
+                  <span className="text-xs sm:text-sm font-bold text-zinc-950">
+                    People at your company
+                  </span>
                   <span className="text-xs font-mono font-bold text-zinc-950 bg-white px-2.5 py-0.5 rounded-md border border-zinc-200 shadow-2xs">
-                    {clientVolume} Projects
+                    {teamSize} {teamSize === 1 ? 'person' : 'people'}
                   </span>
                 </div>
                 <input
                   type="range"
-                  min="2"
-                  max="25"
+                  min="1"
+                  max="15"
                   step="1"
-                  value={clientVolume}
-                  onChange={e => {
-                    setActivePreset(null);
-                    setClientVolume(parseInt(e.target.value, 10));
-                  }}
+                  value={teamSize}
+                  onChange={e => setTeamSize(parseInt(e.target.value, 10))}
                   className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950 touch-manipulation"
                 />
-                <div className="flex justify-between text-[9px] sm:text-[10px] text-zinc-400 font-mono">
-                  <span>2 Solo</span>
-                  <span>10 Active Studio</span>
-                  <span>25+ Agency Scale</span>
+                <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
+                  <span>1 (Solo)</span>
+                  <span>5 (Studio Team)</span>
+                  <span>15+ (Agency)</span>
                 </div>
               </div>
-
-              {/* Slider 2: Average Project Value */}
-              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-zinc-50/80 border border-zinc-200/80 space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-semibold text-zinc-900">Avg. Project Value</span>
-                  <span className="text-xs font-mono font-bold text-zinc-950 bg-white px-2.5 py-0.5 rounded-md border border-zinc-200 shadow-2xs">
-                    {currency === 'INR' ? `₹${avgProjectValue.toLocaleString('en-IN')}` : `$${Math.round(avgProjectValue / 75).toLocaleString('en-US')}`}
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="5000"
-                  max="100000"
-                  step="5000"
-                  value={avgProjectValue}
-                  onChange={e => {
-                    setActivePreset(null);
-                    setAvgProjectValue(parseInt(e.target.value, 10));
-                  }}
-                  className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-950 touch-manipulation"
-                />
-                <div className="flex justify-between text-[9px] sm:text-[10px] text-zinc-400 font-mono">
-                  <span>{currency === 'INR' ? '₹5k' : '$65'}</span>
-                  <span>{currency === 'INR' ? '₹50k' : '$650'}</span>
-                  <span>{currency === 'INR' ? '₹100k' : '$1.3k'}</span>
-                </div>
-              </div>
-
             </div>
 
-          </div>
-
-          {/* RIGHT PANEL: 3 CORE ROI PILLARS (TIME + COST + REVENUE) (5 Cols) */}
-          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-3.5">
-            
-            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-[24px] bg-zinc-50/90 border border-zinc-200/90 text-zinc-900 shadow-2xs space-y-4">
-              
-              <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-zinc-200/80">
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500">
-                  Consolidated ROI Breakdown
-                </span>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-200 text-zinc-900 text-[10px] font-bold">
-                  {selectedTools.length} Workflows Unified
-                </span>
+            {/* RIGHT COLUMN: APPS TO REPLACE & COST SAVINGS (6 Cols) */}
+            <div className="lg:col-span-6 space-y-5">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
+                  Apps to replace
+                </h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSelectAllApps}
+                    className="text-[11px] font-medium text-zinc-500 hover:text-zinc-950 transition-colors cursor-pointer"
+                  >
+                    Select All
+                  </button>
+                  <span className="text-zinc-300">&bull;</span>
+                  <button
+                    type="button"
+                    onClick={handleResetApps}
+                    className="text-[11px] font-medium text-zinc-500 hover:text-zinc-950 transition-colors cursor-pointer"
+                  >
+                    Reset
+                  </button>
+                </div>
               </div>
 
-              {/* 3 Metric Cards */}
-              <div className="space-y-2.5">
-                
-                {/* Metric 1: Time Saved */}
-                <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs">
-                  <div className="flex items-center justify-between text-xs text-zinc-500">
-                    <span className="font-medium flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-zinc-700" />
-                      <span>Time Saved:</span>
-                    </span>
-                    <span className="text-[11px] font-mono text-zinc-400">~{monthlyHoursSaved} hrs / mo</span>
+              {/* Clean List of Selected Apps with Prices */}
+              <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-1">
+                {selectedApps.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-zinc-400 border border-dashed border-zinc-200 rounded-xl">
+                    Select at least 1 app on the left to see replacements
                   </div>
-                  <div className="text-xl sm:text-2xl font-display font-extrabold text-zinc-950 mt-1 tracking-tight">
-                    ~{weeklyHoursFormatted} Hours <span className="text-xs text-zinc-500 font-normal font-sans">/ week</span>
-                  </div>
-                </div>
+                ) : (
+                  selectedApps.map(appId => {
+                    const app = REPLACEABLE_APPS.find(a => a.id === appId);
+                    if (!app) return null;
+                    const cost = currency === 'INR' ? `₹${app.monthlyCostINR.toLocaleString('en-IN')}` : `$${app.monthlyCostUSD}`;
 
-                {/* Metric 2: Cost Saved */}
-                <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs">
-                  <div className="flex items-center justify-between text-xs text-zinc-500">
-                    <span className="font-medium flex items-center gap-1.5">
-                      <Receipt className="w-3.5 h-3.5 text-zinc-700" />
-                      <span>Software Cost Saved:</span>
-                    </span>
-                    <span className="text-[11px] font-mono text-zinc-400">vs. Cora Pro</span>
-                  </div>
-                  <div className="text-xl sm:text-2xl font-display font-extrabold text-zinc-950 mt-1 tracking-tight">
-                    {currency === 'INR' ? `₹${netAnnualCostSaved.toLocaleString('en-IN')}` : `$${netAnnualCostSaved.toLocaleString('en-US')}`}
-                    <span className="text-xs text-zinc-500 font-normal ml-1 font-sans">/ year</span>
-                  </div>
-                </div>
-
-                {/* Metric 3: Additional Revenue Potential */}
-                <div className="p-3.5 rounded-xl bg-white border border-zinc-200/80 shadow-2xs">
-                  <div className="flex items-center justify-between text-xs text-zinc-500">
-                    <span className="font-medium flex items-center gap-1.5">
-                      <TrendingUp className="w-3.5 h-3.5 text-zinc-950" />
-                      <span>Additional Revenue Potential:</span>
-                    </span>
-                    <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded font-bold">
-                      +{extraProjects} Client Deal/mo
-                    </span>
-                  </div>
-                  <div className="text-xl sm:text-2xl font-display font-extrabold text-zinc-950 mt-1 tracking-tight">
-                    +{currency === 'INR' ? `₹${additionalMonthlyRevenue.toLocaleString('en-IN')}` : `$${additionalMonthlyRevenue.toLocaleString('en-US')}`}
-                    <span className="text-xs text-zinc-500 font-normal ml-1 font-sans">/ mo</span>
-                  </div>
-                  <p className="text-[10px] text-zinc-500 mt-1">
-                    Unlocking <strong>{currency === 'INR' ? `+₹${additionalAnnualRevenue.toLocaleString('en-IN')}` : `+$${additionalAnnualRevenue.toLocaleString('en-US')}`} / year</strong> from unbilled administrative capacity.
-                  </p>
-                </div>
-
+                    return (
+                      <div
+                        key={app.id}
+                        className="flex items-center justify-between gap-3 py-2 px-3 rounded-xl bg-zinc-50/70 border border-zinc-200/60 text-xs"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                            {app.renderLogo("w-4 h-4")}
+                          </div>
+                          <span className="font-semibold text-zinc-900 truncate">
+                            {app.name}
+                          </span>
+                          <span className="text-[10px] text-zinc-400 truncate hidden sm:inline">
+                            ({app.category})
+                          </span>
+                        </div>
+                        <span className="font-mono font-bold text-zinc-950 shrink-0">
+                          {cost} <span className="font-normal text-zinc-500 text-[10px]">/ user</span>
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
               </div>
 
-              {/* Price Callout */}
-              <div className="pt-2 border-t border-zinc-200/80 flex items-baseline justify-between text-xs">
-                <span className="text-zinc-500">Cora Unified Backbone:</span>
-                <span className="font-semibold text-zinc-950 font-mono">
-                  From ₹499/mo (India Plan) or ₹1,665/mo (Pro)
-                </span>
+              {/* Total & Cora Calculation */}
+              <div className="pt-3 border-t border-zinc-200/80 space-y-1.5 text-xs">
+                <div className="flex items-center justify-between text-zinc-700">
+                  <span className="font-bold text-zinc-950 text-sm">Total</span>
+                  <span className="font-mono font-extrabold text-zinc-950 text-base">
+                    {currency === 'INR' ? `₹${totalAnnualStackCost.toLocaleString('en-IN')}` : `$${totalAnnualStackCost.toLocaleString('en-US')}`}
+                    <span className="text-xs text-zinc-500 font-normal"> /year</span>
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-zinc-400 pt-0.5">
+                  <span>CORA FOR {teamSize} {teamSize === 1 ? 'USER' : 'USERS'}</span>
+                  <span className="font-bold text-zinc-700">
+                    = {currency === 'INR' ? '₹19,990 / YEAR' : '$190 / YEAR'}
+                  </span>
+                </div>
               </div>
 
-              {/* Action Conversion CTA */}
+              {/* ClickUp-style Cost Savings Highlight Card */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-zinc-50 border border-zinc-200/90 space-y-3">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-xs font-medium text-zinc-600">
+                    Cost savings
+                  </span>
+                  <span className="text-3xl sm:text-4xl font-display font-extrabold text-zinc-950 tracking-tight">
+                    {currency === 'INR' ? `₹${costSavings.toLocaleString('en-IN')}` : `$${costSavings.toLocaleString('en-US')}`}
+                  </span>
+                </div>
+
+                <div className="pt-2 border-t border-zinc-200/60 text-xs text-zinc-500 leading-relaxed">
+                  Cora can save a {teamSize}-person team <strong className="text-zinc-900 font-semibold">{currency === 'INR' ? `₹${costSavings.toLocaleString('en-IN')}` : `$${costSavings.toLocaleString('en-US')}`} per year</strong> compared to the non-enterprise price of your apps, and saves <strong className="text-zinc-900 font-semibold">~{roundedWeeklyHours} hours/week</strong> in administrative juggling.
+                </div>
+              </div>
+
+              {/* Action Button */}
               <a
                 href="https://app.heycora.in/workspace/login?plan=pro"
-                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3 px-4 rounded-xl text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white py-3.5 px-5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs active:scale-[0.98] cursor-pointer"
               >
-                <span>Consolidate your business on Cora</span>
+                <span>Start saving with Cora today</span>
                 <ArrowRight className="w-4 h-4 text-white" />
               </a>
 
-              <div className="text-center text-[10px] text-zinc-400 space-y-0.5">
-                <div>✓ 100% white-label for your clients &bull; No setup fees</div>
-                <div>✓ Free onboarding &amp; data migration support</div>
+              <div className="text-center text-[11px] text-zinc-400">
+                100% white-label for your clients &bull; No setup fees &bull; Instant data migration
               </div>
             </div>
 
           </div>
-
         </div>
-
       </section>
 
       {/* ── Frequently Asked Questions ── */}
