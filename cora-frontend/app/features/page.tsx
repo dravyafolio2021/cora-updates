@@ -426,9 +426,10 @@ export default function FeaturesPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
                   {filteredBuiltModules.map((mod) => (
-                    <div
+                    <Link
                       key={mod.slug}
-                      className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group"
+                      href={`/features/${mod.slug}`}
+                      className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer block"
                     >
                       {/* Top Tactile 3D UI Illustration Area */}
                       <div className="w-full h-[195px] sm:h-[210px] overflow-hidden border-b border-zinc-100 relative group-hover:scale-[1.02] transition-transform duration-300 select-none">
@@ -438,7 +439,7 @@ export default function FeaturesPage() {
                       {/* Bottom Content Body - Minimalist & Punchy (2-3 words heading, 5-6 words description) */}
                       <div className="p-5 sm:p-6 flex flex-col justify-between flex-1 space-y-3.5">
                         <div>
-                          <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950 leading-snug group-hover:text-zinc-800 transition-colors">
+                          <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950 leading-snug group-hover:text-zinc-700 transition-colors">
                             {mod.shortTitle}
                           </h3>
 
@@ -449,16 +450,13 @@ export default function FeaturesPage() {
 
                         {/* ONLY Explore Feature CTA */}
                         <div className="pt-2 border-t border-zinc-100">
-                          <Link
-                            href={`/features/${mod.slug}`}
-                            className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-zinc-950 hover:text-zinc-600 transition-colors group/cta"
-                          >
+                          <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-zinc-950 group-hover:text-zinc-600 transition-colors">
                             <span>Explore Feature</span>
-                            <ArrowRight className="w-3.5 h-3.5 group-hover/cta:translate-x-1 transition-transform" />
-                          </Link>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                          </span>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -482,7 +480,12 @@ export default function FeaturesPage() {
                   {filteredRoadmapModules.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group"
+                      onClick={() => {
+                        setSelectedNotifyModuleId(item.id);
+                        setIsNotifyModalOpen(true);
+                        trackEvent('roadmap_notify_card_clicked', { module_id: item.id });
+                      }}
+                      className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer"
                     >
                       {/* Top Tactile 3D UI Illustration Area */}
                       <div className="w-full h-[195px] sm:h-[210px] overflow-hidden border-b border-zinc-100 relative group-hover:scale-[1.02] transition-transform duration-300 select-none">
@@ -492,7 +495,7 @@ export default function FeaturesPage() {
                       {/* Bottom Content Body - Minimalist & Punchy */}
                       <div className="p-5 sm:p-6 flex flex-col justify-between flex-1 space-y-3.5">
                         <div>
-                          <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950 leading-snug group-hover:text-zinc-800 transition-colors">
+                          <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950 leading-snug group-hover:text-zinc-700 transition-colors">
                             {ROADMAP_SHORT_TITLES[item.id] || item.title}
                           </h3>
 
@@ -506,19 +509,11 @@ export default function FeaturesPage() {
                           <span className="font-mono text-[11px] font-bold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-md">
                             {item.eta}
                           </span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedNotifyModuleId(item.id);
-                              setIsNotifyModalOpen(true);
-                              trackEvent('roadmap_notify_card_clicked', { module_id: item.id });
-                            }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 active:scale-95 transition-all shadow-xs cursor-pointer group/notify"
-                          >
-                            <Bell className="w-3 h-3 text-amber-300 group-hover/notify:rotate-12 transition-transform" />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-950 text-white text-xs font-bold group-hover:bg-zinc-800 group-active:scale-95 transition-all shadow-xs">
+                            <Bell className="w-3 h-3 text-amber-300 group-hover:rotate-12 transition-transform" />
                             <span>Notify Me</span>
-                            <ArrowRight className="w-3 h-3 text-zinc-400 group-hover/notify:translate-x-0.5 transition-transform" />
-                          </button>
+                            <ArrowRight className="w-3 h-3 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+                          </span>
                         </div>
                       </div>
                     </div>
