@@ -91,7 +91,7 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
             </div>
 
             {/* Main Title */}
-            <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-semibold text-zinc-950 tracking-[-0.03em] leading-[1.15]">
+            <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-semibold text-zinc-950 tracking-[-0.03em] leading-[1.24] sm:leading-[1.28]">
               {feature.title}
             </h1>
 

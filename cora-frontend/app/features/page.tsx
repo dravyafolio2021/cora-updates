@@ -74,8 +74,8 @@ export default function FeaturesPage() {
             <span>20 Features Live • 8 In Roadmap</span>
           </div>
 
-          {/* Clean, Refined Heading matching Design System (font-semibold) */}
-          <h1 className="font-display text-3xl sm:text-4xl md:text-[46px] font-semibold text-zinc-950 leading-[1.18] tracking-[-0.03em] max-w-[760px] mx-auto mb-3">
+          {/* Clean, Refined Heading with Breathable Line Height */}
+          <h1 className="font-display text-3xl sm:text-4xl md:text-[46px] font-semibold text-zinc-950 leading-[1.26] sm:leading-[1.32] tracking-[-0.03em] max-w-[820px] mx-auto mb-4">
             Everything you need to run your business
           </h1>
 
