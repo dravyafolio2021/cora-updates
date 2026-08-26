@@ -30,6 +30,52 @@ import { ModuleCardVisual } from '@/components/features/ModuleCardVisual';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
+// Concise 5-6 word punchy descriptions for all modules
+const MODULE_MICRO_DESCRIPTIONS: Record<string, string> = {
+  'ai-cofounder': 'Automate proposals and daily studio operations.',
+  'content-ai': 'Generate viral scripts and social copy.',
+  'rag-mcp': 'Self-learning memory with living studio context.',
+  'voice-to-scope': 'Convert audio briefs into structured scopes.',
+  'lead-crm': 'Track deals and automated client outreach.',
+  'canvas-builder': 'Build high-converting landing pages visually.',
+  'form-builder': 'Capture qualified leads with embeddable forms.',
+  'review-portal': 'Collect 5-star Google client reviews automatically.',
+  'esign-vault': 'Legally binding digital contracts and signatures.',
+  'crew-dispatch': 'Schedule crew call sheets without conflicts.',
+  'master-calendar': 'Manage multi-location shoot bookings seamlessly.',
+  'task-board': 'Track milestones and post-production workflows.',
+  'gst-invoicing': 'Automated Indian B2B tax invoice calculations.',
+  'asset-gear': 'Track equipment check-ins and studio inventory.',
+  'media-hub': 'Store and deliver 8K RAW footage.',
+  'rbac-system': 'Role-based permissions with audit activity logs.',
+  'email-smtp': 'Custom domain email with verified deliverability.',
+  'pwa-push': 'Instant shoot alerts across mobile devices.',
+  'docs-portal': 'Interactive API docs and testing playground.',
+  'super-admin': 'Govern studio branches from one hub.',
+  'onboarding-wizard': 'Launch your workspace in 3 minutes.',
+
+  // Roadmap Modules
+  'whatsapp-cloud': 'Direct two-way client chat inside CRM.',
+  'photo-proofing': 'Watermarked galleries and photo selection approvals.',
+  'integrated-payments': 'Auto-reconcile UPI and card payment collections.',
+  'video-storyboard': 'AI scriptwriting and viral video decks.',
+  'multi-branch': 'Shared regional gear and consolidated financials.',
+  'voice-ai-agent': 'Automated conversational voice booking confirmations.',
+  'tally-zoho-export': 'One-click CA-ready sales ledger export.',
+  'client-mobile-app': 'Native iOS and Android client app.'
+};
+
+const ROADMAP_SHORT_TITLES: Record<string, string> = {
+  'whatsapp-cloud': 'WhatsApp Cloud API',
+  'photo-proofing': 'Client Photo Proofing',
+  'integrated-payments': 'Instant Auto-Payments',
+  'video-storyboard': 'AI Video Storyboard',
+  'multi-branch': 'Multi-Branch Workspaces',
+  'voice-ai-agent': 'Autonomous Voice AI',
+  'tally-zoho-export': 'Tally & Zoho Sync',
+  'client-mobile-app': 'Client Mobile App'
+};
+
 export default function FeaturesPage() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedIndustry, setSelectedIndustry] = useState('all');
@@ -378,61 +424,31 @@ export default function FeaturesPage() {
                       className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group"
                     >
                       {/* Top Tactile 3D UI Illustration Area */}
-                      <div className="w-full h-[200px] sm:h-[215px] overflow-hidden border-b border-zinc-100 relative group-hover:scale-[1.02] transition-transform duration-300 select-none">
-                        <ModuleCardVisual slug={mod.slug} category={mod.category} title={mod.shortTitle || mod.title} />
+                      <div className="w-full h-[195px] sm:h-[210px] overflow-hidden border-b border-zinc-100 relative group-hover:scale-[1.02] transition-transform duration-300 select-none">
+                        <ModuleCardVisual slug={mod.slug} category={mod.category} title={mod.shortTitle} />
                       </div>
 
-                      {/* Bottom Content Body */}
-                      <div className="p-5 sm:p-6 flex flex-col justify-between flex-1 space-y-4">
+                      {/* Bottom Content Body - Minimalist & Punchy (2-3 words heading, 5-6 words description) */}
+                      <div className="p-5 sm:p-6 flex flex-col justify-between flex-1 space-y-3.5">
                         <div>
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                              {mod.categoryLabel}
-                            </span>
-                            <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                              LIVE
-                            </span>
-                          </div>
-
-                          <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 leading-snug group-hover:text-zinc-800 transition-colors">
-                            {mod.title}
+                          <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950 leading-snug group-hover:text-zinc-800 transition-colors">
+                            {mod.shortTitle}
                           </h3>
 
-                          <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed mt-2 line-clamp-2">
-                            {mod.tagline || mod.heroDescription}
+                          <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mt-1.5 font-normal">
+                            {MODULE_MICRO_DESCRIPTIONS[mod.slug] || mod.tagline}
                           </p>
                         </div>
 
-                        {/* Capability Tags & Explore Links */}
-                        <div className="space-y-3.5 pt-1">
-                          <div className="flex flex-wrap gap-1.5">
-                            {mod.tags.slice(0, 3).map((tag) => (
-                              <span
-                                key={tag}
-                                className="text-[10px] font-medium bg-zinc-100 text-zinc-700 px-2.5 py-0.5 rounded-lg border border-zinc-200/60"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-
-                          <div className="pt-3.5 border-t border-zinc-100 flex items-center justify-between gap-3">
-                            <Link
-                              href={`/features/${mod.slug}`}
-                              className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 hover:text-zinc-600 transition-colors group-hover:translate-x-0.5 transition-transform"
-                            >
-                              <span>Explore Feature</span>
-                              <ArrowRight className="w-3.5 h-3.5" />
-                            </Link>
-
-                            <a
-                              href={`https://app.heycora.in/workspace/login?feature=${mod.slug}`}
-                              className="text-[11px] font-medium text-zinc-400 hover:text-zinc-800 transition-colors"
-                            >
-                              Launch Free ↗
-                            </a>
-                          </div>
+                        {/* ONLY Explore Feature CTA */}
+                        <div className="pt-2 border-t border-zinc-100">
+                          <Link
+                            href={`/features/${mod.slug}`}
+                            className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-zinc-950 hover:text-zinc-600 transition-colors group/cta"
+                          >
+                            <span>Explore Feature</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover/cta:translate-x-1 transition-transform" />
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -464,32 +480,27 @@ export default function FeaturesPage() {
                       key={item.id}
                       className="bg-zinc-900/90 rounded-[28px] border border-zinc-800 flex flex-col justify-between overflow-hidden hover:border-zinc-700 hover:shadow-xl transition-all group"
                     >
-                      <div className="w-full h-[150px] overflow-hidden border-b border-zinc-800 relative select-none">
-                        <ModuleCardVisual slug={item.id} category={item.categoryLabel} title={item.title} />
+                      <div className="w-full h-[155px] overflow-hidden border-b border-zinc-800 relative select-none">
+                        <ModuleCardVisual slug={item.id} category={item.categoryLabel} title={ROADMAP_SHORT_TITLES[item.id] || item.title} />
                       </div>
 
                       <div className="p-5 flex flex-col justify-between flex-1 space-y-3">
                         <div>
                           <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
-                            <span className="text-zinc-500 uppercase font-bold">{item.categoryLabel}</span>
                             <span className="text-amber-300 font-bold bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30">
                               {item.eta}
                             </span>
+                            <span className="text-amber-400 font-semibold flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                              {item.status}
+                            </span>
                           </div>
-                          <h4 className="font-display text-sm font-bold text-white leading-snug">
-                            {item.title}
+                          <h4 className="font-display text-base font-bold text-white leading-snug">
+                            {ROADMAP_SHORT_TITLES[item.id] || item.title}
                           </h4>
-                          <p className="text-zinc-400 text-xs leading-relaxed mt-1.5 line-clamp-2">
-                            {item.desc}
+                          <p className="text-zinc-400 text-xs leading-relaxed mt-1 font-normal">
+                            {MODULE_MICRO_DESCRIPTIONS[item.id] || item.desc}
                           </p>
-                        </div>
-
-                        <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-500">
-                          <span>Status</span>
-                          <span className="text-amber-400 font-semibold flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                            {item.status}
-                          </span>
                         </div>
                       </div>
                     </div>
