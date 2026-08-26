@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { 
   ChevronDown, 
   ChevronLeft,
@@ -41,6 +42,7 @@ import { trackEvent } from '../analytics/Analytics';
 import { MODULE_GLYPH_MAP } from '@/components/features/ModuleAppGlyphs';
 
 export function Navbar() {
+  const pathname = usePathname();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(null);
@@ -48,6 +50,11 @@ export function Navbar() {
   const [isHovered, setIsHovered] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Dedicated independent header on Docs pages
+  if (pathname?.startsWith('/docs')) {
+    return null;
+  }
 
   // Track scroll state for sticky header backdrop styling
   useEffect(() => {

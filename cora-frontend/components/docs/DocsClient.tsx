@@ -106,65 +106,87 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
   const nextArticle = currentIndex < DOCS_DATA.length - 1 ? DOCS_DATA[currentIndex + 1] : null;
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex flex-col justify-between pt-24 sm:pt-28">
+    <div className="min-h-screen bg-white text-zinc-900 flex flex-col justify-between">
       
-      {/* ── DOCS SUB-HEADER / BREADCRUMB BAR (BELOW GLOBAL NAVBAR) ── */}
-      <div className="border-b border-zinc-200/80 bg-zinc-50/70 backdrop-blur-xs px-4 sm:px-8 py-3">
+      {/* ── INDEPENDENT DEDICATED DOCS HEADER ── */}
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-zinc-200/80 px-4 sm:px-8 py-3">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
           
-          {/* Left: Mobile Trigger + Breadcrumbs */}
-          <div className="flex items-center gap-2.5 min-w-0">
+          {/* Left: Brand Logo + Docs Badge + Breadcrumb Trail */}
+          <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setMobileSidebarOpen(true)}
-              className="lg:hidden p-1.5 rounded-lg text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/60 transition-colors"
+              className="lg:hidden p-1.5 rounded-lg text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 transition-colors"
               aria-label="Open Sidebar"
             >
               <SlidersHorizontal className="w-4 h-4" />
             </button>
 
-            <Link href="/docs" className="text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-colors">
-              Docs
+            <Link href="/" className="font-display text-lg font-bold text-zinc-950 tracking-tight flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
+              CORA
             </Link>
 
             <span className="text-zinc-300">/</span>
 
-            <span className="text-xs font-medium text-zinc-500 hidden sm:inline">
+            <Link href="/docs" className="flex items-center gap-1.5 font-mono text-xs font-bold text-zinc-800 hover:text-black transition-colors shrink-0">
+              <span>DOCS</span>
+              <span className="px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-mono text-[10px] font-bold border border-emerald-200">
+                v3.2.46
+              </span>
+            </Link>
+
+            <span className="text-zinc-300 hidden md:inline">/</span>
+
+            <span className="text-xs font-medium text-zinc-400 hidden md:inline">
               {currentArticle.categoryLabel}
             </span>
 
-            <span className="text-zinc-300 hidden sm:inline">/</span>
+            <span className="text-zinc-300 hidden md:inline">/</span>
 
-            <span className="text-xs font-semibold text-zinc-950 truncate max-w-[240px]">
+            <span className="text-xs font-medium text-zinc-800 truncate max-w-[200px] hidden md:inline">
               {currentArticle.shortTitle}
             </span>
           </div>
 
-          {/* Right: Search Bar Trigger + Workspace Action */}
+          {/* Right: Quick Links + Search Trigger + Studio OS Action */}
           <div className="flex items-center gap-3 shrink-0">
+            <nav className="hidden md:flex items-center gap-4 text-xs font-medium text-zinc-600 mr-2">
+              <Link href="/" className="hover:text-zinc-950 transition-colors">
+                Main Site
+              </Link>
+              <Link href="/features" className="hover:text-zinc-950 transition-colors">
+                Features
+              </Link>
+              <Link href="/docs/rest-api-reference" className="hover:text-zinc-950 transition-colors">
+                API Specs
+              </Link>
+            </nav>
+
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-100 text-zinc-600 hover:text-zinc-950 text-xs font-medium border border-zinc-200 transition-all cursor-pointer shadow-2xs"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 text-zinc-600 hover:text-zinc-950 text-xs font-medium border border-zinc-200/60 transition-all cursor-pointer shadow-2xs"
             >
               <Search className="w-3.5 h-3.5 text-zinc-400" />
               <span className="hidden sm:inline">Search docs...</span>
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-semibold text-zinc-500 bg-zinc-100 rounded-md border border-zinc-200">
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-semibold text-zinc-500 bg-white rounded-md border border-zinc-200 shadow-2xs">
                 ⌘K
               </kbd>
             </button>
 
             <a
               href="https://app.heycora.in/workspace/login?source=docs_header"
-              className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
             >
-              <span>Open Studio OS</span>
+              <span className="hidden sm:inline">Launch Studio OS</span>
+              <span className="sm:hidden">App</span>
               <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
             </a>
           </div>
 
         </div>
-      </div>
+      </header>
 
       {/* ── 3-COLUMN MASTER CONTAINER ── */}
       <div className="w-full max-w-[1440px] mx-auto flex-1 flex items-start">
@@ -172,7 +194,7 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
         {/* ══════════════════════════════════════════════════════════════════
             1. LEFT NAVIGATION SIDEBAR (CATEGORIES & ARTICLES)
         ══════════════════════════════════════════════════════════════════ */}
-        <aside className="hidden lg:block w-[280px] shrink-0 sticky top-28 h-[calc(100vh-112px)] overflow-y-auto p-6 border-r border-zinc-100 space-y-6">
+        <aside className="hidden lg:block w-[280px] shrink-0 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto p-6 border-r border-zinc-100 space-y-6">
           
           <div className="space-y-5">
             {DOC_CATEGORIES.map((cat) => {
@@ -322,7 +344,7 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
         {/* ══════════════════════════════════════════════════════════════════
             3. RIGHT ON-THIS-PAGE TOC SIDEBAR
         ══════════════════════════════════════════════════════════════════ */}
-        <aside className="hidden xl:block w-[240px] shrink-0 sticky top-28 h-[calc(100vh-112px)] overflow-y-auto p-6 space-y-6">
+        <aside className="hidden xl:block w-[240px] shrink-0 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto p-6 space-y-6">
           
           {currentArticle.toc && currentArticle.toc.length > 0 && (
             <div className="space-y-2.5">
