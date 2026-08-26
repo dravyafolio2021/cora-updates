@@ -457,48 +457,47 @@ export default function FeaturesPage() {
               </div>
             )}
 
-            {/* ── 8 UPCOMING ROADMAP MODULES ── */}
+            {/* ── 8 UPCOMING ROADMAP MODULES (CLEAN MONOCHROME) ── */}
             {filteredRoadmapModules.length > 0 && (
-              <div className="bg-zinc-950 rounded-[32px] p-6 sm:p-10 text-white border border-zinc-800 shadow-2xl relative overflow-hidden">
+              <div className="bg-zinc-50/70 rounded-[32px] p-6 sm:p-8 border border-zinc-200/80 relative overflow-hidden">
                 
                 <div className="max-w-[640px] mb-8">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 rounded-xl border border-amber-500/30 text-xs font-semibold text-amber-300 mb-3">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full border border-zinc-200 text-xs font-semibold text-zinc-800 mb-3 shadow-2xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
                     <span>Active Product Roadmap</span>
                   </div>
-                  <h2 className="font-display text-xl sm:text-3xl font-bold tracking-tight mb-2">
+                  <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 mb-1.5">
                     Upcoming Modules &amp; Enterprise Tools
                   </h2>
-                  <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+                  <p className="text-zinc-500 text-xs sm:text-sm leading-relaxed">
                     Currently in private alpha with high-volume photography and film studios.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredRoadmapModules.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-zinc-900/90 rounded-[28px] border border-zinc-800 flex flex-col justify-between overflow-hidden hover:border-zinc-700 hover:shadow-xl transition-all group"
+                      className="bg-white rounded-[28px] border border-zinc-200/80 flex flex-col justify-between overflow-hidden hover:shadow-[0_16px_36px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 group"
                     >
-                      <div className="w-full h-[155px] overflow-hidden border-b border-zinc-800 relative select-none">
+                      <div className="w-full h-[160px] overflow-hidden border-b border-zinc-100 relative select-none">
                         <ModuleCardVisual slug={item.id} category={item.categoryLabel} title={ROADMAP_SHORT_TITLES[item.id] || item.title} />
                       </div>
 
                       <div className="p-5 flex flex-col justify-between flex-1 space-y-3">
                         <div>
                           <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
-                            <span className="text-amber-300 font-bold bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30">
+                            <span className="text-zinc-700 font-bold bg-zinc-100 px-2 py-0.5 rounded-md border border-zinc-200/60">
                               {item.eta}
                             </span>
-                            <span className="text-amber-400 font-semibold flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                            <span className="text-zinc-500 font-medium font-mono">
                               {item.status}
                             </span>
                           </div>
-                          <h4 className="font-display text-base font-bold text-white leading-snug">
+                          <h4 className="font-display text-base font-bold text-zinc-950 leading-snug">
                             {ROADMAP_SHORT_TITLES[item.id] || item.title}
                           </h4>
-                          <p className="text-zinc-400 text-xs leading-relaxed mt-1 font-normal">
+                          <p className="text-zinc-600 text-xs leading-relaxed mt-1 font-normal">
                             {MODULE_MICRO_DESCRIPTIONS[item.id] || item.desc}
                           </p>
                         </div>
