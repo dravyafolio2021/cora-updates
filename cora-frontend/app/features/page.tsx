@@ -21,12 +21,14 @@ import {
   Clapperboard,
   Building,
   Heart,
-  Palette
+  Palette,
+  Bell
 } from 'lucide-react';
 import { BUILT_MODULES, UPCOMING_MODULES, CATEGORIES, INDUSTRIES, FeatureModule } from '@/lib/features-data';
 import { FeatureIcon } from '@/components/features/FeatureIcon';
 import { FeaturesSidebar } from '@/components/features/FeaturesSidebar';
 import { ModuleCardVisual } from '@/components/features/ModuleCardVisual';
+import { RoadmapNotifyDrawer } from '@/components/features/RoadmapNotifyDrawer';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -82,6 +84,8 @@ export default function FeaturesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'live' | 'roadmap'>('all');
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [isNotifyDrawerOpen, setIsNotifyDrawerOpen] = useState(false);
+  const [selectedNotifyModuleId, setSelectedNotifyModuleId] = useState<string>('whatsapp-cloud');
 
   // Accessibility & iOS Mobile Scroll Lock: 100% prevent background page scrolling when drawer is open
   useEffect(() => {
@@ -494,15 +498,24 @@ export default function FeaturesPage() {
                           </p>
                         </div>
 
-                        {/* Status Bar */}
-                        <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-xs">
+                        {/* Status Bar with Interactive Notify Me CTA */}
+                        <div className="pt-3 border-t border-zinc-100 flex items-center justify-between gap-2">
                           <span className="font-mono text-[11px] font-bold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-md">
                             {item.eta}
                           </span>
-                          <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded-md flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                            {item.status}
-                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedNotifyModuleId(item.id);
+                              setIsNotifyDrawerOpen(true);
+                              trackEvent('roadmap_notify_card_clicked', { module_id: item.id });
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 active:scale-95 transition-all shadow-xs cursor-pointer group/notify"
+                          >
+                            <Bell className="w-3 h-3 text-amber-300 group-hover/notify:rotate-12 transition-transform" />
+                            <span>Notify Me</span>
+                            <ArrowRight className="w-3 h-3 text-zinc-400 group-hover/notify:translate-x-0.5 transition-transform" />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -688,6 +701,13 @@ export default function FeaturesPage() {
           </div>
         </div>
       </section>
+
+      {/* ── 6. ROADMAP INTENT & EARLY ACCESS NOTIFY DRAWER ── */}
+      <RoadmapNotifyDrawer
+        isOpen={isNotifyDrawerOpen}
+        onClose={() => setIsNotifyDrawerOpen(false)}
+        initialModuleId={selectedNotifyModuleId}
+      />
 
     </main>
   );
