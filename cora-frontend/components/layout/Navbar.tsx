@@ -763,18 +763,18 @@ export function Navbar() {
                       </div>
                     </Link>
 
-                    {/* Card 2: Guides & Playbooks (Solid Soft Sky Blue) */}
+                    {/* Card 2: Documentation & Developer Hub */}
                     <Link
-                      href="/features/esign-vault"
+                      href="/docs"
                       onClick={() => setActiveDropdown(null)}
                       className="group relative rounded-[28px] bg-[#E0F2FE] hover:bg-[#BAE6FD] border-0 p-6 sm:p-7 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[270px]"
                     >
                       <div className="space-y-1.5 z-10 max-w-[190px]">
                         <h3 className="font-display text-2xl font-bold text-zinc-950 tracking-tight leading-tight">
-                          Guides &amp; Playbooks
+                          Documentation
                         </h3>
                         <p className="text-zinc-600 text-xs font-normal leading-relaxed">
-                          Studio SOPs, rate cards &amp; legal contract templates
+                          23 architecture guides, REST APIs &amp; studio SOPs
                         </p>
                       </div>
 
@@ -782,7 +782,7 @@ export function Navbar() {
                       <div className="absolute -right-3 -bottom-3 w-[165px] h-[165px] rounded-2xl overflow-hidden shadow-md border-2 border-white/80 pointer-events-none transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
                         <Image
                           src="/images/cora_nav_guides_relatable.png"
-                          alt="Guides & Playbooks Contract Vault"
+                          alt="Documentation & Developer Hub"
                           fill
                           className="object-cover"
                         />
@@ -790,7 +790,7 @@ export function Navbar() {
 
                       <div className="pt-6 z-10">
                         <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-sky-950 group-hover:translate-x-1 transition-transform">
-                          <span>Explore playbooks</span>
+                          <span>Browse 23 docs &amp; APIs</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </span>
                       </div>

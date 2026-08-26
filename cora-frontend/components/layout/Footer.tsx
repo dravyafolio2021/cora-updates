@@ -111,6 +111,7 @@ export function Footer() {
               </div>
               <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
                 <li><Link href="/features" className="hover:text-zinc-950 transition-colors">Features</Link></li>
+                <li><Link href="/docs" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-950">Documentation</Link></li>
                 <li><Link href="/demo" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-950">Get A Demo</Link></li>
                 <li><Link href="/ai-agent" className="hover:text-zinc-950 transition-colors">AI Co-Founder</Link></li>
                 <li><Link href="/use-cases" className="hover:text-zinc-950 transition-colors">Use Cases</Link></li>

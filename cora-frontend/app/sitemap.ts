@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { BUILT_MODULES } from '@/lib/features-data';
+import { DOCS_DATA } from '@/lib/docs-data';
 
 export const dynamic = 'force-static';
 
@@ -14,6 +15,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
+  const docUrls = DOCS_DATA.map((doc) => ({
+    url: `${baseUrl}/docs/${doc.slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
+  }));
+
   return [
     {
       url: baseUrl,
@@ -21,6 +29,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 1.0,
     },
+    {
+      url: `${baseUrl}/docs`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
+    ...docUrls,
     {
       url: `${baseUrl}/features`,
       lastModified: now,

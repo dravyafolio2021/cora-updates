@@ -1394,18 +1394,84 @@ function cora_docs_get_new_pages_v3246() {
             'content'  => "# Module: PWA & Mobile Shell\n\nShipped in **v3.2.46**, the PWA & Mobile Shell module transforms the Cora workspace into a fully installable Progressive Web App with offline support and real-time push notifications.\n\n## Components\n- **PWA Manifest**: Dynamic `/cora-manifest.json` with branded icons.\n- **Service Worker**: Caching, offline fallback, and push notification delivery.\n- **VAPID Push**: ES256 self-signed JWT push authorization.\n- **Install Prompt Banner**: Slide-in UI prompting users to install the app, with persistent 'never remind' option.\n- **REST API**: `/wp-json/cora-pwa/v1/` endpoints for subscription management and notification dispatch.\n\n## Access Control\n- Push subscription registration: Any authenticated workspace user.\n- Notification dispatch: Triggered server-side by CRM, Bookings, and Task Manager event hooks.\n- VAPID key management: Super Admin only.\n\nSee **PWA & Mobile** in the sidebar for detailed sub-module documentation."
         ),
 
-        // ── Guides ────────────────────────────────────────────────────────
+        // ── Comprehensive 20-Module Ecosystem Updates (v3.4.46) ──────────
         array(
-            'slug'     => 'guide-onboarding',
-            'title'    => 'Onboarding Flow',
-            'category' => 'guides',
-            'content'  => "# Onboarding Flow\n\nThe Cora onboarding flow guides new workspace tenants through initial configuration in a step-by-step wizard.\n\n## Steps\n1. **Business Profile**: Agency name, logo, address, GSTIN, and industry selection.\n2. **Team Setup**: Invite initial team members and assign roles.\n3. **Workspace Configuration**: Activate modules relevant to the selected industry.\n4. **SMTP Configuration**: Connect outbound email (Gmail/SendGrid).\n5. **First Content**: Create first form, lead pipeline stage, or document template.\n6. **Go Live**: Confirm setup and land on the dashboard.\n\n## Industry Presets\nSelecting an industry at step 1 automatically activates the relevant module set:\n- **Photography Studio**: Crew Scheduler, Equipment, Media Library, Document Vault, Forms.\n- **Real Estate**: CRM Leads, Property Listings, Document Vault, Canvas Builder, Review Acquisition.\n- **General Agency**: CRM, Forms, Email Studio, Content Suite, Financials.\n\n## Implementation\nThe onboarding wizard is rendered at `/workspace/onboarding` and driven by `views/onboarding.php`."
+            'slug'     => 'ai-cofounder',
+            'title'    => 'AI Co-Founder & Operations Agent',
+            'category' => 'ai',
+            'content'  => "# AI Co-Founder & Operations Agent\n\nThe Cora AI Co-Founder is an autonomous reasoning agent that qualifies leads, prepares production budgets, identifies calendar overlaps, and drafts commercial service contracts.\n\n## Core Capabilities\n- **Autonomous Scoping**: Converts client emails and unstructured messages into formal shoot briefs.\n- **Rate Card Intelligence**: Automatically applies your studio day rates, gear line items, and 18% GST margins.\n- **WhatsApp Triage**: Short conversational chat bubbles with interactive RCS action cards for 1-tap approvals.\n\n## AJAX API Reference\n| Action | Parameters | Description |\n|---|---|---|\n| `cora_ajax_ai_cofounder_query` | `nonce`, `message`, `context_type` | Process prompt with RAG memory injection |\n| `cora_ajax_ai_approve_action` | `nonce`, `action_id`, `approved` | Execute approved action card |"
         ),
         array(
-            'slug'     => 'guide-pwa-install',
-            'title'    => 'PWA Install Guide',
-            'category' => 'guides',
-            'content'  => "# PWA Install Guide\n\nThis guide explains how to install the Cora workspace as a Progressive Web App on your device for a native app-like experience.\n\n## Android (Chrome)\n1. Open `app.heycora.in` in Chrome.\n2. Look for the **Install Cora** banner at the bottom-right of the screen.\n3. Tap **Install App**.\n4. Confirm in the system dialog.\n5. Cora will appear on your home screen and app drawer.\n\n## iOS (Safari)\n1. Open `app.heycora.in` in Safari.\n2. Tap the **Share** button (rectangle with arrow).\n3. Scroll down and tap **Add to Home Screen**.\n4. Confirm with **Add** in the top-right.\n\n## Desktop (Chrome/Edge)\n1. Open `app.heycora.in` in Chrome or Edge.\n2. Click the install icon in the address bar (or use the **Install Cora** banner).\n3. Click **Install** in the dialog.\n\n## Troubleshooting\n- If you dismissed the banner and selected 'Don't ask again', clear `cora_pwa_never_prompt` from LocalStorage in DevTools to reset.\n- PWA installation requires HTTPS. The app will not install on `http://` connections.\n- If the banner never appears, verify the Service Worker is registered at `https://app.heycora.in/cora-service-worker.js`."
+            'slug'     => 'rag-mcp',
+            'title'    => 'RAG Memory & Model Context Protocol (MCP)',
+            'category' => 'ai',
+            'content'  => "# RAG Memory & Model Context Protocol (MCP)\n\nCora integrates a local Model Context Protocol (MCP) server gateway allowing external LLM clients (Cursor, Claude Desktop, Antigravity) to read and manipulate studio records securely.\n\n## Features\n- **Keyword-Dense RAG**: Zero-dependency SQLite/MySQL semantic chunking.\n- **JSON-RPC 2.0 Gateway**: Bidirectional WebSocket and REST tool execution.\n- **Dynamic Token Rotation**: Revoke and regenerate bearer keys from the admin popover."
+        ),
+        array(
+            'slug'     => 'voice-to-scope',
+            'title'    => 'Voice-to-Scope Audio Briefs',
+            'category' => 'ai',
+            'content'  => "# Voice-to-Scope Audio Briefs\n\nConverts client voice memos and audio recordings into structured deliverables lists, shoot agendas, and GST proposals using Gemini Multimodal Audio analysis."
+        ),
+        array(
+            'slug'     => 'lead-crm',
+            'title'    => 'Kanban Lead CRM',
+            'category' => 'crm',
+            'content'  => "# Kanban Lead CRM\n\nNotion-styled drag-and-drop lead board tailored for high-ticket commercial shoots, wedding productions, and agency retainers with automated WhatsApp follow-up triggers."
+        ),
+        array(
+            'slug'     => 'canvas-builder',
+            'title'    => 'Funnel Canvas Builder',
+            'category' => 'content',
+            'content'  => "# Funnel Canvas Builder\n\nVisual landing page and conversion funnel designer with monochromatic theme tokens, responsive mobile previews, and white-labeled client editing."
+        ),
+        array(
+            'slug'     => 'esign-vault',
+            'title'    => 'SHA-256 E-Sign Vault',
+            'category' => 'vault',
+            'content'  => "# SHA-256 E-Sign Vault\n\nIndian IT Act 2000 compliant digital signature registry with 5-step guided wizard (Details → Terms → GST Math → E-Sign → Watermarked PDF)."
+        ),
+        array(
+            'slug'     => 'crew-dispatch',
+            'title'    => 'Crew & Gear Dispatch',
+            'category' => 'operations',
+            'content'  => "# Crew & Gear Dispatch\n\nAutomated call sheet generator with shoot location maps, call times, crew roles, and 1-click WhatsApp broadcast alerts."
+        ),
+        array(
+            'slug'     => 'master-calendar',
+            'title'    => 'Master Shoot Calendar',
+            'category' => 'operations',
+            'content'  => "# Master Shoot Calendar\n\nCentralized multi-location booking calendar tracking shoot statuses, equipment reservations, and two-way Google/Apple Calendar sync."
+        ),
+        array(
+            'slug'     => 'gst-invoicing',
+            'title'    => '18% GST Invoicing & Math',
+            'category' => 'finance',
+            'content'  => "# 18% GST Invoicing & Math\n\nAutomated tax engine calculating Intra-State CGST (9%) + SGST (9%) vs. Inter-State IGST (18%) with SAC 998381 code pre-seeding and CA export packs."
+        ),
+        array(
+            'slug'     => 'asset-gear',
+            'title'    => 'Gear & Inventory Management',
+            'category' => 'operations',
+            'content'  => "# Gear & Inventory Management\n\nComplete equipment registry with serial numbers, condition tracking, maintenance logs, and shoot checkout reservation conflict alerts."
+        ),
+        array(
+            'slug'     => 'media-hub',
+            'title'    => 'Media Hub & 4K RAW Proofing',
+            'category' => 'media',
+            'content'  => "# Media Hub & 4K RAW Proofing\n\nWorkspace asset library with Gemini AI image tagging, client gallery password portals, download controls, and in-browser canvas photo editor."
+        ),
+        array(
+            'slug'     => 'rbac-system',
+            'title'    => 'Multi-Tenant RBAC & Security',
+            'category' => 'overview',
+            'content'  => "# Multi-Tenant RBAC & Security\n\n30-point granular capability security matrix with strict tenant database isolation by agency_id and tamper-evident audit trails."
+        ),
+        array(
+            'slug'     => 'pwa-architecture',
+            'title'    => 'PWA Architecture & Service Worker',
+            'category' => 'pwa',
+            'content'  => "# PWA Architecture & Service Worker\n\nFull Progressive Web App specifications with root-scoped Service Worker, Network-First API navigation, Cache-First static assets, and VAPID Web Push alerts."
         ),
     );
 }
