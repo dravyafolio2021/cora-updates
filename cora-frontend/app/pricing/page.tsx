@@ -14,6 +14,9 @@ import {
   Layout,
   ShieldCheck,
   FileCheck,
+  FileSignature,
+  FolderUp,
+  Calendar,
   Receipt,
   Globe,
   Star,
@@ -49,62 +52,90 @@ interface ServiceTool {
   monthlyCostINR: number;
   monthlyCostUSD: number;
   hoursSavedWeekly: number;
+  iconType: 'esign' | 'storage' | 'whatsapp' | 'invoicing' | 'scheduling' | 'ai';
+  iconBg: string;
+  iconBorder: string;
+  iconText: string;
 }
 
 const SERVICE_TOOLS: ServiceTool[] = [
   {
     id: 'contracts',
-    name: 'Contracts & E-Signatures',
+    name: 'Contracts & E-Sign',
     category: 'Legal Agreements',
-    replacedApp: 'DocuSign / PandaDoc / Paper',
+    replacedApp: 'DocuSign • PandaDoc',
     monthlyCostINR: 1500,
     monthlyCostUSD: 18,
-    hoursSavedWeekly: 3.0
+    hoursSavedWeekly: 3.0,
+    iconType: 'esign',
+    iconBg: 'bg-blue-50',
+    iconBorder: 'border-blue-200/70',
+    iconText: 'text-blue-600'
   },
   {
     id: 'portals',
-    name: 'Client Portals & File Vault',
-    category: 'Asset Delivery',
-    replacedApp: 'Drive / WeTransfer / Dropbox',
+    name: 'Client Galleries & Vault',
+    category: 'Delivery & Storage',
+    replacedApp: 'Google Drive • WeTransfer',
     monthlyCostINR: 1800,
     monthlyCostUSD: 22,
-    hoursSavedWeekly: 4.5
+    hoursSavedWeekly: 4.5,
+    iconType: 'storage',
+    iconBg: 'bg-amber-50',
+    iconBorder: 'border-amber-200/70',
+    iconText: 'text-amber-600'
   },
   {
     id: 'whatsapp',
-    name: 'WhatsApp CRM & Auto-Pings',
+    name: 'WhatsApp CRM & Alerts',
     category: 'Client Communications',
-    replacedApp: 'Wati / Interakt / Manual Chat',
+    replacedApp: 'WhatsApp Biz • Wati',
     monthlyCostINR: 2499,
     monthlyCostUSD: 29,
-    hoursSavedWeekly: 5.5
+    hoursSavedWeekly: 5.5,
+    iconType: 'whatsapp',
+    iconBg: 'bg-emerald-50',
+    iconBorder: 'border-emerald-200/70',
+    iconText: 'text-[#25D366]'
   },
   {
     id: 'invoicing',
-    name: 'GST Invoicing & UPI QR',
-    category: 'Billing & Reconciliation',
-    replacedApp: 'Zoho Invoice / Khatabook / Excel',
+    name: 'GST Billing & UPI QR',
+    category: 'Payments & Invoicing',
+    replacedApp: 'Zoho Invoice • Khatabook',
     monthlyCostINR: 1200,
     monthlyCostUSD: 15,
-    hoursSavedWeekly: 3.5
+    hoursSavedWeekly: 3.5,
+    iconType: 'invoicing',
+    iconBg: 'bg-indigo-50',
+    iconBorder: 'border-indigo-200/70',
+    iconText: 'text-indigo-600'
   },
   {
     id: 'scheduling',
-    name: 'Bookings & Project Kanban',
+    name: 'Bookings & Kanban',
     category: 'Operations & Calendar',
-    replacedApp: 'Calendly / HoneyBook / Trello',
+    replacedApp: 'Calendly • HoneyBook',
     monthlyCostINR: 1800,
     monthlyCostUSD: 20,
-    hoursSavedWeekly: 4.0
+    hoursSavedWeekly: 4.0,
+    iconType: 'scheduling',
+    iconBg: 'bg-rose-50',
+    iconBorder: 'border-rose-200/70',
+    iconText: 'text-rose-600'
   },
   {
     id: 'ai_proposals',
     name: 'AI Proposals & Briefs',
-    category: 'Sales & Scoping',
-    replacedApp: 'ChatGPT Plus / Copy AI',
+    category: 'Sales Proposals',
+    replacedApp: 'ChatGPT Plus • Copy AI',
     monthlyCostINR: 1999,
     monthlyCostUSD: 20,
-    hoursSavedWeekly: 3.5
+    hoursSavedWeekly: 3.5,
+    iconType: 'ai',
+    iconBg: 'bg-purple-50',
+    iconBorder: 'border-purple-200/70',
+    iconText: 'text-purple-600'
   }
 ];
 
@@ -134,6 +165,23 @@ const FAQS = [
     a: 'All data is protected by AES-256 encryption at rest and TLS 1.3 in transit. All e-signatures are SHA-256 cryptographically sealed and legally compliant under the Indian IT Act 2000 and DPDP Act 2023.'
   }
 ];
+
+const renderToolIcon = (type: ServiceTool['iconType']) => {
+  switch (type) {
+    case 'esign':
+      return <FileSignature className="w-5 h-5" />;
+    case 'storage':
+      return <FolderUp className="w-5 h-5" />;
+    case 'whatsapp':
+      return <WhatsAppIcon className="w-5 h-5" />;
+    case 'invoicing':
+      return <Receipt className="w-5 h-5" />;
+    case 'scheduling':
+      return <Calendar className="w-5 h-5" />;
+    case 'ai':
+      return <Sparkles className="w-5 h-5" />;
+  }
+};
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
@@ -1566,8 +1614,8 @@ export default function PricingPage() {
               </div>
             </div>
 
-            {/* Compact Tool Cards Grid (2 Columns, Non-Text-Heavy) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {/* Visual Icon Tool Cards Grid (2 Columns) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
               {SERVICE_TOOLS.map(tool => {
                 const isSelected = selectedTools.includes(tool.id);
                 const cost = currency === 'INR' ? `₹${tool.monthlyCostINR.toLocaleString('en-IN')}` : `$${tool.monthlyCostUSD}`;
@@ -1577,33 +1625,37 @@ export default function PricingPage() {
                     key={tool.id}
                     type="button"
                     onClick={() => toggleTool(tool.id)}
-                    className={`p-3 rounded-xl border text-left transition-all relative flex items-start gap-2.5 cursor-pointer ${
+                    className={`p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border text-left transition-all relative flex items-center justify-between gap-2.5 cursor-pointer ${
                       isSelected
-                        ? 'border-zinc-950 bg-zinc-50/80 shadow-2xs'
+                        ? 'border-zinc-950 bg-zinc-50/90 shadow-2xs ring-1 ring-zinc-950'
                         : 'border-zinc-200/80 bg-white hover:border-zinc-300 opacity-60 hover:opacity-100'
                     }`}
                   >
-                    {/* Monochromatic Checkbox */}
-                    <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                      isSelected ? 'bg-zinc-950 text-white' : 'border border-zinc-300 bg-white'
-                    }`}>
-                      {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                      {/* Prominent Visual Squircle Icon */}
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 border ${tool.iconBg} ${tool.iconBorder} ${tool.iconText} shadow-2xs`}>
+                        {renderToolIcon(tool.iconType)}
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="font-bold text-xs sm:text-[13px] text-zinc-950 truncate">
+                          {tool.name}
+                        </div>
+                        <div className="text-[10px] sm:text-[11px] text-zinc-500 font-medium truncate mt-0.5">
+                          {tool.replacedApp}
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="font-semibold text-xs text-zinc-950 line-clamp-1">
-                        {tool.name}
+                    <div className="flex flex-col items-end shrink-0 pl-1.5">
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center mb-1 ${
+                        isSelected ? 'bg-zinc-950 text-white' : 'border border-zinc-300 bg-white'
+                      }`}>
+                        {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                       </div>
-                      <div className="text-[10px] text-zinc-500 font-mono mt-0.5 line-clamp-1">
-                        {tool.replacedApp}
-                      </div>
-
-                      <div className="mt-2 flex items-center justify-between text-[10px] pt-1.5 border-t border-zinc-200/60">
-                        <span className="font-semibold text-zinc-800 font-mono">{cost}/mo</span>
-                        <span className="text-zinc-600 font-mono bg-zinc-100 px-1.5 py-0.5 rounded">
-                          +{tool.hoursSavedWeekly}h/wk
-                        </span>
-                      </div>
+                      <span className="text-[10px] font-mono text-zinc-700 bg-zinc-100 border border-zinc-200/60 px-1.5 py-0.5 rounded font-medium">
+                        {cost}/mo
+                      </span>
                     </div>
                   </button>
                 );
