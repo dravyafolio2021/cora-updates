@@ -20,15 +20,17 @@ export interface DocCategory {
 }
 
 export const DOCS_DATA: DocArticle[] = [
-  // ── 1. GETTING STARTED & OVERVIEW ──
+  // ════════════════════════════════════════════════════════════════════════
+  // ── 1. GETTING STARTED & PLATFORM ARCHITECTURE ─────────────────────────
+  // ════════════════════════════════════════════════════════════════════════
   {
     slug: 'platform-architecture',
     title: 'Platform Architecture & Multi-Tenant Stack',
     shortTitle: 'Architecture & Stack',
     category: 'overview',
     categoryLabel: 'Getting Started',
-    description: 'Deep dive into Cora’s single-plugin decoupled architecture, LiteSpeed performance, database isolation, and hybrid Next.js routing.',
-    readTime: '6 min read',
+    description: 'Comprehensive architectural guide to Cora’s single-plugin WordPress backend runtime, Next.js 16 SSG edge layer, and isolated MySQL schemas.',
+    readTime: '7 min read',
     lastUpdated: 'August 2026',
     badge: 'Core System',
     toc: [
@@ -39,8 +41,6 @@ export const DOCS_DATA: DocArticle[] = [
       { id: 'security-model', title: '5. Zero-Trust Security Model' },
     ],
     content: `
-# Platform Architecture & Multi-Tenant Stack
-
 Cora is engineered as an enterprise-grade autonomous operating system for Indian creative studios and agencies. It operates on a **hybrid decoupled architecture** where a high-performance Next.js marketing and documentation layer is paired with a resilient, single-plugin WordPress/PHP 8.2 backend runtime.
 
 ---
@@ -98,7 +98,7 @@ The Cora platform consists of four primary decoupled layers:
 Inbound requests are handled via strict virtual host separation:
 
 | Host / Subdomain | Target Layer | Handler File | Purpose |
-|------------------|--------------|--------------|---------|
+|---|---|---|---|
 | \`heycora.in\` | Next.js Frontend | \`out/index.html\`, \`out/docs/*\` | Marketing, Docs, Tools |
 | \`app.heycora.in\` | WordPress Backend | \`cora-workspace.php\` | Production SaaS Tenant SPA |
 | \`staging.heycora.in\` | Staging Instance | \`cora-workspace.php\` | QA & Feature Release Previews |
@@ -142,7 +142,7 @@ Cross-tenant leakage is prevented at both the database abstraction layer and the
     category: 'overview',
     categoryLabel: 'Getting Started',
     description: 'Set up your creative studio workspace in under 5 minutes: business profile, GST tax rates, team roles, and initial booking.',
-    readTime: '4 min read',
+    readTime: '5 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'step-1-login', title: 'Step 1: First-Time Login' },
@@ -152,8 +152,6 @@ Cross-tenant leakage is prevented at both the database abstraction layer and the
       { id: 'step-5-pwa', title: 'Step 5: Install Mobile PWA' },
     ],
     content: `
-# Workspace Quickstart Guide
-
 Welcome to Cora Studio OS. This guide walks you through provisioning your creative studio workspace, configuring your legal GST credentials, inviting team members, and creating your first client booking.
 
 ---
@@ -224,12 +222,12 @@ You can now receive real-time push notifications for new client inquiries and ca
   },
   {
     slug: 'multi-tenant-rbac',
-    title: 'Multi-Tenant RBAC & Role Capabilities',
+    title: 'Multi-Tenant RBAC & Security Matrix',
     shortTitle: 'RBAC & Permissions',
     category: 'overview',
     categoryLabel: 'Getting Started',
     description: 'Detailed security permission matrix, role inheritance rules, and audit trail enforcement for creative studios.',
-    readTime: '5 min read',
+    readTime: '6 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'role-hierarchy', title: '1. Role Hierarchy' },
@@ -238,8 +236,6 @@ You can now receive real-time push notifications for new client inquiries and ca
       { id: 'audit-logging', title: '4. Tamper-Evident Audit Trails' },
     ],
     content: `
-# Multi-Tenant RBAC & Role Capabilities
-
 Cora enforces a granular Role-Based Access Control (RBAC) engine that isolates tenant workspaces while giving studio directors precise control over who can view financials, edit contracts, or dispatch gear.
 
 ---
@@ -247,7 +243,7 @@ Cora enforces a granular Role-Based Access Control (RBAC) engine that isolates t
 ## 1. Role Hierarchy
 
 | System Role | Role Key | Scoped Access Level |
-|-------------|----------|---------------------|
+|---|---|---|
 | **Super Admin** | \`cora_super_admin\` | Global infrastructure, server health, multi-tenant billing, and system backups. |
 | **Studio Owner** | \`owner\` | Full root ownership of tenant workspace, role creation, and API key management. |
 | **Studio Administrator** | \`administrator\` | Operational CRUD across CRM, Bookings, Contracts, Invoicing, and Media. |
@@ -299,8 +295,59 @@ Every state mutation in the workspace (contract signature, invoice cancellation,
 - Previous State vs. New State JSON diff
     `,
   },
+  {
+    slug: 'compliance-security',
+    title: 'Legal Compliance & Security Architecture',
+    shortTitle: 'Compliance & Security',
+    category: 'overview',
+    categoryLabel: 'Getting Started',
+    description: 'Indian Information Technology Act 2000 digital signature compliance, SHA-256 integrity hashing, and data encryption standards.',
+    readTime: '5 min read',
+    lastUpdated: 'August 2026',
+    badge: 'Legal Tech',
+    toc: [
+      { id: 'it-act-compliance', title: '1. Indian IT Act 2000 Compliance' },
+      { id: 'cryptographic-integrity', title: '2. Cryptographic SHA-256 Hashing' },
+      { id: 'data-protection', title: '3. Data Protection & Tenant Isolation' },
+      { id: 'audit-readiness', title: '4. Statutory Audit Readiness' },
+    ],
+    content: `
+Security and legal enforceability form the foundation of Cora Studio OS. All contracts, invoices, and financial records are engineered to withstand scrutiny in Indian courts and statutory audits.
 
-  // ── 2. INTELLIGENCE & AI SUITE ──
+---
+
+## 1. Indian IT Act 2000 Compliance
+
+All signatures captured in Cora comply with Sections 4 and 5 of the **Indian Information Technology Act, 2000** for electronic contract execution:
+- **Signer Verification**: Signer IP address, browser user-agent, and email magic token are immutably bound to the record.
+- **Date & Call-Time Stamp**: Exact execution date and time (IST) are stamped on every document page.
+- **Non-Repudiation**: The signer must explicitly check clause checkboxes and sign the HTML5 canvas before the certificate is sealed.
+
+---
+
+## 2. Cryptographic SHA-256 Hashing
+
+When an agreement is executed, the server renders a PDF and calculates its unique SHA-256 checksum:
+
+\`\`\`
+Original PDF Bytes ──> [ SHA-256 Hash Engine ] ──> e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+\`\`\`
+
+If even a single character or metadata byte is altered post-signature, the checksum validation fails immediately.
+
+---
+
+## 3. Data Protection & Tenant Isolation
+
+- **SSL/TLS 1.3**: All traffic in transit is encrypted using modern TLS 1.3 ciphers.
+- **SQL Parameterization**: Every database interaction uses parameterized prepared statements via \`$wpdb->prepare()\`.
+- **Zero Third-Party Trackers**: No third-party ad pixels or tracking scripts operate inside the private workspace SaaS shell.
+    `,
+  },
+
+  // ════════════════════════════════════════════════════════════════════════
+  // ── 2. INTELLIGENCE & AUTONOMOUS AI SUITE ──────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════
   {
     slug: 'ai-cofounder',
     title: 'AI Co-Founder: Autonomous Studio Agent',
@@ -318,8 +365,6 @@ Every state mutation in the workspace (contract signature, invoice cancellation,
       { id: 'llm-backends', title: '4. Gemini 3.5 & Claude Sonnet Backends' },
     ],
     content: `
-# AI Co-Founder: Autonomous Studio Agent
-
 The **Cora AI Co-Founder** is a persistent, context-aware autonomous agent designed to act as your studio's chief operating officer. It handles inbound lead qualification, drafts custom commercial proposals, calculates production budgets, and triages daily operational bottlenecks.
 
 ---
@@ -367,7 +412,7 @@ You can switch the underlying reasoning engine in the sticky administrator popov
     category: 'intelligence',
     categoryLabel: 'Intelligence & AI',
     description: 'Generate viral video scripts, social captions, and optimize website pages for AI search engine citations.',
-    readTime: '5 min read',
+    readTime: '6 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'script-generator', title: '1. Viral Video Script Generator' },
@@ -376,8 +421,6 @@ You can switch the underlying reasoning engine in the sticky administrator popov
       { id: 'google-business-sync', title: '4. Google Business Profile Sync' },
     ],
     content: `
-# Content AI & Generative Engine Optimization (GEO)
-
 The **Content AI & GEO Suite** unites high-conversion marketing copywriting with next-generation search engine optimization designed for both traditional Google SERPs and modern AI answer engines (ChatGPT Search, Perplexity, Gemini).
 
 ---
@@ -422,8 +465,6 @@ Schedule and preview posts across Instagram, LinkedIn, and WordPress with brand 
       { id: 'token-auth', title: '4. Bearer Token Security' },
     ],
     content: `
-# RAG Memory & Model Context Protocol (MCP)
-
 Cora transforms static studio data into a living intelligence layer via Retrieval-Augmented Generation (RAG) and open Model Context Protocol (MCP) server endpoints.
 
 ---
@@ -471,7 +512,7 @@ Cora acts as an **MCP Server**, allowing external desktop IDEs (Cursor, Windsurf
     category: 'intelligence',
     categoryLabel: 'Intelligence & AI',
     description: 'Convert voice recordings and audio WhatsApp briefs into formal client scopes of work, deliverables checklists, and GST estimates.',
-    readTime: '4 min read',
+    readTime: '5 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'how-it-works', title: '1. How It Works' },
@@ -479,8 +520,6 @@ Cora acts as an **MCP Server**, allowing external desktop IDEs (Cursor, Windsurf
       { id: 'structured-extraction', title: '3. Structured Extraction Schema' },
     ],
     content: `
-# Voice-to-Scope Audio Brief Transcription
-
 Creative clients frequently send chaotic 5-minute audio voice notes instead of written briefs. **Voice-to-Scope** uses Gemini Multimodal Audio to instantly convert spoken briefings into structured production contracts.
 
 ---
@@ -497,7 +536,9 @@ Creative clients frequently send chaotic 5-minute audio voice notes instead of w
     `,
   },
 
-  // ── 3. SALES & CRM ──
+  // ════════════════════════════════════════════════════════════════════════
+  // ── 3. SALES, FUNNELS & CRM ────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════
   {
     slug: 'lead-crm',
     title: 'Kanban Lead CRM & Pipeline Automation',
@@ -505,7 +546,7 @@ Creative clients frequently send chaotic 5-minute audio voice notes instead of w
     category: 'sales',
     categoryLabel: 'Sales & CRM',
     description: 'Track incoming shoot inquiries, manage visual deal pipelines, and trigger automated WhatsApp follow-ups.',
-    readTime: '5 min read',
+    readTime: '6 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'pipeline-stages', title: '1. Visual Pipeline Stages' },
@@ -513,8 +554,6 @@ Creative clients frequently send chaotic 5-minute audio voice notes instead of w
       { id: 'lead-scoring', title: '3. AI Intent Lead Scoring' },
     ],
     content: `
-# Kanban Lead CRM & Pipeline Automation
-
 The Cora **Kanban Lead CRM** gives creative studios a Notion-style drag-and-drop deal board tailored for high-ticket commercial shoots, retainer contracts, and wedding bookings.
 
 ---
@@ -545,8 +584,6 @@ By default, every new workspace seeds with five industry-standard pipeline stage
       { id: 'git-sync', title: '3. Version-Controlled Theme Sync' },
     ],
     content: `
-# Funnel Canvas Builder & Web Creator
-
 The **Canvas Builder** enables creative agencies to design and publish lightning-fast client landing pages, portfolio showcases, and lead-capture funnels directly inside the Cora workspace.
     `,
   },
@@ -557,7 +594,7 @@ The **Canvas Builder** enables creative agencies to design and publish lightning
     category: 'sales',
     categoryLabel: 'Sales & CRM',
     description: 'No-code drag-and-drop form creation system for client questionnaires, shoot booking briefs, and GST collection.',
-    readTime: '4 min read',
+    readTime: '5 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'field-types', title: '1. Supported Field Types' },
@@ -565,8 +602,6 @@ The **Canvas Builder** enables creative agencies to design and publish lightning
       { id: 'crm-piping', title: '3. Direct CRM Lead Piping' },
     ],
     content: `
-# Visual Forms Builder & Lead Capture
-
 Create custom embeddable forms with conditional branching, date slot selection, and direct piping into your Kanban Lead CRM.
     `,
   },
@@ -577,7 +612,7 @@ Create custom embeddable forms with conditional branching, date slot selection, 
     category: 'sales',
     categoryLabel: 'Sales & CRM',
     description: 'Automate post-shoot review collection with intelligent sentiment filtering and direct Google Business Profile synchronization.',
-    readTime: '4 min read',
+    readTime: '5 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'sentiment-funnel', title: '1. Smart Sentiment Funnel' },
@@ -585,13 +620,13 @@ Create custom embeddable forms with conditional branching, date slot selection, 
       { id: 'whatsapp-invitations', title: '3. WhatsApp Review Invitations' },
     ],
     content: `
-# 5★ Review Acquisition Portal
-
 Automate 5-star Google review collection. When a client rates their experience 4 or 5 stars, they are seamlessly guided to Google Maps. Negative feedback (1–3 stars) is captured privately for internal resolution.
     `,
   },
 
-  // ── 4. OPERATIONS & LEGAL ──
+  // ════════════════════════════════════════════════════════════════════════
+  // ── 4. OPERATIONS & LEGAL ──────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════
   {
     slug: 'esign-vault',
     title: 'SHA-256 E-Sign Vault & Legal Contracts',
@@ -609,8 +644,6 @@ Automate 5-star Google review collection. When a client rates their experience 4
       { id: 'pdf-generation', title: '4. Server-Side PDF Rendering' },
     ],
     content: `
-# SHA-256 E-Sign Vault & Legal Contracts
-
 The **Document Vault** is Cora's legal and compliance engine. It eliminates paper agreements and expensive third-party tools (DocuSign, PandaDoc) by providing unlimited, cryptographically verified digital contracts.
 
 ---
@@ -650,8 +683,6 @@ All signatures captured in Cora comply with Sections 4 and 5 of the **Indian Inf
       { id: 'whatsapp-broadcast', title: '3. One-Tap WhatsApp Broadcast' },
     ],
     content: `
-# Crew & Gear Dispatch Call Sheets
-
 Generate professional call sheets with call times, location maps, shoot agendas, gear checklists, and weather forecasts, then dispatch them to crew via WhatsApp with one click.
     `,
   },
@@ -662,7 +693,7 @@ Generate professional call sheets with call times, location maps, shoot agendas,
     category: 'operations',
     categoryLabel: 'Operations & Legal',
     description: 'Centralized multi-location calendar for shoot bookings, equipment reservations, and crew availability.',
-    readTime: '4 min read',
+    readTime: '5 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'calendar-views', title: '1. Multi-Day & Month Views' },
@@ -670,8 +701,6 @@ Generate professional call sheets with call times, location maps, shoot agendas,
       { id: 'ical-sync', title: '3. Google & Apple Calendar Sync' },
     ],
     content: `
-# Master Shoot Calendar & Booking Engine
-
 Manage all upcoming productions across multiple studios and outdoor locations with real-time status indicators and two-way calendar synchronization.
     `,
   },
@@ -682,7 +711,7 @@ Manage all upcoming productions across multiple studios and outdoor locations wi
     category: 'operations',
     categoryLabel: 'Operations & Legal',
     description: 'Post-production deliverable tracking, client review links, and async threaded commenting.',
-    readTime: '4 min read',
+    readTime: '5 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'post-production-flow', title: '1. Post-Production Milestone Flow' },
@@ -690,13 +719,13 @@ Manage all upcoming productions across multiple studios and outdoor locations wi
       { id: 'threaded-comments', title: '3. Threaded Timecode Comments' },
     ],
     content: `
-# Task Board & Deliverable Milestones
-
 Track post-production status from RAW ingest to rough cut, color grading, client revisions, and final master delivery.
     `,
   },
 
-  // ── 5. FINANCE & ASSETS ──
+  // ════════════════════════════════════════════════════════════════════════
+  // ── 5. FINANCE & ASSET MANAGEMENT ──────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════
   {
     slug: 'gst-invoicing',
     title: '18% GST Invoicing & Tax Math Engine',
@@ -704,7 +733,7 @@ Track post-production status from RAW ingest to rough cut, color grading, client
     category: 'finance',
     categoryLabel: 'Finance & Assets',
     description: 'Automated CGST/SGST/IGST splitting, HSN/SAC code registry, pro-forma invoices, and payment reconciliation.',
-    readTime: '5 min read',
+    readTime: '6 min read',
     lastUpdated: 'August 2026',
     badge: 'India Compliant',
     toc: [
@@ -713,8 +742,6 @@ Track post-production status from RAW ingest to rough cut, color grading, client
       { id: 'invoice-pdf', title: '3. Compliant PDF Tax Invoices' },
     ],
     content: `
-# 18% GST Invoicing & Tax Math Engine
-
 The Cora **GST Math Engine** handles all tax calculations required for Indian service businesses and commercial studios:
 
 - **Intra-State (Same State)**: Splits 18% GST into **9% CGST** + **9% SGST**.
@@ -725,12 +752,12 @@ The Cora **GST Math Engine** handles all tax calculations required for Indian se
   },
   {
     slug: 'asset-gear',
-    title: 'Gear & Inventory Management',
+    title: 'Gear & Inventory Equipment Registry',
     shortTitle: 'Gear & Inventory',
     category: 'finance',
     categoryLabel: 'Finance & Assets',
     description: 'Catalog cameras, lenses, lighting kits, track serial numbers, condition logs, and booking checkouts.',
-    readTime: '4 min read',
+    readTime: '5 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'inventory-registry', title: '1. Gear Catalog & Serial Numbers' },
@@ -738,8 +765,6 @@ The Cora **GST Math Engine** handles all tax calculations required for Indian se
       { id: 'condition-logs', title: '3. Maintenance & Damage Logs' },
     ],
     content: `
-# Gear & Inventory Management
-
 Maintain full tracking of your physical production assets, prevent double-booking of specialty lenses, and log maintenance repair histories.
     `,
   },
@@ -750,7 +775,7 @@ Maintain full tracking of your physical production assets, prevent double-bookin
     category: 'finance',
     categoryLabel: 'Finance & Assets',
     description: 'Workspace-scoped asset library with Gemini AI image tagging, client gallery share links, and in-browser image editor.',
-    readTime: '5 min read',
+    readTime: '6 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'ai-tagging', title: '1. Gemini Vision AI Tagging' },
@@ -758,13 +783,57 @@ Maintain full tracking of your physical production assets, prevent double-bookin
       { id: 'media-editor', title: '3. In-Browser Canvas Media Editor' },
     ],
     content: `
-# Media Hub & 4K RAW Proofing Gallery
-
 Deliver curated photo and video collections to your clients via secure, password-protected gallery portals with one-click download controls.
     `,
   },
+  {
+    slug: 'deal-simulator',
+    title: 'Deal Feasibility & Margin Simulator',
+    shortTitle: 'Deal Simulator',
+    category: 'finance',
+    categoryLabel: 'Finance & Assets',
+    description: 'Evaluate shoot profitability against subcontractor fees, equipment rentals, travel, and 18% GST reserves before signing.',
+    readTime: '5 min read',
+    lastUpdated: 'August 2026',
+    toc: [
+      { id: 'scoring-model', title: '1. Net Profit & Margin % Scoring' },
+      { id: 'ai-verdicts', title: '2. AI Feasibility Verdicts' },
+      { id: 'invoice-conversion', title: '3. 1-Click Invoice Conversion' },
+    ],
+    content: `
+The **Deal Feasibility Simulator** calculates true take-home bottom-line profit before you commit to a commercial shoot:
 
-  // ── 6. DEVELOPER APIS, PWA & CONNECTORS ──
+- **Net Profit & Margin %**: Subtracts equipment rentals, assistant wages, catering, and 18% GST reserves.
+- **AI Feasibility Verdict**: Flags low-margin quotes (< 30%) and gives actionable recommendations.
+- **1-Click Conversion**: Pushes approved feasibility numbers directly into a staged client invoice.
+    `,
+  },
+  {
+    slug: 'finance-reports',
+    title: 'Tax, Advance GST & CA Accountant Pack',
+    shortTitle: 'Accountant Pack',
+    category: 'finance',
+    categoryLabel: 'Finance & Assets',
+    description: 'Automate quarterly advance tax reserves, Input Tax Credit (ITC) reconciliation, and 1-click CA audit export packs.',
+    readTime: '5 min read',
+    lastUpdated: 'August 2026',
+    toc: [
+      { id: 'itc-reconciliation', title: '1. Output vs Input GST Reconciliation' },
+      { id: 'advance-tax', title: '2. Advance Income Tax Allocation' },
+      { id: 'ca-export', title: '3. 1-Click CA Audit Pack Export' },
+    ],
+    content: `
+The Financials module provides complete visibility into tax obligations and streamlines end-of-quarter handoffs to your Chartered Accountant:
+
+- **ITC Calculation**: Matches GST collected on client invoices against GST paid on gear rentals and studio expenses.
+- **Advance Tax Reserve**: Suggests 15% quarterly income tax allocations to avoid interest penalties.
+- **CA Export Pack**: Generates a clean ZIP containing itemized sales, purchase, and tax ledgers formatted for statutory audit.
+    `,
+  },
+
+  // ════════════════════════════════════════════════════════════════════════
+  // ── 6. DEVELOPER APIS, PWA & CONNECTORS ────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════
   {
     slug: 'pwa-architecture',
     title: 'PWA Architecture & Service Worker Lifecycle',
@@ -781,8 +850,6 @@ Deliver curated photo and video collections to your clients via secure, password
       { id: 'vapid-push', title: '3. VAPID Push Implementation' },
     ],
     content: `
-# PWA Architecture & Service Worker Lifecycle
-
 Cora ships with native Progressive Web App (PWA) capabilities, offering sub-50ms screen painting and native-like offline reliability.
 
 ---
@@ -811,7 +878,7 @@ Registered at root scope (\`/\`):
     category: 'developers',
     categoryLabel: 'Developer APIs & PWA',
     description: 'Complete API reference for bookings, leads, invoices, e-sign contracts, and PWA push subscriptions.',
-    readTime: '7 min read',
+    readTime: '8 min read',
     lastUpdated: 'August 2026',
     badge: 'API Spec',
     toc: [
@@ -821,8 +888,6 @@ Registered at root scope (\`/\`):
       { id: 'pwa-endpoints', title: '4. PWA Push Endpoints' },
     ],
     content: `
-# REST API & AJAX Endpoint Reference
-
 All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`/wp-json/cora-pwa/v1/\`) and standard AJAX actions.
 
 ---
@@ -837,7 +902,7 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
 ## 2. API Endpoints Table
 
 | Method | Route / Action | Required Permission | Description |
-|--------|----------------|---------------------|-------------|
+|---|---|---|---|
 | \`GET\` | \`/wp-json/cora/v1/leads\` | \`cora_view_dashboard\` | Fetch paginated leads list |
 | \`POST\` | \`/wp-json/cora/v1/leads\` | \`cora_manage_bookings\` | Create new shoot lead |
 | \`POST\` | \`/wp-json/cora/v1/invoices\` | \`cora_manage_financials\` | Create 18% GST invoice |
@@ -847,13 +912,53 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
     `,
   },
   {
+    slug: 'mcp-gateway',
+    title: 'Model Context Protocol (MCP) Server Gateway',
+    shortTitle: 'MCP Gateway',
+    category: 'developers',
+    categoryLabel: 'Developer APIs & PWA',
+    description: 'Connect external AI IDEs and autonomous LLM agents (Cursor, Windsurf, Claude Desktop) directly to your studio workspace.',
+    readTime: '6 min read',
+    lastUpdated: 'August 2026',
+    badge: 'Developer Protocol',
+    toc: [
+      { id: 'mcp-protocol', title: '1. Model Context Protocol Overview' },
+      { id: 'configuration', title: '2. IDE Configuration (claude_desktop_config.json)' },
+      { id: 'tools-catalog', title: '3. Exposed Workspace Tool Registry' },
+    ],
+    content: `
+The **Cora MCP Gateway** exposes your studio database as structured Model Context Protocol (MCP) tools so external AI coding assistants can query calendar availability, generate quotes, and create invoices.
+
+---
+
+## 1. Configuration
+
+Add the following to your \`claude_desktop_config.json\` or Cursor MCP settings:
+
+\`\`\`json
+{
+  "mcpServers": {
+    "cora-studio": {
+      "command": "npx",
+      "args": ["-y", "@heycora/mcp-server"],
+      "env": {
+        "CORA_WORKSPACE_URL": "https://app.heycora.in",
+        "CORA_API_TOKEN": "YOUR_WORKSPACE_BEARER_TOKEN"
+      }
+    }
+  }
+}
+\`\`\`
+    `,
+  },
+  {
     slug: 'website-connectors',
     title: 'Website Connectors: Framer, Webflow & WordPress',
     shortTitle: 'Website Connectors',
     category: 'developers',
     categoryLabel: 'Developer APIs & PWA',
     description: 'Embed client portals, e-sign agreements, and lead capture forms on Framer, Webflow, and custom websites.',
-    readTime: '4 min read',
+    readTime: '5 min read',
     lastUpdated: 'August 2026',
     toc: [
       { id: 'framer-embed', title: '1. Framer 1-Line Embed' },
@@ -861,8 +966,6 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
       { id: 'wordpress-plugin', title: '3. WordPress Connector' },
     ],
     content: `
-# Website Connectors: Framer, Webflow & WordPress
-
 Connect your existing website or portfolio directly to your Cora backend with a single script embed or webhook URL.
 
 ---
@@ -879,7 +982,7 @@ Add this script tag to your Framer project settings to embed live booking calend
 </script>
 \`\`\`
     `,
-  }
+  },
 ];
 
 export const DOC_CATEGORIES: DocCategory[] = [

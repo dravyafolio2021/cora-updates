@@ -111,8 +111,13 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
 
     // 3. Headings
     if (line.startsWith('# ')) {
+      // Skip the first top-level # heading if it's at the very beginning of the content
+      if (i === 0 || blocks.length === 0) {
+        i++;
+        continue;
+      }
       blocks.push(
-        <h1 key={`h1-${i}`} className="font-display text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight mt-8 mb-4">
+        <h1 key={`h1-${i}`} className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight mt-8 mb-4">
           {line.replace('# ', '')}
         </h1>
       );
