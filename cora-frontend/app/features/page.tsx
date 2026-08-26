@@ -26,6 +26,7 @@ import {
 import { BUILT_MODULES, UPCOMING_MODULES, CATEGORIES, INDUSTRIES, FeatureModule } from '@/lib/features-data';
 import { FeatureIcon } from '@/components/features/FeatureIcon';
 import { FeaturesSidebar } from '@/components/features/FeaturesSidebar';
+import { ModuleCardVisual } from '@/components/features/ModuleCardVisual';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -358,7 +359,7 @@ export default function FeaturesPage() {
               </div>
             )}
 
-            {/* ── 20 BUILT MODULES CARDS GRID ── */}
+            {/* ── 20 BUILT MODULES CARDS GRID (TACTILE 3D UI ILLUSTRATION CARDS) ── */}
             {filteredBuiltModules.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-6">
@@ -370,72 +371,70 @@ export default function FeaturesPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
                   {filteredBuiltModules.map((mod) => (
                     <div
                       key={mod.slug}
-                      className="bg-white rounded-[22px] border border-zinc-200/90 p-5 sm:p-6 flex flex-col justify-between hover:shadow-[0_12px_28px_rgba(0,0,0,0.06)] hover:border-zinc-300 transition-all group"
+                      className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group"
                     >
-                      <div className="space-y-3.5">
-                        
-                        {/* Top Bar: Icon + Live Badge */}
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-                            <FeatureIcon name={mod.iconName} className="w-5 h-5" />
-                          </div>
-                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            LIVE
-                          </span>
-                        </div>
+                      {/* Top Tactile 3D UI Illustration Area */}
+                      <div className="w-full h-[200px] sm:h-[215px] overflow-hidden border-b border-zinc-100 relative group-hover:scale-[1.02] transition-transform duration-300 select-none">
+                        <ModuleCardVisual slug={mod.slug} category={mod.category} title={mod.shortTitle || mod.title} />
+                      </div>
 
-                        {/* Category & Title */}
+                      {/* Bottom Content Body */}
+                      <div className="p-5 sm:p-6 flex flex-col justify-between flex-1 space-y-4">
                         <div>
-                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-1">
-                            {mod.categoryLabel}
-                          </span>
-                          <h3 className="font-display text-base font-bold text-zinc-950 leading-snug group-hover:text-zinc-800 transition-colors">
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">
+                              {mod.categoryLabel}
+                            </span>
+                            <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              LIVE
+                            </span>
+                          </div>
+
+                          <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 leading-snug group-hover:text-zinc-800 transition-colors">
                             {mod.title}
                           </h3>
+
+                          <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed mt-2 line-clamp-2">
+                            {mod.tagline || mod.heroDescription}
+                          </p>
                         </div>
 
-                        {/* Description */}
-                        <p className="text-zinc-600 text-xs leading-relaxed line-clamp-3">
-                          {mod.tagline || mod.heroDescription}
-                        </p>
+                        {/* Capability Tags & Explore Links */}
+                        <div className="space-y-3.5 pt-1">
+                          <div className="flex flex-wrap gap-1.5">
+                            {mod.tags.slice(0, 3).map((tag) => (
+                              <span
+                                key={tag}
+                                className="text-[10px] font-medium bg-zinc-100 text-zinc-700 px-2.5 py-0.5 rounded-lg border border-zinc-200/60"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
 
-                        {/* Capability Tags */}
-                        <div className="flex flex-wrap gap-1.5 pt-1">
-                          {mod.tags.slice(0, 3).map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-[10px] font-medium bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded-md border border-zinc-200/60"
+                          <div className="pt-3.5 border-t border-zinc-100 flex items-center justify-between gap-3">
+                            <Link
+                              href={`/features/${mod.slug}`}
+                              className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 hover:text-zinc-600 transition-colors group-hover:translate-x-0.5 transition-transform"
                             >
-                              {tag}
-                            </span>
-                          ))}
+                              <span>Explore Feature</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </Link>
+
+                            <a
+                              href={`https://app.heycora.in/workspace/login?feature=${mod.slug}`}
+                              className="text-[11px] font-medium text-zinc-400 hover:text-zinc-800 transition-colors"
+                            >
+                              Launch Free ↗
+                            </a>
+                          </div>
                         </div>
-
                       </div>
-
-                      {/* Footer Action Links */}
-                      <div className="pt-4 border-t border-zinc-100 mt-4 flex items-center justify-between gap-3">
-                        <Link
-                          href={`/features/${mod.slug}`}
-                          className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 hover:text-zinc-600 transition-colors group-hover:translate-x-0.5 transition-transform"
-                        >
-                          <span>Explore Feature</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-
-                        <a
-                          href={`https://app.heycora.in/workspace/login?feature=${mod.slug}`}
-                          className="text-[11px] font-medium text-zinc-400 hover:text-zinc-700 transition-colors"
-                        >
-                          Launch Free ↗
-                        </a>
-                      </div>
-
                     </div>
                   ))}
                 </div>
@@ -459,42 +458,39 @@ export default function FeaturesPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                   {filteredRoadmapModules.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-zinc-900/80 rounded-2xl p-4.5 border border-zinc-800 flex flex-col justify-between hover:border-zinc-700 transition-all group"
+                      className="bg-zinc-900/90 rounded-[28px] border border-zinc-800 flex flex-col justify-between overflow-hidden hover:border-zinc-700 hover:shadow-xl transition-all group"
                     >
-                      <div className="space-y-2.5">
-                        <div className="flex items-center justify-between">
-                          <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
-                            <FeatureIcon name={item.iconName} className="w-4 h-4" />
-                          </div>
-                          <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30">
-                            {item.eta}
-                          </span>
-                        </div>
-
-                        <div>
-                          <span className="text-[9px] font-mono font-bold text-zinc-500 uppercase tracking-wider block mb-0.5">
-                            {item.categoryLabel}
-                          </span>
-                          <h4 className="font-display text-xs sm:text-sm font-bold text-white leading-snug">
-                            {item.title}
-                          </h4>
-                        </div>
-
-                        <p className="text-zinc-400 text-xs leading-relaxed line-clamp-3">
-                          {item.desc}
-                        </p>
+                      <div className="w-full h-[150px] overflow-hidden border-b border-zinc-800 relative select-none">
+                        <ModuleCardVisual slug={item.id} category={item.categoryLabel} title={item.title} />
                       </div>
 
-                      <div className="pt-3 mt-3 border-t border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-500">
-                        <span>Status</span>
-                        <span className="text-amber-400 font-semibold flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                          {item.status}
-                        </span>
+                      <div className="p-5 flex flex-col justify-between flex-1 space-y-3">
+                        <div>
+                          <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
+                            <span className="text-zinc-500 uppercase font-bold">{item.categoryLabel}</span>
+                            <span className="text-amber-300 font-bold bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30">
+                              {item.eta}
+                            </span>
+                          </div>
+                          <h4 className="font-display text-sm font-bold text-white leading-snug">
+                            {item.title}
+                          </h4>
+                          <p className="text-zinc-400 text-xs leading-relaxed mt-1.5 line-clamp-2">
+                            {item.desc}
+                          </p>
+                        </div>
+
+                        <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-500">
+                          <span>Status</span>
+                          <span className="text-amber-400 font-semibold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                            {item.status}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}
