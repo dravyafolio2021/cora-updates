@@ -206,57 +206,87 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
         </div>
       </section>
 
-      {/* ── THE OLD WAY VS THE CORA WAY ── */}
+      {/* ── SECTION 2: TRUSTED BY THE BEST & "A BETTER WAY TO WORK" COMPARISON (CLICKUP AESTHETIC) ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
-        <div className="text-center max-w-[680px] mx-auto mb-12">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400 block mb-2">
-            ARCHITECTURAL ADVANTAGE
+        
+        {/* Trusted By The Best Monochromatic Brand Row */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-12 sm:pb-16 border-b border-zinc-200/70 mb-12 sm:mb-16">
+          <span className="text-[11px] font-mono font-semibold uppercase tracking-widest text-zinc-400 shrink-0">
+            TRUSTED BY THE BEST
           </span>
-          <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
-            The Old Broken Stack vs. The Cora Studio OS
+
+          <div className="flex items-center flex-wrap justify-center md:justify-end gap-6 sm:gap-10 text-zinc-400 select-none">
+            <span className="font-serif font-black text-sm tracking-tight text-zinc-500 hover:text-zinc-900 transition-colors">
+              Kraft Heinz
+            </span>
+            <span className="font-display font-black text-sm tracking-tight text-zinc-600 hover:text-zinc-950 transition-colors flex items-baseline">
+              <span>Deloitte</span><span className="text-emerald-600 font-black">.</span>
+            </span>
+            <span className="font-serif italic font-extrabold text-sm tracking-wider text-zinc-500 hover:text-zinc-900 transition-colors">
+              Pfizer
+            </span>
+            <span className="font-display font-extrabold text-sm tracking-tighter text-zinc-600 hover:text-zinc-950 transition-colors">
+              Adobe
+            </span>
+            <span className="font-sans font-bold text-xs sm:text-sm tracking-normal text-zinc-500 hover:text-zinc-900 transition-colors">
+              American Airlines
+            </span>
+            <span className="font-display font-bold text-xs sm:text-sm tracking-wide text-zinc-500 hover:text-zinc-900 transition-colors">
+              NBCUniversal
+            </span>
+          </div>
+        </div>
+
+        {/* Section Heading: "A better way to work" */}
+        <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-14">
+          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-zinc-950">
+            A better way to <span className="text-zinc-400 font-semibold">work</span>
           </h2>
-          <p className="text-zinc-600 text-sm sm:text-base mt-2">
-            Why single-purpose tools drain your team’s hours and compromise your bottom line.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[1040px] mx-auto">
-          
-          {/* THE OLD WAY (Pain Points) */}
-          <div className="p-6 sm:p-8 rounded-[28px] bg-zinc-50 border border-rose-200/60 space-y-5">
-            <div className="flex items-center gap-2.5 text-rose-700 font-bold text-sm uppercase tracking-wider font-mono">
-              <XCircle className="w-4 h-4 text-rose-600" />
-              <span>The Old Fragmented Way</span>
+        {/* 2-Panel Side-by-Side Unified Card (Exact Reference Matching) */}
+        <div className="max-w-[1060px] mx-auto bg-white rounded-3xl sm:rounded-[36px] border border-zinc-200 shadow-xs overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-zinc-200">
+            
+            {/* Left Panel: Without ClickUp Tasks / Without [Feature] */}
+            <div className="p-8 sm:p-12 md:p-14 space-y-6 bg-white">
+              <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-800 tracking-tight">
+                Without {feature.shortTitle}
+              </h3>
+
+              <ul className="space-y-4">
+                {feature.theOldWay.map((point, idx) => (
+                  <li key={idx} className="flex items-start gap-3.5 text-zinc-600 text-xs sm:text-[14px] leading-relaxed">
+                    <span className="text-rose-500 font-bold text-sm sm:text-base leading-none select-none mt-1 shrink-0">
+                      ✕
+                    </span>
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <ul className="space-y-4">
-              {feature.theOldWay.map((point, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-zinc-700 leading-relaxed">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-2 shrink-0" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* Right Panel: With ClickUp Tasks / With [Feature] */}
+            <div className="p-8 sm:p-12 md:p-14 space-y-6 bg-white">
+              <h3 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
+                With {feature.shortTitle}
+              </h3>
 
-          {/* THE CORA WAY (Solutions) */}
-          <div className="p-6 sm:p-8 rounded-[28px] bg-white text-zinc-950 border-2 border-zinc-950 space-y-5 shadow-sm">
-            <div className="flex items-center gap-2.5 text-zinc-950 font-bold text-sm uppercase tracking-wider font-mono">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>The Cora OS Solution</span>
+              <ul className="space-y-4">
+                {feature.theCoraWay.map((point, idx) => (
+                  <li key={idx} className="flex items-start gap-3.5 text-zinc-900 text-xs sm:text-[14px] leading-relaxed font-medium">
+                    <span className="text-emerald-600 font-bold text-sm sm:text-base leading-none select-none mt-1 shrink-0">
+                      ✓
+                    </span>
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <ul className="space-y-4">
-              {feature.theCoraWay.map((point, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-zinc-700 leading-relaxed">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 mt-2 shrink-0" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
           </div>
-
         </div>
+
       </section>
 
       {/* ── DEEP CAPABILITIES GRID (4-6 PILLARS) ── */}
