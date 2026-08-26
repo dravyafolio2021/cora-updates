@@ -193,7 +193,10 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
         {/* ══════════════════════════════════════════════════════════════════
             1. LEFT NAVIGATION SIDEBAR (CATEGORIES & ARTICLES)
         ══════════════════════════════════════════════════════════════════ */}
-        <aside className="hidden lg:block w-[280px] shrink-0 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto p-6 border-r border-zinc-100 space-y-6">
+        <aside
+          data-lenis-prevent
+          className="hidden lg:block w-[280px] shrink-0 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto overscroll-contain p-6 border-r border-zinc-100 space-y-6"
+        >
           
           <div className="space-y-5">
             {DOC_CATEGORIES.map((cat) => {
@@ -343,7 +346,10 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
         {/* ══════════════════════════════════════════════════════════════════
             3. RIGHT ON-THIS-PAGE TOC SIDEBAR
         ══════════════════════════════════════════════════════════════════ */}
-        <aside className="hidden xl:block w-[240px] shrink-0 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto p-6 space-y-6">
+        <aside
+          data-lenis-prevent
+          className="hidden xl:block w-[240px] shrink-0 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto overscroll-contain p-6 space-y-6"
+        >
           
           {currentArticle.toc && currentArticle.toc.length > 0 && (
             <div className="space-y-2.5">
@@ -422,7 +428,10 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
             className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileSidebarOpen(false)}
           />
-          <div className="relative w-full max-w-[300px] bg-white h-full shadow-2xl p-6 overflow-y-auto z-10 flex flex-col justify-between">
+          <div
+            data-lenis-prevent
+            className="relative w-full max-w-[300px] bg-white h-full shadow-2xl p-6 overflow-y-auto overscroll-contain z-10 flex flex-col justify-between"
+          >
             <div className="space-y-6">
               <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
                 <span className="font-display font-bold text-base text-zinc-950">Documentation</span>
@@ -507,7 +516,10 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
             </div>
 
             {/* Results Body */}
-            <div className="max-h-[380px] overflow-y-auto p-2">
+            <div
+              data-lenis-prevent
+              className="max-h-[380px] overflow-y-auto overscroll-contain p-2"
+            >
               {searchQuery.trim() === '' ? (
                 <div className="p-6 text-center text-xs text-zinc-400 space-y-1">
                   <p className="font-semibold text-zinc-600">Quick Navigation</p>
