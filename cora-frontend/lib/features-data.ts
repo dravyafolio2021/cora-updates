@@ -93,13 +93,13 @@ export interface RoadmapModule {
 }
 
 export const CATEGORIES = [
-  { id: 'all', label: 'All Modules (28)' },
-  { id: 'intelligence', label: 'Intelligence & AI (4)' },
-  { id: 'sales', label: 'Sales & CRM (4)' },
-  { id: 'operations', label: 'Operations & Legal (4)' },
-  { id: 'finance', label: 'Finance & Assets (4)' },
-  { id: 'platform', label: 'Platform & Governance (4)' },
-  { id: 'roadmap', label: 'Upcoming Roadmap (8)' }
+  { id: 'all', label: 'All (28)' },
+  { id: 'intelligence', label: 'AI & Copy (4)' },
+  { id: 'sales', label: 'Leads & CRM (4)' },
+  { id: 'operations', label: 'Contracts & Crew (4)' },
+  { id: 'finance', label: 'GST & Invoicing (4)' },
+  { id: 'platform', label: 'Settings (4)' },
+  { id: 'roadmap', label: 'Roadmap (8)' }
 ];
 
 export const BUILT_MODULES: FeatureModule[] = [

@@ -52,14 +52,14 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
 
   return (
     <div className="w-full">
-      {/* ── ARTISTIC BLENDED HERO SECTION ── */}
-      <section className="relative w-full pt-28 sm:pt-36 pb-16 sm:pb-24 overflow-hidden">
+      {/* ── ARTISTIC BLENDED HERO SECTION (COMPACT <=40VH) ── */}
+      <section className="relative w-full pt-20 sm:pt-24 pb-8 sm:pb-12 overflow-hidden">
         {/* Soft Organic Background & Gradient Veil that melts down into the page */}
         <ArtisticHeroBackground tone={categoryTone} />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6">
           {/* Breadcrumbs */}
-          <nav className="flex items-center gap-1.5 text-xs text-zinc-600 font-medium overflow-x-auto whitespace-nowrap scrollbar-none py-1 mb-8">
+          <nav className="flex items-center gap-1.5 text-xs text-zinc-600 font-medium overflow-x-auto whitespace-nowrap scrollbar-none py-1 mb-4">
             <Link href="/" className="hover:text-zinc-950 transition-colors">
               Home
             </Link>
@@ -77,37 +77,37 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
             </span>
           </nav>
 
-          <div className="flex flex-col items-start gap-5 max-w-[880px]">
+          <div className="flex flex-col items-start gap-3.5 max-w-[880px]">
             {/* Status & Category Badge */}
-            <div className="flex items-center flex-wrap gap-2.5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200/90 rounded-full text-xs font-semibold shadow-2xs">
+            <div className="flex items-center flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200/90 rounded-full text-xs font-semibold shadow-2xs">
                 <FeatureIcon name={feature.iconName} className="w-3.5 h-3.5 text-zinc-800" />
                 <span>{feature.categoryLabel}</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 rounded-full text-[11px] font-mono font-bold backdrop-blur-md">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 rounded-full text-[10px] font-mono font-bold backdrop-blur-md">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 {feature.status}
               </span>
             </div>
 
             {/* Main Title */}
-            <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.1]">
+            <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.15]">
               {feature.title}
             </h1>
 
             {/* Value Tagline */}
-            <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed">
+            <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[760px]">
               {feature.heroDescription}
             </p>
 
             {/* Stats Bar */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-6 w-full py-4 my-2 border-y border-zinc-200/70">
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 w-full py-3 my-1 border-y border-zinc-200/70">
               {feature.stats.map((stat, idx) => (
                 <div key={idx} className="space-y-0.5">
-                  <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
+                  <div className="font-display text-lg sm:text-2xl font-extrabold text-zinc-950 tracking-tight">
                     {stat.metric}
                   </div>
-                  <div className="text-[11px] sm:text-xs text-zinc-500 font-medium">
+                  <div className="text-[10px] sm:text-xs text-zinc-500 font-medium">
                     {stat.label}
                   </div>
                 </div>
@@ -115,21 +115,21 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
             </div>
 
             {/* Dual Action Buttons */}
-            <div className="flex items-center flex-wrap gap-3.5 pt-1">
+            <div className="flex items-center flex-wrap gap-2.5 pt-0.5">
               <a
                 href={`https://app.heycora.in/workspace/login?feature=${feature.slug}`}
                 onClick={() => trackEvent('feature_detail_try_free', { slug: feature.slug })}
-                className="inline-flex items-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm group cursor-pointer"
+                className="inline-flex items-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm group cursor-pointer"
               >
-                <span>Launch {feature.shortTitle} Free</span>
-                <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+                <span>Try {feature.shortTitle} Free</span>
+                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
               </a>
 
               <Link
                 href="/pricing"
-                className="inline-flex items-center gap-2 bg-white text-zinc-900 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50/80 px-5 py-3.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs"
+                className="inline-flex items-center gap-2 bg-white text-zinc-900 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50/80 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs"
               >
-                <span>View Included Plans</span>
+                <span>Pricing Plans</span>
               </Link>
             </div>
 

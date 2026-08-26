@@ -61,32 +61,32 @@ export default function FeaturesPage() {
   return (
     <main className="w-full relative pb-24 overflow-hidden bg-white text-zinc-900">
       
-      {/* ── ARTISTIC BLENDED HERO & INTRO SECTION ── */}
-      <section className="relative w-full pt-32 sm:pt-40 pb-20 sm:pb-28 overflow-hidden">
-        {/* Soft Organic Background & Gradient Veil that melts down into the page */}
+      {/* ── COMPACT ARTISTIC INTRO SECTION (MAX 40VH) ── */}
+      <section className="relative w-full pt-24 sm:pt-28 pb-8 sm:pb-10 overflow-hidden">
+        {/* Soft Organic Background & Gradient Veil merging seamlessly down */}
         <ArtisticHeroBackground tone="blue" />
 
-        <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
+        <div className="relative z-10 w-full max-w-[1100px] mx-auto px-4 sm:px-6 text-center">
           
-          {/* Status Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/80 backdrop-blur-md rounded-full border border-blue-200/80 text-xs font-semibold text-zinc-900 mb-6 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>20 Built Modules Live • 8 In Active Development</span>
+          {/* Status Pill */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full border border-blue-200/70 text-[11px] font-semibold text-zinc-800 mb-3.5 shadow-2xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>20 Features Ready • 8 In Progress</span>
           </div>
 
-          {/* Clean Headline */}
-          <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl font-extrabold text-zinc-950 leading-[1.12] tracking-[-0.035em] max-w-[920px] mx-auto mb-5">
-            One Operating System, Every Creative Workflow
+          {/* Simple, Direct Heading for Non-Tech Users */}
+          <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl font-extrabold text-zinc-950 leading-tight tracking-[-0.03em] max-w-[800px] mx-auto mb-2.5">
+            Everything you need to run your studio
           </h1>
 
-          {/* Tagline */}
-          <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed max-w-[720px] mx-auto mb-9">
-            An autonomous, unified workspace replacing 8+ disconnected tools with native AI reasoning, Kanban CRM, SHA-256 contracts, and 18% GST invoicing.
+          {/* Plain English Subtitle */}
+          <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[620px] mx-auto mb-6">
+            Inquiries, shoot calendar, legal contracts, and GST bills. Built for photographers, filmmakers, and creative agencies.
           </p>
 
-          {/* ── FLOATING ARTISTIC PILL BAR (Inspired by Media Reference) ── */}
-          <div className="max-w-[920px] mx-auto mb-8">
-            <div className="inline-flex items-center justify-center p-1.5 bg-white/75 backdrop-blur-md border border-zinc-200/80 rounded-full shadow-sm max-w-full overflow-x-auto scrollbar-none gap-1">
+          {/* ── RESPONSIVE COMPACT PILL BAR ── */}
+          <div className="w-full max-w-[820px] mx-auto mb-4 px-1">
+            <div className="flex items-center justify-start sm:justify-center p-1 bg-white/85 backdrop-blur-md border border-zinc-200/80 rounded-full shadow-2xs overflow-x-auto scrollbar-none gap-1">
               {CATEGORIES.map((cat) => {
                 const isActive = activeCategory === cat.id;
                 return (
@@ -96,10 +96,10 @@ export default function FeaturesPage() {
                       setActiveCategory(cat.id);
                       trackEvent('features_category_filter', { category: cat.id });
                     }}
-                    className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer shrink-0 ${
                       isActive
-                        ? 'bg-white text-zinc-950 shadow-md border border-zinc-200/90 font-bold scale-[1.02]'
-                        : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/40'
+                        ? 'bg-zinc-950 text-white shadow-xs font-bold'
+                        : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/60'
                     }`}
                   >
                     <span>{cat.label}</span>
@@ -109,46 +109,27 @@ export default function FeaturesPage() {
             </div>
           </div>
 
-          {/* Search Bar sitting harmoniously in the hero */}
-          <div className="max-w-[460px] mx-auto mb-6">
+          {/* Sleek Compact Search Bar */}
+          <div className="max-w-[380px] mx-auto">
             <div className="relative flex items-center">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search capabilities (e.g. GST, E-Signs, CRM, Calendar, MCP)..."
+                placeholder="Search tools (e.g. GST, E-Sign, CRM, Calendar)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/90 focus:bg-white border border-zinc-200/90 focus:border-zinc-950 rounded-2xl text-xs sm:text-sm font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all shadow-sm"
+                className="w-full pl-9 pr-3.5 py-1.5 bg-white/90 focus:bg-white border border-zinc-200/90 focus:border-zinc-950 rounded-xl text-xs font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all shadow-2xs"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 text-xs text-zinc-400 hover:text-zinc-700 font-mono"
+                  className="absolute right-2.5 text-[11px] text-zinc-400 hover:text-zinc-700 font-mono"
                 >
                   Clear
                 </button>
               )}
             </div>
-          </div>
-
-          {/* Quick CTAs */}
-          <div className="flex items-center justify-center flex-wrap gap-3 pt-2">
-            <a
-              href="https://app.heycora.in/workspace/login?source=features_hero"
-              onClick={() => trackEvent('features_page_cta_clicked')}
-              className="inline-flex items-center gap-2 bg-zinc-950 text-white px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-sm border border-zinc-800 group cursor-pointer"
-            >
-              <span>Get started for Free</span>
-              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-200/90 hover:border-zinc-300 px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
-            >
-              <span>View Pricing &amp; ROI</span>
-            </Link>
           </div>
 
         </div>
