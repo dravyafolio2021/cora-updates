@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { FeatureModule, BUILT_MODULES } from '@/lib/features-data';
 import { FeatureIcon } from './FeatureIcon';
+import { FeatureVisualMockup } from './FeatureVisualMockup';
 import { ArtisticHeroBackground } from './ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -197,78 +198,8 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
             </div>
 
             {/* Mockup Operational Content Panel */}
-            <div className="p-5 sm:p-8 space-y-6 bg-[#FCFCFD]">
-              
-              {/* Header Info & Live Metric Pills */}
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-zinc-200/80">
-                <div>
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950">
-                    {feature.mockup.headerTitle}
-                  </h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    {feature.mockup.headerSubtitle}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2.5 shrink-0">
-                  <div className="px-3 py-1.5 rounded-xl bg-white border border-zinc-200 shadow-2xs text-left">
-                    <span className="text-[10px] font-mono text-zinc-400 block">{feature.mockup.metric1.label}</span>
-                    <span className="text-xs font-mono font-bold text-zinc-950">{feature.mockup.metric1.value}</span>
-                  </div>
-                  <div className="px-3 py-1.5 rounded-xl bg-white border border-zinc-200 shadow-2xs text-left">
-                    <span className="text-[10px] font-mono text-zinc-400 block">{feature.mockup.metric2.label}</span>
-                    <span className="text-xs font-mono font-bold text-zinc-950">{feature.mockup.metric2.value}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Data Table Matrix Preview */}
-              <div className="w-full overflow-x-auto rounded-2xl border border-zinc-200/90 bg-white shadow-2xs">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="border-b border-zinc-200 bg-zinc-50/80 text-zinc-500 font-mono text-[11px] uppercase">
-                      {feature.mockup.tableHeaders.map((header, idx) => (
-                        <th key={idx} className="py-3 px-4 font-semibold">{header}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-100 font-medium">
-                    {feature.mockup.rows.map((row, rIdx) => (
-                      <tr key={rIdx} className="hover:bg-zinc-50/80 transition-colors">
-                        <td className="py-3.5 px-4 text-zinc-900 font-semibold">{row.col1}</td>
-                        <td className="py-3.5 px-4 text-zinc-600">{row.col2}</td>
-                        <td className="py-3.5 px-4 text-zinc-700 font-mono text-[11px]">{row.col3}</td>
-                        <td className="py-3.5 px-4">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-zinc-100 text-zinc-800 border border-zinc-200">
-                            <span className={`w-1.5 h-1.5 rounded-full ${
-                              row.statusType === 'success' 
-                                ? 'bg-emerald-500' 
-                                : row.statusType === 'warning'
-                                  ? 'bg-amber-500'
-                                  : row.statusType === 'info'
-                                    ? 'bg-sky-500'
-                                    : 'bg-zinc-400'
-                            }`} />
-                            {row.statusText}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-4 text-right">
-                          <span className="text-[11px] font-bold text-zinc-950 hover:text-zinc-600 transition-colors cursor-default underline underline-offset-4">
-                            {row.actionText} →
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mockup Footer Caption */}
-              <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1 font-mono">
-                <span>⚡ Powered by Cora Atomic UI Engine</span>
-                <span>SHA-256 Verified • AES-256 Encrypted</span>
-              </div>
-
+            <div className="p-3 sm:p-5 bg-[#FCFCFD]">
+              <FeatureVisualMockup feature={feature} />
             </div>
 
           </div>
