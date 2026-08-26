@@ -254,7 +254,7 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
         {/* ══════════════════════════════════════════════════════════════════
             2. CENTER MAIN ARTICLE PROSE VIEW
         ══════════════════════════════════════════════════════════════════ */}
-        <main className="flex-1 min-w-0 px-6 sm:px-12 py-10 lg:py-12 max-w-[840px] mx-auto">
+        <main className="flex-1 min-w-0 px-6 sm:px-12 py-10 lg:py-12 pb-28 lg:pb-12 max-w-[840px] mx-auto">
           
           {/* Article Header & Metadata */}
           <div className="space-y-3 pb-8 border-b border-zinc-100">
@@ -420,66 +420,145 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
-          4. MOBILE SLIDE-OUT DRAWER SIDEBAR
+          4. MOBILE FLOATING BOTTOM BAR (< lg)
+      ══════════════════════════════════════════════════════════════════ */}
+      <div className="lg:hidden fixed bottom-4 left-4 right-4 z-40">
+        <div className="bg-zinc-950/95 text-white rounded-2xl p-2 px-3 shadow-2xl border border-zinc-800 flex items-center justify-between gap-2 backdrop-blur-md">
+          
+          {/* Left: Open Bottom Sheet Trigger */}
+          <button
+            type="button"
+            onClick={() => setMobileSidebarOpen(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold transition-colors cursor-pointer max-w-[55%]"
+          >
+            <Layers className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <span className="truncate">{currentArticle.shortTitle}</span>
+            <ChevronDown className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+          </button>
+
+          {/* Right Controls: Search + Free Start / Next */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+              aria-label="Search Documentation"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+
+            {nextArticle ? (
+              <Link
+                href={`/docs/${nextArticle.slug}`}
+                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-bold transition-colors shrink-0 shadow-2xs"
+              >
+                <span>Next</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            ) : (
+              <a
+                href="https://app.heycora.in/workspace/login?source=docs_bottombar"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-bold transition-colors shrink-0 shadow-2xs"
+              >
+                <span>Free</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </a>
+            )}
+          </div>
+
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          5. MOBILE BOTTOM SHEET DRAWER (< lg)
       ══════════════════════════════════════════════════════════════════ */}
       {mobileSidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
+          {/* Dark Backdrop */}
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileSidebarOpen(false)}
           />
+
+          {/* Slide-Up Bottom Sheet Card */}
           <div
             data-lenis-prevent
-            className="relative w-full max-w-[300px] bg-white h-full shadow-2xl p-6 overflow-y-auto overscroll-contain z-10 flex flex-col justify-between"
+            className="relative w-full max-h-[82vh] bg-white rounded-t-[32px] shadow-2xl border-t border-zinc-200/90 z-10 flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200"
           >
-            <div className="space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
-                <span className="font-display font-bold text-base text-zinc-950">Documentation</span>
+            {/* Top Drag Handle + Header */}
+            <div className="pt-3 pb-3 px-6 border-b border-zinc-100 shrink-0">
+              <div className="w-12 h-1.5 bg-zinc-300/80 rounded-full mx-auto mb-3" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="font-display font-bold text-base text-zinc-950">Documentation</span>
+                  <span className="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 text-[10px] font-mono font-bold border border-zinc-200">
+                    23 Guides
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setMobileSidebarOpen(false)}
-                  className="p-1 text-zinc-400 hover:text-zinc-950"
+                  className="p-1.5 rounded-full bg-zinc-100 text-zinc-500 hover:text-zinc-950 hover:bg-zinc-200 transition-colors cursor-pointer"
+                  aria-label="Close Bottom Sheet"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
-              </div>
-
-              <div className="space-y-5">
-                {DOC_CATEGORIES.map((cat) => (
-                  <div key={cat.id} className="space-y-1">
-                    <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block px-2">
-                      {cat.label}
-                    </span>
-                    <div className="space-y-0.5">
-                      {cat.articles.map((art) => (
-                        <Link
-                          key={art.slug}
-                          href={`/docs/${art.slug}`}
-                          onClick={() => setMobileSidebarOpen(false)}
-                          className={`block px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                            art.slug === currentArticle.slug
-                              ? 'bg-zinc-950 text-white font-semibold'
-                              : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950'
-                          }`}
-                        >
-                          {art.shortTitle}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
 
-            <div className="pt-6 border-t border-zinc-100">
+            {/* Scrollable Category List */}
+            <div
+              data-lenis-prevent
+              className="p-6 overflow-y-auto overscroll-contain flex-1 space-y-6"
+            >
+              {DOC_CATEGORIES.map((cat) => {
+                const IconComp = CATEGORY_ICONS[cat.id] || BookOpen;
+                return (
+                  <div key={cat.id} className="space-y-2">
+                    <div className="flex items-center gap-2 text-[11px] font-mono font-bold text-zinc-400 uppercase tracking-wider px-1">
+                      <IconComp className="w-3.5 h-3.5 text-zinc-500" />
+                      <span>{cat.label}</span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-1">
+                      {cat.articles.map((art) => {
+                        const isActive = art.slug === currentArticle.slug;
+                        return (
+                          <Link
+                            key={art.slug}
+                            href={`/docs/${art.slug}`}
+                            onClick={() => setMobileSidebarOpen(false)}
+                            className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-colors ${
+                              isActive
+                                ? 'bg-zinc-950 text-white font-semibold shadow-2xs'
+                                : 'text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 font-medium bg-zinc-50/60 border border-zinc-100'
+                            }`}
+                          >
+                            <span className="truncate">{art.shortTitle}</span>
+                            {art.badge && !isActive && (
+                              <span className="text-[9px] font-mono font-bold text-zinc-500 bg-white px-1.5 py-0.5 rounded-md border border-zinc-200">
+                                {art.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom Action Footer */}
+            <div className="p-4 bg-zinc-50 border-t border-zinc-100 shrink-0">
               <a
-                href="https://app.heycora.in/workspace/login?source=docs_mobile"
-                className="w-full py-3 rounded-xl bg-zinc-950 text-white text-xs font-semibold text-center flex items-center justify-center gap-1.5 shadow-2xs hover:bg-zinc-800 transition-colors border border-zinc-800"
+                href="https://app.heycora.in/workspace/login?source=docs_bottom_sheet"
+                className="w-full py-3 rounded-xl bg-zinc-950 text-white text-xs sm:text-sm font-semibold text-center flex items-center justify-center gap-1.5 shadow-2xs hover:bg-zinc-800 transition-colors border border-zinc-800"
               >
                 <span>Get started for Free</span>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
               </a>
             </div>
+
           </div>
         </div>
       )}
