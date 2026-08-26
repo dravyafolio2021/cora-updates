@@ -360,246 +360,429 @@ export function Navbar() {
             >
               <div className="w-full max-w-[1240px] mx-auto rounded-[28px] bg-white border border-zinc-200/90 shadow-[0px_25px_70px_rgba(0,0,0,0.12)] p-8 sm:p-10 animate-in fade-in slide-in-from-top-3 duration-200">
                 
-                {/* ── DROPDOWN: FEATURES (20 BUILT MODULES ACROSS 4 CORE PILLARS) ── */}
+                {/* ── DROPDOWN: FEATURES (20 BUILT MODULES ACROSS 4 EQUAL PILLARS) ── */}
                 {activeDropdown === 'features' && (
-                  <div className="grid grid-cols-12 gap-0 items-stretch">
-                    
-                    {/* 1. INTELLIGENCE & AI */}
-                    <div className="col-span-2 space-y-1 pr-5">
-                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-[0.08em] block pb-2.5 mb-1 border-b border-zinc-100">
-                        Intelligence &amp; AI
-                      </span>
-                      <Link
-                        href="/features/ai-cofounder"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="6" width="16" height="13" rx="3" className="text-zinc-500" /><circle cx="9.5" cy="12" r="1.5" fill="currentColor" className="text-zinc-600" /><circle cx="14.5" cy="12" r="1.5" fill="currentColor" className="text-zinc-600" /><line x1="9" y1="16.5" x2="15" y2="16.5" className="text-zinc-400" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">AI Co-Founder</span>
-                      </Link>
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+                      
+                      {/* 1. INTELLIGENCE & AI */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between pb-2 mb-1 border-b border-zinc-100">
+                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                            Intelligence &amp; AI
+                          </span>
+                          <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-200/60">
+                            FLAGSHIP
+                          </span>
+                        </div>
 
-                      <Link
-                        href="/features/content-ai"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 7.523 7.523 12 2 12C7.523 12 12 16.477 12 22C12 16.477 16.477 12 22 12C16.477 12 12 7.523 12 2Z" fill="currentColor" className="text-zinc-500" /><path d="M18 4c0 1.1-.9 2-2 2 1.1 0 2 .9 2 2 0-1.1.9-2 2-2-1.1 0-2-.9-2-2z" fill="currentColor" className="text-zinc-400" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Content AI &amp; SEO</span>
-                      </Link>
-
-                      <Link
-                        href="/features/rag-mcp"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="10" r="4" className="text-zinc-500" /><circle cx="12" cy="10" r="1.5" fill="currentColor" className="text-zinc-600" /><path d="M7 17h10M9 20h6" className="text-zinc-400" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">RAG Memory MCP</span>
-                      </Link>
-
-                      <Link
-                        href="/features/voice-to-scope"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none"><rect x="5" y="8" width="2" height="8" rx="1" fill="currentColor" className="text-zinc-400" /><rect x="9" y="4" width="2" height="16" rx="1" fill="currentColor" className="text-zinc-500" /><rect x="13" y="6" width="2" height="12" rx="1" fill="currentColor" className="text-zinc-600" /><rect x="17" y="9" width="2" height="6" rx="1" fill="currentColor" className="text-zinc-400" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Voice-to-Scope</span>
-                      </Link>
-                    </div>
-
-                    {/* 2. SALES & CRM */}
-                    <div className="col-span-2 space-y-1 px-5 border-l border-zinc-100">
-                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-[0.08em] block pb-2.5 mb-1 border-b border-zinc-100">
-                        Sales &amp; CRM
-                      </span>
-                      <Link
-                        href="/features/lead-crm"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="18" rx="2" fill="currentColor" className="text-zinc-500" /><rect x="12" y="3" width="7" height="11" rx="2" fill="currentColor" className="text-zinc-400" /><circle cx="15.5" cy="18" r="2.5" fill="currentColor" className="text-zinc-300" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Kanban Lead CRM</span>
-                      </Link>
-
-                      <Link
-                        href="/features/canvas-builder"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="3" className="text-zinc-500" /><line x1="3" y1="9" x2="21" y2="9" className="text-zinc-400" /><line x1="9" y1="21" x2="9" y2="9" className="text-zinc-400" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Funnel Builder</span>
-                      </Link>
-
-                      <Link
-                        href="/features/form-builder"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="2" className="text-zinc-500" /><rect x="8" y="8" width="3" height="3" rx="0.5" className="text-zinc-400" /><line x1="14" y1="9.5" x2="17" y2="9.5" className="text-zinc-400" /><rect x="8" y="14" width="3" height="3" rx="0.5" className="text-zinc-400" /><line x1="14" y1="15.5" x2="17" y2="15.5" className="text-zinc-400" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Visual Forms</span>
-                      </Link>
-
-                      <Link
-                        href="/features/review-portal"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.47 5.01L20 8.02l-4 3.89.94 5.51L12 14.77l-4.94 2.65L8 11.91 4 8.02l5.53-.99L12 2z" fill="currentColor" className="text-zinc-500" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">5★ Review Portal</span>
-                      </Link>
-                    </div>
-
-                    {/* 3. OPERATIONS & LEGAL */}
-                    <div className="col-span-2 space-y-1 px-5 border-l border-zinc-100">
-                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-[0.08em] block pb-2.5 mb-1 border-b border-zinc-100">
-                        Operations &amp; Legal
-                      </span>
-                      <Link
-                        href="/features/esign-vault"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3h9l5 5v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" className="text-zinc-500" /><polyline points="14 3 14 8 19 8" className="text-zinc-400" /><path d="M9 15l2 2 4-4" className="text-zinc-600" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">SHA-256 E-Signs</span>
-                      </Link>
-
-                      <Link
-                        href="/features/crew-dispatch"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13" className="text-zinc-500" /><polygon points="22 2 15 22 11 13 2 9 22 2" fill="none" className="text-zinc-500" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Crew Dispatch</span>
-                      </Link>
-
-                      <Link
-                        href="/features/master-calendar"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="17" rx="2" className="text-zinc-500" /><line x1="8" y1="2" x2="8" y2="6" className="text-zinc-400" /><line x1="16" y1="2" x2="16" y2="6" className="text-zinc-400" /><line x1="3" y1="10" x2="21" y2="10" className="text-zinc-400" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Master Calendar</span>
-                      </Link>
-
-                      <Link
-                        href="/features/task-board"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" className="text-zinc-500" /><path d="M9 11l2 2 4-4" className="text-zinc-600" /><line x1="3" y1="9" x2="21" y2="9" className="text-zinc-400" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Task Board</span>
-                      </Link>
-                    </div>
-
-                    {/* 4. FINANCE & ASSETS */}
-                    <div className="col-span-2 space-y-1 px-5 border-l border-zinc-100">
-                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-[0.08em] block pb-2.5 mb-1 border-b border-zinc-100">
-                        Finance &amp; Assets
-                      </span>
-                      <Link
-                        href="/features/gst-invoicing"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 2h16v20l-2.5-1.5L15 22l-3-1.5L9 22l-2.5-1.5L4 22V2z" className="text-zinc-500" /><line x1="8" y1="7" x2="16" y2="7" className="text-zinc-400" /><line x1="8" y1="11" x2="13" y2="11" className="text-zinc-400" /><line x1="8" y1="15" x2="16" y2="15" className="text-zinc-400" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">18% GST Invoicing</span>
-                      </Link>
-
-                      <Link
-                        href="/features/asset-gear"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" className="text-zinc-400" /><rect x="3" y="6" width="18" height="14" rx="2" className="text-zinc-500" /><circle cx="12" cy="13" r="4" className="text-zinc-500" /><circle cx="12" cy="13" r="1.5" className="text-zinc-600" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Gear &amp; Inventory</span>
-                      </Link>
-
-                      <Link
-                        href="/features/media-hub"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" className="text-zinc-500" /><polygon points="10 9 16 12 10 15 10 9" fill="currentColor" className="text-zinc-500" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Media Hub &amp; RAW</span>
-                      </Link>
-
-                      <Link
-                        href="/features/rbac-system"
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
-                      >
-                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
-                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L4 5.5v5.5c0 5.5 3.8 10.6 8 11.8 4.2-1.2 8-6.3 8-11.8V5.5L12 2z" className="text-zinc-500" /><path d="M9 12l2 2 4-4" className="text-zinc-600" /></svg>
-                        </span>
-                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Multi-Tenant RBAC</span>
-                      </Link>
-                    </div>
-
-                    {/* 5. RIGHT CTA CARD — MONOCHROMATIC DARK */}
-                    <div className="col-span-4 pl-6 border-l border-zinc-100">
-                      <Link
-                        href="/features"
-                        onClick={() => setActiveDropdown(null)}
-                        className="h-full rounded-2xl bg-zinc-950 text-white p-6 relative overflow-hidden flex flex-col justify-between group block hover:bg-zinc-900 transition-colors"
-                      >
-                        {/* Module Pill Chips */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5">
-                            <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono font-bold text-zinc-400 border border-white/10">AI</span>
-                            <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono font-bold text-zinc-400 border border-white/10">CRM</span>
-                            <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono font-bold text-zinc-400 border border-white/10">GST</span>
-                            <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono font-bold text-zinc-400 border border-white/10">E-Sign</span>
+                        <Link
+                          href="/features/ai-cofounder"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <Bot className="w-4 h-4 stroke-[1.9]" />
                           </div>
-                          <span className="text-[10px] font-mono font-bold text-zinc-500">
-                            20 built • 8 roadmap
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                AI Co-Founder
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Autonomous operations triage &amp; quotes
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/content-ai"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <Sparkles className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Content AI &amp; GEO
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              3-Act viral scripts &amp; answer density
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/rag-mcp"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <BrainCircuit className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                RAG Memory MCP
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Semantic memory &amp; IDE connection
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/voice-to-scope"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <Zap className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Voice-to-Scope
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Audio briefs to structured contracts
+                            </p>
+                          </div>
+                        </Link>
+                      </div>
+
+                      {/* 2. SALES & PIPELINE */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between pb-2 mb-1 border-b border-zinc-100">
+                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                            Sales &amp; Pipeline
+                          </span>
+                          <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                            GROWTH
                           </span>
                         </div>
 
-                        <div className="space-y-1.5 pt-4">
-                          <span className="text-[10px] font-mono font-medium text-zinc-500 uppercase tracking-wider block">
-                            CORA STUDIO OS
+                        <Link
+                          href="/features/lead-crm"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <Kanban className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Kanban Lead CRM
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Visual deal stages &amp; WhatsApp follow-up
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/canvas-builder"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <LayoutTemplate className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Funnel Builder
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              High-converting landing pages &amp; reels
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/form-builder"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <FormInput className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Visual Forms
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Dynamic briefs &amp; call-time slot intake
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/review-portal"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <Star className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                5★ Review Portal
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Smart sentiment routing &amp; Google sync
+                            </p>
+                          </div>
+                        </Link>
+                      </div>
+
+                      {/* 3. OPERATIONS & LEGAL */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between pb-2 mb-1 border-b border-zinc-100">
+                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                            Operations &amp; Legal
                           </span>
-                          <h4 className="font-display text-[15px] font-semibold text-white leading-snug">
-                            The complete 20-in-1 autonomous operating system for creative studios.
-                          </h4>
+                          <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                            LEGAL TECH
+                          </span>
                         </div>
 
-                        <div className="pt-3">
-                          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 group-hover:text-white transition-colors">
-                            <span>Explore all 20 modules &amp; roadmap</span>
-                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        <Link
+                          href="/features/esign-vault"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <FileText className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                SHA-256 E-Signs
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              5-Step legally binding digital contracts
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/crew-dispatch"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <Send className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Crew Dispatch
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Automated call sheets &amp; conflict matrix
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/master-calendar"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <Calendar className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Master Calendar
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Multi-location shoot scheduling &amp; iCal
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/task-board"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <CheckSquare className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Task Board
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Post-production milestones &amp; proofing
+                            </p>
+                          </div>
+                        </Link>
+                      </div>
+
+                      {/* 4. FINANCE & ASSETS */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between pb-2 mb-1 border-b border-zinc-100">
+                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                            Finance &amp; Assets
+                          </span>
+                          <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                            INDIA GST
                           </span>
                         </div>
-                      </Link>
+
+                        <Link
+                          href="/features/gst-invoicing"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <Receipt className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                18% GST Invoicing
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Automated CGST/SGST splitting &amp; SAC
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/asset-gear"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <Camera className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Gear &amp; Inventory
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Equipment registry &amp; shoot reservations
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/media-hub"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <Film className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Media Hub &amp; RAW
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Workspace library &amp; client 4K galleries
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/rbac-system"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                            <ShieldCheck className="w-4 h-4 stroke-[1.9]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                                Multi-Tenant RBAC
+                              </span>
+                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              30-Point security &amp; capability matrix
+                            </p>
+                          </div>
+                        </Link>
+                      </div>
+
+                    </div>
+
+                    {/* ── Sleek Monochromatic Bottom Bar ── */}
+                    <div className="-mx-8 -mb-8 sm:-mx-10 sm:-mb-10 mt-8 px-8 sm:px-10 py-4 bg-zinc-50/90 rounded-b-[28px] border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 text-xs text-zinc-600">
+                        <span className="flex items-center gap-1.5 font-bold text-zinc-950">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                          20 Live Modules
+                        </span>
+                        <span className="text-zinc-300">•</span>
+                        <span className="hidden md:inline">Single-plugin architecture with 100% MySQL tenant isolation</span>
+                        <span className="text-zinc-300 hidden md:inline">•</span>
+                        <Link href="/docs" onClick={() => setActiveDropdown(null)} className="font-semibold text-zinc-900 hover:text-black underline underline-offset-4 decoration-zinc-300">
+                          API Specs &amp; Docs →
+                        </Link>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href="/demo"
+                          onClick={() => setActiveDropdown(null)}
+                          className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-colors"
+                        >
+                          Interactive Demo
+                        </Link>
+                        <Link
+                          href="/features"
+                          onClick={() => setActiveDropdown(null)}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all shadow-2xs group"
+                        >
+                          <span>Explore All 20 Modules</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+                        </Link>
+                      </div>
                     </div>
 
                   </div>
