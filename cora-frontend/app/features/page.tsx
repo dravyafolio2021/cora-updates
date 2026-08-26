@@ -203,8 +203,8 @@ export default function FeaturesPage() {
       {/* ── 2. TWO-COLUMN DIRECTORY: LEFT PERMANENT STICKY SIDEBAR + RIGHT CARDS ── */}
       <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 mb-24 pt-4 sm:pt-6">
         
-        {/* Mobile Filter Action Header (<lg only) */}
-        <div className="lg:hidden flex items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-200/80">
+        {/* Mobile Sticky Filter Action Bar (<lg only) */}
+        <div className="lg:hidden sticky top-16 z-30 bg-white/95 backdrop-blur-md py-3 px-1 border-b border-zinc-200/80 mb-6 flex items-center justify-between gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
           <button
             type="button"
             onClick={() => {
@@ -223,12 +223,12 @@ export default function FeaturesPage() {
           </button>
 
           <div className="flex items-center gap-2 text-xs font-medium text-zinc-600">
-            <span>{totalResultsCount} modules</span>
+            <span className="font-mono">{totalResultsCount} modules</span>
             {(activeCategory !== 'all' || selectedIndustry !== 'all' || statusFilter !== 'all' || searchQuery) && (
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="text-[11px] font-semibold text-zinc-400 hover:text-zinc-900 underline"
+                className="text-[11px] font-semibold text-zinc-400 hover:text-zinc-900 underline cursor-pointer"
               >
                 Reset
               </button>
@@ -239,7 +239,7 @@ export default function FeaturesPage() {
         <div className="flex items-start gap-8 lg:gap-10 relative">
           
           {/* ── LEFT PERMANENT STICKY SIDEBAR (DESKTOP) ── */}
-          <div className="hidden lg:block w-72 shrink-0 sticky top-28 self-start max-h-[calc(100vh-130px)] overflow-y-auto pr-2 scrollbar-none">
+          <div className="hidden lg:block w-72 shrink-0 sticky top-24 z-20 self-start max-h-[calc(100vh-110px)] overflow-y-auto pr-2 scrollbar-none">
             <FeaturesSidebar
               activeCategory={activeCategory}
               onSelectCategory={setActiveCategory}
