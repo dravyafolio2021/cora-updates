@@ -38,6 +38,7 @@ import {
   Code
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
+import { MODULE_GLYPH_MAP } from '@/components/features/ModuleAppGlyphs';
 
 export function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -367,8 +368,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60 group-hover:scale-105 transition-transform">
-                            <Bot className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['ai-cofounder'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['ai-cofounder'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">AI Co-Founder</span>
                         </Link>
@@ -378,8 +379,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200/60 group-hover:scale-105 transition-transform">
-                            <Sparkles className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['content-ai'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['content-ai'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Content AI &amp; SEO</span>
                         </Link>
@@ -389,8 +390,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-200/60 group-hover:scale-105 transition-transform">
-                            <BrainCircuit className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['rag-mcp'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['rag-mcp'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">RAG Memory MCP</span>
                         </Link>
@@ -400,8 +401,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 border border-sky-200/60 group-hover:scale-105 transition-transform">
-                            <Zap className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['voice-to-scope'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['voice-to-scope'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Voice-to-Scope</span>
                         </Link>
@@ -419,8 +420,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200/60 group-hover:scale-105 transition-transform">
-                            <Kanban className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['lead-crm'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['lead-crm'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Kanban Lead CRM</span>
                         </Link>
@@ -430,8 +431,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center shrink-0 border border-violet-200/60 group-hover:scale-105 transition-transform">
-                            <LayoutTemplate className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['canvas-builder'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['canvas-builder'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Funnel Builder</span>
                         </Link>
@@ -441,8 +442,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-200/60 group-hover:scale-105 transition-transform">
-                            <FormInput className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['form-builder'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['form-builder'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Visual Forms</span>
                         </Link>
@@ -452,8 +453,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200/60 group-hover:scale-105 transition-transform">
-                            <Star className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['review-portal'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['review-portal'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">5★ Review Portal</span>
                         </Link>
@@ -471,8 +472,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-200/60 group-hover:scale-105 transition-transform">
-                            <FileText className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['esign-vault'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['esign-vault'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">SHA-256 E-Signs</span>
                         </Link>
@@ -482,8 +483,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-200/60 group-hover:scale-105 transition-transform">
-                            <Send className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['crew-dispatch'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['crew-dispatch'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Crew Dispatch</span>
                         </Link>
@@ -493,8 +494,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-200/60 group-hover:scale-105 transition-transform">
-                            <Calendar className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['master-calendar'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['master-calendar'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Master Calendar</span>
                         </Link>
@@ -504,8 +505,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60 group-hover:scale-105 transition-transform">
-                            <CheckSquare className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['task-board'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['task-board'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Task Board</span>
                         </Link>
@@ -523,8 +524,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60 group-hover:scale-105 transition-transform">
-                            <Receipt className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['gst-invoicing'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['gst-invoicing'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">18% GST Invoicing</span>
                         </Link>
@@ -534,8 +535,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 border border-sky-200/60 group-hover:scale-105 transition-transform">
-                            <Camera className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['asset-gear'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['asset-gear'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Gear &amp; Inventory</span>
                         </Link>
@@ -545,8 +546,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 border border-orange-200/60 group-hover:scale-105 transition-transform">
-                            <HardDrive className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['media-hub'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['media-hub'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Media Hub &amp; RAW</span>
                         </Link>
@@ -556,8 +557,8 @@ export function Navbar() {
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
                         >
-                          <div className="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0 border border-zinc-200/80 group-hover:scale-105 transition-transform">
-                            <Users2 className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['rbac-system'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
+                            {React.createElement(MODULE_GLYPH_MAP['rbac-system'].Glyph, { className: 'w-full h-full' })}
                           </div>
                           <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Multi-Tenant RBAC</span>
                         </Link>
@@ -993,23 +994,23 @@ export function Navbar() {
                     CORE WORKSPACE MODULES
                   </span>
                   <Link href="/ai-agent" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/70"><Sparkles className="w-4 h-4" /></div>
+                    <div className={`w-9 h-9 rounded-[12px] ${MODULE_GLYPH_MAP['ai-cofounder'].bgGradient} p-1.5 flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.08)]`}>{React.createElement(MODULE_GLYPH_MAP['ai-cofounder'].Glyph, { className: 'w-full h-full' })}</div>
                     <div><div className="text-sm font-bold text-zinc-950">AI Agent Workspace</div><div className="text-xs text-zinc-500">Autonomous co-founder &amp; memory</div></div>
                   </Link>
                   <Link href="/features/gst-invoicing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/70"><Receipt className="w-4 h-4" /></div>
+                    <div className={`w-9 h-9 rounded-[12px] ${MODULE_GLYPH_MAP['gst-invoicing'].bgGradient} p-1.5 flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.08)]`}>{React.createElement(MODULE_GLYPH_MAP['gst-invoicing'].Glyph, { className: 'w-full h-full' })}</div>
                     <div><div className="text-sm font-bold text-zinc-950">18% GST Invoicing</div><div className="text-xs text-zinc-500">CGST/SGST automated splitting</div></div>
                   </Link>
                   <Link href="/features/esign-vault" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200/70"><FileText className="w-4 h-4" /></div>
+                    <div className={`w-9 h-9 rounded-[12px] ${MODULE_GLYPH_MAP['esign-vault'].bgGradient} p-1.5 flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.08)]`}>{React.createElement(MODULE_GLYPH_MAP['esign-vault'].Glyph, { className: 'w-full h-full' })}</div>
                     <div><div className="text-sm font-bold text-zinc-950">SHA-256 E-Sign Vault</div><div className="text-xs text-zinc-500">IT Act 2000 digital contracts</div></div>
                   </Link>
                   <Link href="/features/lead-crm" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200/70"><Kanban className="w-4 h-4" /></div>
+                    <div className={`w-9 h-9 rounded-[12px] ${MODULE_GLYPH_MAP['lead-crm'].bgGradient} p-1.5 flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.08)]`}>{React.createElement(MODULE_GLYPH_MAP['lead-crm'].Glyph, { className: 'w-full h-full' })}</div>
                     <div><div className="text-sm font-bold text-zinc-950">Kanban Lead CRM</div><div className="text-xs text-zinc-500">Milestones &amp; WhatsApp dispatch</div></div>
                   </Link>
                   <Link href="/features/crew-dispatch" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-200/70"><Send className="w-4 h-4" /></div>
+                    <div className={`w-9 h-9 rounded-[12px] ${MODULE_GLYPH_MAP['crew-dispatch'].bgGradient} p-1.5 flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.08)]`}>{React.createElement(MODULE_GLYPH_MAP['crew-dispatch'].Glyph, { className: 'w-full h-full' })}</div>
                     <div><div className="text-sm font-bold text-zinc-950">Crew &amp; Gear Dispatch</div><div className="text-xs text-zinc-500">Automated shoot call sheets</div></div>
                   </Link>
                   <div className="pt-2">

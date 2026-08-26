@@ -17,7 +17,7 @@ import {
   Clock
 } from 'lucide-react';
 import { FeatureModule, BUILT_MODULES } from '@/lib/features-data';
-import { FeatureIcon } from './FeatureIcon';
+import { MODULE_GLYPH_MAP } from './ModuleAppGlyphs';
 import { CapabilityVisualCard } from './CapabilityVisualCard';
 import { ModuleCardVisual } from './ModuleCardVisual';
 import { FeaturePlusEverythingGrid } from './FeaturePlusEverythingGrid';
@@ -110,7 +110,13 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
             {/* Status & Category Badge */}
             <div className="flex items-center flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200/90 rounded-full text-xs font-semibold shadow-2xs">
-                <FeatureIcon name={feature.iconName} className="w-3.5 h-3.5 text-zinc-800" />
+                {MODULE_GLYPH_MAP[feature.slug] ? (
+                  <span className={`w-4 h-4 rounded-[5px] ${MODULE_GLYPH_MAP[feature.slug].bgGradient} p-0.5 inline-flex items-center justify-center`}>
+                    {React.createElement(MODULE_GLYPH_MAP[feature.slug].Glyph, { className: 'w-full h-full' })}
+                  </span>
+                ) : (
+                  <span className="w-3.5 h-3.5 rounded-full bg-zinc-200" />
+                )}
                 <span>{feature.categoryLabel}</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 rounded-full text-[10px] font-mono font-bold backdrop-blur-md">
