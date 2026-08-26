@@ -457,49 +457,52 @@ export default function FeaturesPage() {
               </div>
             )}
 
-            {/* ── 8 UPCOMING ROADMAP MODULES (CLEAN MONOCHROME) ── */}
+            {/* ── 8 UPCOMING ROADMAP MODULES (PURE LIGHT-MODE CARDS MATCHING REFERENCE) ── */}
             {filteredRoadmapModules.length > 0 && (
-              <div className="bg-zinc-50/70 rounded-[32px] p-6 sm:p-8 border border-zinc-200/80 relative overflow-hidden">
+              <div className="pt-8 border-t border-zinc-200/80">
                 
-                <div className="max-w-[640px] mb-8">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full border border-zinc-200 text-xs font-semibold text-zinc-800 mb-3 shadow-2xs">
-                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-                    <span>Active Product Roadmap</span>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                    <h2 className="font-display text-lg sm:text-xl font-bold text-zinc-950">
+                      In Roadmap ({filteredRoadmapModules.length})
+                    </h2>
                   </div>
-                  <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 mb-1.5">
-                    Upcoming Modules &amp; Enterprise Tools
-                  </h2>
-                  <p className="text-zinc-500 text-xs sm:text-sm leading-relaxed">
-                    Currently in private alpha with high-volume photography and film studios.
-                  </p>
+                  <span className="text-xs font-mono text-zinc-500">Coming Soon</span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
                   {filteredRoadmapModules.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-white rounded-[28px] border border-zinc-200/80 flex flex-col justify-between overflow-hidden hover:shadow-[0_16px_36px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 group"
+                      className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group"
                     >
-                      <div className="w-full h-[160px] overflow-hidden border-b border-zinc-100 relative select-none">
+                      {/* Top Tactile 3D UI Illustration Area */}
+                      <div className="w-full h-[195px] sm:h-[210px] overflow-hidden border-b border-zinc-100 relative group-hover:scale-[1.02] transition-transform duration-300 select-none">
                         <ModuleCardVisual slug={item.id} category={item.categoryLabel} title={ROADMAP_SHORT_TITLES[item.id] || item.title} />
                       </div>
 
-                      <div className="p-5 flex flex-col justify-between flex-1 space-y-3">
+                      {/* Bottom Content Body - Minimalist & Punchy */}
+                      <div className="p-5 sm:p-6 flex flex-col justify-between flex-1 space-y-3.5">
                         <div>
-                          <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
-                            <span className="text-zinc-700 font-bold bg-zinc-100 px-2 py-0.5 rounded-md border border-zinc-200/60">
-                              {item.eta}
-                            </span>
-                            <span className="text-zinc-500 font-medium font-mono">
-                              {item.status}
-                            </span>
-                          </div>
-                          <h4 className="font-display text-base font-bold text-zinc-950 leading-snug">
+                          <h3 className="font-display text-lg sm:text-xl font-bold text-zinc-950 leading-snug group-hover:text-zinc-800 transition-colors">
                             {ROADMAP_SHORT_TITLES[item.id] || item.title}
-                          </h4>
-                          <p className="text-zinc-600 text-xs leading-relaxed mt-1 font-normal">
+                          </h3>
+
+                          <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mt-1.5 font-normal">
                             {MODULE_MICRO_DESCRIPTIONS[item.id] || item.desc}
                           </p>
+                        </div>
+
+                        {/* Status Bar */}
+                        <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-xs">
+                          <span className="font-mono text-[11px] font-bold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-md">
+                            {item.eta}
+                          </span>
+                          <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                            {item.status}
+                          </span>
                         </div>
                       </div>
                     </div>
