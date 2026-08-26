@@ -355,248 +355,241 @@ export function Navbar() {
                 
                 {/* ── DROPDOWN: FEATURES (20 BUILT MODULES ACROSS 4 CORE PILLARS) ── */}
                 {activeDropdown === 'features' && (
-                  <div className="grid grid-cols-12 gap-6 items-stretch">
+                  <div className="grid grid-cols-12 gap-0 items-stretch">
                     
                     {/* 1. INTELLIGENCE & AI */}
-                    <div className="col-span-2 space-y-3.5">
-                      <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                        INTELLIGENCE &amp; AI
+                    <div className="col-span-2 space-y-1 pr-5">
+                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-[0.08em] block pb-2.5 mb-1 border-b border-zinc-100">
+                        Intelligence &amp; AI
                       </span>
-                      <div className="space-y-1.5">
-                        <Link
-                          href="/features/ai-cofounder"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['ai-cofounder'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['ai-cofounder'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">AI Co-Founder</span>
-                        </Link>
+                      <Link
+                        href="/features/ai-cofounder"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="6" width="16" height="13" rx="3" className="text-zinc-500" /><circle cx="9.5" cy="12" r="1.5" fill="currentColor" className="text-zinc-600" /><circle cx="14.5" cy="12" r="1.5" fill="currentColor" className="text-zinc-600" /><line x1="9" y1="16.5" x2="15" y2="16.5" className="text-zinc-400" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">AI Co-Founder</span>
+                      </Link>
 
-                        <Link
-                          href="/features/content-ai"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['content-ai'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['content-ai'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Content AI &amp; SEO</span>
-                        </Link>
+                      <Link
+                        href="/features/content-ai"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 7.523 7.523 12 2 12C7.523 12 12 16.477 12 22C12 16.477 16.477 12 22 12C16.477 12 12 7.523 12 2Z" fill="currentColor" className="text-zinc-500" /><path d="M18 4c0 1.1-.9 2-2 2 1.1 0 2 .9 2 2 0-1.1.9-2 2-2-1.1 0-2-.9-2-2z" fill="currentColor" className="text-zinc-400" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Content AI &amp; SEO</span>
+                      </Link>
 
-                        <Link
-                          href="/features/rag-mcp"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['rag-mcp'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['rag-mcp'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">RAG Memory MCP</span>
-                        </Link>
+                      <Link
+                        href="/features/rag-mcp"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="10" r="4" className="text-zinc-500" /><circle cx="12" cy="10" r="1.5" fill="currentColor" className="text-zinc-600" /><path d="M7 17h10M9 20h6" className="text-zinc-400" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">RAG Memory MCP</span>
+                      </Link>
 
-                        <Link
-                          href="/features/voice-to-scope"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['voice-to-scope'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['voice-to-scope'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Voice-to-Scope</span>
-                        </Link>
-                      </div>
+                      <Link
+                        href="/features/voice-to-scope"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none"><rect x="5" y="8" width="2" height="8" rx="1" fill="currentColor" className="text-zinc-400" /><rect x="9" y="4" width="2" height="16" rx="1" fill="currentColor" className="text-zinc-500" /><rect x="13" y="6" width="2" height="12" rx="1" fill="currentColor" className="text-zinc-600" /><rect x="17" y="9" width="2" height="6" rx="1" fill="currentColor" className="text-zinc-400" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Voice-to-Scope</span>
+                      </Link>
                     </div>
 
-                    {/* 2. SALES & CLIENT CRM */}
-                    <div className="col-span-2 space-y-3.5">
-                      <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                        SALES &amp; CRM
+                    {/* 2. SALES & CRM */}
+                    <div className="col-span-2 space-y-1 px-5 border-l border-zinc-100">
+                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-[0.08em] block pb-2.5 mb-1 border-b border-zinc-100">
+                        Sales &amp; CRM
                       </span>
-                      <div className="space-y-1.5">
-                        <Link
-                          href="/features/lead-crm"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['lead-crm'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['lead-crm'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Kanban Lead CRM</span>
-                        </Link>
+                      <Link
+                        href="/features/lead-crm"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="18" rx="2" fill="currentColor" className="text-zinc-500" /><rect x="12" y="3" width="7" height="11" rx="2" fill="currentColor" className="text-zinc-400" /><circle cx="15.5" cy="18" r="2.5" fill="currentColor" className="text-zinc-300" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Kanban Lead CRM</span>
+                      </Link>
 
-                        <Link
-                          href="/features/canvas-builder"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['canvas-builder'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['canvas-builder'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Funnel Builder</span>
-                        </Link>
+                      <Link
+                        href="/features/canvas-builder"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="3" className="text-zinc-500" /><line x1="3" y1="9" x2="21" y2="9" className="text-zinc-400" /><line x1="9" y1="21" x2="9" y2="9" className="text-zinc-400" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Funnel Builder</span>
+                      </Link>
 
-                        <Link
-                          href="/features/form-builder"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['form-builder'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['form-builder'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Visual Forms</span>
-                        </Link>
+                      <Link
+                        href="/features/form-builder"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="2" className="text-zinc-500" /><rect x="8" y="8" width="3" height="3" rx="0.5" className="text-zinc-400" /><line x1="14" y1="9.5" x2="17" y2="9.5" className="text-zinc-400" /><rect x="8" y="14" width="3" height="3" rx="0.5" className="text-zinc-400" /><line x1="14" y1="15.5" x2="17" y2="15.5" className="text-zinc-400" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Visual Forms</span>
+                      </Link>
 
-                        <Link
-                          href="/features/review-portal"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['review-portal'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['review-portal'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">5★ Review Portal</span>
-                        </Link>
-                      </div>
+                      <Link
+                        href="/features/review-portal"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.47 5.01L20 8.02l-4 3.89.94 5.51L12 14.77l-4.94 2.65L8 11.91 4 8.02l5.53-.99L12 2z" fill="currentColor" className="text-zinc-500" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">5★ Review Portal</span>
+                      </Link>
                     </div>
 
-                    {/* 3. OPERATIONS & LOGISTICS */}
-                    <div className="col-span-2 space-y-3.5">
-                      <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                        OPERATIONS &amp; LEGAL
+                    {/* 3. OPERATIONS & LEGAL */}
+                    <div className="col-span-2 space-y-1 px-5 border-l border-zinc-100">
+                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-[0.08em] block pb-2.5 mb-1 border-b border-zinc-100">
+                        Operations &amp; Legal
                       </span>
-                      <div className="space-y-1.5">
-                        <Link
-                          href="/features/esign-vault"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['esign-vault'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['esign-vault'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">SHA-256 E-Signs</span>
-                        </Link>
+                      <Link
+                        href="/features/esign-vault"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3h9l5 5v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" className="text-zinc-500" /><polyline points="14 3 14 8 19 8" className="text-zinc-400" /><path d="M9 15l2 2 4-4" className="text-zinc-600" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">SHA-256 E-Signs</span>
+                      </Link>
 
-                        <Link
-                          href="/features/crew-dispatch"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['crew-dispatch'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['crew-dispatch'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Crew Dispatch</span>
-                        </Link>
+                      <Link
+                        href="/features/crew-dispatch"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13" className="text-zinc-500" /><polygon points="22 2 15 22 11 13 2 9 22 2" fill="none" className="text-zinc-500" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Crew Dispatch</span>
+                      </Link>
 
-                        <Link
-                          href="/features/master-calendar"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['master-calendar'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['master-calendar'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Master Calendar</span>
-                        </Link>
+                      <Link
+                        href="/features/master-calendar"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="17" rx="2" className="text-zinc-500" /><line x1="8" y1="2" x2="8" y2="6" className="text-zinc-400" /><line x1="16" y1="2" x2="16" y2="6" className="text-zinc-400" /><line x1="3" y1="10" x2="21" y2="10" className="text-zinc-400" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Master Calendar</span>
+                      </Link>
 
-                        <Link
-                          href="/features/task-board"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['task-board'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['task-board'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Task Board</span>
-                        </Link>
-                      </div>
+                      <Link
+                        href="/features/task-board"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" className="text-zinc-500" /><path d="M9 11l2 2 4-4" className="text-zinc-600" /><line x1="3" y1="9" x2="21" y2="9" className="text-zinc-400" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Task Board</span>
+                      </Link>
                     </div>
 
-                    {/* 4. FINANCE & INFRASTRUCTURE */}
-                    <div className="col-span-2 space-y-3.5">
-                      <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                        FINANCE &amp; ASSETS
+                    {/* 4. FINANCE & ASSETS */}
+                    <div className="col-span-2 space-y-1 px-5 border-l border-zinc-100">
+                      <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-[0.08em] block pb-2.5 mb-1 border-b border-zinc-100">
+                        Finance &amp; Assets
                       </span>
-                      <div className="space-y-1.5">
-                        <Link
-                          href="/features/gst-invoicing"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['gst-invoicing'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['gst-invoicing'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">18% GST Invoicing</span>
-                        </Link>
+                      <Link
+                        href="/features/gst-invoicing"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 2h16v20l-2.5-1.5L15 22l-3-1.5L9 22l-2.5-1.5L4 22V2z" className="text-zinc-500" /><line x1="8" y1="7" x2="16" y2="7" className="text-zinc-400" /><line x1="8" y1="11" x2="13" y2="11" className="text-zinc-400" /><line x1="8" y1="15" x2="16" y2="15" className="text-zinc-400" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">18% GST Invoicing</span>
+                      </Link>
 
-                        <Link
-                          href="/features/asset-gear"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['asset-gear'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['asset-gear'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Gear &amp; Inventory</span>
-                        </Link>
+                      <Link
+                        href="/features/asset-gear"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" className="text-zinc-400" /><rect x="3" y="6" width="18" height="14" rx="2" className="text-zinc-500" /><circle cx="12" cy="13" r="4" className="text-zinc-500" /><circle cx="12" cy="13" r="1.5" className="text-zinc-600" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Gear &amp; Inventory</span>
+                      </Link>
 
-                        <Link
-                          href="/features/media-hub"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['media-hub'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['media-hub'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Media Hub &amp; RAW</span>
-                        </Link>
+                      <Link
+                        href="/features/media-hub"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" className="text-zinc-500" /><polygon points="10 9 16 12 10 15 10 9" fill="currentColor" className="text-zinc-500" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Media Hub &amp; RAW</span>
+                      </Link>
 
-                        <Link
-                          href="/features/rbac-system"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-50 transition-colors group"
-                        >
-                          <div className={`w-7 h-7 rounded-[10px] ${MODULE_GLYPH_MAP['rbac-system'].bgGradient} p-1.5 flex items-center justify-center shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)] group-hover:scale-105 transition-transform`}>
-                            {React.createElement(MODULE_GLYPH_MAP['rbac-system'].Glyph, { className: 'w-full h-full' })}
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-800 group-hover:text-zinc-950 truncate">Multi-Tenant RBAC</span>
-                        </Link>
-                      </div>
+                      <Link
+                        href="/features/rbac-system"
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-center gap-2.5 px-1.5 py-[7px] rounded-lg hover:bg-zinc-50 transition-colors group"
+                      >
+                        <span className="w-[26px] h-[26px] rounded-lg bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200/80 transition-colors">
+                          <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L4 5.5v5.5c0 5.5 3.8 10.6 8 11.8 4.2-1.2 8-6.3 8-11.8V5.5L12 2z" className="text-zinc-500" /><path d="M9 12l2 2 4-4" className="text-zinc-600" /></svg>
+                        </span>
+                        <span className="text-[13px] font-medium text-zinc-700 group-hover:text-zinc-950 transition-colors">Multi-Tenant RBAC</span>
+                      </Link>
                     </div>
 
-                    {/* 5. RIGHT HIGHLIGHT CARD (CLAY-STYLE GRADIENT SHOWCASE) */}
-                    <div className="col-span-4">
+                    {/* 5. RIGHT CTA CARD — MONOCHROMATIC DARK */}
+                    <div className="col-span-4 pl-6 border-l border-zinc-100">
                       <Link
                         href="/features"
                         onClick={() => setActiveDropdown(null)}
-                        className="h-full rounded-2xl bg-gradient-to-br from-[#0EA5E9] via-[#0284C7] to-[#0369A1] text-white p-6 relative overflow-hidden flex flex-col justify-between shadow-lg group block hover:brightness-105 transition-all"
+                        className="h-full rounded-2xl bg-zinc-950 text-white p-6 relative overflow-hidden flex flex-col justify-between group block hover:bg-zinc-900 transition-colors"
                       >
-                        {/* Glassmorphic Emblem Container */}
-                        <div className="bg-white/20 backdrop-blur-md rounded-2xl p-2.5 border border-white/30 flex items-center justify-between shadow-inner">
+                        {/* Module Pill Chips */}
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
-                            <span className="w-6 h-6 rounded-full bg-amber-500/30 text-amber-200 flex items-center justify-center text-[10px] font-mono font-bold border border-amber-300/40">AI</span>
-                            <span className="w-6 h-6 rounded-full bg-emerald-500/30 text-emerald-200 flex items-center justify-center text-[10px] font-mono font-bold border border-emerald-300/40">CRM</span>
-                            <span className="w-6 h-6 rounded-full bg-sky-500/30 text-sky-200 flex items-center justify-center text-[10px] font-mono font-bold border border-sky-300/40">GST</span>
+                            <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono font-bold text-zinc-400 border border-white/10">AI</span>
+                            <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono font-bold text-zinc-400 border border-white/10">CRM</span>
+                            <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono font-bold text-zinc-400 border border-white/10">GST</span>
+                            <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono font-bold text-zinc-400 border border-white/10">E-Sign</span>
                           </div>
-                          <span className="text-[10px] font-mono font-bold text-sky-200 bg-white/10 px-2 py-0.5 rounded-full border border-white/20">
-                            20 BUILT • 8 ROADMAP
+                          <span className="text-[10px] font-mono font-bold text-zinc-500">
+                            20 built • 8 roadmap
                           </span>
                         </div>
 
-                        <div className="space-y-1.5 pt-3">
-                          <span className="text-[10px] font-mono font-bold text-sky-200 uppercase tracking-wider block">
+                        <div className="space-y-1.5 pt-4">
+                          <span className="text-[10px] font-mono font-medium text-zinc-500 uppercase tracking-wider block">
                             CORA STUDIO OS
                           </span>
-                          <h4 className="font-display text-sm font-bold text-white leading-snug">
+                          <h4 className="font-display text-[15px] font-semibold text-white leading-snug">
                             The complete 20-in-1 autonomous operating system for creative studios.
                           </h4>
                         </div>
 
-                        <div className="pt-2">
-                          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white group-hover:translate-x-1 transition-transform">
+                        <div className="pt-3">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 group-hover:text-white transition-colors">
                             <span>Explore all 20 modules &amp; roadmap</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                           </span>
                         </div>
                       </Link>
@@ -993,28 +986,38 @@ export function Navbar() {
                   <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
                     CORE WORKSPACE MODULES
                   </span>
-                  <Link href="/ai-agent" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className={`w-9 h-9 rounded-[12px] ${MODULE_GLYPH_MAP['ai-cofounder'].bgGradient} p-1.5 flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.08)]`}>{React.createElement(MODULE_GLYPH_MAP['ai-cofounder'].Glyph, { className: 'w-full h-full' })}</div>
+                  <Link href="/ai-agent" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60">
+                      <Sparkles className="w-4 h-4 text-zinc-700" />
+                    </div>
                     <div><div className="text-sm font-bold text-zinc-950">AI Agent Workspace</div><div className="text-xs text-zinc-500">Autonomous co-founder &amp; memory</div></div>
                   </Link>
-                  <Link href="/features/gst-invoicing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className={`w-9 h-9 rounded-[12px] ${MODULE_GLYPH_MAP['gst-invoicing'].bgGradient} p-1.5 flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.08)]`}>{React.createElement(MODULE_GLYPH_MAP['gst-invoicing'].Glyph, { className: 'w-full h-full' })}</div>
+                  <Link href="/features/gst-invoicing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60">
+                      <Receipt className="w-4 h-4 text-zinc-700" />
+                    </div>
                     <div><div className="text-sm font-bold text-zinc-950">18% GST Invoicing</div><div className="text-xs text-zinc-500">CGST/SGST automated splitting</div></div>
                   </Link>
-                  <Link href="/features/esign-vault" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className={`w-9 h-9 rounded-[12px] ${MODULE_GLYPH_MAP['esign-vault'].bgGradient} p-1.5 flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.08)]`}>{React.createElement(MODULE_GLYPH_MAP['esign-vault'].Glyph, { className: 'w-full h-full' })}</div>
+                  <Link href="/features/esign-vault" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60">
+                      <FileText className="w-4 h-4 text-zinc-700" />
+                    </div>
                     <div><div className="text-sm font-bold text-zinc-950">SHA-256 E-Sign Vault</div><div className="text-xs text-zinc-500">IT Act 2000 digital contracts</div></div>
                   </Link>
-                  <Link href="/features/lead-crm" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className={`w-9 h-9 rounded-[12px] ${MODULE_GLYPH_MAP['lead-crm'].bgGradient} p-1.5 flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.08)]`}>{React.createElement(MODULE_GLYPH_MAP['lead-crm'].Glyph, { className: 'w-full h-full' })}</div>
+                  <Link href="/features/lead-crm" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60">
+                      <Kanban className="w-4 h-4 text-zinc-700" />
+                    </div>
                     <div><div className="text-sm font-bold text-zinc-950">Kanban Lead CRM</div><div className="text-xs text-zinc-500">Milestones &amp; WhatsApp dispatch</div></div>
                   </Link>
-                  <Link href="/features/crew-dispatch" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className={`w-9 h-9 rounded-[12px] ${MODULE_GLYPH_MAP['crew-dispatch'].bgGradient} p-1.5 flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.08)]`}>{React.createElement(MODULE_GLYPH_MAP['crew-dispatch'].Glyph, { className: 'w-full h-full' })}</div>
+                  <Link href="/features/crew-dispatch" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60">
+                      <Send className="w-4 h-4 text-zinc-700" />
+                    </div>
                     <div><div className="text-sm font-bold text-zinc-950">Crew &amp; Gear Dispatch</div><div className="text-xs text-zinc-500">Automated shoot call sheets</div></div>
                   </Link>
                   <div className="pt-2">
-                    <Link href="/features" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                    <Link href="/features" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-zinc-950 flex items-center gap-1.5 hover:text-zinc-600 transition-colors">
                       <span>View all 20 modules &amp; roadmap</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
@@ -1028,16 +1031,16 @@ export function Navbar() {
                   <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
                     INDUSTRY WORKSPACES
                   </span>
-                  <Link href="/use-cases#commercial-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-200/70"><Camera className="w-4 h-4" /></div>
+                  <Link href="/use-cases#commercial-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60"><Camera className="w-4 h-4 text-zinc-700" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">Commercial Photo &amp; Film</div><div className="text-xs text-zinc-500">Gear checkouts &amp; 4K RAW proofing</div></div>
                   </Link>
-                  <Link href="/use-cases#real-estate-media" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200/70"><Building2 className="w-4 h-4" /></div>
+                  <Link href="/use-cases#real-estate-media" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60"><Building2 className="w-4 h-4 text-zinc-700" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">Real Estate &amp; Brokerages</div><div className="text-xs text-zinc-500">Property listings &amp; MLS AI copy</div></div>
                   </Link>
-                  <Link href="/use-cases#wedding-events" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-200/70"><Sparkles className="w-4 h-4" /></div>
+                  <Link href="/use-cases#wedding-events" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60"><Sparkles className="w-4 h-4 text-zinc-700" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">Wedding &amp; Event Production</div><div className="text-xs text-zinc-500">Multi-day call sheets &amp; advance GST</div></div>
                   </Link>
                   <Link href="/use-cases#interior-design" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
