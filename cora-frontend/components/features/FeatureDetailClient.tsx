@@ -20,6 +20,10 @@ import { FeatureModule, BUILT_MODULES } from '@/lib/features-data';
 import { FeatureIcon } from './FeatureIcon';
 import { CapabilityVisualCard } from './CapabilityVisualCard';
 import { ModuleCardVisual } from './ModuleCardVisual';
+import { FeaturePlusEverythingGrid } from './FeaturePlusEverythingGrid';
+import { FeaturePlatformBeginningGrid } from './FeaturePlatformBeginningGrid';
+import { FeatureSecurityTrustBar } from './FeatureSecurityTrustBar';
+import { FeatureStudioSpotlightBanner } from './FeatureStudioSpotlightBanner';
 import { ArtisticHeroBackground } from './ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -307,7 +311,16 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
 
       </section>
 
-      {/* ── 3-STEP WORKFLOW STEPPER ── */}
+      {/* ── SECTION 4: PLUS, EVERYTHING YOU NEED TO GET IT DONE (9-GRID MICRO CAPABILITIES) ── */}
+      <FeaturePlusEverythingGrid feature={feature} />
+
+      {/* ── SECTION 5: REAL-TIME PRODUCTION INTELLIGENCE SPOTLIGHT (CLICKUP DASHBOARD STYLE IN CORA MONOCHROME) ── */}
+      <FeatureStudioSpotlightBanner feature={feature} />
+
+      {/* ── SECTION 6: THE CORA PLATFORM (16 CONVERGED STUDIO OS MODULES GRID) ── */}
+      <FeaturePlatformBeginningGrid feature={feature} />
+
+      {/* ── SECTION 7: 3-STEP WORKFLOW STEPPER ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
         <div className="bg-zinc-50 rounded-[32px] p-8 sm:p-12 md:p-14 border border-zinc-200/90">
           <div className="max-w-[680px] mb-12">
@@ -337,7 +350,10 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
         </div>
       </section>
 
-      {/* ── REPLACED TOOLS & SAVINGS ── */}
+      {/* ── SECTION 8: ENTERPRISE TRUST & SECURITY EVERYWHERE (SOC 2, ISO 27001, GDPR, IT ACT) ── */}
+      <FeatureSecurityTrustBar />
+
+      {/* ── SECTION 9: REPLACED TOOLS & SAVINGS ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
         <div className="p-6 sm:p-8 rounded-[28px] bg-white border border-zinc-200/90 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center md:text-left">
@@ -365,14 +381,11 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
         </div>
       </section>
 
-      {/* ── FAQS ACCORDION ── */}
+      {/* ── SECTION 10: FAQS ACCORDION ── */}
       <section className="w-full max-w-[860px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
-        <div className="text-center mb-10">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400 block mb-2">
-            FREQUENTLY ASKED QUESTIONS
-          </span>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
-            Everything you need to know about {feature.shortTitle}
+        <div className="text-center mb-10 sm:mb-12">
+          <h2 className="font-display text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
+            FAQ<span className="text-zinc-400 font-semibold">s</span>
           </h2>
         </div>
 
