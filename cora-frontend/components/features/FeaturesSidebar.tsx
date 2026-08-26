@@ -13,8 +13,7 @@ import {
   Rocket, 
   CheckCircle2, 
   Clock, 
-  ArrowRight,
-  Filter,
+  ArrowRight, 
   Sparkles,
   Briefcase,
   Camera,
@@ -23,7 +22,7 @@ import {
   Heart,
   Palette
 } from 'lucide-react';
-import { CATEGORIES, INDUSTRIES, IndustryItem } from '@/lib/features-data';
+import { CATEGORIES, INDUSTRIES } from '@/lib/features-data';
 import Link from 'next/link';
 
 interface FeaturesSidebarProps {
@@ -101,12 +100,13 @@ export function FeaturesSidebar({
       
       {/* ── 1. SEARCH INPUT ── */}
       <div>
-        <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2 px-1">
+        <label htmlFor="directory-search-input" className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2 px-1 block">
           Search Directory
-        </div>
+        </label>
         <div className="relative flex items-center">
-          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" />
+          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" aria-hidden="true" />
           <input
+            id="directory-search-input"
             type="text"
             placeholder="Search all 28 modules..."
             value={searchQuery}
@@ -118,6 +118,7 @@ export function FeaturesSidebar({
               type="button"
               onClick={() => onSearchChange('')}
               className="absolute right-2.5 p-1 rounded-md text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-colors cursor-pointer"
+              aria-label="Clear search input"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -138,10 +139,8 @@ export function FeaturesSidebar({
             return (
               <button
                 key={cat.id}
-                onClick={() => {
-                  onSelectCategory(cat.id);
-                  if (onCloseMobileDrawer) onCloseMobileDrawer();
-                }}
+                type="button"
+                onClick={() => onSelectCategory(cat.id)}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group text-left ${
                   isActive
                     ? 'bg-zinc-950 text-white shadow-xs font-bold'
@@ -182,10 +181,8 @@ export function FeaturesSidebar({
             return (
               <button
                 key={ind.id}
-                onClick={() => {
-                  onSelectIndustry(ind.id);
-                  if (onCloseMobileDrawer) onCloseMobileDrawer();
-                }}
+                type="button"
+                onClick={() => onSelectIndustry(ind.id)}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group text-left ${
                   isSelected
                     ? 'bg-zinc-900 text-white shadow-xs font-bold'
@@ -220,6 +217,7 @@ export function FeaturesSidebar({
         
         <div className="space-y-1">
           <button
+            type="button"
             onClick={() => onStatusFilterChange('all')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
               statusFilter === 'all'
@@ -232,6 +230,7 @@ export function FeaturesSidebar({
           </button>
 
           <button
+            type="button"
             onClick={() => onStatusFilterChange('live')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
               statusFilter === 'live'
@@ -247,6 +246,7 @@ export function FeaturesSidebar({
           </button>
 
           <button
+            type="button"
             onClick={() => onStatusFilterChange('roadmap')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
               statusFilter === 'roadmap'
