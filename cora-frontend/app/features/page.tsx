@@ -71,7 +71,7 @@ export default function FeaturesPage() {
           {/* Status Pill */}
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full border border-blue-200/70 text-[11px] font-semibold text-zinc-800 mb-3.5 shadow-2xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>20 Features Ready • 8 In Progress</span>
+            <span>20 Built Modules Ready • 8 In Roadmap</span>
           </div>
 
           {/* Simple, Direct Heading for Non-Tech Users */}
