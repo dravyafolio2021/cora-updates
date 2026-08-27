@@ -4518,15 +4518,17 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             <?php if ( $sub_page === 'dashboard' ) : ?>
             <section id="cora-page-dashboard" class="cora-page-section cora-active space-y-6">
                 <?php
-                $user_first_name = $current_wp_user->exists() ? ( ! empty( $current_wp_user->first_name ) ? $current_wp_user->first_name : $current_wp_user->display_name ) : 'Dravya';
-                $hour = (int) date('H');
-                $greeting_time = 'Good afternoon';
-                if ($hour >= 5 && $hour < 12) {
+                $user_first_name = $current_wp_user->exists() ? ( ! empty( $current_wp_user->first_name ) ? $current_wp_user->first_name : $current_wp_user->display_name ) : 'Shravya';
+                $hour = (int) current_time( 'H' );
+                $greeting_time = 'Good morning';
+                if ( $hour >= 5 && $hour < 12 ) {
                     $greeting_time = 'Good morning';
-                } elseif ($hour >= 12 && $hour < 17) {
+                } elseif ( $hour >= 12 && $hour < 17 ) {
                     $greeting_time = 'Good afternoon';
-                } else {
+                } elseif ( $hour >= 17 && $hour < 22 ) {
                     $greeting_time = 'Good evening';
+                } else {
+                    $greeting_time = 'Working late';
                 }
                 $greeting_title = $greeting_time . ', ' . $user_first_name . '.';
 
@@ -4761,104 +4763,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     );
                 }
                 ?>
-                <div class="cora-dashboard-upper px-1 sm:px-4 md:px-6 w-full box-border">
-                <!-- Dynamic KPI Metrics Cards (Premium Responsive Layout: 2-Cols on Mobile, 4-Cols on Desktop) -->
-                <div class="w-full max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 select-none">
-                    <?php foreach ( $telemetry_metrics as $idx => $metric ) : ?>
-                    <div class="bg-white/80 p-4 backdrop-blur-md border border-zinc-200/50 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.01] hover:shadow-xs cursor-default">
-                        <div class="space-y-1 min-w-0 pr-2">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider truncate"><?php echo esc_html( $metric['label'] ); ?></span>
-                            <div class="flex items-baseline gap-1.5 flex-wrap">
-                                <span class="text-base sm:text-2xl font-extrabold text-zinc-900 leading-none tracking-tight"><?php echo esc_html( $metric['value'] ); ?></span>
-                                <span class="<?php echo esc_attr( $metric['badge_color'] ); ?> inline-flex items-center text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none"><?php echo esc_html( $metric['badge'] ); ?></span>
-                            </div>
-                        </div>
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-650 shrink-0 shadow-3xs">
-                            <?php echo $metric['icon']; ?>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-
-
-                <!-- Centered Welcome Greeting Section with sparkle SVG -->
-                <div class="text-center px-4 space-y-1.5 sm:space-y-2 relative" style="padding-top: 120px !important; padding-bottom: 40px !important;">
-                    <div class="inline-flex items-center justify-center gap-2.5 sm:gap-3">
-                        <!-- Slate Charcoal Star Sparkle -->
-                        <span class="text-zinc-900 shrink-0">
-                            <svg viewBox="0 0 24 24" width="22" height="22" class="w-5 h-5 sm:w-7 sm:h-7" fill="currentColor">
-                                <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path>
-                            </svg>
-                        </span>
-                        <h1 id="cora-dynamic-greeting-title" class="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-900">
-                            <?php echo esc_html($greeting_title); ?>
-                        </h1>
-                    </div>
-                    <p class="text-xs sm:text-base md:text-lg font-medium text-zinc-450 leading-tight">
-                        <?php echo ( $cora_workspace_industry_raw === 'custom' ) ? "Your AI Co-founder is active. Let's build something great." : "Let's continue growing your business."; ?>
-                    </p>
-                </div>
- 
-                <!-- Lovable-Style Command Search (Ask anything...) -->
-                <div class="w-full max-w-xl mx-auto mt-2 sm:mt-4 mb-6 sm:mb-8 px-2 sm:px-0 relative z-[999] hidden md:block" id="cora-search-container">
-                    <div class="relative flex items-center bg-white/85 backdrop-blur-md border border-zinc-200/60 hover:border-zinc-350 focus-within:border-zinc-900 focus-within:ring-2 focus-within:ring-zinc-100/30 rounded-full shadow-2xs transition-all duration-200 p-1.5 pl-3.5 pr-2">
-                        <span class="text-zinc-600 mr-2 flex shrink-0">
-                            <!-- Lovable Character Icon (Standardized Monochromatic) -->
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                                <circle cx="12" cy="12" r="10" class="text-zinc-100" fill="currentColor"></circle>
-                                <circle cx="12" cy="12" r="7" class="text-zinc-400" fill="currentColor"></circle>
-                                <circle cx="10" cy="11" r="1.2" fill="#fff"></circle>
-                                <circle cx="14" cy="11" r="1.2" fill="#fff"></circle>
-                                <path d="M9.5 15c.5.8 1.5 1.2 2.5 1.2s2-.4 2.5-1.2" stroke="#fff" stroke-width="1.2" stroke-linecap="round" fill="none"></path>
-                            </svg>
-                        </span>
-                        
-                        <!-- Real interactive input field for contextual search -->
-                        <input type="text" 
-                               id="cora-inline-command-input"
-                               placeholder="Ask anything..." 
-                               class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-xs sm:text-sm py-1.5 px-1 text-zinc-800 placeholder:text-zinc-400/80 cursor-pointer"
-                               autocomplete="off" />
-                               
-                        <div class="flex items-center gap-2">
-                            <button onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-955 text-white transition-colors cursor-pointer shadow-sm">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="12" y1="19" x2="12" y2="5"></line>
-                                    <polyline points="5 12 12 5 19 12"></polyline>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Advanced Command Search dropdown in-line container -->
-                    <div id="cora-inline-command-palette" class="absolute left-0 right-0 top-full mt-2 z-[9999] hidden bg-white border border-zinc-200 rounded-2xl shadow-2xl flex-col transition-all duration-200">
-                        <!-- Filter Pills Bar -->
-                        <div class="flex items-center gap-1.5 px-4 py-2 border-b border-zinc-100 bg-zinc-50/50 overflow-x-auto shrink-0 select-none no-scrollbar">
-                            <button type="button" class="cora-search-pill active text-[10px] font-semibold px-3 py-1 rounded-full border border-zinc-200 bg-zinc-900 text-white transition-all cursor-pointer" data-filter="all">Overview</button>
-                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="pages">Pages</button>
-                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="leads">Leads</button>
-                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="settings">Settings</button>
-                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="listings">Listings</button>
-                        </div>
-
-                        <!-- Results List Area — fixed height, always scrollable -->
-                        <div id="cora-inline-command-results" class="overflow-y-auto p-2" style="height: 260px;">
-                            <!-- Loading state / Suggestions list / Search results list -->
-                        </div>
-
-                        <!-- Footer Bar -->
-                        <div class="border-t border-zinc-100 px-4 py-2 bg-zinc-50/50 flex items-center justify-between shrink-0">
-                            <span class="text-[10px] text-zinc-400 font-medium">Need help finding something?</span>
-                            <button type="button" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-[10px] rounded-lg transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer" onclick="window.coraTriggerCommandAI()">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                Ask Cora
-                            </button>
-                        </div>
-                    </div>
-                </div><!-- end cora-search-container -->
-                
-                <!-- Premium Dynamic Quick Actions (Mobile-first Wrap Grid / Desktop Centered Grid) -->
                 <?php
+                // Predefine Quick Actions per industry mode
                 $predefined_actions = array();
                 if ( $cora_workspace_industry_raw === 'custom' ) {
                     $enabled = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
@@ -5040,9 +4946,103 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 <script>
                     var CORA_PREDEFINED_ACTIONS = <?php echo json_encode( $predefined_actions ); ?>;
                 </script>
+
+                <div class="cora-dashboard-upper px-1 sm:px-4 md:px-6 w-full box-border">
+
+                <!-- 1. Centered Welcome Greeting Section with sparkle SVG -->
+                <div class="text-center px-4 space-y-1 sm:space-y-1.5 relative pt-4 sm:pt-6 pb-2 sm:pb-3">
+                    <div class="inline-flex items-center justify-center gap-2 sm:gap-2.5">
+                        <!-- Charcoal Star Sparkle -->
+                        <span class="text-zinc-900 shrink-0">
+                            <svg viewBox="0 0 24 24" width="20" height="20" class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor">
+                                <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path>
+                            </svg>
+                        </span>
+                        <h1 id="cora-dynamic-greeting-title" data-user-name="<?php echo esc_attr($user_first_name); ?>" class="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-900">
+                            <?php echo esc_html($greeting_title); ?>
+                        </h1>
+                    </div>
+                    <p class="text-xs sm:text-sm md:text-base font-medium text-zinc-500 leading-tight">
+                        <?php echo ( $cora_workspace_industry_raw === 'custom' ) ? "Your AI Co-founder is active. Let's build something great." : "Your AI Co-founder is active. Here is your operational briefing."; ?>
+                    </p>
+                </div>
+ 
+                <!-- 2. Universal Command Search (Ask anything...) - Visible & Responsive Across All Viewports -->
+                <div class="w-full max-w-xl mx-auto mt-2 sm:mt-3 mb-3 sm:mb-4 px-2 sm:px-0 relative z-[999]" id="cora-search-container">
+                    <div class="relative flex items-center bg-white/90 backdrop-blur-md border border-zinc-200 hover:border-zinc-400 focus-within:border-zinc-900 focus-within:ring-2 focus-within:ring-zinc-900/10 rounded-full shadow-2xs transition-all duration-200 p-1.5 pl-3.5 pr-2">
+                        <span class="text-zinc-500 mr-2 flex shrink-0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </span>
+                        
+                        <!-- Real interactive input field for contextual search -->
+                        <input type="text" 
+                               id="cora-inline-command-input"
+                               placeholder="Ask Cora anything, search records, or press ⌘K..." 
+                               class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-xs sm:text-sm py-1.5 px-1 text-zinc-900 placeholder:text-zinc-400 cursor-pointer"
+                               autocomplete="off" />
+                               
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 border border-zinc-200 rounded">⌘K</kbd>
+                            <button onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-950 text-white transition-colors cursor-pointer shadow-xs" title="Send to AI Co-Founder">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                                    <polyline points="5 12 12 5 19 12"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Command Search dropdown in-line container -->
+                    <div id="cora-inline-command-palette" class="absolute left-0 right-0 top-full mt-2 z-[9999] hidden bg-white border border-zinc-200 rounded-2xl shadow-2xl flex-col transition-all duration-200">
+                        <!-- Filter Pills Bar -->
+                        <div class="flex items-center gap-1.5 px-4 py-2 border-b border-zinc-100 bg-zinc-50/50 overflow-x-auto shrink-0 select-none no-scrollbar">
+                            <button type="button" class="cora-search-pill active text-[10px] font-semibold px-3 py-1 rounded-full border border-zinc-200 bg-zinc-900 text-white transition-all cursor-pointer" data-filter="all">Overview</button>
+                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="pages">Pages</button>
+                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="leads">Leads</button>
+                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="settings">Settings</button>
+                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="listings">Listings</button>
+                        </div>
+
+                        <!-- Results List Area — fixed height, always scrollable -->
+                        <div id="cora-inline-command-results" class="overflow-y-auto p-2" style="height: 260px;">
+                            <!-- Loading state / Suggestions list / Search results list -->
+                        </div>
+
+                        <!-- Footer Bar -->
+                        <div class="border-t border-zinc-100 px-4 py-2 bg-zinc-50/50 flex items-center justify-between shrink-0">
+                            <span class="text-[10px] text-zinc-400 font-medium">Need help finding something?</span>
+                            <button type="button" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-[10px] rounded-lg transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer" onclick="window.coraTriggerCommandAI()">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                Ask Cora
+                            </button>
+                        </div>
+                    </div>
+                </div><!-- end cora-search-container -->
                 
-                <!-- Premium Dynamic Quick Actions (Mobile-first Wrap Grid / Desktop Centered Grid) -->
-                <div class="w-full flex flex-col items-center justify-center gap-2.5 py-2 px-0 select-none" id="cora-quick-actions-bar"></div>
+                <!-- 3. Premium Dynamic Quick Actions (Mobile-first Wrap Grid / Desktop Centered Grid) -->
+                <div class="w-full flex flex-col items-center justify-center gap-2 py-1 px-0 select-none mb-5 sm:mb-6" id="cora-quick-actions-bar"></div>
+
+                <!-- 4. Dynamic KPI Metrics Cards (Premium Responsive Layout: 2-Cols on Mobile, 4-Cols on Desktop) -->
+                <div class="w-full max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 select-none mb-2">
+                    <?php foreach ( $telemetry_metrics as $idx => $metric ) : ?>
+                    <div class="bg-white/90 p-3.5 sm:p-4 backdrop-blur-md border border-zinc-200/70 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.01] hover:shadow-xs cursor-default">
+                        <div class="space-y-1 min-w-0 pr-2">
+                            <span class="block text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider truncate"><?php echo esc_html( $metric['label'] ); ?></span>
+                            <div class="flex items-baseline gap-1.5 flex-wrap">
+                                <span class="text-base sm:text-2xl font-extrabold text-zinc-900 leading-none tracking-tight"><?php echo esc_html( $metric['value'] ); ?></span>
+                                <span class="<?php echo esc_attr( $metric['badge_color'] ); ?> inline-flex items-center text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none"><?php echo esc_html( $metric['badge'] ); ?></span>
+                            </div>
+                        </div>
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-650 shrink-0 shadow-3xs">
+                            <?php echo $metric['icon']; ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+
             </div><!-- end cora-dashboard-upper -->
                 <!-- ===== Custom Quick Action Modal ===== -->
                 <div id="cora-custom-action-modal" class="fixed inset-0 flex items-center justify-center" style="display:none; z-index: 100000;" onclick="if(event.target===this){this.style.display='none';document.body.style.overflow='';}">
@@ -5207,7 +5207,7 @@ window.coraRenderQuickActionsBar = function() {
         isCreator: true,
         label: 'Custom Shortcuts',
         onclick: 'window.coraOpenCustomActionModal()',
-        icon: '<svg viewBox="0 0 24 24" width="13" height="13" class="text-purple-600 shrink-0" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path></svg>'
+        icon: '<svg viewBox="0 0 24 24" width="13" height="13" class="text-zinc-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>'
     };
 
     if (isDesktop) {
@@ -5217,21 +5217,19 @@ window.coraRenderQuickActionsBar = function() {
 
         var buttonsHtml = totalItems.map(function(item) {
             if (item.isCreator) {
-                return '<button type="button" onclick="' + item.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0" style="margin:0;">' +
-                    '<span class="cora-ai-gradient-pill-inner">' +
-                        item.icon +
-                        '<span>' + item.label + '</span>' +
-                    '</span>' +
+                return '<button type="button" onclick="' + item.onclick + '" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-300/80 bg-zinc-100 hover:bg-zinc-200/80 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0 select-none" style="margin:0;">' +
+                    item.icon +
+                    ' <span>' + item.label + '</span>' +
                 '</button>';
             } else {
-                return '<button onclick="' + item.onclick + '" class="flex justify-center items-center gap-2 px-4 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0" style="margin:0;">' +
+                return '<button onclick="' + item.onclick + '" class="flex justify-center items-center gap-2 px-3.5 py-1.5 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0" style="margin:0;">' +
                     item.icon +
                     ' <span>' + item.label + '</span>' +
                 '</button>';
             }
         }).join('');
 
-        bar.innerHTML = '<div class="w-full" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; row-gap:8px; column-gap:10px; padding:6px 16px; margin:4px 0;">' +
+        bar.innerHTML = '<div class="w-full" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; row-gap:8px; column-gap:8px; padding:4px 12px; margin:2px 0;">' +
             buttonsHtml +
         '</div>';
 
@@ -5257,31 +5255,48 @@ window.coraRenderQuickActionsBar = function() {
             '</button>';
         }).join('');
 
-        var creatorHtml = '<button type="button" onclick="' + creatorBtn.onclick + '" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0 text-[10.5px] font-bold mt-1">' +
-            '<span class="cora-ai-gradient-pill-inner px-4 py-1.5">' +
-                creatorBtn.icon +
-                '<span>' + creatorBtn.label + '</span>' +
-            '</span>' +
+        var creatorHtml = '<button type="button" onclick="' + creatorBtn.onclick + '" class="flex items-center justify-center gap-1.5 px-4 py-1.5 border border-zinc-300/80 bg-zinc-100 hover:bg-zinc-200/80 text-zinc-900 rounded-full text-[10.5px] font-bold transition-all shadow-3xs cursor-pointer select-none whitespace-nowrap shrink-0 mt-0.5">' +
+            creatorBtn.icon +
+            ' <span>' + creatorBtn.label + '</span>' +
         '</button>';
 
-        var html = '<div class="w-full flex flex-col gap-2.5 px-4 py-1.5">';
+        var html = '<div class="w-full flex flex-col gap-2 px-2 py-1">';
         
         if (row1Html) {
-            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-between gap-2.5">' + row1Html + '</div>';
+            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-between gap-2">' + row1Html + '</div>';
         }
         if (row2Html) {
-            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-center gap-2.5">' + row2Html + '</div>';
+            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-center gap-2">' + row2Html + '</div>';
         }
-        html += '<div class="w-full flex flex-row items-center justify-center mt-1">' + creatorHtml + '</div>';
+        html += '<div class="w-full flex flex-row items-center justify-center">' + creatorHtml + '</div>';
         html += '</div>';
 
         bar.innerHTML = html;
     }
 };
 
+window.coraHydrateGreeting = function() {
+    var titleEl = document.getElementById('cora-dynamic-greeting-title');
+    if (!titleEl) return;
+    var hour = new Date().getHours();
+    var greeting = 'Good morning';
+    if (hour >= 12 && hour < 17) {
+        greeting = 'Good afternoon';
+    } else if (hour >= 17 && hour < 22) {
+        greeting = 'Good evening';
+    } else if (hour >= 22 || hour < 5) {
+        greeting = 'Working late';
+    }
+    var userName = titleEl.getAttribute('data-user-name') || 'Shravya';
+    titleEl.textContent = greeting + ', ' + userName + '.';
+};
+
 window.coraRenderCustomActions = window.coraRenderQuickActionsBar;
 
-document.addEventListener('DOMContentLoaded', window.coraRenderQuickActionsBar);
+document.addEventListener('DOMContentLoaded', function() {
+    window.coraHydrateGreeting();
+    window.coraRenderQuickActionsBar();
+});
 window.addEventListener('resize', window.coraRenderQuickActionsBar);
                 </script>
                 <?php

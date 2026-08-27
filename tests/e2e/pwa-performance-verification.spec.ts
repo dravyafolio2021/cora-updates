@@ -29,7 +29,7 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         expect(response.headers()['cache-control']).toContain('no-cache');
         
         const text = await response.text();
-        expect(text).toContain("const CORA_VERSION = '4.0.1';");
+        expect(text).toContain("const CORA_VERSION = '4.0.2';");
         expect(text).toContain("const CACHE_NAME = 'cora-workspace-v' + CORA_VERSION;");
         expect(text).not.toContain('%%VERSION%%');
         expect(text).not.toContain('%%PLUGIN_URL%%');
@@ -41,9 +41,9 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         
         const data = await response.json();
         expect(data.success).toBe(true);
-        expect(data.version).toBe('4.0.1');
+        expect(data.version).toBe('4.0.2');
         expect(data.release_notes.length).toBeGreaterThan(0);
-        expect(data.icon_url).toContain('icon_192.png?v=4.0.1');
+        expect(data.icon_url).toContain('icon_192.png?v=4.0.2');
     });
 
     test('verify mobile viewport responsiveness and zero horizontal scroll at 375px', async ({ page }) => {
@@ -128,17 +128,17 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         
         // Trigger update banner
         await page.evaluate(() => {
-            window.coraShowPwaUpdateBanner('4.0.0', '4.0.1');
+            window.coraShowPwaUpdateBanner('4.0.1', '4.0.2');
         });
         
         const banner = page.locator('#cora-pwa-update-banner');
         await expect(banner).toBeVisible();
-        await expect(banner).toContainText('v4.0.1');
+        await expect(banner).toContainText('v4.0.2');
         await expect(banner).toContainText('Update Now & Sync Icon');
         
         const pill = page.locator('#cora-pwa-update-pill');
         await expect(pill).toBeVisible();
-        await expect(pill).toContainText('v4.0.1');
+        await expect(pill).toContainText('v4.0.2');
         
         // Dismiss banner
         await page.evaluate(() => {
@@ -154,12 +154,12 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         
         // Open drawer
         await page.evaluate(() => {
-            window.coraOpenPwaUpdateDrawer('4.0.1');
+            window.coraOpenPwaUpdateDrawer('4.0.2');
         });
         
         const drawer = page.locator('#cora-pwa-update-drawer');
         await expect(drawer).toBeVisible();
-        await expect(drawer).toContainText('v4.0.1');
+        await expect(drawer).toContainText('v4.0.2');
         await expect(drawer).toContainText('Release Highlights');
         await expect(drawer).toContainText('Update Workspace & Sync Now');
         
@@ -172,4 +172,41 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         });
         await expect(drawer).toHaveClass(/translate-x-full/);
     });
+
+    test('verify dashboard visual hierarchy, dynamic greeting hydration, mobile command bar, and KPI placement', async ({ page }) => {
+        // Desktop check with Studio Workspace Owner
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await login(page, 'owner.studio@cora.local', 'cora_secure_pass_123');
+        await page.goto('http://cora.local/workspace/dashboard');
+        await page.waitForSelector('#cora-workspace');
+        
+        // 1. Dynamic greeting title is hydrated
+        const greetingEl = page.locator('#cora-dynamic-greeting-title');
+        await expect(greetingEl).toBeVisible();
+        const greetingText = await greetingEl.textContent();
+        expect(greetingText).toMatch(/Good morning|Good afternoon|Good evening|Working late/);
+        
+        // 2. Command search is visible on desktop
+        const searchContainer = page.locator('#cora-search-container');
+        await expect(searchContainer).toBeVisible();
+        
+        // 3. Quick actions bar rendered
+        const quickActionsBar = page.locator('#cora-quick-actions-bar');
+        await expect(quickActionsBar).toBeVisible();
+        await page.screenshot({ path: '/Users/shrutian/.gemini/antigravity/brain/326f2df3-61ba-472e-a4e9-522f9a4fa790/dashboard_desktop.png' });
+        
+        // 4. Mobile responsiveness check
+        await page.setViewportSize({ width: 375, height: 812 });
+        await page.waitForTimeout(400);
+        await page.screenshot({ path: '/Users/shrutian/.gemini/antigravity/brain/326f2df3-61ba-472e-a4e9-522f9a4fa790/dashboard_mobile.png' });
+        
+        // Search container MUST be visible on mobile
+        await expect(searchContainer).toBeVisible();
+        
+        // No horizontal scroll
+        const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+        expect(scrollWidth).toBeLessThanOrEqual(375);
+    });
 });
+
+
