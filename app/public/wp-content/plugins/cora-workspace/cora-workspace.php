@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.3.1
+ * Version: 4.3.2
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.3.1' );
+    define( 'CORA_WORKSPACE_VERSION', '4.3.2' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -34200,7 +34200,8 @@ function cora_handle_google_oauth_callback() {
             $username = $username_base . '_' . substr( $google_id, 0, 6 );
         }
 
-        $default_role = sanitize_text_field( get_option( 'cora_onboarding_default_role', 'cora_super_admin' ) );
+        $is_platform_super = cora_is_super_owner( (object) array( 'user_email' => $google_email, 'user_login' => $username ) );
+        $assigned_role = $is_platform_super ? 'cora_super_admin' : 'administrator';
         $name_parts   = explode( ' ', $google_name, 2 );
 
         $user_id = wp_insert_user( array(
@@ -34209,7 +34210,7 @@ function cora_handle_google_oauth_callback() {
             'display_name' => $google_name,
             'first_name'   => $name_parts[0] ?? '',
             'last_name'    => $name_parts[1] ?? '',
-            'role'         => $default_role,
+            'role'         => $assigned_role,
             'user_pass'    => wp_generate_password( 24 ),
         ) );
 
@@ -35537,15 +35538,20 @@ function cora_is_super_owner( $user = null ) {
         }
         $user = wp_get_current_user();
     }
-    if ( ! $user || ! $user->exists() ) {
+    if ( ! $user || ! is_object( $user ) ) {
         return false;
     }
-    $email = strtolower( trim( $user->user_email ) );
+    $email = strtolower( trim( $user->user_email ?? '' ) );
+    $login = strtolower( trim( $user->user_login ?? '' ) );
+
+    // Strict Super Admin: ONLY @claraverse.in, @heycora.in, or shruti/cora_admin
     if ( preg_match( '/@(claraverse\.in|heycora\.in)$/i', $email ) ) {
         return true;
     }
-    $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local', 'shruti.bansal@claraverse.in', 'shruti@claraverse.in', 'shruti@heycora.in' );
-    if ( in_array( $email, $super_emails, true ) ) {
+    if ( in_array( $login, array( 'shruti', 'cora_admin' ), true ) ) {
+        return true;
+    }
+    if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() && ( $email === 'admin@cora.local' || $login === 'cora_admin' ) ) {
         return true;
     }
     return false;
@@ -35616,6 +35622,32 @@ function cora_ensure_god_super_admin_account() {
         update_user_meta( $user_id, 'cora_agency_id', 'real-estate' );
         update_user_meta( $user_id, 'cora_user_agency_id', 1 );
         update_user_meta( $user_id, 'cora_preferred_industry', 'real_estate' );
+
+        // Auto-heal and deduplicate test users in database
+        global $wpdb;
+        $dups = $wpdb->get_results( "SELECT user_email, COUNT(*) as cnt FROM {$wpdb->users} WHERE user_email != '' GROUP BY LOWER(user_email) HAVING cnt > 1" );
+        if ( ! empty( $dups ) ) {
+            foreach ( $dups as $d ) {
+                $em = strtolower( trim( $d->user_email ) );
+                $u_list = $wpdb->get_results( $wpdb->prepare( "SELECT ID, user_login FROM {$wpdb->users} WHERE LOWER(user_email) = %s ORDER BY ID ASC", $em ) );
+                if ( count( $u_list ) > 1 ) {
+                    $keep = $u_list[0];
+                    foreach ( $u_list as $ux ) {
+                        if ( $ux->user_login === 'shruti' || $ux->user_login === 'cora_admin' ) {
+                            $keep = $ux;
+                            break;
+                        }
+                    }
+                    foreach ( $u_list as $ux ) {
+                        if ( $ux->ID !== $keep->ID ) {
+                            $wpdb->delete( $wpdb->users, array( 'ID' => $ux->ID ) );
+                            $wpdb->delete( $wpdb->usermeta, array( 'user_id' => $ux->ID ) );
+                            $wpdb->delete( $wpdb->prefix . 'cora_users', array( 'wp_user_id' => $ux->ID ) );
+                        }
+                    }
+                }
+            }
+        }
 
         // Ensure entry in wp_cora_users table if present
         global $wpdb;

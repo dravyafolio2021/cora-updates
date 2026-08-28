@@ -12,15 +12,20 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
             }
             $user = wp_get_current_user();
         }
-        if ( ! $user || ! $user->exists() ) {
+        if ( ! $user || ! is_object( $user ) ) {
             return false;
         }
-        $email = strtolower( trim( $user->user_email ) );
+        $email = strtolower( trim( $user->user_email ?? '' ) );
+        $login = strtolower( trim( $user->user_login ?? '' ) );
+
+        // Strict Super Admin: ONLY @claraverse.in, @heycora.in, or shruti/cora_admin
         if ( preg_match( '/@(claraverse\.in|heycora\.in)$/i', $email ) ) {
             return true;
         }
-        $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local', 'shruti.bansal@claraverse.in', 'shruti@claraverse.in', 'shruti@heycora.in' );
-        if ( in_array( $email, $super_emails, true ) ) {
+        if ( in_array( $login, array( 'shruti', 'cora_admin' ), true ) ) {
+            return true;
+        }
+        if ( function_exists( 'cora_is_local_environment' ) && cora_is_local_environment() && ( $email === 'admin@cora.local' || $login === 'cora_admin' ) ) {
             return true;
         }
         return false;
