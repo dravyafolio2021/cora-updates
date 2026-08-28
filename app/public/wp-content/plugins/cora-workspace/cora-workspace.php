@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.2.6
+ * Version: 4.2.7
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.2.6' );
+    define( 'CORA_WORKSPACE_VERSION', '4.2.7' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -2423,11 +2423,11 @@ function cora_get_custom_enabled_features() {
 
     $enabled = get_option( $custom_features_key, false );
     if ( $enabled === false ) {
-        // By default: all Workspace, Sales Channel, and AI Marketing features are enabled.
-        // Operations features (CRM leads, scheduler, camera gear, tasks, showings, listings, attendance) are disabled by default.
+        // By default: all modules across Workspace, Operations, Sales Channel, and AI Marketing are enabled
         return array(
             'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
             'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
+            'leads', 'crew_scheduler', 'equipment', 'tasks', 'showings', 'properties', 'attendance',
             'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
         );
     }
