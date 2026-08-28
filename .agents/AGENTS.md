@@ -4,8 +4,8 @@ This file outlines workspace rules, global execution guidelines, and design syst
 
 ## 1. Dialogue and Alert Guidelines
 - **No Browser Defaults**: Never invoke browser-native dialogue overlays such as `alert()`, `confirm()`, or `prompt()`.
-- **Custom Toast System**: Direct all alerts, errors, and confirmation feedback through the custom monochromatic Toast Notification system (`window.coraShowToast`).
-- **Form Drawers**: Replace overlay modals or prompts for complex forms (such as adding shoot bookings) with right-sliding side drawer sheets to maximize screen layout efficiency.
+- **Custom Toast System**: Direct all alerts, errors, and confirmation feedback through the top-floating custom monochromatic Toast Notification system (`window.coraShowToast`).
+- **Bottom & Top Sheets (Zero Mobile Side Drawers)**: Replace overlay popups and side-sliding drawers with **bottom-up slide sheets** (`translate-y-0`) or **top-down banners**. Side-sliding drawers and sidebars are strictly prohibited on mobile screens.
 
 ## 2. Admin User and Bottom Sidebar Popovers
 - **Sidebar Admin Popover**: The administrator widget (Avatar `A` or `S` for Studio) must sit sticky at the bottom of the sidebar.
@@ -68,4 +68,14 @@ The Cora platform enforces a full 5-level Atomic Component Architecture defined 
 - **Multi-Device Lifecycle Prompting**: All platforms (iOS WebClip, Android WebAPK, Desktop PWA, and standard browsers) must support the universal monochromatic in-app update prompt system (`#cora-pwa-update-banner`, `#cora-pwa-update-pill`, and `#cora-pwa-update-drawer`).
 - **Zero-Downtime Cache Invalidation**: On applying an update (`window.coraApplyPwaUpdate`), the client purges all version-mismatched caches, activates the new Service Worker via `skipWaiting`, synchronizes dynamic touch icons/favicons, and smoothly reloads the active screen within 300ms.
 - **REST Version Heartbeat**: The system provides `/wp-json/cora-pwa/v1/version-check` returning active version metadata and changelog highlights. In-app checks run automatically on launch, tab re-focus (`visibilitychange`), and manually via the admin profile popover.
+
+## 12. Mobile Sheet & Drawer Standard Operating Procedure (SOP)
+- **Strict Prohibition of Mobile Side Drawers**: Side-sliding panels, side drawers, and off-canvas flyouts are strictly forbidden on mobile devices. Side-sliding UI creates poor one-handed ergonomics and visual clutter on mobile screens.
+- **Bottom-Up Slide Sheets for Actions & Forms**: All mobile form panels, multi-step creators, filter trays, settings sheets, and sub-navigation menus MUST open as **bottom slide-up sheets** (`translate-y-full` to `translate-y-0`) featuring:
+  - Drag indicator handle (`w-10 h-1 rounded-full bg-zinc-300`).
+  - Top rounded corners (`rounded-t-3xl`).
+  - Dark blurred backdrop overlay (`rgba(9,9,11,0.45)` with `backdrop-filter: blur(8px)`).
+  - Spring-like entrance easing (`cubic-bezier(0.16, 1, 0.3, 1)`).
+- **Top-Down Floating Banners for Notifications**: All system feedback, priority alerts, and toasts MUST float from the **top-center** (`top: 68px`) to ensure zero visual collision with the bottom navigation island bar, active buttons, or bottom sheets.
+
 
