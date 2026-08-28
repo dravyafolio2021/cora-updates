@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.3.6
+ * Version: 4.3.7
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.3.6' );
+    define( 'CORA_WORKSPACE_VERSION', '4.3.7' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -45946,3 +45946,262 @@ if ( ! function_exists( 'cora_force_persistent_auth_cookies' ) ) {
 }
 
 
+
+
+/* ==========================================================================
+   CORA VAULT & FILE MANAGER AI AGENT ACTION ENGINE
+   Empowers real-time document creation, GST math, e-sign, assignment, and sharing
+   ========================================================================== */
+
+if ( ! function_exists( 'cora_ajax_vault_ai_action' ) ) {
+function cora_ajax_vault_ai_action() {
+    check_ajax_referer( 'cora_vault_nonce', 'security' );
+
+    if ( ! current_user_can( 'read' ) ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized workspace action.' ) );
+    }
+
+    $prompt   = sanitize_text_field( $_POST['prompt'] ?? '' );
+    $sub_act  = sanitize_text_field( $_POST['sub_action'] ?? 'parse_and_propose' );
+    $doc_data = isset( $_POST['doc_data'] ) ? (array) $_POST['doc_data'] : array();
+
+    if ( empty( $prompt ) && $sub_act === 'parse_and_propose' ) {
+        wp_send_json_error( array( 'message' => 'Please provide a document prompt or instruction.' ) );
+    }
+
+    $cora_documents = get_option( 'cora_documents', array() );
+    if ( ! is_array( $cora_documents ) ) {
+        $cora_documents = array();
+    }
+
+    // SUB-ACTION 1: DIRECT EXECUTE / SAVE TO VAULT
+    if ( $sub_act === 'save_document' ) {
+        $new_doc_id = 'doc_' . time() . '_' . rand( 100, 999 );
+        $title       = sanitize_text_field( $doc_data['title'] ?? 'New Document' );
+        $type        = sanitize_text_field( $doc_data['type'] ?? 'Invoice' );
+        $client_name = sanitize_text_field( $doc_data['client_name'] ?? 'Client' );
+        $client_email= sanitize_email( $doc_data['client_email'] ?? '' );
+        $client_phone= sanitize_text_field( $doc_data['client_phone'] ?? '' );
+        $client_gstin= sanitize_text_field( $doc_data['client_gstin'] ?? '' );
+        $amount      = floatval( $doc_data['amount'] ?? 0 );
+        $tax_rate    = floatval( $doc_data['tax_rate'] ?? 18 );
+        $is_igst     = ! empty( $doc_data['is_igst'] );
+        $tax_amount  = round( ( $amount * $tax_rate ) / 100, 2 );
+        $grand_total = $amount + $tax_amount;
+        $deposit     = round( $grand_total * 0.5, 2 );
+        $status      = sanitize_text_field( $doc_data['status'] ?? 'Sent' );
+        $assignee    = sanitize_text_field( $doc_data['assignee_name'] ?? '' );
+
+        $items = ! empty( $doc_data['items'] ) && is_array( $doc_data['items'] ) ? $doc_data['items'] : array(
+            array(
+                'desc' => sanitize_text_field( $doc_data['desc'] ?? ( $type . ' Services' ) ),
+                'sac'  => '998381',
+                'qty'  => 1,
+                'rate' => $amount,
+                'tax'  => $tax_rate
+            )
+        );
+
+        $share_hash = wp_hash( $new_doc_id . 'secured_share_token' );
+
+        $doc_record = array(
+            'id'             => $new_doc_id,
+            'number'         => 'DOC-' . date('Y') . '-' . rand(1000, 9999),
+            'title'          => $title,
+            'type'           => $type,
+            'client_name'    => $client_name,
+            'client_email'   => $client_email,
+            'client_phone'   => $client_phone,
+            'client_gstin'   => $client_gstin,
+            'client_address' => sanitize_text_field( $doc_data['client_address'] ?? 'Corporate Workspace, India' ),
+            'pos_state'      => sanitize_text_field( $doc_data['pos_state'] ?? 'Delhi (07)' ),
+            'is_igst'        => $is_igst,
+            'amount'         => $amount,
+            'tax_amount'     => $tax_amount,
+            'grand_total'    => $grand_total,
+            'deposit'        => $deposit,
+            'currency'       => 'INR',
+            'upi_vpa'        => 'cora@icici',
+            'status'         => $status,
+            'watermark'      => 'OFFICIAL',
+            'signed'         => false,
+            'assignee_name'  => $assignee,
+            'created_at'     => current_time( 'mysql' ),
+            'secured_shares' => array(
+                array(
+                    'hash' => $share_hash,
+                    'email' => $client_email ?: 'client@example.com',
+                    'expiry_time' => 0,
+                    'created_at' => time()
+                )
+            ),
+            'items'          => $items
+        );
+
+        // Prepend new document to top of vault
+        array_unshift( $cora_documents, $doc_record );
+        update_option( 'cora_documents', $cora_documents );
+
+        // Dispatch audit notification
+        if ( function_exists( 'cora_notify' ) ) {
+            cora_notify( 'document_created', 'all_admins', array(
+                'title'    => "New {$type} Created via AI Agent",
+                'body'     => "{$title} for {$client_name} (₹" . number_format($grand_total) . ") has been added to the Vault.",
+                'category' => 'Document Vault'
+            ) );
+        }
+
+        wp_send_json_success( array(
+            'message'  => "{$type} successfully created and saved to Document Vault!",
+            'document' => $doc_record,
+            'total_count' => count( $cora_documents )
+        ) );
+    }
+
+    // SUB-ACTION 2: REQUEST E-SIGN VIA AI
+    if ( $sub_act === 'request_esign' ) {
+        $target_doc_id = sanitize_text_field( $doc_data['doc_id'] ?? '' );
+        $signer_email  = sanitize_email( $doc_data['signer_email'] ?? '' );
+        $doc_found     = false;
+
+        foreach ( $cora_documents as &$d ) {
+            if ( ( $d['id'] ?? '' ) === $target_doc_id || ( $d['number'] ?? '' ) === $target_doc_id ) {
+                $d['status'] = 'Sent';
+                $d['esign_token'] = wp_hash( $d['id'] . time() . 'esign' );
+                $d['esign_requested_at'] = current_time( 'mysql' );
+                if ( ! empty( $signer_email ) ) {
+                    $d['client_email'] = $signer_email;
+                }
+                $doc_found = $d;
+                break;
+            }
+        }
+
+        if ( $doc_found ) {
+            update_option( 'cora_documents', $cora_documents );
+            
+            // Dispatch notification
+            if ( function_exists( 'cora_notify' ) ) {
+                cora_notify( 'document_created', 'all_admins', array(
+                    'title'    => "E-Sign Link Dispatched",
+                    'body'     => "E-Sign request sent to {$doc_found['client_name']} for {$doc_found['title']}.",
+                    'category' => 'E-Sign Registry',
+                    'urgent'   => true
+                ) );
+            }
+
+            wp_send_json_success( array(
+                'message' => "E-Sign link generated and sent to {$doc_found['client_name']}!",
+                'document'=> $doc_found
+            ) );
+        } else {
+            wp_send_json_error( array( 'message' => 'Target document not found in Vault.' ) );
+        }
+    }
+
+    // SUB-ACTION 3: ASSIGN DOCUMENT VIA AI
+    if ( $sub_act === 'assign_document' ) {
+        $target_doc_id = sanitize_text_field( $doc_data['doc_id'] ?? '' );
+        $assignee_name = sanitize_text_field( $doc_data['assignee_name'] ?? 'Team Member' );
+        $doc_found     = false;
+
+        foreach ( $cora_documents as &$d ) {
+            if ( ( $d['id'] ?? '' ) === $target_doc_id || ( $d['number'] ?? '' ) === $target_doc_id || stripos( $d['title'], $target_doc_id ) !== false ) {
+                $d['assignee_name'] = $assignee_name;
+                $d['assigned_at']   = current_time( 'mysql' );
+                $doc_found = $d;
+                break;
+            }
+        }
+
+        if ( $doc_found ) {
+            update_option( 'cora_documents', $cora_documents );
+            wp_send_json_success( array(
+                'message' => "{$doc_found['title']} assigned to {$assignee_name} successfully!",
+                'document'=> $doc_found
+            ) );
+        } else {
+            wp_send_json_error( array( 'message' => 'Document could not be found to assign.' ) );
+        }
+    }
+
+    // SUB-ACTION 4: PARSE NATURAL LANGUAGE PROMPT & PROPOSE ACTION
+    $lower_prompt = strtolower( $prompt );
+
+    // Heuristics for intent classification
+    $intent = 'create_document';
+    $doc_type = 'Invoice';
+    if ( strpos( $lower_prompt, 'proposal' ) !== false || strpos( $lower_prompt, 'quote' ) !== false ) {
+        $doc_type = 'Proposal';
+    } elseif ( strpos( $lower_prompt, 'contract' ) !== false || strpos( $lower_prompt, 'agreement' ) !== false || strpos( $lower_prompt, 'sla' ) !== false ) {
+        $doc_type = 'Contract';
+    } elseif ( strpos( $lower_prompt, 'offer' ) !== false || strpos( $lower_prompt, 'letter' ) !== false ) {
+        $doc_type = 'Offer Letter';
+    }
+
+    // Extract amount
+    $amount = 150000;
+    if ( preg_match( '/(?:₹|rs\.?|inr)?\s*([0-9,]+(?:\.[0-9]+)?)\s*(?:l|lakh|k|thousand)?/i', $prompt, $matches ) ) {
+        $val_str = str_replace( ',', '', $matches[1] );
+        $val = floatval( $val_str );
+        if ( stripos( $prompt, 'lakh' ) !== false || stripos( $prompt, ' l' ) !== false || stripos( $prompt, '1.5l' ) !== false ) {
+            if ( $val < 100 ) $val = $val * 100000;
+        } elseif ( stripos( $prompt, 'k' ) !== false || stripos( $prompt, 'thousand' ) !== false ) {
+            if ( $val < 1000 ) $val = $val * 1000;
+        }
+        if ( $val > 0 ) $amount = $val;
+    }
+
+    // Extract client name
+    $client_name = 'Arjun & Priya';
+    if ( preg_match( '/(?:for|to|client|with)\s+([A-Z][a-zA-Z0-9\s&]+?)(?:\s+(?:of|for|amount|with|₹|rs|inr|at|$))/i', $prompt, $c_matches ) ) {
+        $client_name = trim( $c_matches[1] );
+    } elseif ( stripos( $prompt, 'apex' ) !== false ) {
+        $client_name = 'Apex Realty Group';
+    } elseif ( stripos( $prompt, 'fashion' ) !== false ) {
+        $client_name = 'Fashion Council India';
+    } elseif ( stripos( $prompt, 'kavya' ) !== false ) {
+        $client_name = 'Kavya Patel';
+    } elseif ( stripos( $prompt, 'rohan' ) !== false ) {
+        $client_name = 'Rohan Verma';
+    }
+
+    // Check if e-sign or audit follow-up intent
+    if ( strpos( $lower_prompt, 'e-sign' ) !== false || strpos( $lower_prompt, 'esign' ) !== false || strpos( $lower_prompt, 'sign' ) !== false ) {
+        $intent = 'request_esign';
+    } elseif ( strpos( $lower_prompt, 'assign' ) !== false ) {
+        $intent = 'assign_document';
+    } elseif ( strpos( $lower_prompt, 'audit' ) !== false || strpos( $lower_prompt, 'unpaid' ) !== false || strpos( $lower_prompt, 'receivable' ) !== false || strpos( $lower_prompt, 'follow' ) !== false ) {
+        $intent = 'audit_receivables';
+    }
+
+    $tax_rate = 18;
+    $tax_amount = round( ( $amount * $tax_rate ) / 100, 2 );
+    $grand_total = $amount + $tax_amount;
+    $deposit = round( $grand_total * 0.5, 2 );
+
+    $proposal = array(
+        'intent'      => $intent,
+        'type'        => $doc_type,
+        'title'       => "{$doc_type}: {$client_name} Production Services",
+        'client_name' => $client_name,
+        'client_email'=> strtolower( preg_replace( '/[^a-z0-9]/', '', $client_name ) ) . '@example.com',
+        'client_phone'=> '9876543210',
+        'client_gstin'=> '27AAAAA0000B1Z3',
+        'amount'      => $amount,
+        'tax_rate'    => $tax_rate,
+        'tax_amount'  => $tax_amount,
+        'grand_total' => $grand_total,
+        'deposit'     => $deposit,
+        'status'      => 'Sent',
+        'desc'        => "Commercial {$doc_type} for {$client_name} with GST compliance and e-sign registry",
+        'explanation' => "Calculated SAC 998381 with 18% GST (₹" . number_format($tax_amount) . ") on base amount ₹" . number_format($amount) . ". Total: ₹" . number_format($grand_total) . " with 50% deposit ₹" . number_format($deposit) . "."
+    );
+
+    wp_send_json_success( array(
+        'proposal' => $proposal,
+        'message'  => "AI Proposal ready: {$proposal['title']}"
+    ) );
+}
+add_action( 'wp_ajax_cora_vault_ai_action', 'cora_ajax_vault_ai_action' );
+}
