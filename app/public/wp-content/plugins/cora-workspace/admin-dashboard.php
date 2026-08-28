@@ -15702,7 +15702,7 @@ jQuery(document).ready(function($) {
 </div>
 
 <!-- Universal Floating Update Pill -->
-<div id="cora-pwa-update-pill" class="hidden fixed bottom-6 right-6 z-[100001] bg-white border border-zinc-200 rounded-full shadow-lg px-3.5 py-2 flex items-center gap-2.5 transition-all duration-300 font-sans cursor-pointer hover:border-zinc-400 select-none" onclick="window.coraOpenPwaUpdateDrawer()">
+<div id="cora-pwa-update-pill" class="hidden fixed top-18 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-6 sm:right-6 sm:left-auto sm:translate-x-0 z-[100001] bg-white border border-zinc-200 rounded-full shadow-lg px-3.5 py-2 flex items-center gap-2.5 transition-all duration-300 font-sans cursor-pointer hover:border-zinc-400 select-none" onclick="window.coraOpenPwaUpdateDrawer()">
     <span class="relative flex h-2 w-2">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
