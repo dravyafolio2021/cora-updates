@@ -2147,22 +2147,57 @@ jQuery(document).ready(function($) {
                             const formTitle = prop.title || payload.title || 'Client Intake Form';
                             const stepCount = Math.max(1, ...blocks.map(b => (b.step_index || 0) + 1));
                             
-                            // Generate miniature field preview markup
+                            // Generate compact zero-scroll field capsules
                             let fieldsHtml = '';
-                            blocks.forEach((blk, idx) => {
+                            blocks.forEach((blk) => {
                                 const isWa = blk.type === 'phone' || (blk.label && blk.label.toLowerCase().includes('whatsapp'));
-                                const reqBadge = blk.required ? '<span class="text-rose-500 font-bold text-[10px]">*</span>' : '';
+                                const dotColor = isWa ? 'bg-emerald-500' : (blk.required ? 'bg-zinc-800 dark:bg-zinc-200' : 'bg-zinc-300 dark:bg-zinc-600');
+                                const reqMark = blk.required ? ' *' : '';
                                 
-                                let controlHtml = '';
-                                if (blk.type === 'textarea') {
-                                    controlHtml = `<div class="w-full h-11 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1.5 text-[11px] text-zinc-400 select-none">${blk.placeholder || 'Enter notes...'}</div>`;
-                                } else if (blk.type === 'select') {
-                                    controlHtml = `<div class="w-full h-8 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 flex items-center justify-between text-[11px] text-zinc-400 select-none"><span>${blk.placeholder || 'Select option...'}</span><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg></div>`;
-                                } else if (blk.type === 'signature') {
-                                    controlHtml = `<div class="w-full h-10 bg-zinc-50 dark:bg-zinc-800/60 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg px-2.5 flex items-center justify-center gap-1.5 text-[10.5px] text-zinc-400 select-none"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg><span>Digital Signature Pad</span></div>`;
-                                } else if (blk.type === 'file') {
-                                    controlHtml = `<div class="w-full h-10 bg-zinc-50 dark:bg-zinc-800/60 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg px-2.5 flex items-center justify-center gap-1.5 text-[10.5px] text-zinc-400 select-none"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span>Upload attachments</span></div>`;
-                                } else {
+                                fieldsHtml += `
+                                <div class="flex items-center gap-1.5 px-2 py-1 bg-white dark:bg-zinc-800/90 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 min-w-0 shadow-3xs">
+                                    <span class="w-1.5 h-1.5 rounded-full ${dotColor} shrink-0"></span>
+                                    <span class="truncate">${blk.label}${reqMark}</span>
+                                </div>`;
+                            });
+
+                            actionHtml += `
+                            <div class="mt-2.5 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-700 rounded-2xl p-3.5 shadow-xs flex flex-col gap-2.5">
+                                <!-- Card Header -->
+                                <div class="flex items-center justify-between gap-2 pb-1.5 border-b border-zinc-100 dark:border-zinc-800">
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-950 dark:text-white shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
+                                        <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-100 truncate">${formTitle}</h4>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-full text-[8.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 shrink-0">${stepCount} STEPS • ${blocks.length} FIELDS</span>
+                                </div>
+
+                                <!-- Compact Zero-Scroll Field Grid -->
+                                <div class="grid grid-cols-2 gap-1.5 p-1.5 bg-zinc-50/80 dark:bg-zinc-950/40 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50">
+                                    ${fieldsHtml}
+                                </div>
+
+                                <!-- Action Buttons Row -->
+                                <div class="flex flex-col gap-1.5 pt-0.5">
+                                    <button type="button" onclick="window.coraExecuteProposal('${propId}')" class="w-full h-8.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer border-none active:scale-[0.98]">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        <span>${prop.action_label || 'Deploy & Publish Form'}</span>
+                                    </button>
+                                    <div class="flex items-center gap-1.5">
+                                        <button type="button" onclick="window.coraPreviewProposalForm('${propId}')" class="flex-1 h-7.5 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-[10.5px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer border-none">
+                                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                            <span>Preview Live</span>
+                                        </button>
+                                        <button type="button" onclick="window.coraQuickPromptForm('Add a digital signature pad to this form')" class="px-2 h-7.5 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold rounded-lg transition-all flex items-center justify-center gap-0.5 cursor-pointer border-none" title="Add Signature Field">
+                                            <span>+ Signature</span>
+                                        </button>
+                                        <button type="button" onclick="window.coraQuickPromptForm('Add file upload attachments field to this form')" class="px-2 h-7.5 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-semibold rounded-lg transition-all flex items-center justify-center gap-0.5 cursor-pointer border-none" title="Add File Upload">
+                                            <span>+ Files</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>`;
+                        } else {
                                     controlHtml = `<div class="w-full h-8 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 flex items-center gap-1.5 text-[11px] text-zinc-400 select-none">${isWa ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>' : ''}<span class="truncate">${blk.placeholder || blk.label}</span></div>`;
                                 }
 
