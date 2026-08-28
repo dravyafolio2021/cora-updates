@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.5.1
+ * Version: 4.5.2
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.5.1' );
+    define( 'CORA_WORKSPACE_VERSION', '4.5.2' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -16202,11 +16202,46 @@ if ( ! function_exists( 'cora_ai_local_cofounder_handler' ) ) {
 function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard', $history = array() ) {
     $lower_msg = strtolower( $message );
 
-    // Contextual Agentic Form Builder & Editor Handler
-    if ( strpos( $lower_msg, 'form' ) !== false || strpos( $lower_msg, 'intake' ) !== false || strpos( $lower_msg, 'questionnaire' ) !== false || strpos( $lower_msg, 'survey' ) !== false || strpos( $lower_msg, 'inquiry' ) !== false ) {
+    // Check if previous conversation was about forms
+    $has_form_history = false;
+    if ( is_array( $history ) && ! empty( $history ) ) {
+        foreach ( $history as $h ) {
+            $h_content = strtolower( is_array( $h ) ? ( $h['content'] ?? '' ) : (string)$h );
+            if ( strpos( $h_content, 'form' ) !== false || strpos( $h_content, 'blk_' ) !== false || strpos( $h_content, 'field' ) !== false ) {
+                $has_form_history = true;
+                break;
+            }
+        }
+    }
+
+    // Contextual Agentic Form Builder & Editor Handler (Supports multi-turn follow-ups like "add whats field", "add date", "add phone")
+    $is_form_intent = (
+        strpos( $lower_msg, 'form' ) !== false ||
+        strpos( $lower_msg, 'intake' ) !== false ||
+        strpos( $lower_msg, 'questionnaire' ) !== false ||
+        strpos( $lower_msg, 'survey' ) !== false ||
+        strpos( $lower_msg, 'inquiry' ) !== false ||
+        ( ( $current_page === 'forms' || $has_form_history ) && (
+            strpos( $lower_msg, 'field' ) !== false ||
+            strpos( $lower_msg, 'what' ) !== false ||
+            strpos( $lower_msg, 'phone' ) !== false ||
+            strpos( $lower_msg, 'email' ) !== false ||
+            strpos( $lower_msg, 'date' ) !== false ||
+            strpos( $lower_msg, 'budget' ) !== false ||
+            strpos( $lower_msg, 'venue' ) !== false ||
+            strpos( $lower_msg, 'step' ) !== false ||
+            strpos( $lower_msg, 'dropdown' ) !== false ||
+            strpos( $lower_msg, 'signature' ) !== false ||
+            strpos( $lower_msg, 'required' ) !== false ||
+            strpos( $lower_msg, 'add' ) !== false ||
+            strpos( $lower_msg, 'remove' ) !== false
+        ) )
+    );
+
+    if ( $is_form_intent ) {
         // Check for existing form ID
         $target_form_id = 0;
-        if ( preg_match( '/(?:id[:\\s#]+)(\\d+)/i', $message, $id_matches ) ) {
+        if ( preg_match( '/(?:id[:\s#]+)(\d+)/i', $message, $id_matches ) ) {
             $target_form_id = intval( $id_matches[1] );
         }
 
@@ -16220,11 +16255,11 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
             $form_title = 'Client Feedback & Experience Survey';
         } elseif ( stripos( $lower_msg, 'model' ) !== false || stripos( $lower_msg, 'fashion' ) !== false ) {
             $form_title = 'Model & Crew Casting Application';
-        } elseif ( preg_match( '/(?:form\\s+["\']?)([^"\']+?)(?:["\']|\\s+for|\\s+with|\\s+to|$)/i', $message, $t_m ) ) {
+        } elseif ( preg_match( '#(?:form\s+["\']?)([^"\'\r\n]+?)(?:["\']|\s+for|\s+with|\s+to|$)#i', $message, $t_m ) ) {
             $form_title = trim( $t_m[1] );
         }
 
-        // Define intelligent fields based on intent
+        // Base fields
         $blocks = array(
             array(
                 'id'          => 'blk_' . substr( md5( uniqid( 'name', true ) ), 0, 8 ),
@@ -16250,31 +16285,91 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
                 'required'    => true,
                 'step_index'  => 0,
             ),
-            array(
+        );
+
+        $custom_notice = '';
+
+        // Check if user is specifically adding/modifying fields
+        if ( stripos( $lower_msg, "what" ) !== false || stripos( $lower_msg, "whatsapp" ) !== false ) {
+            $custom_notice = "I have ensured the **WhatsApp Mobile Number** field is active with `+91` auto-validation.";
+        }
+        
+        if ( stripos( $lower_msg, 'date' ) !== false || stripos( $lower_msg, 'time' ) !== false ) {
+            $blocks[] = array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'date', true ) ), 0, 8 ),
+                'type'        => 'date',
+                'label'       => 'Preferred Event / Shoot Date',
+                'placeholder' => 'Select date...',
+                'required'    => true,
+                'step_index'  => 1,
+            );
+            $custom_notice .= " Added **Event Date Picker** field.";
+        } else {
+            $blocks[] = array(
                 'id'          => 'blk_' . substr( md5( uniqid( 'date', true ) ), 0, 8 ),
                 'type'        => 'date',
                 'label'       => 'Preferred Event / Shoot Date',
                 'placeholder' => 'Select date...',
                 'required'    => false,
                 'step_index'  => 1,
-            ),
-            array(
+            );
+        }
+
+        if ( stripos( $lower_msg, 'budget' ) !== false || stripos( $lower_msg, 'pricing' ) !== false ) {
+            $blocks[] = array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'budget', true ) ), 0, 8 ),
+                'type'        => 'select',
+                'label'       => 'Estimated Project Budget',
+                'placeholder' => 'Choose budget tier...',
+                'required'    => true,
+                'options'     => "₹50,000 - ₹1,00,000\n₹1,00,000 - ₹2,50,000\n₹2,50,000+",
+                'step_index'  => 1,
+            );
+            $custom_notice .= " Added **Budget Tier Dropdown**.";
+        } else {
+            $blocks[] = array(
                 'id'          => 'blk_' . substr( md5( uniqid( 'budget', true ) ), 0, 8 ),
                 'type'        => 'select',
                 'label'       => 'Estimated Project Budget',
                 'placeholder' => 'Choose budget bracket...',
                 'required'    => true,
-                'options'     => '₹50,000 - ₹1,00,000\n₹1,00,000 - ₹2,50,000\n₹2,50,000+',
+                'options'     => "₹50,000 - ₹1,00,000\n₹1,00,000 - ₹2,50,000\n₹2,50,000+",
                 'step_index'  => 1,
-            ),
-            array(
-                'id'          => 'blk_' . substr( md5( uniqid( 'notes', true ) ), 0, 8 ),
-                'type'        => 'textarea',
-                'label'       => 'Project Requirements & Location Details',
-                'placeholder' => 'Describe your requirements, venue location, or specific vision...',
+            );
+        }
+
+        if ( stripos( $lower_msg, 'signature' ) !== false || stripos( $lower_msg, 'sign' ) !== false ) {
+            $blocks[] = array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'sign', true ) ), 0, 8 ),
+                'type'        => 'signature',
+                'label'       => 'Digital Signature Authorization',
+                'placeholder' => 'Sign above...',
+                'required'    => true,
+                'step_index'  => 1,
+            );
+            $custom_notice .= " Added **Digital Signature Pad**.";
+        }
+
+        if ( stripos( $lower_msg, 'file' ) !== false || stripos( $lower_msg, 'upload' ) !== false || stripos( $lower_msg, 'attachment' ) !== false ) {
+            $blocks[] = array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'file', true ) ), 0, 8 ),
+                'type'        => 'file',
+                'label'       => 'Reference Photos / Attachment',
+                'placeholder' => 'Upload files...',
                 'required'    => false,
                 'step_index'  => 1,
-            ),
+            );
+            $custom_notice .= " Added **File Attachment Dropzone**.";
+        }
+
+        // Notes textarea
+        $blocks[] = array(
+            'id'          => 'blk_' . substr( md5( uniqid( 'notes', true ) ), 0, 8 ),
+            'type'        => 'textarea',
+            'label'       => 'Project Requirements & Location Details',
+            'placeholder' => 'Describe your requirements, venue location, or specific vision...',
+            'required'    => false,
+            'step_index'  => 1,
         );
 
         $form_payload = array(
@@ -16295,7 +16390,8 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 
         $action_label = $target_form_id ? 'Update Form via AI' : 'Deploy Form with AI';
         $reply = "I've structured **{$form_title}** with Notion-style layout and multi-step validation:\n\n" .
-                 "• **Step 1: Contact Details** (Full Name, Email, WhatsApp Phone)\n" .
+                 ( $custom_notice ? "✨ *" . trim($custom_notice) . "*\n\n" : "" ) .
+                 "• **Step 1: Contact Details** (Full Name, Work Email, WhatsApp Phone Number)\n" .
                  "• **Step 2: Project Specifications** (Event Date, Budget Tier, Detailed Notes)\n" .
                  "• **Automations**: Real-time CRM lead capture + Instant Email Notification\n\n" .
                  "Tap below to deploy this form directly to your workspace:";
@@ -16311,7 +16407,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
         ) );
     }
 
-// Contextual Agentic Document & Vault Handler
+    // Contextual Agentic Document & Vault Handler
     $lower_msg = strtolower( $message );
     if ( strpos( $lower_msg, 'invoice' ) !== false || strpos( $lower_msg, 'proposal' ) !== false || strpos( $lower_msg, 'contract' ) !== false || strpos( $lower_msg, 'e-sign' ) !== false || strpos( $lower_msg, 'esign' ) !== false || strpos( $lower_msg, 'vault' ) !== false || strpos( $lower_msg, 'receivable' ) !== false || strpos( $lower_msg, 'document' ) !== false ) {
         // Document type detection
