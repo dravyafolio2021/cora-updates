@@ -22,7 +22,7 @@ $user_email         = $is_logged_in ? wp_get_current_user()->user_email : '';
 $user_display_name  = $is_logged_in ? wp_get_current_user()->display_name : '';
 
 // Google OAuth config
-$google_enabled  = ( get_option( 'cora_onboarding_google_enabled', 1 ) && ! empty( get_option( 'cora_google_client_id', '' ) ) ) || cora_is_local_environment();
+$google_enabled  = true; // Universal Google Sign-In
 $email_enabled   = get_option( 'cora_onboarding_email_enabled', 1 );
 $reg_enabled     = get_option( 'cora_onboarding_enabled', 1 );
 $google_auth_url = home_url( '/workspace/auth/google' );

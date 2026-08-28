@@ -286,7 +286,7 @@
         <p class="subtitle">Enter your credentials to access the workspace.</p>
         
         <?php
-        $google_enabled  = ( get_option( 'cora_onboarding_google_enabled', 1 ) && ! empty( get_option( 'cora_google_client_id', '' ) ) ) || cora_is_local_environment();
+        $google_enabled  = true; // Universal Google Sign-In
         $google_auth_url = home_url( '/workspace/auth/google' );
         if ( ! empty( $_GET['plan'] ) ) {
             $google_auth_url = add_query_arg( array(

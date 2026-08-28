@@ -265,7 +265,7 @@ if ( get_option( 'cora_onboarding_enabled', 1 ) ) {
 </head>
 <body>
 <?php
-$google_enabled  = get_option( 'cora_onboarding_google_enabled', 1 ) && ! empty( get_option( 'cora_google_client_id', '' ) );
+$google_enabled  = true; // Universal Google Sign-In
 $email_enabled   = get_option( 'cora_onboarding_email_enabled', 1 );
 $reg_enabled     = get_option( 'cora_onboarding_enabled', 1 );
 $google_auth_url = home_url( '/workspace/auth/google' );

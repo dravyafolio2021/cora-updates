@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.2.9
+ * Version: 4.3.0
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.2.9' );
+    define( 'CORA_WORKSPACE_VERSION', '4.3.0' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -14019,6 +14019,26 @@ add_action( 'wp_ajax_cora_gbp_disconnect', 'cora_ajax_gbp_disconnect' );
 // ============================================================
 // GOOGLE BUSINESS PROFILE — OAUTH 2.0 REAL INTEGRATION
 // ============================================================
+
+if ( ! function_exists( 'cora_get_google_client_id' ) ) {
+function cora_get_google_client_id() {
+    if ( defined( 'CORA_GOOGLE_CLIENT_ID' ) && ! empty( CORA_GOOGLE_CLIENT_ID ) ) {
+        return CORA_GOOGLE_CLIENT_ID;
+    }
+    if ( defined( 'GOOGLE_CLIENT_ID' ) && ! empty( GOOGLE_CLIENT_ID ) ) {
+        return GOOGLE_CLIENT_ID;
+    }
+    $cid = get_option( 'cora_google_client_id', '' );
+    if ( ! empty( $cid ) ) {
+        return $cid;
+    }
+    $cid_gbp = get_option( 'cora_gbp_client_id', '' );
+    if ( ! empty( $cid_gbp ) ) {
+        return $cid_gbp;
+    }
+    return '549640424566-ubjlnonb70i19q7koa7oa8dhr9cgl7om.apps.googleusercontent.com';
+}
+}
 
 if ( ! function_exists( 'cora_gbp_get_client_id' ) ) {
 function cora_gbp_get_client_id() {
@@ -34014,7 +34034,7 @@ function cora_is_local_environment() {
  */
 if ( ! function_exists( 'cora_initiate_google_oauth' ) ) {
 function cora_initiate_google_oauth() {
-    $client_id = get_option( 'cora_google_client_id', '' );
+    $client_id = function_exists( 'cora_get_google_client_id' ) ? cora_get_google_client_id() : get_option( 'cora_google_client_id', '' );
 
     // If local dev environment and client ID is empty, perform mock google auth redirection
     if ( cora_is_local_environment() && empty( $client_id ) ) {
@@ -34089,8 +34109,11 @@ function cora_handle_google_oauth_callback() {
         $google_id     = '1234567890';
     } else {
         // Exchange auth code for access token
-        $client_id     = get_option( 'cora_google_client_id', '' );
+        $client_id     = function_exists( 'cora_get_google_client_id' ) ? cora_get_google_client_id() : get_option( 'cora_google_client_id', '' );
         $client_secret = get_option( 'cora_google_client_secret', '' );
+        if ( empty( $client_secret ) && function_exists( 'cora_gbp_get_client_secret' ) ) {
+            $client_secret = cora_gbp_get_client_secret();
+        }
         $redirect_uri  = home_url( '/workspace/auth/google/callback' );
 
         $token_response = wp_remote_post( 'https://oauth2.googleapis.com/token', array(
