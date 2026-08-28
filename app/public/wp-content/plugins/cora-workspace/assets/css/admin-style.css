@@ -652,3 +652,224 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     animation: coraPtrSpin 0.75s linear infinite !important;
 }
 
+
+
+/* ==========================================================================
+   CORA TOAST NOTIFICATION SYSTEM (Top-Center Floating, Priority-Aware)
+   Zero overlap with bottom navigation island bar & drawers
+   ========================================================================== */
+#cora-toast-container {
+    position: fixed !important;
+    top: 68px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 999999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: calc(100vw - 32px) !important;
+    max-width: 440px !important;
+    pointer-events: none !important;
+}
+
+.cora-toast-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    padding: 12px 14px !important;
+    background: #ffffff !important;
+    color: #09090b !important;
+    border: 1px solid #e4e4e7 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.06) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    pointer-events: auto !important;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease-out, box-shadow 0.2s ease !important;
+    transform: translateY(-16px) scale(0.95);
+    opacity: 0;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.cora-toast-card.cora-toast-visible {
+    transform: translateY(0) scale(1) !important;
+    opacity: 1 !important;
+}
+
+.cora-toast-card.cora-toast-hiding {
+    transform: translateY(-12px) scale(0.96) !important;
+    opacity: 0 !important;
+}
+
+.cora-toast-icon-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 10px !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+}
+
+.cora-toast-success .cora-toast-icon-wrap {
+    background: #f0fdf4 !important;
+    color: #16a34a !important;
+    border: 1px solid rgba(22, 163, 74, 0.15) !important;
+}
+
+.cora-toast-error .cora-toast-icon-wrap {
+    background: #fef2f2 !important;
+    color: #dc2626 !important;
+    border: 1px solid rgba(220, 38, 38, 0.15) !important;
+}
+
+.cora-toast-warning .cora-toast-icon-wrap {
+    background: #fffbeb !important;
+    color: #d97706 !important;
+    border: 1px solid rgba(217, 119, 6, 0.15) !important;
+}
+
+.cora-toast-info .cora-toast-icon-wrap {
+    background: #f4f4f5 !important;
+    color: #18181b !important;
+    border: 1px solid #e4e4e7 !important;
+}
+
+.cora-toast-msg-wrap {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+}
+
+.cora-toast-title {
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.03em !important;
+    text-transform: uppercase !important;
+    line-height: 1.2 !important;
+}
+
+.cora-toast-success .cora-toast-title { color: #16a34a !important; }
+.cora-toast-error .cora-toast-title { color: #dc2626 !important; }
+.cora-toast-warning .cora-toast-title { color: #d97706 !important; }
+.cora-toast-info .cora-toast-title { color: #71717a !important; }
+
+.cora-toast-text {
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    color: #18181b !important;
+    line-height: 1.35 !important;
+    word-break: break-word !important;
+}
+
+.cora-toast-action-btn {
+    padding: 4px 10px !important;
+    background: #09090b !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    transition: background 0.15s ease, transform 0.1s ease !important;
+}
+
+.cora-toast-action-btn:hover {
+    background: #27272a !important;
+    transform: scale(1.02) !important;
+}
+
+.cora-toast-close-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 6px !important;
+    color: #a1a1aa !important;
+    cursor: pointer !important;
+    transition: color 0.15s ease, background 0.15s ease !important;
+    flex-shrink: 0 !important;
+}
+
+.cora-toast-close-btn:hover {
+    color: #09090b !important;
+    background: #f4f4f5 !important;
+}
+
+/* ==========================================================================
+   CORA MODERN PWA INSTALL BOTTOM SHEET MODAL
+   ========================================================================== */
+#cora-pwa-install-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 999998 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease !important;
+    opacity: 0;
+}
+
+#cora-pwa-install-modal.cora-pwa-sheet-active {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+}
+
+#cora-pwa-install-backdrop {
+    position: absolute !important;
+    inset: 0 !important;
+    background: rgba(9, 9, 11, 0.45) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    cursor: pointer !important;
+}
+
+#cora-pwa-install-sheet {
+    position: relative !important;
+    z-index: 10 !important;
+    width: 100% !important;
+    max-width: 520px !important;
+    margin: 0 auto !important;
+    background: #ffffff !important;
+    border-top: 1px solid #e4e4e7 !important;
+    border-radius: 28px 28px 0 0 !important;
+    box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.16) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+    padding: 20px 24px max(24px, env(safe-area-inset-bottom, 20px)) !important;
+    transform: translateY(100%) !important;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@media (min-width: 640px) {
+    #cora-pwa-install-modal {
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 24px !important;
+    }
+    #cora-pwa-install-sheet {
+        border: 1px solid #e4e4e7 !important;
+        border-radius: 28px !important;
+        transform: translateY(24px) scale(0.96) !important;
+        box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.25) !important;
+    }
+    #cora-pwa-install-modal.cora-pwa-sheet-active #cora-pwa-install-sheet {
+        transform: translateY(0) scale(1) !important;
+    }
+}
+
+#cora-pwa-install-modal.cora-pwa-sheet-active #cora-pwa-install-sheet {
+    transform: translateY(0) !important;
+}

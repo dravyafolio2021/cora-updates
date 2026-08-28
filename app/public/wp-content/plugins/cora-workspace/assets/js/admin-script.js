@@ -253,86 +253,128 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // Custom Toast Notification System
-    // Custom Toast Notification System
-    window.coraShowToast = function(message, type = 'info') {
+    // Custom Toast Notification System (Top-Center Floating, Priority-Aware, Zero Overlap)
+    window.coraShowToast = function(message, type = 'info', actionConfig = null) {
+        if (!message) return;
+
         let toastContainer = $('#cora-toast-container');
         if (toastContainer.length === 0) {
-            $('body').append('<div id="cora-toast-container" class="fixed bottom-5 right-5 z-[9999] flex flex-col-reverse gap-2.5 pointer-events-none"></div>');
+            $('body').append('<div id="cora-toast-container"></div>');
             toastContainer = $('#cora-toast-container');
         }
-        
-        // Prevent duplicate toast stacking
-        let duplicateFound = false;
-        toastContainer.children().each(function() {
-            if ($(this).find('span').text() === message) {
-                const existingToast = $(this);
-                
-                // Visual bounce effect
-                existingToast.css('transform', 'scale(1.06)');
-                setTimeout(() => {
-                    existingToast.css('transform', 'scale(1)');
-                }, 120);
 
-                // Reset timeout
-                const oldTimeoutId = existingToast.data('timeout-id');
-                const oldRemoveId = existingToast.data('remove-timeout-id');
-                if (oldTimeoutId) clearTimeout(oldTimeoutId);
-                if (oldRemoveId) clearTimeout(oldRemoveId);
+        // Clean any accidental unicode emoji strings
+        let cleanMsg = String(message)
+            .replace(/[🔒⚠️✅❌🎉🚨⚡]/g, '')
+            .trim();
 
-                const tId = setTimeout(() => {
-                    existingToast.addClass('translate-y-3 opacity-0');
-                    const rId = setTimeout(() => {
-                        existingToast.remove();
-                    }, 300);
-                    existingToast.data('remove-timeout-id', rId);
-                }, 3000);
-                
-                existingToast.data('timeout-id', tId);
-                duplicateFound = true;
-                return false; // break loop
+        // Auto-detect priority type from message prefix if not explicitly passed
+        let resolvedType = type || 'info';
+        let lowerMsg = cleanMsg.toLowerCase();
+        if (resolvedType === 'info') {
+            if (lowerMsg.startsWith('error') || lowerMsg.includes('failed') || lowerMsg.includes('forbidden') || lowerMsg.includes('could not')) {
+                resolvedType = 'error';
+            } else if (lowerMsg.startsWith('warning') || lowerMsg.includes('warning:')) {
+                resolvedType = 'warning';
+            } else if (lowerMsg.includes('success') || lowerMsg.includes('saved') || lowerMsg.includes('copied') || lowerMsg.includes('created') || lowerMsg.includes('updated')) {
+                resolvedType = 'success';
+            }
+        }
+
+        // Prevent exact duplicate spam
+        let isDuplicate = false;
+        toastContainer.children('.cora-toast-card').each(function() {
+            if ($(this).find('.cora-toast-text').text() === cleanMsg) {
+                const existing = $(this);
+                existing.css('transform', 'translateY(0) scale(1.05)');
+                setTimeout(() => existing.css('transform', 'translateY(0) scale(1)'), 150);
+                isDuplicate = true;
+                return false;
             }
         });
+        if (isDuplicate) return;
 
-        if (duplicateFound) return;
+        // Limit active toasts to max 3 (dismiss oldest)
+        if (toastContainer.children('.cora-toast-card').length >= 3) {
+            toastContainer.children('.cora-toast-card').first().remove();
+        }
 
-        const toastId = 'toast-' + Date.now();
-        
-        let iconHtml = '';
-        if (type === 'success') {
-            iconHtml = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-green-500 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-        } else if (type === 'error') {
-            iconHtml = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-red-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
-        } else if (type === 'warning') {
-            iconHtml = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-amber-500 shrink-0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+        const toastId = 'cora-toast-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+
+        let iconSvg = '';
+        let titleLabel = 'NOTIFICATION';
+
+        if (resolvedType === 'success') {
+            titleLabel = 'SUCCESS';
+            iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        } else if (resolvedType === 'error') {
+            titleLabel = 'ALERT';
+            iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+        } else if (resolvedType === 'warning') {
+            titleLabel = 'WARNING';
+            iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
         } else {
-            iconHtml = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-blue-500 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+            titleLabel = 'INFO';
+            iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+        }
+
+        let actionBtnHtml = '';
+        if (actionConfig && actionConfig.label) {
+            actionBtnHtml = `<button type="button" class="cora-toast-action-btn" id="${toastId}-act">${actionConfig.label}</button>`;
         }
 
         const toastHtml = `
-            <div id="${toastId}" class="bg-white text-zinc-800 text-xs font-semibold px-4 py-3 rounded-xl shadow-lg border border-zinc-200 flex items-center gap-3 pointer-events-auto transition-all duration-300 transform translate-y-3 opacity-0 select-none max-w-sm">
-                ${iconHtml}
-                <span class="flex-1">${message}</span>
+            <div id="${toastId}" class="cora-toast-card cora-toast-${resolvedType}">
+                <div class="cora-toast-icon-wrap">
+                    ${iconSvg}
+                </div>
+                <div class="cora-toast-msg-wrap">
+                    <span class="cora-toast-title">${titleLabel}</span>
+                    <span class="cora-toast-text">${cleanMsg}</span>
+                </div>
+                ${actionBtnHtml}
+                <button type="button" class="cora-toast-close-btn" aria-label="Dismiss">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
         `;
+
         toastContainer.append(toastHtml);
-        
-        const toast = $(`#${toastId}`);
-        // Fade & slide in
-        setTimeout(() => {
-            toast.removeClass('translate-y-3 opacity-0');
-        }, 50);
-        
-        // Auto remove after 3 seconds
-        const tId = setTimeout(() => {
-            toast.addClass('translate-y-3 opacity-0');
-            const rId = setTimeout(() => {
-                toast.remove();
-            }, 300);
-            toast.data('remove-timeout-id', rId);
-        }, 3000);
-        
-        toast.data('timeout-id', tId);
+        const $toast = $(`#${toastId}`);
+
+        if (actionConfig && actionConfig.onClick) {
+            $(`#${toastId}-act`).on('click', function(e) {
+                e.stopPropagation();
+                actionConfig.onClick();
+                dismissToast();
+            });
+        }
+
+        $toast.find('.cora-toast-close-btn').on('click', function(e) {
+            e.stopPropagation();
+            dismissToast();
+        });
+
+        // Trigger smooth slide-down entrance
+        requestAnimationFrame(() => {
+            $toast.addClass('cora-toast-visible');
+        });
+
+        // Auto-dismiss timer (6s for error/warning, 3.5s for success/info)
+        const duration = (resolvedType === 'error' || resolvedType === 'warning') ? 6000 : 3500;
+        let dismissTimer = setTimeout(dismissToast, duration);
+
+        // Pause on hover
+        $toast.on('mouseenter', () => clearTimeout(dismissTimer));
+        $toast.on('mouseleave', () => {
+            dismissTimer = setTimeout(dismissToast, 2000);
+        });
+
+        function dismissToast() {
+            clearTimeout(dismissTimer);
+            $toast.removeClass('cora-toast-visible').addClass('cora-toast-hiding');
+            setTimeout(() => $toast.remove(), 260);
+        }
     };
 
     // 1. Navigation & Widget-Structured Skeleton System
@@ -8032,7 +8074,7 @@ jQuery(document).ready(function($) {
             // Lock content editor on mobile viewports (< 768px)
             if (window.innerWidth < 768) {
                 if (typeof window.coraShowToast === 'function') {
-                    window.coraShowToast('🔒 Content Editor is locked on mobile. Please open on a laptop or tablet screen (≥768px) to write and edit articles.', 'info');
+                    window.coraShowToast('Content Editor is optimized for desktop and tablet screens (≥768px). Please open on a larger screen to write and edit articles.', 'warning');
                 }
                 return false;
             }

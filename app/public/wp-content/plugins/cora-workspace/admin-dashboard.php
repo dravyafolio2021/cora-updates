@@ -15638,26 +15638,67 @@ jQuery(document).ready(function($) {
 </script>
 <?php endif; ?>
 
-<div id="cora-pwa-prompt-banner" class="fixed bottom-6 right-6 z-[9999] max-w-sm w-full bg-white border border-zinc-200 rounded-2xl shadow-xl p-5 transform translate-y-12 opacity-0 pointer-events-none transition-all duration-300 ease-out font-sans">
-    <div class="flex items-start gap-4">
-        <!-- Monochromatic Icon -->
-        <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-900 shrink-0 border border-zinc-200">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+<!-- Modern Cora PWA Install Bottom Sheet Modal -->
+<div id="cora-pwa-install-modal">
+    <div id="cora-pwa-install-backdrop" onclick="coraHidePwaPrompt()"></div>
+    <div id="cora-pwa-install-sheet">
+        <!-- Drag Handle for Mobile -->
+        <div class="flex sm:hidden items-center justify-center -mt-2 -mb-1 cursor-pointer" onclick="coraHidePwaPrompt()">
+            <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
         </div>
-        <div class="flex-1">
-            <h4 class="text-sm font-bold text-zinc-950 mb-1">Get the Cora Desktop App</h4>
-            <p class="text-xs text-zinc-500 leading-relaxed mb-3">Install the workspace for a faster, offline-capable experience with real-time push notifications.</p>
-            <div class="flex items-center gap-2">
-                <button id="cora-pwa-prompt-install" class="px-3 py-1.5 bg-zinc-950 text-white text-xs font-semibold rounded-lg hover:bg-zinc-800 transition">
-                    Install App
-                </button>
-                <button id="cora-pwa-prompt-dismiss" class="px-3 py-1.5 border border-zinc-200 hover:bg-zinc-50 text-zinc-650 text-xs font-semibold rounded-lg transition">
-                    Later
-                </button>
+
+        <div class="flex items-start gap-4">
+            <!-- App Icon with Sleek Modern Border -->
+            <div class="w-13 h-13 rounded-2xl bg-zinc-950 text-white flex items-center justify-center shrink-0 border border-zinc-800 shadow-md">
+                <svg viewBox="0 0 24 24" width="26" height="26" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
             </div>
-            <button id="cora-pwa-prompt-never" class="mt-2.5 block text-[10px] text-zinc-400 hover:text-zinc-650 transition underline">
-                Don't ask me again
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                    <h3 class="text-base font-bold text-zinc-950 tracking-tight m-0">Install Cora Workspace</h3>
+                    <button type="button" onclick="coraHidePwaPrompt()" class="text-zinc-400 hover:text-zinc-800 p-1 rounded-lg transition-colors border-none bg-transparent cursor-pointer">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <p class="text-xs text-zinc-500 mt-1 leading-relaxed m-0">Fast standalone app experience with sub-50ms instant launch, real-time push alerts, and offline caching.</p>
+            </div>
+        </div>
+
+        <!-- Value Proposition Badges -->
+        <div class="grid grid-cols-3 gap-2 pt-1 select-none">
+            <div class="flex flex-col items-center justify-center text-center p-2 rounded-xl bg-zinc-50 border border-zinc-200/80">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 mb-1"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <span class="text-[10px] font-bold text-zinc-800 tracking-tight">Fast Launch</span>
+            </div>
+            <div class="flex flex-col items-center justify-center text-center p-2 rounded-xl bg-zinc-50 border border-zinc-200/80">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 mb-1"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <span class="text-[10px] font-bold text-zinc-800 tracking-tight">Push Alerts</span>
+            </div>
+            <div class="flex flex-col items-center justify-center text-center p-2 rounded-xl bg-zinc-50 border border-zinc-200/80">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 mb-1"><path d="M1 1l22 22"></path><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                <span class="text-[10px] font-bold text-zinc-800 tracking-tight">Offline Sync</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
+            <button type="button" id="cora-pwa-prompt-install" class="w-full sm:flex-1 py-3 px-4 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-none active:scale-[0.98]">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.4" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Install Cora App
             </button>
+            <button type="button" id="cora-pwa-prompt-dismiss" onclick="coraHidePwaPrompt()" class="w-full sm:w-auto py-2.5 px-4 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer border-none">
+                Maybe Later
+            </button>
+        </div>
+        <div class="text-center">
+            <button type="button" id="cora-pwa-prompt-never" class="text-[11px] font-medium text-zinc-400 hover:text-zinc-700 transition-colors underline cursor-pointer border-none bg-transparent">
+                Don't ask again on this device
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- Universal Floating Update Pill -->
@@ -15825,19 +15866,17 @@ function coraShowPwaPrompt() {
     if (neverPrompt || isStandalone) return;
     
     setTimeout(() => {
-        const banner = document.getElementById('cora-pwa-prompt-banner');
-        if (banner) {
-            banner.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
-            banner.classList.add('translate-y-0', 'opacity-100');
+        const modal = document.getElementById('cora-pwa-install-modal');
+        if (modal) {
+            modal.classList.add('cora-pwa-sheet-active');
         }
-    }, 2000);
+    }, 1800);
 }
 
 function coraHidePwaPrompt() {
-    const banner = document.getElementById('cora-pwa-prompt-banner');
-    if (banner) {
-        banner.classList.remove('translate-y-0', 'opacity-100');
-        banner.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+    const modal = document.getElementById('cora-pwa-install-modal');
+    if (modal) {
+        modal.classList.remove('cora-pwa-sheet-active');
     }
 }
 
