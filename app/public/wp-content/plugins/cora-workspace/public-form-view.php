@@ -35,10 +35,13 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo esc_html( $form['title'] ); ?></title>
-    <!-- Tailwind CSS CDN -->
-    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
+    <!-- Tailwind CSS Configuration (Pre-configured for class-based dark mode) -->
     <script>
-        tailwind.config = { darkMode: 'class' };
+        window.tailwind = {
+            config: {
+                darkMode: 'class'
+            }
+        };
         (function() {
             var savedTheme = localStorage.getItem('cora_form_theme');
             if (savedTheme === 'dark') {
@@ -50,6 +53,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             }
         })();
     </script>
+    <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
     <style>
         :root {
             --form-bg: #FAFAFA;
@@ -182,7 +186,7 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             <!-- Right Controls: Theme Toggle & Exit -->
             <div class="flex items-center gap-1.5 shrink-0">
                 <!-- Theme Toggle Button -->
-                <button type="button" id="cora-form-theme-toggle" class="h-7 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300 transition-all border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer text-[11px] font-medium select-none" title="Toggle Light/Dark Theme">
+                <button type="button" id="cora-form-theme-toggle" onclick="window.coraToggleFormTheme()" class="h-7 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300 transition-all border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer text-[11px] font-medium select-none" title="Toggle Light/Dark Theme">
                     <span class="theme-icon-light hidden dark:inline-flex items-center gap-1">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                         <span>Light</span>
@@ -1558,6 +1562,40 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
                 `;
                 return;
             }
+
+
+        window.coraApplyFormTheme = function(theme) {
+            var isDark = (theme === 'dark');
+            var htmlEl = document.documentElement;
+            var bodyEl = document.body;
+            if (isDark) {
+                htmlEl.classList.add('dark');
+                if (bodyEl) bodyEl.classList.add('dark');
+            } else {
+                htmlEl.classList.remove('dark');
+                if (bodyEl) bodyEl.classList.remove('dark');
+            }
+            localStorage.setItem('cora_form_theme', isDark ? 'dark' : 'light');
+            
+            var lightIcons = document.querySelectorAll('.theme-icon-light');
+            var darkIcons = document.querySelectorAll('.theme-icon-dark');
+            lightIcons.forEach(function(el) { el.style.display = isDark ? 'inline-flex' : 'none'; });
+            darkIcons.forEach(function(el) { el.style.display = isDark ? 'none' : 'inline-flex'; });
+        };
+
+        window.coraToggleFormTheme = function() {
+            var currentlyDark = document.documentElement.classList.contains('dark');
+            window.coraApplyFormTheme(currentlyDark ? 'light' : 'dark');
+        };
+
+        // Initialize Theme on startup
+        (function() {
+            var initialTheme = localStorage.getItem('cora_form_theme');
+            if (!initialTheme) {
+                initialTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+            }
+            window.coraApplyFormTheme(initialTheme);
+        })();
 
             // Run Form Startup
             partitionBlocks();
