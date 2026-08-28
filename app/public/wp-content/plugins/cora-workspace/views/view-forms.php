@@ -30,16 +30,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     cora_render_workspace_header( $forms_header_args );
 }
 ?>
-        <!-- Mobile-only editor notice with AI Quick Action -->
-        <div class="flex sm:hidden items-center justify-between gap-2 text-[10px] text-zinc-500 bg-zinc-100/80 border border-zinc-200/50 rounded-xl px-3 py-2 w-full select-none shrink-0 mb-2">
-            <div class="flex items-center gap-1.5 min-w-0">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-400"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                <span class="truncate">Desktop customizer active on PC</span>
-            </div>
-            <button onclick="window.coraPromptFormAI('', 'Create a new Notion-style lead capture form')" class="text-zinc-950 font-bold bg-white px-2 py-1 rounded-lg border border-zinc-200 shadow-3xs shrink-0 cursor-pointer flex items-center gap-1">
-                <span>✨ Create with AI</span>
-            </button>
-        </div>
 
         <script>
         document.addEventListener("DOMContentLoaded", function() {
