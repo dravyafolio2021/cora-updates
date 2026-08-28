@@ -404,11 +404,11 @@ jQuery(document).ready(function($) {
         window.location.assign(siteUrl + '/' + encodeURIComponent(activeWsSlug) + '/' + encodeURIComponent(targetPageId));
     };
 
-    // ─── PWA Standalone Mode In-App Navigation Engine ────────────────────────
-    (function initPwaLinkRetention() {
-        const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-        if (!isStandalone) return;
+    // ─── PWA Standalone Mode In-App Navigation & Pull-To-Refresh Engine ───────
+    (function initPwaEngine() {
+        const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches || window.location.search.includes('standalone=1');
 
+        // 1. Universal In-App Internal Link Retention (Zero External Browser Breakout)
         document.addEventListener('click', function(e) {
             const anchor = e.target.closest('a');
             if (!anchor) return;
@@ -420,10 +420,9 @@ jQuery(document).ready(function($) {
 
             try {
                 const targetUrl = new URL(anchor.href, window.location.origin);
-                // If internal origin and workspace path, retain inside the standalone PWA window
+                // Retain all internal same-origin links inside the standalone WebApp window
                 if (targetUrl.origin === window.location.origin) {
-                    const isInternalWorkspace = targetUrl.pathname.includes('/workspace') || targetUrl.pathname.includes('/docs') || targetUrl.search.includes('page=cora-workspace');
-                    if (isInternalWorkspace) {
+                    if (isStandalone) {
                         e.preventDefault();
                         e.stopPropagation();
                         window.location.assign(anchor.href);
@@ -433,6 +432,101 @@ jQuery(document).ready(function($) {
                 // Ignore URL parse errors
             }
         }, true);
+
+        // 2. High-Performance In-App Pull-to-Refresh Engine (prevents native browser breakout)
+        let touchStartY = 0;
+        let touchDeltaY = 0;
+        let isPulling = false;
+        let pullIndicator = null;
+        const PULL_THRESHOLD = 75;
+
+        function getOrCreatePullIndicator() {
+            if (!pullIndicator) {
+                let el = document.getElementById('cora-pwa-pull-indicator');
+                if (!el) {
+                    el = document.createElement('div');
+                    el.id = 'cora-pwa-pull-indicator';
+                    el.className = 'fixed top-3 left-1/2 -translate-x-1/2 z-[99999] pointer-events-none transition-all duration-150 ease-out opacity-0 scale-75';
+                    el.innerHTML = `
+                        <div class="px-3.5 py-1.5 bg-zinc-950/90 text-white rounded-full shadow-lg border border-zinc-700/50 flex items-center gap-2 backdrop-blur-md">
+                            <svg id="cora-pull-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                            <span id="cora-pull-label" class="text-[10px] font-bold tracking-wide">Pull to refresh</span>
+                        </div>
+                    `;
+                    document.body.appendChild(el);
+                }
+                pullIndicator = el;
+            }
+            return pullIndicator;
+        }
+
+        function getScrollTop() {
+            const mainEl = document.querySelector('.cora-main') || document.querySelector('#cora-main-content') || document.querySelector('.cora-content-wrapper') || document.documentElement;
+            return window.scrollY || document.documentElement.scrollTop || mainEl.scrollTop || 0;
+        }
+
+        window.addEventListener('touchstart', function(e) {
+            if (e.touches.length !== 1) return;
+            if (getScrollTop() <= 2) {
+                touchStartY = e.touches[0].clientY;
+                touchDeltaY = 0;
+                isPulling = false;
+            } else {
+                touchStartY = 0;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchmove', function(e) {
+            if (!touchStartY || e.touches.length !== 1) return;
+            const currentY = e.touches[0].clientY;
+            touchDeltaY = currentY - touchStartY;
+
+            if (touchDeltaY > 10 && getScrollTop() <= 2) {
+                isPulling = true;
+                const ind = getOrCreatePullIndicator();
+                const progress = Math.min(touchDeltaY / PULL_THRESHOLD, 1.2);
+                
+                ind.style.opacity = Math.min(progress, 1).toString();
+                ind.style.transform = `translate(-50%, ${Math.min(touchDeltaY * 0.4, 40)}px) scale(${0.8 + (progress * 0.2)})`;
+
+                const label = ind.querySelector('#cora-pull-label');
+                const icon = ind.querySelector('#cora-pull-icon');
+                if (touchDeltaY >= PULL_THRESHOLD) {
+                    if (label) label.textContent = 'Release to refresh';
+                    if (icon) icon.style.transform = 'rotate(180deg)';
+                } else {
+                    if (label) label.textContent = 'Pull to refresh';
+                    if (icon) icon.style.transform = `rotate(${progress * 180}deg)`;
+                }
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', function() {
+            if (!isPulling) {
+                touchStartY = 0;
+                return;
+            }
+            const ind = getOrCreatePullIndicator();
+            if (touchDeltaY >= PULL_THRESHOLD) {
+                const label = ind.querySelector('#cora-pull-label');
+                const icon = ind.querySelector('#cora-pull-icon');
+                if (label) label.textContent = 'Refreshing...';
+                if (icon) {
+                    icon.classList.add('animate-spin');
+                    icon.style.transform = 'rotate(0deg)';
+                }
+                setTimeout(function() {
+                    // Cleanly reload active view inside the PWA without any redirects or breakout
+                    window.location.reload();
+                }, 300);
+            } else {
+                ind.style.opacity = '0';
+                ind.style.transform = 'translate(-50%, -20px) scale(0.75)';
+            }
+            touchStartY = 0;
+            touchDeltaY = 0;
+            isPulling = false;
+        }, { passive: true });
     })();
 
     $(document).on('click', '.cora-nav-item, .cora-bottom-nav-item', function(e) {

@@ -1192,17 +1192,26 @@ function cora_workspace_handle_workspace_route() {
             ),
         );
         
-        if ( ! empty( $manifest_data['shortcuts'] ) && is_array( $manifest_data['shortcuts'] ) ) {
-            foreach ( $manifest_data['shortcuts'] as &$shortcut ) {
-                $shortcut['icons'] = array(
-                    array(
-                        'src'   => $icon_192,
-                        'sizes' => '192x192',
-                        'type'  => 'image/png',
-                    ),
-                );
-            }
-        }
+        $manifest_data['shortcuts'] = array(
+            array(
+                'name'       => 'Dashboard',
+                'short_name' => 'Dashboard',
+                'url'        => '/workspace/dashboard',
+                'icons'      => array( array( 'src' => $icon_192, 'sizes' => '192x192', 'type' => 'image/png' ) ),
+            ),
+            array(
+                'name'       => 'GST Invoicing',
+                'short_name' => 'Invoices',
+                'url'        => '/workspace/vault',
+                'icons'      => array( array( 'src' => $icon_192, 'sizes' => '192x192', 'type' => 'image/png' ) ),
+            ),
+            array(
+                'name'       => 'Bookings & Schedule',
+                'short_name' => 'Bookings',
+                'url'        => '/workspace/bookings',
+                'icons'      => array( array( 'src' => $icon_192, 'sizes' => '192x192', 'type' => 'image/png' ) ),
+            ),
+        );
         
         echo json_encode( $manifest_data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
         exit;

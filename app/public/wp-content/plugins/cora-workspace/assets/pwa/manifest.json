@@ -67,9 +67,9 @@
       ]
     },
     {
-      "name": "Leads & CRM",
-      "short_name": "Leads",
-      "url": "/workspace/leads",
+      "name": "Bookings & Schedule",
+      "short_name": "Bookings",
+      "url": "/workspace/bookings",
       "icons": [
         {
           "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
