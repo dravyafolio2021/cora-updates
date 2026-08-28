@@ -144,6 +144,11 @@ $cora_settings_tabs = array(
         'desc'  => 'Enforce security parameters',
         'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>'
     ),
+    'modules'    => array(
+        'label' => 'App Modules & Features',
+        'desc'  => 'Enable / disable workspace modules',
+        'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>'
+    ),
 );
 
 if ( $has_branches_feature ) {
@@ -823,6 +828,15 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- TAB 2: PASSWORD POLICY SETTINGS -->
+        <!-- TAB: APP MODULES & FEATURES HUB -->
+        <div id="cora-settings-panel-modules" class="cora-settings-panel space-y-6 max-w-full <?php echo ( $active_tab === 'modules' || $active_tab === 'app-modules' || $active_tab === 'feature-hub' ) ? '' : 'hidden'; ?>">
+            <?php
+            if ( file_exists( CORA_WORKSPACE_PATH . 'views/view-feature-hub.php' ) ) {
+                include CORA_WORKSPACE_PATH . 'views/view-feature-hub.php';
+            }
+            ?>
+        </div>
+
         <div id="cora-settings-panel-pwd-policy" class="cora-settings-panel space-y-6 max-w-3xl <?php echo $active_tab === 'pwd-policy' ? '' : 'hidden'; ?>">
             <!-- Card: Password Policy -->
             <div class="cora-shopify-card">
