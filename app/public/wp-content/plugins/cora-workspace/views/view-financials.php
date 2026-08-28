@@ -83,7 +83,7 @@ $all_expense_categories = array_values( array_unique( array_merge( $default_cate
 // Standardized Page Header
 $financials_header_args = array(
     'title'            => 'Financial Intelligence',
-    'description'      => 'Your AI Co-founder watches cash flow, collects receivables, and tracks profitability in real-time.',
+    'description'      => 'Your Financial Agent watches cash flow, collects receivables, and tracks profitability in real-time.',
     'icon'             => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>',
     'ai_stack'         => true,
     'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
@@ -321,7 +321,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-sm font-bold tracking-tight text-white">Financial Intelligence &amp; AI Co-founder</span>
+                            <span class="text-sm font-bold tracking-tight text-white">Financial Agent</span>
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-800 text-zinc-300 border border-zinc-700">
                                 Live Monitoring
                             </span>
@@ -1145,7 +1145,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div>
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs font-bold text-zinc-900">Cora AI</span>
-                            <span class="px-1.5 py-0.2 rounded text-[9.5px] font-semibold bg-zinc-200/70 text-zinc-700">Financial Co-founder</span>
+                            <span class="px-1.5 py-0.2 rounded text-[9.5px] font-semibold bg-zinc-200/70 text-zinc-700">Financial Agent</span>
                         </div>
                         <div class="text-[10px] text-zinc-500 font-medium">Instant answers &amp; decision analysis from your ledger</div>
                     </div>
@@ -2015,7 +2015,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 finalAiBubble.innerHTML = `<div class="bg-zinc-50 border border-zinc-200 text-zinc-800 rounded-2xl rounded-tl-sm p-3.5 text-xs max-w-[85%] space-y-2 leading-relaxed">
                     <div class="font-bold text-zinc-950 flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-zinc-900"></span>
-                        <span>Cora Co-founder</span>
+                        <span>Financial Agent</span>
                     </div>
                     <div>${formatted}</div>
                     ${actionBtnHtml}

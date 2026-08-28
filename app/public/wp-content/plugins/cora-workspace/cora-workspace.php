@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.2.1
+ * Version: 4.2.2
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.2.1' );
+    define( 'CORA_WORKSPACE_VERSION', '4.2.2' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -5778,7 +5778,7 @@ function cora_mcp_handle_call_tool( $name, $args, $id ) {
             }
 
             $context = cora_build_dynamic_workspace_context( $agency_id );
-            $system_prompt = "You are Cora Workspace AI Co-founder. Use the following real-time operational workspace context to deliver concise, strategic, and actionable answers:\n" . $context . "\n\nIf the user requests to create a form, add a lead, generate an invoice, or schedule a booking, embed [ACTION:action_name]{...JSON...}[/ACTION] to execute it immediately.";
+            $system_prompt = "You are Cora Workspace AI Agent. Use the following real-time operational workspace context to deliver concise, strategic, and actionable answers:\n" . $context . "\n\nIf the user requests to create a form, add a lead, generate an invoice, or schedule a booking, embed [ACTION:action_name]{...JSON...}[/ACTION] to execute it immediately.";
             
             $ai_response = cora_rag_call_ai_api( $question, $system_prompt );
             if ( is_wp_error( $ai_response ) ) {
@@ -15912,7 +15912,7 @@ function cora_ajax_ai_chat() {
         $learned_memories_str = cora_rag_get_relevant_memories( $agency_id, $message, 5 );
     }
 
-    $default_prompt = "You are Cora AI, the autonomous AI Co-Founder for the Cora Workspace Platform.
+    $default_prompt = "You are Cora AI, the autonomous AI Agent for the Cora Workspace Platform.
 You actively take action, configure workspace settings, and automate business workflows.
 
 [ACTIVE WORKSPACE CONFIGURATION & IDENTITY]
@@ -39965,7 +39965,7 @@ function cora_ajax_finance_ask_cora() {
         // General financial query: try multi-provider AI first, fall back to rich overview
         $ai_key = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) ? CORA_PLATFORM_GEMINI_API_KEY : '';
         if ( ! empty( $ai_key ) && function_exists( 'wp_remote_post' ) ) {
-            $system_prompt = "You are Cora, the AI Co-founder & Chief Financial Officer for this creative/service studio.
+            $system_prompt = "You are Cora, the Financial Agent for this business workspace.
 Here is the live financial context:
 Available Cash: ₹" . number_format( $metrics['available_cash'] ) . "
 Expected In: ₹" . number_format( $metrics['expected_in'] ) . "
@@ -40851,7 +40851,7 @@ function cora_pulse_get_workspace_intelligence() {
             'icon'           => $is_ai ? 'sparkles' : 'activity',
             'title'          => $log['action_type'] ?: 'Activity Record',
             'subtitle'       => $log['description'] ?: 'Workspace action logged.',
-            'actor_name'     => $is_ai ? 'Cora Co-founder' : $actor_name,
+            'actor_name'     => $is_ai ? 'Cora Agent' : $actor_name,
             'actor_type'     => $is_ai ? 'ai' : 'user',
             'is_cora'        => $is_ai,
             'priority'       => 'low',

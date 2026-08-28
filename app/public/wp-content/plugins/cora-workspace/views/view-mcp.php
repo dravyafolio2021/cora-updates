@@ -448,7 +448,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
                     <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Cora AI Co-Founder</h3>
+                    <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Cora AI Agent</h3>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mt-1">Autonomous workspace intelligence continuously learning from your daily leads, invoices, bookings, and tasks.</p>
                 </div>
                 <div class="cora-ai-chips">
@@ -476,7 +476,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
         <audio id="cora-ai-audio-player" style="display:none;"></audio>
 
         <div class="cora-ai-input-wrapper">
-            <input type="text" id="cora-ai-input" class="cora-ai-input" placeholder="Ask Cora AI Co-Founder about your workspace..." onkeydown="if(event.key==='Enter') coraSendChatMessage()">
+            <input type="text" id="cora-ai-input" class="cora-ai-input" placeholder="Ask Cora AI Agent about your workspace..." onkeydown="if(event.key==='Enter') coraSendChatMessage()">
             <button type="button" id="cora-ai-send-btn" class="cora-ai-btn" onclick="coraSendChatMessage()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
@@ -656,7 +656,7 @@ $mcp_url = home_url( '/wp-json/cora/v1/mcp' );
                             <option value="cora_manage_documents">Vault Documents & Contracts</option>
                             <option value="cora_manage_reviews">Client Reviews & AI Replies</option>
                             <option value="cora_get_activity_pulse">Real-time Activity Pulse</option>
-                            <option value="cora_ask_workspace_copilot">Ask AI Co-Founder</option>
+                            <option value="cora_ask_workspace_copilot">Ask AI Agent</option>
                         </select>
                     </div>
 
@@ -1112,7 +1112,7 @@ Ready to execute tool call...
         } else if (tool === 'cora_ask_workspace_copilot') {
             html = `
                 <div>
-                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Your Question to AI Co-Founder</label>
+                    <label class="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">Your Question to AI Agent</label>
                     <input type="text" id="cora-guided-copilot-q" class="w-full text-xs p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg outline-none text-zinc-800 dark:text-zinc-200" value="Summarize our current pipeline and financial cash runway.">
                 </div>
             `;

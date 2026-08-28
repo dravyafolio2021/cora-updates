@@ -1727,7 +1727,7 @@ jQuery(document).ready(function($) {
         $('#cora-sidebar-active-chat-title').text('New Conversation');
         $('#cora-sidebar-chat').html(`
             <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">
-                Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?
+                Hello! I am Cora, your autonomous AI Agent. I execute actions directly across your workspace. What would you like to build or automate today?
             </div>
         `);
         $('#cora-sidebar-native-integration').show();
@@ -12793,33 +12793,33 @@ jQuery(document).ready(function($) {
         // 1. Industry-Aware Welcome Messages
         const welcomeMessages = {
             real_estate: {
-                dashboard: "Hello! I am Cora, your autonomous AI Co-Founder for Real Estate. I manage property listings, buyer inquiries, site visit tours, and lease deeds. What would you like to build or automate today?",
-                leads: "Hello! I am Cora, your Real Estate CRM Assistant. I can qualify buyers, update property pipelines, and log inquiries.",
-                financials: "Hello! I am Cora, your Real Estate Finance Assistant. I generate brokerage invoices, rent receipts, and tax calculations.",
+                dashboard: "Hello! I am Cora, your autonomous AI Agent for Real Estate. I manage property listings, buyer inquiries, site visit tours, and lease deeds. What would you like to build or automate today?",
+                leads: "Hello! I am Cora, your Real Estate Sales Agent. I can qualify buyers, update property pipelines, and log inquiries.",
+                financials: "Hello! I am Cora, your Real Estate Financial Agent. I generate brokerage invoices, rent receipts, and tax calculations.",
                 bookings: "Hello! I am Cora, your Site Visit Scheduler. I book property showing tours, client inspections, and manage agent calendars.",
-                vault: "Hello! I am Cora, your Real Estate Legal Assistant. I draft lease deeds, sale agreements, and buyer token NDAs.",
+                vault: "Hello! I am Cora, your Real Estate Legal Agent. I draft lease deeds, sale agreements, and buyer token NDAs.",
                 forms: "Hello! I am Cora, your Property Intake Builder. I create custom property inquiry and seller listing forms.",
-                blogs: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I can draft high-ranking property market articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.",
-                content: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I can draft high-ranking property market articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.",
+                blogs: "Hello! I am your AI Marketing & Content Agent. I can draft high-ranking property market articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.",
+                content: "Hello! I am your AI Marketing & Content Agent. I can draft high-ranking property market articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.",
                 settings: "Hello! I am Cora. I manage your real estate workspace settings, team agents, and permissions.",
                 portfolio: "Hello! I am Cora. I manage your property photo galleries and virtual tour media."
             },
             photography_studio: {
-                dashboard: "Hello! I am Cora, your autonomous AI Co-Founder for Studio. I execute shoot bookings, GST invoices, client contracts, and intake forms. What would you like to build or automate today?",
-                leads: "Hello! I am Cora, your Studio CRM Assistant. I track prospective clients, wedding shoot inquiries, and deal stages.",
-                financials: "Hello! I am Cora, your Studio Finance Assistant. I compute GST splits, generate client invoices, and track payments.",
+                dashboard: "Hello! I am Cora, your autonomous AI Agent for Studio. I execute shoot bookings, GST invoices, client contracts, and intake forms. What would you like to build or automate today?",
+                leads: "Hello! I am Cora, your Studio Sales Agent. I track prospective clients, wedding shoot inquiries, and deal stages.",
+                financials: "Hello! I am Cora, your Studio Financial Agent. I compute GST splits, generate client invoices, and track payments.",
                 bookings: "Hello! I am Cora, your Studio Booking Assistant. I schedule shoot sessions, assign crew members, and block studio bays.",
-                vault: "Hello! I am Cora, your Studio Legal Assistant. I draft model releases, shoot contracts, and copyright assignments.",
+                vault: "Hello! I am Cora, your Studio Legal Agent. I draft model releases, shoot contracts, and copyright assignments.",
                 forms: "Hello! I am Cora, your Studio Form Builder. I create customized photoshoot inquiry and feedback forms.",
-                blogs: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft client-attracting studio blog posts, optimize SEO rankings, extract FAQ schemas, and manage your editorial calendar.",
-                content: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft client-attracting studio blog posts, optimize SEO rankings, extract FAQ schemas, and manage your editorial calendar.",
+                blogs: "Hello! I am your AI Marketing & Content Agent. I draft client-attracting studio blog posts, optimize SEO rankings, extract FAQ schemas, and manage your editorial calendar.",
+                content: "Hello! I am your AI Marketing & Content Agent. I draft client-attracting studio blog posts, optimize SEO rankings, extract FAQ schemas, and manage your editorial calendar.",
                 settings: "Hello! I am Cora. I configure studio equipment, workspace team members, and preferences.",
                 portfolio: "Hello! I am Cora. I manage photo proofing galleries, client delivery links, and portfolio assets."
             },
             custom: {
-                dashboard: "Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?",
-                leads: "Hello! I am Cora, your CRM Assistant. I create leads, update pipeline stages, and log inquiries.",
-                financials: "Hello! I am Cora, your Financials Assistant. I generate GST invoices, calculate tax splits, and record payments.",
+                dashboard: "Hello! I am Cora, your autonomous AI Agent. I execute actions directly across your workspace. What would you like to build or automate today?",
+                leads: "Hello! I am Cora, your Sales Agent. I create leads, update pipeline stages, and log inquiries.",
+                financials: "Hello! I am Cora, your Financial Agent. I generate GST invoices, calculate tax splits, and record payments.",
                 forms: "Hello! I am Cora, your Form Builder. I create custom forms with dynamic fields and live shareable links.",
                 vault: "Hello! I am Cora, your Document Assistant. I draft master service agreements, contracts, and e-signatures.",
                 bookings: "Hello! I am Cora, your Schedule Assistant. I book appointments, calendar slots, and client meetings.",
@@ -12982,7 +12982,7 @@ jQuery(document).ready(function($) {
         const indWelcome = welcomeMessages[activeIndustry] || welcomeMessages.custom;
         const welcomeText = isContentPage 
             ? (indWelcome.blogs || "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft market-dominating articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.")
-            : (indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Co-Founder. What would you like to build or automate today?");
+            : (indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Agent. What would you like to build or automate today?");
         
         const firstAiBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
         if (firstAiBubble.length && ($('#cora-sidebar-chat .chat-bubble.user').length === 0 || isContentPage)) {

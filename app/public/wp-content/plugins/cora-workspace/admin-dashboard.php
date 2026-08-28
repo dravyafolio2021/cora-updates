@@ -4999,7 +4999,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <?php echo esc_html($greeting_title); ?>
                         </h1>
                         <p class="text-xs sm:text-sm md:text-base font-medium text-zinc-500 leading-tight">
-                            Your AI Co-founder is active. Let's build something great.
+                            Your AI Agent is active. Let's build something great.
                         </p>
                     </div>
 
@@ -5021,7 +5021,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                    
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 border border-zinc-200 rounded">⌘K</kbd>
-                                <button onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-950 text-white transition-colors cursor-pointer shadow-xs border-0" title="Send to AI Co-Founder">
+                                <button onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-950 text-white transition-colors cursor-pointer shadow-xs border-0" title="Send to AI Agent">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <line x1="12" y1="19" x2="12" y2="5"></line>
                                         <polyline points="5 12 12 5 19 12"></polyline>
@@ -8248,7 +8248,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             <div class="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-between gap-6">
                 <div class="cora-ai-sidebar-chat-history flex flex-col gap-3" id="cora-sidebar-chat">
                     <div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-bl-none p-3.5 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[90%]">
-                        Hello! I am Cora, your autonomous AI Co-Founder. I execute actions directly across your workspace. What would you like to build or automate today?
+                        Hello! I am Cora, your autonomous AI Agent. I execute actions directly across your workspace. What would you like to build or automate today?
                     </div>
                 </div>
 
