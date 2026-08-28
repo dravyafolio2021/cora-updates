@@ -372,6 +372,11 @@ add_filter( 'pre_option_update_core', '__return_null' );
  * Intercept requests to /workspace and render the standalone dashboard
  */
 function cora_real_estate_ai_handle_workspace_route() {
+    // If unified cora-workspace plugin is active, delegate all routing to cora-workspace
+    if ( defined( 'CORA_WORKSPACE_VERSION' ) ) {
+        return;
+    }
+
     $request_uri = $_SERVER['REQUEST_URI'];
     $home_path = parse_url( home_url(), PHP_URL_PATH );
     $path = substr( $request_uri, strlen( $home_path ) );
@@ -662,10 +667,13 @@ function cora_real_estate_ai_handle_workspace_route() {
         exit;
     }
 }
-add_action( 'template_redirect', 'cora_real_estate_ai_handle_workspace_route' );
 
 $cora_active_plugins = (array) get_option( 'active_plugins', array() );
 $cora_is_workspace_active = in_array( 'cora-workspace/cora-workspace.php', $cora_active_plugins, true ) || ( is_multisite() && array_key_exists( 'cora-workspace/cora-workspace.php', (array) get_site_option( 'active_sitewide_plugins', array() ) ) );
+
+if ( ! $cora_is_workspace_active ) {
+    add_action( 'template_redirect', 'cora_real_estate_ai_handle_workspace_route' );
+}
 
 if ( ! $cora_is_workspace_active ) {
 if ( ! function_exists( 'cora_real_estate_ai_admin_assets' ) ) {

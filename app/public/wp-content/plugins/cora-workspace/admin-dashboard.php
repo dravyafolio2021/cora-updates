@@ -388,8 +388,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         window.addEventListener('unhandledrejection', function(e) {
             var reasonStr = e.reason ? (e.reason.message || String(e.reason)) : '';
             var stackStr = (e.reason && e.reason.stack) ? String(e.reason.stack) : '';
-            // Ignore 3rd-party browser extension unhandled rejections (e.g. 200.js, M_ID)
-            if (stackStr.includes('chrome-extension://') || stackStr.includes('moz-extension://') || stackStr.includes('200.js') || reasonStr.includes('M_ID')) {
+            // Ignore 3rd-party browser extensions, ServiceWorker background fetch rejections, and network sync warnings
+            if (stackStr.includes('chrome-extension://') || stackStr.includes('moz-extension://') || stackStr.includes('200.js') || 
+                reasonStr.includes('M_ID') || 
+                reasonStr.includes('ServiceWorker') || 
+                reasonStr.includes('service worker') || 
+                reasonStr.includes('Service Worker') || 
+                reasonStr.includes('Failed to update a ServiceWorker') || 
+                reasonStr.includes('Failed to register a ServiceWorker')) {
+                console.warn('Cora Suppressed Non-Fatal PWA/Extension Rejection:', reasonStr);
                 return;
             }
             console.error('Cora Unhandled Promise Rejection:', e);
@@ -417,10 +424,25 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     $sw_url = add_query_arg( 'token', $token, $sw_url );
                 }
                 ?>
-                navigator.serviceWorker.register('<?php echo esc_url( $sw_url ); ?>', { scope: '/' })
+                var targetSwUrl = '<?php echo esc_url_raw( $sw_url ); ?>';
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    registrations.forEach(function(r) {
+                        var swInstance = r.active || r.installing || r.waiting;
+                        var scriptUrl = swInstance ? swInstance.scriptURL : '';
+                        if (scriptUrl && (scriptUrl.endsWith('&') || scriptUrl.includes('&#038;') || !scriptUrl.includes('v=' + '<?php echo CORA_WORKSPACE_VERSION; ?>'))) {
+                            r.unregister().catch(function() {});
+                        }
+                    });
+                }).catch(function() {});
+
+                navigator.serviceWorker.register(targetSwUrl, { scope: '/' })
                     .then(function(reg) {
                         console.log('Service worker registered with scope:', reg.scope);
-                        reg.update();
+                        if (typeof reg.update === 'function') {
+                            reg.update().catch(function(err) {
+                                console.warn('ServiceWorker background update check non-fatal:', err);
+                            });
+                        }
                         // Detect SW updates and auto-activate new version
                         reg.addEventListener('updatefound', function() {
                             var newWorker = reg.installing;
@@ -434,7 +456,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             }
                         });
                     })
-                    .catch(function(err) { console.error('Service worker registration failed:', err); });
+                    .catch(function(err) { console.warn('Service worker registration non-fatal:', err); });
             });
             // Lock mobile screen orientation to portrait-primary
             if (window.screen && window.screen.orientation && typeof window.screen.orientation.lock === 'function') {
@@ -4577,188 +4599,168 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     }
                 }
 
+                // Calculate dynamic telemetry metrics per industry mode (100% genuine data, zero emojis, zero dummy defaults)
+                if ( ! isset( $recent_active_showings ) || ! is_array( $recent_active_showings ) ) {
+                    $recent_active_showings = array();
+                    if ( is_array( $cora_workspace_clients ) ) {
+                        foreach ( $cora_workspace_clients as $client ) {
+                            if ( isset( $client['status'] ) && $client['status'] !== 'completed' ) {
+                                $recent_active_showings[] = $client;
+                            }
+                        }
+                    }
+                }
+
+                $leads_count = is_array( $cora_workspace_leads ) ? count( $cora_workspace_leads ) : 0;
+                $listings_count = is_array( $cora_workspace_listings ) ? count( $cora_workspace_listings ) : 0;
+                $clients_count = is_array( $cora_workspace_clients ) ? count( $cora_workspace_clients ) : 0;
+                $showings_count = is_array( $recent_active_showings ) ? count( $recent_active_showings ) : 0;
+                $docs_count = is_array( $cora_documents ) ? count( $cora_documents ) : 0;
+                $gear_count = is_array( $cora_studio_gear ) ? count( $cora_studio_gear ) : 0;
+                $team_count = is_array( $cora_users ) ? count( $cora_users ) : 1;
+                $formatted_revenue = cora_format_rupees( $dynamic_revenue_total );
+
                 if ( $cora_workspace_industry_raw === 'custom' ) {
-                    global $wpdb;
                     $enabled = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
 
-                    $telemetry_metrics = array();
-
-                    if ( in_array( 'leads', $enabled, true ) ) {
-                        $telemetry_metrics[] = array(
-                            'label'       => 'Active Leads',
-                            'value'       => count( $cora_workspace_leads ),
-                            'badge'       => '+12%',
-                            'badge_color' => 'text-emerald-650 bg-emerald-50 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 5 C 20 5, 40 25, 60 15 C 80 5, 90 28, 100 28',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
-                        );
-                    }
-
-                    if ( in_array( 'properties', $enabled, true ) ) {
-                        $telemetry_metrics[] = array(
-                            'label'       => 'Properties',
-                            'value'       => count( $cora_workspace_listings ),
-                            'badge'       => 'Active',
-                            'badge_color' => 'text-emerald-655 bg-emerald-50 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 25 C 20 25, 30 5, 50 15 C 70 25, 80 10, 100 5',
-                            'primary'     => true,
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
-                        );
-                    }
-
-                    if ( in_array( 'showings', $enabled, true ) ) {
-                        $telemetry_metrics[] = array(
-                            'label'       => 'Showings',
-                            'value'       => $dynamic_active_bookings_count,
-                            'badge'       => 'Scheduled',
-                            'badge_color' => 'text-zinc-650 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 8 C 20 8, 40 22, 60 12 C 80 2, 90 25, 100 25',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-                        );
-                    }
-
-                    if ( in_array( 'equipment', $enabled, true ) ) {
-                        $gear_count = is_array($cora_studio_gear) ? count($cora_studio_gear) : 0;
-                        $telemetry_metrics[] = array(
-                            'label'       => 'Camera Gear',
-                            'value'       => $gear_count,
-                            'badge'       => 'Assets',
-                            'badge_color' => 'text-zinc-655 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 5 C 20 5, 40 25, 60 15 C 80 5, 90 28, 100 28',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>',
-                        );
-                    }
-
-                    if ( in_array( 'financials', $enabled, true ) ) {
-                        $telemetry_metrics[] = array(
+                    $all_candidates = array(
+                        'financials' => array(
                             'label'       => 'Pipeline Value',
-                            'value'       => cora_format_rupees( $dynamic_revenue_total ),
-                            'badge'       => 'Negotiating',
-                            'badge_color' => 'text-zinc-650 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 15 L 100 15',
-                            'svg_dash'    => true,
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M6 3h12M6 8h12M9 3v10.5M9 3h3.5a5 5 0 0 1 0 10H9M9 13.5L16 21"></path></svg>',
-                        );
-                    }
-
-                    $static_presets = array(
-                        'team' => array(
-                            'label'       => 'Active Team',
-                            'value'       => count( $cora_users ),
-                            'badge'       => 'Members',
-                            'badge_color' => 'text-zinc-655 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 15 L 100 15',
-                            'svg_dash'    => true,
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
+                            'value'       => $formatted_revenue,
+                            'badge'       => 'Active Deals',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M6 3h12M6 8h12M9 3v10.5M9 3h3.5a5 5 0 0 1 0 10H9M9 13.5L16 21"></path></svg>',
                         ),
-                        'docs' => array(
+                        'leads' => array(
+                            'label'       => 'Inbound Leads',
+                            'value'       => (string) $leads_count,
+                            'badge'       => 'Speed-to-Lead AI',
+                            'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>',
+                        ),
+                        'showings' => array(
+                            'label'       => 'Appointments',
+                            'value'       => (string) $showings_count,
+                            'badge'       => 'Scheduled',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+                        ),
+                        'vault' => array(
                             'label'       => 'Secure Vault',
-                            'value'       => is_array($cora_documents) ? count($cora_documents) : 0,
-                            'badge'       => 'Files',
-                            'badge_color' => 'text-zinc-655 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 15 L 100 15',
-                            'svg_dash'    => true,
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
+                            'value'       => (string) $docs_count,
+                            'badge'       => 'E-Sign Verified',
+                            'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
                         ),
-                        'canvas' => array(
-                            'label'       => 'Website Pages',
-                            'value'       => $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_pages" ),
-                            'badge'       => 'Canvas',
-                            'badge_color' => 'text-zinc-655 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 15 L 100 15',
-                            'svg_dash'    => true,
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon></svg>'
+                        'team' => array(
+                            'label'       => 'Team Members',
+                            'value'       => (string) $team_count,
+                            'badge'       => 'Active Seats',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>',
                         ),
-                        'forms' => array(
-                            'label'       => 'Active Forms',
-                            'value'       => $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_forms" ),
-                            'badge'       => 'Forms',
-                            'badge_color' => 'text-zinc-655 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 15 L 100 15',
-                            'svg_dash'    => true,
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>'
-                        )
+                        'properties' => array(
+                            'label'       => 'Properties',
+                            'value'       => (string) $listings_count,
+                            'badge'       => 'Listings',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
+                        ),
+                        'equipment' => array(
+                            'label'       => 'Equipment',
+                            'value'       => (string) $gear_count,
+                            'badge'       => 'Gear Prepped',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>',
+                        ),
                     );
 
-                    foreach ( $static_presets as $k => $preset ) {
-                        if ( count( $telemetry_metrics ) >= 4 ) {
-                            break;
+                    $telemetry_metrics = array();
+                    foreach ( $enabled as $feat_key ) {
+                        if ( isset( $all_candidates[ $feat_key ] ) ) {
+                            $telemetry_metrics[] = $all_candidates[ $feat_key ];
+                            if ( count( $telemetry_metrics ) >= 4 ) {
+                                break;
+                            }
                         }
-                        $telemetry_metrics[] = $preset;
+                    }
+                    if ( count( $telemetry_metrics ) < 4 ) {
+                        foreach ( $all_candidates as $cand_data ) {
+                            $already_in = false;
+                            foreach ( $telemetry_metrics as $existing ) {
+                                if ( $existing['label'] === $cand_data['label'] ) {
+                                    $already_in = true;
+                                    break;
+                                }
+                            }
+                            if ( ! $already_in ) {
+                                $telemetry_metrics[] = $cand_data;
+                            }
+                            if ( count( $telemetry_metrics ) >= 4 ) {
+                                break;
+                            }
+                        }
                     }
                 } elseif ( $is_studio ) {
-                    $gear_count = is_array($cora_studio_gear) ? count($cora_studio_gear) : 0;
                     $telemetry_metrics = array(
                         array(
-                            'label'       => 'Active Shoots',
-                            'value'       => count( $recent_active_showings ),
-                            'badge'       => 'In Progress',
-                            'badge_color' => 'text-emerald-650 bg-emerald-50 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 25 C 20 25, 30 5, 50 15 C 70 25, 80 10, 100 5',
-                            'primary'     => true,
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+                            'label'       => 'Studio Revenue',
+                            'value'       => $formatted_revenue,
+                            'badge'       => 'Invoices & Retainers',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M6 3h12M6 8h12M9 3v10.5M9 3h3.5a5 5 0 0 1 0 10H9M9 13.5L16 21"></path></svg>',
+                        ),
+                        array(
+                            'label'       => 'Confirmed Shoots',
+                            'value'       => (string) $clients_count,
+                            'badge'       => 'Production Queue',
+                            'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+                        ),
+                        array(
+                            'label'       => 'Client Proofing',
+                            'value'       => (string) $docs_count,
+                            'badge'       => 'Proofing Vault',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><polygon points="12 22.08 12 12 3 6.92 3 17.08 12 22.08"></polygon><polygon points="12 22.08 21 17.08 21 6.92 12 12 12 22.08"></polygon><polygon points="12 12 21 6.92 12 2 3 6.92 12 12"></polygon></svg>',
                         ),
                         array(
                             'label'       => 'Camera Gear',
-                            'value'       => $gear_count,
-                            'badge'       => 'Assets',
-                            'badge_color' => 'text-zinc-650 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 5 C 20 5, 40 25, 60 15 C 80 5, 90 28, 100 28',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>',
-                        ),
-                        array(
-                            'label'       => 'Bookings (MTD)',
-                            'value'       => count( $cora_workspace_clients ),
-                            'badge'       => 'Confirmed',
-                            'badge_color' => 'text-zinc-650 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 8 C 20 8, 40 22, 60 12 C 80 2, 90 25, 100 25',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-                        ),
-                        array(
-                            'label'       => 'Pending Deliveries',
-                            'value'       => $dynamic_pending_count,
-                            'badge'       => 'Editing',
-                            'badge_color' => 'text-zinc-650 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 15 L 100 15',
-                            'svg_dash'    => true,
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><polygon points="12 22.08 12 12 3 6.92 3 17.08 12 22.08"></polygon><polygon points="12 22.08 21 17.08 21 6.92 12 12 12 22.08"></polygon><polygon points="12 12 21 6.92 12 2 3 6.92 12 12"></polygon></svg>',
+                            'value'       => (string) $gear_count,
+                            'badge'       => 'Assets Prepped',
+                            'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>',
                         ),
                     );
                 } else {
                     $telemetry_metrics = array(
                         array(
-                            'label'       => 'Properties',
-                            'value'       => count( $cora_workspace_listings ),
-                            'badge'       => 'Active',
-                            'badge_color' => 'text-emerald-655 bg-emerald-50 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 25 C 20 25, 30 5, 50 15 C 70 25, 80 10, 100 5',
-                            'primary'     => true,
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
-                        ),
-                        array(
-                            'label'       => 'Active Leads',
-                            'value'       => count( $cora_workspace_leads ),
-                            'badge'       => '+12%',
-                            'badge_color' => 'text-emerald-650 bg-emerald-50 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 5 C 20 5, 40 25, 60 15 C 80 5, 90 28, 100 28',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
-                        ),
-                        array(
-                            'label'       => 'Showings',
-                            'value'       => $dynamic_active_bookings_count,
-                            'badge'       => 'Scheduled',
-                            'badge_color' => 'text-zinc-650 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 8 C 20 8, 40 22, 60 12 C 80 2, 90 25, 100 25',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-                        ),
-                        array(
                             'label'       => 'Pipeline Value',
-                            'value'       => cora_format_rupees( $dynamic_revenue_total ),
-                            'badge'       => 'Negotiating',
-                            'badge_color' => 'text-zinc-650 bg-zinc-100 px-1.5 py-0.5 rounded-md',
-                            'svg_path'    => 'M0 15 L 100 15',
-                            'svg_dash'    => true,
-                            'icon'        => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M6 3h12M6 8h12M9 3v10.5M9 3h3.5a5 5 0 0 1 0 10H9M9 13.5L16 21"></path></svg>',
+                            'value'       => $formatted_revenue,
+                            'badge'       => 'Active Deals',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M6 3h12M6 8h12M9 3v10.5M9 3h3.5a5 5 0 0 1 0 10H9M9 13.5L16 21"></path></svg>',
+                        ),
+                        array(
+                            'label'       => 'Inbound Leads',
+                            'value'       => (string) $leads_count,
+                            'badge'       => 'Speed-to-Lead AI',
+                            'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>',
+                        ),
+                        array(
+                            'label'       => 'Property Tours',
+                            'value'       => (string) $showings_count,
+                            'badge'       => 'Scheduled Visits',
+                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+                        ),
+                        array(
+                            'label'       => 'Active Listings',
+                            'value'       => (string) $listings_count,
+                            'badge'       => 'Portfolio Vault',
+                            'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
+                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
                         ),
                     );
                 }
@@ -4943,112 +4945,660 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     );
                 }
                 ?>
-                <script>
-                    var CORA_PREDEFINED_ACTIONS = <?php echo json_encode( $predefined_actions ); ?>;
-                </script>
+                <div class="cora-dashboard-mockup-wrapper w-full mx-auto px-3 sm:px-6 pt-6 sm:pt-10 pb-20 box-border select-none" style="max-width: 1118px;">
 
-                <div class="cora-dashboard-upper px-1 sm:px-4 md:px-6 w-full box-border">
-
-                <!-- 1. Centered Welcome Greeting Section with sparkle SVG -->
-                <div class="text-center px-4 space-y-1 sm:space-y-1.5 relative pt-4 sm:pt-6 pb-2 sm:pb-3">
-                    <div class="inline-flex items-center justify-center gap-2 sm:gap-2.5">
-                        <!-- Charcoal Star Sparkle -->
-                        <span class="text-zinc-900 shrink-0">
-                            <svg viewBox="0 0 24 24" width="20" height="20" class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor">
-                                <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path>
-                            </svg>
-                        </span>
-                        <h1 id="cora-dynamic-greeting-title" data-user-name="<?php echo esc_attr($user_first_name); ?>" class="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-900">
-                            <?php echo esc_html($greeting_title); ?>
-                        </h1>
-                    </div>
-                    <p class="text-xs sm:text-sm md:text-base font-medium text-zinc-500 leading-tight">
-                        <?php echo ( $cora_workspace_industry_raw === 'custom' ) ? "Your AI Co-founder is active. Let's build something great." : "Your AI Co-founder is active. Here is your operational briefing."; ?>
-                    </p>
-                </div>
- 
-                <!-- 2. Universal Command Search (Ask anything...) - Visible & Responsive Across All Viewports -->
-                <div class="w-full max-w-xl mx-auto mt-2 sm:mt-3 mb-3 sm:mb-4 px-2 sm:px-0 relative z-[999]" id="cora-search-container">
-                    <div class="relative flex items-center bg-white/90 backdrop-blur-md border border-zinc-200 hover:border-zinc-400 focus-within:border-zinc-900 focus-within:ring-2 focus-within:ring-zinc-900/10 rounded-full shadow-2xs transition-all duration-200 p-1.5 pl-3.5 pr-2">
-                        <span class="text-zinc-500 mr-2 flex shrink-0">
-                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                        </span>
-                        
-                        <!-- Real interactive input field for contextual search -->
-                        <input type="text" 
-                               id="cora-inline-command-input"
-                               placeholder="Ask Cora anything, search records, or press ⌘K..." 
-                               class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-xs sm:text-sm py-1.5 px-1 text-zinc-900 placeholder:text-zinc-400 cursor-pointer"
-                               autocomplete="off" />
-                               
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 border border-zinc-200 rounded">⌘K</kbd>
-                            <button onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-950 text-white transition-colors cursor-pointer shadow-xs" title="Send to AI Co-Founder">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="12" y1="19" x2="12" y2="5"></line>
-                                    <polyline points="5 12 12 5 19 12"></polyline>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Advanced Command Search dropdown in-line container -->
-                    <div id="cora-inline-command-palette" class="absolute left-0 right-0 top-full mt-2 z-[9999] hidden bg-white border border-zinc-200 rounded-2xl shadow-2xl flex-col transition-all duration-200">
-                        <!-- Filter Pills Bar -->
-                        <div class="flex items-center gap-1.5 px-4 py-2 border-b border-zinc-100 bg-zinc-50/50 overflow-x-auto shrink-0 select-none no-scrollbar">
-                            <button type="button" class="cora-search-pill active text-[10px] font-semibold px-3 py-1 rounded-full border border-zinc-200 bg-zinc-900 text-white transition-all cursor-pointer" data-filter="all">Overview</button>
-                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="pages">Pages</button>
-                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="leads">Leads</button>
-                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="settings">Settings</button>
-                            <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="listings">Listings</button>
-                        </div>
-
-                        <!-- Results List Area — fixed height, always scrollable -->
-                        <div id="cora-inline-command-results" class="overflow-y-auto p-2" style="height: 260px;">
-                            <!-- Loading state / Suggestions list / Search results list -->
-                        </div>
-
-                        <!-- Footer Bar -->
-                        <div class="border-t border-zinc-100 px-4 py-2 bg-zinc-50/50 flex items-center justify-between shrink-0">
-                            <span class="text-[10px] text-zinc-400 font-medium">Need help finding something?</span>
-                            <button type="button" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-[10px] rounded-lg transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer" onclick="window.coraTriggerCommandAI()">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                Ask Cora
-                            </button>
-                        </div>
-                    </div>
-                </div><!-- end cora-search-container -->
-                
-                <!-- 3. Premium Dynamic Quick Actions (Mobile-first Wrap Grid / Desktop Centered Grid) -->
-                <div class="w-full flex flex-col items-center justify-center gap-2 py-1 px-0 select-none mb-5 sm:mb-6" id="cora-quick-actions-bar"></div>
-
-                <!-- 4. Dynamic KPI Metrics Cards (Premium Responsive Layout: 2-Cols on Mobile, 4-Cols on Desktop) -->
-                <div class="w-full max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 select-none mb-2">
-                    <?php foreach ( $telemetry_metrics as $idx => $metric ) : ?>
-                    <div class="bg-white/90 p-3.5 sm:p-4 backdrop-blur-md border border-zinc-200/70 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.01] hover:shadow-xs cursor-default">
-                        <div class="space-y-1 min-w-0 pr-2">
-                            <span class="block text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider truncate"><?php echo esc_html( $metric['label'] ); ?></span>
-                            <div class="flex items-baseline gap-1.5 flex-wrap">
-                                <span class="text-base sm:text-2xl font-extrabold text-zinc-900 leading-none tracking-tight"><?php echo esc_html( $metric['value'] ); ?></span>
-                                <span class="<?php echo esc_attr( $metric['badge_color'] ); ?> inline-flex items-center text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none"><?php echo esc_html( $metric['badge'] ); ?></span>
+                    <!-- 1. Dynamic Mini Telemetry Metrics Row (Always 4 Cards, Ultra-Compact Micro Scale, Mobile 2-Cols, Desktop 4-Cols Centered) -->
+                    <div class="w-full max-w-[500px] sm:max-w-[540px] mx-auto grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-12 sm:mb-16 select-none">
+                        <?php 
+                        $display_telemetry = ! empty( $telemetry_metrics ) ? array_slice( $telemetry_metrics, 0, 4 ) : array();
+                        foreach ( $display_telemetry as $metric ) : 
+                            $badge_val = isset($metric['badge']) ? $metric['badge'] : '';
+                            $badge_class = isset($metric['badge_class']) ? $metric['badge_class'] : 'text-zinc-500 dark:text-zinc-400';
+                            $icon_html = isset($metric['icon']) ? $metric['icon'] : '';
+                        ?>
+                        <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/80 dark:border-zinc-800 px-2.5 py-1.5 sm:px-3 sm:py-2 flex flex-col justify-between min-h-[44px] shadow-3xs hover:shadow-2xs transition-all hover:border-zinc-300 dark:hover:border-zinc-700">
+                            <div class="flex items-center justify-between gap-1 leading-none">
+                                <span class="text-[8px] sm:text-[8.5px] font-semibold <?php echo esc_attr( $badge_class ); ?> truncate">
+                                    <?php echo esc_html( $badge_val ); ?>
+                                </span>
+                                <div class="w-3.5 h-3.5 rounded-[4px] bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/60 dark:border-zinc-700/60 flex items-center justify-center text-zinc-400 dark:text-zinc-500 shrink-0">
+                                    <?php echo $icon_html; ?>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline justify-between gap-1 pt-1 leading-none">
+                                <div class="text-[13px] sm:text-[14px] font-extrabold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
+                                    <?php echo esc_html( $metric['value'] ); ?>
+                                </div>
                             </div>
                         </div>
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-650 shrink-0 shadow-3xs">
-                            <?php echo $metric['icon']; ?>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <!-- 2. Centered Welcome Greeting Section -->
+                    <div class="text-center px-4 space-y-2.5 relative pb-1">
+                        <h1 id="cora-dynamic-greeting-title" data-user-name="<?php echo esc_attr($user_first_name); ?>" class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-900">
+                            <?php echo esc_html($greeting_title); ?>
+                        </h1>
+                        <p class="text-xs sm:text-sm md:text-base font-medium text-zinc-500 leading-tight">
+                            Your AI Co-founder is active. Let's build something great.
+                        </p>
+                    </div>
+
+                    <!-- 3. Universal Command Search -->
+                    <div class="w-full max-w-xl mx-auto mt-11 sm:mt-14 mb-8 sm:mb-11 px-2 sm:px-0 relative z-[999]" id="cora-search-container">
+                        <div class="relative flex items-center bg-white/95 backdrop-blur-md border border-zinc-200 hover:border-zinc-300 focus-within:border-zinc-900 focus-within:ring-2 focus-within:ring-zinc-900/10 rounded-full shadow-2xs transition-all duration-200 p-1.5 pl-3.5 pr-2">
+                            <span class="text-zinc-400 mr-2 flex shrink-0">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </span>
+                            
+                            <input type="text" 
+                                   id="cora-inline-command-input"
+                                   placeholder="Ask Cora anything, search records, or press ⌘K..." 
+                                   class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-xs sm:text-sm py-1.5 px-1 text-zinc-900 placeholder:text-zinc-400 cursor-pointer"
+                                   autocomplete="off" />
+                                   
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 border border-zinc-200 rounded">⌘K</kbd>
+                                <button onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-950 text-white transition-colors cursor-pointer shadow-xs border-0" title="Send to AI Co-Founder">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                                        <polyline points="5 12 12 5 19 12"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown Palette -->
+                        <div id="cora-inline-command-palette" class="absolute left-0 right-0 top-full mt-2 z-[9999] hidden bg-white border border-zinc-200 rounded-2xl shadow-2xl flex-col transition-all duration-200">
+                            <div class="flex items-center gap-1.5 px-4 py-2 border-b border-zinc-100 bg-zinc-50/50 overflow-x-auto shrink-0 select-none no-scrollbar">
+                                <button type="button" class="cora-search-pill active text-[10px] font-semibold px-3 py-1 rounded-full border border-zinc-200 bg-zinc-900 text-white transition-all cursor-pointer" data-filter="all">Overview</button>
+                                <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="pages">Pages</button>
+                                <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="leads">Leads</button>
+                                <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="settings">Settings</button>
+                                <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="listings">Listings</button>
+                            </div>
+                            <div id="cora-inline-command-results" class="overflow-y-auto p-2" style="height: 260px;"></div>
                         </div>
                     </div>
-                    <?php endforeach; ?>
-                </div>
 
-            </div><!-- end cora-dashboard-upper -->
+                    <!-- 4. Quick Action Shortcuts Pill Bar (2-Line Aligned) -->
+                    <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-3.5 py-1 select-none mb-24 sm:mb-28" style="margin-bottom: 96px;">
+                        
+                        <!-- Line 1: Primary Action Pills -->
+                        <div class="flex items-center justify-center flex-wrap gap-2.5">
+                            <?php if ( $is_studio ) : ?>
+                            <button onclick="coraNavigateTo('financials')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
+                                <span>Create Invoice</span>
+                            </button>
+                            <button onclick="coraNavigateTo('bookings')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                <span>Book Shoot</span>
+                            </button>
+                            <button onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                <span>Upload Media</span>
+                            </button>
+                            <button onclick="coraNavigateTo('vault')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                <span>Model Releases</span>
+                            </button>
+                            <button onclick="coraNavigateTo('equipment')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                <span>Gear Tracker</span>
+                            </button>
+                            <button onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <span>New Workflow</span>
+                            </button>
+                            <?php else : ?>
+                            <button onclick="coraNavigateTo('blogs')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                <span>Write Article</span>
+                            </button>
+                            <button onclick="coraNavigateTo('forms')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                <span>Build Form</span>
+                            </button>
+                            <button onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                <span>Upload Media</span>
+                            </button>
+                            <button onclick="coraNavigateTo('vault')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                <span>Upload File</span>
+                            </button>
+                            <button onclick="coraNavigateTo('financials')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
+                                <span>Create Invoice</span>
+                            </button>
+                            <button onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <span>New Workflow</span>
+                            </button>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Line 2: Custom Shortcuts Gradient Button Row -->
+                        <div class="flex items-center justify-center flex-wrap gap-2.5">
+                            <div id="cora-custom-actions-container" class="contents"></div>
+                            <button type="button" onclick="window.coraOpenCustomActionModal()" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0">
+                                <span class="cora-ai-gradient-pill-inner">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-purple-600 shrink-0">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    <span>Custom Shortcuts</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 5. Dynamic AI Agency Decision & Guidance Cards Grid -->
+                    
+                    <?php if ( $is_studio ) : 
+                        $active_shoots_count = count( $recent_active_showings );
+                        $bookings_count = count( $cora_workspace_clients );
+                        $vault_count = is_array($cora_documents) ? count($cora_documents) : 0;
+                        $gear_total = is_array($cora_studio_gear) ? count($cora_studio_gear) : 0;
+                        $studio_retainer_calc = $dynamic_revenue_total > 0 ? cora_format_rupees( round( $dynamic_revenue_total * 0.5 ) ) : '₹0';
+                    ?>
+                    <!-- STUDIO ROW 1: 3 EQUAL COLUMNS (LINEAR / RAYCAST STYLE - 100% REAL DATA) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 w-full">
+                        
+                        <!-- CARD 1: Retainer Billing & GST Tax -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Retainers &bull; Invoicing</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-zinc-400 dark:text-zinc-500"><?php echo esc_html( $bookings_count ); ?> Active Shoots</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Collect 50% Shoot Retainers via UPI
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Automate 50% booking deposit invoices and instant GST tax receipts before blocking studio dates.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2.5">
+                                <div class="flex items-center justify-between text-[11px] font-mono">
+                                    <span class="text-zinc-500">Deposit Invoicing</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">50% Advance</span>
+                                </div>
+                                <div class="flex items-center justify-between py-1.5 px-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 text-xs">
+                                    <span class="font-mono font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $studio_retainer_calc ); ?></span>
+                                    <span class="text-[10px] font-mono text-zinc-400">18% GST Breakdown</span>
+                                    <span class="text-[10px] font-semibold <?php echo $dynamic_revenue_total > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-400'; ?>"><?php echo $dynamic_revenue_total > 0 ? 'Active' : 'Standby'; ?></span>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
+                                    <span>Instant UPI Deep-link</span>
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-semibold">Auto-Reconcile</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('financials')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Create UPI Invoice</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">Fast Pay</span>
+                            </div>
+                        </div>
+
+                        <!-- CARD 2: Proofing & Digital Gallery Vault -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Proofing Vault</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-zinc-400 dark:text-zinc-500"><?php echo esc_html( $vault_count ); ?> Vaults</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Deliver Watermarked Client Galleries
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Publish high-resolution private client proofing links with instant favorite selections and download permissions.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2.5">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="font-medium text-zinc-700 dark:text-zinc-300">Client Selection</span>
+                                    <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold"><?php echo esc_html( $vault_count ); ?> Galleries Active</span>
+                                </div>
+                                <div class="w-full bg-zinc-200 dark:bg-zinc-700 h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-emerald-500 h-full rounded-full" style="width: <?php echo $vault_count > 0 ? min(100, $vault_count * 20) : 0; ?>%;"></div>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] font-mono text-zinc-400">
+                                    <span><?php echo esc_html( $vault_count ); ?> Client Galleries</span>
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-medium"><?php echo $vault_count > 0 ? 'Proofing Active' : 'Vault Ready'; ?></span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('media')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Open Proofing Vault</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">Vault &bull; <?php echo esc_html( $vault_count ); ?></span>
+                            </div>
+                        </div>
+
+                        <!-- CARD 3: Automated WhatsApp Shoot Call Sheets -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>24h Shoot Alerts</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-zinc-400 dark:text-zinc-500"><?php echo esc_html( $active_shoots_count ); ?> Active</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Automated Shoot Call Sheets &amp; GPS
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Send automated call-time alerts, studio location GPS coordinates, and mood boards 24 hours prior to call time.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2.5">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="font-medium text-zinc-700 dark:text-zinc-300">Call Time Dispatch</span>
+                                    <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">T-24h Auto</span>
+                                </div>
+                                <div class="flex items-center justify-between py-1.5 px-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 text-[11px]">
+                                    <span class="font-mono text-zinc-700 dark:text-zinc-300"><?php echo $active_shoots_count > 0 ? esc_html( $active_shoots_count ) . ' Shoots Scheduled' : '0 Shoots Pending'; ?></span>
+                                    <span class="text-[10px] font-bold <?php echo $active_shoots_count > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-400'; ?>"><?php echo $active_shoots_count > 0 ? 'Active' : 'Standby'; ?></span>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] font-mono text-zinc-400">
+                                    <span>GPS Location Pin</span>
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-semibold"><?php echo $active_shoots_count > 0 ? 'Auto-Triggered' : 'Ready'; ?></span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('bookings')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Configure Call Alerts</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">Sync Cal</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- STUDIO ROW 2: 2 COLUMNS (WIDE POST-PRODUCTION + CONTRACTS) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+                        
+                        <!-- CARD 4: Autonomous Post-Production Pipeline (Spans 2 Columns) -->
+                        <div class="md:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[320px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Studio Engine &bull; Automated Pipeline</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-emerald-600 dark:text-emerald-400 font-semibold"><?php echo esc_html( $bookings_count ); ?> Active in Queue</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Autonomous Post-Production Queue
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed max-w-xl">
+                                    Monitor raw ingestion, AI culling, skin retouching, color grading, and final client album delivery across all active projects.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style 4-Stage Connected Pipeline Track -->
+                            <div class="my-4 p-4 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60">
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full <?php echo $bookings_count > 0 ? 'bg-emerald-500' : 'bg-zinc-400'; ?>"></span>
+                                            <span class="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100">01. Ingest</span>
+                                        </div>
+                                        <span class="text-[10px] text-zinc-400 font-mono"><?php echo $bookings_count > 0 ? 'RAW Active' : 'Standby'; ?></span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full <?php echo $bookings_count > 0 ? 'bg-emerald-500' : 'bg-zinc-400'; ?>"></span>
+                                            <span class="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100">02. AI Culling</span>
+                                        </div>
+                                        <span class="text-[10px] text-emerald-600 font-mono font-semibold"><?php echo $bookings_count > 0 ? 'AI Active' : 'Standby'; ?></span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full <?php echo $dynamic_pending_count > 0 ? 'bg-purple-500' : 'bg-zinc-400'; ?>"></span>
+                                            <span class="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100">03. Retouch</span>
+                                        </div>
+                                        <span class="text-[10px] <?php echo $dynamic_pending_count > 0 ? 'text-purple-600' : 'text-zinc-400'; ?> font-mono font-semibold"><?php echo $dynamic_pending_count > 0 ? $dynamic_pending_count . ' In Progress' : '0 Pending'; ?></span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full <?php echo $vault_count > 0 ? 'bg-blue-500' : 'bg-zinc-400'; ?>"></span>
+                                            <span class="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100">04. 4K Delivery</span>
+                                        </div>
+                                        <span class="text-[10px] text-blue-600 font-mono font-semibold"><?php echo $vault_count > 0 ? $vault_count . ' Ready' : 'Ready'; ?></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('bookings')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>View Production Queue</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400"><?php echo esc_html( $bookings_count ); ?> Active In Pipeline</span>
+                            </div>
+                        </div>
+
+                        <!-- CARD 5: E-Sign Contracts & Model Releases (Spans 1 Column) -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[320px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Legal E-Sign</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-emerald-600 dark:text-emerald-400 font-semibold"><?php echo esc_html( $vault_count ); ?> Documents</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Contracts &amp; Model Releases
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Secure digital e-signatures on commercial shoot agreements, model releases, and copyright licenses.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2">
+                                <div class="flex items-center justify-between text-[11px] font-mono">
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-semibold"><?php echo $vault_count > 0 ? esc_html( $vault_count ) . ' Documents Signed' : '0 Documents'; ?></span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold"><?php echo $vault_count > 0 ? '✓ Verified' : 'Vault Active'; ?></span>
+                                </div>
+                                <div class="text-[10px] font-mono text-zinc-400">
+                                    SHA-256 Audit Trail Cryptographically Synced
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('vault')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Review Vault</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">100% Audit-Proof</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <?php else : 
+                        $listings_count = is_array( $cora_workspace_listings ) ? count( $cora_workspace_listings ) : 0;
+                        $leads_count = is_array( $cora_workspace_leads ) ? count( $cora_workspace_leads ) : 0;
+                        $showings_count = $dynamic_active_bookings_count ?? ( is_array( $recent_active_showings ) ? count( $recent_active_showings ) : 0 );
+                        $pipeline_val = cora_format_rupees( $dynamic_revenue_total );
+                    ?>
+                    <!-- REAL ESTATE / GLOBAL ROW 1: 3 EQUAL COLUMNS (LINEAR / RAYCAST STYLE - 100% REAL DATA) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 w-full">
+                        
+                        <!-- CARD 1: Speed-to-Lead Instant Response Desk -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Speed-to-Lead AI</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-semibold text-emerald-600 dark:text-emerald-400"><?php echo esc_html( $leads_count ); ?> Inbound Leads</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Instant Lead Qualification &amp; Dispatch
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Auto-qualify incoming buyer inquiries 24/7, filter verified budgets, and deliver tailored floor plans in under 60 seconds.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic Flow -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2.5">
+                                <div class="flex items-center justify-between text-[11px] font-mono">
+                                    <span class="text-zinc-500">Inbound Leads Desk</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">● Active</span>
+                                </div>
+                                <div class="flex items-center justify-between py-1.5 px-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 text-xs">
+                                    <span class="font-mono text-zinc-700 dark:text-zinc-300"><?php echo $leads_count > 0 ? esc_html( $leads_count ) . ' Inbound Inquiries' : '0 Pending Inquiries'; ?></span>
+                                    <span class="text-zinc-300 dark:text-zinc-600">➔</span>
+                                    <span class="font-mono text-zinc-900 dark:text-zinc-100 font-bold"><?php echo $leads_count > 0 ? 'AI Floor Plans' : 'Standby'; ?></span>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] font-mono text-zinc-400">
+                                    <span>Speed-to-Lead Response</span>
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-semibold"><?php echo $leads_count > 0 ? 'Instant Reply Active' : '&lt;60s AI Engine'; ?></span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('emails')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Configure Triggers</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">24/7 AI Desk</span>
+                            </div>
+                        </div>
+
+                        <!-- CARD 2: Active Deal Pipeline & Tour Velocity -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Deal Velocity</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-semibold text-emerald-600 dark:text-emerald-400"><?php echo esc_html( $showings_count ); ?> Tours Active</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Pipeline: <?php echo esc_html( $pipeline_val ); ?> in Motion
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Seamlessly advance buyer prospects from scheduled site tours to token agreements and registered closings.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hero Value & Hairline Stage Velocity -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2.5">
+                                <div class="flex items-baseline justify-between">
+                                    <span class="text-xl sm:text-2xl font-mono font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight"><?php echo esc_html( $pipeline_val ); ?></span>
+                                    <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold"><?php echo $showings_count > 0 ? esc_html( $showings_count ) . ' Active Tours' : '0 Tours Active'; ?></span>
+                                </div>
+                                <div class="w-full bg-zinc-200 dark:bg-zinc-700 h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-emerald-500 h-full rounded-full" style="width: <?php echo $showings_count > 0 ? min(100, $showings_count * 25) : 0; ?>%;"></div>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] font-mono text-zinc-400">
+                                    <span><?php echo $showings_count > 0 ? esc_html( $showings_count ) . ' Site Visits Scheduled' : '0 Site Visits'; ?></span>
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-medium"><?php echo $dynamic_revenue_total > 0 ? 'Ready for E-Sign' : 'Standby'; ?></span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('leads')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Manage Deals &amp; Tours</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400"><?php echo esc_html( $showings_count ); ?> Active</span>
+                            </div>
+                        </div>
+
+                        <!-- CARD 3: AI Listing Marketing & Multi-Channel Studio -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Creative Studio</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-semibold text-emerald-600 dark:text-emerald-400"><?php echo esc_html( $listings_count ); ?> Listings</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    AI Listing Assets &amp; Social Content
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Generate luxury PDF property brochures, Instagram carousels, and 4K video walkthrough scripts in seconds.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic Stack -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2">
+                                <div class="flex items-center justify-between text-[11px] font-mono">
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-semibold"><?php echo $listings_count > 0 ? esc_html( $listings_count ) . ' Listings Active' : '0 Listings'; ?></span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold"><?php echo $listings_count > 0 ? '✓ Ready' : 'Standby'; ?></span>
+                                </div>
+                                <div class="flex items-center justify-between py-1.5 px-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 text-[10.5px] font-mono">
+                                    <span class="text-zinc-700 dark:text-zinc-300">PDF Brochure</span>
+                                    <span class="text-zinc-400">&bull;</span>
+                                    <span class="text-zinc-700 dark:text-zinc-300">Reels Script</span>
+                                    <span class="text-zinc-400">&bull;</span>
+                                    <span class="text-zinc-700 dark:text-zinc-300">Carousel</span>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] font-mono text-zinc-400">
+                                    <span>Brand Styled</span>
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-semibold"><?php echo $listings_count > 0 ? '1-Click Publish' : 'Ready'; ?></span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('blogs')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Create AI Content</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400"><?php echo esc_html( $listings_count ); ?> Listings</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- REAL ESTATE / GLOBAL ROW 2: 2 COLUMNS (WIDE LEAD FOLLOW-UPS + LOCAL SEO - 100% REAL DATA) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+                        
+                        <!-- CARD 4: Autonomous Lead Follow-Up Engine (Spans 2 Columns) -->
+                        <div class="md:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[320px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>AI Nurture Engine &bull; 24/7 Drip Automations</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium text-emerald-600 dark:text-emerald-400 font-semibold"><?php echo esc_html( $leads_count ); ?> Active Leads</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Autonomous Lead Follow-Up &amp; Tour Booking
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed max-w-xl">
+                                    Keep warm buyer prospects engaged automatically while in the field with personalized floor plans, video walkthroughs, and calendar booking links.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style 4-Stage Connected Automation Track -->
+                            <div class="my-4 p-4 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60">
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full <?php echo $leads_count > 0 ? 'bg-emerald-500' : 'bg-zinc-400'; ?>"></span>
+                                            <span class="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100">01. Inbound</span>
+                                        </div>
+                                        <span class="text-[10px] text-zinc-400 font-mono"><?php echo $leads_count > 0 ? esc_html( $leads_count ) . ' Leads' : '0 Leads'; ?></span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full <?php echo $leads_count > 0 ? 'bg-emerald-500' : 'bg-zinc-400'; ?>"></span>
+                                            <span class="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100">02. AI Match</span>
+                                        </div>
+                                        <span class="text-[10px] text-emerald-600 font-mono font-semibold"><?php echo $leads_count > 0 ? 'Active' : 'Standby'; ?></span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full <?php echo $leads_count > 0 ? 'bg-blue-500' : 'bg-zinc-400'; ?>"></span>
+                                            <span class="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100">03. PDF Sent</span>
+                                        </div>
+                                        <span class="text-[10px] text-blue-600 font-mono font-semibold"><?php echo $leads_count > 0 ? 'Auto-Dispatch' : 'Standby'; ?></span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full <?php echo $showings_count > 0 ? 'bg-purple-500' : 'bg-zinc-400'; ?>"></span>
+                                            <span class="text-[11px] font-mono font-bold text-zinc-900 dark:text-zinc-100">04. Tour Sync</span>
+                                        </div>
+                                        <span class="text-[10px] text-purple-600 font-mono font-semibold"><?php echo $showings_count > 0 ? esc_html( $showings_count ) . ' Scheduled' : '0 Scheduled'; ?></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('automations')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Explore Automations</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">0 Manual Tasks</span>
+                            </div>
+                        </div>
+
+                        <!-- CARD 5: Local SEO & Google Citations Radar (Spans 1 Column) -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[320px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span>Territory Radar</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-semibold text-emerald-600 dark:text-emerald-400"><?php echo $listings_count > 0 ? esc_html( $listings_count ) . ' Areas' : 'GEO Active'; ?></span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mt-3 mb-1.5">
+                                    Local SEO &amp; Citation Radar
+                                </h3>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                    Dominate local map searches and ensure Google AI quotes your agency for premium property queries in your pin codes.
+                                </p>
+                            </div>
+
+                            <!-- Linear-Style Hairline Schematic Radar Box -->
+                            <div class="my-4 p-3.5 bg-zinc-50/70 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 flex flex-col gap-2">
+                                <div class="flex items-center justify-between text-[11px] font-mono">
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-semibold"><?php echo $listings_count > 0 ? esc_html( $listings_count ) . ' Territories Synced' : 'Territory Radar Active'; ?></span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold"><?php echo $listings_count > 0 ? '✓ Live' : 'Ready'; ?></span>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] font-mono text-zinc-400">
+                                    <span>📍 <?php echo $listings_count > 0 ? esc_html( $listings_count ) . ' Pin Codes Monitored' : 'Territory Ready'; ?></span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-semibold"><?php echo $leads_count > 0 ? '+ Inbound Leads' : 'Standby'; ?></span>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+                                <button onclick="coraNavigateTo('google-profile')" class="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                    <span>Inspect Geo Rankings</span>
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover/btn:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                                <span class="text-[10px] font-mono text-zinc-400">GEO Active</span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <?php endif; ?>
+
+                </div><!-- end cora-dashboard-mockup-wrapper -->
+
                 <!-- ===== Custom Quick Action Modal ===== -->
                 <div id="cora-custom-action-modal" class="fixed inset-0 flex items-center justify-center" style="display:none; z-index: 100000;" onclick="if(event.target===this){this.style.display='none';document.body.style.overflow='';}">
                     <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
                     <div class="relative bg-white rounded-2xl shadow-2xl border border-zinc-200 w-full max-w-md mx-4" style="max-height:90vh;overflow-y:auto;">
-                        <!-- Header -->
                         <div class="flex items-start justify-between px-6 pt-6 pb-4 border-b border-zinc-100">
                             <div>
                                 <h3 class="text-sm font-bold text-zinc-900">Quick Action Shortcuts</h3>
@@ -5058,878 +5608,223 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
                         </div>
-                        <!-- Suggested Presets -->
                         <div class="px-6 py-4 border-b border-zinc-100">
                             <p class="text-[10px] font-semibold text-zinc-450 uppercase tracking-wide mb-2.5">Suggested for you</p>
                             <div id="cora-preset-pills" class="flex flex-wrap gap-1.5"></div>
                         </div>
-                        <!-- Custom Form -->
                         <div class="px-6 py-4 border-b border-zinc-100">
                             <p class="text-[10px] font-semibold text-zinc-450 uppercase tracking-wide mb-2.5">Create custom shortcut</p>
                             <div class="space-y-2.5">
                                 <input type="text" id="cora-custom-action-name" placeholder="Label (e.g. View Reports)" class="w-full px-3 py-2 text-sm border border-zinc-200 rounded-xl bg-zinc-50 text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors" />
-                                <div class="relative" id="cora-page-picker-wrap">
-                                    <div class="flex items-center gap-2 px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 cursor-text" onclick="document.getElementById('cora-page-search').focus()">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                        <input type="text" id="cora-page-search" placeholder="Search pages..." autocomplete="off" class="flex-1 text-sm bg-transparent border-0 outline-none text-zinc-800 placeholder:text-zinc-400" oninput="window.coraFilterPages(this.value)" onfocus="document.getElementById('cora-page-list-drop').style.display='block';window.coraFilterPages(this.value)" />
-                                        <span id="cora-page-selected-label" class="text-[10px] font-semibold text-green-600 shrink-0 hidden">✓</span>
-                                    </div>
-                                    <input type="hidden" id="cora-custom-action-page" value="" />
-                                    <div id="cora-page-list-drop" class="absolute left-0 right-0 top-full mt-1 bg-white border border-zinc-200 rounded-xl shadow-lg overflow-hidden" style="display:none; z-index:200; max-height:180px; overflow-y:auto;">
+                                <div id="cora-page-picker-wrap" class="relative">
+                                    <input type="text" id="cora-page-search" placeholder="Select destination page..." oninput="window.coraFilterPages(this.value)" onfocus="window.coraFilterPages(this.value)" class="w-full px-3 py-2 text-sm border border-zinc-200 rounded-xl bg-zinc-50 text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors" autocomplete="off" />
+                                    <input type="hidden" id="cora-custom-action-page" value="dashboard" />
+                                    <span id="cora-page-selected-label" class="hidden text-[11px] text-emerald-600 font-semibold mt-1 block">✓ Destination Selected</span>
+                                    <div id="cora-page-list-drop" class="absolute left-0 right-0 top-full mt-1 bg-white border border-zinc-200 rounded-xl shadow-xl z-50 max-h-40 overflow-y-auto" style="display:none;">
                                         <div id="cora-page-list-items"></div>
                                     </div>
                                 </div>
                                 <button onclick="window.coraAddCustomAction()" class="w-full py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold rounded-xl transition-colors cursor-pointer border-0">Add Shortcut</button>
                             </div>
                         </div>
-                        <!-- Existing -->
                         <div class="px-6 py-4">
                             <p class="text-[10px] font-semibold text-zinc-450 uppercase tracking-wide mb-2.5">Your shortcuts</p>
                             <div id="cora-custom-actions-list"></div>
                         </div>
                     </div>
                 </div>
-                <?php
-                $enabled_pages = array( 'settings-suite' );
-                if ( $cora_workspace_industry_raw === 'custom' ) {
-                    $enabled_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
-                    if ( in_array( 'calendar', $enabled_features, true ) || in_array( 'showings', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'bookings';
-                    }
-                    if ( in_array( 'leads', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'leads';
-                        $enabled_pages[] = 'clients';
-                    }
-                    if ( in_array( 'properties', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'listings';
-                    }
-                    if ( in_array( 'equipment', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'equipment';
-                    }
-                    if ( in_array( 'crew_scheduler', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'crew-scheduler';
-                    }
-                    if ( in_array( 'media', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'media';
-                    }
-                    if ( in_array( 'financials', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'financials';
-                    }
-                    if ( in_array( 'blogs', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'content-suite';
-                    }
-                    if ( in_array( 'forms', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'forms';
-                    }
-                    if ( in_array( 'ai-assistants', $enabled_features, true ) || in_array( 'gbp', $enabled_features, true ) || in_array( 'knowledge-base', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'ai-assistants';
-                    }
-                    if ( in_array( 'mcp', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'integrations';
-                    }
-                    if ( in_array( 'knowledge-base', $enabled_features, true ) ) {
-                        $enabled_pages[] = 'knowledge-base';
-                    }
-                } elseif ( $is_studio ) {
-                    $enabled_pages = array( 'bookings', 'clients', 'equipment', 'crew-scheduler', 'media', 'financials', 'content-suite', 'forms', 'settings-suite', 'ai-assistants', 'integrations', 'knowledge-base' );
-                } else {
-                    $enabled_pages = array( 'bookings', 'leads', 'clients', 'listings', 'media', 'financials', 'content-suite', 'forms', 'settings-suite', 'ai-assistants', 'integrations', 'knowledge-base' );
-                }
-                ?>
+
                 <script>
-window.coraGetPageIconSvg = function(page) {
-    var stroke = 'stroke="currentColor" stroke-width="1.8" fill="none" style="width: 14px; height: 14px;"';
-    switch(page) {
-        case 'bookings': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
-        case 'leads': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
-        case 'clients': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
-        case 'listings': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
-        case 'equipment': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>';
-        case 'crew-scheduler': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>';
-        case 'media': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
-        case 'financials': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M12 8v8M8 12h8"></path></svg>';
-        case 'content-suite': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>';
-        case 'forms': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>';
-        case 'settings-suite': return '<svg viewBox="0 0 24 24" '+stroke+'><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
-        case 'ai-assistants': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M12 2v6M8 5h8"></path><circle cx="8" cy="16" r="1"></circle><circle cx="16" cy="16" r="1"></circle></svg>';
-        case 'integrations': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>';
-        case 'knowledge-base': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>';
-        default: return '<svg viewBox="0 0 24 24" '+stroke+'><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
-    }
-};
-
-var CORA_ENABLED_PAGES = <?php echo json_encode( $enabled_pages ); ?>;
-var ALL_PAGES_RAW=[{value:'bookings',label:'Bookings / Calendar'},{value:'leads',label:'Leads'},{value:'clients',label:'Clients'},{value:'listings',label:'Listings'},{value:'equipment',label:'Equipment / Gear'},{value:'crew-scheduler',label:'Crew Scheduler'},{value:'media',label:'Media Library'},{value:'financials',label:'Financials'},{value:'content-suite',label:'Content Suite'},{value:'forms',label:'Forms & Contracts'},{value:'settings-suite',label:'Settings'},{value:'ai-assistants',label:'AI Assistants'},{value:'integrations',label:'Integrations'},{value:'knowledge-base',label:'RAG Knowledge Base'}];
-
-var bookings_label = ( <?php echo $is_studio ? 'true' : 'false'; ?> ) ? 'Book a Shoot' : 'Schedule Showing';
-var listings_label = ( <?php echo $is_studio ? 'true' : 'false'; ?> ) ? 'View Portfolio' : 'View Listings';
-var PRESETS_RAW=[{name:bookings_label,page:'bookings'},{name:'Check Financials',page:'financials'},{name:'Add New Lead',page:'leads'},{name:'Upload Media',page:'media'},{name:'View Crew',page:'crew-scheduler'},{name:'AI Assistants',page:'ai-assistants'},{name:'Content Suite',page:'content-suite'},{name:listings_label,page:'listings'},{name:'RAG Knowledge Base',page:'knowledge-base'}];
-
-var CORA_ALL_PAGES = ALL_PAGES_RAW.filter(function(p){ return CORA_ENABLED_PAGES.indexOf(p.value) > -1; });
-var CORA_PRESETS = PRESETS_RAW.filter(function(p){ return CORA_ENABLED_PAGES.indexOf(p.page) > -1; });
-
-window.coraFilterPages=function(q){var drop=document.getElementById('cora-page-list-drop');var items=document.getElementById('cora-page-list-items');if(!drop||!items)return;drop.style.display='block';var filtered=q?CORA_ALL_PAGES.filter(function(p){return p.label.toLowerCase().indexOf(q.toLowerCase())>-1;}):CORA_ALL_PAGES;if(!filtered.length){items.innerHTML='<p style="font-size:11px;color:#a1a1aa;padding:10px 12px;">No pages found</p>';return;}items.innerHTML=filtered.map(function(p){var iconHtml=window.coraGetPageIconSvg(p.value);return '<button type="button" onclick="window.coraSelectPage(\''+p.value+'\',\''+p.label.replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 12px;font-size:12px;background:none;border:none;cursor:pointer;color:#3f3f46;" onmouseover="this.style.background=\'#f4f4f5\'" onmouseout="this.style.background=\'none\'"><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;color:#71717a;">'+iconHtml+'</span><span>'+p.label+'</span></button>';}).join('');};
-
-window.coraSelectPage=function(value,label){document.getElementById('cora-custom-action-page').value=value;document.getElementById('cora-page-search').value=label;var lbl=document.getElementById('cora-page-selected-label');lbl.classList.remove('hidden');document.getElementById('cora-page-list-drop').style.display='none';};
-
-window.coraRenderPresets=function(){var container=document.getElementById('cora-preset-pills');if(!container)return;var existing=JSON.parse(localStorage.getItem('cora_custom_quick_actions')||'[]').map(function(a){return a.page+'|'+a.name;});container.innerHTML=CORA_PRESETS.map(function(p){var added=existing.indexOf(p.page+'|'+p.name)>-1;var iconHtml=window.coraGetPageIconSvg(p.page);return '<button type="button" onclick="window.coraAddPreset(\''+p.name.replace(/'/g,"\\'")+'\',\''+p.page+'\')" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;font-size:11px;font-weight:500;border-radius:20px;cursor:pointer;border:1px solid '+(added?'#bbf7d0':'#e4e4e7')+';background:'+(added?'#f0fdf4':'#fafafa')+';color:'+(added?'#16a34a':'#3f3f46')+';">'+'<span style="display:inline-flex;align-items:center;color:'+(added?'#16a34a':'#71717a')+'; width:12px; height:12px;">'+iconHtml+'</span><span>'+p.name+'</span>'+(added?'<span style="font-size:9px;margin-left:2px;">✓</span>':'')+'</button>';}).join('');};
-
-window.coraAddPreset=function(name,page){var actions=JSON.parse(localStorage.getItem('cora_custom_quick_actions')||'[]');if(actions.find(function(a){return a.name===name&&a.page===page;})){if(window.coraShowToast)coraShowToast('Already added!','info');return;}actions.push({name:name,page:page});localStorage.setItem('cora_custom_quick_actions',JSON.stringify(actions));window.coraRenderCustomActions();window.coraRenderCustomActionsList();window.coraRenderPresets();if(window.coraShowToast)coraShowToast(name+' added!','success');};
-
-window.coraOpenCustomActionModal=function(){var m=document.getElementById('cora-custom-action-modal');m.style.display='flex';document.body.style.overflow='hidden';window.coraFilterPages('');window.coraRenderPresets();window.coraRenderCustomActionsList();document.addEventListener('click',function h(e){if(!e.target.closest('#cora-page-picker-wrap')){var d=document.getElementById('cora-page-list-drop');if(d)d.style.display='none';}},{capture:true});};
-
-window.coraAddCustomAction=function(){var name=(document.getElementById('cora-custom-action-name').value||'').trim();var page=document.getElementById('cora-custom-action-page').value;if(!name||!page){if(window.coraShowToast)coraShowToast('Please enter a label and select a page.','error');return;}var actions=JSON.parse(localStorage.getItem('cora_custom_quick_actions')||'[]');actions.push({name:name,page:page});localStorage.setItem('cora_custom_quick_actions',JSON.stringify(actions));document.getElementById('cora-custom-action-name').value='';document.getElementById('cora-custom-action-page').value='';document.getElementById('cora-page-search').value='';document.getElementById('cora-page-selected-label').classList.add('hidden');window.coraRenderCustomActions();window.coraRenderCustomActionsList();window.coraRenderPresets();if(window.coraShowToast)coraShowToast('Shortcut added!','success');};
-
-window.coraDeleteCustomAction=function(idx){var actions=JSON.parse(localStorage.getItem('cora_custom_quick_actions')||'[]');actions.splice(idx,1);localStorage.setItem('cora_custom_quick_actions',JSON.stringify(actions));window.coraRenderCustomActions();window.coraRenderCustomActionsList();window.coraRenderPresets();};
-
-window.coraRenderCustomActionsList=function(){var list=document.getElementById('cora-custom-actions-list');if(!list)return;var actions=JSON.parse(localStorage.getItem('cora_custom_quick_actions')||'[]');if(!actions.length){list.innerHTML='<p style="font-size:11px;color:#a1a1aa;text-align:center;padding:6px 0;">No shortcuts yet — add one above or pick a suggestion.</p>';return;}list.innerHTML='<div style="display:flex;flex-direction:column;gap:6px;">'+actions.map(function(a,i){var iconHtml=window.coraGetPageIconSvg(a.page);return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#f4f4f5;border-radius:10px;"><div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;align-items:center;color:#71717a;width:12px;height:12px;">'+iconHtml+'</span><span style="font-size:12px;font-weight:500;color:#3f3f46;">'+a.name+'</span></div><button onclick="window.coraDeleteCustomAction('+i+')" style="background:none;border:none;cursor:pointer;color:#a1a1aa;padding:2px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>';}).join('')+'</div>';};
-
-window.coraRenderQuickActionsBar = function() {
-    var bar = document.getElementById('cora-quick-actions-bar');
-    if (!bar) return;
-
-    var isDesktop = window.innerWidth >= 768;
-
-    // Load custom shortcuts from localStorage
-    var customStored = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
-    var customActions = customStored.map(function(act) {
-        return {
-            label: act.name,
-            icon: window.coraGetPageIconSvg(act.page),
-            onclick: "coraNavigateTo('" + act.page + "');"
-        };
-    });
-
-    // Merge predefined actions with custom actions
-    var allActions = CORA_PREDEFINED_ACTIONS.concat(customActions);
-
-    var creatorBtn = {
-        isCreator: true,
-        label: 'Custom Shortcuts',
-        onclick: 'window.coraOpenCustomActionModal()',
-        icon: '<svg viewBox="0 0 24 24" width="13" height="13" class="text-zinc-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>'
-    };
-
-    if (isDesktop) {
-        // Desktop: Render in one single centered row with wrap and generous gaps
-        var activeActions = allActions.slice(0, 6);
-        var totalItems = activeActions.concat([creatorBtn]);
-
-        var buttonsHtml = totalItems.map(function(item) {
-            if (item.isCreator) {
-                return '<button type="button" onclick="' + item.onclick + '" class="flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-300/80 bg-zinc-100 hover:bg-zinc-200/80 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0 select-none" style="margin:0;">' +
-                    item.icon +
-                    ' <span>' + item.label + '</span>' +
-                '</button>';
-            } else {
-                return '<button onclick="' + item.onclick + '" class="flex justify-center items-center gap-2 px-3.5 py-1.5 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-xs font-semibold transition-all shadow-3xs cursor-pointer whitespace-nowrap shrink-0" style="margin:0;">' +
-                    item.icon +
-                    ' <span>' + item.label + '</span>' +
-                '</button>';
-            }
-        }).join('');
-
-        bar.innerHTML = '<div class="w-full" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; row-gap:8px; column-gap:8px; padding:4px 12px; margin:2px 0;">' +
-            buttonsHtml +
-        '</div>';
-
-    } else {
-        // Mobile layout:
-        // Row 1: 3 chips
-        // Row 2: 2 chips
-        // Row 3: Custom Shortcuts chip
-        var row1Actions = allActions.slice(0, 3);
-        var row2Actions = allActions.slice(3, 5);
-
-        var row1Html = row1Actions.map(function(item) {
-            return '<button onclick="' + item.onclick + '" class="flex-1 flex justify-center items-center gap-1 px-2.5 py-1.5 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[10px] font-bold transition-all shadow-3xs cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis select-none" style="min-width: 0;">' +
-                item.icon +
-                ' <span class="truncate">' + item.label + '</span>' +
-            '</button>';
-        }).join('');
-
-        var row2Html = row2Actions.map(function(item) {
-            return '<button onclick="' + item.onclick + '" class="flex-1 flex justify-center items-center gap-1.5 px-3.5 py-1.5 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-full text-[10.5px] font-bold transition-all shadow-3xs cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis select-none" style="min-width: 0; max-width: 48%;">' +
-                item.icon +
-                ' <span class="truncate">' + item.label + '</span>' +
-            '</button>';
-        }).join('');
-
-        var creatorHtml = '<button type="button" onclick="' + creatorBtn.onclick + '" class="flex items-center justify-center gap-1.5 px-4 py-1.5 border border-zinc-300/80 bg-zinc-100 hover:bg-zinc-200/80 text-zinc-900 rounded-full text-[10.5px] font-bold transition-all shadow-3xs cursor-pointer select-none whitespace-nowrap shrink-0 mt-0.5">' +
-            creatorBtn.icon +
-            ' <span>' + creatorBtn.label + '</span>' +
-        '</button>';
-
-        var html = '<div class="w-full flex flex-col gap-2 px-2 py-1">';
-        
-        if (row1Html) {
-            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-between gap-2">' + row1Html + '</div>';
-        }
-        if (row2Html) {
-            html += '<div class="w-full flex flex-row flex-nowrap items-center justify-center gap-2">' + row2Html + '</div>';
-        }
-        html += '<div class="w-full flex flex-row items-center justify-center">' + creatorHtml + '</div>';
-        html += '</div>';
-
-        bar.innerHTML = html;
-    }
-};
-
-window.coraHydrateGreeting = function() {
-    var titleEl = document.getElementById('cora-dynamic-greeting-title');
-    if (!titleEl) return;
-    var hour = new Date().getHours();
-    var greeting = 'Good morning';
-    if (hour >= 12 && hour < 17) {
-        greeting = 'Good afternoon';
-    } else if (hour >= 17 && hour < 22) {
-        greeting = 'Good evening';
-    } else if (hour >= 22 || hour < 5) {
-        greeting = 'Working late';
-    }
-    var userName = titleEl.getAttribute('data-user-name') || 'Shravya';
-    titleEl.textContent = greeting + ', ' + userName + '.';
-};
-
-window.coraRenderCustomActions = window.coraRenderQuickActionsBar;
-
-document.addEventListener('DOMContentLoaded', function() {
-    window.coraHydrateGreeting();
-    window.coraRenderQuickActionsBar();
-});
-window.addEventListener('resize', window.coraRenderQuickActionsBar);
-                </script>
-                <?php
-                // Calculate dynamic metrics for Cash Overview
-                $mtd_received = 0;
-                $expected_amount = 0;
-                $overdue_amount = 0;
-
-                if ( is_array( $cora_financials ) ) {
-                    foreach ( $cora_financials as $entry ) {
-                        $amt = floatval( preg_replace( '/[^\d.]/', '', $entry['amount'] ?? '0' ) );
-                        $type = strtolower( $entry['type'] ?? '' );
-                        $status = strtolower( $entry['status'] ?? '' );
-                        if ( ( $type === 'inflow' || $type === 'income' || $type === 'credit' ) && $status === 'cleared' ) {
-                            $mtd_received += $amt;
-                        }
-                        if ( $status === 'pending' || $status === 'upcoming' ) {
-                            $expected_amount += $amt;
-                        }
-                        if ( $status === 'overdue' ) {
-                            $overdue_amount += $amt;
-                        }
+                window.coraGetPageIconSvg = function(page) {
+                    var stroke = 'stroke="currentColor" stroke-width="1.8" fill="none" style="width: 13px; height: 13px;"';
+                    switch(page) {
+                        case 'bookings': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
+                        case 'leads': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+                        case 'clients': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
+                        case 'listings': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+                        case 'equipment': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>';
+                        case 'media': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>';
+                        case 'financials': return '<svg viewBox="0 0 24 24" '+stroke+'><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>';
+                        case 'content-suite':
+                        case 'blogs': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>';
+                        case 'forms': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>';
+                        case 'settings-suite': return '<svg viewBox="0 0 24 24" '+stroke+'><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
+                        case 'automations': return '<svg viewBox="0 0 24 24" '+stroke+'><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
+                        case 'vault': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>';
+                        default: return '<svg viewBox="0 0 24 24" '+stroke+'><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
                     }
-                }
-                ?>
-                <div class="cora-bento-grid pt-4 sm:pt-6 gap-5">
-                    <?php if ( $cora_workspace_industry_raw === 'custom' ) : ?>
-                        <!-- CARD 1: AI Co-Founder Briefing (Spans 2 Columns) -->
-                        <div class="border border-zinc-100 rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-between md:col-span-2 min-h-[320px]">
-                            <div>
-                                <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="h-8 w-8 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path></svg>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">AI Co-Founder Briefing</h3>
-                                            <span class="text-[11px] text-zinc-450 font-medium">Real-time workspace insights and summaries</span>
-                                        </div>
-                                    </div>
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-[9px] border border-emerald-200/60 uppercase tracking-wider">
-                                        <span class="relative flex h-2 w-2">
-                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                        </span>
-                                        Active
-                                    </span>
-                                </div>
+                };
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3">
-                                    <div class="p-3 rounded-xl bg-zinc-50/70 border border-zinc-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-2.5 min-w-0">
-                                            <span class="relative flex h-2 w-2 shrink-0">
-                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                            </span>
-                                            <span class="text-xs font-bold text-zinc-800 truncate">AI Co-founder</span>
-                                        </div>
-                                        <span class="text-[10px] text-zinc-600 font-semibold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200 shadow-2xs">Online</span>
-                                    </div>
-                                    <?php if ( in_array( 'gbp', $enabled, true ) ) : ?>
-                                    <div class="p-3 rounded-xl bg-zinc-50/70 border border-zinc-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-2.5 min-w-0">
-                                            <span class="relative flex h-2 w-2 shrink-0">
-                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                            </span>
-                                            <span class="text-xs font-bold text-zinc-800 truncate">AI Marketing</span>
-                                        </div>
-                                        <span class="text-[10px] text-zinc-600 font-semibold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200 shadow-2xs">Monitoring</span>
-                                    </div>
-                                    <?php endif; ?>
-                                    <?php if ( in_array( 'automations', $enabled, true ) ) : ?>
-                                    <div class="p-3 rounded-xl bg-zinc-50/70 border border-zinc-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-2.5 min-w-0">
-                                            <span class="relative flex h-2 w-2 shrink-0">
-                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                            </span>
-                                            <span class="text-xs font-bold text-zinc-800 truncate">Automations</span>
-                                        </div>
-                                        <span class="text-[10px] text-zinc-600 font-semibold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200 shadow-2xs">Active</span>
-                                    </div>
-                                    <?php endif; ?>
-                                    <?php if ( in_array( 'vault', $enabled, true ) ) : ?>
-                                    <div class="p-3 rounded-xl bg-zinc-50/70 border border-zinc-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-2.5 min-w-0">
-                                            <span class="relative flex h-2 w-2 shrink-0">
-                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                            </span>
-                                            <span class="text-xs font-bold text-zinc-800 truncate">Secure Vault</span>
-                                        </div>
-                                        <span class="text-[10px] text-zinc-600 font-semibold uppercase tracking-wider shrink-0 bg-white px-2 py-0.5 rounded border border-zinc-200 shadow-2xs">Ready</span>
-                                    </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
+                var CORA_ALL_PAGES = [
+                    {value:'bookings',label:'Bookings & Calendar'},
+                    {value:'leads',label:'Leads CRM'},
+                    {value:'clients',label:'Clients'},
+                    {value:'financials',label:'Financials & Invoices'},
+                    {value:'vault',label:'Document Vault'},
+                    {value:'media',label:'Media Library'},
+                    {value:'forms',label:'Forms & Contracts'},
+                    {value:'blogs',label:'Content Articles'},
+                    {value:'automations',label:'Automations & Workflows'},
+                    {value:'settings-suite',label:'Settings Suite'}
+                ];
 
-                            <div class="pt-4 border-t border-zinc-100 mt-3">
-                                <button onclick="window.coraToggleSidebar(true)" class="w-full flex items-center justify-between text-xs font-bold text-violet-655 hover:text-violet-750 transition-colors cursor-pointer group">
-                                    <span>Consult AI Co-Founder</span>
-                                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                                </button>
-                            </div>
-                        </div>
+                var CORA_PRESETS = [
+                    {name:'Check Financials',page:'financials'},
+                    {name:'Bookings',page:'bookings'},
+                    {name:'Add Lead',page:'leads'},
+                    {name:'Upload Media',page:'media'},
+                    {name:'Document Vault',page:'vault'},
+                    {name:'New Form',page:'forms'},
+                    {name:'Automations',page:'automations'}
+                ];
 
-                        <!-- CARD 2: AI Co-founder Diagnostics (Spans 1 Column) -->
-                        <div class="border border-zinc-100 rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-between min-h-[320px]">
-                            <div>
-                                <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">AI Co-founder Diagnostics</h3>
-                                            <span class="text-[11px] text-zinc-450 font-medium">Status & quota metrics</span>
-                                        </div>
-                                    </div>
-                                </div>
+                window.coraFilterPages = function(q) {
+                    var drop = document.getElementById('cora-page-list-drop');
+                    var items = document.getElementById('cora-page-list-items');
+                    if (!drop || !items) return;
+                    drop.style.display = 'block';
+                    var filtered = q ? CORA_ALL_PAGES.filter(function(p) { return p.label.toLowerCase().indexOf(q.toLowerCase()) > -1; }) : CORA_ALL_PAGES;
+                    if (!filtered.length) {
+                        items.innerHTML = '<p style="font-size:11px;color:#a1a1aa;padding:10px 12px;">No matching pages</p>';
+                        return;
+                    }
+                    items.innerHTML = filtered.map(function(p) {
+                        var iconHtml = window.coraGetPageIconSvg(p.value);
+                        return '<button type="button" onclick="window.coraSelectPage(\''+p.value+'\',\''+p.label.replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 12px;font-size:12px;background:none;border:none;cursor:pointer;color:#3f3f46;" onmouseover="this.style.background=\'#f4f4f5\'" onmouseout="this.style.background=\'none\'"><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;color:#71717a;">'+iconHtml+'</span><span>'+p.label+'</span></button>';
+                    }).join('');
+                };
 
-                                <div class="space-y-4 mt-2">
-                                    <div class="flex items-center justify-between py-1 border-b border-zinc-100">
-                                        <span class="text-xs text-zinc-500 font-bold">Active Engine</span>
-                                        <span class="text-xs font-extrabold text-zinc-800">Gemini 2.5 Flash</span>
-                                    </div>
-                                    <div class="flex items-center justify-between py-1 border-b border-zinc-100">
-                                        <span class="text-xs text-zinc-500 font-bold">Latency</span>
-                                        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-emerald-600">
-                                            <span class="relative flex h-1.5 w-1.5">
-                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                                            </span>
-                                            142ms
-                                        </span>
-                                    </div>
-                                    <div class="flex items-center justify-between py-1 border-b border-zinc-100 dark:border-zinc-800">
-                                        <span class="text-xs text-zinc-500 font-bold">Quota Usage</span>
-                                        <?php
-                                        $ai_stats = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 0, 'daily_limit' => 100 );
-                                        $daily_pct = $ai_stats['daily_limit'] > 0 ? min(100, round(($ai_stats['daily_count'] / $ai_stats['daily_limit']) * 100)) : 0;
-                                        ?>
-                                        <span class="text-xs font-extrabold text-zinc-800 dark:text-zinc-200" id="cora-ai-diagnostics-quota-text"><?php echo esc_html( $ai_stats['daily_count'] ); ?> / <?php echo esc_html( $ai_stats['daily_limit'] ); ?> (<?php echo esc_html( $daily_pct ); ?>%)</span>
-                                    </div>
-                                    <div class="flex items-center justify-between py-1">
-                                        <span class="text-xs text-zinc-500 font-bold">Database Health</span>
-                                        <span class="text-xs font-extrabold text-zinc-800">Optimized</span>
-                                    </div>
-                                </div>
-                            </div>
+                window.coraSelectPage = function(value, label) {
+                    var pageInput = document.getElementById('cora-custom-action-page');
+                    var searchInput = document.getElementById('cora-page-search');
+                    var lbl = document.getElementById('cora-page-selected-label');
+                    var drop = document.getElementById('cora-page-list-drop');
+                    if (pageInput) pageInput.value = value;
+                    if (searchInput) searchInput.value = label;
+                    if (lbl) lbl.classList.remove('hidden');
+                    if (drop) drop.style.display = 'none';
+                };
 
-                            <div class="pt-4 border-t border-zinc-100 mt-3">
-                                <button onclick="window.coraShowToast('AI Co-founder diagnostic trace passed: 100% OK', 'success')" class="w-full flex items-center justify-between text-xs font-bold text-emerald-650 hover:text-emerald-750 transition-colors cursor-pointer group">
-                                    <span>Run Diagnostics</span>
-                                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                                </button>
-                            </div>
-                        </div>
+                window.coraRenderPresets = function() {
+                    var container = document.getElementById('cora-preset-pills');
+                    if (!container) return;
+                    var existing = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]').map(function(a) { return a.page + '|' + a.name; });
+                    container.innerHTML = CORA_PRESETS.map(function(p) {
+                        var added = existing.indexOf(p.page + '|' + p.name) > -1;
+                        var iconHtml = window.coraGetPageIconSvg(p.page);
+                        return '<button type="button" onclick="window.coraAddPreset(\''+p.name.replace(/'/g,"\\'")+'\',\''+p.page+'\')" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;font-size:11px;font-weight:500;border-radius:20px;cursor:pointer;border:1px solid '+(added?'#bbf7d0':'#e4e4e7')+';background:'+(added?'#f0fdf4':'#fafafa')+';color:'+(added?'#16a34a':'#3f3f46')+';">'+'<span style="display:inline-flex;align-items:center;color:'+(added?'#16a34a':'#71717a')+'; width:12px; height:12px;">'+iconHtml+'</span><span>'+p.name+'</span>'+(added?'<span style="font-size:9px;margin-left:2px;">✓</span>':'')+'</button>';
+                    }).join('');
+                };
 
-                        <!-- CARD 3: Smart Recommendations (Spans 1 Column) -->
-                        <div class="border border-zinc-100 rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-between min-h-[280px]">
-                            <div>
-                                <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="h-8 w-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26C17.81 13.47 19 11.38 19 9a7 7 0 0 0-7-7z"></path></svg>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Smart Tasks</h3>
-                                            <span class="text-[11px] text-zinc-450 font-medium">Contextual workspace insights</span>
-                                        </div>
-                                    </div>
-                                </div>
+                window.coraAddPreset = function(name, page) {
+                    var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    if (actions.find(function(a) { return a.name === name && a.page === page; })) {
+                        if (window.coraShowToast) coraShowToast('Already added!', 'info');
+                        return;
+                    }
+                    actions.push({ name: name, page: page });
+                    localStorage.setItem('cora_custom_quick_actions', JSON.stringify(actions));
+                    window.coraRenderCustomActions();
+                    window.coraRenderCustomActionsList();
+                    window.coraRenderPresets();
+                    if (window.coraShowToast) coraShowToast(name + ' added!', 'success');
+                };
 
-                                <div class="space-y-3.5">
-                                    <?php
-                                    $custom_smart_tasks = array();
-                                    if ( in_array( 'blogs', $enabled, true ) ) {
-                                        $custom_smart_tasks[] = array(
-                                            'title' => 'Write a Blog Post',
-                                            'desc' => 'Increase local traffic search',
-                                            'url' => "coraNavigateTo('blogs')",
-                                            'icon' => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
-                                        );
-                                    }
-                                    if ( in_array( 'forms', $enabled, true ) ) {
-                                        $custom_smart_tasks[] = array(
-                                            'title' => 'Optimize Form Fields',
-                                            'desc' => 'Improve lead intake response rate',
-                                            'url' => "coraNavigateTo('forms')",
-                                            'icon' => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>'
-                                        );
-                                    }
-                                    if ( count($custom_smart_tasks) < 2 ) {
-                                        $custom_smart_tasks[] = array(
-                                            'title' => 'Configure Shortcuts',
-                                            'desc' => 'Customize dashboard buttons',
-                                            'url' => "window.coraOpenCustomActionModal()",
-                                            'icon' => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"></path></svg>'
-                                        );
-                                    }
-                                    foreach ( $custom_smart_tasks as $task ) : ?>
-                                        <div class="flex items-start gap-2.5 p-2 bg-zinc-55/35 border border-transparent rounded-xl hover:bg-zinc-50 transition-all cursor-pointer" onclick="<?php echo $task['url']; ?>">
-                                            <div class="h-6 w-6 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 font-bold text-[11px]">
-                                                <?php echo $task['icon']; ?>
-                                            </div>
-                                            <div class="flex-1 min-w-0 pr-1 flex items-center justify-between">
-                                                <div class="flex flex-col min-w-0">
-                                                    <span class="text-[11px] font-bold text-zinc-800 leading-tight"><?php echo esc_html( $task['title'] ); ?></span>
-                                                    <span class="text-[9px] text-zinc-455 truncate mt-0.5"><?php echo esc_html( $task['desc'] ); ?></span>
-                                                </div>
-                                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
+                window.coraOpenCustomActionModal = function() {
+                    var m = document.getElementById('cora-custom-action-modal');
+                    if (!m) return;
+                    m.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    window.coraFilterPages('');
+                    window.coraRenderPresets();
+                    window.coraRenderCustomActionsList();
+                    document.addEventListener('click', function h(e) {
+                        if (!e.target.closest('#cora-page-picker-wrap')) {
+                            var d = document.getElementById('cora-page-list-drop');
+                            if (d) d.style.display = 'none';
+                        }
+                    }, { capture: true });
+                };
 
-                            <div class="pt-4 border-t border-zinc-100 mt-3">
-                                <button onclick="window.coraToggleSidebar(true)" class="w-full flex items-center justify-between text-xs font-bold text-blue-650 hover:text-blue-750 transition-colors cursor-pointer group">
-                                    <span>Browse Smart Actions</span>
-                                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                                </button>
-                            </div>
-                        </div>
+                window.coraAddCustomAction = function() {
+                    var nameEl = document.getElementById('cora-custom-action-name');
+                    var pageEl = document.getElementById('cora-custom-action-page');
+                    var name = (nameEl ? nameEl.value : '').trim();
+                    var page = pageEl ? pageEl.value : '';
+                    if (!name || !page) {
+                        if (window.coraShowToast) coraShowToast('Please enter a label and select a page.', 'error');
+                        return;
+                    }
+                    var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    actions.push({ name: name, page: page });
+                    localStorage.setItem('cora_custom_quick_actions', JSON.stringify(actions));
+                    if (nameEl) nameEl.value = '';
+                    var searchEl = document.getElementById('cora-page-search');
+                    if (searchEl) searchEl.value = '';
+                    var lbl = document.getElementById('cora-page-selected-label');
+                    if (lbl) lbl.classList.add('hidden');
+                    window.coraRenderCustomActions();
+                    window.coraRenderCustomActionsList();
+                    window.coraRenderPresets();
+                    if (window.coraShowToast) coraShowToast('Shortcut added!', 'success');
+                };
 
-                        <!-- CARD 4: Activity Log (Spans 1 Column) -->
-                        <div class="border border-zinc-100 rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-between min-h-[280px]">
-                            <div>
-                                <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="h-8 w-8 rounded-xl bg-orange-50 text-orange-655 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Activity Log</h3>
-                                            <span class="text-[11px] text-zinc-450 font-medium">Recent workspace actions</span>
-                                        </div>
-                                    </div>
-                                </div>
+                window.coraDeleteCustomAction = function(idx) {
+                    var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    actions.splice(idx, 1);
+                    localStorage.setItem('cora_custom_quick_actions', JSON.stringify(actions));
+                    window.coraRenderCustomActions();
+                    window.coraRenderCustomActionsList();
+                    window.coraRenderPresets();
+                };
 
-                                <div class="space-y-3.5">
-                                    <div class="flex items-start gap-2.5 text-xs text-zinc-650">
-                                        <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-500 shrink-0">10:14 AM</span>
-                                        <span class="truncate">Workspace settings updated to Custom Mode</span>
-                                    </div>
-                                    <div class="flex items-start gap-2.5 text-xs text-zinc-650">
-                                        <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-500 shrink-0">Yesterday</span>
-                                        <span class="truncate">Security: User session authorized</span>
-                                    </div>
-                                    <div class="flex items-start gap-2.5 text-xs text-zinc-650">
-                                        <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-500 shrink-0">Yesterday</span>
-                                        <span class="truncate">Forms: Form builder template synced</span>
-                                    </div>
-                                </div>
-                            </div>
+                window.coraRenderCustomActionsList = function() {
+                    var list = document.getElementById('cora-custom-actions-list');
+                    if (!list) return;
+                    var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    if (!actions.length) {
+                        list.innerHTML = '<p style="font-size:11px;color:#a1a1aa;text-align:center;padding:6px 0;">No shortcuts yet — add one above or pick a suggestion.</p>';
+                        return;
+                    }
+                    list.innerHTML = '<div style="display:flex;flex-direction:column;gap:6px;">' + actions.map(function(a, i) {
+                        var iconHtml = window.coraGetPageIconSvg(a.page);
+                        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#f4f4f5;border-radius:10px;"><div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;align-items:center;color:#71717a;width:12px;height:12px;">' + iconHtml + '</span><span style="font-size:12px;font-weight:500;color:#3f3f46;">' + a.name + '</span></div><button onclick="window.coraDeleteCustomAction(' + i + ')" style="background:none;border:none;cursor:pointer;color:#a1a1aa;padding:2px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>';
+                    }).join('') + '</div>';
+                };
 
-                            <div class="pt-4 border-t border-zinc-100 mt-3">
-                                <button onclick="coraNavigateTo('activity-timeline')" class="w-full flex items-center justify-between text-xs font-bold text-orange-600 hover:text-orange-750 transition-colors cursor-pointer group">
-                                    <span>View Activity Timeline</span>
-                                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                                </button>
-                            </div>
-                        </div>
+                window.coraRenderCustomActions = function() {
+                    var c = document.getElementById('cora-custom-actions-container');
+                    if (!c) return;
+                    var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]').slice(0, 4);
+                    c.innerHTML = actions.map(function(a) {
+                        var iconHtml = window.coraGetPageIconSvg(a.page);
+                        return '<button onclick="coraNavigateTo(\'' + a.page + '\')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer"><span class="text-zinc-500 flex items-center">' + iconHtml + '</span><span>' + a.name + '</span></button>';
+                    }).join('');
+                };
 
-                        <!-- CARD 5: AI Inbox (Spans 1 Column, custom view) -->
-                        <div class="border border-zinc-100 rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-between min-h-[280px]">
-                            <div>
-                                <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="h-8 w-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">AI Inbox</h3>
-                                            <span class="text-[11px] text-zinc-455 font-medium">Pending system updates</span>
-                                        </div>
-                                    </div>
-                                    <span class="h-5 w-5 rounded-full bg-purple-50 text-purple-600 font-bold text-[10px] flex items-center justify-center shrink-0"><?php echo intval($cora_unread_count); ?></span>
-                                </div>
+                window.coraHydrateGreeting = function() {
+                    var titleEl = document.getElementById('cora-dynamic-greeting-title');
+                    if (!titleEl) return;
+                    var hour = new Date().getHours();
+                    var greeting = 'Good morning';
+                    if (hour >= 12 && hour < 17) {
+                        greeting = 'Good afternoon';
+                    } else if (hour >= 17 && hour < 22) {
+                        greeting = 'Good evening';
+                    } else if (hour >= 22 || hour < 5) {
+                        greeting = 'Working late';
+                    }
+                    var userName = titleEl.getAttribute('data-user-name') || 'Shravya';
+                    titleEl.textContent = greeting + ', ' + userName + '.';
+                };
 
-                                <div class="space-y-3">
-                                    <?php if ( empty( $cora_user_notifications ) ) : ?>
-                                        <div class="flex flex-col items-center justify-center py-8 text-center">
-                                            <div class="h-10 w-10 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center mb-2">
-                                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                            </div>
-                                            <h4 class="text-[11px] font-bold text-zinc-700">Your inbox is clear</h4>
-                                            <p class="text-[9px] text-zinc-455 mt-0.5 max-w-[180px]">No pending system updates or alerts.</p>
-                                        </div>
-                                    <?php else : 
-                                        foreach ( array_slice( $cora_user_notifications, 0, 2 ) as $notif ) : 
-                                            $n_title = $notif['title'] ?? 'Notification';
-                                            $n_body = $notif['body'] ?? '';
-                                            $n_time = isset( $notif['timestamp'] ) ? human_time_diff( $notif['timestamp'], current_time( 'timestamp' ) ) . ' ago' : 'Just now';
-                                            $n_icon = (strpos(strtolower($n_title), 'request') !== false || strpos(strtolower($n_title), 'appeal') !== false) ? '?' : 'i';
-                                        ?>
-                                            <div class="flex items-start gap-2.5 p-2 bg-zinc-50/30 border border-zinc-100/60 rounded-xl">
-                                                <div class="h-6 w-6 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center shrink-0 font-bold text-[11px]"><?php echo $n_icon; ?></div>
-                                                <div class="flex flex-col min-w-0 flex-1">
-                                                    <strong class="text-[11px] font-bold text-zinc-800 truncate"><?php echo esc_html($n_title); ?></strong>
-                                                    <span class="text-[9px] text-zinc-455 truncate"><?php echo esc_html($n_body); ?></span>
-                                                </div>
-                                                <span class="text-[9px] text-zinc-455 shrink-0"><?php echo esc_html($n_time); ?></span>
-                                            </div>
-                                        <?php endforeach; 
-                                    endif; ?>
-                                </div>
-                            </div>
-
-                            <div class="pt-4 border-t border-zinc-100 mt-3">
-                                <button onclick="window.coraShowToast('AI Inbox is currently in staging sync mode.', 'info')" class="w-full flex items-center justify-between text-xs font-bold text-purple-650 hover:text-purple-750 transition-colors cursor-pointer group">
-                                    <span>Check AI Messages</span>
-                                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                                </button>
-                            </div>
-                        </div>
-                    <?php else : ?>
-                        <!-- CARD 1: Today's Timeline (Spans 2 Columns) -->
-                    <div class="border border-zinc-100 rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-between md:col-span-2 min-h-[320px]">
-                        <div>
-                            <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="h-8 w-8 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Today's Timeline</h3>
-                                        <span class="text-[11px] text-zinc-450 font-medium">Your key operational events for today</span>
-                                    </div>
-                                </div>
-                                <span class="h-5 w-7 rounded-full bg-violet-50 text-violet-600 font-bold text-[10px] flex items-center justify-center shrink-0"><?php echo count($today_events); ?></span>
-                            </div>
-
-                            <?php if ( empty( $today_events ) ) : ?>
-                                <div class="flex flex-col items-center justify-center py-10 text-center">
-                                    <div class="h-12 w-12 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center mb-3">
-                                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-zinc-700">Clear Schedule Today</h4>
-                                    <p class="text-[11px] text-zinc-450 mt-1 max-w-[280px]">No active shoots or showings booked for today.</p>
-                                </div>
-                            <?php else : ?>
-                                <!-- Timeline Vertical Node List -->
-                                <div class="space-y-4 pl-1 relative before:absolute before:left-[4.75rem] before:top-2 before:bottom-2 before:w-[2px] before:bg-zinc-100">
-                                    <?php foreach ( $today_events as $event ) : 
-                                        $time_formatted = date('h:i A', strtotime($event['time']));
-                                        $badge_cls = 'text-zinc-600 bg-zinc-100 border border-zinc-200';
-                                        $dot_cls = 'bg-zinc-400';
-                                        if ($event['status'] === 'confirmed') {
-                                            $badge_cls = 'text-emerald-700 bg-emerald-50 border border-emerald-100';
-                                            $dot_cls = 'bg-emerald-500';
-                                        } elseif ($event['status'] === 'editing') {
-                                            $badge_cls = 'text-amber-700 bg-amber-50 border border-amber-100';
-                                            $dot_cls = 'bg-amber-500';
-                                        }
-                                    ?>
-                                        <div class="flex items-start gap-4 relative text-xs">
-                                            <span class="text-[10px] font-bold text-zinc-455 w-16 shrink-0 pt-0.5"><?php echo esc_html($time_formatted); ?></span>
-                                            <span class="w-2.5 h-2.5 rounded-full <?php echo $dot_cls; ?> ring-4 ring-white shrink-0 z-10 mt-1"></span>
-                                            <div class="flex-1 min-w-0">
-                                                 <div class="flex items-center gap-2 flex-wrap">
-                                                     <strong class="font-bold text-zinc-850 truncate text-[13px]"><?php echo esc_html($event['deal_type']); ?></strong>
-                                                     <span class="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded <?php echo $badge_cls; ?>"><?php echo esc_html($event['status']); ?></span>
-                                                 </div>
-                                                 <span class="text-[10px] text-zinc-500 block truncate mt-0.5"><?php echo esc_html($event['resolved_client_name']); ?> &bull; <?php echo esc_html($event['location'] ?? $event['notes']); ?></span>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                        <div class="pt-4 border-t border-zinc-100 mt-3">
-                            <button onclick="coraNavigateTo('bookings')" class="w-full flex items-center justify-between text-xs font-bold text-violet-655 hover:text-violet-750 transition-colors cursor-pointer group">
-                                <span>View Full Calendar & Booking CRM</span>
-                                <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- CARD 3: Cash Overview (Spans 1 Column, matches other cards cleanly) -->
-                    <div class="border border-zinc-100 rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-between min-h-[320px]">
-                        <div>
-                            <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M12 8v8M8 12h8"></path></svg>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Cash Overview</h3>
-                                        <span class="text-[11px] text-zinc-450 font-medium">Your financial snapshot</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-5 mt-2">
-                                <div class="flex items-center justify-between py-1 border-b border-zinc-100">
-                                    <span class="text-xs text-zinc-500 font-bold">Received (MTD)</span>
-                                    <span class="text-base font-extrabold text-emerald-600">₹<?php echo number_format($mtd_received); ?></span>
-                                </div>
-
-                                <div class="flex items-center justify-between py-1 border-b border-zinc-100">
-                                    <span class="text-xs text-zinc-500 font-bold">Expected</span>
-                                    <span class="text-base font-extrabold text-zinc-900">₹<?php echo number_format($expected_amount); ?></span>
-                                </div>
-
-                                <div class="flex items-center justify-between py-1">
-                                    <span class="text-xs text-zinc-500 font-bold">Overdue Invoices</span>
-                                    <span class="text-base font-extrabold text-zinc-455">₹<?php echo number_format($overdue_amount); ?></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="pt-4 border-t border-zinc-100 mt-3">
-                            <button onclick="coraNavigateTo('financials')" class="w-full flex items-center justify-between text-xs font-bold text-emerald-650 hover:text-emerald-750 transition-colors cursor-pointer group">
-                                <span>Go to Financial Ledger</span>
-                                <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- CARD 4: Clients Needing Attention (Spans 1 Column) -->
-                    <div class="border border-zinc-100 rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-between min-h-[280px]">
-                        <div>
-                            <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="h-8 w-8 rounded-xl bg-orange-50 text-orange-655 flex items-center justify-center shrink-0">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Attention Required</h3>
-                                        <span class="text-[11px] text-zinc-450 font-medium">Follow ups that cannot wait</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-3.5">
-                                <?php
-                                $attention_clients = array();
-                                if ( is_array( $cora_workspace_clients ) ) {
-                                    foreach ( $cora_workspace_clients as $client ) {
-                                        if ( isset( $client['status'] ) && $client['status'] === 'pending' ) {
-                                            $attention_clients[] = $client;
-                                        }
-                                    }
-                                }
-                                if ( empty( $attention_clients ) ) : ?>
-                                    <div class="flex flex-col items-center justify-center py-6 text-center">
-                                        <div class="h-10 w-10 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center mb-2">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                        </div>
-                                        <h4 class="text-[11px] font-bold text-zinc-700">All caught up</h4>
-                                        <p class="text-[9px] text-zinc-455 mt-0.5 max-w-[180px]">No immediate follow ups required.</p>
-                                    </div>
-                                <?php else : 
-                                    foreach ( array_slice($attention_clients, 0, 3) as $client ) :
-                                        $c_name = $client['names'] ?? 'Client';
-                                        $c_reason = $client['reason'] ?? ($is_studio ? 'Shoot confirmation' : 'Lead follow-up');
-                                        $c_time = $client['time_ago'] ?? '1d';
-                                        $badge_cls = 'text-zinc-500 bg-zinc-100';
-                                        if (strtolower($c_time) === 'today') {
-                                            $badge_cls = 'text-orange-700 bg-orange-50';
-                                        }
-                                    ?>
-                                        <div class="flex items-center justify-between text-xs gap-2">
-                                            <div class="flex flex-col min-w-0">
-                                                <strong class="font-bold text-zinc-855 truncate text-[11px]"><?php echo esc_html($c_name); ?></strong>
-                                                <span class="text-[10px] text-zinc-455 truncate"><?php echo esc_html($c_reason); ?></span>
-                                            </div>
-                                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0 <?php echo $badge_cls; ?>"><?php echo esc_html($c_time); ?></span>
-                                        </div>
-                                    <?php endforeach;
-                                endif; ?>
-                            </div>
-                        </div>
-
-                        <div class="pt-4 border-t border-zinc-100 mt-3">
-                            <button onclick="coraNavigateTo('clients')" class="w-full flex items-center justify-between text-xs font-bold text-orange-600 hover:text-orange-700 transition-colors cursor-pointer group">
-                                <span>View All Contacts</span>
-                                <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- CARD 5: Smart Suggestions (Spans 1 Column) -->
-                    <div class="border border-zinc-100 rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-between min-h-[280px]">
-                        <div>
-                            <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="h-8 w-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26C17.81 13.47 19 11.38 19 9a7 7 0 0 0-7-7z"></path></svg>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Smart Tasks</h3>
-                                <div class="space-y-3.5">
-                                <?php
-                                $smart_tasks = array();
-                                if ( $is_studio ) {
-                                    if ( ! empty( $all_bookings ) ) {
-                                        $first_bk = reset( $all_bookings );
-                                        $c_name = $first_bk['client_name'] ?? 'Client';
-                                        $smart_tasks[] = array(
-                                            'title' => 'Assign Crew Shift',
-                                            'desc'  => 'For ' . $c_name . ' shoot',
-                                            'url'   => "coraNavigateTo('crew-scheduler')",
-                                            'icon'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>'
-                                        );
-                                    }
-                                    if ( ! empty( $cora_workspace_listings ) ) {
-                                        $first_gear = reset( $cora_workspace_listings );
-                                        $g_name = $first_gear['name'] ?? 'Gear';
-                                        $smart_tasks[] = array(
-                                            'title' => 'Check in ' . $g_name,
-                                            'desc'  => $g_name . ' verification',
-                                            'url'   => "coraNavigateTo('equipment')",
-                                            'icon'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>'
-                                        );
-                                    }
-                                } else {
-                                    if ( ! empty( $all_bookings ) ) {
-                                        $first_bk = reset( $all_bookings );
-                                        $c_name = $first_bk['client_name'] ?? 'Client';
-                                        $smart_tasks[] = array(
-                                            'title' => 'Draft Tour Captions',
-                                            'desc'  => 'For ' . $c_name . ' Tour',
-                                            'url'   => "coraNavigateTo('ai-assistants')",
-                                            'icon'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
-                                        );
-                                    }
-                                    if ( ! empty( $cora_workspace_listings ) ) {
-                                        $first_prop = reset( $cora_workspace_listings );
-                                        $p_name = $first_prop['name'] ?? 'Property';
-                                        $smart_tasks[] = array(
-                                            'title' => 'Create Listing Brochure',
-                                            'desc'  => 'For ' . $p_name . ' listing',
-                                            'url'   => "window.coraOpenCommandPalette()",
-                                            'icon'  => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>'
-                                        );
-                                    }
-                                }
-
-                                if ( empty( $smart_tasks ) ) : ?>
-                                    <div class="flex flex-col items-center justify-center py-6 text-center">
-                                        <div class="h-10 w-10 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center mb-2">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26C17.81 13.47 19 11.38 19 9a7 7 0 0 0-7-7z"></path></svg>
-                                        </div>
-                                        <h4 class="text-[11px] font-bold text-zinc-700">No smart tasks</h4>
-                                        <p class="text-[9px] text-zinc-455 mt-0.5 max-w-[180px]">Add bookings or listings to see recommendations.</p>
-                                    </div>
-                                <?php else : 
-                                    foreach ( $smart_tasks as $task ) : ?>
-                                        <div class="flex items-start gap-2.5 p-2 bg-zinc-55/35 border border-transparent rounded-xl hover:bg-zinc-50 transition-all cursor-pointer" onclick="<?php echo $task['url']; ?>">
-                                            <div class="h-6 w-6 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 font-bold text-[11px]">
-                                                <?php echo $task['icon']; ?>
-                                            </div>
-                                            <div class="flex-1 min-w-0 pr-1 flex items-center justify-between">
-                                                <div class="flex flex-col min-w-0">
-                                                    <span class="text-[11px] font-bold text-zinc-800 leading-tight"><?php echo esc_html( $task['title'] ); ?></span>
-                                                    <span class="text-[9px] text-zinc-455 truncate mt-0.5"><?php echo esc_html( $task['desc'] ); ?></span>
-                                                </div>
-                                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                            </div>
-                                        </div>
-                                    <?php endforeach;
-                                endif; ?>
-                            </div>
-                        </div>
-
-                        <div class="pt-4 border-t border-zinc-100 mt-3">
-                            <button onclick="coraNavigateTo('ai-assistants')" class="w-full flex items-center justify-between text-xs font-bold text-blue-650 hover:text-blue-750 transition-colors cursor-pointer group">
-                                <span>Browse Smart Actions</span>
-                                <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- CARD 2: AI Inbox (Spans 1 Column) -->
-                    <div class="border border-zinc-100 rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-between min-h-[280px]">
-                        <div>
-                            <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="h-8 w-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">AI Inbox</h3>
-                                        <span class="text-[11px] text-zinc-455 font-medium">Pending system updates</span>
-                                    </div>
-                                </div>
-                                <span class="h-5 w-5 rounded-full bg-purple-50 text-purple-600 font-bold text-[10px] flex items-center justify-center shrink-0"><?php echo intval($cora_unread_count); ?></span>
-                            </div>
-
-                            <div class="space-y-3">
-                                <?php if ( empty( $cora_user_notifications ) ) : ?>
-                                    <div class="flex flex-col items-center justify-center py-8 text-center">
-                                        <div class="h-10 w-10 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center mb-2">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                                        </div>
-                                        <h4 class="text-[11px] font-bold text-zinc-700">Your inbox is clear</h4>
-                                        <p class="text-[9px] text-zinc-455 mt-0.5 max-w-[180px]">No pending system updates or alerts.</p>
-                                    </div>
-                                <?php else : 
-                                    foreach ( array_slice( $cora_user_notifications, 0, 2 ) as $notif ) : 
-                                        $n_title = $notif['title'] ?? 'Notification';
-                                        $n_body = $notif['body'] ?? '';
-                                        $n_time = isset( $notif['timestamp'] ) ? human_time_diff( $notif['timestamp'], current_time( 'timestamp' ) ) . ' ago' : 'Just now';
-                                        $n_icon = (strpos(strtolower($n_title), 'request') !== false || strpos(strtolower($n_title), 'appeal') !== false) ? '?' : 'i';
-                                    ?>
-                                        <div class="flex items-start gap-2.5 p-2 bg-zinc-50/30 border border-zinc-100/60 rounded-xl">
-                                            <div class="h-6 w-6 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center shrink-0 font-bold text-[11px]"><?php echo $n_icon; ?></div>
-                                            <div class="flex flex-col min-w-0 flex-1">
-                                                <strong class="text-[11px] font-bold text-zinc-800 truncate"><?php echo esc_html($n_title); ?></strong>
-                                                <span class="text-[9px] text-zinc-455 truncate"><?php echo esc_html($n_body); ?></span>
-                                            </div>
-                                            <span class="text-[9px] text-zinc-455 shrink-0"><?php echo esc_html($n_time); ?></span>
-                                        </div>
-                                    <?php endforeach; 
-                                endif; ?>
-                            </div>
-                        </div>
-
-                        <div class="pt-4 border-t border-zinc-100 mt-3">
-                            <button onclick="window.coraShowToast('AI Inbox is currently in staging sync mode.', 'info')" class="w-full flex items-center justify-between text-xs font-bold text-purple-650 hover:text-purple-750 transition-colors cursor-pointer group">
-                                <span>Check AI Messages</span>
-                                <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                            </button>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-                </div><!-- end cora-bento-grid -->
-
+                document.addEventListener('DOMContentLoaded', function() {
+                    window.coraHydrateGreeting();
+                    if (typeof window.coraRenderCustomActions === 'function') {
+                        window.coraRenderCustomActions();
+                    }
+                });
+                </script>
 
             </section>
             <?php endif; ?>
@@ -15973,13 +15868,13 @@ function coraRequestPushSubscription() {
                 .then(res => res.json())
                 .then(resData => {
                     if (resData.success) {
-                        if (window.coraShowToast) {
-                            window.coraShowToast('Notifications enabled successfully!', 'success');
-                        }
-                        
-                        const token = resData.data.token;
-                        navigator.serviceWorker.register('<?php echo home_url('/cora-service-worker.js'); ?>?v=<?php echo CORA_WORKSPACE_VERSION; ?>&token=' + token, { scope: '/' })
-                            .then(() => {
+                        const token = resData.data && resData.data.token ? resData.data.token : '';
+                        const swTokenUrl = '<?php echo esc_url_raw( home_url('/cora-service-worker.js') ); ?>?v=<?php echo CORA_WORKSPACE_VERSION; ?>' + (token ? '&token=' + encodeURIComponent(token) : '');
+                        navigator.serviceWorker.register(swTokenUrl, { scope: '/' })
+                            .then(reg => {
+                                if (reg && typeof reg.update === 'function') {
+                                    reg.update().catch(err => console.warn('PWA update non-fatal:', err));
+                                }
                                 const badge = document.getElementById('cora-pwa-badge');
                                 if (badge) {
                                     badge.innerText = 'Active';
@@ -15991,6 +15886,9 @@ function coraRequestPushSubscription() {
                                 if (testBtn) testBtn.classList.remove('hidden');
                                 const statusText = document.getElementById('cora-pwa-status-text');
                                 if (statusText) statusText.innerText = 'Notifications are active on this device.';
+                            })
+                            .catch(err => {
+                                console.warn('PWA SW register token non-fatal:', err);
                             });
                     } else {
                         if (window.coraShowToast) {

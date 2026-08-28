@@ -665,9 +665,11 @@
         // High-Performance PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/cora-service-worker.js?v=<?php echo defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '3.5.0'; ?>', { scope: '/' })
+                navigator.serviceWorker.register('/cora-service-worker.js?v=<?php echo defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : '4.0.3'; ?>', { scope: '/' })
                     .then(function(reg) {
-                        reg.update();
+                        if (reg && typeof reg.update === 'function') {
+                            reg.update().catch(function(err) { console.warn('PWA update notice:', err); });
+                        }
                     })
                     .catch(function(err) {
                         console.warn('PWA SW notice:', err);

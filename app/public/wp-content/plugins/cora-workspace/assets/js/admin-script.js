@@ -4213,8 +4213,14 @@ jQuery(document).ready(function($) {
                     if (registration.waiting) {
                         registration.waiting.postMessage({ type: 'skipWaiting' });
                     }
-                    registration.update();
+                    if (typeof registration.update === 'function') {
+                        registration.update().catch(function(err) {
+                            console.warn('PWA apply update non-fatal:', err);
+                        });
+                    }
                 });
+            }).catch(function(err) {
+                console.warn('PWA getRegistrations non-fatal:', err);
             });
         }
 
@@ -4271,7 +4277,11 @@ jQuery(document).ready(function($) {
                     if (window.coraShowToast) window.coraShowToast("Could not reach update server. Checking local service worker...");
                 }
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.ready.then(reg => reg.update());
+                    navigator.serviceWorker.ready.then(reg => {
+                        if (reg && typeof reg.update === 'function') {
+                            reg.update().catch(err => console.warn('PWA update check non-fatal:', err));
+                        }
+                    }).catch(err => console.warn('PWA ready non-fatal:', err));
                 }
             });
     };
@@ -4296,7 +4306,11 @@ jQuery(document).ready(function($) {
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.ready.then(function(registration) {
-                registration.update();
+                if (registration && typeof registration.update === 'function') {
+                    registration.update().catch(function(err) {
+                        console.warn('PWA initial update check non-fatal:', err);
+                    });
+                }
                 registration.addEventListener('updatefound', function() {
                     const newWorker = registration.installing;
                     if (newWorker) {
@@ -4307,6 +4321,8 @@ jQuery(document).ready(function($) {
                         });
                     }
                 });
+            }).catch(function(err) {
+                console.warn('PWA ready watcher non-fatal:', err);
             });
         }
 

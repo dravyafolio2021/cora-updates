@@ -29,7 +29,7 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         expect(response.headers()['cache-control']).toContain('no-cache');
         
         const text = await response.text();
-        expect(text).toContain("const CORA_VERSION = '4.0.2';");
+        expect(text).toContain("const CORA_VERSION = '4.0.3';");
         expect(text).toContain("const CACHE_NAME = 'cora-workspace-v' + CORA_VERSION;");
         expect(text).not.toContain('%%VERSION%%');
         expect(text).not.toContain('%%PLUGIN_URL%%');
@@ -41,9 +41,9 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         
         const data = await response.json();
         expect(data.success).toBe(true);
-        expect(data.version).toBe('4.0.2');
+        expect(data.version).toBe('4.0.3');
         expect(data.release_notes.length).toBeGreaterThan(0);
-        expect(data.icon_url).toContain('icon_192.png?v=4.0.2');
+        expect(data.icon_url).toContain('icon_192.png?v=4.0.3');
     });
 
     test('verify mobile viewport responsiveness and zero horizontal scroll at 375px', async ({ page }) => {
@@ -175,7 +175,7 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
 
     test('verify dashboard visual hierarchy, dynamic greeting hydration, mobile command bar, and KPI placement', async ({ page }) => {
         // Desktop check with Studio Workspace Owner
-        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.setViewportSize({ width: 1280, height: 1600 });
         await login(page, 'owner.studio@cora.local', 'cora_secure_pass_123');
         await page.goto('http://cora.local/workspace/dashboard');
         await page.waitForSelector('#cora-workspace');
@@ -193,7 +193,12 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         // 3. Quick actions bar rendered
         const quickActionsBar = page.locator('#cora-quick-actions-bar');
         await expect(quickActionsBar).toBeVisible();
-        await page.screenshot({ path: '/Users/shrutian/.gemini/antigravity/brain/326f2df3-61ba-472e-a4e9-522f9a4fa790/dashboard_desktop.png' });
+        const dashboardWrap = page.locator('.cora-dashboard-mockup-wrapper');
+        if (await dashboardWrap.isVisible()) {
+            await dashboardWrap.screenshot({ path: '/Users/shrutian/.gemini/antigravity/brain/326f2df3-61ba-472e-a4e9-522f9a4fa790/dashboard_desktop.png' });
+        } else {
+            await page.screenshot({ path: '/Users/shrutian/.gemini/antigravity/brain/326f2df3-61ba-472e-a4e9-522f9a4fa790/dashboard_desktop.png' });
+        }
         
         // 4. Mobile responsiveness check
         await page.setViewportSize({ width: 375, height: 812 });
@@ -206,7 +211,16 @@ test.describe('Cora PWA & Mobile Performance Suite', () => {
         // No horizontal scroll
         const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
         expect(scrollWidth).toBeLessThanOrEqual(375);
+
+        // 5. Check Real Estate workspace
+        await page.setViewportSize({ width: 1280, height: 1600 });
+        await page.goto('http://cora.local/workspace/dashboard?industry=real_estate');
+        await page.waitForSelector('#cora-workspace');
+        const reDashboardWrap = page.locator('.cora-dashboard-mockup-wrapper');
+        if (await reDashboardWrap.isVisible()) {
+            await reDashboardWrap.screenshot({ path: '/Users/shrutian/.gemini/antigravity/brain/326f2df3-61ba-472e-a4e9-522f9a4fa790/dashboard_realestate.png' });
+        } else {
+            await page.screenshot({ path: '/Users/shrutian/.gemini/antigravity/brain/326f2df3-61ba-472e-a4e9-522f9a4fa790/dashboard_realestate.png' });
+        }
     });
 });
-
-
