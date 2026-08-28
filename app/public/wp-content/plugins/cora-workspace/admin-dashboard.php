@@ -12223,7 +12223,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
         <div style="flex:1; overflow-y:auto; padding:16px 20px; -webkit-overflow-scrolling:touch; touch-action:pan-y;">
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <?php foreach ( $cora_mobile_drawer_items as $target => $item ) :
-                    $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
+                    $nav_url = '/' . $cora_ws_slug . '/' . $target;
                     $is_active = ( $sub_page === $target || str_replace('_','-',$sub_page) === str_replace('_','-',$target) );
                     
                     if ( $is_active ) {

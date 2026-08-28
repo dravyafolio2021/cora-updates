@@ -229,9 +229,13 @@ $features_list = array(
             window.coraShowToast("Updating workspace modules...");
         }
 
-        $.post(coraREData.ajaxUrl, {
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : ((typeof coraData !== 'undefined' && coraData.ajaxUrl) ? coraData.ajaxUrl : '/wp-admin/admin-ajax.php');
+        const ajaxNonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ((typeof coraData !== 'undefined' && coraData.ajaxNonce) ? coraData.ajaxNonce : '');
+
+        $.post(ajaxUrl, {
             action: 'cora_save_custom_features',
-            security: coraREData.ajaxNonce || '',
+            security: ajaxNonce,
+            nonce: ajaxNonce,
             features: enabledFeatures
         }, function(response) {
             if (response && response.success) {

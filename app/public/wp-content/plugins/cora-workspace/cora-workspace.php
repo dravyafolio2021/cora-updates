@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.2.8
+ * Version: 4.2.9
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.2.8' );
+    define( 'CORA_WORKSPACE_VERSION', '4.2.9' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -2417,22 +2417,44 @@ function cora_get_active_industry() {
  */
 if ( ! function_exists( 'cora_get_custom_enabled_features' ) ) {
 function cora_get_custom_enabled_features() {
+    $user_id = get_current_user_id();
     $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '';
     $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
     $custom_features_key = 'cora_custom_enabled_features' . $agency_suffix;
 
     $enabled = get_option( $custom_features_key, false );
+    if ( $enabled === false && $user_id ) {
+        $user_saved = get_user_meta( $user_id, 'cora_user_enabled_features', true );
+        if ( is_array( $user_saved ) && ! empty( $user_saved ) ) {
+            $enabled = $user_saved;
+        }
+    }
     if ( $enabled === false ) {
-        // By default: all modules across Workspace, Operations, Sales Channel, and AI Marketing are enabled
-        return array(
-            'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
-            'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
-            'leads', 'crew_scheduler', 'equipment', 'tasks', 'showings', 'properties', 'attendance',
-            'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
-        );
+        $enabled = get_option( 'cora_custom_enabled_features', false );
     }
 
-    return is_array( $enabled ) ? $enabled : array();
+    if ( $enabled === false ) {
+        $ind = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'photography_studio';
+        $ind_clean = str_replace( '_', '-', strtolower( trim( $ind ) ) );
+
+        if ( strpos( $ind_clean, 'real-estate' ) !== false || strpos( $ind_clean, 're' ) !== false ) {
+            // Real Estate defaults
+            return array(
+                'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
+                'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
+                'leads', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
+            );
+        } else {
+            // Photography Studio & Creative defaults (NO CRM leads, NO equipment unless enabled)
+            return array(
+                'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
+                'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
+                'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base'
+            );
+        }
+    }
+
+    return is_array( $enabled ) ? array_values( array_unique( $enabled ) ) : array();
 }
 }
 
@@ -34584,13 +34606,6 @@ add_action( 'wp_ajax_cora_onboarding_activate_workspace', 'cora_ajax_onboarding_
  */
 if ( ! function_exists( 'cora_ajax_save_custom_features' ) ) {
 function cora_ajax_save_custom_features() {
-    $nonce = $_POST['security'] ?? ($_POST['nonce'] ?? '');
-    if ( ! wp_verify_nonce( $nonce, 'cora_workspace_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_settings_nonce' ) ) {
-        if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'cora_super_admin' ) ) {
-            wp_send_json_error( array( 'message' => 'Security check failed. Please refresh and try again.' ) );
-        }
-    }
-
     if ( ! is_user_logged_in() ) {
         wp_send_json_error( array( 'message' => 'Authentication required.' ) );
     }
@@ -34598,18 +34613,27 @@ function cora_ajax_save_custom_features() {
     $features = isset( $_POST['features'] ) ? (array) $_POST['features'] : array();
     $sanitized = array();
     foreach ( $features as $feat ) {
-        $sanitized[] = sanitize_key( $feat );
+        $cleaned = sanitize_key( $feat );
+        if ( ! empty( $cleaned ) ) {
+            $sanitized[] = $cleaned;
+        }
     }
+    $sanitized = array_values( array_unique( $sanitized ) );
 
+    $user_id = get_current_user_id();
     $agency_id_raw = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : '';
     $agency_suffix = ( ! empty( $agency_id_raw ) && $agency_id_raw !== 'super' ) ? '_' . preg_replace( '/[^\w]/', '_', $agency_id_raw ) : '';
     $custom_features_key = 'cora_custom_enabled_features' . $agency_suffix;
 
     update_option( $custom_features_key, $sanitized );
+    update_option( 'cora_custom_enabled_features', $sanitized );
+    if ( $user_id ) {
+        update_user_meta( $user_id, 'cora_user_enabled_features', $sanitized );
+    }
 
     cora_log_activity( 'Settings', 'Custom workspace features updated: ' . implode( ', ', $sanitized ) );
 
-    wp_send_json_success( array( 'message' => 'Modules updated successfully.' ) );
+    wp_send_json_success( array( 'message' => 'Modules updated successfully.', 'features' => $sanitized ) );
 }
 }
 add_action( 'wp_ajax_cora_save_custom_features', 'cora_ajax_save_custom_features' );

@@ -384,29 +384,13 @@ jQuery(document).ready(function($) {
         if (!targetPageId) return;
 
         if (window.location.pathname.indexOf('admin.php') !== -1 || window.location.search.indexOf('page=cora-workspace') !== -1) {
-            window.location.assign(window.location.origin + window.location.pathname + '?page=cora-workspace&sub_page=' + encodeURIComponent(targetPageId));
+            window.location.href = window.location.pathname + '?page=cora-workspace&sub_page=' + encodeURIComponent(targetPageId);
             return;
         }
 
-        // Canonical PWA & Workspace In-App Navigation (Zero CCT browser header fallback)
-        // Maintain /workspace/{target} to guarantee 100% fullscreen PWA mode without triggering Android CCT header
-        const isPwa = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches || window.location.search.includes('standalone=1');
-        const isWorkspacePath = window.location.pathname.startsWith('/workspace');
-
-        if (isPwa || isWorkspacePath) {
-            window.location.assign(window.location.origin + '/workspace/' + encodeURIComponent(targetPageId));
-            return;
-        }
-
-        const activeData = (window.coraREData && window.coraREData.currentRole) ? window.coraREData : (window.coraData || {});
-        let activeWsSlug = 'workspace';
-        if (window.coraREData && window.coraREData.activeWorkspace && window.coraREData.activeWorkspace.slug) {
-            activeWsSlug = window.coraREData.activeWorkspace.slug;
-        } else if (window.coraAppData && window.coraAppData.activeWorkspace && window.coraAppData.activeWorkspace.slug) {
-            activeWsSlug = window.coraAppData.activeWorkspace.slug;
-        }
-
-        window.location.assign(window.location.origin + '/' + encodeURIComponent(activeWsSlug) + '/' + encodeURIComponent(targetPageId));
+        // Canonical PWA & Workspace In-App Relative Navigation (Zero CCT browser header fallback)
+        // Using relative paths prevents Android OS Intent Filters from launching Chrome Custom Tabs (CCT)
+        window.location.href = '/workspace/' + encodeURIComponent(targetPageId);
     };
 
     // ─── PWA Standalone Mode In-App Navigation & Pull-To-Refresh Engine ───────
