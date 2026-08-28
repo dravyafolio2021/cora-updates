@@ -451,11 +451,11 @@ jQuery(document).ready(function($) {
                 if (!el) {
                     el = document.createElement('div');
                     el.id = 'cora-pwa-pull-indicator';
-                    el.className = 'fixed top-3 left-1/2 -translate-x-1/2 z-[99999] pointer-events-none transition-all duration-150 ease-out opacity-0 scale-75';
+                    el.style.cssText = 'position: fixed; top: 68px; left: 50%; transform: translate(-50%, -24px) scale(0.8); z-index: 999999; pointer-events: none; opacity: 0; transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease-out;';
                     el.innerHTML = `
-                        <div class="px-3.5 py-1.5 bg-zinc-950/90 text-white rounded-full shadow-lg border border-zinc-700/50 flex items-center gap-2 backdrop-blur-md">
-                            <svg id="cora-pull-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-                            <span id="cora-pull-label" class="text-[10px] font-bold tracking-wide">Pull to refresh</span>
+                        <div class="cora-ptr-pill" style="display: inline-flex; align-items: center; gap: 8.5px; padding: 8px 18px; background: #09090b !important; color: #ffffff !important; border-radius: 9999px !important; box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.5), 0 4px 12px -2px rgba(0, 0, 0, 0.3) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);">
+                            <svg id="cora-pull-icon" class="cora-ptr-icon" viewBox="0 0 24 24" width="14" height="14" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); flex-shrink: 0;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            <span id="cora-pull-label" class="cora-ptr-label" style="font-size: 11.5px; font-weight: 700; color: #ffffff !important; letter-spacing: 0.02em; white-space: nowrap; font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1;">Pull to refresh</span>
                         </div>
                     `;
                     document.body.appendChild(el);
@@ -492,7 +492,7 @@ jQuery(document).ready(function($) {
                 const progress = Math.min(touchDeltaY / PULL_THRESHOLD, 1.2);
                 
                 ind.style.opacity = Math.min(progress, 1).toString();
-                ind.style.transform = `translate(-50%, ${Math.min(touchDeltaY * 0.4, 40)}px) scale(${0.8 + (progress * 0.2)})`;
+                ind.style.transform = `translate(-50%, ${Math.min(touchDeltaY * 0.35, 28)}px) scale(${0.85 + (progress * 0.15)})`;
 
                 const label = ind.querySelector('#cora-pull-label');
                 const icon = ind.querySelector('#cora-pull-icon');
@@ -517,16 +517,19 @@ jQuery(document).ready(function($) {
                 const icon = ind.querySelector('#cora-pull-icon');
                 if (label) label.textContent = 'Refreshing...';
                 if (icon) {
-                    icon.classList.add('animate-spin');
+                    icon.classList.add('cora-ptr-spinning');
                     icon.style.transform = 'rotate(0deg)';
                 }
+                ind.style.transform = 'translate(-50%, 16px) scale(1)';
+                ind.style.opacity = '1';
+
                 setTimeout(function() {
                     // Cleanly reload active view inside the PWA without any redirects or breakout
                     window.location.reload();
-                }, 300);
+                }, 350);
             } else {
                 ind.style.opacity = '0';
-                ind.style.transform = 'translate(-50%, -20px) scale(0.75)';
+                ind.style.transform = 'translate(-50%, -24px) scale(0.8)';
             }
             touchStartY = 0;
             touchDeltaY = 0;
