@@ -8,24 +8,90 @@ $current_role = ! empty( wp_get_current_user()->roles ) ? wp_get_current_user()-
 $current_agency = cora_get_current_user_agency_id();
 $current_branch = cora_get_current_user_branch_id();
 
-// Active industry mode resolution (Real Estate vs Studio/Photography)
+// Active industry mode resolution (Real Estate vs Studio/Photography vs Custom)
 $active_industry = function_exists( 'cora_get_active_industry' ) 
     ? cora_get_active_industry() 
     : ( ! empty( $_COOKIE['cora_workspace_industry'] ) 
         ? sanitize_text_field( $_COOKIE['cora_workspace_industry'] ) 
         : get_option( 'cora_workspace_industry', 'real_estate' ) );
 $is_studio_mode = ( strpos( strtolower( $active_industry ), 'photo' ) !== false || strpos( strtolower( $active_industry ), 'studio' ) !== false );
+$is_custom_mode = ( $active_industry === 'custom' );
 
-$feature_labels = array(
-    'crm_leads'         => $is_studio_mode ? 'Client Leads (CRM)' : 'Buyer Leads (CRM)',
-    'showings_bookings' => $is_studio_mode ? 'Shoots & Bookings' : 'Showings & Bookings',
-    'financials'        => 'Financials',
-    'media_vault'       => 'Media & Vault',
-    'equipment'         => $is_studio_mode ? 'Camera Equipment' : 'Property Listings',
-    'ai_suite'          => 'AI Suite',
-    'attendance'        => 'Attendance',
-    'quota_label'       => $is_studio_mode ? 'Max Shoot/Booking Quota (Monthly)' : 'Max Showing/Listing Quota (Monthly)'
-);
+// Dynamic Workspace Features & Quota Configuration based on active industry & modules
+if ( $is_studio_mode ) {
+    $dynamic_workspace_features = array(
+        'crm_leads'         => array( 'label' => 'Client Leads (CRM)', 'default' => true ),
+        'showings_bookings' => array( 'label' => 'Shoots & Bookings', 'default' => true ),
+        'crew_scheduler'    => array( 'label' => 'Team Scheduler & Shifts', 'default' => true ),
+        'equipment'         => array( 'label' => 'Camera Equipment & Gear', 'default' => false ),
+        'financials'        => array( 'label' => 'Invoices & GST Financials', 'default' => false ),
+        'media_vault'       => array( 'label' => 'Media Proofing & File Vault', 'default' => true ),
+        'tasks'             => array( 'label' => 'Client Task Deliverables', 'default' => false ),
+        'ai_suite'          => array( 'label' => 'AI Suite & Marketing Tools', 'default' => false ),
+        'forms'             => array( 'label' => 'Photoshoot Intake Forms', 'default' => false ),
+        'attendance'        => array( 'label' => 'Crew Attendance & Shifts', 'default' => true )
+    );
+    $feature_labels = array(
+        'crm_leads'         => 'Client Leads (CRM)',
+        'showings_bookings' => 'Shoots & Bookings',
+        'crew_scheduler'    => 'Team Scheduler',
+        'financials'        => 'Invoices & Financials',
+        'media_vault'       => 'Media Proofing & Vault',
+        'equipment'         => 'Camera Equipment & Gear',
+        'tasks'             => 'Client Task Deliverables',
+        'ai_suite'          => 'AI Suite & Marketing',
+        'forms'             => 'Intake Forms',
+        'attendance'        => 'Crew Attendance',
+        'quota_label'       => 'Max Shoot/Booking Quota (Monthly)'
+    );
+} elseif ( $is_custom_mode ) {
+    $dynamic_workspace_features = array(
+        'crm_leads'         => array( 'label' => 'Leads & Client CRM', 'default' => true ),
+        'showings_bookings' => array( 'label' => 'Appointments & Bookings', 'default' => true ),
+        'financials'        => array( 'label' => 'Invoices & GST Financials', 'default' => false ),
+        'media_vault'       => array( 'label' => 'Documents & File Vault', 'default' => true ),
+        'tasks'             => array( 'label' => 'Project Task Management', 'default' => true ),
+        'ai_suite'          => array( 'label' => 'AI Marketing Suite', 'default' => false ),
+        'forms'             => array( 'label' => 'Dynamic Forms & Surveys', 'default' => false ),
+        'attendance'        => array( 'label' => 'Team Shifts & Attendance', 'default' => true )
+    );
+    $feature_labels = array(
+        'crm_leads'         => 'Leads & Client CRM',
+        'showings_bookings' => 'Appointments & Bookings',
+        'financials'        => 'Invoices & Financials',
+        'media_vault'       => 'Documents & File Vault',
+        'tasks'             => 'Project Task Management',
+        'ai_suite'          => 'AI Marketing Suite',
+        'forms'             => 'Dynamic Forms',
+        'attendance'        => 'Team Attendance',
+        'quota_label'       => 'Max Monthly Project/Task Quota'
+    );
+} else {
+    // Real Estate
+    $dynamic_workspace_features = array(
+        'crm_leads'         => array( 'label' => 'Buyer Leads (CRM)', 'default' => true ),
+        'showings_bookings' => array( 'label' => 'Site Visits & Showings', 'default' => true ),
+        'equipment'         => array( 'label' => 'Property Listings & Inventory', 'default' => false ),
+        'financials'        => array( 'label' => 'Brokerage Invoices & Financials', 'default' => false ),
+        'media_vault'       => array( 'label' => 'Media & Vault NDAs', 'default' => true ),
+        'tasks'             => array( 'label' => 'Client Task Management', 'default' => false ),
+        'ai_suite'          => array( 'label' => 'AI Marketing & Content Suite', 'default' => false ),
+        'forms'             => array( 'label' => 'Property Intake Forms', 'default' => false ),
+        'attendance'        => array( 'label' => 'Agent Attendance & Logs', 'default' => true )
+    );
+    $feature_labels = array(
+        'crm_leads'         => 'Buyer Leads (CRM)',
+        'showings_bookings' => 'Site Visits & Showings',
+        'financials'        => 'Brokerage Financials',
+        'media_vault'       => 'Media & Vault NDAs',
+        'equipment'         => 'Property Listings',
+        'tasks'             => 'Client Task Management',
+        'ai_suite'          => 'AI Marketing Suite',
+        'forms'             => 'Property Intake Forms',
+        'attendance'        => 'Agent Attendance',
+        'quota_label'       => 'Max Showing/Listing Quota (Monthly)'
+    );
+}
 
 // Build user roles labels dynamically (including custom roles)
 $role_labels = cora_get_all_roles();
@@ -1207,6 +1273,41 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     'badge' => 'Read-Only',
                     'desc'  => 'Read-only gallery access for client photo selection, proofing approval, & invoice views.',
                     'tags'  => array( 'Galleries', 'Proofing', 'Invoices' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
+                ),
+            );
+        } elseif ( $is_custom_mode ) {
+            $role_templates = array(
+                array(
+                    'key'   => 'cora_ops_lead',
+                    'title' => 'Operations Lead',
+                    'badge' => 'Manager Access',
+                    'desc'  => 'Full operational control, team workflows, project tasks, financials, and CRM pipeline.',
+                    'tags'  => array( 'CRM', 'Financials', 'Vault', 'Team' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+                ),
+                array(
+                    'key'   => 'cora_specialist',
+                    'title' => 'Project Specialist',
+                    'badge' => 'Contributor',
+                    'desc'  => 'Assigned client deliverables, booking schedule, task checklists, and shift logging.',
+                    'tags'  => array( 'Tasks', 'Bookings', 'Attendance' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
+                ),
+                array(
+                    'key'   => 'cora_marketing_lead',
+                    'title' => 'Marketing & Content Lead',
+                    'badge' => 'Contributor',
+                    'desc'  => 'AI content studio, blog roadmap, media assets, and forms publishing.',
+                    'tags'  => array( 'Content Suite', 'AI Suite', 'Media' ),
+                    'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+                ),
+                array(
+                    'key'   => 'cora_viewer',
+                    'title' => 'Client Portal Viewer',
+                    'badge' => 'Read-Only',
+                    'desc'  => 'Read-only access for document vault files, status milestones, and invoices.',
+                    'tags'  => array( 'Documents', 'Invoices', 'Tasks' ),
                     'svg'   => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
                 ),
             );
@@ -2773,35 +2874,13 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
         <div class="space-y-2 pt-2 border-t border-zinc-100 ">
             <label class="block text-xs font-bold text-zinc-800 ">Assigned Feature Permissions Matrix</label>
-            <div class="space-y-2 border border-zinc-200 rounded-lg p-3 bg-zinc-50/50 ">
+            <div class="space-y-2 border border-zinc-200 rounded-lg p-3 bg-zinc-50/50 max-h-56 overflow-y-auto">
+                <?php foreach ( $dynamic_workspace_features as $f_key => $f_info ) : ?>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="crm_leads" class="edit-custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['crm_leads'] ); ?></span>
+                    <input type="checkbox" value="<?php echo esc_attr( $f_key ); ?>" class="edit-custom-role-perm-cb accent-zinc-950 rounded">
+                    <span><?php echo esc_html( $f_info['label'] ); ?></span>
                 </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="showings_bookings" class="edit-custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['showings_bookings'] ); ?></span>
-                </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="financials" class="edit-custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['financials'] ); ?></span>
-                </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="media_vault" class="edit-custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['media_vault'] ); ?></span>
-                </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="equipment" class="edit-custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['equipment'] ); ?></span>
-                </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="ai_suite" class="edit-custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['ai_suite'] ); ?></span>
-                </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="attendance" class="edit-custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['attendance'] ); ?></span>
-                </label>
+                <?php endforeach; ?>
             </div>
         </div>
 
@@ -2866,38 +2945,16 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
             <input type="number" id="custom-role-max-quota" min="0" placeholder="Unlimited (or e.g. 15)" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-lg focus:border-zinc-400 focus:outline-none bg-white text-zinc-950 ">
         </div>
 
-        <!-- 5. Feature Permissions Matrix checkboxes -->
+        <!-- 5. Feature Permissions Matrix checkboxes (Dynamic per workspace modules) -->
         <div class="space-y-2 pt-2 border-t border-zinc-100 ">
             <label class="block text-xs font-bold text-zinc-800 ">Feature Permissions Matrix</label>
             <div class="space-y-2 border border-zinc-200 rounded-lg p-3 bg-zinc-50/50 max-h-56 overflow-y-auto">
+                <?php foreach ( $dynamic_workspace_features as $f_key => $f_info ) : ?>
                 <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="crm_leads" class="custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['crm_leads'] ); ?></span>
+                    <input type="checkbox" value="<?php echo esc_attr( $f_key ); ?>" class="custom-role-perm-cb accent-zinc-950 rounded" <?php echo ! empty( $f_info['default'] ) ? 'checked' : ''; ?>>
+                    <span><?php echo esc_html( $f_info['label'] ); ?></span>
                 </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="showings_bookings" class="custom-role-perm-cb accent-zinc-950 rounded" checked>
-                    <span><?php echo esc_html( $feature_labels['showings_bookings'] ); ?></span>
-                </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="financials" class="custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['financials'] ); ?></span>
-                </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="media_vault" class="custom-role-perm-cb accent-zinc-950 rounded" checked>
-                    <span><?php echo esc_html( $feature_labels['media_vault'] ); ?></span>
-                </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="equipment" class="custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['equipment'] ); ?></span>
-                </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="ai_suite" class="custom-role-perm-cb accent-zinc-950 rounded">
-                    <span><?php echo esc_html( $feature_labels['ai_suite'] ); ?></span>
-                </label>
-                <label class="flex items-center gap-2.5 text-xs text-zinc-800 cursor-pointer hover:text-zinc-950">
-                    <input type="checkbox" value="attendance" class="custom-role-perm-cb accent-zinc-950 rounded" checked>
-                    <span><?php echo esc_html( $feature_labels['attendance'] ); ?></span>
-                </label>
+                <?php endforeach; ?>
             </div>
         </div>
 
@@ -4773,12 +4830,15 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     function handleApplyBaseTemplate(tmplKey) {
         if (!tmplKey) return;
         var permsMap = {
-            'cora_branch_manager': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'financials', 'media_vault', 'attendance'] },
-            'cora_re_agent': { access: 'contributor', perms: ['crm_leads', 'showings_bookings', 'media_vault', 'attendance'] },
-            'cora_re_assistant': { access: 'contributor', perms: ['showings_bookings', 'attendance'] },
-            'cora_studio_manager': { access: 'manager', perms: ['showings_bookings', 'media_vault', 'equipment', 'financials', 'ai_suite', 'attendance'] },
-            'cora_photographer': { access: 'contributor', perms: ['showings_bookings', 'media_vault', 'equipment', 'attendance'] },
-            'cora_editor': { access: 'contributor', perms: ['media_vault', 'ai_suite'] },
+            'cora_branch_manager': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'financials', 'media_vault', 'equipment', 'attendance', 'tasks'] },
+            'cora_re_agent': { access: 'contributor', perms: ['crm_leads', 'showings_bookings', 'media_vault', 'equipment', 'attendance'] },
+            'cora_re_assistant': { access: 'contributor', perms: ['showings_bookings', 'attendance', 'tasks'] },
+            'cora_studio_manager': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'crew_scheduler', 'media_vault', 'equipment', 'financials', 'ai_suite', 'attendance', 'tasks'] },
+            'cora_photographer': { access: 'contributor', perms: ['showings_bookings', 'crew_scheduler', 'media_vault', 'equipment', 'attendance'] },
+            'cora_editor': { access: 'contributor', perms: ['media_vault', 'ai_suite', 'tasks'] },
+            'cora_ops_lead': { access: 'manager', perms: ['crm_leads', 'showings_bookings', 'financials', 'media_vault', 'tasks', 'attendance'] },
+            'cora_specialist': { access: 'contributor', perms: ['showings_bookings', 'tasks', 'attendance'] },
+            'cora_marketing_lead': { access: 'contributor', perms: ['ai_suite', 'media_vault', 'forms'] },
             'cora_viewer': { access: 'read_only', perms: ['showings_bookings', 'media_vault'] }
         };
         var config = permsMap[tmplKey];

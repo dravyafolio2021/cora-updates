@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.2.4
+ * Version: 4.2.5
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.2.4' );
+    define( 'CORA_WORKSPACE_VERSION', '4.2.5' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -2345,38 +2345,70 @@ add_action( 'init', 'cora_workspace_register_taxonomies' );
  */
 if ( ! function_exists( 'cora_get_active_industry' ) ) {
 function cora_get_active_industry() {
+    // 1. Explicit URL Query Param takes highest priority
     if ( ! empty( $_GET['industry'] ) ) {
         $ind = sanitize_text_field( $_GET['industry'] );
         if ( in_array( $ind, array( 'real_estate', 'photography', 'photography_studio', 'custom' ), true ) ) {
             if ( $ind === 'photography' ) {
                 $ind = 'photography_studio';
             }
-            update_option( 'cora_workspace_industry', $ind );
+            if ( is_user_logged_in() ) {
+                update_user_meta( get_current_user_id(), 'cora_preferred_industry', $ind );
+            }
             setcookie( 'cora_workspace_industry', $ind, time() + 86400 * 365, '/' );
             return $ind;
         }
     }
-    $ind = '';
-    if ( ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
-        $ind = sanitize_text_field( $_COOKIE['cora_workspace_industry'] );
-    }
-    if ( ! $ind && is_user_logged_in() ) {
+
+    // 2. Active Logged-in User's Agency / Workspace Industry (Dynamic per tenant workspace)
+    if ( is_user_logged_in() ) {
         $user_id = get_current_user_id();
         $user_pref = get_user_meta( $user_id, 'cora_preferred_industry', true );
-        if ( $user_pref ) {
-            $ind = $user_pref;
+        if ( $user_pref && in_array( $user_pref, array( 'real_estate', 'photography', 'photography_studio', 'custom' ), true ) ) {
+            return ( $user_pref === 'photography' ) ? 'photography_studio' : $user_pref;
+        }
+
+        if ( function_exists( 'cora_get_current_user_agency_id' ) ) {
+            $agency_id = cora_get_current_user_agency_id();
+            if ( $agency_id && $agency_id !== 'super' ) {
+                global $wpdb;
+                $agencies_table = $wpdb->prefix . 'cora_agencies';
+                if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $agencies_table ) ) {
+                    $db_ind = '';
+                    if ( is_numeric( $agency_id ) ) {
+                        $db_ind = $wpdb->get_var( $wpdb->prepare( "SELECT industry FROM {$agencies_table} WHERE id = %d", intval( $agency_id ) ) );
+                    } else {
+                        $db_ind = $wpdb->get_var( $wpdb->prepare( "SELECT industry FROM {$agencies_table} WHERE slug = %s", $agency_id ) );
+                    }
+                    if ( $db_ind && in_array( $db_ind, array( 'real_estate', 'photography', 'photography_studio', 'custom' ), true ) ) {
+                        return ( $db_ind === 'photography' ) ? 'photography_studio' : $db_ind;
+                    }
+                }
+                $agency_opt = get_option( "cora_agency_industry_{$agency_id}" );
+                if ( $agency_opt ) {
+                    return ( $agency_opt === 'photography' ) ? 'photography_studio' : $agency_opt;
+                }
+            }
         }
     }
-    if ( ! $ind ) {
-        $ind = get_option( 'cora_workspace_industry' );
+
+    // 3. Cookie fallback
+    if ( ! empty( $_COOKIE['cora_workspace_industry'] ) ) {
+        $ind = sanitize_text_field( $_COOKIE['cora_workspace_industry'] );
+        if ( $ind === 'photography' ) {
+            $ind = 'photography_studio';
+        }
+        if ( in_array( $ind, array( 'real_estate', 'photography_studio', 'custom' ), true ) ) {
+            return $ind;
+        }
     }
-    if ( ! $ind ) {
-        $ind = 'real_estate';
-    }
+
+    // 4. Global option fallback
+    $ind = get_option( 'cora_workspace_industry', 'real_estate' );
     if ( $ind === 'photography' ) {
         $ind = 'photography_studio';
     }
-    return $ind;
+    return $ind ?: 'real_estate';
 }
 }
 
