@@ -17,6 +17,17 @@ if ( $blocks_row ) {
 $styling = json_decode( $form['styling'], true ) ?: array();
 $settings = json_decode( $form['settings'], true ) ?: array();
 $description = isset( $settings['description'] ) ? $settings['description'] : ( isset( $settings['subtitle'] ) ? $settings['subtitle'] : 'Fill out details below to submit request.' );
+
+// Resolve Workspace Details
+$agency_id = ! empty( $form['agency_id'] ) ? intval( $form['agency_id'] ) : 0;
+$workspace_name = get_option( 'blogname', 'Cora Workspace' );
+if ( $agency_id > 0 ) {
+    $agency_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_agencies WHERE id = %d", $agency_id ), ARRAY_A );
+    if ( $agency_row && ! empty( $agency_row['agency_name'] ) ) {
+        $workspace_name = $agency_row['agency_name'];
+    }
+}
+$ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,6 +37,19 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
     <title><?php echo esc_html( $form['title'] ); ?></title>
     <!-- Tailwind CSS CDN -->
     <script src="<?php echo CORA_WORKSPACE_URL . 'assets/js/tailwind-cdn.min.js'; ?>"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' };
+        (function() {
+            var savedTheme = localStorage.getItem('cora_form_theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
     <style>
         :root {
             --form-bg: #FAFAFA;
@@ -153,20 +177,45 @@ $description = isset( $settings['description'] ) ? $settings['description'] : ( 
     <div class="w-full sm:max-w-2xl bg-white dark:bg-zinc-900 border-0 sm:border border-zinc-200/90 dark:border-zinc-800/90 rounded-none sm:rounded-2xl p-5 sm:px-8 sm:py-6 shadow-none sm:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.06)] relative flex flex-col min-h-screen sm:min-h-0">
 
 
-        <!-- Top Platform Brand Banner & Exit Button -->
+        <!-- Top Workspace Identity Banner & Controls -->
         <div class="flex items-center justify-between pb-3 mb-4 border-b border-zinc-100 dark:border-zinc-800/80">
-            <div class="flex items-center gap-2.5">
-                <div class="w-7 h-7 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs flex items-center justify-center shadow-xs leading-none">
-                    C
+            <!-- Workspace Branding Block -->
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs flex items-center justify-center shadow-xs leading-none shrink-0 border border-zinc-200/80 dark:border-zinc-700/80">
+                    <?php echo esc_html( $ws_initial ); ?>
                 </div>
-                <div class="flex flex-col">
-                    <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-none">Cora Forms</span>
-                    <span class="text-[9.5px] font-medium text-zinc-400 dark:text-zinc-500">Official Communication</span>
+                <div class="flex flex-col min-w-0">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight truncate">
+                            <?php echo esc_html( $workspace_name ); ?>
+                        </span>
+                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50 shrink-0">
+                            <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Verified
+                        </span>
+                    </div>
+                    <span class="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 truncate">Official Intake • Secured by Cora</span>
                 </div>
             </div>
-            <button type="button" class="w-7 h-7 rounded-full bg-zinc-100/80 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-400 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-all border-0 cursor-pointer" onclick="if (window.opener) { window.close(); } else { window.history.back(); }">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
+
+            <!-- Right Controls: Theme Toggle & Exit -->
+            <div class="flex items-center gap-1.5 shrink-0">
+                <!-- Theme Toggle Button -->
+                <button type="button" id="cora-form-theme-toggle" class="h-7 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300 transition-all border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer text-[11px] font-medium select-none" title="Toggle Light/Dark Theme">
+                    <span class="theme-icon-light hidden dark:inline-flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <span>Light</span>
+                    </span>
+                    <span class="theme-icon-dark inline-flex dark:hidden items-center gap-1">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                        <span>Dark</span>
+                    </span>
+                </button>
+
+                <button type="button" class="w-7 h-7 rounded-lg bg-zinc-100/80 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-400 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-all border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer" onclick="if (window.opener) { window.close(); } else { window.history.back(); }" title="Close">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
         </div>
 
         <!-- Multi-Step Header Tracker -->
