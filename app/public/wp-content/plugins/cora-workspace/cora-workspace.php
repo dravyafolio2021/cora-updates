@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.1.7
+ * Version: 4.1.8
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.1.7' );
+    define( 'CORA_WORKSPACE_VERSION', '4.1.8' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -1212,6 +1212,12 @@ function cora_workspace_handle_workspace_route() {
                 'url'        => '/workspace/bookings',
                 'icons'      => array( array( 'src' => $icon_192, 'sizes' => '192x192', 'type' => 'image/png' ) ),
             ),
+            array(
+                'name'       => 'Talk to Founder (WhatsApp)',
+                'short_name' => 'Founder Chat',
+                'url'        => '/workspace/contact-founder',
+                'icons'      => array( array( 'src' => $icon_192, 'sizes' => '192x192', 'type' => 'image/png' ) ),
+            ),
         );
         
         echo json_encode( $manifest_data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
@@ -1221,6 +1227,11 @@ function cora_workspace_handle_workspace_route() {
         status_header( 200 );
         header( 'Content-Type: text/html; charset=UTF-8' );
         echo file_get_contents( CORA_WORKSPACE_PATH . 'assets/pwa/offline.html' );
+        exit;
+    }
+
+    if ( $path === 'contact-founder' || $path === 'workspace/contact-founder' || $path === 'talk-to-founder' || $path === 'workspace/talk-to-founder' ) {
+        wp_redirect( 'https://wa.me/919817059266?text=' . rawurlencode( 'Hi Cora Founder, I have a question regarding my workspace.' ) );
         exit;
     }
 

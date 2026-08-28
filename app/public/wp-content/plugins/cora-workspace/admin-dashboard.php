@@ -3611,6 +3611,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <span class="text-[10px] text-zinc-400 font-mono">⌘.</span>
                 </button>
 
+                <a href="https://wa.me/919817059266?text=Hi%20Cora%20Founder%2C%20I%20have%20a%20question%20about%20my%20workspace." target="_blank" rel="noopener noreferrer" class="w-full text-left px-2.5 py-2 text-xs text-zinc-700 rounded-xl hover:bg-emerald-50 hover:text-emerald-700 font-medium flex items-center justify-between cursor-pointer transition-colors no-underline" onclick="$('#cora-header-profile-popover').addClass('hidden');">
+                    <div class="flex items-center gap-3">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="text-emerald-600 shrink-0"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.403 5.633A8.919 8.919 0 0 0 12.053 3c-4.948 0-8.976 4.027-8.978 8.977 0 1.58.413 3.125 1.2 4.488l-1.276 4.66 4.77-1.252a8.936 8.936 0 0 0 4.283 1.093h.004c4.947 0 8.975-4.027 8.977-8.977a8.926 8.926 0 0 0-2.63-6.353zM12.053 19.31a7.432 7.432 0 0 1-3.79-1.042l-.272-.162-2.82.74.752-2.748-.177-.282a7.43 7.43 0 0 1-1.139-3.934c.002-4.103 3.342-7.443 7.447-7.443a7.402 7.402 0 0 1 5.263 2.183 7.404 7.404 0 0 1 2.181 5.266c-.002 4.104-3.343 7.444-7.445 7.444zm4.079-5.571c-.223-.112-1.322-.653-1.526-.728-.205-.074-.354-.112-.503.112-.149.224-.577.728-.707.877-.13.15-.26.168-.484.056-.223-.112-.942-.347-1.794-1.108-.663-.592-1.11-1.322-1.24-1.546-.13-.223-.014-.344.098-.456.1-.1.223-.26.335-.392.112-.13.149-.224.223-.373.075-.149.038-.28-.018-.392-.056-.112-.503-1.213-.689-1.66-.182-.439-.366-.38-.503-.387-.13-.007-.28-.007-.429-.007-.15 0-.391.056-.596.28-.205.224-.782.766-.782 1.867 0 1.102.8 2.167.912 2.316.112.15 1.574 2.404 3.814 3.37.533.23 1.012.38 1.397.502.535.17 1.02.146 1.405.089.43-.064 1.322-.54 1.507-1.062.187-.523.187-.972.13-1.062-.056-.09-.205-.149-.43-.262z"/></svg>
+                        Talk to Founder
+                    </div>
+                    <span class="text-[9px] font-semibold text-emerald-600 px-1.5 py-0.5 bg-emerald-50 rounded">WhatsApp</span>
+                </a>
+
                 <div class="px-2 py-1.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-1 select-none my-0.5">
                     <div class="flex items-center justify-between px-1">
                         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Language</span>
@@ -4066,12 +4074,19 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                     <button class="w-full text-left px-2.5 py-2 text-xs text-zinc-700 rounded-xl hover:bg-zinc-50 hover:text-zinc-900 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="coraNavigateTo('settings-suite'); $('#cora-profile-popover').addClass('hidden');">
                         <div class="flex items-center gap-3">
-                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l-.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                             Settings
                         </div>
                         <span class="text-[10px] text-zinc-400 font-mono">⌘.</span>
                     </button>
 
+                    <a href="https://wa.me/919817059266?text=Hi%20Cora%20Founder%2C%20I%20have%20a%20question%20about%20my%20workspace." target="_blank" rel="noopener noreferrer" class="w-full text-left px-2.5 py-2 text-xs text-zinc-700 rounded-xl hover:bg-emerald-50 hover:text-emerald-700 font-medium flex items-center justify-between cursor-pointer transition-colors no-underline" onclick="$('#cora-profile-popover').addClass('hidden');">
+                        <div class="flex items-center gap-3">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="text-emerald-600 shrink-0"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.403 5.633A8.919 8.919 0 0 0 12.053 3c-4.948 0-8.976 4.027-8.978 8.977 0 1.58.413 3.125 1.2 4.488l-1.276 4.66 4.77-1.252a8.936 8.936 0 0 0 4.283 1.093h.004c4.947 0 8.975-4.027 8.977-8.977a8.926 8.926 0 0 0-2.63-6.353zM12.053 19.31a7.432 7.432 0 0 1-3.79-1.042l-.272-.162-2.82.74.752-2.748-.177-.282a7.43 7.43 0 0 1-1.139-3.934c.002-4.103 3.342-7.443 7.447-7.443a7.402 7.402 0 0 1 5.263 2.183 7.404 7.404 0 0 1 2.181 5.266c-.002 4.104-3.343 7.444-7.445 7.444zm4.079-5.571c-.223-.112-1.322-.653-1.526-.728-.205-.074-.354-.112-.503.112-.149.224-.577.728-.707.877-.13.15-.26.168-.484.056-.223-.112-.942-.347-1.794-1.108-.663-.592-1.11-1.322-1.24-1.546-.13-.223-.014-.344.098-.456.1-.1.223-.26.335-.392.112-.13.149-.224.223-.373.075-.149.038-.28-.018-.392-.056-.112-.503-1.213-.689-1.66-.182-.439-.366-.38-.503-.387-.13-.007-.28-.007-.429-.007-.15 0-.391.056-.596.28-.205.224-.782.766-.782 1.867 0 1.102.8 2.167.912 2.316.112.15 1.574 2.404 3.814 3.37.533.23 1.012.38 1.397.502.535.17 1.02.146 1.405.089.43-.064 1.322-.54 1.507-1.062.187-.523.187-.972.13-1.062-.056-.09-.205-.149-.43-.262z"/></svg>
+                            Talk to Founder
+                        </div>
+                        <span class="text-[9px] font-semibold text-emerald-600 px-1.5 py-0.5 bg-emerald-50 rounded">WhatsApp</span>
+                    </a>
 
                     <div class="px-2 py-1.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-1 select-none my-0.5">
                         <div class="flex items-center justify-between px-1">
@@ -12932,8 +12947,8 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
 
         <!-- Footer Bar -->
         <div class="border-t border-zinc-100 px-4 py-2.5 bg-zinc-50/50 flex items-center justify-between shrink-0">
-            <span class="text-xs text-zinc-450 font-medium">Need help finding something?</span>
-            <a href="https://wa.me/918708528105?text=Hi%20Cora%20Team%2C%20I%27d%20like%20to%20report%20a%20bug%20on%20the%20platform." target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer decoration-none" style="text-decoration: none;">
+            <span class="text-xs text-zinc-450 font-medium">Need help or talk to founder?</span>
+            <a href="https://wa.me/919817059266?text=Hi%20Cora%20Founder%2C%20I%20have%20a%20question%20about%20the%20platform." target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer decoration-none" style="text-decoration: none;">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="shrink-0"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.455L0 24zm6.59-4.846c1.66.986 3.284 1.483 4.805 1.484 5.429-.002 9.843-4.417 9.845-9.848.001-2.63-1.019-5.1-2.868-6.953C16.578 1.984 14.105 1.01 11.5 1.01c-5.432 0-9.848 4.416-9.85 9.849-.001 1.702.469 3.366 1.36 4.818l-.988 3.606 3.702-.971c1.45.89 2.973 1.342 4.323 1.342zm11.238-7.51c-.302-.151-1.785-.882-2.057-.981-.273-.099-.471-.148-.669.151-.197.299-.767.971-.94 1.169-.173.199-.347.223-.649.072-.302-.151-1.273-.469-2.427-1.496-.897-.8-1.503-1.788-1.679-2.09-.176-.302-.019-.465.132-.614.136-.134.302-.352.453-.529.151-.176.202-.302.302-.503.101-.202.051-.377-.025-.529-.076-.151-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.785-.73 2.033-1.433.248-.704.248-1.307.173-1.433-.075-.125-.272-.2-.574-.352z"/></svg>
                 Report Bug
             </a>
@@ -15353,7 +15368,7 @@ window.coraSendFeedback = function(method) {
     const rawMessage = messageLines.join('\n');
     
     if (method === 'whatsapp') {
-        const url = `https://wa.me/918708528105?text=${encodeURIComponent(rawMessage)}`;
+        const url = `https://wa.me/919817059266?text=${encodeURIComponent(rawMessage)}`;
         window.open(url, '_blank');
         if (window.coraShowToast) {
             window.coraShowToast('Feedback opened in WhatsApp!', 'success');
