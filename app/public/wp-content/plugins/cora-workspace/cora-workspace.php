@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.5.0
+ * Version: 4.5.1
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.5.0' );
+    define( 'CORA_WORKSPACE_VERSION', '4.5.1' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -16200,7 +16200,118 @@ When the user asks you to create, update, or execute something:
  */
 if ( ! function_exists( 'cora_ai_local_cofounder_handler' ) ) {
 function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard', $history = array() ) {
-    // Contextual Agentic Document & Vault Handler
+    $lower_msg = strtolower( $message );
+
+    // Contextual Agentic Form Builder & Editor Handler
+    if ( strpos( $lower_msg, 'form' ) !== false || strpos( $lower_msg, 'intake' ) !== false || strpos( $lower_msg, 'questionnaire' ) !== false || strpos( $lower_msg, 'survey' ) !== false || strpos( $lower_msg, 'inquiry' ) !== false ) {
+        // Check for existing form ID
+        $target_form_id = 0;
+        if ( preg_match( '/(?:id[:\\s#]+)(\\d+)/i', $message, $id_matches ) ) {
+            $target_form_id = intval( $id_matches[1] );
+        }
+
+        // Form Title extraction
+        $form_title = 'Client Lead & Inquiry Form';
+        if ( stripos( $lower_msg, 'wedding' ) !== false ) {
+            $form_title = 'Wedding Photography & Video Inquiry';
+        } elseif ( stripos( $lower_msg, 'real estate' ) !== false || stripos( $lower_msg, 'property' ) !== false ) {
+            $form_title = 'Property Buyer & Site Visit Registration';
+        } elseif ( stripos( $lower_msg, 'feedback' ) !== false || stripos( $lower_msg, 'review' ) !== false ) {
+            $form_title = 'Client Feedback & Experience Survey';
+        } elseif ( stripos( $lower_msg, 'model' ) !== false || stripos( $lower_msg, 'fashion' ) !== false ) {
+            $form_title = 'Model & Crew Casting Application';
+        } elseif ( preg_match( '/(?:form\\s+["\']?)([^"\']+?)(?:["\']|\\s+for|\\s+with|\\s+to|$)/i', $message, $t_m ) ) {
+            $form_title = trim( $t_m[1] );
+        }
+
+        // Define intelligent fields based on intent
+        $blocks = array(
+            array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'name', true ) ), 0, 8 ),
+                'type'        => 'text',
+                'label'       => 'Full Name',
+                'placeholder' => 'e.g. Rohan Verma',
+                'required'    => true,
+                'step_index'  => 0,
+            ),
+            array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'email', true ) ), 0, 8 ),
+                'type'        => 'email',
+                'label'       => 'Work / Personal Email',
+                'placeholder' => 'client@example.com',
+                'required'    => true,
+                'step_index'  => 0,
+            ),
+            array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'phone', true ) ), 0, 8 ),
+                'type'        => 'phone',
+                'label'       => 'WhatsApp / Mobile Number',
+                'placeholder' => '+91 98765 43210',
+                'required'    => true,
+                'step_index'  => 0,
+            ),
+            array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'date', true ) ), 0, 8 ),
+                'type'        => 'date',
+                'label'       => 'Preferred Event / Shoot Date',
+                'placeholder' => 'Select date...',
+                'required'    => false,
+                'step_index'  => 1,
+            ),
+            array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'budget', true ) ), 0, 8 ),
+                'type'        => 'select',
+                'label'       => 'Estimated Project Budget',
+                'placeholder' => 'Choose budget bracket...',
+                'required'    => true,
+                'options'     => '₹50,000 - ₹1,00,000\n₹1,00,000 - ₹2,50,000\n₹2,50,000+',
+                'step_index'  => 1,
+            ),
+            array(
+                'id'          => 'blk_' . substr( md5( uniqid( 'notes', true ) ), 0, 8 ),
+                'type'        => 'textarea',
+                'label'       => 'Project Requirements & Location Details',
+                'placeholder' => 'Describe your requirements, venue location, or specific vision...',
+                'required'    => false,
+                'step_index'  => 1,
+            ),
+        );
+
+        $form_payload = array(
+            'id'       => $target_form_id,
+            'title'    => $form_title,
+            'status'   => 'published',
+            'blocks'   => $blocks,
+            'settings' => array(
+                'submit_button_text' => 'Submit Inquiry',
+                'success_message'    => 'Thank you! Your inquiry has been submitted to our team.',
+                'email_notification' => true,
+            ),
+            'styling'  => array(
+                'theme'         => 'monochrome',
+                'border_radius' => 'rounded-2xl',
+            ),
+        );
+
+        $action_label = $target_form_id ? 'Update Form via AI' : 'Deploy Form with AI';
+        $reply = "I've structured **{$form_title}** with Notion-style layout and multi-step validation:\n\n" .
+                 "• **Step 1: Contact Details** (Full Name, Email, WhatsApp Phone)\n" .
+                 "• **Step 2: Project Specifications** (Event Date, Budget Tier, Detailed Notes)\n" .
+                 "• **Automations**: Real-time CRM lead capture + Instant Email Notification\n\n" .
+                 "Tap below to deploy this form directly to your workspace:";
+
+        wp_send_json_success( array(
+            'reply' => $reply,
+            'action_proposal' => array(
+                'type'         => 'form_agent_action',
+                'title'        => $form_title,
+                'action_label' => $action_label,
+                'action_cmd'   => 'coraConfirmFormAIExecution(' . json_encode( $form_payload ) . ')'
+            )
+        ) );
+    }
+
+// Contextual Agentic Document & Vault Handler
     $lower_msg = strtolower( $message );
     if ( strpos( $lower_msg, 'invoice' ) !== false || strpos( $lower_msg, 'proposal' ) !== false || strpos( $lower_msg, 'contract' ) !== false || strpos( $lower_msg, 'e-sign' ) !== false || strpos( $lower_msg, 'esign' ) !== false || strpos( $lower_msg, 'vault' ) !== false || strpos( $lower_msg, 'receivable' ) !== false || strpos( $lower_msg, 'document' ) !== false ) {
         // Document type detection

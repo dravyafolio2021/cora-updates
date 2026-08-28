@@ -18,11 +18,11 @@ $forms_header_args = array(
     'tutorial_onclick' => "window.open('https://www.youtube.com/@heycora', '_blank')",
     'cta'              => array(
         'text'        => 'Create form',
-        'mobile_text' => '',
-        'onclick'     => '',
+        'mobile_text' => '✨ AI Create',
+        'onclick'     => "if(window.innerWidth < 640){ window.coraPromptFormAI('', 'Create a new Notion-style lead capture form'); } else { if(typeof createNewForm==='function'){ createNewForm(); } }",
         'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
         'visible'     => true,
-        'class'       => '!hidden sm:!flex', // Hide on mobile
+        'class'       => '',
     ),
 );
 
@@ -30,10 +30,15 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     cora_render_workspace_header( $forms_header_args );
 }
 ?>
-        <!-- Mobile-only editor notice -->
-        <div class="flex sm:hidden items-center gap-1.5 text-[10px] text-zinc-400 bg-zinc-100/80 border border-zinc-200/50 rounded-lg px-3 py-2 w-full justify-center select-none shrink-0 mb-2">
-            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-            Form editor available on desktop
+        <!-- Mobile-only editor notice with AI Quick Action -->
+        <div class="flex sm:hidden items-center justify-between gap-2 text-[10px] text-zinc-500 bg-zinc-100/80 border border-zinc-200/50 rounded-xl px-3 py-2 w-full select-none shrink-0 mb-2">
+            <div class="flex items-center gap-1.5 min-w-0">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0 text-zinc-400"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                <span class="truncate">Desktop customizer active on PC</span>
+            </div>
+            <button onclick="window.coraPromptFormAI('', 'Create a new Notion-style lead capture form')" class="text-zinc-950 font-bold bg-white px-2 py-1 rounded-lg border border-zinc-200 shadow-3xs shrink-0 cursor-pointer flex items-center gap-1">
+                <span>✨ Create with AI</span>
+            </button>
         </div>
 
         <script>
@@ -2564,9 +2569,15 @@ function renderFormsList() {
                 </div>
 
                 <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100 ">
-                    <button class="btn-edit-form h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="${form.id}" title="Edit Form">
+                    <!-- Desktop Edit Button (Opens visual customizer) -->
+                    <button class="btn-edit-form hidden sm:flex h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="${form.id}" title="Edit Form in Customizer (Desktop)">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         Edit
+                    </button>
+                    <!-- Mobile AI Edit Button (Opens 2-way Agentic AI) -->
+                    <button class="btn-edit-ai-mobile sm:hidden h-8 flex-1 rounded-lg bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" onclick="window.coraPromptFormAI('${form.id}', '${(form.title || 'Form').replace(/'/g, "\\'")}')">
+                        <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
+                        Edit with AI
                     </button>
                     <button class="btn-view-subs h-8 flex-1 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-zinc-950 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer" data-id="${form.id}" title="View Submissions">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
@@ -2632,6 +2643,23 @@ function renderFormsList() {
     // --- Routing ---
     function handleRouting() {
         const hash = window.location.hash || '#list';
+
+        // Intercept mobile editor access (Desktop Only)
+        if (window.innerWidth < 640 && (hash.startsWith('#edit/') || hash === '#new')) {
+            window.location.hash = '#list';
+            if (hash === '#new') {
+                window.coraPromptFormAI('', 'Create a new Notion-style lead capture form');
+            } else {
+                const id = hash.split('/')[1];
+                const formObj = (formsData || []).find(f => f.id == id);
+                const title = formObj ? formObj.title : 'Form #' + id;
+                window.coraPromptFormAI(id, title);
+            }
+            if (window.coraShowToast) {
+                window.coraShowToast('Desktop customizer active on larger screens. Opened Form AI Assistant.', 'info');
+            }
+            return;
+        }
 
         // Remove loading overlay if present when not editing
         if (!hash.startsWith('#edit/')) {

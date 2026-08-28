@@ -14490,3 +14490,82 @@ jQuery(document).ready(function($) {
     $(document).ready(function() {
         window.coraHydrateAutoUpdateConsent();
     });
+
+
+/* ==========================================================================
+   AGENTIC FORM BUILDER & MOBILE ASSISTANT INTEGRATION
+   ========================================================================== */
+window.coraPromptFormAI = function(formId, formTitle) {
+    var prompt = '';
+    if (formId) {
+        prompt = 'Help me edit form "' + (formTitle || 'Form #' + formId) + '" (ID: ' + formId + '): add or modify fields, adjust logic steps, and update settings.';
+    } else {
+        prompt = 'Create a new Notion-style lead capture form for my workspace. Add recommended fields, multi-step logic, and submit settings.';
+    }
+
+    if (window.coraShowToast) {
+        window.coraShowToast('Opening Form AI Assistant...', 'info');
+    }
+
+    // Open AI Island on Mobile or Sidebar on Desktop
+    if (typeof window.coraToggleIslandState === 'function') {
+        window.coraToggleIslandState('ai');
+        var islandInput = document.getElementById('cora-island-ai-input');
+        if (islandInput) {
+            islandInput.value = prompt;
+            setTimeout(function() {
+                if (typeof window.coraSubmitIslandAI === 'function') {
+                    window.coraSubmitIslandAI();
+                }
+            }, 200);
+            return;
+        }
+    }
+
+    if (typeof window.coraToggleSidebar === 'function') {
+        window.coraToggleSidebar(true);
+    }
+    if (typeof window.coraExecuteAIChat === 'function') {
+        window.coraExecuteAIChat(prompt);
+    }
+};
+
+window.coraConfirmFormAIExecution = function(formPayload) {
+    if (!formPayload) return;
+    if (window.coraShowToast) {
+        window.coraShowToast('Deploying form via AI...', 'info');
+    }
+
+    var restUrl = (window.coraREData && window.coraREData.siteUrl ? window.coraREData.siteUrl : '') + '/wp-json/cora/v1/forms';
+    var nonce = (window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : (window.cora_vars ? window.cora_vars.nonce : '');
+
+    jQuery.ajax({
+        url: restUrl,
+        type: 'POST',
+        headers: {
+            'X-WP-Nonce': nonce,
+            'Content-Type': 'application/json'
+        },
+        data: JSON.stringify(formPayload),
+        success: function(res) {
+            if (window.coraShowToast) {
+                window.coraShowToast('✨ Form "' + (formPayload.title || 'Form') + '" deployed successfully with AI!', 'success');
+            }
+            // Refresh forms list if available
+            if (typeof window.fetchForms === 'function') {
+                window.fetchForms();
+            } else if (document.getElementById('forms-list-body')) {
+                // If on forms page, trigger hash route refresh
+                if (typeof handleRouting === 'function') {
+                    handleRouting();
+                }
+            }
+        },
+        error: function(err) {
+            var msg = (err && err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : 'Error deploying form with AI.';
+            if (window.coraShowToast) {
+                window.coraShowToast(msg, 'error');
+            }
+        }
+    });
+};
