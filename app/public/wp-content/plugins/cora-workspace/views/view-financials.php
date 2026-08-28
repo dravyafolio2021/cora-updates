@@ -312,7 +312,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
          ════════════════════════════════════════════════════════ -->
     <div id="tab-fin-home" class="cora-fin-tab-panel space-y-6">
 
-        <!-- 1. CORA'S TAKE — AI FINANCIAL AGENT & CO-FOUNDER COCKPIT -->
+        <!-- 1. CORA'S TAKE — AI FINANCIAL BRIEFING & DECISION INSIGHTS -->
         <div class="bg-zinc-950 text-white rounded-2xl p-5 md:p-6 shadow-md border border-zinc-800 relative overflow-hidden">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
                 <div class="flex items-center gap-3">
@@ -321,9 +321,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-sm font-extrabold tracking-tight text-white">Financial AI Agent</span>
-                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                                <span class="cora-pulse-dot bg-emerald-400"></span> Live Monitoring
+                            <span class="text-sm font-bold tracking-tight text-white">Financial Intelligence &amp; AI Co-founder</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-800 text-zinc-300 border border-zinc-700">
+                                Live Monitoring
                             </span>
                         </div>
                         <p class="text-xs text-zinc-400 font-medium mt-0.5" id="cora-take-headline">
@@ -333,9 +333,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="window.coraOpenDrawer('agent-cockpit')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer border-0 flex items-center gap-1.5 shadow-sm">
+                    <button type="button" onclick="window.coraOpenCopilot()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer border-0 flex items-center gap-1.5 shadow-sm">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                        <span>Open Agent Cockpit</span>
+                        <span>Ask Cora</span>
                     </button>
                     <button type="button" onclick="window.coraRefreshFinancials()" class="w-8 h-8 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 flex items-center justify-center cursor-pointer border border-zinc-800 transition-all" title="Refresh Live Data">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
@@ -343,7 +343,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
             </div>
 
-            <!-- Bullet Points generated from real numbers -->
+            <!-- Bullet Points generated from real numbers (Clean monochromatic numbers, zero neon!) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 text-xs text-zinc-300">
                 <?php 
                 $bullets = ! empty( $cora_take['bullets'] ) ? $cora_take['bullets'] : array(
@@ -352,11 +352,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     'Runway trajectory will calibrate automatically as project revenue is logged.'
                 );
                 foreach ( $bullets as $idx => $bullet ) : 
-                    $color_cls = $idx === 0 ? 'text-emerald-400' : ( $idx === 1 ? 'text-blue-400' : 'text-amber-400' );
                 ?>
-                <div class="flex items-start gap-2 bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
-                    <span class="<?php echo $color_cls; ?> font-bold"><?php echo ($idx + 1); ?>.</span>
-                    <span><?php echo wp_kses_post( $bullet ); ?></span>
+                <div class="flex items-start gap-2 bg-zinc-900/80 p-3 rounded-xl border border-zinc-800/80">
+                    <span class="text-zinc-400 font-bold"><?php echo ($idx + 1); ?>.</span>
+                    <span class="text-zinc-200"><?php echo wp_kses_post( $bullet ); ?></span>
                 </div>
                 <?php endforeach; ?>
             </div>
@@ -427,10 +426,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
 
             <!-- Card 4: Projected Cash -->
-            <div class="cora-fin-card p-4 flex flex-col justify-between gap-3 bg-zinc-900 text-white border-zinc-900">
+            <div class="cora-fin-card p-4 flex flex-col justify-between gap-3 bg-zinc-950 text-white border-zinc-900">
                 <div class="flex items-center justify-between">
                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Projected Cash</span>
-                    <span class="w-6 h-6 rounded-lg bg-zinc-800 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                    <span class="w-6 h-6 rounded-lg bg-zinc-800 text-zinc-300 flex items-center justify-center font-bold text-xs">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </span>
                 </div>
@@ -438,8 +437,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div class="text-2xl font-extrabold text-white cora-mono-num">₹<?php echo number_format( $projected_cash ); ?></div>
                     <div class="text-[11px] text-zinc-400 font-medium mt-0.5">After collections &amp; expenses</div>
                 </div>
-                <div class="text-[10px] font-bold text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded-md inline-block w-fit border border-emerald-800/40">
-                    Net Health: <?php echo $projected_cash >= 0 ? 'Healthy' : 'Deficit Warning'; ?>
+                <div class="text-[10px] font-semibold text-zinc-300 bg-zinc-800/80 px-2 py-0.5 rounded-md inline-block w-fit border border-zinc-700">
+                    Net: <?php echo $projected_cash >= 0 ? 'Healthy Position' : 'Deficit Warning'; ?>
                 </div>
             </div>
         </div>
@@ -1127,270 +1126,166 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 
 <!-- ════════════════════════════════════════════════════════
-     FLOATING BOTTOM "ASK CORA" BAR (Invokes Right-Sliding Drawer)
+     FLOATING BOTTOM "ASK CORA" BAR & EXPANDED DECISION POPUP
+     (Standard bottom-anchored floating popup card - Zero Neon)
      ════════════════════════════════════════════════════════ -->
 
 <div id="cora-fin-copilot-container" class="hidden lg:flex">
     <div class="w-full flex flex-col items-center">
+
+        <!-- Expanded AI Decision Pop-up Window (Floats Above Bar) -->
+        <div id="cora-fin-copilot-window" class="opacity-0 scale-95 pointer-events-none transform origin-bottom transition-all duration-300 ease-out mb-3 rounded-2xl overflow-hidden flex flex-col bg-white border border-zinc-200 shadow-2xl" style="height: 450px;">
+            
+            <!-- Window Header -->
+            <div class="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/80 select-none">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        C
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-zinc-900">Cora AI</span>
+                            <span class="px-1.5 py-0.2 rounded text-[9.5px] font-semibold bg-zinc-200/70 text-zinc-700">Financial Co-founder</span>
+                        </div>
+                        <div class="text-[10px] text-zinc-500 font-medium">Instant answers &amp; decision analysis from your ledger</div>
+                    </div>
+                </div>
+
+                <button type="button" onclick="window.coraCloseCopilot()" class="w-7 h-7 rounded-lg hover:bg-zinc-200/70 text-zinc-400 hover:text-zinc-700 flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm" title="Close">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <!-- Window Content: 2-Column Split (Zero Neon, Clean Monochromatic) -->
+            <div id="cora-fin-copilot-dashboard" class="flex-1 flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-zinc-100 overflow-hidden bg-white">
+                
+                <!-- Left Column (Decision Actions & Quick Questions) -->
+                <div class="flex-1 p-5 space-y-4 overflow-y-auto select-none">
+                    <div>
+                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Decision Actions</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('create-invoice');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
+                                <span class="w-6 h-6 rounded-md bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                </span>
+                                <div>
+                                    <div class="font-bold text-zinc-950">Draft Invoice</div>
+                                    <div class="text-[9.5px] text-zinc-400 font-normal">Bill client with GST</div>
+                                </div>
+                            </button>
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('record-income');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
+                                <span class="w-6 h-6 rounded-md bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                                </span>
+                                <div>
+                                    <div class="font-bold text-zinc-950">Record Payment</div>
+                                    <div class="text-[9.5px] text-zinc-400 font-normal">Reconcile receivables</div>
+                                </div>
+                            </button>
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('project-sim');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
+                                <span class="w-6 h-6 rounded-md bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                </span>
+                                <div>
+                                    <div class="font-bold text-zinc-950">Deal Simulator</div>
+                                    <div class="text-[9.5px] text-zinc-400 font-normal">Pricing &amp; margin test</div>
+                                </div>
+                            </button>
+                            <button type="button" onclick="window.coraCloseCopilot(); window.coraOpenDrawer('add-expense');" class="flex items-center gap-2.5 p-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-colors">
+                                <span class="w-6 h-6 rounded-md bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                </span>
+                                <div>
+                                    <div class="font-bold text-zinc-950">Log Expense</div>
+                                    <div class="text-[9.5px] text-zinc-400 font-normal">Track ITC &amp; vendor TDS</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Quick Decision Queries</div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span onclick="window.coraSubmitCopilotPrompt('Who owes me money right now?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">Who owes me money?</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('Why did my profit margin drop this month?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">Why did profit drop?</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('Can I afford to hire someone for ₹40k/month?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">Can I afford a ₹40k hire?</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('Show me my biggest recurring expenses')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">Audit subscriptions</span>
+                            <span onclick="window.coraSubmitCopilotPrompt('Who are my most profitable clients?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer transition-colors">Top profitable clients</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Live Financial Summary & Capacity) -->
+                <div class="w-full sm:w-64 p-5 flex flex-col justify-between select-none bg-zinc-50/50">
+                    <div class="space-y-3">
+                        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Live Ledger Context</div>
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2.5 rounded-xl border border-zinc-200 bg-white">
+                                <div class="text-[10px] text-zinc-400 font-semibold">Available Cash</div>
+                                <div class="text-sm font-bold text-zinc-950 font-mono mt-0.5">₹<?php echo number_format($available_cash); ?></div>
+                            </div>
+                            <div class="p-2.5 rounded-xl border border-zinc-200 bg-white">
+                                <div class="text-[10px] text-zinc-400 font-semibold">Uncollected Invoices</div>
+                                <div class="text-sm font-bold text-zinc-950 font-mono mt-0.5">₹<?php echo number_format($expected_in); ?></div>
+                            </div>
+                            <div class="p-2.5 rounded-xl border border-zinc-200 bg-white">
+                                <div class="text-[10px] text-zinc-400 font-semibold">Monthly Fixed Burn</div>
+                                <div class="text-sm font-bold text-zinc-950 font-mono mt-0.5">₹<?php echo number_format($monthly_rec); ?>/mo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Usage Quota -->
+                    <div class="pt-3 border-t border-zinc-200/80">
+                        <div class="flex justify-between text-[10px] text-zinc-600 font-semibold mb-1">
+                            <span>Monthly AI Quota</span>
+                            <span class="font-mono font-bold text-zinc-950">42.5%</span>
+                        </div>
+                        <div class="w-full bg-zinc-200 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-zinc-950 h-full rounded-full" style="width: 42.5%"></div>
+                        </div>
+                        <div class="text-[9px] text-zinc-400 pt-1 flex justify-between">
+                            <span>Gemini 2.5 Flash</span>
+                            <span>42,500 / 100,000 tokens</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Chat History Pane (Shown after a question is asked) -->
+            <div id="cora-fin-copilot-chat" class="hidden flex-1 overflow-y-auto p-4 space-y-3 bg-white">
+                <!-- Dynamic AI answers streamed here -->
+            </div>
+
+            <!-- Popover Input Footer -->
+            <div class="p-3 border-t border-zinc-200 flex items-center gap-3 bg-white select-none">
+                <span class="text-zinc-400 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </span>
+                <input type="text" id="cora-fin-copilot-chat-input" placeholder="Ask anything about invoices, cash flow, clients, or expenses..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-900 placeholder:text-zinc-400">
+                <button type="button" id="cora-fin-copilot-send-btn" onclick="window.coraSendCopilotChat()" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white transition-colors border-none cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-bold shadow-xs">
+                    <span>Ask AI</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </button>
+            </div>
+
+        </div>
+
         <!-- Floating Pill Input Bar (Always Visible at Bottom) -->
-        <div id="cora-fin-copilot-bar" onclick="window.coraOpenDrawer('agent-cockpit')" class="flex items-center gap-3 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-4 py-2.5 w-full transition-all hover:border-zinc-400 cursor-pointer select-none">
+        <div id="cora-fin-copilot-bar" onclick="window.coraOpenCopilot()" class="flex items-center gap-3 bg-white/95 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-4 py-2.5 w-full transition-all hover:border-zinc-400 cursor-pointer select-none">
             <span class="text-zinc-400 flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </span>
             <input type="text" id="cora-fin-copilot-placeholder-input" placeholder="Ask anything about invoices, cash flow, clients, or expenses..." class="flex-1 text-xs font-medium outline-none border-none bg-transparent text-zinc-800 placeholder:text-zinc-400 cursor-pointer" readonly>
             <button type="button" class="px-4 py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white transition-all border-none cursor-pointer text-xs font-bold shadow-xs shrink-0 flex items-center gap-1 select-none">
-                <span>Ask AI Agent</span>
+                <span>Ask AI</span>
                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             </button>
         </div>
+
     </div>
 </div>
-
-
-<!-- ════════════════════════════════════════════════════════
-     SLIDE DRAWERS (Cora Native Standard - IDs ending in -drawer)
-     ════════════════════════════════════════════════════════ -->
-
-<!-- 0. FINANCIAL AI AGENT CO-FOUNDER & AUTONOMOUS MANAGEMENT DRAWER -->
-<aside id="cora-fin-agent-drawer" class="cora-side-drawer fixed top-0 right-0 w-full sm:w-[580px] max-w-full h-full bg-white shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 flex flex-col font-sans overflow-hidden hidden collapsed">
-    <!-- Header -->
-    <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-950 text-white shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-white flex items-center justify-center font-extrabold text-sm shrink-0">
-                C
-            </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h3 class="text-sm font-bold text-white">Financial AI Agent</h3>
-                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                        <span class="cora-pulse-dot bg-emerald-400"></span> Live Agent
-                    </span>
-                </div>
-                <p class="text-[11px] text-zinc-400">Autonomous Financial Sentinel &amp; Decision Cockpit</p>
-            </div>
-        </div>
-        <button type="button" onclick="window.coraCloseAllDrawers()" class="w-8 h-8 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center cursor-pointer border-0 bg-transparent text-sm font-bold" title="Close Drawer">
-            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-    </div>
-
-    <!-- Agent Drawer Navigation Tabs -->
-    <div class="flex border-b border-zinc-200 bg-zinc-50 text-xs font-semibold select-none shrink-0 overflow-x-auto cora-no-scrollbar">
-        <button type="button" onclick="window.coraSwitchAgentTab(1)" id="fin-agent-tab-1" class="flex-1 py-2.5 px-3 text-center border-b-2 border-zinc-950 text-zinc-950 font-bold bg-white cursor-pointer whitespace-nowrap">1. Cockpit</button>
-        <button type="button" onclick="window.coraSwitchAgentTab(2)" id="fin-agent-tab-2" class="flex-1 py-2.5 px-3 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 cursor-pointer whitespace-nowrap">2. Playbooks</button>
-        <button type="button" onclick="window.coraSwitchAgentTab(3)" id="fin-agent-tab-3" class="flex-1 py-2.5 px-3 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 cursor-pointer whitespace-nowrap">3. Actions Ledger</button>
-        <button type="button" onclick="window.coraSwitchAgentTab(4)" id="fin-agent-tab-4" class="flex-1 py-2.5 px-3 text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-800 cursor-pointer whitespace-nowrap">4. Copilot Chat</button>
-    </div>
-
-    <!-- Tab 1: Agent Cockpit -->
-    <div id="fin-agent-panel-1" class="flex-1 overflow-y-auto p-5 space-y-5">
-        <!-- Live Agent Telemetry Card -->
-        <div class="p-4 rounded-2xl bg-zinc-900 text-white border border-zinc-800 space-y-3">
-            <div class="flex items-center justify-between text-xs">
-                <span class="text-zinc-400 font-bold uppercase tracking-wider text-[10px]">Active Financial Sentinel</span>
-                <span class="text-emerald-400 font-mono font-bold text-[11px]">● 24/7 Watchdog Active</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 pt-1 text-xs">
-                <div class="p-2.5 rounded-xl bg-zinc-950/80 border border-zinc-800">
-                    <div class="text-[10px] text-zinc-400 font-semibold">Available Liquid Cash</div>
-                    <div class="text-base font-extrabold text-white font-mono mt-0.5">₹<?php echo number_format($available_cash); ?></div>
-                </div>
-                <div class="p-2.5 rounded-xl bg-zinc-950/80 border border-zinc-800">
-                    <div class="text-[10px] text-zinc-400 font-semibold">Overdue Receivables</div>
-                    <div class="text-base font-extrabold <?php echo $overdue_total > 0 ? 'text-red-400' : 'text-zinc-300'; ?> font-mono mt-0.5">₹<?php echo number_format($overdue_total); ?></div>
-                </div>
-            </div>
-            <div class="pt-2 border-t border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-400">
-                <span>AI Model: <strong class="text-zinc-200">Gemini 2.5 Flash</strong></span>
-                <span>Session: <strong class="text-zinc-200">0 ms latency</strong></span>
-            </div>
-        </div>
-
-        <!-- Quick 1-Click Financial Actions Matrix -->
-        <div class="space-y-2">
-            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Direct Financial Actions</div>
-            <div class="grid grid-cols-2 gap-2">
-                <button type="button" onclick="window.coraCloseAllDrawers(); window.coraOpenDrawer('create-invoice');" class="flex items-center gap-2.5 p-3 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-all">
-                    <span class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                    </span>
-                    <div>
-                        <div class="font-bold text-zinc-950">Draft GST Invoice</div>
-                        <div class="text-[10px] text-zinc-400 font-normal">State tax &amp; Vault link</div>
-                    </div>
-                </button>
-                <button type="button" onclick="window.coraCloseAllDrawers(); window.coraOpenDrawer('record-income');" class="flex items-center gap-2.5 p-3 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-all">
-                    <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-                    </span>
-                    <div>
-                        <div class="font-bold text-zinc-950">Record Payment</div>
-                        <div class="text-[10px] text-zinc-400 font-normal">Reconcile open invoice</div>
-                    </div>
-                </button>
-                <button type="button" onclick="window.coraCloseAllDrawers(); window.coraOpenDrawer('project-sim');" class="flex items-center gap-2.5 p-3 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-all">
-                    <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                    </span>
-                    <div>
-                        <div class="font-bold text-zinc-950">Deal Simulator</div>
-                        <div class="text-[10px] text-zinc-400 font-normal">Pricing &amp; margin test</div>
-                    </div>
-                </button>
-                <button type="button" onclick="window.coraCloseAllDrawers(); window.coraOpenDrawer('add-expense');" class="flex items-center gap-2.5 p-3 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-bold text-zinc-800 cursor-pointer shadow-xs text-left transition-all">
-                    <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    </span>
-                    <div>
-                        <div class="font-bold text-zinc-950">Log Expense</div>
-                        <div class="text-[10px] text-zinc-400 font-normal">ITC &amp; vendor TDS</div>
-                    </div>
-                </button>
-            </div>
-        </div>
-
-        <!-- Agent Usage Quota -->
-        <div class="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-2">
-            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">AI Financial Quota</div>
-            <div class="flex justify-between text-xs font-semibold text-zinc-700">
-                <span>42,500 / 100,000 monthly tokens</span>
-                <span class="font-mono font-bold text-zinc-950">42.5%</span>
-            </div>
-            <div class="w-full bg-zinc-200 h-1.5 rounded-full overflow-hidden">
-                <div class="bg-zinc-950 h-full rounded-full" style="width: 42.5%"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab 2: Autonomous Playbooks -->
-    <div id="fin-agent-panel-2" class="flex-1 overflow-y-auto p-5 space-y-4 hidden">
-        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Proactive Financial Playbooks</div>
-        
-        <!-- Playbook 1: Speed to Cash Collections -->
-        <div class="p-4 rounded-2xl border border-zinc-200 bg-white space-y-3 shadow-xs">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="w-7 h-7 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    </span>
-                    <div>
-                        <div class="text-xs font-bold text-zinc-950">Speed-to-Cash Dunning</div>
-                        <div class="text-[10px] text-zinc-500">Automated WhatsApp &amp; Email payment reminders</div>
-                    </div>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800">Active</span>
-            </div>
-            <p class="text-xs text-zinc-600">Monitors overdue client invoices and triggers contextual follow-ups at 3, 7, and 14 days overdue without sounding robotic.</p>
-            <div class="flex items-center justify-between pt-1 border-t border-zinc-100 text-xs">
-                <span class="text-zinc-500 text-[11px]"><?php echo $overdue_count; ?> invoices currently overdue</span>
-                <button type="button" onclick="window.coraCloseAllDrawers(); window.coraSwitchFinTab('fin-receivables');" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0">Audit Receivables →</button>
-            </div>
-        </div>
-
-        <!-- Playbook 2: Cash Runway Sentinel -->
-        <div class="p-4 rounded-2xl border border-zinc-200 bg-white space-y-3 shadow-xs">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                    </span>
-                    <div>
-                        <div class="text-xs font-bold text-zinc-950">Cash Runway Sentinel</div>
-                        <div class="text-[10px] text-zinc-500">30/60/90-Day Liquidity Buffer Monitoring</div>
-                    </div>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800">Active</span>
-            </div>
-            <p class="text-xs text-zinc-600">Calculates fixed burn against collected retainers, automatically alerting you if projected balance drops below 2 months buffer.</p>
-            <div class="flex items-center justify-between pt-1 border-t border-zinc-100 text-xs">
-                <span class="text-zinc-500 text-[11px]">Buffer: ~<?php echo $monthly_rec > 0 ? round($available_cash / $monthly_rec, 1) : 'Safe'; ?> Mo</span>
-                <button type="button" onclick="window.coraCloseAllDrawers(); window.coraSwitchFinTab('fin-forecast');" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0">View Forecast →</button>
-            </div>
-        </div>
-
-        <!-- Playbook 3: Tax & GST Reserve Shield -->
-        <div class="p-4 rounded-2xl border border-zinc-200 bg-white space-y-3 shadow-xs">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    </span>
-                    <div>
-                        <div class="text-xs font-bold text-zinc-950">Tax &amp; GST Reserve Shield</div>
-                        <div class="text-[10px] text-zinc-500">Quarterly Advance Tax &amp; Net GST Auto-Lock</div>
-                    </div>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800">Active</span>
-            </div>
-            <p class="text-xs text-zinc-600">Automatically computes ITC offsets and sets aside recommended tax buffers to prevent surprise quarterly liabilities.</p>
-            <div class="flex items-center justify-between pt-1 border-t border-zinc-100 text-xs">
-                <span class="text-zinc-500 text-[11px]">Net Tax Reserve: ₹<?php echo number_format($gst_data['tax_reserve_target'] ?? 0); ?></span>
-                <button type="button" onclick="window.coraCloseAllDrawers(); window.coraSwitchFinTab('fin-tax');" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0">View Tax Estimates →</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab 3: Action Ledger -->
-    <div id="fin-agent-panel-3" class="flex-1 overflow-y-auto p-5 space-y-3 hidden">
-        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Autonomous Actions Executed</div>
-        
-        <div class="space-y-2">
-            <div class="p-3 rounded-xl border border-zinc-200 bg-white space-y-1">
-                <div class="flex items-center justify-between text-xs">
-                    <span class="font-bold text-zinc-900">Calculated 90-Day Cash Runway</span>
-                    <span class="text-[10px] text-zinc-400 font-mono">Just now</span>
-                </div>
-                <p class="text-[11px] text-zinc-600">Calibrated cash buffer trajectory with current cleared balance and scheduled recurring commitments.</p>
-            </div>
-
-            <div class="p-3 rounded-xl border border-zinc-200 bg-white space-y-1">
-                <div class="flex items-center justify-between text-xs">
-                    <span class="font-bold text-zinc-950">Audited Input Tax Credit (ITC)</span>
-                    <span class="text-[10px] text-zinc-400 font-mono">Today</span>
-                </div>
-                <p class="text-[11px] text-zinc-600">Verified recorded expense entries against GSTIN registration records.</p>
-            </div>
-
-            <div class="p-3 rounded-xl border border-zinc-200 bg-white space-y-1">
-                <div class="flex items-center justify-between text-xs">
-                    <span class="font-bold text-zinc-950">Synchronized CRM Receivables</span>
-                    <span class="text-[10px] text-zinc-400 font-mono">Today</span>
-                </div>
-                <p class="text-[11px] text-zinc-600">Reconciled invoice balances with active client shoot contracts in the Document Vault.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab 4: Copilot Console -->
-    <div id="fin-agent-panel-4" class="flex-1 flex flex-col overflow-hidden hidden bg-zinc-50">
-        <div class="p-4 border-b border-zinc-200 bg-white select-none space-y-2">
-            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Suggested Questions</div>
-            <div class="flex flex-wrap gap-1.5">
-                <button type="button" onclick="window.coraSubmitAgentPrompt('Who owes me money right now?')" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0 transition-colors">Who owes me money?</button>
-                <button type="button" onclick="window.coraSubmitAgentPrompt('Why did profit margin drop?')" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0 transition-colors">Why did profit drop?</button>
-                <button type="button" onclick="window.coraSubmitAgentPrompt('Can I afford a ₹40k hire?')" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0 transition-colors">Can I afford a ₹40k hire?</button>
-                <button type="button" onclick="window.coraSubmitAgentPrompt('Show me my biggest recurring expenses')" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 cursor-pointer border-0 transition-colors">Audit subscriptions</button>
-            </div>
-        </div>
-
-        <div id="cora-fin-agent-chat" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
-            <div class="p-3 rounded-xl bg-zinc-50 border border-zinc-200 text-xs text-zinc-600 space-y-1">
-                <div class="font-bold text-zinc-950 flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span>Cora Financial Agent Online</span>
-                </div>
-                <p>Ask anything about your cash balance, tax liabilities, client profitability, or deal feasibility. I calculate directly against your workspace records.</p>
-            </div>
-        </div>
-
-        <div class="p-3 border-t border-zinc-200 bg-white flex items-center gap-2 select-none">
-            <input type="text" id="cora-fin-agent-chat-input" placeholder="Ask anything about invoices, cash flow, clients, or expenses..." class="flex-1 text-xs outline-none border border-zinc-200 rounded-xl px-3 py-2 text-zinc-900 placeholder:text-zinc-400 bg-zinc-50">
-            <button type="button" id="cora-fin-agent-send-btn" onclick="window.coraSendAgentChat()" class="px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white transition-colors border-0 cursor-pointer text-xs font-bold shrink-0">
-                Ask AI
-            </button>
-        </div>
-    </div>
-</aside>
 
 
 
@@ -2016,75 +1911,68 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     };
     window.switchFinTab = window.coraSwitchFinTab;
 
-    /* ── Financial AI Agent & Drawer Controller ── */
-    window.coraSwitchAgentTab = function(tabNum) {
-        [1, 2, 3, 4].forEach(n => {
-            const panel = document.getElementById('fin-agent-panel-' + n);
-            const tabBtn = document.getElementById('fin-agent-tab-' + n);
-            if (panel) {
-                if (n === tabNum) {
-                    panel.classList.remove('hidden');
-                } else {
-                    panel.classList.add('hidden');
-                }
-            }
-            if (tabBtn) {
-                if (n === tabNum) {
-                    tabBtn.classList.add('border-zinc-950', 'text-zinc-950', 'bg-white');
-                    tabBtn.classList.remove('border-transparent', 'text-zinc-500');
-                } else {
-                    tabBtn.classList.remove('border-zinc-950', 'text-zinc-950', 'bg-white');
-                    tabBtn.classList.add('border-transparent', 'text-zinc-500');
-                }
-            }
-        });
-        if (tabNum === 4) {
-            setTimeout(() => {
-                const inp = document.getElementById('cora-fin-agent-chat-input');
-                if (inp) inp.focus();
-            }, 80);
-        }
-    };
-
+    /* ── Floating Ask Cora Bottom Pop-up Controller ── */
     window.coraOpenCopilot = function() {
-        window.coraOpenDrawer('agent-cockpit');
-        window.coraSwitchAgentTab(4);
+        window.coraCloseFinPopover();
+        const win = document.getElementById('cora-fin-copilot-window');
+        const bar = document.getElementById('cora-fin-copilot-bar');
+        if (win) {
+            win.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            win.classList.add('active', 'opacity-100', 'scale-100', 'pointer-events-auto');
+        }
+        if (bar) {
+            bar.classList.add('hidden-bar');
+        }
+        setTimeout(() => {
+            const inp = document.getElementById('cora-fin-copilot-chat-input');
+            if (inp) inp.focus();
+        }, 100);
     };
 
     window.coraCloseCopilot = function() {
-        window.coraCloseAllDrawers();
-    };
-
-    window.coraSubmitAgentPrompt = function(promptText) {
-        window.coraSwitchAgentTab(4);
-        const input = document.getElementById('cora-fin-agent-chat-input');
-        if (input) {
-            input.value = promptText;
-            window.coraSendAgentChat();
+        const win = document.getElementById('cora-fin-copilot-window');
+        const bar = document.getElementById('cora-fin-copilot-bar');
+        if (win) {
+            win.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+            win.classList.remove('active', 'opacity-100', 'scale-100', 'pointer-events-auto');
+        }
+        if (bar) {
+            bar.classList.remove('hidden-bar');
         }
     };
 
-    window.coraSubmitCopilotPrompt = window.coraSubmitAgentPrompt;
+    window.coraSubmitCopilotPrompt = function(promptText) {
+        const input = document.getElementById('cora-fin-copilot-chat-input');
+        if (input) {
+            input.value = promptText;
+            window.coraSendCopilotChat();
+        }
+    };
+    window.coraSubmitAgentPrompt = window.coraSubmitCopilotPrompt;
 
-    window.coraSendAgentChat = function() {
-        const input = document.getElementById('cora-fin-agent-chat-input');
+    window.coraSendCopilotChat = function() {
+        const input = document.getElementById('cora-fin-copilot-chat-input');
         const query = input ? input.value.trim() : '';
         if (!query) return;
 
-        const chatPane = document.getElementById('cora-fin-agent-chat');
-        const sendBtn = document.getElementById('cora-fin-agent-send-btn');
+        const chatPane = document.getElementById('cora-fin-copilot-chat');
+        const dashboard = document.getElementById('cora-fin-copilot-dashboard');
+        const sendBtn = document.getElementById('cora-fin-copilot-send-btn');
 
+        if (dashboard) dashboard.classList.add('hidden');
         if (chatPane) {
-            // Append user bubble
+            chatPane.classList.remove('hidden');
+
+            // Append user message bubble (Monochromatic)
             const userBubble = document.createElement('div');
             userBubble.className = 'flex justify-end';
-            userBubble.innerHTML = `<div class="bg-zinc-950 text-white rounded-2xl rounded-tr-sm px-4 py-2 text-xs max-w-[85%] font-medium">${query}</div>`;
+            userBubble.innerHTML = `<div class="bg-zinc-950 text-white rounded-2xl rounded-tr-sm px-4 py-2 text-xs max-w-[80%] font-medium">${query}</div>`;
             chatPane.appendChild(userBubble);
 
-            // Append loading bubble
+            // Append loading state bubble
             const aiBubble = document.createElement('div');
             aiBubble.className = 'flex justify-start';
-            aiBubble.id = 'agent-temp-ai-bubble';
+            aiBubble.id = 'copilot-temp-ai-bubble';
             aiBubble.innerHTML = `<div class="bg-zinc-100 text-zinc-700 rounded-2xl rounded-tl-sm px-4 py-2 text-xs max-w-[85%] animate-pulse">Analyzing ledger records and cash forecast...</div>`;
             chatPane.appendChild(aiBubble);
             chatPane.scrollTop = chatPane.scrollHeight;
@@ -2105,7 +1993,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         .then(r => r.json())
         .then(res => {
             if (sendBtn) sendBtn.disabled = false;
-            const tempBubble = document.getElementById('agent-temp-ai-bubble');
+            const tempBubble = document.getElementById('copilot-temp-ai-bubble');
             if (tempBubble) tempBubble.remove();
 
             if (chatPane && res.success && res.data) {
@@ -2126,8 +2014,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                 finalAiBubble.innerHTML = `<div class="bg-zinc-50 border border-zinc-200 text-zinc-800 rounded-2xl rounded-tl-sm p-3.5 text-xs max-w-[85%] space-y-2 leading-relaxed">
                     <div class="font-bold text-zinc-950 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span>Financial AI Agent</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-900"></span>
+                        <span>Cora Co-founder</span>
                     </div>
                     <div>${formatted}</div>
                     ${actionBtnHtml}
@@ -2138,17 +2026,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         })
         .catch(() => {
             if (sendBtn) sendBtn.disabled = false;
-            const tempBubble = document.getElementById('agent-temp-ai-bubble');
+            const tempBubble = document.getElementById('copilot-temp-ai-bubble');
             if (tempBubble) {
-                tempBubble.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-3 text-xs">Error communicating with financial AI agent.</div>`;
+                tempBubble.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-3 text-xs">Error communicating with financial AI engine.</div>`;
             }
         });
     };
 
-    window.coraSendCopilotChat = window.coraSendAgentChat;
+    window.coraSendAgentChat = window.coraSendCopilotChat;
 
     window.coraHandleCopilotAction = function(action, target) {
-        window.coraCloseAllDrawers();
+        window.coraCloseCopilot();
         if (action === 'draft_followup') {
             window.coraDraftFollowUp(target);
         } else if (action === 'switch_tab') {
@@ -2191,8 +2079,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     /* ── Standard Cora Platform Side Drawers Controller ── */
     window.coraOpenDrawer = function(drawerName) {
         window.coraCloseFinPopover();
+        window.coraCloseCopilot();
         const map = {
-            'agent-cockpit': '#cora-fin-agent-drawer',
             'create-invoice': '#cora-fin-invoice-drawer',
             'followup': '#cora-fin-followup-drawer',
             'add-expense': '#cora-fin-expense-drawer',
