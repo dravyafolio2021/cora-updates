@@ -745,9 +745,16 @@ jQuery(document).ready(function($) {
                 ? 'text-red-600 hover:text-red-700 border-zinc-200 hover:bg-red-50 '
                 : 'text-emerald-600 hover:text-emerald-700 border-zinc-200 hover:bg-emerald-50 ';
 
-            // Build select options for roles list
+            // Build select options for roles list (Super Admin only for Claraverse / Heycora domains)
             let roleOptions = '';
+            const uEmail = (u.user_email || '').toLowerCase().trim();
+            const isSuperDomain = uEmail.endsWith('@claraverse.in') || uEmail.endsWith('@heycora.in') || uEmail.endsWith('@cora.local') || uEmail === 'dravya.shs@gmail.com' || uEmail === 'dravya.shravya@gmail.com' || uEmail === 'admin@cora.local';
+
             Object.keys(coraRoleLabels).forEach(rKey => {
+                const isSuperRole = (rKey === 'administrator' || rKey === 'cora_shruti' || rKey === 'super_admin');
+                if (isSuperRole && !isSuperDomain) {
+                    return; // Skip Super Admin option for non-super domain users
+                }
                 roleOptions += `<option value="${rKey}" ${u.role === rKey ? 'selected' : ''}>${escapeHtml(coraRoleLabels[rKey])}</option>`;
             });
 
