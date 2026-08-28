@@ -15748,9 +15748,9 @@ jQuery(document).ready(function($) {
 </div>
 
 <!-- Universal In-App Update Details Drawer Sheet -->
-<div id="cora-pwa-update-drawer-backdrop" onclick="window.coraClosePwaUpdateDrawer()" class="hidden fixed inset-0 z-[100010] bg-black/40 backdrop-blur-xs transition-opacity duration-300"></div>
+<div id="cora-pwa-update-drawer-backdrop" onclick="window.coraClosePwaUpdateDrawer()" class="hidden fixed inset-0 transition-opacity duration-300 cursor-pointer" style="position:fixed !important; inset:0 !important; z-index:1000050 !important; background:rgba(9,9,11,0.55) !important; backdrop-filter:blur(8px) !important; -webkit-backdrop-filter:blur(8px) !important;"></div>
 
-<div id="cora-pwa-update-drawer" class="hidden fixed bottom-0 left-0 right-0 max-h-[85vh] sm:max-h-[75vh] w-full max-w-xl mx-auto bg-white border-t sm:border border-zinc-200 rounded-t-3xl sm:rounded-3xl z-[100015] shadow-2xl flex flex-col transition-transform duration-300 translate-y-full font-sans select-none pb-[env(safe-area-inset-bottom,16px)]">
+<div id="cora-pwa-update-drawer" class="hidden fixed bottom-0 max-h-[85vh] sm:max-h-[75vh] w-full max-w-lg bg-white border-t sm:border border-zinc-200 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col transition-all duration-300 font-sans select-none pb-[env(safe-area-inset-bottom,16px)]" style="position:fixed !important; bottom:0 !important; left:50% !important; transform:translate(-50%, 100%) !important; z-index:1000060 !important; background:#ffffff !important; opacity:1 !important;">
     <!-- Drag indicator handle for mobile -->
     <div class="flex items-center justify-center pt-3 pb-1 cursor-pointer select-none" onclick="window.coraClosePwaUpdateDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
