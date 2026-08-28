@@ -414,7 +414,7 @@ jQuery(document).ready(function($) {
                     if (isStandalone) {
                         e.preventDefault();
                         e.stopPropagation();
-                        window.location.assign(anchor.href);
+                        window.location.href = targetUrl.pathname + targetUrl.search + targetUrl.hash;
                     }
                 }
             } catch (err) {

@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.3.2
+ * Version: 4.3.3
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.3.2' );
+    define( 'CORA_WORKSPACE_VERSION', '4.3.3' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -1154,10 +1154,11 @@ function cora_workspace_handle_workspace_route() {
         $icon_192 = CORA_WORKSPACE_URL . 'assets/pwa/icon_192.png?v=' . CORA_WORKSPACE_VERSION;
         $icon_512 = CORA_WORKSPACE_URL . 'assets/pwa/icon_512.png?v=' . CORA_WORKSPACE_VERSION;
         
-        $manifest_data['name']             = 'CORA Workspace';
-        $manifest_data['short_name']        = 'CORA';
-        $manifest_data['start_url']         = '/workspace/dashboard';
-        $manifest_data['scope']             = '/';
+        $manifest_data['id']                = '/workspace/dashboard';
+        $manifest_data['name']              = 'CORA Workspace';
+        $manifest_data['short_name']         = 'CORA';
+        $manifest_data['start_url']          = '/workspace/dashboard';
+        $manifest_data['scope']              = '/';
         $manifest_data['display']           = 'standalone';
         $manifest_data['display_override']  = array( 'standalone', 'window-controls-overlay' );
         $manifest_data['background_color']  = '#ffffff';

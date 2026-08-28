@@ -1,11 +1,14 @@
 {
   "name": "CORA Workspace",
   "short_name": "CORA",
-  "description": "CORA — AI Co-founder for Indian Service Businesses & Solopreneurs",
+  "description": "CORA \u2014 AI Co-founder for Indian Service Businesses & Solopreneurs",
   "start_url": "/workspace/dashboard",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "window-controls-overlay"],
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ],
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
@@ -14,7 +17,11 @@
   },
   "handle_links": "preferred",
   "capture_links": "existing-client-navigate",
-  "categories": ["business", "productivity", "finance"],
+  "categories": [
+    "business",
+    "productivity",
+    "finance"
+  ],
   "icons": [
     {
       "src": "/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png",
@@ -90,5 +97,6 @@
         }
       ]
     }
-  ]
+  ],
+  "id": "/workspace/dashboard"
 }
