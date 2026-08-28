@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.5.3
+ * Version: 4.5.4
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.5.3' );
+    define( 'CORA_WORKSPACE_VERSION', '4.5.4' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -1094,12 +1094,15 @@ function cora_workspace_handle_workspace_route() {
     remove_action( 'template_redirect', 'cora_real_estate_ai_handle_workspace_route' );
     remove_action( 'template_redirect', 'cora_studio_ai_handle_workspace_route' );
 
-    $request_uri = $_SERVER['REQUEST_URI'];
-    $home_path = parse_url( home_url(), PHP_URL_PATH ) ?: '';
-    $path = substr( $request_uri, strlen( $home_path ) );
-    $path = trim( parse_url( $path, PHP_URL_PATH ), '/' );
-
-    $path_parts = explode( '/', $path );
+    $request_uri = parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ) ?: '';
+    $home_path   = parse_url( home_url(), PHP_URL_PATH ) ?: '';
+    if ( ! empty( $home_path ) && 0 === strpos( $request_uri, $home_path ) ) {
+        $path = substr( $request_uri, strlen( $home_path ) );
+    } else {
+        $path = $request_uri;
+    }
+    $path = trim( $path, '/' );
+    $path_parts = array_values( array_filter( explode( '/', $path ) ) );
     
     // Bypass standalone router for REST API or WP admin/AJAX requests
     if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
@@ -1326,15 +1329,9 @@ function cora_workspace_handle_workspace_route() {
         wp_die( __( 'Invalid or unavailable article preview link.', 'cora-workspace' ), __( 'Access Denied', 'cora-workspace' ), array( 'response' => 404 ) );
     }
 
-    $shared_form_idx = -1;
-    if ( isset( $path_parts[0] ) && 'shared-form' === $path_parts[0] ) {
-        $shared_form_idx = 1;
-    } else if ( isset( $path_parts[1] ) && 'shared-form' === $path_parts[1] ) {
-        $shared_form_idx = 2;
-    }
-
-    if ( $shared_form_idx !== -1 ) {
-        $identifier = isset( $path_parts[$shared_form_idx] ) ? sanitize_text_field( $path_parts[$shared_form_idx] ) : '';
+    $shared_form_pos = array_search( 'shared-form', $path_parts, true );
+    if ( false !== $shared_form_pos && isset( $path_parts[$shared_form_pos + 1] ) ) {
+        $identifier = sanitize_text_field( $path_parts[$shared_form_pos + 1] );
         if ( ! empty( $identifier ) ) {
             global $wpdb;
             $form = null;
