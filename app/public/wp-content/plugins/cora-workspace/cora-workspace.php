@@ -25208,6 +25208,27 @@ function cora_ajax_send_invitation() {
         }
     }
 
+    // Super Admin / Platform Admin Domain Restriction
+    if ( in_array( $invite_role, array( 'administrator', 'cora_shruti', 'super_admin' ), true ) ) {
+        $clean_email = strtolower( trim( $email ) );
+        $is_super_domain = preg_match( '/@(claraverse\.in|heycora\.in)$/i', $clean_email ) || in_array( $clean_email, array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local' ), true );
+        if ( ! $is_super_domain ) {
+            wp_send_json_error( array( 'message' => 'Super Admin and Platform Super Admin roles are reserved for verified @claraverse.in and @heycora.in domain accounts.' ) );
+        }
+    }
+
+    // Manager Limit Check (Max 2 Managers per workspace)
+    $is_manager_role = in_array( $invite_role, array( 'cora_manager', 'cora_branch_manager', 'cora_studio_manager', 'cora_re_managing_agent' ), true );
+    if ( $is_manager_role && $agency_id_num >= 1 ) {
+        $existing_manager_count = intval( $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$cora_users_table} WHERE agency_id = %d AND role IN ('cora_manager', 'cora_branch_manager', 'cora_studio_manager', 'cora_re_managing_agent') AND status = 'active'",
+            $agency_id_num
+        ) ) );
+        if ( $existing_manager_count >= 2 ) {
+            wp_send_json_error( array( 'message' => 'Workspace limit reached: A workspace can have a maximum of 2 Managers. Please demote or reassign an existing Manager before adding a new one.' ) );
+        }
+    }
+
     // Role hierarchy checks
     if ( $role === 'cora_branch_manager' ) {
         $allowed = array( 'cora_photographer', 'cora_videographer', 'cora_drone_pilot', 'cora_editor', 'cora_viewer' );
@@ -25793,6 +25814,36 @@ function cora_ajax_save_user_changes() {
 
     if ( empty( $target_role ) ) {
         $target_role = ! empty( $target_user->roles ) ? $target_user->roles[0] : 'administrator';
+    }
+
+    // Super Admin / Platform Super Admin domain validation
+    if ( in_array( $target_role, array( 'administrator', 'cora_shruti', 'super_admin' ), true ) ) {
+        $target_email_clean = strtolower( trim( $target_user->user_email ) );
+        $is_target_super_domain = preg_match( '/@(claraverse\.in|heycora\.in)$/i', $target_email_clean ) || in_array( $target_email_clean, array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local' ), true );
+        if ( ! $is_target_super_domain ) {
+            wp_send_json_error( array( 'message' => 'Super Admin and Platform Super Admin roles are reserved for verified @claraverse.in and @heycora.in domain accounts.' ) );
+        }
+    }
+
+    // Manager Limit Check (Max 2 Managers per workspace)
+    $is_target_manager_role = in_array( $target_role, array( 'cora_manager', 'cora_branch_manager', 'cora_studio_manager', 'cora_re_managing_agent' ), true );
+    $old_target_role = ! empty( $target_user->roles ) ? $target_user->roles[0] : '';
+    $was_already_manager = in_array( $old_target_role, array( 'cora_manager', 'cora_branch_manager', 'cora_studio_manager', 'cora_re_managing_agent' ), true );
+
+    if ( $is_target_manager_role && ! $was_already_manager ) {
+        global $wpdb;
+        $cora_users_table = $wpdb->prefix . 'cora_users';
+        $target_agency_num = cora_db_get_agency_id();
+        if ( $target_agency_num >= 1 ) {
+            $existing_manager_count = intval( $wpdb->get_var( $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$cora_users_table} WHERE agency_id = %d AND wp_user_id != %d AND role IN ('cora_manager', 'cora_branch_manager', 'cora_studio_manager', 'cora_re_managing_agent') AND status = 'active'",
+                $target_agency_num,
+                $target_user_id
+            ) ) );
+            if ( $existing_manager_count >= 2 ) {
+                wp_send_json_error( array( 'message' => 'Workspace limit reached: A workspace can have a maximum of 2 Managers. Please demote or reassign an existing Manager before assigning this role.' ) );
+            }
+        }
     }
 
     // Role Hierarchy & Branch limits check
@@ -35389,8 +35440,12 @@ function cora_is_super_owner( $user = null ) {
     if ( ! $user || ! $user->exists() ) {
         return false;
     }
+    $email = strtolower( trim( $user->user_email ) );
+    if ( preg_match( '/@(claraverse\.in|heycora\.in)$/i', $email ) ) {
+        return true;
+    }
     $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local', 'shruti.bansal@claraverse.in', 'shruti@claraverse.in', 'shruti@heycora.in' );
-    if ( in_array( strtolower( $user->user_email ), $super_emails, true ) ) {
+    if ( in_array( $email, $super_emails, true ) ) {
         return true;
     }
     return false;

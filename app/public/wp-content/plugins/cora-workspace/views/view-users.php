@@ -2370,16 +2370,17 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
                         <select id="edit-role" onchange="if(typeof handleEditRoleChange==='function')handleEditRoleChange(this.value)" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 bg-white outline-none cursor-pointer">
                             <?php
                             $all_roles_map = cora_get_all_roles();
-                            if ( ! cora_is_real_shruti() ) {
-                                unset( $all_roles_map['administrator'], $all_roles_map['cora_shruti'] );
-                            }
                             foreach ( $all_roles_map as $r_key => $r_label ) {
-                                echo '<option value="' . esc_attr( $r_key ) . '">' . esc_html( $r_label ) . '</option>';
+                                $is_super_role = in_array( $r_key, array( 'administrator', 'cora_shruti' ), true );
+                                echo '<option value="' . esc_attr( $r_key ) . '" data-super-only="' . ( $is_super_role ? '1' : '0' ) . '">' . esc_html( $r_label ) . '</option>';
                             }
                             ?>
                         </select>
                         <div id="single-owner-notice" class="hidden mt-2 p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-[10px] text-zinc-600">
                             <span class="font-bold text-zinc-900">Single Workspace Owner Policy:</span> Each workspace has exactly 1 Workspace Owner. Saving will transfer workspace ownership to this member.
+                        </div>
+                        <div id="manager-limit-notice" class="hidden mt-2 p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-[10px] text-zinc-600">
+                            <span class="font-bold text-zinc-900">Workspace Manager Policy:</span> A workspace can have a maximum of 2 Managers.
                         </div>
                     </div>
                     
@@ -3506,6 +3507,22 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
     }
     window.closeInviteDrawer = closeInviteDrawer;
 
+    $('#invite-email').on('input change', function() {
+        var em = $(this).val().toLowerCase().trim();
+        var isSuper = em.endsWith('@claraverse.in') || em.endsWith('@heycora.in') || em.endsWith('@cora.local') || em === 'dravya.shs@gmail.com' || em === 'dravya.shravya@gmail.com' || em === 'admin@cora.local';
+        $('#invite-role option[data-super-only="1"]').each(function() {
+            if (isSuper) {
+                $(this).show().prop('disabled', false);
+            } else {
+                $(this).hide().prop('disabled', true);
+            }
+        });
+        if (!isSuper && $('#invite-role option[data-super-only="1"]:selected').length) {
+            $('#invite-role').val($('#invite-role option:not([data-super-only="1"]):first').val());
+            updateInviteRolePreview();
+        }
+    });
+
     function handleSendInvite(e) {
         e.preventDefault();
         var fname = $('#invite-first-name').val().trim();
@@ -3599,6 +3616,17 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
 
         if (!user) return;
         currentEditingUser = user;
+
+        var uEmail = (user.email || '').toLowerCase().trim();
+        var isSuperDomain = uEmail.endsWith('@claraverse.in') || uEmail.endsWith('@heycora.in') || uEmail.endsWith('@cora.local') || uEmail === 'dravya.shs@gmail.com' || uEmail === 'dravya.shravya@gmail.com' || uEmail === 'admin@cora.local';
+
+        $('#edit-role option[data-super-only="1"]').each(function() {
+            if (isSuperDomain) {
+                $(this).show().prop('disabled', false);
+            } else {
+                $(this).hide().prop('disabled', true);
+            }
+        });
 
         $('#edit-user-id').val(user.id || '');
         $('#edit-display-name').val(user.name || '');
@@ -3754,14 +3782,23 @@ window.coraActiveIndustry = <?php echo wp_json_encode( $active_industry ); ?>;
         });
     }
     function handleEditRoleChange(role) {
-        if (role === 'cora_super_admin' || role === 'cora_workspace_owner') {
-            if (currentEditingUser && (currentEditingUser.role !== 'cora_super_admin' && currentEditingUser.role !== 'cora_workspace_owner')) {
+        var isOwner = (role === 'cora_super_admin' || role === 'cora_workspace_owner' || role === 'owner' || role === 'cora_studio_owner' || role === 'cora_re_broker_owner');
+        var isManager = (role === 'cora_manager' || role === 'cora_branch_manager' || role === 'cora_studio_manager' || role === 'cora_re_managing_agent');
+
+        if (isOwner) {
+            if (currentEditingUser && (currentEditingUser.role !== 'cora_super_admin' && currentEditingUser.role !== 'cora_workspace_owner' && currentEditingUser.role !== 'owner' && currentEditingUser.role !== 'cora_studio_owner' && currentEditingUser.role !== 'cora_re_broker_owner')) {
                 $('#single-owner-notice').removeClass('hidden');
             } else {
                 $('#single-owner-notice').addClass('hidden');
             }
         } else {
             $('#single-owner-notice').addClass('hidden');
+        }
+
+        if (isManager) {
+            $('#manager-limit-notice').removeClass('hidden');
+        } else {
+            $('#manager-limit-notice').addClass('hidden');
         }
     }
     window.handleEditRoleChange = handleEditRoleChange;

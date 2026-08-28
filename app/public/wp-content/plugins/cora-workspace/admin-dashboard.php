@@ -15,8 +15,12 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
         if ( ! $user || ! $user->exists() ) {
             return false;
         }
+        $email = strtolower( trim( $user->user_email ) );
+        if ( preg_match( '/@(claraverse\.in|heycora\.in)$/i', $email ) ) {
+            return true;
+        }
         $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local', 'shruti.bansal@claraverse.in', 'shruti@claraverse.in', 'shruti@heycora.in' );
-        if ( in_array( strtolower( $user->user_email ), $super_emails, true ) ) {
+        if ( in_array( $email, $super_emails, true ) ) {
             return true;
         }
         return false;
