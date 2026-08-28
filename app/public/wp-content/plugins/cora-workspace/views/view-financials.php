@@ -312,62 +312,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
          ════════════════════════════════════════════════════════ -->
     <div id="tab-fin-home" class="cora-fin-tab-panel space-y-6">
 
-        <!-- 1. CORA'S TAKE — AI FINANCIAL BRIEFING & DECISION INSIGHTS -->
-        <div class="bg-zinc-950 text-white rounded-2xl p-5 md:p-6 shadow-md border border-zinc-800 relative overflow-hidden">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 text-white flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"></path></svg>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm font-bold tracking-tight text-white">Financial Agent</span>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-800 text-zinc-300 border border-zinc-700">
-                                Live Monitoring
-                            </span>
-                        </div>
-                        <p class="text-xs text-zinc-400 font-medium mt-0.5" id="cora-take-headline">
-                            <?php echo esc_html( $cora_take['headline'] ?? 'Your cash buffer is healthy; collecting overdue receivables will optimize month-end position.' ); ?>
-                        </p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="window.coraOpenCopilot()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer border-0 flex items-center gap-1.5 shadow-sm">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                        <span>Ask Cora</span>
-                    </button>
-                    <button type="button" onclick="window.coraRefreshFinancials()" class="w-8 h-8 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 flex items-center justify-center cursor-pointer border border-zinc-800 transition-all" title="Refresh Live Data">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Bullet Points generated from real numbers (Clean monochromatic numbers, zero neon!) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 text-xs text-zinc-300">
-                <?php 
-                $bullets = ! empty( $cora_take['bullets'] ) ? $cora_take['bullets'] : array(
-                    'Zero outstanding overdue payments across this workspace.',
-                    'No active fixed overhead commitments recorded yet.',
-                    'Runway trajectory will calibrate automatically as project revenue is logged.'
-                );
-                foreach ( $bullets as $idx => $bullet ) : 
-                ?>
-                <div class="flex items-start gap-2 bg-zinc-900/80 p-3 rounded-xl border border-zinc-800/80">
-                    <span class="text-zinc-400 font-bold"><?php echo ($idx + 1); ?>.</span>
-                    <span class="text-zinc-200"><?php echo wp_kses_post( $bullet ); ?></span>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-
-        <!-- 2. FINANCIAL SNAPSHOT (4 Core Cards) -->
+        <!-- 1. FINANCIAL SNAPSHOT (4 Core Numbers at Top Priority) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
             <!-- Card 1: Available Cash -->
             <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
                 <div class="flex items-center justify-between">
                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Available Cash</span>
-                    <span class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">₹</span>
+                    <span class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">₹</span>
                 </div>
                 <div>
                     <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $available_cash ); ?></div>
@@ -376,11 +327,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <?php 
                 if ( $monthly_rec > 0 && $available_cash > 0 ) {
                     $runway_months = round( $available_cash / $monthly_rec, 1 );
-                    $buffer_badge_class = 'text-emerald-600 bg-emerald-50';
+                    $buffer_badge_class = 'text-zinc-800 bg-zinc-100';
                     $buffer_badge_text = "● Buffer: ~{$runway_months} Mo Safe";
                 } elseif ( $available_cash > 0 ) {
-                    $buffer_badge_class = 'text-emerald-600 bg-emerald-50';
-                    $buffer_badge_text = "● Buffer: ₹" . number_format($available_cash) . " (No burn)";
+                    $buffer_badge_class = 'text-zinc-800 bg-zinc-100';
+                    $buffer_badge_text = "● Buffer: ₹" . number_format($available_cash);
                 } else {
                     $buffer_badge_class = 'text-zinc-500 bg-zinc-100';
                     $buffer_badge_text = "Ready to record";
@@ -395,7 +346,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
                 <div class="flex items-center justify-between">
                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Expected In</span>
-                    <span class="w-6 h-6 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs">
+                    <span class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
                     </span>
                 </div>
@@ -403,7 +354,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $expected_in ); ?></div>
                     <div class="text-[11px] text-zinc-500 font-medium mt-0.5">From outstanding invoices</div>
                 </div>
-                <div class="text-[10px] font-semibold <?php echo $overdue_total > 0 ? 'text-red-600 bg-red-50' : 'text-zinc-500 bg-zinc-100'; ?> px-2 py-0.5 rounded-md inline-block w-fit">
+                <div class="text-[10px] font-semibold <?php echo $overdue_total > 0 ? 'text-red-700 bg-red-50' : 'text-zinc-500 bg-zinc-100'; ?> px-2 py-0.5 rounded-md inline-block w-fit">
                     <?php echo $overdue_total > 0 ? '₹' . number_format( $overdue_total ) . ' Overdue' : '0 Overdue'; ?>
                 </div>
             </div>
@@ -412,7 +363,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
                 <div class="flex items-center justify-between">
                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Expected Out</span>
-                    <span class="w-6 h-6 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs">
+                    <span class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
                     </span>
                 </div>
@@ -440,6 +391,53 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <div class="text-[10px] font-semibold text-zinc-300 bg-zinc-800/80 px-2 py-0.5 rounded-md inline-block w-fit border border-zinc-700">
                     Net: <?php echo $projected_cash >= 0 ? 'Healthy Position' : 'Deficit Warning'; ?>
                 </div>
+            </div>
+        </div>
+
+        <!-- 2. FINANCIAL AGENT INSIGHT (Clean, Compact Monochromatic Card) -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200 shadow-xs space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center font-bold text-xs shrink-0">
+                        C
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-zinc-900">Financial Agent</span>
+                            <span class="px-1.5 py-0.2 rounded text-[9.5px] font-semibold bg-zinc-100 text-zinc-600">Live Analysis</span>
+                        </div>
+                        <p class="text-xs text-zinc-600 font-medium mt-0.5" id="cora-take-headline">
+                            <?php echo esc_html( $cora_take['headline'] ?? 'Your cash buffer is healthy; collecting overdue receivables will optimize month-end position.' ); ?>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" onclick="window.coraOpenCopilot()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 transition-all cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        <span>Ask Cora</span>
+                    </button>
+                    <button type="button" onclick="window.coraRefreshFinancials()" class="w-7 h-7 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border border-zinc-200 transition-all" title="Refresh Live Data">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bullet Points (Clean 3-column micro layout on desktop, clean compact stack on mobile) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs text-zinc-600">
+                <?php 
+                $bullets = ! empty( $cora_take['bullets'] ) ? $cora_take['bullets'] : array(
+                    'Zero outstanding overdue payments across this workspace.',
+                    'No active fixed overhead commitments recorded yet.',
+                    'Runway trajectory will calibrate automatically as project revenue is logged.'
+                );
+                foreach ( $bullets as $idx => $bullet ) : 
+                ?>
+                <div class="flex items-start gap-2 bg-zinc-50 p-2.5 rounded-xl border border-zinc-100 text-[11px] leading-relaxed">
+                    <span class="text-zinc-400 font-bold"><?php echo ($idx + 1); ?>.</span>
+                    <span class="text-zinc-700"><?php echo wp_kses_post( $bullet ); ?></span>
+                </div>
+                <?php endforeach; ?>
             </div>
         </div>
 
