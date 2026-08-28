@@ -42,7 +42,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 }
 ?>
 
-<div class="max-w-5xl mx-auto py-6 sm:py-10 px-4 space-y-10 select-none font-sans">
+<div class="max-w-5xl mx-auto py-6 sm:py-10 px-4 space-y-10 font-sans">
     
     <!-- Hero Header Section (Clean Frameless Minimalist) -->
     <div class="text-center max-w-2xl mx-auto space-y-4">
