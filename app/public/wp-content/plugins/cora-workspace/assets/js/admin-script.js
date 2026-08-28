@@ -2135,23 +2135,100 @@ jQuery(document).ready(function($) {
                         replyHtml = rawReply;
                     }
                     
-                    if (response.data.action_proposal) {
+                                        if (response.data.action_proposal) {
                         const prop = response.data.action_proposal;
                         window.__coraPendingProposals = window.__coraPendingProposals || {};
                         const propId = 'prop_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
                         window.__coraPendingProposals[propId] = prop;
-                        const propTypeLabel = (prop.type || 'ACTION').replace(/_/g, ' ');
-                        actionHtml += `
-                        <div class="mt-3 p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xs flex flex-col gap-2.5">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider">${propTypeLabel}</span>
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            </div>
-                            <button type="button" onclick="window.coraExecuteProposal('${propId}')" class="w-full py-2.5 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer border-none active:scale-[0.98]">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <span>${prop.action_label || 'Deploy with AI'}</span>
-                            </button>
-                        </div>`;
+
+                        if (prop.type === 'form_agent_action' && prop.payload && prop.payload.blocks) {
+                            const payload = prop.payload;
+                            const blocks = payload.blocks || [];
+                            const formTitle = prop.title || payload.title || 'Client Intake Form';
+                            const stepCount = Math.max(1, ...blocks.map(b => (b.step_index || 0) + 1));
+                            
+                            // Generate miniature field preview markup
+                            let fieldsHtml = '';
+                            blocks.forEach((blk, idx) => {
+                                const isWa = blk.type === 'phone' || (blk.label && blk.label.toLowerCase().includes('whatsapp'));
+                                const reqBadge = blk.required ? '<span class="text-rose-500 font-bold text-[10px]">*</span>' : '';
+                                
+                                let controlHtml = '';
+                                if (blk.type === 'textarea') {
+                                    controlHtml = `<div class="w-full h-11 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1.5 text-[11px] text-zinc-400 select-none">${blk.placeholder || 'Enter notes...'}</div>`;
+                                } else if (blk.type === 'select') {
+                                    controlHtml = `<div class="w-full h-8 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 flex items-center justify-between text-[11px] text-zinc-400 select-none"><span>${blk.placeholder || 'Select option...'}</span><svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg></div>`;
+                                } else if (blk.type === 'signature') {
+                                    controlHtml = `<div class="w-full h-10 bg-zinc-50 dark:bg-zinc-800/60 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg px-2.5 flex items-center justify-center gap-1.5 text-[10.5px] text-zinc-400 select-none"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg><span>Digital Signature Pad</span></div>`;
+                                } else if (blk.type === 'file') {
+                                    controlHtml = `<div class="w-full h-10 bg-zinc-50 dark:bg-zinc-800/60 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg px-2.5 flex items-center justify-center gap-1.5 text-[10.5px] text-zinc-400 select-none"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span>Upload attachments</span></div>`;
+                                } else {
+                                    controlHtml = `<div class="w-full h-8 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 flex items-center gap-1.5 text-[11px] text-zinc-400 select-none">${isWa ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>' : ''}<span class="truncate">${blk.placeholder || blk.label}</span></div>`;
+                                }
+
+                                fieldsHtml += `
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200">${blk.label} ${reqBadge}</span>
+                                        <span class="text-[9.5px] font-mono text-zinc-400 uppercase">Step ${(blk.step_index || 0) + 1}</span>
+                                    </div>
+                                    ${controlHtml}
+                                </div>`;
+                            });
+
+                            actionHtml += `
+                            <div class="mt-3 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-700 rounded-2xl p-4 shadow-sm flex flex-col gap-3.5">
+                                <!-- Card Header -->
+                                <div class="flex items-start justify-between gap-2 pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-950 dark:text-white shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
+                                            <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-100 truncate">${formTitle}</h4>
+                                        </div>
+                                        <p class="text-[10px] text-zinc-400 mt-0.5 font-medium">${stepCount}-Step Multi-Step • ${blocks.length} Live Fields • CRM Sync</p>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">READY</span>
+                                </div>
+
+                                <!-- Visual Form Preview Box -->
+                                <div class="bg-zinc-50/70 dark:bg-zinc-950/50 border border-zinc-200/70 dark:border-zinc-800 rounded-xl p-3 flex flex-col gap-2.5 max-h-56 overflow-y-auto scrollbar-thin">
+                                    ${fieldsHtml}
+                                </div>
+
+                                <!-- Action Buttons Row -->
+                                <div class="flex flex-col gap-2 pt-1">
+                                    <button type="button" onclick="window.coraExecuteProposal('${propId}')" class="w-full h-9 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer border-none active:scale-[0.98]">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        <span>${prop.action_label || 'Deploy & Publish Form'}</span>
+                                    </button>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" onclick="window.coraPreviewProposalForm('${propId}')" class="flex-1 h-8 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-[11px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer border-none">
+                                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                            <span>Preview Live</span>
+                                        </button>
+                                        <button type="button" onclick="window.coraQuickPromptForm('Add a digital signature pad to this form')" class="px-2.5 h-8 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer border-none" title="Add Signature Field">
+                                            <span>+ Signature</span>
+                                        </button>
+                                        <button type="button" onclick="window.coraQuickPromptForm('Add file upload attachments field to this form')" class="px-2.5 h-8 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer border-none" title="Add File Upload">
+                                            <span>+ Files</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>`;
+                        } else {
+                            const propTypeLabel = (prop.type || 'ACTION').replace(/_/g, ' ');
+                            actionHtml += `
+                            <div class="mt-3 p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xs flex flex-col gap-2.5">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider">${propTypeLabel}</span>
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                </div>
+                                <button type="button" onclick="window.coraExecuteProposal('${propId}')" class="w-full py-2.5 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer border-none active:scale-[0.98]">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span>${prop.action_label || 'Deploy with AI'}</span>
+                                </button>
+                            </div>`;
+                        }
                     }
 
                     if (replyHtml || actionHtml) {
@@ -14604,4 +14681,54 @@ window.coraExecuteProposal = function(propId) {
             }
         }
     }
+};
+
+
+window.coraQuickPromptForm = function(promptText) {
+    if (typeof window.coraExecuteAIChat === 'function') {
+        window.coraExecuteAIChat(promptText);
+    } else {
+        var islandInput = document.getElementById('cora-island-ai-input');
+        if (islandInput) {
+            islandInput.value = promptText;
+            if (typeof window.coraSubmitIslandAI === 'function') {
+                window.coraSubmitIslandAI();
+            }
+        }
+    }
+};
+
+window.coraPreviewProposalForm = function(propId) {
+    var prop = (window.__coraPendingProposals && window.__coraPendingProposals[propId]) ? window.__coraPendingProposals[propId] : null;
+    if (!prop || !prop.payload) {
+        if (window.coraShowToast) window.coraShowToast('Form preview not available.', 'error');
+        return;
+    }
+    
+    // Automatically save & deploy form first, then open preview tab
+    if (window.coraShowToast) window.coraShowToast('Deploying & generating live preview...', 'info');
+    
+    var siteUrl = (window.coraREData && window.coraREData.siteUrl) ? window.coraREData.siteUrl : (window.location.origin || '');
+    if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+    var restUrl = siteUrl + '/wp-json/cora/v1/forms';
+    var nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : ((window.cora_vars && window.cora_vars.nonce) ? window.cora_vars.nonce : '');
+
+    jQuery.ajax({
+        url: restUrl,
+        type: 'POST',
+        headers: {
+            'X-WP-Nonce': nonce,
+            'Content-Type': 'application/json'
+        },
+        data: JSON.stringify(prop.payload),
+        success: function(res) {
+            var formKey = (res && res.form_key) ? res.form_key : (prop.payload.form_key || (res && res.id ? res.id : ''));
+            if (window.coraShowToast) window.coraShowToast('Opening live form preview...', 'success');
+            window.open(siteUrl + '/shared-form/' + formKey, '_blank');
+            if (typeof window.fetchForms === 'function') window.fetchForms();
+        },
+        error: function(err) {
+            if (window.coraShowToast) window.coraShowToast('Could not open preview: ' + (err.responseJSON ? err.responseJSON.message : 'Error'), 'error');
+        }
+    });
 };

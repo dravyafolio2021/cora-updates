@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.5.6
+ * Version: 4.5.7
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.5.6' );
+    define( 'CORA_WORKSPACE_VERSION', '4.5.7' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -16386,12 +16386,8 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
         );
 
         $action_label = $target_form_id ? 'Update Form via AI' : 'Deploy Form with AI';
-        $reply = "I've structured **{$form_title}** with Notion-style layout and multi-step validation:\n\n" .
-                 ( $custom_notice ? "✨ *" . trim($custom_notice) . "*\n\n" : "" ) .
-                 "• **Step 1: Contact Details** (Full Name, Work Email, WhatsApp Phone Number)\n" .
-                 "• **Step 2: Project Specifications** (Event Date, Budget Tier, Detailed Notes)\n" .
-                 "• **Automations**: Real-time CRM lead capture + Instant Email Notification\n\n" .
-                 "Tap below to deploy this form directly to your workspace:";
+        $reply = "I've structured **{$form_title}** with Notion-style layout and multi-step validation:" .
+                 ( $custom_notice ? "\n\n✨ *" . trim($custom_notice) . "*" : "" );
 
         wp_send_json_success( array(
             'reply' => $reply,
