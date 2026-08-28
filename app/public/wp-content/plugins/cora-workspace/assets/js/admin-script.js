@@ -4344,7 +4344,7 @@ jQuery(document).ready(function($) {
         if (banner) {
             const tag = document.getElementById('cora-pwa-update-version-tag');
             if (tag) tag.textContent = 'v' + targetVer;
-            banner.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+            banner.classList.remove('-translate-y-24', 'translate-y-24', 'opacity-0', 'pointer-events-none');
             banner.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
         }
     };
@@ -4352,7 +4352,7 @@ jQuery(document).ready(function($) {
     window.coraDismissPwaUpdateBanner = function() {
         const banner = document.getElementById('cora-pwa-update-banner');
         if (banner) {
-            banner.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+            banner.classList.add('-translate-y-24', 'opacity-0', 'pointer-events-none');
             banner.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
         }
     };

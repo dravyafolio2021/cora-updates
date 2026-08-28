@@ -15715,7 +15715,7 @@ jQuery(document).ready(function($) {
 </div>
 
 <!-- Dynamic PWA Version & App Icon Update Banner (Quick Notification) -->
-<div id="cora-pwa-update-banner" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[100002] w-full max-w-md px-4 transition-all duration-300 transform translate-y-24 opacity-0 pointer-events-none font-sans select-none">
+<div id="cora-pwa-update-banner" class="fixed top-18 sm:top-20 left-1/2 -translate-x-1/2 z-[100002] w-full max-w-md px-4 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none font-sans select-none">
     <div class="bg-white border border-zinc-200 rounded-2xl p-4 shadow-2xl flex flex-col gap-3">
         <div class="flex items-start gap-3">
             <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
