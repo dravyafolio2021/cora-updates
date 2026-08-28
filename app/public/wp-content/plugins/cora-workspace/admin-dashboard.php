@@ -12119,55 +12119,47 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             </div>
 
             <!-- STATE 3: Navigation Tabs Bar (Middle) -->
+            <?php
+            $cora_active_sub = empty($sub_page) ? 'dashboard' : str_replace('_', '-', $sub_page);
+            $is_home_act    = ( $cora_active_sub === 'dashboard' || $cora_active_sub === 'home' );
+            $is_content_act = ( $cora_active_sub === 'blogs' );
+            $is_fin_act     = ( $cora_active_sub === 'financials' );
+            $is_users_act   = in_array( $cora_active_sub, array( 'team-roles', 'users', 'user-roles', 'super-users' ), true );
+            $users_target   = cora_is_super_owner() ? 'super-users' : 'team-roles';
+            $is_more_act    = ( ! $is_home_act && ! $is_content_act && ! $is_fin_act && ! $is_users_act );
+            ?>
             <nav id="cora-island-view-nav" class="cora-island-view hidden flex-1 mx-1 flex items-center justify-evenly" style="display: none; flex: 1 1 auto; justify-content: space-around;">
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('dashboard');}" class="cora-island-nav-link" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">Home</span>
+                <!-- Home Item -->
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('dashboard');}" class="cora-island-nav-link <?php echo $is_home_act ? 'cora-active' : ''; ?>" data-island-target="dashboard" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_home_act ? '2.4' : '1.8'; ?>" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_home_act ? '800' : '600'; ?>; margin-top: 1px;">Home</span>
                 </a>
-                <?php
-                $cora_active_custom_feats = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
-                $cora_is_feat_on = function( $slug ) use ( $cora_active_custom_feats ) {
-                    return empty( $cora_active_custom_feats ) || in_array( $slug, $cora_active_custom_feats, true );
-                };
 
-                $cora_mobile_crm_target = 'leads';
-                $cora_mobile_crm_label  = 'CRM';
-                $cora_mobile_crm_icon   = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
-
-                $cora_active_ind = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : ( isset( $current_industry ) ? $current_industry : get_option( 'cora_workspace_industry', 'real_estate' ) );
-                $cora_active_ind_clean = str_replace( '_', '-', strtolower( trim( $cora_active_ind ) ) );
-
-                if ( $cora_active_ind_clean === 'photography' || $cora_active_ind_clean === 'studio' || $cora_active_ind_clean === 'photography-studio' ) {
-                    $cora_mobile_crm_target = 'bookings';
-                    $cora_mobile_crm_label  = 'Bookings';
-                    $cora_mobile_crm_icon   = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
-                }
-
-                if ( $cora_is_feat_on( $cora_mobile_crm_target ) || $cora_is_feat_on( 'leads' ) ) :
-                ?>
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('<?php echo esc_js($cora_mobile_crm_target); ?>');}" class="cora-island-nav-link" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-                    <?php echo $cora_mobile_crm_icon; ?>
-                    <span style="font-size: 9px; font-weight: 700; margin-top: 1px;"><?php echo esc_html($cora_mobile_crm_label); ?></span>
+                <!-- Content Item -->
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('blogs');}" class="cora-island-nav-link <?php echo $is_content_act ? 'cora-active' : ''; ?>" data-island-target="blogs" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_content_act ? '2.4' : '1.8'; ?>" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_content_act ? '800' : '600'; ?>; margin-top: 1px;">Content</span>
                 </a>
-                <?php endif; ?>
 
-                <?php if ( $cora_is_feat_on( 'blogs' ) ) : ?>
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('blogs');}" class="cora-island-nav-link" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                    <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">Content</span>
+                <!-- Finance Item -->
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('financials');}" class="cora-island-nav-link <?php echo $is_fin_act ? 'cora-active' : ''; ?>" data-island-target="financials" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="<?php echo $is_fin_act ? '2.4' : '1.8'; ?>"><path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_fin_act ? '800' : '600'; ?>; margin-top: 1px;">Finance</span>
                 </a>
-                <?php endif; ?>
 
-                <?php if ( $cora_is_feat_on( 'financials' ) ) : ?>
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('financials');}" class="cora-island-nav-link" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/></svg>
-                    <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">Finance</span>
+                <!-- Users Item -->
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('<?php echo esc_js($users_target); ?>');}" class="cora-island-nav-link <?php echo $is_users_act ? 'cora-active' : ''; ?>" data-island-target="<?php echo esc_attr($users_target); ?>" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_users_act ? '2.4' : '1.8'; ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_users_act ? '800' : '600'; ?>; margin-top: 1px;">Users</span>
                 </a>
-                <?php endif; ?>
 
-                <a href="javascript:void(0)" onclick="window.coraToggleMobileNavDrawer(true);" class="cora-island-nav-link" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                    <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">More</span>
+                <!-- More Item (Drawer Trigger) -->
+                <a href="javascript:void(0)" onclick="window.coraToggleMobileNavDrawer(true);" class="cora-island-nav-link <?php echo $is_more_act ? 'cora-active' : ''; ?>" data-island-target="more" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="<?php echo $is_more_act ? '2.4' : '1.8'; ?>" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                    <span style="font-size: 9px; font-weight: <?php echo $is_more_act ? '800' : '600'; ?>; margin-top: 1px;">More</span>
+                    <?php if ( $is_more_act ) : ?>
+                    <span style="position: absolute; top: 2px; right: 8px; width: 4px; height: 4px; border-radius: 99px; background: #09090b;"></span>
+                    <?php endif; ?>
                 </a>
             </nav>
 
@@ -12232,8 +12224,8 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
                     $is_active = ( $sub_page === $target || str_replace('_','-',$sub_page) === str_replace('_','-',$target) );
                     
                     if ( $is_active ) {
-                        $bar_style = 'background:#f4f4f5; border-color:#e4e4e7; color:#09090b; font-weight:700;';
-                        $icon_color = '#09090b';
+                        $bar_style = 'background:#09090b; border-color:#09090b; color:#ffffff; font-weight:700; box-shadow:0 4px 12px rgba(0,0,0,0.12);';
+                        $icon_color = '#ffffff';
                     } else {
                         $bar_style = 'background:#ffffff; border-color:#e4e4e7; color:#27272a; font-weight:600;';
                         $icon_color = '#71717a';

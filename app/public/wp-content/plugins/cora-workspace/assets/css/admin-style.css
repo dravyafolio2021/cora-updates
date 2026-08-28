@@ -440,13 +440,41 @@ body,
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
-    color: #3f3f46 !important;
-    padding: 2px 4px !important;
+    color: #71717a !important;
+    padding: 3px 6px !important;
+    border-radius: 10px !important;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative !important;
 }
 
+.cora-island-nav-link svg {
+    stroke-width: 1.8;
+    transition: stroke-width 0.15s ease, transform 0.15s ease, stroke 0.15s ease !important;
+}
+
+.cora-island-nav-link span {
+    transition: color 0.15s ease, font-weight 0.15s ease !important;
+}
 
 .cora-island-nav-link:hover {
     color: #09090b !important;
+    background: #f4f4f5 !important;
+}
+
+.cora-island-nav-link.cora-active {
+    color: #09090b !important;
+    background: #f4f4f5 !important;
+}
+
+.cora-island-nav-link.cora-active svg {
+    stroke: #09090b !important;
+    stroke-width: 2.4 !important;
+    transform: scale(1.06);
+}
+
+.cora-island-nav-link.cora-active span {
+    color: #09090b !important;
+    font-weight: 800 !important;
 }
 
 /* ==========================================================================
