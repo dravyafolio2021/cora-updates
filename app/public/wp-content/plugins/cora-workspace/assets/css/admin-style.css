@@ -529,6 +529,23 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Mobile Bottom Navigation Sheet & Island Interaction */
+#cora-mobile-nav-drawer {
+    pointer-events: auto !important;
+}
+
+#cora-mobile-nav-drawer-sheet {
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+#cora-mobile-nav-drawer-sheet a {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    cursor: pointer !important;
+}
+
 /* Mobile Smooth Scroll */
 .cora-main, .cora-sidebar, .cora-drawer-scrollable {
     -webkit-overflow-scrolling: touch;

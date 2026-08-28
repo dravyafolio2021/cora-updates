@@ -12115,11 +12115,16 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
 
             <!-- STATE 3: Navigation Tabs Bar (Middle) -->
             <nav id="cora-island-view-nav" class="cora-island-view hidden flex-1 mx-1 flex items-center justify-evenly" style="display: none; flex: 1 1 auto; justify-content: space-around;">
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('dashboard');}" class="cora-island-nav-link">
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('dashboard');}" class="cora-island-nav-link" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                     <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">Home</span>
                 </a>
                 <?php
+                $cora_active_custom_feats = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
+                $cora_is_feat_on = function( $slug ) use ( $cora_active_custom_feats ) {
+                    return empty( $cora_active_custom_feats ) || in_array( $slug, $cora_active_custom_feats, true );
+                };
+
                 $cora_mobile_crm_target = 'leads';
                 $cora_mobile_crm_label  = 'CRM';
                 $cora_mobile_crm_icon   = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
@@ -12132,20 +12137,30 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                     $cora_mobile_crm_label  = 'Bookings';
                     $cora_mobile_crm_icon   = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
                 }
+
+                if ( $cora_is_feat_on( $cora_mobile_crm_target ) || $cora_is_feat_on( 'leads' ) ) :
                 ?>
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('<?php echo esc_js($cora_mobile_crm_target); ?>');}" class="cora-island-nav-link">
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('<?php echo esc_js($cora_mobile_crm_target); ?>');}" class="cora-island-nav-link" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <?php echo $cora_mobile_crm_icon; ?>
                     <span style="font-size: 9px; font-weight: 700; margin-top: 1px;"><?php echo esc_html($cora_mobile_crm_label); ?></span>
                 </a>
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('blogs');}" class="cora-island-nav-link">
+                <?php endif; ?>
+
+                <?php if ( $cora_is_feat_on( 'blogs' ) ) : ?>
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('blogs');}" class="cora-island-nav-link" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                     <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">Content</span>
                 </a>
-                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('financials');}" class="cora-island-nav-link">
+                <?php endif; ?>
+
+                <?php if ( $cora_is_feat_on( 'financials' ) ) : ?>
+                <a href="javascript:void(0)" onclick="if(typeof coraNavigateTo==='function'){coraNavigateTo('financials');}" class="cora-island-nav-link" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14M5 9h14M8 4v1a5 5 0 0 0 0 8h1L19 20M8 13h5a4 4 0 0 0 0-8H8"/></svg>
                     <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">Finance</span>
                 </a>
-                <a href="javascript:void(0)" onclick="window.coraToggleMobileNavDrawer(true);" class="cora-island-nav-link">
+                <?php endif; ?>
+
+                <a href="javascript:void(0)" onclick="window.coraToggleMobileNavDrawer(true);" class="cora-island-nav-link" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                     <span style="font-size: 9px; font-weight: 700; margin-top: 1px;">More</span>
                 </a>
@@ -12164,13 +12179,19 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
 
 <?php
 $cora_mobile_drawer_items = array();
+$enabled_custom_features = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
 if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
     foreach ( $nav_groups as $group ) {
         if ( empty( $group['items'] ) || ! is_array( $group['items'] ) ) continue;
         foreach ( $group['items'] as $target => $item ) {
             $super_pages = array( 'super-admin', 'super-users', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs' );
-            if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
-                continue;
+            if ( ! in_array( $target, $super_pages, true ) ) {
+                if ( ! empty( $enabled_custom_features ) && ! in_array( $target, $enabled_custom_features, true ) && ! in_array( $target, array( 'dashboard', 'feature-hub', 'settings-suite', 'settings' ), true ) ) {
+                    continue;
+                }
+                if ( function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
+                    continue;
+                }
             }
             $cora_mobile_drawer_items[$target] = $item;
         }
@@ -12180,26 +12201,26 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 <!-- Mobile Bottom Navigation Drawer Sheet (outside #cora-workspace so it renders as true fixed portal) -->
 <div id="cora-mobile-nav-drawer" style="display:none; position:fixed; inset:0; z-index:99999; flex-direction:column; justify-content:flex-end;">
     <!-- Backdrop -->
-    <div onclick="window.coraToggleMobileNavDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);"></div>
+    <div onclick="window.coraToggleMobileNavDrawer(false)" style="position:absolute; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); cursor:pointer;"></div>
 
     <!-- Drawer Sheet -->
-    <div id="cora-mobile-nav-drawer-sheet" style="position:relative; z-index:1; width:100%; background:#fff; border-top:1px solid #e4e4e7; border-radius:24px 24px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,0.12); display:flex; flex-direction:column; max-height:75vh; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); transform:translateY(100%); padding-bottom:max(12px,env(safe-area-inset-bottom,0px));">
+    <div id="cora-mobile-nav-drawer-sheet" style="position:relative; z-index:10; width:100%; background:#ffffff; border-top:1px solid #e4e4e7; border-radius:24px 24px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,0.12); display:flex; flex-direction:column; max-height:75vh; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); transform:translateY(100%); padding-bottom:max(16px,env(safe-area-inset-bottom,0px)); pointer-events:auto; touch-action:pan-y;">
 
         <!-- Drag Handle -->
-        <div onclick="window.coraToggleMobileNavDrawer(false)" style="display:flex; align-items:center; justify-content:center; padding:10px 0 6px; cursor:pointer; flex-shrink:0;">
+        <div onclick="window.coraToggleMobileNavDrawer(false)" style="display:flex; align-items:center; justify-content:center; padding:12px 0 8px; cursor:pointer; flex-shrink:0; touch-action:manipulation;">
             <div style="width:44px; height:5px; border-radius:99px; background:#d4d4d8;"></div>
         </div>
 
         <!-- Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 20px 12px; border-bottom:1px solid #f4f4f5; flex-shrink:0;">
-            <span style="font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#a1a1aa;">All Modules &amp; Tools</span>
-            <button onclick="window.coraToggleMobileNavDrawer(false)" style="background:none; border:none; cursor:pointer; color:#a1a1aa; padding:4px; display:flex; align-items:center; justify-content:center; border-radius:50%;">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span style="font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#71717a;">All Modules &amp; Tools</span>
+            <button onclick="window.coraToggleMobileNavDrawer(false)" style="background:none; border:none; cursor:pointer; color:#71717a; padding:6px; display:flex; align-items:center; justify-content:center; border-radius:50%; touch-action:manipulation;">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
 
         <!-- List of 1 Column Bars -->
-        <div style="flex:1; overflow-y:auto; padding:16px 20px; -webkit-overflow-scrolling:touch;">
+        <div style="flex:1; overflow-y:auto; padding:16px 20px; -webkit-overflow-scrolling:touch; touch-action:pan-y;">
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <?php foreach ( $cora_mobile_drawer_items as $target => $item ) :
                     $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
@@ -12213,11 +12234,11 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
                         $icon_color = '#71717a';
                     }
                 ?>
-                <a href="<?php echo esc_url($nav_url); ?>" style="display:flex; align-items:center; gap:12px; padding:12px 16px; border:1px solid; border-radius:12px; text-decoration:none; transition:all 0.15s; <?php echo $bar_style; ?>">
-                    <span class="cora-mobile-nav-icon-wrapper" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; color:<?php echo $icon_color; ?>; flex-shrink:0;">
+                <a href="<?php echo esc_url($nav_url); ?>" onclick="if(typeof window.coraNavigateTo==='function'){ event.preventDefault(); window.coraToggleMobileNavDrawer(false); window.coraNavigateTo('<?php echo esc_js($target); ?>'); } else { window.coraToggleMobileNavDrawer(false); }" style="display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid; border-radius:12px; text-decoration:none; transition:all 0.15s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer; pointer-events:auto; <?php echo $bar_style; ?>">
+                    <span class="cora-mobile-nav-icon-wrapper" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; color:<?php echo $icon_color; ?>; flex-shrink:0;">
                         <?php echo $item['icon']; ?>
                     </span>
-                    <span style="font-size:13px; letter-spacing:-0.01em; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?php echo esc_html($item['title']); ?></span>
+                    <span style="font-size:13.5px; letter-spacing:-0.01em; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?php echo esc_html($item['title']); ?></span>
                 </a>
                 <?php endforeach; ?>
             </div>
@@ -12247,21 +12268,24 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
                 window.coraToggleSidebar(false);
             }
             if (!fromPopState) {
-                history.pushState({ drawer: 'mobile-nav' }, '');
+                try { history.pushState({ drawer: 'mobile-nav' }, ''); } catch(e) {}
             }
             drawer.style.display = 'flex';
-            sheet.getBoundingClientRect();
-            sheet.style.transform = 'translateY(0)';
+            drawer.style.pointerEvents = 'auto';
+            requestAnimationFrame(function() {
+                sheet.style.transform = 'translateY(0)';
+            });
             document.body.style.overflow = 'hidden';
         } else {
             sheet.style.transform = 'translateY(100%)';
             document.body.style.overflow = '';
             setTimeout(function() {
                 drawer.style.display = 'none';
-            }, 310);
+                drawer.style.pointerEvents = 'none';
+            }, 280);
 
             if (!fromPopState && history.state && history.state.drawer === 'mobile-nav') {
-                history.back();
+                try { history.back(); } catch(e) {}
             }
         }
     };
