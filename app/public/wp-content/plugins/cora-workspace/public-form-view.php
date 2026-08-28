@@ -68,40 +68,21 @@ $ws_initial = strtoupper( substr( trim( $workspace_name ), 0, 1 ) ) ?: 'C';
             --form-choice-hover: #F4F4F5;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --form-bg: #09090B;
-                --form-card: #18181B;
-                --form-border: #27272A;
-                --form-text: #FAFAFA;
-                --form-label: #F4F4F5;
-                --form-subtext: #A1A1AA;
-                --form-input-bg: #27272A;
-                --form-input-border: #3F3F46;
-                --form-input-text: #FAFAFA;
-                --form-input-placeholder: #71717A;
-                --form-focus-ring: #FFFFFF;
-                --form-choice-bg: #27272A;
-                --form-choice-border: #3F3F46;
-                --form-choice-hover: #3F3F46;
-            }
-        }
-
-        .dark {
-            --form-bg: #09090B;
-            --form-card: #18181B;
-            --form-border: #27272A;
-            --form-text: #FAFAFA;
-            --form-label: #F4F4F5;
-            --form-subtext: #A1A1AA;
-            --form-input-bg: #27272A;
-            --form-input-border: #3F3F46;
-            --form-input-text: #FAFAFA;
-            --form-input-placeholder: #71717A;
-            --form-focus-ring: #FFFFFF;
-            --form-choice-bg: #27272A;
-            --form-choice-border: #3F3F46;
-            --form-choice-hover: #3F3F46;
+        html.dark, body.dark, .dark {
+            --form-bg: #09090B !important;
+            --form-card: #18181B !important;
+            --form-border: #27272A !important;
+            --form-text: #FAFAFA !important;
+            --form-label: #F4F4F5 !important;
+            --form-subtext: #A1A1AA !important;
+            --form-input-bg: #27272A !important;
+            --form-input-border: #3F3F46 !important;
+            --form-input-text: #FAFAFA !important;
+            --form-input-placeholder: #71717A !important;
+            --form-focus-ring: #FFFFFF !important;
+            --form-choice-bg: #27272A !important;
+            --form-choice-border: #3F3F46 !important;
+            --form-choice-hover: #3F3F46 !important;
         }
 
         body {
