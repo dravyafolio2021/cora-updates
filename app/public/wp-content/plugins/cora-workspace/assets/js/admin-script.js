@@ -522,18 +522,16 @@ jQuery(document).ready(function($) {
     })();
 
     $(document).on('click', '.cora-nav-item, .cora-bottom-nav-item', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         const item = $(this).closest('.cora-nav-item, .cora-bottom-nav-item');
         
         if (item.hasClass('cora-nav-soon')) {
-            e.preventDefault();
-            e.stopPropagation();
             window.coraShowToast("AI Assistants & Automation features are coming soon. Stay tuned!");
             return false;
         }
 
         if (item.hasClass('cora-nav-locked')) {
-            e.preventDefault();
-            e.stopPropagation();
             window.coraShowToast("Gallery SEO Tagging is a Premium feature. Upgrade to unlock.");
             return false;
         }
@@ -548,6 +546,7 @@ jQuery(document).ready(function($) {
             $('.cora-sidebar').addClass('-translate-x-full');
             $('#cora-sidebar-backdrop').addClass('hidden');
         }
+        return false;
     });
 
     // Mobile specific AI tab trigger (slides sidebar in/out)

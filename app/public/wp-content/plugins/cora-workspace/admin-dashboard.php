@@ -4001,7 +4001,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             $nav_url = home_url( '/' . $cora_ws_slug . '/' . $target );
                         ?>
                         <li class="list-none" data-target="<?php echo esc_attr($target); ?>">
-                            <a href="<?php echo esc_url( $nav_url ); ?>" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 hover:text-zinc-950" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
+                            <a href="javascript:void(0)" onclick="if(typeof window.coraNavigateTo==='function'){ event.preventDefault(); window.coraNavigateTo('<?php echo esc_js($target); ?>'); }" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 hover:text-zinc-950" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
                                 <div class="flex items-center gap-3 select-none">
                                     <span class="cora-nav-icon select-none">
                                         <?php echo $item['icon']; ?>
@@ -12239,7 +12239,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
                         $icon_color = '#71717a';
                     }
                 ?>
-                <a href="<?php echo esc_url($nav_url); ?>" onclick="if(typeof window.coraNavigateTo==='function'){ event.preventDefault(); window.coraToggleMobileNavDrawer(false); window.coraNavigateTo('<?php echo esc_js($target); ?>'); } else { window.coraToggleMobileNavDrawer(false); }" style="display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid; border-radius:12px; text-decoration:none; transition:all 0.15s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer; pointer-events:auto; <?php echo $bar_style; ?>">
+                <a href="javascript:void(0)" onclick="if(typeof window.coraNavigateTo==='function'){ event.preventDefault(); window.coraToggleMobileNavDrawer(false); window.coraNavigateTo('<?php echo esc_js($target); ?>'); } else { window.coraToggleMobileNavDrawer(false); }" style="display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid; border-radius:12px; text-decoration:none; transition:all 0.15s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer; pointer-events:auto; <?php echo $bar_style; ?>">
                     <span class="cora-mobile-nav-icon-wrapper" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; color:<?php echo $icon_color; ?>; flex-shrink:0;">
                         <?php echo $item['icon']; ?>
                     </span>

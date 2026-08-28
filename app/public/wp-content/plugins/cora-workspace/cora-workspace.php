@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.3.3
+ * Version: 4.3.4
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.3.3' );
+    define( 'CORA_WORKSPACE_VERSION', '4.3.4' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -1533,7 +1533,12 @@ function cora_workspace_handle_workspace_route() {
         // Auto-assign workspace owner role if user is new or has standard subscriber/empty role
         $user_roles = (array) ( $user ? $user->roles : array() );
         if ( $user && ( in_array( 'subscriber', $user_roles, true ) || empty( $user_roles ) || in_array( 'cora_owner', $user_roles, true ) || in_array( 'cora_workspace_owner', $user_roles, true ) ) ) {
-            $user->set_role( 'cora_super_admin' );
+            if ( cora_is_super_owner( $user ) ) {
+                $user->set_role( 'cora_super_admin' );
+            } else {
+                $user->set_role( 'administrator' );
+                update_user_meta( $user->ID, 'cora_user_role', 'owner' );
+            }
             $user_roles = (array) $user->roles;
         }
 
