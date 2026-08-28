@@ -1,6 +1,6 @@
 <?php
 /**
- * Cora Workspace - Workspace Calendar (Frameless Minimalist UI & Official Integrations)
+ * Cora Workspace - Workspace Calendar (Ultra-Minimalist Frameless UI)
  * File: views/view-calendar.php
  */
 
@@ -42,10 +42,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 }
 ?>
 
-<div class="max-w-5xl mx-auto py-6 sm:py-10 px-4 space-y-10 font-sans">
+<div class="max-w-3xl mx-auto py-12 sm:py-20 px-4 space-y-8 font-sans">
     
-    <!-- Hero Header Section (Clean Frameless Minimalist) -->
-    <div class="text-center max-w-2xl mx-auto space-y-4">
+    <!-- Hero Header Section (Clean Ultra-Minimalist) -->
+    <div class="text-center space-y-4">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-800">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Early Access Opening Soon</span>
@@ -54,12 +54,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <h2 class="text-3xl sm:text-4xl font-extrabold text-zinc-950 tracking-tight m-0">
             Unified Calendar &amp; Scheduling
         </h2>
-        <p class="text-sm text-zinc-500 leading-relaxed font-normal m-0 max-w-lg mx-auto">
+        <p class="text-xs sm:text-sm text-zinc-500 leading-relaxed font-normal m-0 max-w-lg mx-auto">
             Bidirectional 2-way sync with your primary calendars. Seamless client booking links and conflict-free crew scheduling.
         </p>
 
         <!-- Waitlist Intake Bar -->
-        <div id="cora-calendar-intent-container" class="pt-3 max-w-md mx-auto">
+        <div id="cora-calendar-intent-container" class="pt-2 max-w-md mx-auto">
             <?php if ( $already_joined ) : ?>
             <div class="p-4 bg-zinc-100/70 rounded-2xl text-center space-y-1.5">
                 <div class="flex items-center justify-center gap-2 text-xs font-bold text-zinc-900">
@@ -94,137 +94,56 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
     </div>
 
-    <!-- Supported Platforms Grid (No Harsh Outlines · Official Brand Logos) -->
-    <div class="space-y-4">
-        <div class="flex items-center justify-between px-1">
-            <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider m-0">Supported Platforms</h3>
-            <span class="text-[11px] font-mono text-zinc-400">OAuth 2.0 Ready</span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            
-            <!-- 1. Google Calendar -->
-            <div class="p-4 bg-zinc-50/70 hover:bg-zinc-100/70 rounded-2xl transition-all flex flex-col justify-between gap-3 group">
-                <div class="flex items-start gap-3.5">
-                    <div class="shrink-0">
-                        <svg viewBox="0 0 192 192" width="32" height="32">
-                            <rect width="192" height="192" rx="36" fill="#fff"/>
-                            <path d="M144 48H48v96h96V48z" fill="#fff"/>
-                            <path d="M144 48v24H48V48h24V32h16v16h32V32h16v16h8z" fill="#EA4335"/>
-                            <path d="M144 72H48v72h96V72z" fill="#4285F4"/>
-                            <path d="M48 72h24v72H48z" fill="#FBBC04"/>
-                            <path d="M48 144h96v8a16 16 0 0 1-16 16H64a16 16 0 0 1-16-16v-8z" fill="#34A853"/>
-                            <path d="M144 72v72h16a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16h-16v24z" fill="#188038"/>
-                            <text x="96" y="125" font-size="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" fill="#1e293b" text-anchor="middle">31</text>
-                        </svg>
-                    </div>
-                    <div>
-                        <h4 class="text-xs font-bold text-zinc-950 m-0">Google Calendar</h4>
-                        <p class="text-[11px] text-zinc-500 m-0 mt-0.5 leading-normal">Gmail &amp; Google Workspace</p>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <span class="text-[10px] font-semibold text-emerald-600 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 2-Way Sync
-                    </span>
-                    <span class="text-[10px] font-mono text-zinc-400">v3 API</span>
-                </div>
+    <!-- Supported Platform Icons Only (Clean Centered Row) -->
+    <div class="pt-4 flex flex-col items-center justify-center gap-3">
+        <span class="text-[11px] font-mono font-medium text-zinc-400 uppercase tracking-widest">Supported 2-Way Sync Ecosystems</span>
+        
+        <div class="flex items-center justify-center gap-6 sm:gap-8 flex-wrap">
+            <!-- Google Calendar -->
+            <div class="flex items-center gap-2 text-xs font-semibold text-zinc-750 hover:text-zinc-950 transition-colors" title="Google Calendar & Workspace (2-Way Sync)">
+                <svg viewBox="0 0 192 192" width="26" height="26">
+                    <rect width="192" height="192" rx="36" fill="#fff"/>
+                    <path d="M144 48H48v96h96V48z" fill="#fff"/>
+                    <path d="M144 48v24H48V48h24V32h16v16h32V32h16v16h8z" fill="#EA4335"/>
+                    <path d="M144 72H48v72h96V72z" fill="#4285F4"/>
+                    <path d="M48 72h24v72H48z" fill="#FBBC04"/>
+                    <path d="M48 144h96v8a16 16 0 0 1-16 16H64a16 16 0 0 1-16-16v-8z" fill="#34A853"/>
+                    <path d="M144 72v72h16a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16h-16v24z" fill="#188038"/>
+                    <text x="96" y="125" font-size="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" fill="#1e293b" text-anchor="middle">31</text>
+                </svg>
+                <span class="hidden sm:inline">Google Calendar</span>
             </div>
 
-            <!-- 2. Microsoft Outlook -->
-            <div class="p-4 bg-zinc-50/70 hover:bg-zinc-100/70 rounded-2xl transition-all flex flex-col justify-between gap-3 group">
-                <div class="flex items-start gap-3.5">
-                    <div class="shrink-0">
-                        <svg viewBox="0 0 48 48" width="32" height="32">
-                            <rect width="48" height="48" rx="10" fill="#0078D4"/>
-                            <path fill="#0364B8" d="M4 14v22c0 2.2 1.8 4 4 4h32c2.2 0 4-1.8 4-4V14z"/>
-                            <path fill="#28A8EA" d="M44 14L24 27 4 14V12c0-2.2 1.8-4 4-4h32c2.2 0 4 1.8 4 4v2z"/>
-                            <rect width="18" height="18" x="6" y="15" fill="#005A9E" rx="4"/>
-                            <text x="15" y="28" font-size="12" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" fill="#fff" text-anchor="middle">O</text>
-                        </svg>
-                    </div>
-                    <div>
-                        <h4 class="text-xs font-bold text-zinc-950 m-0">Microsoft Outlook</h4>
-                        <p class="text-[11px] text-zinc-500 m-0 mt-0.5 leading-normal">Microsoft 365 &amp; Exchange</p>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <span class="text-[10px] font-semibold text-emerald-600 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 2-Way Sync
-                    </span>
-                    <span class="text-[10px] font-mono text-zinc-400">Graph API</span>
-                </div>
+            <!-- Microsoft Outlook -->
+            <div class="flex items-center gap-2 text-xs font-semibold text-zinc-750 hover:text-zinc-950 transition-colors" title="Microsoft Outlook & Office 365 (2-Way Sync)">
+                <svg viewBox="0 0 48 48" width="26" height="26">
+                    <rect width="48" height="48" rx="10" fill="#0078D4"/>
+                    <path fill="#0364B8" d="M4 14v22c0 2.2 1.8 4 4 4h32c2.2 0 4-1.8 4-4V14z"/>
+                    <path fill="#28A8EA" d="M44 14L24 27 4 14V12c0-2.2 1.8-4 4-4h32c2.2 0 4 1.8 4 4v2z"/>
+                    <rect width="18" height="18" x="6" y="15" fill="#005A9E" rx="4"/>
+                    <text x="15" y="28" font-size="12" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" fill="#fff" text-anchor="middle">O</text>
+                </svg>
+                <span class="hidden sm:inline">Outlook</span>
             </div>
 
-            <!-- 3. Apple Calendar -->
-            <div class="p-4 bg-zinc-50/70 hover:bg-zinc-100/70 rounded-2xl transition-all flex flex-col justify-between gap-3 group">
-                <div class="flex items-start gap-3.5">
-                    <div class="shrink-0">
-                        <svg viewBox="0 0 48 48" width="32" height="32">
-                            <rect width="48" height="48" rx="10" fill="#FFFFFF"/>
-                            <path d="M0 10C0 4.477 4.477 0 10 0h28c5.523 0 10 4.477 10 10v6H0v-6z" fill="#FF3B30"/>
-                            <text x="24" y="37" font-size="20" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" fill="#1C1C1E" text-anchor="middle">17</text>
-                        </svg>
-                    </div>
-                    <div>
-                        <h4 class="text-xs font-bold text-zinc-950 m-0">Apple Calendar</h4>
-                        <p class="text-[11px] text-zinc-500 m-0 mt-0.5 leading-normal">macOS &amp; iOS iCloud</p>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <span class="text-[10px] font-semibold text-emerald-600 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> CalDAV
-                    </span>
-                    <span class="text-[10px] font-mono text-zinc-400">iCloud</span>
-                </div>
+            <!-- Apple Calendar -->
+            <div class="flex items-center gap-2 text-xs font-semibold text-zinc-750 hover:text-zinc-950 transition-colors" title="Apple Calendar & iCloud (CalDAV)">
+                <svg viewBox="0 0 48 48" width="26" height="26">
+                    <rect width="48" height="48" rx="10" fill="#FFFFFF"/>
+                    <path d="M0 10C0 4.477 4.477 0 10 0h28c5.523 0 10 4.477 10 10v6H0v-6z" fill="#FF3B30"/>
+                    <text x="24" y="37" font-size="20" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" fill="#1C1C1E" text-anchor="middle">17</text>
+                </svg>
+                <span class="hidden sm:inline">Apple Calendar</span>
             </div>
 
-            <!-- 4. Calendly & Cal.com -->
-            <div class="p-4 bg-zinc-50/70 hover:bg-zinc-100/70 rounded-2xl transition-all flex flex-col justify-between gap-3 group">
-                <div class="flex items-start gap-3.5">
-                    <div class="shrink-0">
-                        <svg viewBox="0 0 48 48" width="32" height="32">
-                            <circle cx="24" cy="24" r="24" fill="#006BFF"/>
-                            <path d="M33 24c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.35 0 4.5.9 6.1 2.38l-2.4 2.4A5.6 5.6 0 0 0 24 18.6c-2.98 0-5.4 2.42-5.4 5.4s2.42 5.4 5.4 5.4 5.4-2.42 5.4-5.4h3.6z" fill="#fff"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h4 class="text-xs font-bold text-zinc-950 m-0">Calendly / Cal.com</h4>
-                        <p class="text-[11px] text-zinc-500 m-0 mt-0.5 leading-normal">Client Self-Booking Links</p>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <span class="text-[10px] font-semibold text-emerald-600 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Webhooks
-                    </span>
-                    <span class="text-[10px] font-mono text-zinc-400">REST API</span>
-                </div>
+            <!-- Calendly / Cal.com -->
+            <div class="flex items-center gap-2 text-xs font-semibold text-zinc-750 hover:text-zinc-950 transition-colors" title="Calendly & Cal.com (Booking Links)">
+                <svg viewBox="0 0 48 48" width="26" height="26">
+                    <circle cx="24" cy="24" r="24" fill="#006BFF"/>
+                    <path d="M33 24c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.35 0 4.5.9 6.1 2.38l-2.4 2.4A5.6 5.6 0 0 0 24 18.6c-2.98 0-5.4 2.42-5.4 5.4s2.42 5.4 5.4 5.4 5.4-2.42 5.4-5.4h3.6z" fill="#fff"/>
+                </svg>
+                <span class="hidden sm:inline">Cal.com / Calendly</span>
             </div>
-
-        </div>
-    </div>
-
-    <!-- Core Capabilities (Clean Minimalist Frameless) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-        <div class="space-y-1.5">
-            <h4 class="text-xs font-bold text-zinc-950 m-0">Conflict-Free Roster</h4>
-            <p class="text-xs text-zinc-500 leading-relaxed m-0">
-                Personal and workspace calendars continuously cross-check to prevent double bookings.
-            </p>
-        </div>
-
-        <div class="space-y-1.5">
-            <h4 class="text-xs font-bold text-zinc-950 m-0">Branded Booking Links</h4>
-            <p class="text-xs text-zinc-500 leading-relaxed m-0">
-                Custom scheduling pages with pre-set durations, questionnaires, and buffer rules.
-            </p>
-        </div>
-
-        <div class="space-y-1.5">
-            <h4 class="text-xs font-bold text-zinc-950 m-0">Automated Reminders</h4>
-            <p class="text-xs text-zinc-500 leading-relaxed m-0">
-                Instant confirmation emails and WhatsApp notifications to minimize no-shows.
-            </p>
         </div>
     </div>
 
