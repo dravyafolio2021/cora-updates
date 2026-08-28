@@ -4322,8 +4322,8 @@ jQuery(document).ready(function($) {
             backdrop.style.opacity = '1';
         }
 
-        drawer.classList.remove('hidden', 'translate-x-full');
-        drawer.style.transform = 'translateX(0)';
+        drawer.classList.remove('hidden', 'translate-y-full', 'translate-x-full');
+        drawer.style.transform = 'translateY(0)';
 
         // Hide floating pill when drawer is open
         const pill = document.getElementById('cora-pwa-update-pill');
@@ -4335,12 +4335,12 @@ jQuery(document).ready(function($) {
         const drawer = document.getElementById('cora-pwa-update-drawer');
         if (!drawer) return;
 
-        drawer.style.transform = 'translateX(100%)';
+        drawer.style.transform = 'translateY(100%)';
         if (backdrop) {
             backdrop.style.opacity = '0';
             setTimeout(() => backdrop.classList.add('hidden'), 300);
         }
-        setTimeout(() => drawer.classList.add('hidden', 'translate-x-full'), 310);
+        setTimeout(() => drawer.classList.add('hidden', 'translate-y-full'), 310);
     };
 
     window.coraShowPwaUpdateBanner = function(oldVer, newVer) {
