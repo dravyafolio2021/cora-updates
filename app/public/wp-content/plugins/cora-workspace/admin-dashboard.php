@@ -15845,6 +15845,20 @@ jQuery(document).ready(function($) {
                 Your application caches and assets will update immediately upon tapping the button below.
             </p>
         </div>
+
+        <!-- Automatic Background Updates User Consent -->
+        <div class="p-3.5 bg-zinc-50/80 hover:bg-zinc-100/70 border border-zinc-200 rounded-2xl flex items-center justify-between cursor-pointer transition-all select-none" onclick="const cb = document.getElementById('cora-drawer-auto-update-cb'); if(cb){ cb.checked = !cb.checked; window.coraToggleAutoUpdateConsent(cb.checked); }">
+            <div class="flex items-center gap-3 pr-2">
+                <div class="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                </div>
+                <div>
+                    <h5 class="text-xs font-bold text-zinc-900 m-0">Always Auto-Update for Future Releases</h5>
+                    <p class="text-[10.5px] text-zinc-500 m-0 mt-0.5 leading-normal">Silently apply new versions and refresh assets in the background.</p>
+                </div>
+            </div>
+            <input type="checkbox" id="cora-drawer-auto-update-cb" class="w-4 h-4 rounded text-zinc-950 focus:ring-0 focus:ring-offset-0 cursor-pointer" onclick="event.stopPropagation(); window.coraToggleAutoUpdateConsent(this.checked);">
+        </div>
     </div>
 
     <!-- Footer Actions -->

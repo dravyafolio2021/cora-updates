@@ -4443,7 +4443,15 @@ jQuery(document).ready(function($) {
                     } catch(e) {}
 
                     if (installed && installed !== data.version) {
-                        window.coraOpenPwaUpdateDrawer(data.version);
+                        const isAutoSilent = localStorage.getItem('cora_auto_update_silent_consent') === 'true';
+                        if (isAutoSilent) {
+                            if (typeof window.coraShowToast === 'function') {
+                                window.coraShowToast('Auto-updating workspace to v' + data.version + '...', 'info');
+                            }
+                            window.coraApplyPwaUpdate();
+                        } else {
+                            window.coraOpenPwaUpdateDrawer(data.version);
+                        }
                     } else if (showFeedback && window.coraShowToast) {
                         window.coraShowToast(`You're on the latest version (v${data.version}). All assets and icons are synchronized.`);
                     }
@@ -14450,3 +14458,35 @@ jQuery(document).ready(function($) {
             }
         });
     };
+
+
+    // ============================================================
+    // UNIVERSAL AUTO-UPDATE USER CONSENT & SILENT ENGINE
+    // ============================================================
+    window.coraToggleAutoUpdateConsent = function(enabled) {
+        try {
+            localStorage.setItem('cora_auto_update_silent_consent', enabled ? 'true' : 'false');
+            
+            const drawerCb = document.getElementById('cora-drawer-auto-update-cb');
+            const settingsToggle = document.getElementById('cora-settings-auto-update-toggle');
+            if (drawerCb) drawerCb.checked = enabled;
+            if (settingsToggle) settingsToggle.checked = enabled;
+
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast(enabled ? 'Automatic background updates enabled' : 'Automatic background updates disabled', 'info');
+            }
+        } catch(e) {}
+    };
+
+    window.coraHydrateAutoUpdateConsent = function() {
+        try {
+            const isConsent = localStorage.getItem('cora_auto_update_silent_consent') === 'true';
+            const drawerCb = document.getElementById('cora-drawer-auto-update-cb');
+            const settingsToggle = document.getElementById('cora-settings-auto-update-toggle');
+            if (drawerCb) drawerCb.checked = isConsent;
+            if (settingsToggle) settingsToggle.checked = isConsent;
+        } catch(e) {}
+    };
+    $(document).ready(function() {
+        window.coraHydrateAutoUpdateConsent();
+    });

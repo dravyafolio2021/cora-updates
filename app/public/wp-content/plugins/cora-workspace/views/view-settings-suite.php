@@ -3286,6 +3286,40 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 </div>
             </div>
 
+            <!-- Automatic Background Updates Setting Card -->
+            <div class="cora-shopify-card mt-6">
+                <div class="cora-shopify-card-header border-b border-zinc-150 pb-3 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 m-0">Automatic Background Updates</h3>
+                        <p class="text-xs text-zinc-500 m-0">Seamlessly sync new releases, dynamic icons, and offline performance without prompts.</p>
+                    </div>
+                </div>
+
+                <div class="cora-shopify-card-body pt-5 relative space-y-4">
+                    <div class="p-5 bg-zinc-50 border border-zinc-200 rounded-2xl flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="text-xs font-bold text-zinc-900 m-0 flex items-center gap-2">
+                                    <span>Silent Automatic Upgrades</span>
+                                </h4>
+                                <p class="text-xs text-zinc-650 m-0 font-medium leading-relaxed">
+                                    When enabled, new platform updates and updated app icons are applied automatically in the background without showing confirmation dialogs.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Toggle Switch -->
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1 select-none">
+                            <input type="checkbox" id="cora-settings-auto-update-toggle" class="sr-only peer" onchange="window.coraToggleAutoUpdateConsent(this.checked);">
+                            <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zinc-950"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <!-- PWA/App Manual Installation Card -->
             <div class="cora-shopify-card mt-6">
                 <!-- Header -->
