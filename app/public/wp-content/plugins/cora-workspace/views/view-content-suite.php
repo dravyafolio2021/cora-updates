@@ -109,8 +109,8 @@ foreach($cora_posts as $post) {
 $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 ?>
 <!-- Metrics Grid -->
-<div class="cora-metrics-grid mb-6 px-0">
-    <!-- Card 1: Total Articles -->
+<div id="cora-overview-metrics-grid" class="cora-metrics-grid mb-6 px-0">
+    <!-- Card 1: Total Articles (Primary) -->
     <div class="cora-stat-card">
         <div class="flex items-center">
             <div class="p-2 bg-zinc-50 text-zinc-800 border border-zinc-100 rounded-xl flex items-center justify-center shrink-0">
@@ -137,7 +137,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <div class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider mt-1">Active library</div>
     </div>
 
-    <!-- Card 2: Published -->
+    <!-- Card 2: Published (Primary) -->
     <div class="cora-stat-card">
         <div class="flex items-center">
             <div class="p-2 bg-zinc-50 text-zinc-800 border border-zinc-100 rounded-xl flex items-center justify-center shrink-0">
@@ -164,8 +164,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <div class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider mt-1">Live on site</div>
     </div>
 
-    <!-- Card 3: Drafts -->
-    <div class="cora-stat-card">
+    <!-- Card 3: Drafts (Secondary on Mobile) -->
+    <div class="cora-stat-card cora-metric-card-secondary">
         <div class="flex items-center">
             <div class="p-2 bg-zinc-50 text-zinc-800 border border-zinc-100 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
@@ -191,8 +191,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <div class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider mt-1">In progress</div>
     </div>
 
-    <!-- Card 4: Avg SEO Score -->
-    <div class="cora-stat-card">
+    <!-- Card 4: Avg SEO Score (Secondary on Mobile) -->
+    <div class="cora-stat-card cora-metric-card-secondary">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
                 <div class="p-2 bg-zinc-50 text-zinc-800 border border-zinc-100 rounded-xl flex items-center justify-center shrink-0">
@@ -233,8 +233,8 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
     </div>
 
-    <!-- Card 5: Total Leads -->
-    <div class="cora-stat-card">
+    <!-- Card 5: Total Leads (Secondary on Mobile) -->
+    <div class="cora-stat-card cora-metric-card-secondary">
         <div class="flex items-center">
             <div class="p-2 bg-zinc-50 text-zinc-800 border border-zinc-100 rounded-xl flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -259,6 +259,14 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         </div>
         <div class="text-[9px] text-zinc-400 font-bold uppercase tracking-wider mt-1">From content</div>
     </div>
+</div>
+
+<!-- Mobile Metrics Expand/Collapse Toggle -->
+<div class="sm:hidden -mt-3 mb-5 flex justify-center select-none">
+    <button type="button" id="cora-mobile-metrics-toggle" onclick="window.coraToggleMobileMetrics()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-[11px] font-semibold transition-all border-0 cursor-pointer shadow-3xs active:scale-97">
+        <span id="cora-mobile-metrics-toggle-text">Show 3 more metrics</span>
+        <svg id="cora-mobile-metrics-toggle-icon" viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </button>
 </div>
 
 <!-- Tabs Navigation -->
@@ -1193,18 +1201,18 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <div class="flex items-center gap-3 flex-1 w-full max-w-2xl relative" id="seo-dropdown-wrapper">
             <span class="hidden sm:inline-block text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest shrink-0">Active Article:</span>
             <div class="relative flex-1 w-full">
-                <button onclick="coraToggleSEODropdown(event)" class="w-full text-xs font-bold text-zinc-800 hover:text-zinc-950 transition-colors flex items-center justify-between bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 cursor-pointer shadow-3xs select-none">
-                    <span id="seo-active-article-title-display">Select an article...</span>
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 ml-2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                <button onclick="coraToggleSEODropdown(event)" class="w-full text-xs font-semibold text-zinc-850 dark:text-zinc-100 hover:text-zinc-950 dark:hover:text-white transition-all flex items-center justify-between bg-zinc-50/80 hover:bg-zinc-100/80 dark:bg-zinc-900 dark:hover:bg-zinc-850 border border-zinc-200/70 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer shadow-3xs select-none">
+                    <span id="seo-active-article-title-display" class="truncate max-w-[90%]">Select an article...</span>
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 ml-2 text-zinc-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
 
-                <!-- Restructured combobox popover card -->
-                <div id="seo-sidebar" class="hidden absolute left-0 top-full mt-2 w-full min-w-full bg-white border border-zinc-250 rounded-xl shadow-xl z-[999] flex flex-col overflow-hidden max-h-[350px] transition-all duration-200 select-none">
+                <!-- Restructured combobox popover card (No harsh outline, modern elevation) -->
+                <div id="seo-sidebar" class="hidden absolute left-0 top-full mt-2 w-full min-w-full bg-white dark:bg-zinc-900 border-0 rounded-2xl shadow-2xl z-[999] flex flex-col overflow-hidden max-h-[380px] transition-all duration-200 select-none outline-none ring-0" style="box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.04);">
                     <!-- Search Bar -->
-                    <div class="p-3 border-b border-zinc-100 flex items-center gap-2">
-                        <div class="relative flex-1">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-450"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            <input type="text" id="seo-search" class="w-full pl-8 pr-3 py-2 border border-zinc-200/80 rounded-lg text-xs focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-200 bg-zinc-50/50 focus:bg-white transition-all " placeholder="Search title or ID..." oninput="filterSEOArticleList(this.value)">
+                    <div class="p-2.5 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900">
+                        <div class="relative flex items-center">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="absolute left-3 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="text" id="seo-search" class="w-full pl-8.5 pr-3 py-2 bg-zinc-100/70 hover:bg-zinc-100 dark:bg-zinc-800/70 dark:hover:bg-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 outline-none border-0 ring-0 focus:ring-1 focus:ring-zinc-400/30 transition-all font-sans" placeholder="Search title or ID..." oninput="filterSEOArticleList(this.value)">
                         </div>
                     </div>
 
@@ -1213,12 +1221,23 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
                         <?php foreach($cora_posts as $idx => $post): 
                             $score = intval(get_post_meta($post->ID, '_cora_seo_score', true));
                             if (!$score) $score = 75;
-                            $score_cls = ($score >= 80) ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60 ' : (($score >= 50) ? 'bg-amber-50 text-amber-700 border-amber-200/60 ' : 'bg-red-50 text-red-700 border-red-200/60 ');
-                            $modified_time = human_time_diff(get_the_modified_time('U', $post->ID), current_time('timestamp'));
+                            $score_cls = ($score >= 80) 
+                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' 
+                                : (($score >= 50) ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300');
+                            $post_status = get_post_status($post->ID);
+                            $status_label = ($post_status === 'publish') ? 'Published' : 'Draft';
                         ?>
-                        <button class="seo-article-btn w-full text-left p-2 hover:bg-zinc-50/80 rounded-lg border border-transparent hover:border-zinc-200/80 transition-all cursor-pointer flex items-center justify-between gap-3 group <?php echo $idx === 0 ? 'active bg-zinc-50 border-zinc-200/80 shadow-3xs' : ''; ?>" data-id="<?php echo $post->ID; ?>" data-title="<?php echo esc_attr($post->post_title); ?>" data-score="<?php echo $score; ?>" onclick="openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
-                            <span class="text-xs font-semibold text-zinc-700 group-hover:text-zinc-900 transition-colors truncate max-w-[200px] sm:max-w-md leading-tight"><?php echo esc_html($post->post_title); ?></span>
-                            <span class="seo-badge-pill px-1.5 py-0.5 rounded text-[9px] font-extrabold border shrink-0 <?php echo $score_cls; ?>"><?php echo $score; ?>/100</span>
+                        <button class="seo-article-btn w-full text-left px-3 py-2.5 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60 rounded-xl border-0 transition-all cursor-pointer flex items-center justify-between gap-3 group select-none <?php echo $idx === 0 ? 'active bg-zinc-100/80 dark:bg-zinc-800 text-zinc-950 dark:text-white font-semibold' : 'text-zinc-700 dark:text-zinc-300 font-medium'; ?>" data-id="<?php echo $post->ID; ?>" data-title="<?php echo esc_attr($post->post_title); ?>" data-score="<?php echo $score; ?>" onclick="openSEOAnalysis(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
+                            <div class="flex items-center gap-2 min-w-0 flex-1">
+                                <span class="seo-active-check opacity-0 group-[.active]:opacity-100 text-zinc-950 dark:text-white transition-opacity shrink-0">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </span>
+                                <span class="text-xs truncate max-w-[200px] sm:max-w-md leading-tight"><?php echo esc_html($post->post_title); ?></span>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-[10px] text-zinc-400 font-normal"><?php echo $status_label; ?></span>
+                                <span class="seo-badge-pill px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 <?php echo $score_cls; ?>"><?php echo $score; ?>/100</span>
+                            </div>
                         </button>
                         <?php endforeach; ?>
 
@@ -2018,6 +2037,25 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     grid-column: span 2 / span 2 !important;
 }
 
+/* Mobile Collapsible Metrics (2 Primary Cards Shown by Default, 3 Secondary in Toggle) */
+@media (max-width: 639px) {
+    #cora-overview-metrics-grid .cora-stat-card.cora-metric-card-secondary {
+        display: none !important;
+    }
+    #cora-overview-metrics-grid.cora-mobile-metrics-expanded .cora-stat-card.cora-metric-card-secondary {
+        display: flex !important;
+        animation: coraMetricFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #cora-overview-metrics-grid.cora-mobile-metrics-expanded > .cora-stat-card:last-child {
+        grid-column: span 2 / span 2 !important;
+    }
+}
+
+@keyframes coraMetricFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 @media (min-width: 640px) {
     .cora-metrics-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -2290,6 +2328,24 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
 <script>
 (function() {
+    // ============================================================
+    // OVERVIEW: Mobile Metrics Collapsible Toggle
+    // ============================================================
+    window.coraToggleMobileMetrics = function() {
+        const grid = document.getElementById('cora-overview-metrics-grid');
+        const toggleText = document.getElementById('cora-mobile-metrics-toggle-text');
+        const toggleIcon = document.getElementById('cora-mobile-metrics-toggle-icon');
+        if (!grid) return;
+
+        const isExpanded = grid.classList.toggle('cora-mobile-metrics-expanded');
+        if (toggleText) {
+            toggleText.innerText = isExpanded ? 'Show fewer metrics' : 'Show 3 more metrics';
+        }
+        if (toggleIcon) {
+            toggleIcon.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+    };
+
     function showBackdrop() {
         const bd = document.getElementById('cora-drawer-backdrop');
         if(bd) { bd.classList.remove('hidden'); bd.style.pointerEvents = 'auto'; }
@@ -3072,9 +3128,11 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         // Highlight active item in combobox dropdown list
         document.querySelectorAll('.seo-article-btn').forEach(btn => {
             if(btn.dataset.id == articleId) {
-                btn.classList.add('active', 'bg-zinc-50', 'border-zinc-200/80', 'shadow-3xs');
+                btn.classList.add('active', 'bg-zinc-100/80', 'dark:bg-zinc-800', 'text-zinc-950', 'dark:text-white', 'font-semibold');
+                btn.classList.remove('text-zinc-700', 'dark:text-zinc-300', 'font-medium');
             } else {
-                btn.classList.remove('active', 'bg-zinc-50', 'border-zinc-200/80', 'shadow-3xs');
+                btn.classList.remove('active', 'bg-zinc-100/80', 'dark:bg-zinc-800', 'text-zinc-950', 'dark:text-white', 'font-semibold');
+                btn.classList.add('text-zinc-700', 'dark:text-zinc-300', 'font-medium');
             }
         });
 
@@ -6338,12 +6396,10 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if(window.coraShowToast) window.coraShowToast('CSV exported successfully', 'success');
     };
 
-    // (Floating AI Agent JS engine has been extracted to views/partials/floating-agent.php)
-
-    // Open Content Tutorial Walkthrough
+    // Open Content Tutorial Walkthrough (Coming Soon)
     window.coraOpenContentTutorial = function() {
         if (window.coraShowToast) {
-            window.coraShowToast('Launching Cora Content Workflow Video Tutorial...', 'info');
+            window.coraShowToast('Tutorial walkthrough coming soon!', 'info');
         }
     };
 
@@ -6355,120 +6411,184 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 // CORA CONTENT SUITE AI COPILOT ("MYRA" - THE CORA EXPERT)
 // =========================================================================
 (function() {
+    <?php
+    $_cora_agent_img = defined('CORA_WORKSPACE_URL') ? CORA_WORKSPACE_URL . 'assets/images/avatar.png' : plugins_url('assets/images/avatar.png', dirname(dirname(__FILE__)));
+    ?>
     const copilotHtml = `
     <div id="cora-copilot-wrapper" class="font-sans relative">
         <div id="cora-copilot-container">
-            <!-- Floating Chat Window (WhatsApp Style + Search Dashboard) -->
-            <div id="cora-copilot-chat-window" class="bg-white border border-zinc-200 shadow-2xl rounded-2xl flex flex-col h-[460px] transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom">
-                <!-- Chat Header -->
-                <div class="flex items-center justify-between p-3.5 border-b border-zinc-150 bg-[#FBFaf7] rounded-t-2xl select-none">
-                    <div class="flex items-center gap-3">
-                        <div class="relative flex items-center justify-center font-mono">
-                            <div class="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs select-none shadow-xs border border-zinc-200 ">M</div>
-                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-[#FBFaf7] rounded-full"></span>
+            <!-- Floating AI Content Agent Window (100% Opaque Solid Surface, Zero Outline, Executive Intelligence) -->
+            <div id="cora-copilot-chat-window" class="bg-white dark:bg-zinc-950 shadow-2xl rounded-2xl flex flex-col h-[510px] transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom overflow-hidden border-0 ring-0">
+                
+                <!-- Content Agent Header -->
+                <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 select-none">
+                    <div class="flex items-center gap-3.5">
+                        <div class="relative flex items-center justify-center shrink-0">
+                            <img src="<?php echo esc_url($_cora_agent_img); ?>" alt="AI Content Agent" class="w-9 h-9 rounded-xl object-cover shadow-3xs border-0 block bg-zinc-100 dark:bg-zinc-800" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                            <div class="w-9 h-9 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hidden items-center justify-center font-bold text-xs shadow-xs">C</div>
+                            <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-zinc-900 rounded-full animate-pulse"></span>
                         </div>
                         <div>
-                            <div class="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
-                                <span>Myra</span>
-                                <span class="text-[9px] font-semibold text-zinc-500 bg-white/90 border border-zinc-200 px-1.5 py-0.5 rounded tracking-wide font-sans">Cora expert</span>
+                            <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                                <span>Cora Content Agent</span>
+                                <span class="text-[9.5px] font-mono font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md tracking-tight">AI Content Lead</span>
                             </div>
-                            <div class="text-[9px] text-green-600 font-bold" id="cora-copilot-status">online</div>
+                            <div class="flex items-center gap-1.5 text-[10.5px] font-mono text-zinc-400 dark:text-zinc-500 mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                                <span id="cora-copilot-status" class="text-emerald-600 dark:text-emerald-400 font-medium">Strategic Engine &bull; Live Context</span>
+                            </div>
                         </div>
                     </div>
-                    <button id="cora-copilot-close-btn" class="p-1.5 hover:bg-zinc-100 text-zinc-400 hover:text-zinc-850 rounded-lg transition-colors border-none bg-transparent cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[9px] font-mono font-medium text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 rounded">ESC</kbd>
+                        <button id="cora-copilot-close-btn" class="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg transition-colors border-none bg-transparent cursor-pointer flex items-center justify-center">
+                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Chat Dashboard Split Pane (Shown when chatMessages is empty) -->
-                <div id="cora-copilot-dashboard" class="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-zinc-150 flex-1 overflow-y-auto bg-white ">
-                    <!-- Left Pane: Quick Actions & Recent Searches -->
-                    <div class="flex-1 p-5 space-y-6">
+                <!-- Co-Founder Split Intelligence Pane -->
+                <div id="cora-copilot-dashboard" class="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-zinc-100 dark:divide-zinc-800/80 flex-1 overflow-y-auto bg-white dark:bg-zinc-950">
+                    
+                    <!-- Left Pane: Strategic Directives & Workspace Context -->
+                    <div class="flex-1 p-6 space-y-5 bg-white dark:bg-zinc-950">
                         <div>
-                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2.5">Quick Actions</div>
-                            <div class="flex flex-wrap gap-2">
-                                <button type="button" onclick="window.coraExecuteCopilotAction('create_article', 'New Article', this)" class="px-3 py-2 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs font-semibold text-zinc-850 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                    New Article
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[10.5px] font-mono font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Strategic Directives</span>
+                                <span class="text-[10px] font-mono text-zinc-400">1-Click Execution</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <button type="button" onclick="window.coraExecuteCopilotAction('create_article', 'New Article', this)" class="p-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-850 rounded-xl text-left cursor-pointer flex items-start gap-3 transition-all active:scale-[0.98] select-none border-0 group">
+                                    <div class="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-200 shrink-0 shadow-3xs group-hover:bg-zinc-950 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-950 transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Draft Market Article</div>
+                                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-normal leading-tight mt-0.5">Author SEO-structured post</div>
+                                    </div>
                                 </button>
-                                <button type="button" onclick="window.coraSendCopilotMessage('Write AI Content Brief')" class="px-3 py-2 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs font-semibold text-zinc-850 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
-                                    AI Content Brief
+                                <button type="button" onclick="window.coraSendCopilotMessage('Write AI Content Brief')" class="p-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-850 rounded-xl text-left cursor-pointer flex items-start gap-3 transition-all active:scale-[0.98] select-none border-0 group">
+                                    <div class="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-200 shrink-0 shadow-3xs group-hover:bg-zinc-950 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-950 transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Editorial Strategy</div>
+                                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-normal leading-tight mt-0.5">30-day topical roadmap</div>
+                                    </div>
                                 </button>
-                                <button type="button" onclick="switchContentTab('ct-opportunities')" class="px-3 py-2 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs font-semibold text-zinc-850 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                    Keyword Research
+                                <button type="button" onclick="switchContentTab('ct-opportunities')" class="p-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-850 rounded-xl text-left cursor-pointer flex items-start gap-3 transition-all active:scale-[0.98] select-none border-0 group">
+                                    <div class="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-200 shrink-0 shadow-3xs group-hover:bg-zinc-950 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-950 transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Competitor Intent Radar</div>
+                                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-normal leading-tight mt-0.5">High-converting search gaps</div>
+                                    </div>
                                 </button>
-                                <button type="button" onclick="switchContentTab('ct-seo')" class="px-3 py-2 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl text-xs font-semibold text-zinc-850 cursor-pointer flex items-center gap-2 shadow-3xs transition-all active:scale-97 select-none">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                                    Optimizer
+                                <button type="button" onclick="switchContentTab('ct-seo')" class="p-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-850 rounded-xl text-left cursor-pointer flex items-start gap-3 transition-all active:scale-[0.98] select-none border-0 group">
+                                    <div class="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-200 shrink-0 shadow-3xs group-hover:bg-zinc-950 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-950 transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">SEO Optimizer &amp; Score</div>
+                                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-normal leading-tight mt-0.5">Audit rankings &amp; meta</div>
+                                    </div>
                                 </button>
                             </div>
                         </div>
+
                         <div>
-                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2.5">Recent Searches</div>
-                            <div class="flex flex-wrap gap-2">
-                                <button type="button" onclick="window.coraSendCopilotMessage('skincare content ideas')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 rounded-full text-xs text-zinc-700 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">skincare content ideas</button>
-                                <button type="button" onclick="window.coraSendCopilotMessage('wedding photography keywords')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 rounded-full text-xs text-zinc-700 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">wedding photography keywords</button>
-                                <button type="button" onclick="window.coraSendCopilotMessage('ai visibility report')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 rounded-full text-xs text-zinc-700 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">ai visibility report</button>
-                                <button type="button" onclick="window.coraSendCopilotMessage('low ranking pages')" class="px-3 py-1.5 bg-zinc-100/70 hover:bg-zinc-200/70 rounded-full text-xs text-zinc-700 font-semibold border-none cursor-pointer transition-all active:scale-97 select-none">low ranking pages</button>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10.5px] font-mono font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Active Workspace Context</span>
+                                <span class="text-[10px] font-mono text-zinc-400">Context Memory</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button type="button" onclick="window.coraSendCopilotMessage('Draft an authoritative, high-intent market article targeting our core customer persona')" class="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg text-[11px] text-zinc-700 dark:text-zinc-300 font-medium cursor-pointer transition-all active:scale-97 select-none border-0 flex items-center gap-1.5">
+                                    <span class="text-zinc-400 text-[10px]">&rsaquo;</span>
+                                    <span>target market brief</span>
+                                </button>
+                                <button type="button" onclick="window.coraSendCopilotMessage('Identify top 3 low-competition, high-search-intent keywords for our editorial calendar')" class="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg text-[11px] text-zinc-700 dark:text-zinc-300 font-medium cursor-pointer transition-all active:scale-97 select-none border-0 flex items-center gap-1.5">
+                                    <span class="text-zinc-400 text-[10px]">&rsaquo;</span>
+                                    <span>high-intent keywords</span>
+                                </button>
+                                <button type="button" onclick="window.coraSendCopilotMessage('Audit our active search visibility and identify top content opportunities')" class="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg text-[11px] text-zinc-700 dark:text-zinc-300 font-medium cursor-pointer transition-all active:scale-97 select-none border-0 flex items-center gap-1.5">
+                                    <span class="text-zinc-400 text-[10px]">&rsaquo;</span>
+                                    <span>ai search visibility</span>
+                                </button>
+                                <button type="button" onclick="window.coraSendCopilotMessage('Analyze our library drafts with low SEO scores and recommend 1-click upgrades')" class="px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg text-[11px] text-zinc-700 dark:text-zinc-300 font-medium cursor-pointer transition-all active:scale-97 select-none border-0 flex items-center gap-1.5">
+                                    <span class="text-zinc-400 text-[10px]">&rsaquo;</span>
+                                    <span>low ranking pages</span>
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Pane: Suggestions -->
-                    <div class="w-full sm:w-64 p-5 flex flex-col justify-between select-none">
+                    <!-- Right Pane: Proactive Growth Radar & Compute Telemetry -->
+                    <div class="w-full sm:w-80 p-6 flex flex-col justify-between select-none bg-zinc-50/50 dark:bg-zinc-900/50">
                         <div class="space-y-3">
-                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Suggestions</div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10.5px] font-mono font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Proactive Growth Radar</span>
+                                <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">Live Signals</span>
+                            </div>
                             <div class="space-y-1.5">
-                                <div onclick="window.coraSendCopilotMessage('Run index check')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/50 hover:bg-zinc-100/70 cursor-pointer transition-all">
-                                    <span class="text-xs font-semibold text-zinc-700 ">Run index check</span>
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 "><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                <div onclick="window.coraSendCopilotMessage('Audit current draft for SEO gaps, heading structure, and missing semantic keywords')" class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-100/90 dark:hover:bg-zinc-850 cursor-pointer transition-all shadow-3xs border-0 group">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Audit current draft for SEO gaps</span>
+                                    </div>
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:translate-x-0.5 transition-transform"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </div>
-                                <div onclick="window.coraSendCopilotMessage('Optimize meta descriptors')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/50 hover:bg-zinc-100/70 cursor-pointer transition-all">
-                                    <span class="text-xs font-semibold text-zinc-700 ">Optimize meta descriptors</span>
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 "><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                <div onclick="window.coraSendCopilotMessage('Write high-CTR meta title and 155-char search meta description for this article')" class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-100/90 dark:hover:bg-zinc-850 cursor-pointer transition-all shadow-3xs border-0 group">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Generate high-CTR meta package</span>
+                                    </div>
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:translate-x-0.5 transition-transform"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </div>
-                                <div onclick="window.coraSendCopilotMessage('Suggest question headings')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/50 hover:bg-zinc-100/70 cursor-pointer transition-all">
-                                    <span class="text-xs font-semibold text-zinc-700 ">Suggest question headings</span>
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 "><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                <div onclick="window.coraSendCopilotMessage('Generate 4 Google People-Also-Ask FAQ questions with authoritative answers for this article')" class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-100/90 dark:hover:bg-zinc-850 cursor-pointer transition-all shadow-3xs border-0 group">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Extract high-CTR FAQ section</span>
+                                    </div>
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:translate-x-0.5 transition-transform"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </div>
-                                <div onclick="window.coraSendCopilotMessage('Audit organic search rank')" class="flex items-center justify-between p-2.5 rounded-xl border border-zinc-100 bg-zinc-50/50 hover:bg-zinc-100/70 cursor-pointer transition-all">
-                                    <span class="text-xs font-semibold text-zinc-700 ">Audit organic search rank</span>
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-400 "><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                <div onclick="window.coraSendCopilotMessage('Draft a comprehensive 3-point H2 section addressing high search intent for this topic')" class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-100/90 dark:hover:bg-zinc-850 cursor-pointer transition-all shadow-3xs border-0 group">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Draft high-intent H2 sections</span>
+                                    </div>
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:translate-x-0.5 transition-transform"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </div>
                             </div>
-                        </div>
-                        <div onclick="window.coraSendCopilotMessage('View all suggestions')" class="text-xs font-bold text-zinc-800 hover:text-black cursor-pointer flex items-center gap-1 mt-3 transition-colors">
-                            <span>View all suggestions</span>
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <div onclick="window.coraSendCopilotMessage('Plan a 30-day topical authority editorial roadmap with target focus keywords')" class="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 hover:text-black dark:hover:text-white cursor-pointer inline-flex items-center gap-1 mt-1 transition-colors group">
+                                <span>Generate 30-Day Editorial Strategy</span>
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="transition-transform group-hover:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </div>
                         </div>
 
-                        <!-- AI Quota & Token Usage (Dynamic) -->
+                        <!-- AI Compute Quota & Engine Telemetry -->
                         <?php
                         $_cora_t_stats = function_exists('cora_workspace_get_token_usage_stats') ? cora_workspace_get_token_usage_stats() : array('monthly_tokens' => 12450, 'monthly_limit' => 100000, 'percent' => 12.5);
                         ?>
-                        <div class="pt-4 border-t border-zinc-150 mt-4 select-none">
-                            <div class="text-[10px] font-bold text-zinc-450 uppercase tracking-wider mb-2">Usage Quota</div>
-                            <div class="space-y-2 text-[10px] text-zinc-650 ">
-                                <!-- Progress -->
+                        <div class="pt-4 border-t border-zinc-200/80 dark:border-zinc-800 select-none">
+                            <div class="text-[10px] font-mono font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">AI Compute Quota</div>
+                            <div class="space-y-2 text-[10.5px] text-zinc-600 dark:text-zinc-400 font-mono">
                                 <div>
-                                    <div class="flex justify-between font-semibold mb-1">
+                                    <div class="flex justify-between font-semibold mb-1.5">
                                         <span id="cora-copilot-token-numbers"><?php echo number_format($_cora_t_stats['monthly_tokens']); ?> / <?php echo number_format($_cora_t_stats['monthly_limit']); ?> tokens</span>
-                                        <span id="cora-copilot-token-percent" class="font-mono font-bold"><?php echo $_cora_t_stats['percent']; ?>%</span>
+                                        <span id="cora-copilot-token-percent" class="text-emerald-600 dark:text-emerald-400 font-bold"><?php echo $_cora_t_stats['percent']; ?>%</span>
                                     </div>
-                                    <div class="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden">
-                                        <div id="cora-copilot-token-progress" class="bg-zinc-950 h-full rounded-full transition-all duration-500" style="width: <?php echo $_cora_t_stats['percent']; ?>%"></div>
+                                    <div class="w-full bg-zinc-200 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                                        <div id="cora-copilot-token-progress" class="bg-zinc-950 dark:bg-white h-full rounded-full transition-all duration-500" style="width: <?php echo $_cora_t_stats['percent']; ?>%"></div>
                                     </div>
                                 </div>
-                                <!-- Inline stats -->
-                                <div class="flex items-center justify-between text-[9px] text-zinc-400 pt-0.5">
+                                <div class="flex items-center justify-between text-[10px] text-zinc-400 pt-0.5">
                                     <div class="flex items-center gap-1.5">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span>
-                                        <span id="cora-copilot-active-engine">Gemini Flash</span>
+                                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full inline-block animate-pulse"></span>
+                                        <span id="cora-copilot-active-engine">Gemini 1.5 Flash</span>
                                     </div>
                                     <div>
-                                        <span>Session: </span><span id="cora-copilot-session-tokens" class="font-mono font-bold">0 tokens</span>
+                                        <span>Session: </span><span id="cora-copilot-session-tokens" class="font-bold text-zinc-700 dark:text-zinc-300">0 tokens</span>
                                     </div>
                                 </div>
                             </div>
@@ -6476,33 +6596,33 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     </div>
                 </div>
 
-                <!-- Chat History Pane (WhatsApp Style, Hidden by default when empty) -->
-                <div id="cora-copilot-chat-history" class="hidden flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50/20 ">
+                <!-- Chat History Pane (Hidden by default when empty) -->
+                <div id="cora-copilot-chat-history" class="hidden flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50 dark:bg-zinc-950">
                     <!-- Messages will be dynamically rendered here -->
                 </div>
 
-                <!-- Chat Input Footer -->
-                <div class="p-3.5 border-t border-zinc-150 flex items-center gap-3 bg-white rounded-b-2xl select-none">
-                    <span class="text-zinc-400 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <!-- Executive Command Input Footer -->
+                <div class="p-3.5 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-3 bg-white dark:bg-zinc-900 select-none">
+                    <span class="text-zinc-400 flex items-center justify-center shrink-0 ml-1.5">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     </span>
-                    <input type="text" id="cora-copilot-chat-input" placeholder="Ask anything or search articles, keywords, opportunities..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-850 placeholder:text-zinc-450 focus:placeholder:text-zinc-550 transition-all">
-                    <button id="cora-copilot-send-btn" class="px-4 py-2 rounded-full bg-zinc-950 hover:bg-zinc-850 text-white transition-colors border-none cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-bold shadow-xs active:scale-97 select-none">
-                        <span>Ask AI</span>
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <input type="text" id="cora-copilot-chat-input" placeholder="Ask your AI Content Agent for strategy, research, or content execution..." class="flex-1 text-xs outline-none border-none bg-transparent text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:placeholder:text-zinc-500 transition-all font-sans">
+                    <button id="cora-copilot-send-btn" class="px-4 py-2 rounded-full bg-zinc-950 hover:bg-zinc-850 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 transition-all border-none cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-bold shadow-xs active:scale-97 select-none">
+                        <span>Execute</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </button>
                 </div>
             </div>
 
-            <!-- Floating Input Bar -->
-            <div id="cora-copilot-bar" class="flex items-center gap-3 bg-white/90 backdrop-blur-lg border border-zinc-200 shadow-xl rounded-full px-4 py-2.5 w-full transition-all hover:border-zinc-400 cursor-pointer select-none">
-                <span class="text-zinc-450 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <!-- Floating Input Bar (Compact Normal State with Purple AI Gradient Highlight) -->
+            <div id="cora-copilot-bar" class="flex items-center gap-2.5 bg-gradient-to-r from-white via-purple-50/40 to-white dark:from-zinc-900 dark:via-purple-950/30 dark:to-zinc-900 shadow-xl rounded-full px-3.5 py-1.5 transition-all cursor-pointer select-none border-0 ring-0 outline-none">
+                <span class="text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </span>
-                <input type="text" id="cora-copilot-input-field" placeholder="Ask anything or search articles, keywords, opportunities..." class="flex-1 text-[11px] font-semibold outline-none border-none bg-transparent text-zinc-850 placeholder:text-zinc-400 cursor-pointer" readonly>
-                <button id="cora-copilot-bar-ask-btn" class="px-4 py-1.5 rounded-full bg-zinc-950 hover:bg-zinc-850 text-white transition-all border-none cursor-pointer text-[10px] font-bold shadow-3xs active:scale-95 shrink-0 flex items-center gap-1 select-none">
-                    <span>Ask AI</span>
-                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <input type="text" id="cora-copilot-input-field" placeholder="Ask AI Content Agent..." class="flex-1 text-[11.5px] font-normal outline-none border-none bg-transparent text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 cursor-pointer" readonly>
+                <button id="cora-copilot-bar-ask-btn" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%) !important; color: #ffffff !important;" class="px-3.5 py-1 rounded-full text-white transition-all border-none cursor-pointer text-[11px] font-bold shadow-xs active:scale-95 shrink-0 flex items-center gap-1 select-none">
+                    <span style="color: #ffffff !important; font-weight: 700 !important;">Ask AI</span>
+                    <svg viewBox="0 0 24 24" width="9" height="9" stroke="#ffffff" stroke-width="2.5" fill="none" style="stroke: #ffffff !important;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
             </div>
         </div>
@@ -6533,35 +6653,68 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             }
             @media (max-width: 1023px) {
                 #cora-copilot-container {
-                    padding-left: 0;
-                    bottom: 84px !important;
+                    padding-left: 12px !important;
+                    padding-right: 12px !important;
+                    bottom: 78px !important;
+                    z-index: 99999 !important;
                 }
                 #cora-copilot-bar {
                     display: none !important;
                 }
                 #cora-copilot-chat-window {
-                    height: 58vh !important;
-                    max-height: 420px !important;
-                    min-height: 320px !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    height: 72vh !important;
+                    max-height: 520px !important;
+                    min-height: 350px !important;
+                    border-radius: 1.25rem !important;
+                    margin: 0 !important;
                 }
                 #cora-copilot-dashboard {
                     overflow-y: auto !important;
                 }
             }
-            #cora-copilot-bar, #cora-copilot-chat-window {
+            #cora-copilot-bar {
                 width: calc(100% - 48px) !important;
-                max-width: 800px !important;
+                max-width: 500px !important;
                 margin: 0 auto;
                 transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-            #cora-copilot-bar {
                 pointer-events: auto !important;
+                background: linear-gradient(135deg, #ffffff 0%, #faf5ff 50%, #f5f3ff 100%) !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: 0 10px 25px -4px rgba(147, 51, 234, 0.16), 0 4px 10px -2px rgba(126, 34, 206, 0.08) !important;
+            }
+            .cora-dark-theme #cora-copilot-bar {
+                background: linear-gradient(135deg, #18181b 0%, #1e112a 50%, #120e24 100%) !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: 0 10px 25px -4px rgba(147, 51, 234, 0.35) !important;
+            }
+            #cora-copilot-bar-ask-btn {
+                background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%) !important;
+                color: #ffffff !important;
+                border: none !important;
+                box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35) !important;
+            }
+            #cora-copilot-bar-ask-btn:hover {
+                background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%) !important;
+                box-shadow: 0 4px 12px rgba(124, 58, 237, 0.5) !important;
             }
             #cora-copilot-chat-window {
+                width: calc(100% - 48px) !important;
+                max-width: 820px !important;
+                margin: 0 auto;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
                 pointer-events: none !important;
+                background-color: #ffffff !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.22) !important;
             }
             #cora-copilot-bar:hover {
                 transform: translateY(-2px) !important;
+                box-shadow: 0 14px 28px -4px rgba(147, 51, 234, 0.22), 0 6px 12px -2px rgba(126, 34, 206, 0.12) !important;
             }
             #cora-copilot-bar.hidden-bar {
                 opacity: 0 !important;
@@ -6579,8 +6732,10 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 pointer-events: auto !important;
                 transform: scale(1) !important;
             }
-            #cora-copilot-chat-window, #cora-copilot-dashboard {
-                background-color: #FBFaf7 !important;
+            .cora-dark-theme #cora-copilot-chat-window, 
+            .cora-dark-theme #cora-copilot-dashboard {
+                background-color: #09090b !important;
+                border: none !important;
             }
             
             .cora-copilot-bubble {
@@ -6626,43 +6781,76 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     }
 
     function getContentSuiteState() {
-        let stateStr = "Current Content Suite State:\n";
-        const activeTabEl = document.querySelector('.cora-tab-btn.border-zinc-950');
-        const activeTab = activeTabEl ? activeTabEl.getAttribute('data-tab') : 'ct-overview';
-        stateStr += `- Active Tab: ${activeTab}\n`;
+        let stateStr = "=== CORA CONTENT SUITE & WORKSPACE LIVE STATE ===\n";
+        
+        // 1. Industry & Workspace Mode
+        const isStudio = document.body.classList.contains('cora-industry-photography-studio') || (window.location.search.includes('industry=photography_studio'));
+        const isRealEstate = document.body.classList.contains('cora-industry-real-estate') || (window.location.search.includes('industry=real_estate'));
+        const industry = isStudio ? "Photography Studio (Weddings, Fashion, Commercial Shoots, Equipment Rentals)" : (isRealEstate ? "Real Estate (Luxury Properties, Commercial Leasing, Buyer Advisory)" : "Creative SaaS & Content Studio");
+        stateStr += `- Workspace Industry: ${industry}\n`;
 
+        // 2. Active Tab
+        const activeTabEl = document.querySelector('.cora-tab-btn.border-zinc-950, .cora-tab-btn.active');
+        const activeTab = activeTabEl ? activeTabEl.getAttribute('data-tab') : 'ct-overview';
+        stateStr += `- Active Suite View: ${activeTab}\n`;
+
+        // 3. Document Editor State
         const fullEditor = document.getElementById('cora-full-page-editor');
         const editorOpen = fullEditor && !fullEditor.classList.contains('hidden') && fullEditor.style.display !== 'none';
-        stateStr += `- Editor Open: ${editorOpen ? 'Yes' : 'No'}\n`;
+        stateStr += `- Document Editor Open: ${editorOpen ? 'YES' : 'NO'}\n`;
 
         if (editorOpen) {
             const id = document.getElementById('cora-article-id')?.value || 'N/A';
             const title = document.getElementById('cora-article-title')?.value || 'Untitled';
-            const keyword = document.getElementById('cora-seo-keyword')?.value || document.getElementById('seo-focus-keyword')?.value || 'None';
+            const keyword = document.getElementById('cora-seo-keyword')?.value || document.getElementById('seo-focus-keyword')?.value || '';
+            const metaDesc = document.getElementById('seo-meta-description')?.value || document.getElementById('cora-seo-meta-desc')?.value || '';
             const wordCountText = document.getElementById('cora-editor-metrics')?.innerText || '0 words';
-            
-            stateStr += `- Editing Article ID: ${id}\n`;
-            stateStr += `- Editing Article Title: "${title}"\n`;
-            stateStr += `- Editing Focus Keyword: "${keyword}"\n`;
-            stateStr += `- Editor Word Count: "${wordCountText}"\n`;
+            const seoScoreEl = document.getElementById('cora-seo-score') || document.querySelector('[data-seo-gauge-score]');
+            const seoScore = seoScoreEl ? seoScoreEl.innerText.trim() : 'N/A';
+
+            let editorTextSnippet = '';
+            let headingCount = 0;
+            if (window.coraQuillListingCoordinator) {
+                const rawText = window.coraQuillListingCoordinator.getText().trim();
+                editorTextSnippet = rawText.length > 1200 ? rawText.substring(0, 1200) + '...' : rawText;
+                const htmlContent = window.coraQuillListingCoordinator.root.innerHTML || '';
+                headingCount = (htmlContent.match(/<h[1-4][^>]*>/gi) || []).length;
+            }
+
+            stateStr += `[ACTIVE DOCUMENT IN EDITOR]:\n`;
+            stateStr += `  * Article ID: ${id}\n`;
+            stateStr += `  * Title: "${title}"\n`;
+            stateStr += `  * Focus Keyword: "${keyword || 'Not Set (Needs Optimization)'}"\n`;
+            stateStr += `  * Meta Description: "${metaDesc || 'Missing (Needs Optimization)'}"\n`;
+            stateStr += `  * Current Live SEO Score: ${seoScore}/100\n`;
+            stateStr += `  * Word Count & Readability: ${wordCountText}\n`;
+            stateStr += `  * Subheadings (H1-H4) Count: ${headingCount}\n`;
+            if (editorTextSnippet) {
+                stateStr += `  * Current Draft Content Snippet:\n"""\n${editorTextSnippet}\n"""\n`;
+            } else {
+                stateStr += `  * Current Draft Content: [Blank canvas ready for outline or full drafting]\n`;
+            }
         }
 
+        // 4. Library Inventory Context
         const rows = document.querySelectorAll('#cora-articles-table-body .ct-row');
         if (rows && rows.length > 0) {
-            stateStr += `- Recent Library Articles:\n`;
-            Array.from(rows).slice(0, 3).forEach((row, i) => {
+            stateStr += `- Published & Draft Articles in Library (${rows.length} total):\n`;
+            Array.from(rows).slice(0, 4).forEach((row) => {
                 const titleEl = row.querySelector('.font-bold');
                 const title = titleEl ? titleEl.innerText : 'Unknown';
+                const score = row.dataset.seoScore || 'N/A';
                 const statusCells = row.querySelectorAll('td');
                 const status = statusCells[3] ? statusCells[3].innerText.trim() : 'Draft';
-                stateStr += `  * "${title}" (${status})\n`;
+                stateStr += `  * "${title}" (Status: ${status}, SEO Score: ${score}/100)\n`;
             });
         }
 
+        // 5. Territory Opportunity Signals
         if (window.coraOpportunitiesData && window.coraOpportunitiesData.length > 0) {
-            stateStr += `- Detected Opportunities:\n`;
-            window.coraOpportunitiesData.slice(0, 3).forEach((opp, i) => {
-                stateStr += `  * "${opp.title}" (Intent: ${opp.search_volume || 'High'}, Impact: ${opp.impact_score || 'High'})\n`;
+            stateStr += `- High-Intent Territory Search Gaps:\n`;
+            window.coraOpportunitiesData.slice(0, 3).forEach((opp) => {
+                stateStr += `  * "${opp.title}" (Search Intent: ${opp.search_volume || 'High'}, Difficulty: ${opp.difficulty || 'Low'})\n`;
             });
         }
         return stateStr;
@@ -6672,7 +6860,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (window.coraShowToast) window.coraShowToast('Executing Action...', 'info');
         if (btnEl) {
             btnEl.disabled = true;
-            btnEl.innerHTML = `<svg class="animate-spin mr-1 inline-block" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none"><circle cx="12" cy="12" r="10"></circle></svg> Processing...`;
+            btnEl.innerHTML = `<svg class="animate-spin mr-1 inline-block" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none"><circle cx="12" cy="12" r="10"></circle></svg> Executing...`;
         }
 
         try {
@@ -6688,8 +6876,6 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
 
                     let idsToDelete = [];
                     const allRows = Array.from(document.querySelectorAll('#cora-articles-table-body .ct-row'));
-
-                    // Check if command is "keep_top_N" or "best_seo" or numeric limit
                     const lowerData = String(data || '').toLowerCase();
                     if (lowerData.includes('keep_top') || lowerData.includes('best_seo') || type === 'keep_top_articles' || /^\d+$/.test(String(data || '').trim()) || lowerData.includes('keep')) {
                         let keepCount = 3;
@@ -6701,20 +6887,17 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                             break;
                         }
 
-                        // Sort all rows by SEO score descending
                         allRows.sort((a, b) => {
                             const scoreA = parseInt(a.dataset.seoScore) || 0;
                             const scoreB = parseInt(b.dataset.seoScore) || 0;
                             return scoreB - scoreA;
                         });
 
-                        // The ones from index keepCount onwards are deleted
                         const rowsToDelete = allRows.slice(keepCount);
                         idsToDelete = rowsToDelete.map(r => parseInt(r.dataset.postId)).filter(id => id > 0);
                     } else if (lowerData === 'all' || lowerData === 'all_drafts' || lowerData === 'drafts') {
                         idsToDelete = allRows.map(r => parseInt(r.dataset.postId)).filter(id => id > 0);
                     } else {
-                        // Comma-separated IDs or titles
                         const parts = String(data).split(/[,;\s]+/);
                         idsToDelete = parts.map(p => parseInt(p)).filter(id => !isNaN(id) && id > 0);
                         
@@ -6783,11 +6966,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                     if (titleInput) {
                         titleInput.value = data;
                         titleInput.dispatchEvent(new Event('input', { bubbles: true }));
-                        if (window.coraShowToast) window.coraShowToast('Title updated successfully!', 'success');
+                        if (window.coraShowToast) window.coraShowToast('SEO Title updated!', 'success');
                     } else {
-                        throw new Error('Editor title field not found. Make sure the article is open.');
+                        throw new Error('Editor title field not found. Make sure an article draft is open.');
                     }
                     break;
+
                 case 'set_keyword':
                     const kwEditor = document.getElementById('cora-seo-keyword');
                     const kwDrawer = document.getElementById('seo-focus-keyword');
@@ -6799,19 +6983,74 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         kwDrawer.value = data;
                         kwDrawer.dispatchEvent(new Event('input', { bubbles: true }));
                     }
-                    if (window.coraShowToast) window.coraShowToast('Focus keyword set to: ' + data, 'success');
+                    if (typeof window.coraRunLiveSeoCheck === 'function') window.coraRunLiveSeoCheck();
+                    if (window.coraShowToast) window.coraShowToast('Focus Keyword set: ' + data, 'success');
                     break;
+
+                case 'set_meta':
+                    const metaEditor = document.getElementById('cora-seo-meta-desc');
+                    const metaDrawer = document.getElementById('seo-meta-description');
+                    if (metaEditor) {
+                        metaEditor.value = data;
+                        metaEditor.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    if (metaDrawer) {
+                        metaDrawer.value = data;
+                        metaDrawer.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    if (typeof window.coraRunLiveSeoCheck === 'function') window.coraRunLiveSeoCheck();
+                    if (window.coraShowToast) window.coraShowToast('Meta Description applied to SEO settings!', 'success');
+                    break;
+
+                case 'optimize_seo':
+                    // Payload format: "Title | Focus Keyword | Meta Description"
+                    const parts = String(data).split('|').map(s => s.trim());
+                    if (parts[0]) {
+                        const tInput = document.getElementById('cora-article-title');
+                        if (tInput) { tInput.value = parts[0]; tInput.dispatchEvent(new Event('input', { bubbles: true })); }
+                    }
+                    if (parts[1]) {
+                        const kw1 = document.getElementById('cora-seo-keyword');
+                        const kw2 = document.getElementById('seo-focus-keyword');
+                        if (kw1) { kw1.value = parts[1]; kw1.dispatchEvent(new Event('input', { bubbles: true })); }
+                        if (kw2) { kw2.value = parts[1]; kw2.dispatchEvent(new Event('input', { bubbles: true })); }
+                    }
+                    if (parts[2]) {
+                        const m1 = document.getElementById('cora-seo-meta-desc');
+                        const m2 = document.getElementById('seo-meta-description');
+                        if (m1) { m1.value = parts[2]; m1.dispatchEvent(new Event('input', { bubbles: true })); }
+                        if (m2) { m2.value = parts[2]; m2.dispatchEvent(new Event('input', { bubbles: true })); }
+                    }
+                    if (typeof window.coraRunLiveSeoCheck === 'function') window.coraRunLiveSeoCheck();
+                    if (window.coraShowToast) window.coraShowToast('Applied Complete SEO Optimization Pack!', 'success');
+                    break;
+
                 case 'insert_text':
+                case 'insert_section':
+                case 'insert_faq':
                     if (window.coraQuillListingCoordinator) {
                         const quill = window.coraQuillListingCoordinator;
                         const range = quill.getSelection();
                         const index = range ? range.index : quill.getLength();
                         quill.clipboard.dangerouslyPasteHTML(index, data, 'user');
-                        if (window.coraShowToast) window.coraShowToast('Text inserted into editor!', 'success');
+                        if (typeof window.coraRunLiveSeoCheck === 'function') setTimeout(window.coraRunLiveSeoCheck, 200);
+                        if (window.coraShowToast) window.coraShowToast('Section inserted into draft!', 'success');
                     } else {
-                        throw new Error('Quill editor not available.');
+                        throw new Error('Quill editor not open. Please open an article draft first.');
                     }
                     break;
+
+                case 'replace_content':
+                    if (window.coraQuillListingCoordinator) {
+                        const quill = window.coraQuillListingCoordinator;
+                        quill.root.innerHTML = data;
+                        if (typeof window.coraRunLiveSeoCheck === 'function') setTimeout(window.coraRunLiveSeoCheck, 200);
+                        if (window.coraShowToast) window.coraShowToast('Article draft updated with complete content!', 'success');
+                    } else {
+                        throw new Error('Quill editor not open.');
+                    }
+                    break;
+
                 case 'save_article':
                     if (typeof window.coraSaveArticle === 'function') {
                         window.coraSaveArticle('draft', false);
@@ -6819,9 +7058,11 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         throw new Error('Save handler not found.');
                     }
                     break;
+
                 case 'create_article':
                     window.coraCreateArticleWithTitle(data);
                     break;
+
                 case 'scan_opportunities':
                     const scanBtn = document.querySelector('[onclick*="coraGenerateOpportunitiesBacklog"]');
                     if (scanBtn) {
@@ -6832,6 +7073,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                         throw new Error('Scan gaps trigger not found.');
                     }
                     break;
+
                 default:
                     throw new Error('Unknown Action type: ' + type);
             }
@@ -6917,7 +7159,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         
         const config = getSelectedAIConfig();
         if (activeEngineEl) {
-            activeEngineEl.innerText = config.provider === 'openai' ? 'GPT-4o' : (config.provider === 'groq' ? 'Groq Llama 3.1' : 'Gemini Flash');
+            activeEngineEl.innerText = config.provider === 'openai' ? 'GPT-4o' : (config.provider === 'groq' ? 'Groq Llama 3.1' : 'Gemini 1.5 Flash');
         }
     }
 
@@ -6950,19 +7192,23 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                 const data = actionMatch[2];
                 
                 let btnLabel = 'Apply Action';
-                if (type === 'set_title') btnLabel = 'Apply Title';
-                else if (type === 'set_keyword') btnLabel = 'Set Keyword';
-                else if (type === 'insert_text') btnLabel = 'Insert Paragraph';
+                if (type === 'set_title') btnLabel = 'Apply SEO Title';
+                else if (type === 'set_keyword') btnLabel = 'Set Focus Keyword';
+                else if (type === 'set_meta') btnLabel = 'Apply Meta Description';
+                else if (type === 'optimize_seo') btnLabel = '1-Click SEO Optimization';
+                else if (type === 'insert_text' || type === 'insert_section') btnLabel = 'Insert Section into Draft';
+                else if (type === 'insert_faq') btnLabel = 'Insert FAQ Section';
+                else if (type === 'replace_content') btnLabel = 'Apply Full Draft to Editor';
                 else if (type === 'save_article') btnLabel = 'Save Draft Now';
-                else if (type === 'create_article') btnLabel = 'Create Draft';
-                else if (type === 'scan_opportunities') btnLabel = 'Scan Gaps Now';
+                else if (type === 'create_article') btnLabel = 'Create & Open Draft';
+                else if (type === 'scan_opportunities') btnLabel = 'Scan Search Gaps Now';
                 else if (type === 'delete_articles' || type === 'keep_top_articles' || type === 'prune_library' || type === 'bulk_delete_articles') btnLabel = 'Execute: Prune & Keep Top SEO Articles';
-                else if (type === 'publish_article' || type === 'publish_articles') btnLabel = 'Publish Articles Now';
+                else if (type === 'publish_article' || type === 'publish_articles') btnLabel = 'Publish Article Now';
 
                 actionHtml = `
                 <div class="mt-2.5">
-                    <button onclick="window.coraExecuteCopilotAction('${type}', \`${data.replace(/`/g, '\\`').replace(/"/g, '&quot;')}\`, this)" class="inline-flex items-center px-3 py-1.5 bg-zinc-950 text-white hover:bg-zinc-800 text-[10px] font-bold rounded-lg transition-all shadow-xs border-none cursor-pointer active:scale-97">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <button onclick="window.coraExecuteCopilotAction('${type}', \`${data.replace(/`/g, '\\`').replace(/"/g, '&quot;')}\`, this)" class="inline-flex items-center px-3.5 py-1.5 bg-zinc-950 text-white hover:bg-zinc-800 text-[11px] font-bold rounded-lg transition-all shadow-xs border-none cursor-pointer active:scale-97">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="mr-1.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         ${btnLabel}
                     </button>
                 </div>
@@ -7005,7 +7251,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (existing) existing.remove();
 
         if (show) {
-            if (statusEl) statusEl.innerText = 'typing...';
+            if (statusEl) statusEl.innerText = 'Analyzing & Writing...';
             const typingHtml = `
             <div id="cora-copilot-typing-bubble" class="flex flex-col items-start">
                 <div class="bg-white text-zinc-850 rounded-2xl rounded-tl-sm shadow-xs border border-zinc-200/50 p-3.5 px-4 max-w-[80%] flex items-center gap-1.5">
@@ -7018,7 +7264,7 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
             container.insertAdjacentHTML('beforeend', typingHtml);
             container.scrollTop = container.scrollHeight;
         } else {
-            if (statusEl) statusEl.innerText = 'online';
+            if (statusEl) statusEl.innerText = 'Strategic Engine • Live Context';
         }
     }
 
@@ -7040,26 +7286,28 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         const stateContext = getContentSuiteState();
         const config = getSelectedAIConfig();
 
-        const systemPrompt = `You are Myra, a sharp, action-oriented Indian AI Content Manager and Cora expert for Cora Studio.
-Your style is a professional but typical direct Indian manager WhatsApp chat conversation.
-Speak/write in Indian English (Hinglish words are welcome: "Haan boss", "Acha listen", "Sorted", "Ek kaam karo", "Please check").
-Strictly follow these rules:
-1. NEVER reply in long paragraphs or long lists of tasks (max 2-3 short sentences). Be extremely concise.
-2. Address the user based on the state. For example, if an article is open, talk about it. If not, suggest scanning opportunities or creating a draft.
-3. Keep it purely text-based and professional. NO emojis.
-4. When you suggest or execute an action, ALWAYS append the exact action tag at the very end of your response:
-   - To delete/prune articles and keep top N by SEO score: [ACTION:keep_top_articles:3] (or [ACTION:delete_articles:keep_top_3])
-   - To delete all drafts or selected IDs: [ACTION:delete_articles:all_drafts] or [ACTION:delete_articles:123,456]
-   - To publish all drafts or an article: [ACTION:publish_articles:all_drafts] or [ACTION:publish_article:123]
-   - To rename/set the editing article title: [ACTION:set_title:New Title Here]
-   - To set focus keyword: [ACTION:set_keyword:New Keyword]
-   - To insert an intro/paragraph into the editor: [ACTION:insert_text:<p>Your paragraph text here</p>]
-   - To save the current article: [ACTION:save_article:draft]
-   - To create a new article draft: [ACTION:create_article:Title of Article]
-   - To scan for opportunities: [ACTION:scan_opportunities:now]
-Always keep it crisp, direct, and actionable.`;
+        const systemPrompt = `You are the Senior Content Director & Lead SEO Copywriter working as an executive strategic assistant for the workspace owner.
+Your mission is to help the owner produce search-dominating, high-converting content, eliminate SEO weaknesses, optimize headings and meta data, and execute fast.
 
-        const fullUserPrompt = `[DASHBOARD STATE CONTEXT]\n` + stateContext + `\n\n[USER MESSAGE]\n` + messageText;
+STRICT OPERATIONAL RULES:
+1. SENIOR LEVEL TONE: Be direct, sharp, and authoritative. Explain your editorial reasoning in 1-2 concise sentences, followed by the exact high-grade deliverable.
+2. ZERO CHATBOT FLUFF: Never output generic conversational filler. Deliver ready-to-publish content (headlines, paragraphs, H2/H3 breakdowns, FAQs, or meta tags).
+3. 1-CLICK ACTION TAGS: Whenever you provide an actionable deliverable, ALWAYS append the exact matching [ACTION:...] tag at the very end of your message so the owner can apply it with a single click:
+   - For an SEO Title: [ACTION:set_title:High CTR SEO Title Here]
+   - For a Focus Keyword: [ACTION:set_keyword:target keyword]
+   - For a Search Meta Description: [ACTION:set_meta:Compelling meta description under 155 chars with target keyword.]
+   - For Full SEO Optimization (Title + Keyword + Meta): [ACTION:optimize_seo:Optimized Title | Focus Keyword | Meta Description under 155 chars]
+   - For an Article Section or Paragraph: [ACTION:insert_text:<h2>Subheading</h2><p>Well-written authoritative paragraph with search intent focus.</p>]
+   - For an FAQ Section: [ACTION:insert_faq:<h2>Frequently Asked Questions</h2><h3>Q1?</h3><p>A1.</p><h3>Q2?</h3><p>A2.</p>]
+   - For a Full Replacement Draft: [ACTION:replace_content:<h2>Complete Article Outline & Body...</h2>]
+   - For a New Article Creation: [ACTION:create_article:Article Title]
+   - For Publishing the active draft: [ACTION:publish_article:now]
+   - For Scanning Keyword Gaps: [ACTION:scan_opportunities:now]
+   - For Pruning Low SEO Posts: [ACTION:keep_top_articles:3]
+
+Always ground your advice in the [DASHBOARD STATE CONTEXT] provided below (active document, current SEO score, word count, industry).`;
+
+        const fullUserPrompt = `[DASHBOARD STATE CONTEXT]\n` + stateContext + `\n\n[OWNER REQUEST]\n` + messageText;
 
         showTypingIndicator(true);
 
@@ -7073,7 +7321,7 @@ Always keep it crisp, direct, and actionable.`;
             system_prompt: systemPrompt,
             provider: config.provider,
             model: config.model,
-            temperature: 0.5
+            temperature: 0.4
         }, function(response) {
             showTypingIndicator(false);
             if (response && response.success && response.data && response.data.reply) {
@@ -7101,10 +7349,10 @@ Always keep it crisp, direct, and actionable.`;
                 } catch(e) {}
                 updateTokenStatsUI();
             } else {
-                const failMsg = response?.data?.message || response?.data || 'Failed to connect. API issue boss, please check Settings.';
+                const failMsg = response?.data?.message || response?.data || 'Failed to connect to AI engine. Please verify your AI API key in Settings.';
                 chatMessages.push({
                     sender: 'manager',
-                    text: 'Acha listen, some problem in connection: ' + failMsg + '. Please check once.',
+                    text: 'Unable to reach the AI engine: ' + failMsg + '. Please check AI Model Settings.',
                     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 });
             }
@@ -7113,7 +7361,7 @@ Always keep it crisp, direct, and actionable.`;
             showTypingIndicator(false);
             chatMessages.push({
                 sender: 'manager',
-                text: 'Acha listen, network failed boss. Check your connection or AI models setting and try again.',
+                text: 'Network connection interrupted. Please check your network and try again.',
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             });
             renderMessages();
@@ -7205,12 +7453,41 @@ Always keep it crisp, direct, and actionable.`;
                 }
             });
 
-            // Dynamically integrate circular bottom-right AI trigger with copilot modal on mobile
+            // Dynamically integrate circular bottom-right AI trigger & global mobile island with AI Content Agent
             const bindMobileTrigger = function() {
+                // 1. Mobile Island AI Input placeholder & text
+                const mInput = document.getElementById('cora-island-ai-input');
+                if (mInput) {
+                    mInput.placeholder = "Ask AI Content Agent...";
+                }
+                const mCompact = document.querySelector('#cora-island-view-compact span');
+                if (mCompact) {
+                    mCompact.innerText = "Ask AI Content Agent...";
+                }
+
+                // 2. Global Mobile Island trigger binding
+                const islandAiBtn = document.getElementById('cora-island-state-ai-btn');
+                if (islandAiBtn) {
+                    islandAiBtn.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.coraToggleCopilot(true);
+                    };
+                }
+
+                const islandCompact = document.getElementById('cora-island-view-compact');
+                if (islandCompact) {
+                    islandCompact.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.coraToggleCopilot(true);
+                    };
+                }
+
+                // 3. Fallback mobile triggers
                 const mobileAiTrigger = document.getElementById('cora-mobile-ai-trigger');
                 if (mobileAiTrigger) {
                     mobileAiTrigger.removeAttribute('onclick');
-                    // Add listener to open the modular copilot overlay instead of native sidebar
                     mobileAiTrigger.addEventListener('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -7232,4 +7509,3 @@ Always keep it crisp, direct, and actionable.`;
     }
 })();
 </script>
-

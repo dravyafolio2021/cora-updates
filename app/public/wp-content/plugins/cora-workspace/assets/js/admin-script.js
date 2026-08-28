@@ -1945,6 +1945,11 @@ jQuery(document).ready(function($) {
 
         const curPage = window.coraCurrentView || new URLSearchParams(window.location.search).get('sub_page') || 'dashboard';
 
+        let effectiveMessage = text;
+        if ((curPage === 'blogs' || curPage === 'content' || $('#cora-view-content-suite').length > 0) && typeof window.getContentSuiteState === 'function') {
+            effectiveMessage = `[DASHBOARD STATE CONTEXT]\n` + window.getContentSuiteState() + `\n\n[USER REQUEST]\n` + text;
+        }
+
         // Actual AJAX call to backend
         $.ajax({
             url: ajaxUrlEndpoint,
@@ -1952,7 +1957,7 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'cora_ai_chat',
                 security: ajaxNonceSec,
-                message: text,
+                message: effectiveMessage,
                 current_page: curPage,
                 history: JSON.stringify(recentHistory)
             },
@@ -1963,6 +1968,34 @@ jQuery(document).ready(function($) {
                     let rawReply = response.data.reply || '';
                     let replyHtml = rawReply;
 
+                    // Parse Action tags if present (e.g. [ACTION:set_title:...])
+                    let actionHtml = '';
+                    const actionMatch = rawReply.match(/\[ACTION:([a-z_]+):([^\]]+)\]/);
+                    if (actionMatch) {
+                        rawReply = rawReply.replace(/\[ACTION:[a-z_]+:[^\]]+\]/g, '').trim();
+                        const actType = actionMatch[1];
+                        const actData = actionMatch[2];
+                        let btnLabel = 'Apply Action';
+                        if (actType === 'set_title') btnLabel = 'Apply SEO Title';
+                        else if (actType === 'set_keyword') btnLabel = 'Set Focus Keyword';
+                        else if (actType === 'set_meta') btnLabel = 'Apply Meta Description';
+                        else if (actType === 'optimize_seo') btnLabel = '1-Click SEO Optimization';
+                        else if (actType === 'insert_text' || actType === 'insert_section') btnLabel = 'Insert Section into Draft';
+                        else if (actType === 'insert_faq') btnLabel = 'Insert FAQ Section';
+                        else if (actType === 'replace_content') btnLabel = 'Apply Full Draft to Editor';
+                        else if (actType === 'create_article') btnLabel = 'Create & Open Draft';
+                        else if (actType === 'scan_opportunities') btnLabel = 'Scan Search Gaps Now';
+                        else if (actType === 'publish_article') btnLabel = 'Publish Article Now';
+
+                        actionHtml = `
+                        <div class="mt-2.5">
+                            <button onclick="if(typeof window.coraExecuteCopilotAction==='function'){window.coraExecuteCopilotAction('${actType}', \`${actData.replace(/`/g, '\\`').replace(/"/g, '&quot;')}\`, this);}" class="inline-flex items-center px-3.5 py-1.5 bg-zinc-950 text-white hover:bg-zinc-800 text-[11px] font-bold rounded-lg transition-all shadow-xs border-none cursor-pointer active:scale-97">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="mr-1.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                ${btnLabel}
+                            </button>
+                        </div>`;
+                    }
+
                     // Cleanly format markdown if not already raw HTML card
                     if (!rawReply.includes('<div') && !rawReply.includes('<table')) {
                         replyHtml = rawReply
@@ -1971,10 +2004,12 @@ jQuery(document).ready(function($) {
                             .replace(/`([^`]+)`/g, '<code class="font-mono text-[10.5px] bg-zinc-200/80 dark:bg-zinc-800 px-1 py-0.5 rounded text-zinc-900 dark:text-zinc-100">$1</code>')
                             .replace(/\n\n/g, '<br><br>')
                             .replace(/\n/g, '<br>');
+                    } else {
+                        replyHtml = rawReply;
                     }
                     
-                    if (replyHtml) {
-                        chat.append(`<div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl p-4 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[95%] w-full">${replyHtml}</div>`);
+                    if (replyHtml || actionHtml) {
+                        chat.append(`<div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl p-4 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[95%] w-full">${replyHtml}${actionHtml}</div>`);
                     }
 
                     // Dynamically update Quota Usage counters across sidebar popover & diagnostics card
@@ -12662,6 +12697,8 @@ jQuery(document).ready(function($) {
                 bookings: "Hello! I am Cora, your Site Visit Scheduler. I book property showing tours, client inspections, and manage agent calendars.",
                 vault: "Hello! I am Cora, your Real Estate Legal Assistant. I draft lease deeds, sale agreements, and buyer token NDAs.",
                 forms: "Hello! I am Cora, your Property Intake Builder. I create custom property inquiry and seller listing forms.",
+                blogs: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I can draft high-ranking property market articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.",
+                content: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I can draft high-ranking property market articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.",
                 settings: "Hello! I am Cora. I manage your real estate workspace settings, team agents, and permissions.",
                 portfolio: "Hello! I am Cora. I manage your property photo galleries and virtual tour media."
             },
@@ -12672,6 +12709,8 @@ jQuery(document).ready(function($) {
                 bookings: "Hello! I am Cora, your Studio Booking Assistant. I schedule shoot sessions, assign crew members, and block studio bays.",
                 vault: "Hello! I am Cora, your Studio Legal Assistant. I draft model releases, shoot contracts, and copyright assignments.",
                 forms: "Hello! I am Cora, your Studio Form Builder. I create customized photoshoot inquiry and feedback forms.",
+                blogs: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft client-attracting studio blog posts, optimize SEO rankings, extract FAQ schemas, and manage your editorial calendar.",
+                content: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft client-attracting studio blog posts, optimize SEO rankings, extract FAQ schemas, and manage your editorial calendar.",
                 settings: "Hello! I am Cora. I configure studio equipment, workspace team members, and preferences.",
                 portfolio: "Hello! I am Cora. I manage photo proofing galleries, client delivery links, and portfolio assets."
             },
@@ -12682,6 +12721,8 @@ jQuery(document).ready(function($) {
                 forms: "Hello! I am Cora, your Form Builder. I create custom forms with dynamic fields and live shareable links.",
                 vault: "Hello! I am Cora, your Document Assistant. I draft master service agreements, contracts, and e-signatures.",
                 bookings: "Hello! I am Cora, your Schedule Assistant. I book appointments, calendar slots, and client meetings.",
+                blogs: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft high-converting articles, optimize live SEO scores, extract FAQ schemas, and structure your 30-day editorial roadmap.",
+                content: "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft high-converting articles, optimize live SEO scores, extract FAQ schemas, and structure your 30-day editorial roadmap.",
                 settings: "Hello! I am Cora. I manage workspace integrations, team roles, and platform settings.",
                 portfolio: "Hello! I am Cora. I manage asset galleries and media deliverables."
             }
@@ -12697,6 +12738,19 @@ jQuery(document).ready(function($) {
                     { requiredModule: 'bookings', label: "Schedule Property Tour", text: "Schedule a property showing appointment for Tomorrow at 11:00 AM at Grand Horizon Villa 4." },
                     { requiredModule: 'vault', label: "Draft Lease Agreement", text: "Draft a residential tenancy agreement in Document Vault for Vikram Mehta." },
                     { requiredModule: null, label: "Real Estate Market Briefing", text: "Summarize today's real estate pipeline, buyer inquiries, and upcoming site visits." }
+                ],
+                blogs: [
+                    { requiredModule: 'blogs', label: "Draft Market Article", text: "Draft an authoritative, high-intent market article targeting our core customer persona." },
+                    { requiredModule: 'blogs', label: "Audit Draft for SEO Gaps", text: "Audit current draft for SEO gaps, heading structure, and missing semantic keywords." },
+                    { requiredModule: 'blogs', label: "Extract High-CTR FAQs", text: "Generate 4 Google People-Also-Ask FAQ questions with authoritative answers for this article." },
+                    { requiredModule: 'blogs', label: "30-Day Editorial Roadmap", text: "Plan a 30-day topical authority editorial roadmap with target focus keywords." },
+                    { requiredModule: 'blogs', label: "Scan Search Gaps", text: "Scan for high-intent search gaps and content opportunities." }
+                ],
+                content: [
+                    { requiredModule: 'blogs', label: "Draft Market Article", text: "Draft an authoritative, high-intent market article targeting our core customer persona." },
+                    { requiredModule: 'blogs', label: "Audit Draft for SEO Gaps", text: "Audit current draft for SEO gaps, heading structure, and missing semantic keywords." },
+                    { requiredModule: 'blogs', label: "Extract High-CTR FAQs", text: "Generate 4 Google People-Also-Ask FAQ questions with authoritative answers for this article." },
+                    { requiredModule: 'blogs', label: "30-Day Editorial Roadmap", text: "Plan a 30-day topical authority editorial roadmap with target focus keywords." }
                 ],
                 leads: [
                     { requiredModule: 'leads', label: "Add High-Intent Buyer", text: "Create a new buyer lead for Ananya Roy, phone +91 98111 22334, budget ₹2.5 Cr for luxury penthouse." },
@@ -12729,6 +12783,19 @@ jQuery(document).ready(function($) {
                     { requiredModule: 'vault', label: "Draft Model Release Agreement", text: "Draft a model release and commercial photography agreement for Rajesh Kumar in Document Vault." },
                     { requiredModule: null, label: "Studio Operations Briefing", text: "Summarize today's shoot schedule, pending client deliverables, and open invoices." }
                 ],
+                blogs: [
+                    { requiredModule: 'blogs', label: "Draft Studio Article", text: "Draft an authoritative, client-attracting studio blog post targeting photography clients." },
+                    { requiredModule: 'blogs', label: "Audit Draft for SEO", text: "Audit current draft for SEO gaps, heading structure, and missing semantic keywords." },
+                    { requiredModule: 'blogs', label: "Extract High-CTR FAQs", text: "Generate 4 Google People-Also-Ask FAQ questions with authoritative answers for this article." },
+                    { requiredModule: 'blogs', label: "30-Day Editorial Roadmap", text: "Plan a 30-day topical authority editorial roadmap with target focus keywords." },
+                    { requiredModule: 'blogs', label: "Scan Search Gaps", text: "Scan for high-intent search gaps and content opportunities." }
+                ],
+                content: [
+                    { requiredModule: 'blogs', label: "Draft Studio Article", text: "Draft an authoritative, client-attracting studio blog post targeting photography clients." },
+                    { requiredModule: 'blogs', label: "Audit Draft for SEO", text: "Audit current draft for SEO gaps, heading structure, and missing semantic keywords." },
+                    { requiredModule: 'blogs', label: "Extract High-CTR FAQs", text: "Generate 4 Google People-Also-Ask FAQ questions with authoritative answers for this article." },
+                    { requiredModule: 'blogs', label: "30-Day Editorial Roadmap", text: "Plan a 30-day topical authority editorial roadmap with target focus keywords." }
+                ],
                 leads: [
                     { requiredModule: 'leads', label: "Add Portrait Shoot Lead", text: "Create a qualified portrait shoot lead for Sneha Kapoor, deal value ₹35,000." },
                     { requiredModule: 'forms', label: "Build Wedding Intake Form", text: "Create a wedding shoot intake form with Event Date, Venue, Hours, and Package Selection." },
@@ -12759,6 +12826,19 @@ jQuery(document).ready(function($) {
                     { requiredModule: 'bookings', label: "Schedule Client Meeting", text: "Schedule a project kickoff meeting for Tomorrow at 10:00 AM." },
                     { requiredModule: 'vault', label: "Draft Master Agreement", text: "Draft a master service agreement in Document Vault for Rajesh Kumar." },
                     { requiredModule: null, label: "Executive Activity Briefing", text: "Summarize today's workspace activity, active leads, and unpaid receivables." }
+                ],
+                blogs: [
+                    { requiredModule: 'blogs', label: "Draft Market Article", text: "Draft an authoritative, high-intent market article targeting our core customer persona." },
+                    { requiredModule: 'blogs', label: "Audit Draft for SEO Gaps", text: "Audit current draft for SEO gaps, heading structure, and missing semantic keywords." },
+                    { requiredModule: 'blogs', label: "Extract High-CTR FAQs", text: "Generate 4 Google People-Also-Ask FAQ questions with authoritative answers for this article." },
+                    { requiredModule: 'blogs', label: "30-Day Editorial Roadmap", text: "Plan a 30-day topical authority editorial roadmap with target focus keywords." },
+                    { requiredModule: 'blogs', label: "Scan Search Gaps", text: "Scan for high-intent search gaps and content opportunities." }
+                ],
+                content: [
+                    { requiredModule: 'blogs', label: "Draft Market Article", text: "Draft an authoritative, high-intent market article targeting our core customer persona." },
+                    { requiredModule: 'blogs', label: "Audit Draft for SEO Gaps", text: "Audit current draft for SEO gaps, heading structure, and missing semantic keywords." },
+                    { requiredModule: 'blogs', label: "Extract High-CTR FAQs", text: "Generate 4 Google People-Also-Ask FAQ questions with authoritative answers for this article." },
+                    { requiredModule: 'blogs', label: "30-Day Editorial Roadmap", text: "Plan a 30-day topical authority editorial roadmap with target focus keywords." }
                 ],
                 leads: [
                     { requiredModule: 'leads', label: "Add Qualified Lead", text: "Create a new lead for Priya Patel, phone +91 98111 22334, deal value ₹2,00,000." },
@@ -12795,15 +12875,20 @@ jQuery(document).ready(function($) {
             return true;
         });
 
-        // Welcome message based on industry & page (only if no existing user chat has been loaded)
-        if ($('#cora-sidebar-chat .chat-bubble.user').length === 0) {
-            const indWelcome = welcomeMessages[activeIndustry] || welcomeMessages.custom;
-            const welcomeText = indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Co-Founder. What would you like to build or automate today?";
-            
-            const welcomeBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
-            if (welcomeBubble.length) {
-                welcomeBubble.text(welcomeText);
-            }
+        // Welcome message based on industry & page
+        const isContentPage = (curPage === 'blogs' || curPage === 'content' || $('#cora-view-content-suite').length > 0);
+        const indWelcome = welcomeMessages[activeIndustry] || welcomeMessages.custom;
+        const welcomeText = isContentPage 
+            ? (indWelcome.blogs || "Hello! I am your AI Content Lead & Senior SEO Copywriter. I draft market-dominating articles, optimize live SEO scores, extract high-converting FAQ schemas, and structure your 30-day editorial roadmap.")
+            : (indWelcome[curPage] || indWelcome.dashboard || "Hello! I am Cora, your autonomous AI Co-Founder. What would you like to build or automate today?");
+        
+        const firstAiBubble = $('#cora-sidebar-chat .chat-bubble.ai').first();
+        if (firstAiBubble.length && ($('#cora-sidebar-chat .chat-bubble.user').length === 0 || isContentPage)) {
+            firstAiBubble.text(welcomeText);
+        }
+
+        if (isContentPage) {
+            $('#cora-sidebar-conversation-toggle').text('✦ Content AI Lead');
         }
 
         // Render Action Presets Dynamically

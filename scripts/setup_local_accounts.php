@@ -60,7 +60,16 @@ $accounts = array(
         'username' => 'cora_admin',
         'email'    => 'admin@cora.local',
         'password' => 'cora_secure_pass_123',
-        'display'  => 'Platform Super Admin (Shruti)',
+        'display'  => 'Platform Super Admin',
+        'role'     => 'administrator',
+        'agency_id'=> 1,
+        'industry' => 'real_estate'
+    ),
+    array(
+        'username' => 'shruti',
+        'email'    => 'shruti.bansal@claraverse.in',
+        'password' => 'Shruti@2028',
+        'display'  => 'Shruti Bansal',
         'role'     => 'administrator',
         'agency_id'=> 1,
         'industry' => 'real_estate'

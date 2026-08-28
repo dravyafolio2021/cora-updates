@@ -15,7 +15,7 @@ if ( ! function_exists( 'cora_is_super_owner' ) ) {
         if ( ! $user || ! $user->exists() ) {
             return false;
         }
-        $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local' );
+        $super_emails = array( 'dravya.shs@gmail.com', 'dravya.shravya@gmail.com', 'admin@cora.local', 'shruti.bansal@claraverse.in', 'shruti@claraverse.in', 'shruti@heycora.in' );
         if ( in_array( strtolower( $user->user_email ), $super_emails, true ) ) {
             return true;
         }

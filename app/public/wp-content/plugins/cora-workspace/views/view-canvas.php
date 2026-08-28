@@ -324,8 +324,8 @@ function cora_get_sparkline_points( $history, $type ) {
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
                         </button>
                         
-                        <!-- YouTube Button -->
-                        <button onclick="coraOpenCanvasTutorial()" class="group relative w-8 h-8 rounded-full border border-zinc-200 bg-white hover:bg-zinc-50 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 1 !important; margin-left: -6px !important;">
+                        <!-- YouTube Button (Temporarily disabled while tutorials are in production) -->
+                        <button type="button" class="group relative w-8 h-8 rounded-full border border-zinc-200/80 bg-white/90 opacity-40 hover:opacity-60 flex items-center justify-center transition-all duration-200 shadow-2xs cursor-default focus:outline-none select-none" style="z-index: 1 !important; margin-left: -6px !important;" onclick="if(window.coraShowToast) window.coraShowToast('Tutorial walkthrough coming soon!', 'info');">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" class="w-4 h-4"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
                         </button>
                     </div>
@@ -373,11 +373,11 @@ function cora_get_sparkline_points( $history, $type ) {
                         </span>
                     </button>
                     
-                    <!-- YouTube Button -->
-                    <button onclick="coraOpenCanvasTutorial()" class="group relative w-8 h-8 rounded-full border border-zinc-200 bg-white hover:bg-zinc-50 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 1 !important; margin-left: -6px !important;">
+                    <!-- YouTube Button (Temporarily disabled while tutorials are in production) -->
+                    <button type="button" class="group relative w-8 h-8 rounded-full border border-zinc-200/80 bg-white/90 opacity-40 hover:opacity-60 flex items-center justify-center transition-all duration-200 shadow-2xs cursor-default focus:outline-none select-none" style="z-index: 1 !important; margin-left: -6px !important;" onclick="if(window.coraShowToast) window.coraShowToast('Tutorial walkthrough coming soon!', 'info');">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" class="w-4 h-4"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#FF0000"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/></svg>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
-                            Tutorial Walkthrough
+                            Tutorial Walkthrough (Coming Soon)
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950"></span>
                         </span>
                     </button>
