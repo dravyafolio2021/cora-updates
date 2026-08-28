@@ -15639,7 +15639,7 @@ jQuery(document).ready(function($) {
 <?php endif; ?>
 
 <!-- Modern Cora PWA Install Bottom Sheet Modal -->
-<div id="cora-pwa-install-modal">
+<div id="cora-pwa-install-modal" class="hidden">
     <div id="cora-pwa-install-backdrop" onclick="coraHidePwaPrompt()"></div>
     <div id="cora-pwa-install-sheet">
         <!-- Drag Handle for Mobile -->
@@ -15872,6 +15872,7 @@ function coraShowPwaPrompt() {
     setTimeout(() => {
         const modal = document.getElementById('cora-pwa-install-modal');
         if (modal) {
+            modal.classList.remove('hidden');
             modal.classList.add('cora-pwa-sheet-active');
         }
     }, 1800);
@@ -15881,6 +15882,7 @@ function coraHidePwaPrompt() {
     const modal = document.getElementById('cora-pwa-install-modal');
     if (modal) {
         modal.classList.remove('cora-pwa-sheet-active');
+        setTimeout(() => modal.classList.add('hidden'), 300);
     }
 }
 

@@ -810,10 +810,10 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
    CORA MODERN PWA INSTALL BOTTOM SHEET MODAL
    ========================================================================== */
 #cora-pwa-install-modal {
+    display: none !important;
     position: fixed !important;
     inset: 0 !important;
     z-index: 999998 !important;
-    display: flex !important;
     flex-direction: column !important;
     justify-content: flex-end !important;
     pointer-events: none !important;
@@ -822,6 +822,7 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
 }
 
 #cora-pwa-install-modal.cora-pwa-sheet-active {
+    display: flex !important;
     pointer-events: auto !important;
     opacity: 1 !important;
 }
