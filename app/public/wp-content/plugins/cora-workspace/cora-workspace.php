@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.3.0
+ * Version: 4.3.1
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.3.0' );
+    define( 'CORA_WORKSPACE_VERSION', '4.3.1' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -34051,7 +34051,7 @@ function cora_initiate_google_oauth() {
         exit;
     }
 
-    if ( empty( $client_id ) || ! get_option( 'cora_onboarding_google_enabled', 1 ) || ! get_option( 'cora_onboarding_enabled', 1 ) ) {
+    if ( empty( $client_id ) ) {
         wp_redirect( home_url( '/workspace/register?error=google_disabled' ) );
         exit;
     }

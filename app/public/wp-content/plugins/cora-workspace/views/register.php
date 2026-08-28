@@ -266,8 +266,8 @@ if ( get_option( 'cora_onboarding_enabled', 1 ) ) {
 <body>
 <?php
 $google_enabled  = true; // Universal Google Sign-In
-$email_enabled   = get_option( 'cora_onboarding_email_enabled', 1 );
-$reg_enabled     = get_option( 'cora_onboarding_enabled', 1 );
+$email_enabled   = true; // Universal Email Sign-Up
+$reg_enabled     = true; // Universal Registration Open
 $google_auth_url = home_url( '/workspace/auth/google' );
 if ( ! empty( $_GET['plan'] ) ) {
     $google_auth_url = add_query_arg( array(

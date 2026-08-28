@@ -23,8 +23,8 @@ $user_display_name  = $is_logged_in ? wp_get_current_user()->display_name : '';
 
 // Google OAuth config
 $google_enabled  = true; // Universal Google Sign-In
-$email_enabled   = get_option( 'cora_onboarding_email_enabled', 1 );
-$reg_enabled     = get_option( 'cora_onboarding_enabled', 1 );
+$email_enabled   = true; // Universal Email Sign-Up
+$reg_enabled     = true; // Universal Registration Open
 $google_auth_url = home_url( '/workspace/auth/google' );
 
 // Plan Selection Context
