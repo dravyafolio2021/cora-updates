@@ -2565,7 +2565,7 @@ function renderFormsList() {
                         Edit
                     </button>
                     <!-- Mobile AI Edit Button (Opens 2-way Agentic AI) -->
-                    <button class="btn-edit-ai-mobile sm:hidden h-8 flex-1 rounded-lg bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" onclick="window.coraPromptFormAI('${form.id}', '${(form.title || 'Form').replace(/'/g, "\\'")}')">
+                    <button class="btn-edit-ai-mobile sm:hidden h-8 flex-1 rounded-lg bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="${form.id}" title="Edit Form with AI">
                         <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
                         Edit with AI
                     </button>
@@ -2588,6 +2588,14 @@ function renderFormsList() {
         });
 
         // Attach listeners
+        jQuery('.btn-edit-ai-mobile').on('click', function() {
+            const id = jQuery(this).data('id');
+            const formObj = (formsData || []).find(f => f.id == id);
+            const title = (formObj && formObj.title) ? formObj.title : 'Form #' + id;
+            if (typeof window.coraPromptFormAI === 'function') {
+                window.coraPromptFormAI(id, title);
+            }
+        });
         jQuery('.btn-view-live').on('click', function() {
             const id = jQuery(this).data('id');
             const formObj = (formsData || []).find(f => f.id == id);
