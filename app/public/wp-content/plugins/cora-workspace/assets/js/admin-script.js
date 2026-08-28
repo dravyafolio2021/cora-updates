@@ -388,12 +388,17 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        const activeData = (window.coraREData && window.coraREData.currentRole) ? window.coraREData : (window.coraData || {});
-        let siteUrl = activeData.siteUrl || window.location.origin;
-        if (siteUrl.endsWith('/')) {
-            siteUrl = siteUrl.slice(0, -1);
+        // Canonical PWA & Workspace In-App Navigation (Zero CCT browser header fallback)
+        // Maintain /workspace/{target} to guarantee 100% fullscreen PWA mode without triggering Android CCT header
+        const isPwa = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches || window.location.search.includes('standalone=1');
+        const isWorkspacePath = window.location.pathname.startsWith('/workspace');
+
+        if (isPwa || isWorkspacePath) {
+            window.location.assign(window.location.origin + '/workspace/' + encodeURIComponent(targetPageId));
+            return;
         }
-        
+
+        const activeData = (window.coraREData && window.coraREData.currentRole) ? window.coraREData : (window.coraData || {});
         let activeWsSlug = 'workspace';
         if (window.coraREData && window.coraREData.activeWorkspace && window.coraREData.activeWorkspace.slug) {
             activeWsSlug = window.coraREData.activeWorkspace.slug;
@@ -401,7 +406,7 @@ jQuery(document).ready(function($) {
             activeWsSlug = window.coraAppData.activeWorkspace.slug;
         }
 
-        window.location.assign(siteUrl + '/' + encodeURIComponent(activeWsSlug) + '/' + encodeURIComponent(targetPageId));
+        window.location.assign(window.location.origin + '/' + encodeURIComponent(activeWsSlug) + '/' + encodeURIComponent(targetPageId));
     };
 
     // ─── PWA Standalone Mode In-App Navigation & Pull-To-Refresh Engine ───────
