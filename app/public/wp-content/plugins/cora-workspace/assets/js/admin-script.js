@@ -2137,15 +2137,19 @@ jQuery(document).ready(function($) {
                     
                     if (response.data.action_proposal) {
                         const prop = response.data.action_proposal;
+                        window.__coraPendingProposals = window.__coraPendingProposals || {};
+                        const propId = 'prop_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                        window.__coraPendingProposals[propId] = prop;
+                        const propTypeLabel = (prop.type || 'ACTION').replace(/_/g, ' ');
                         actionHtml += `
                         <div class="mt-3 p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xs flex flex-col gap-2.5">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider">${prop.type.replace('_', ' ')}</span>
+                                <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider">${propTypeLabel}</span>
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             </div>
-                            <button onclick="${prop.action_cmd}" class="w-full py-2.5 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer border-none active:scale-[0.98]">
+                            <button type="button" onclick="window.coraExecuteProposal('${propId}')" class="w-full py-2.5 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer border-none active:scale-[0.98]">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <span>${prop.action_label}</span>
+                                <span>${prop.action_label || 'Deploy with AI'}</span>
                             </button>
                         </div>`;
                     }
@@ -14568,4 +14572,36 @@ window.coraConfirmFormAIExecution = function(formPayload) {
             }
         }
     });
+};
+
+
+window.coraExecuteProposal = function(propId) {
+    var prop = (window.__coraPendingProposals && window.__coraPendingProposals[propId]) ? window.__coraPendingProposals[propId] : null;
+    if (!prop) {
+        if (window.coraShowToast) window.coraShowToast('Action expired. Please prompt the AI again.', 'error');
+        return;
+    }
+    if (prop.type === 'form_agent_action' && prop.payload) {
+        window.coraConfirmFormAIExecution(prop.payload);
+        return;
+    }
+    if (prop.type === 'vault_agent_action' && prop.payload) {
+        if (typeof window.coraConfirmVaultAIExecution === 'function') {
+            window.coraConfirmVaultAIExecution(prop.payload);
+            return;
+        }
+    }
+    if (prop.action_cmd) {
+        try {
+            var fn = new Function(prop.action_cmd);
+            fn();
+        } catch(e) {
+            console.error('Proposal execution error:', e);
+            if (prop.payload && typeof window.coraConfirmFormAIExecution === 'function') {
+                window.coraConfirmFormAIExecution(prop.payload);
+            } else if (window.coraShowToast) {
+                window.coraShowToast('Action execution failed: ' + e.message, 'error');
+            }
+        }
+    }
 };
