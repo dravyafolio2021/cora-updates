@@ -377,18 +377,18 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
 
             <!-- Card 4: Projected Cash -->
-            <div class="cora-fin-card p-4 flex flex-col justify-between gap-3 bg-zinc-950 text-white border-zinc-900">
+            <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
                 <div class="flex items-center justify-between">
                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Projected Cash</span>
-                    <span class="w-6 h-6 rounded-lg bg-zinc-800 text-zinc-300 flex items-center justify-center font-bold text-xs">
+                    <span class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </span>
                 </div>
                 <div>
-                    <div class="text-2xl font-extrabold text-white cora-mono-num">₹<?php echo number_format( $projected_cash ); ?></div>
-                    <div class="text-[11px] text-zinc-400 font-medium mt-0.5">After collections &amp; expenses</div>
+                    <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $projected_cash ); ?></div>
+                    <div class="text-[11px] text-zinc-500 font-medium mt-0.5">After collections &amp; expenses</div>
                 </div>
-                <div class="text-[10px] font-semibold text-zinc-300 bg-zinc-800/80 px-2 py-0.5 rounded-md inline-block w-fit border border-zinc-700">
+                <div class="text-[10px] font-semibold <?php echo $projected_cash >= 0 ? 'text-zinc-800 bg-zinc-100' : 'text-red-700 bg-red-50'; ?> px-2 py-0.5 rounded-md inline-block w-fit">
                     Net: <?php echo $projected_cash >= 0 ? 'Healthy Position' : 'Deficit Warning'; ?>
                 </div>
             </div>
