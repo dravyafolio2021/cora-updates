@@ -2135,6 +2135,21 @@ jQuery(document).ready(function($) {
                         replyHtml = rawReply;
                     }
                     
+                    if (response.data.action_proposal) {
+                        const prop = response.data.action_proposal;
+                        actionHtml += `
+                        <div class="mt-3 p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xs flex flex-col gap-2.5">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider">${prop.type.replace('_', ' ')}</span>
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            </div>
+                            <button onclick="${prop.action_cmd}" class="w-full py-2.5 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer border-none active:scale-[0.98]">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>${prop.action_label}</span>
+                            </button>
+                        </div>`;
+                    }
+
                     if (replyHtml || actionHtml) {
                         chat.append(`<div class="chat-bubble ai bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-2xl p-4 text-xs leading-relaxed self-start border border-zinc-200/60 dark:border-zinc-700/60 shadow-xs max-w-[95%] w-full">${replyHtml}${actionHtml}</div>`);
                     }
@@ -14386,3 +14401,50 @@ jQuery(document).ready(function($) {
     $(document).ready(function() {
         window.coraCheckPwaPushStatus();
     });
+
+
+    window.coraConfirmVaultAIExecution = function(opts) {
+        if (!opts) return;
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Executing AI Document Action...', 'info');
+        }
+
+        const ajaxUrlEndpoint = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+        const ajaxNonceSec = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        $.ajax({
+            url: ajaxUrlEndpoint,
+            type: 'POST',
+            data: {
+                action: 'cora_vault_ai_action',
+                security: ajaxNonceSec,
+                sub_action: opts.sub_action || 'save_document',
+                doc_data: opts.doc_data || {}
+            },
+            success: function(res) {
+                if (res.success) {
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast(res.data.message || 'Action executed successfully!', 'success');
+                    }
+                    if (window.location.pathname.includes('/vault')) {
+                        setTimeout(() => {
+                            if (typeof coraNavigateTo === 'function') {
+                                coraNavigateTo('vault');
+                            } else {
+                                window.location.reload();
+                            }
+                        }, 700);
+                    }
+                } else {
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast(res.data?.message || 'Failed to execute action.', 'error');
+                    }
+                }
+            },
+            error: function() {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Network error while executing AI action.', 'error');
+                }
+            }
+        });
+    };

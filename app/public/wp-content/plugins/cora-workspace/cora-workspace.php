@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.3.8
+ * Version: 4.3.9
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.3.8' );
+    define( 'CORA_WORKSPACE_VERSION', '4.3.9' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -16200,6 +16200,87 @@ When the user asks you to create, update, or execute something:
  */
 if ( ! function_exists( 'cora_ai_local_cofounder_handler' ) ) {
 function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard', $history = array() ) {
+    // Contextual Agentic Document & Vault Handler
+    $lower_msg = strtolower( $message );
+    if ( strpos( $lower_msg, 'invoice' ) !== false || strpos( $lower_msg, 'proposal' ) !== false || strpos( $lower_msg, 'contract' ) !== false || strpos( $lower_msg, 'e-sign' ) !== false || strpos( $lower_msg, 'esign' ) !== false || strpos( $lower_msg, 'vault' ) !== false || strpos( $lower_msg, 'receivable' ) !== false || strpos( $lower_msg, 'document' ) !== false ) {
+        // Document type detection
+        $doc_type = 'Invoice';
+        if ( strpos( $lower_msg, 'proposal' ) !== false || strpos( $lower_msg, 'quote' ) !== false ) {
+            $doc_type = 'Proposal';
+        } elseif ( strpos( $lower_msg, 'contract' ) !== false || strpos( $lower_msg, 'agreement' ) !== false || strpos( $lower_msg, 'sla' ) !== false ) {
+            $doc_type = 'Contract';
+        } elseif ( strpos( $lower_msg, 'offer' ) !== false ) {
+            $doc_type = 'Offer Letter';
+        }
+
+        // Amount parsing
+        $amount = 150000;
+        if ( preg_match( '/(?:₹|rs\.?|inr)?\s*([0-9,]+(?:\.[0-9]+)?)\s*(?:l|lakh|k|thousand)?/i', $message, $matches ) ) {
+            $val_str = str_replace( ',', '', $matches[1] );
+            $val = floatval( $val_str );
+            if ( stripos( $message, 'lakh' ) !== false || stripos( $message, ' l' ) !== false || stripos( $message, '1.5l' ) !== false ) {
+                if ( $val < 100 ) $val = $val * 100000;
+            } elseif ( stripos( $message, 'k' ) !== false || stripos( $message, 'thousand' ) !== false ) {
+                if ( $val < 1000 ) $val = $val * 1000;
+            }
+            if ( $val > 0 ) $amount = $val;
+        }
+
+        // Client parsing
+        $client_name = 'Apex Realty Group';
+        if ( preg_match( '/(?:for|to|client|with)\s+([A-Z][a-zA-Z0-9\s&]+?)(?:\s+(?:of|for|amount|with|₹|rs|inr|at|$))/i', $message, $c_matches ) ) {
+            $client_name = trim( $c_matches[1] );
+        } elseif ( stripos( $message, 'arjun' ) !== false || stripos( $message, 'priya' ) !== false ) {
+            $client_name = 'Arjun & Priya';
+        } elseif ( stripos( $message, 'fashion' ) !== false ) {
+            $client_name = 'Fashion Council India';
+        } elseif ( stripos( $message, 'kavya' ) !== false ) {
+            $client_name = 'Kavya Patel';
+        } elseif ( stripos( $message, 'rohan' ) !== false ) {
+            $client_name = 'Rohan Verma';
+        }
+
+        $tax_rate = 18;
+        $tax_amount = round( ( $amount * $tax_rate ) / 100, 2 );
+        $grand_total = $amount + $tax_amount;
+        $deposit = round( $grand_total * 0.5, 2 );
+
+        if ( strpos( $lower_msg, 'e-sign' ) !== false || strpos( $lower_msg, 'esign' ) !== false ) {
+            $reply = "I have prepared the **E-Sign Request** for **{$client_name}**.\n\n• **Document**: DOC-2026 {$doc_type}\n• **Signer**: {$client_name} (contact@example.com)\n• **Verification**: Cryptographic Token Ready\n\nWould you like me to dispatch the e-sign link via transactional email and WhatsApp?";
+            wp_send_json_success( array(
+                'reply' => $reply,
+                'action_proposal' => array(
+                    'type' => 'esign_request',
+                    'client' => $client_name,
+                    'action_label' => 'Dispatch E-Sign Link',
+                    'action_cmd' => "coraConfirmVaultAIExecution({sub_action:'request_esign', doc_data:{target_doc_id:'doc_101', signer_email:'arjun.priya@example.com'}})"
+                )
+            ) );
+        }
+
+        $reply = "I've structured a new **{$doc_type}** for **{$client_name}** with GST compliance:\n\n" .
+                 "• **Base Amount**: ₹" . number_format($amount) . "\n" .
+                 "• **SAC Code**: 998381 (18% GST: ₹" . number_format($tax_amount) . ")\n" .
+                 "• **Grand Total**: ₹" . number_format($grand_total) . "\n" .
+                 "• **50% Advance Deposit**: ₹" . number_format($deposit) . "\n\n" .
+                 "You can execute and save this record directly into your Document Vault with one click:";
+
+        wp_send_json_success( array(
+            'reply' => $reply,
+            'action_proposal' => array(
+                'type' => 'create_document',
+                'title' => "{$doc_type}: {$client_name} Production Services",
+                'client_name' => $client_name,
+                'amount' => $amount,
+                'tax_rate' => 18,
+                'tax_amount' => $tax_amount,
+                'grand_total' => $grand_total,
+                'deposit' => $deposit,
+                'action_label' => "Execute & Save {$doc_type} to Vault",
+                'action_cmd' => "coraConfirmVaultAIExecution({sub_action:'save_document', doc_data:{title:'{$doc_type}: {$client_name} Production Services', type:'{$doc_type}', client_name:'{$client_name}', amount:{$amount}, tax_rate:18, grand_total:{$grand_total}, deposit:{$deposit}}})"
+            )
+        ) );
+    }
     global $wpdb;
     $agency_id = function_exists('cora_db_get_agency_id') ? cora_db_get_agency_id() : 1;
     $user_id   = get_current_user_id();
