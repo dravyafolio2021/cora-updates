@@ -56,7 +56,7 @@ fi
 echo "✅ Guard analysis complete."
 
 # Step 3: Packaging
-echo "Packaging release zip..."
+echo "Packaging lean release zip..."
 rm -f "$OUTPUT_ZIP"
 
 cd "$PLUGIN_DIR"
@@ -64,8 +64,13 @@ zip -r -q "$OUTPUT_ZIP" "$PLUGIN_NAME" \
   -x "$PLUGIN_NAME/node_modules/*" \
   -x "$PLUGIN_NAME/.git/*" \
   -x "$PLUGIN_NAME/scratch/*" \
+  -x "$PLUGIN_NAME/scratch_*" \
+  -x "$PLUGIN_NAME/test-results/*" \
+  -x "$PLUGIN_NAME/apex-realty-group/*" \
   -x "$PLUGIN_NAME/package-lock.json" \
   -x "$PLUGIN_NAME/*.guide.html" \
+  -x "$PLUGIN_NAME/*.html" \
+  -x "$PLUGIN_NAME/*.py" \
   -x "*/.DS_Store"
 
 echo "✅ Packaging complete: $OUTPUT_ZIP"

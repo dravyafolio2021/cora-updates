@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.6.1
+ * Version: 4.6.2
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,10 +18,61 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.6.1' );
+    define( 'CORA_WORKSPACE_VERSION', '4.6.2' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
+
+// =========================================================================
+// CORA HIGH-PERFORMANCE MICRO-CACHE & MEMORY LAYER (Sub-millisecond SLA)
+// =========================================================================
+if ( ! function_exists( 'cora_cache_get' ) ) {
+    function cora_cache_get( $key, $group = 'cora_workspace' ) {
+        static $runtime_cache = array();
+        $composite_key = "{$group}:{$key}";
+        if ( array_key_exists( $composite_key, $runtime_cache ) ) {
+            return $runtime_cache[ $composite_key ];
+        }
+        $val = wp_cache_get( $key, $group );
+        if ( false !== $val ) {
+            $runtime_cache[ $composite_key ] = $val;
+            return $val;
+        }
+        return false;
+    }
+}
+
+if ( ! function_exists( 'cora_cache_set' ) ) {
+    function cora_cache_set( $key, $data, $group = 'cora_workspace', $expire = 300 ) {
+        static $runtime_cache = array();
+        $composite_key = "{$group}:{$key}";
+        $runtime_cache[ $composite_key ] = $data;
+        return wp_cache_set( $key, $data, $group, $expire );
+    }
+}
+
+if ( ! function_exists( 'cora_cache_delete' ) ) {
+    function cora_cache_delete( $key, $group = 'cora_workspace' ) {
+        static $runtime_cache = array();
+        $composite_key = "{$group}:{$key}";
+        unset( $runtime_cache[ $composite_key ] );
+        return wp_cache_delete( $key, $group );
+    }
+}
+
+if ( ! function_exists( 'cora_cache_flush_agency' ) ) {
+    function cora_cache_flush_agency( $agency_id ) {
+        $agency_id = intval( $agency_id );
+        if ( $agency_id <= 0 ) return;
+        cora_cache_delete( "agency_settings_{$agency_id}" );
+        cora_cache_delete( "agency_clients_{$agency_id}" );
+        cora_cache_delete( "agency_leads_{$agency_id}" );
+        cora_cache_delete( "agency_forms_{$agency_id}" );
+        cora_cache_delete( "agency_stats_{$agency_id}" );
+    }
+}
+
+
 define( 'CORA_WORKSPACE_PLUGIN_FILE', __FILE__ );
 if ( ! defined( 'CORA_PLUGIN_FILE' ) ) {
     define( 'CORA_PLUGIN_FILE', __FILE__ );
@@ -22274,7 +22325,9 @@ function cora_create_custom_tables() {
       KEY branch_id (branch_id),
       KEY assigned_to (assigned_to),
       KEY status (status),
-      KEY followup_date (followup_date)
+      KEY followup_date (followup_date),
+      KEY agency_status (agency_id, status),
+      KEY agency_created (agency_id, created_at)
     ) $charset_collate;";
 
     // 6. cora_properties
@@ -22306,7 +22359,9 @@ function cora_create_custom_tables() {
       KEY agency_id (agency_id),
       KEY branch_id (branch_id),
       KEY status (status),
-      KEY city (city)
+      KEY city (city),
+      KEY agency_status (agency_id, status),
+      KEY agency_created (agency_id, created_at)
     ) $charset_collate;";
 
     // 7. cora_clients
