@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.8.3
+ * Version: 4.8.4
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.3' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.4' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -8244,11 +8244,26 @@ function cora_get_preview_theme_id() {
 }
 
 // ── Dynamic query interceptor to resolve pages of draft themes on the frontend ──
-add_action( 'pre_get_posts', 'cora_canvas_route_preview_pages' );
+add_action( 'pre_get_posts', 'cora_canvas_route_preview_pages', 1 );
 if ( ! function_exists( 'cora_canvas_route_preview_pages' ) ) {
 function cora_canvas_route_preview_pages( $query ) {
     if ( is_admin() || ! $query->is_main_query() ) {
         return;
+    }
+
+    // 0. Elementor Editor Preview Fast-Route: Always resolve preview requests without 404
+    if ( isset( $_GET['elementor-preview'] ) || isset( $_GET['preview_id'] ) ) {
+        $preview_pid = isset( $_GET['elementor-preview'] ) ? intval( $_GET['elementor-preview'] ) : intval( $_GET['preview_id'] );
+        if ( $preview_pid > 0 ) {
+            $query->set( 'page_id', $preview_pid );
+            $query->set( 'p', $preview_pid );
+            $query->set( 'post_type', array( 'page', 'post', 'elementor_library' ) );
+            $query->set( 'post_status', array( 'publish', 'draft', 'pending', 'private', 'auto-draft', 'future' ) );
+            $query->is_404 = false;
+            $query->is_page = true;
+            $query->is_singular = true;
+            return;
+        }
     }
 
     global $wpdb;
@@ -8357,7 +8372,7 @@ function cora_canvas_route_preview_pages( $query ) {
 
     if ( $canvas_page ) {
         $query->set( 'page_id', intval( $canvas_page['wp_post_id'] ) );
-        $query->set( 'post_status', [ 'publish', 'draft', 'pending', 'private' ] );
+        $query->set( 'post_status', [ 'publish', 'draft', 'pending', 'private', 'auto-draft' ] );
         $query->is_404 = false;
     }
 }

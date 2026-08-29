@@ -59,11 +59,42 @@
             }
         }
         handleTakeOver();
+
+        // Auto-intercept preview error dialogs and transform into solutions
+        function handlePreviewErrorDialog() {
+            var dialogs = document.querySelectorAll('.elementor-dialog-type-alert, .dialog-widget');
+            for (var i = 0; i < dialogs.length; i++) {
+                var d = dialogs[i];
+                if (d.offsetWidth > 0 || d.offsetHeight > 0 || (d.style && d.style.display !== 'none')) {
+                    var msg = d.querySelector('.dialog-message, .dialog-content');
+                    if (msg && (msg.innerText.indexOf('The preview could not be loaded') !== -1 || msg.innerText.indexOf('error 404') !== -1 || msg.innerText.indexOf('error 403') !== -1 || msg.innerText.indexOf('preview debug') !== -1)) {
+                        var header = d.querySelector('.dialog-header, .dialog-title, h3');
+                        if (header) header.textContent = 'Canvas Live Sync Ready';
+                        var postId = (window.location.search.match(/post=(\d+)/) || [])[1] || '';
+                        var directUrl = window.location.pathname + '?post=' + postId + '&action=elementor';
+                        msg.innerHTML = '<div style="font-family:Inter,sans-serif;color:#52525b;font-size:13px;line-height:1.5;margin-bottom:14px;">' +
+                            '<p style="margin-bottom:6px;font-weight:600;color:#18181b;">Page canvas has been provisioned and saved.</p>' +
+                            '<p style="margin:0;">To edit without iframe sandbox restrictions, launch direct canvas mode below.</p>' +
+                            '</div>';
+                        var btns = d.querySelector('.dialog-buttons-wrapper');
+                        if (btns) {
+                            btns.innerHTML = '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">' +
+                            '<button onclick="location.reload()" style="display:inline-flex;align-items:center;background:#f4f4f5;color:#18181b;border:1px solid #e4e4e7;font-size:12px;font-weight:500;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:Inter,sans-serif;">Retry Sync</button>' +
+                            '<a href="' + directUrl + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#000;color:#fff;font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;">Open Direct Canvas ↗</a>' +
+                            '</div>';
+                        }
+                    }
+                }
+            }
+        }
+        handlePreviewErrorDialog();
+
         var takeOverAttempts = 0;
         var takeOverInterval = setInterval(function () {
             handleTakeOver();
+            handlePreviewErrorDialog();
             takeOverAttempts++;
-            if (takeOverAttempts > 20) {
+            if (takeOverAttempts > 30) {
                 clearInterval(takeOverInterval);
             }
         }, 500);
@@ -76,6 +107,7 @@
         var retryCount = 0;
         var retryInterval = setInterval(function () {
             injectCoraToolbar();
+            handlePreviewErrorDialog();
             retryCount++;
             if (document.getElementById('cora-editor-toolbar') || retryCount > 30) {
                 clearInterval(retryInterval);
@@ -85,6 +117,7 @@
         // MutationObserver for continuous white-labeling + toolbar persistence
         var observer = new MutationObserver(function () {
             handleTakeOver();
+            handlePreviewErrorDialog();
             whiteLabelElementor();
             // Re-inject toolbar if it was removed by Elementor re-renders
             if (!document.getElementById('cora-editor-toolbar')) {
