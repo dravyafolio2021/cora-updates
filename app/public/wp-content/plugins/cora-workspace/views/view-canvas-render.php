@@ -1,12 +1,25 @@
 <?php
 /**
- * Elementor Page Canvas Render Template
+ * Elementor Page Canvas Render Template with Resilient Theme & Kit Sync
  */
 while ( ob_get_level() > 0 ) {
     ob_end_clean();
 }
 status_header( 200 );
 nocache_headers();
+
+global $wpdb;
+$ws = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+$agency_id = ! empty( $ws['agency_id'] ) ? intval( $ws['agency_id'] ) : 1;
+
+$live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' ORDER BY id DESC LIMIT 1", $agency_id ), ARRAY_A );
+if ( ! $live_theme ) {
+    $live_theme = $wpdb->get_row( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+}
+$theme_settings = $live_theme ? ( json_decode( $live_theme['settings'], true ) ?: array() ) : array();
+
+$header_template_id = ! empty( $theme_settings['header_template_id'] ) ? intval( $theme_settings['header_template_id'] ) : 0;
+$footer_template_id = ! empty( $theme_settings['footer_template_id'] ) ? intval( $theme_settings['footer_template_id'] ) : 0;
 
 echo '<!DOCTYPE html>';
 echo '<html ';
@@ -21,11 +34,19 @@ echo '<body ';
 body_class();
 echo '>';
 
-// Render Elementor Header
+// 1. Render Elementor Header (Native Theme Builder location or Canvas linked template)
+$header_rendered = false;
 if ( function_exists( 'elementor_theme_do_location' ) ) {
-    elementor_theme_do_location( 'header' );
+    $header_rendered = elementor_theme_do_location( 'header' );
+}
+if ( ! $header_rendered && $header_template_id > 0 && class_exists( '\Elementor\Plugin' ) ) {
+    $header_content = \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $header_template_id );
+    if ( ! empty( $header_content ) ) {
+        echo '<header id="cora-canvas-site-header">' . $header_content . '</header>';
+    }
 }
 
+// 2. Render Page Content
 $page_id = isset( $GLOBALS['cora_canvas_render_page_id'] ) ? intval( $GLOBALS['cora_canvas_render_page_id'] ) : get_the_ID();
 if ( $page_id > 0 ) {
     global $post;
@@ -35,17 +56,28 @@ if ( $page_id > 0 ) {
 if ( class_exists( '\Elementor\Plugin' ) && $page_id ) {
     $elementor_content = \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $page_id );
     if ( ! empty( $elementor_content ) ) {
-        echo $elementor_content;
+        echo '<main id="cora-canvas-main-content">' . $elementor_content . '</main>';
     } else {
+        echo '<main id="cora-canvas-main-content">';
         the_content();
+        echo '</main>';
     }
 } else {
+    echo '<main id="cora-canvas-main-content">';
     the_content();
+    echo '</main>';
 }
 
-// Render Elementor Footer
+// 3. Render Elementor Footer (Native Theme Builder location or Canvas linked template)
+$footer_rendered = false;
 if ( function_exists( 'elementor_theme_do_location' ) ) {
-    elementor_theme_do_location( 'footer' );
+    $footer_rendered = elementor_theme_do_location( 'footer' );
+}
+if ( ! $footer_rendered && $footer_template_id > 0 && class_exists( '\Elementor\Plugin' ) ) {
+    $footer_content = \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $footer_template_id );
+    if ( ! empty( $footer_content ) ) {
+        echo '<footer id="cora-canvas-site-footer">' . $footer_content . '</footer>';
+    }
 }
 
 // Output preview bar script if applicable

@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.6.8
+ * Version: 4.6.9
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.6.8' );
+    define( 'CORA_WORKSPACE_VERSION', '4.6.9' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -30526,17 +30526,45 @@ add_action( 'wp_ajax_cora_ajax_save_theme_settings', 'cora_ajax_canvas_save_them
 if ( ! function_exists( 'cora_push_settings_to_elementor_kit' ) ) {
 function cora_push_settings_to_elementor_kit( $settings ) {
     if ( ! function_exists( 'get_option' ) ) return;
+    global $wpdb;
+
+    // 1. Discover or auto-provision active Elementor Kit
     $kit_id = (int) get_option( 'elementor_active_kit', 0 );
+    if ( $kit_id <= 0 || ! get_post( $kit_id ) ) {
+        $existing_kit_id = $wpdb->get_var( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_elementor_template_type' AND meta_value = 'kit' LIMIT 1" );
+        if ( $existing_kit_id && get_post( $existing_kit_id ) ) {
+            $kit_id = intval( $existing_kit_id );
+            update_option( 'elementor_active_kit', $kit_id );
+        } else {
+            $kit_id = wp_insert_post( array(
+                'post_title'  => 'Cora Design System Kit',
+                'post_name'   => 'cora-design-system-kit',
+                'post_type'   => 'elementor_library',
+                'post_status' => 'publish'
+            ) );
+            if ( ! is_wp_error( $kit_id ) && $kit_id > 0 ) {
+                update_post_meta( $kit_id, '_elementor_edit_mode', 'builder' );
+                update_post_meta( $kit_id, '_elementor_template_type', 'kit' );
+                update_option( 'elementor_active_kit', $kit_id );
+            }
+        }
+    }
     if ( $kit_id <= 0 ) return;
 
     $kit_meta = get_post_meta( $kit_id, '_elementor_page_settings', true );
     if ( ! is_array( $kit_meta ) ) $kit_meta = array();
 
-    // System Colors — 4 Elementor global colors
-    $primary   = $settings['el_primary']   ?? $settings['primary_color']   ?? '#18181b';
-    $secondary = $settings['el_secondary'] ?? $settings['secondary_color']  ?? '#27272a';
-    $text      = $settings['el_text']      ?? $settings['text_color']       ?? '#09090b';
-    $accent    = $settings['el_accent']    ?? $settings['accent_color']     ?? '#10b981';
+    // 2. System & Custom Colors Palette
+    $primary    = $settings['el_primary']    ?? $settings['primary_color']    ?? '#18181b';
+    $secondary  = $settings['el_secondary']  ?? $settings['secondary_color']  ?? '#27272a';
+    $text       = $settings['el_text']       ?? $settings['text_color']       ?? '#09090b';
+    $accent     = $settings['el_accent']     ?? $settings['accent_color']     ?? '#10b981';
+    $background = $settings['bg_color']      ?? '#ffffff';
+    $surface    = $settings['surface_color'] ?? '#f4f4f5';
+    $border     = $settings['border_color']  ?? '#e4e4e7';
+    $success    = $settings['success_color'] ?? '#16a34a';
+    $warning    = $settings['warning_color'] ?? '#d97706';
+    $danger     = $settings['danger_color']  ?? '#dc2626';
 
     $kit_meta['system_colors'] = array(
         array( '_id' => 'primary',   'title' => 'Primary',   'color' => sanitize_hex_color( $primary )   ?: '#18181b' ),
@@ -30545,40 +30573,177 @@ function cora_push_settings_to_elementor_kit( $settings ) {
         array( '_id' => 'accent',    'title' => 'Accent',    'color' => sanitize_hex_color( $accent )    ?: '#10b981' ),
     );
 
-    // System Typography — 4 Elementor global typography presets
-    $type_map = array(
-        'primary'   => array( 'title' => 'Primary',   'weight_fallback' => 700 ),
-        'secondary' => array( 'title' => 'Secondary', 'weight_fallback' => 600 ),
-        'text'      => array( 'title' => 'Text',      'weight_fallback' => 400 ),
-        'accent'    => array( 'title' => 'Accent',    'weight_fallback' => 600 ),
+    $kit_meta['custom_colors'] = array(
+        array( '_id' => 'cora_bg',      'title' => 'Background', 'color' => sanitize_hex_color( $background ) ?: '#ffffff' ),
+        array( '_id' => 'cora_surface', 'title' => 'Surface',    'color' => sanitize_hex_color( $surface )    ?: '#f4f4f5' ),
+        array( '_id' => 'cora_border',  'title' => 'Border',     'color' => sanitize_hex_color( $border )     ?: '#e4e4e7' ),
+        array( '_id' => 'cora_success', 'title' => 'Success',    'color' => sanitize_hex_color( $success )    ?: '#16a34a' ),
+        array( '_id' => 'cora_warning', 'title' => 'Warning',    'color' => sanitize_hex_color( $warning )    ?: '#d97706' ),
+        array( '_id' => 'cora_danger',  'title' => 'Danger',     'color' => sanitize_hex_color( $danger )     ?: '#dc2626' ),
     );
-    $heading_font = $settings['heading_font'] ?? 'Inter';
-    $body_font    = $settings['body_font']    ?? 'Inter';
 
-    $kit_meta['system_typography'] = array();
-    foreach ( $type_map as $tid => $tdef ) {
-        $family = $settings[ "el_type_{$tid}_family" ] ?? ( ( $tid === 'text' ) ? $body_font : $heading_font );
-        $weight = $settings[ "el_type_{$tid}_weight" ] ?? $tdef['weight_fallback'];
-        $kit_meta['system_typography'][] = array(
-            '_id'   => $tid,
-            'title' => $tdef['title'],
-            'typography_typography'   => 'custom',
-            'typography_font_family'  => sanitize_text_field( $family ),
-            'typography_font_weight'  => intval( $weight ),
+    // 3. System & Custom Typography Hierarchy
+    $heading_font = sanitize_text_field( $settings['heading_font'] ?? 'Inter' );
+    $body_font    = sanitize_text_field( $settings['body_font']    ?? 'Inter' );
+    $base_size    = intval( $settings['base_font_size'] ?? 16 );
+
+    $kit_meta['system_typography'] = array(
+        array(
+            '_id' => 'primary',
+            'title' => 'Primary',
+            'typography_typography'  => 'custom',
+            'typography_font_family' => $heading_font,
+            'typography_font_weight' => intval( $settings['el_type_primary_weight'] ?? 700 ),
+        ),
+        array(
+            '_id' => 'secondary',
+            'title' => 'Secondary',
+            'typography_typography'  => 'custom',
+            'typography_font_family' => $heading_font,
+            'typography_font_weight' => intval( $settings['el_type_secondary_weight'] ?? 600 ),
+        ),
+        array(
+            '_id' => 'text',
+            'title' => 'Text',
+            'typography_typography'  => 'custom',
+            'typography_font_family' => $body_font,
+            'typography_font_weight' => intval( $settings['el_type_text_weight'] ?? 400 ),
+            'typography_font_size'   => array( 'unit' => 'px', 'size' => $base_size ),
+        ),
+        array(
+            '_id' => 'accent',
+            'title' => 'Accent',
+            'typography_typography'  => 'custom',
+            'typography_font_family' => $heading_font,
+            'typography_font_weight' => intval( $settings['el_type_accent_weight'] ?? 600 ),
+        ),
+    );
+
+    $kit_meta['custom_typography'] = array(
+        array(
+            '_id' => 'cora_h1',
+            'title' => 'H1 — Hero Header',
+            'typography_typography'  => 'custom',
+            'typography_font_family' => $heading_font,
+            'typography_font_size'   => array( 'unit' => 'px', 'size' => 44 ),
+            'typography_font_weight' => '800',
+            'typography_line_height' => array( 'unit' => 'em', 'size' => 1.15 ),
+        ),
+        array(
+            '_id' => 'cora_h2',
+            'title' => 'H2 — Section Header',
+            'typography_typography'  => 'custom',
+            'typography_font_family' => $heading_font,
+            'typography_font_size'   => array( 'unit' => 'px', 'size' => 32 ),
+            'typography_font_weight' => '700',
+            'typography_line_height' => array( 'unit' => 'em', 'size' => 1.25 ),
+        ),
+        array(
+            '_id' => 'cora_h3',
+            'title' => 'H3 — Card Header',
+            'typography_typography'  => 'custom',
+            'typography_font_family' => $heading_font,
+            'typography_font_size'   => array( 'unit' => 'px', 'size' => 24 ),
+            'typography_font_weight' => '600',
+            'typography_line_height' => array( 'unit' => 'em', 'size' => 1.3 ),
+        ),
+        array(
+            '_id' => 'cora_caption',
+            'title' => 'Caption / Micro',
+            'typography_typography'  => 'custom',
+            'typography_font_family' => $body_font,
+            'typography_font_size'   => array( 'unit' => 'px', 'size' => 12 ),
+            'typography_font_weight' => '500',
+            'typography_line_height' => array( 'unit' => 'em', 'size' => 1.4 ),
+        ),
+    );
+
+    // 4. Site Logo & Identity Synchronization
+    if ( ! empty( $settings['logo_url'] ) || ! empty( $settings['logo'] ) ) {
+        $logo_url = ! empty( $settings['logo_url'] ) ? esc_url_raw( $settings['logo_url'] ) : esc_url_raw( $settings['logo'] );
+        $logo_id  = ! empty( $settings['logo_id'] ) ? intval( $settings['logo_id'] ) : ( function_exists( 'attachment_url_to_postid' ) ? attachment_url_to_postid( $logo_url ) : 0 );
+        $kit_meta['site_logo'] = array(
+            'url' => $logo_url,
+            'id'  => $logo_id,
         );
+        if ( $logo_id > 0 ) {
+            set_theme_mod( 'custom_logo', $logo_id );
+        }
+    }
+    if ( ! empty( $settings['site_title'] ) ) {
+        $kit_meta['site_name'] = sanitize_text_field( $settings['site_title'] );
+    }
+    if ( ! empty( $settings['site_tagline'] ) ) {
+        $kit_meta['site_description'] = sanitize_text_field( $settings['site_tagline'] );
+    }
+    if ( ! empty( $settings['container_width'] ) ) {
+        $kit_meta['container_width'] = array( 'unit' => 'px', 'size' => intval( $settings['container_width'] ) );
     }
 
-    update_post_meta( $kit_id, '_elementor_page_settings', $kit_meta );
+    // 5. Header & Footer Template Conditions
+    $header_template_id = ! empty( $settings['header_template_id'] ) ? intval( $settings['header_template_id'] ) : 0;
+    $footer_template_id = ! empty( $settings['footer_template_id'] ) ? intval( $settings['footer_template_id'] ) : 0;
 
-    // Flush Elementor's CSS cache so changes render on the next page load
+    if ( $header_template_id > 0 ) {
+        update_post_meta( $header_template_id, '_elementor_conditions', array( 'include/general' ) );
+    }
+    if ( $footer_template_id > 0 ) {
+        update_post_meta( $footer_template_id, '_elementor_conditions', array( 'include/general' ) );
+    }
+
+    // 6. Save Kit Settings & Clear Elementor CSS Caches
+    update_post_meta( $kit_id, '_elementor_page_settings', $kit_meta );
     delete_post_meta( $kit_id, '_elementor_css' );
 
-    // Also flush via Elementor Pro's files manager if available
-    if ( class_exists( 'Elementor\Plugin' ) && isset( Elementor\Plugin::$instance->files_manager ) ) {
-        Elementor\Plugin::$instance->files_manager->clear_cache();
+    if ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->files_manager ) ) {
+        \Elementor\Plugin::$instance->files_manager->clear_cache();
     }
 }
 }
+
+// ── Live CSS Token Injection Hook ───────────────────────────────────────────
+if ( ! function_exists( 'cora_output_live_theme_css_tokens' ) ) {
+function cora_output_live_theme_css_tokens() {
+    global $wpdb;
+    $ws = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+    $agency_id = ! empty( $ws['agency_id'] ) ? intval( $ws['agency_id'] ) : 1;
+
+    $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' ORDER BY id DESC LIMIT 1", $agency_id ), ARRAY_A );
+    if ( ! $live_theme ) {
+        $live_theme = $wpdb->get_row( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+    }
+    $settings = $live_theme ? ( json_decode( $live_theme['settings'], true ) ?: array() ) : array();
+
+    $primary    = $settings['primary_color']   ?? $settings['el_primary']   ?? '#18181b';
+    $secondary  = $settings['secondary_color'] ?? $settings['el_secondary'] ?? '#27272a';
+    $accent     = $settings['accent_color']    ?? $settings['el_accent']    ?? '#10b981';
+    $text       = $settings['text_color']      ?? $settings['el_text']      ?? '#09090b';
+    $background = $settings['bg_color']        ?? '#ffffff';
+    $surface    = $settings['surface_color']   ?? '#f4f4f5';
+    $border     = $settings['border_color']    ?? '#e4e4e7';
+    $radius     = intval( $settings['border_radius'] ?? 8 );
+    $h_font     = sanitize_text_field( $settings['heading_font'] ?? 'Inter' );
+    $b_font     = sanitize_text_field( $settings['body_font'] ?? 'Inter' );
+
+    echo "\n<style id=\"cora-canvas-dynamic-tokens\">\n";
+    echo ":root {\n";
+    echo "  --color-primary: " . esc_attr( $primary ) . ";\n";
+    echo "  --color-secondary: " . esc_attr( $secondary ) . ";\n";
+    echo "  --color-accent: " . esc_attr( $accent ) . ";\n";
+    echo "  --color-text: " . esc_attr( $text ) . ";\n";
+    echo "  --color-background: " . esc_attr( $background ) . ";\n";
+    echo "  --color-surface: " . esc_attr( $surface ) . ";\n";
+    echo "  --color-border: " . esc_attr( $border ) . ";\n";
+    echo "  --border-radius: " . esc_attr( $radius ) . "px;\n";
+    echo "  --heading-font: '" . esc_attr( $h_font ) . "', sans-serif;\n";
+    echo "  --body-font: '" . esc_attr( $b_font ) . "', sans-serif;\n";
+    echo "}\n";
+    echo "</style>\n";
+}
+}
+add_action( 'wp_head', 'cora_output_live_theme_css_tokens', 99 );
+add_action( 'elementor/editor/after_enqueue_styles', 'cora_output_live_theme_css_tokens', 99 );
+add_action( 'elementor/frontend/after_enqueue_styles', 'cora_output_live_theme_css_tokens', 99 );
 
 // ── Standalone Elementor Sync AJAX (called from "Sync to Elementor Now" button) ──
 if ( ! function_exists( 'cora_ajax_sync_elementor_globals' ) ) {
