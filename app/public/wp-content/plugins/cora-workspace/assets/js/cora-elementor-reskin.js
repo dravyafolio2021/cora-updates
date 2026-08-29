@@ -89,30 +89,10 @@
         }
         handlePreviewErrorDialog();
 
-        // Auto-sanitize Elementor Page Layout select dropdown to strictly 2 options
-        function sanitizePageLayoutSelect() {
-            var selects = document.querySelectorAll('select[data-setting="template"], select[name="template"], .elementor-control-template select');
-            for (var i = 0; i < selects.length; i++) {
-                var sel = selects[i];
-                if (sel.getAttribute('data-cora-layout-sanitized') === 'true') continue;
-                
-                var currentVal = sel.value;
-                var isCanvas = currentVal === 'elementor_canvas' || currentVal === 'canvas';
-                
-                sel.innerHTML = '<option value="default">Default (Header &amp; Footer)</option>' +
-                                '<option value="elementor_canvas">Canvas (No Header / Footer)</option>';
-                
-                sel.value = isCanvas ? 'elementor_canvas' : 'default';
-                sel.setAttribute('data-cora-layout-sanitized', 'true');
-            }
-        }
-        sanitizePageLayoutSelect();
-
         var takeOverAttempts = 0;
         var takeOverInterval = setInterval(function () {
             handleTakeOver();
             handlePreviewErrorDialog();
-            sanitizePageLayoutSelect();
             takeOverAttempts++;
             if (takeOverAttempts > 30) {
                 clearInterval(takeOverInterval);
@@ -128,7 +108,6 @@
         var retryInterval = setInterval(function () {
             injectCoraToolbar();
             handlePreviewErrorDialog();
-            sanitizePageLayoutSelect();
             retryCount++;
             if (document.getElementById('cora-editor-toolbar') || retryCount > 30) {
                 clearInterval(retryInterval);
@@ -139,7 +118,6 @@
         var observer = new MutationObserver(function () {
             handleTakeOver();
             handlePreviewErrorDialog();
-            sanitizePageLayoutSelect();
             whiteLabelElementor();
             // Re-inject toolbar if it was removed by Elementor re-renders
             if (!document.getElementById('cora-editor-toolbar')) {

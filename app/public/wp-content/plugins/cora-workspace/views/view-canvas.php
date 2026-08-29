@@ -2637,7 +2637,7 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
 
             <!-- Editor Iframe -->
-            <iframe id="elementor-editor-iframe" src="<?php echo esc_url($_editor_resume_url); ?>" class="w-full h-full border-none<?php echo $_editor_resume_url ? '' : ' hidden'; ?>"></iframe>
+            <iframe id="elementor-editor-iframe" onload="jQuery('#iframe-loader').addClass('hidden'); jQuery(this).removeClass('hidden');" src="<?php echo esc_url($_editor_resume_url); ?>" class="w-full h-full border-none<?php echo $_editor_resume_url ? '' : ' hidden'; ?>"></iframe>
 
         </div>
     </div>
