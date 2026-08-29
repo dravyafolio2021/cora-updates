@@ -5984,15 +5984,53 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 };
 
                 var CORA_IS_STUDIO = <?php echo $is_studio ? 'true' : 'false'; ?>;
-                var CORA_DEFAULT_DYNAMIC_ACTIONS = CORA_IS_STUDIO ? [
-                    { name: 'Create Invoice', page: 'financials' },
-                    { name: 'New Workflow', page: 'automations' },
-                    { name: 'Model Releases', page: 'vault' }
-                ] : [
-                    { name: 'Create Invoice', page: 'financials' },
-                    { name: 'New Workflow', page: 'automations' },
-                    { name: 'Build Form', page: 'forms' }
-                ];
+                var CORA_IS_CUSTOM = <?php echo ( $cora_workspace_industry_raw === 'custom' ) ? 'true' : 'false'; ?>;
+                var CORA_CUSTOM_ENABLED = <?php echo json_encode( function_exists('cora_get_custom_enabled_features') ? cora_get_custom_enabled_features() : array() ); ?>;
+
+                var CORA_DEFAULT_DYNAMIC_ACTIONS = [];
+                if (CORA_IS_STUDIO) {
+                    CORA_DEFAULT_DYNAMIC_ACTIONS = [
+                        { name: 'Create Invoice', page: 'financials' },
+                        { name: 'New Workflow', page: 'automations' },
+                        { name: 'Model Releases', page: 'vault' }
+                    ];
+                } else if (CORA_IS_CUSTOM) {
+                    var candidateMap = [
+                        { key: 'financials', name: 'Create Invoice', page: 'financials' },
+                        { key: 'automations', name: 'New Workflow', page: 'automations' },
+                        { key: 'forms', name: 'Build Form', page: 'forms' },
+                        { key: 'vault', name: 'File Manager', page: 'vault' },
+                        { key: 'leads', name: 'Client Leads', page: 'leads' },
+                        { key: 'bookings', name: 'Bookings', page: 'bookings' },
+                        { key: 'equipment', name: 'Gear Tracker', page: 'equipment' },
+                        { key: 'blogs', name: 'Write Article', page: 'blogs' }
+                    ];
+                    for (var k = 0; k < candidateMap.length; k++) {
+                        if (CORA_CUSTOM_ENABLED.indexOf(candidateMap[k].key) > -1) {
+                            CORA_DEFAULT_DYNAMIC_ACTIONS.push({ name: candidateMap[k].name, page: candidateMap[k].page });
+                            if (CORA_DEFAULT_DYNAMIC_ACTIONS.length >= 3) break;
+                        }
+                    }
+                    if (CORA_DEFAULT_DYNAMIC_ACTIONS.length < 3) {
+                        var fallbacks = [
+                            { name: 'Create Invoice', page: 'financials' },
+                            { name: 'New Workflow', page: 'automations' },
+                            { name: 'Build Form', page: 'forms' }
+                        ];
+                        for (var f = 0; f < fallbacks.length; f++) {
+                            if (!CORA_DEFAULT_DYNAMIC_ACTIONS.find(function(item) { return item.page === fallbacks[f].page; })) {
+                                CORA_DEFAULT_DYNAMIC_ACTIONS.push(fallbacks[f]);
+                                if (CORA_DEFAULT_DYNAMIC_ACTIONS.length >= 3) break;
+                            }
+                        }
+                    }
+                } else {
+                    CORA_DEFAULT_DYNAMIC_ACTIONS = [
+                        { name: 'Create Invoice', page: 'financials' },
+                        { name: 'New Workflow', page: 'automations' },
+                        { name: 'Build Form', page: 'forms' }
+                    ];
+                }
 
                 var CORA_ALL_PAGES = [
                     {value:'bookings',label:'Bookings & Calendar'},
