@@ -878,32 +878,71 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
 
 /* ==========================================================================
    WORKSPACE TEXT SELECTION INTEGRITY
-   Guarantee standard cursor text selection for all content, cards, tables,
-   headings, paragraphs, codes, inputs, and descriptions across the workspace.
+   Guarantee standard cursor text selection for content paragraphs, codes, inputs,
+   and descriptions while strictly disabling text selection on all interactive controls.
    ========================================================================== */
-#cora-workspace-container,
-.cora-page-section,
-.cora-main-content,
-main.cora-main,
-.cora-shopify-card,
-.cora-shopify-card-body,
-p, h1, h2, h3, h4, h5, h6,
-span:not(.cora-nav-icon):not(.cora-badge-sidebar):not(.drag-handle),
-td, th, pre, code, blockquote,
-input, textarea, [contenteditable="true"] {
-    -webkit-user-select: text !important;
-    -moz-user-select: text !important;
-    -ms-user-select: text !important;
-    user-select: text !important;
+#cora-workspace-container p,
+#cora-workspace-container h1,
+#cora-workspace-container h2,
+#cora-workspace-container h3,
+#cora-workspace-container h4,
+#cora-workspace-container h5,
+#cora-workspace-container h6,
+#cora-workspace-container td,
+#cora-workspace-container th,
+#cora-workspace-container pre,
+#cora-workspace-container code,
+#cora-workspace-container blockquote,
+#cora-workspace-container input,
+#cora-workspace-container textarea,
+#cora-workspace-container [contenteditable="true"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 /* Restrict select-none strictly to functional control elements */
 button,
+button *,
+a,
+a *,
+.cora-btn,
+.cora-btn *,
 .cora-nav-item,
+.cora-nav-item *,
 .cora-sidebar,
 .cora-topbar,
 .drag-handle,
-.cora-btn {
-    -webkit-user-select: none;
-    user-select: none;
+.cora-island-btn-menu,
+.cora-island-btn-menu *,
+.cora-island-btn-ai,
+.cora-island-btn-ai *,
+.cora-island-nav-link,
+.cora-island-nav-link *,
+.cora-search-pill,
+.cora-search-pill *,
+.cora-ai-gradient-pill,
+.cora-ai-gradient-pill *,
+.cora-island-view,
+[role="button"],
+[role="button"] *,
+[onclick],
+[onclick] * {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+button > span,
+button > svg,
+a > span,
+a > svg,
+.cora-ai-gradient-pill-inner,
+.cora-ai-gradient-pill-inner * {
+    pointer-events: none;
 }

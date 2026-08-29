@@ -2202,59 +2202,6 @@ jQuery(document).ready(function($) {
                                 </div>
                             </div>`;
                         } else {
-                                    controlHtml = `<div class="w-full h-8 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 flex items-center gap-1.5 text-[11px] text-zinc-400 select-none">${isWa ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>' : ''}<span class="truncate">${blk.placeholder || blk.label}</span></div>`;
-                                }
-
-                                fieldsHtml += `
-                                <div class="flex flex-col gap-1">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200">${blk.label} ${reqBadge}</span>
-                                        <span class="text-[9.5px] font-mono text-zinc-400 uppercase">Step ${(blk.step_index || 0) + 1}</span>
-                                    </div>
-                                    ${controlHtml}
-                                </div>`;
-                            });
-
-                            actionHtml += `
-                            <div class="mt-3 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-700 rounded-2xl p-4 shadow-sm flex flex-col gap-3.5">
-                                <!-- Card Header -->
-                                <div class="flex items-start justify-between gap-2 pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
-                                    <div class="min-w-0">
-                                        <div class="flex items-center gap-1.5">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-950 dark:text-white shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
-                                            <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-100 truncate">${formTitle}</h4>
-                                        </div>
-                                        <p class="text-[10px] text-zinc-400 mt-0.5 font-medium">${stepCount}-Step Multi-Step • ${blocks.length} Live Fields • CRM Sync</p>
-                                    </div>
-                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">READY</span>
-                                </div>
-
-                                <!-- Visual Form Preview Box -->
-                                <div class="bg-zinc-50/70 dark:bg-zinc-950/50 border border-zinc-200/70 dark:border-zinc-800 rounded-xl p-3 flex flex-col gap-2.5 max-h-56 overflow-y-auto scrollbar-thin">
-                                    ${fieldsHtml}
-                                </div>
-
-                                <!-- Action Buttons Row -->
-                                <div class="flex flex-col gap-2 pt-1">
-                                    <button type="button" onclick="window.coraExecuteProposal('${propId}')" class="w-full h-9 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer border-none active:scale-[0.98]">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        <span>${prop.action_label || 'Deploy & Publish Form'}</span>
-                                    </button>
-                                    <div class="flex items-center gap-2">
-                                        <button type="button" onclick="window.coraPreviewProposalForm('${propId}')" class="flex-1 h-8 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-[11px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer border-none">
-                                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                            <span>Preview Live</span>
-                                        </button>
-                                        <button type="button" onclick="window.coraQuickPromptForm('Add a digital signature pad to this form')" class="px-2.5 h-8 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer border-none" title="Add Signature Field">
-                                            <span>+ Signature</span>
-                                        </button>
-                                        <button type="button" onclick="window.coraQuickPromptForm('Add file upload attachments field to this form')" class="px-2.5 h-8 bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer border-none" title="Add File Upload">
-                                            <span>+ Files</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>`;
-                        } else {
                             const propTypeLabel = (prop.type || 'ACTION').replace(/_/g, ' ');
                             actionHtml += `
                             <div class="mt-3 p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xs flex flex-col gap-2.5">
