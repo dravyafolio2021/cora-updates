@@ -12,18 +12,41 @@ global $wpdb;
 $ws = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
 $agency_id = ! empty( $ws['agency_id'] ) ? intval( $ws['agency_id'] ) : 1;
 
-$live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' ORDER BY id DESC LIMIT 1", $agency_id ), ARRAY_A );
-if ( ! $live_theme ) {
-    $live_theme = $wpdb->get_row( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+// Resolve active or preview theme row
+$active_theme = function_exists( 'cora_get_active_theme_row' ) ? cora_get_active_theme_row() : null;
+if ( ! $active_theme ) {
+    $preview_theme_id = function_exists( 'cora_get_preview_theme_id' ) ? intval( cora_get_preview_theme_id() ) : 0;
+    if ( $preview_theme_id > 0 ) {
+        $active_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d LIMIT 1", $preview_theme_id ), ARRAY_A );
+    }
 }
-$theme_settings = $live_theme ? ( json_decode( $live_theme['settings'], true ) ?: array() ) : array();
+if ( ! $active_theme ) {
+    $active_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' ORDER BY id DESC LIMIT 1", $agency_id ), ARRAY_A );
+}
+if ( ! $active_theme ) {
+    $active_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+}
 
-// Auto-discover published Elementor Header library templates if not explicitly configured
+$theme_settings = $active_theme ? ( json_decode( $active_theme['settings'], true ) ?: array() ) : array();
+
+// 1. Resolve Header Template ID from theme settings or Elementor library
+$header_template_id = 0;
+if ( ! empty( $theme_settings['header_template_id'] ) ) {
+    $header_template_id = intval( $theme_settings['header_template_id'] );
+} elseif ( ! empty( $theme_settings['templates']['header'] ) ) {
+    $header_template_id = intval( $theme_settings['templates']['header'] );
+} elseif ( ! empty( $theme_settings['header_id'] ) ) {
+    $header_template_id = intval( $theme_settings['header_id'] );
+}
+
 if ( $header_template_id <= 0 ) {
+    // Auto-discover the most recent published Elementor Header library template
     $found_headers = get_posts( array(
         'post_type'      => 'elementor_library',
         'posts_per_page' => 1,
         'post_status'    => 'publish',
+        'orderby'        => 'date',
+        'order'          => 'DESC',
         'meta_query'     => array(
             array(
                 'key'   => '_elementor_template_type',
@@ -36,12 +59,24 @@ if ( $header_template_id <= 0 ) {
     }
 }
 
-// Auto-discover published Elementor Footer library templates if not explicitly configured
+// 2. Resolve Footer Template ID from theme settings or Elementor library
+$footer_template_id = 0;
+if ( ! empty( $theme_settings['footer_template_id'] ) ) {
+    $footer_template_id = intval( $theme_settings['footer_template_id'] );
+} elseif ( ! empty( $theme_settings['templates']['footer'] ) ) {
+    $footer_template_id = intval( $theme_settings['templates']['footer'] );
+} elseif ( ! empty( $theme_settings['footer_id'] ) ) {
+    $footer_template_id = intval( $theme_settings['footer_id'] );
+}
+
 if ( $footer_template_id <= 0 ) {
+    // Auto-discover the most recent published Elementor Footer library template
     $found_footers = get_posts( array(
         'post_type'      => 'elementor_library',
         'posts_per_page' => 1,
         'post_status'    => 'publish',
+        'orderby'        => 'date',
+        'order'          => 'DESC',
         'meta_query'     => array(
             array(
                 'key'   => '_elementor_template_type',
@@ -90,7 +125,10 @@ if ( ! $header_rendered ) {
                 <?php if ( $logo_img ) : ?>
                     <?php echo $logo_img; ?>
                 <?php else : ?>
-                    <span><?php echo esc_html( $site_name ?: 'Claroverse' ); ?></span>
+                    <?php
+                    $display_name = ! empty( $ws['name'] ) ? $ws['name'] : ( get_bloginfo( 'name' ) ?: 'Cora Studio' );
+                    ?>
+                    <span><?php echo esc_html( $display_name ); ?></span>
                 <?php endif; ?>
             </a>
         </div>
