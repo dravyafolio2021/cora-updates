@@ -5354,68 +5354,66 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </div>
                     </div>
 
-                    <!-- 4. Quick Action Shortcuts Pill Bar (2-Line Aligned) -->
-                    <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-3.5 py-1 select-none mb-24 sm:mb-28" style="margin-bottom: 96px;">
+                    <!-- 4. Quick Action Shortcuts Pill Bar (3-Row Layout: 2 Permanent, 3 Dynamic, 1 Custom Trigger) -->
+                    <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-2.5 sm:gap-3 py-1 select-none mb-20 sm:mb-28" style="margin-bottom: 80px;">
                         
-                        <!-- Line 1: Primary Action Pills -->
-                        <div class="flex items-center justify-center flex-wrap gap-2.5">
+                        <!-- Row 1: 2 Permanent Action Chips -->
+                        <div id="cora-permanent-actions-row" class="flex items-center justify-center gap-2 sm:gap-2.5 flex-nowrap">
                             <?php if ( $is_studio ) : ?>
-                            <button type="button" onclick="coraNavigateTo('financials')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
-                                <span>Create Invoice</span>
-                            </button>
-                            <button type="button" onclick="coraNavigateTo('bookings')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                <span>Book Shoot</span>
-                            </button>
-                            <button type="button" onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            <button type="button" onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                 <span>Upload Media</span>
                             </button>
-                            <button type="button" onclick="coraNavigateTo('vault')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                                <span>Model Releases</span>
-                            </button>
-                            <button type="button" onclick="coraNavigateTo('equipment')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            <button type="button" onclick="coraNavigateTo('equipment')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                                 <span>Gear Tracker</span>
                             </button>
-                            <button type="button" onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                <span>New Workflow</span>
-                            </button>
                             <?php else : ?>
-                            <button type="button" onclick="coraNavigateTo('blogs')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                <span>Write Article</span>
-                            </button>
-                            <button type="button" onclick="coraNavigateTo('forms')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                <span>Build Form</span>
-                            </button>
-                            <button type="button" onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            <button type="button" onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                 <span>Upload Media</span>
                             </button>
-                            <button type="button" onclick="coraNavigateTo('vault')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                                <span>Upload File</span>
-                            </button>
-                            <button type="button" onclick="coraNavigateTo('financials')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
-                                <span>Create Invoice</span>
-                            </button>
-                            <button type="button" onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                <span>New Workflow</span>
+                            <button type="button" onclick="coraNavigateTo('blogs')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                <span>Write Article</span>
                             </button>
                             <?php endif; ?>
                         </div>
 
-                        <!-- Line 2: Custom Shortcuts Gradient Button Row -->
-                        <div class="flex items-center justify-center flex-wrap gap-2.5">
-                            <div id="cora-custom-actions-container" class="contents"></div>
-                            <button type="button" onclick="window.coraOpenCustomActionModal()" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0">
+                        <!-- Row 2: 3 Dynamic Action Chips (Default industry actions replaced dynamically by custom shortcuts) -->
+                        <div id="cora-dynamic-actions-row" class="flex items-center justify-center gap-1.5 sm:gap-2.5 max-w-full overflow-x-auto no-scrollbar py-0.5">
+                            <?php if ( $is_studio ) : ?>
+                            <button type="button" onclick="coraNavigateTo('financials')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-[11px] sm:text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
+                                <span>Create Invoice</span>
+                            </button>
+                            <button type="button" onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-[11px] sm:text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <span>New Workflow</span>
+                            </button>
+                            <button type="button" onclick="coraNavigateTo('vault')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-[11px] sm:text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                <span>Model Releases</span>
+                            </button>
+                            <?php else : ?>
+                            <button type="button" onclick="coraNavigateTo('financials')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-[11px] sm:text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
+                                <span>Create Invoice</span>
+                            </button>
+                            <button type="button" onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-[11px] sm:text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <span>New Workflow</span>
+                            </button>
+                            <button type="button" onclick="coraNavigateTo('forms')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-[11px] sm:text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                <span>Build Form</span>
+                            </button>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Row 3: Custom Shortcuts Trigger Button (Centered) -->
+                        <div id="cora-custom-action-trigger-row" class="flex items-center justify-center pt-0.5">
+                            <button type="button" onclick="window.coraOpenCustomActionModal()" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                                 <span class="cora-ai-gradient-pill-inner">
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-purple-600 shrink-0">
                                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -5985,6 +5983,17 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     }
                 };
 
+                var CORA_IS_STUDIO = <?php echo $is_studio ? 'true' : 'false'; ?>;
+                var CORA_DEFAULT_DYNAMIC_ACTIONS = CORA_IS_STUDIO ? [
+                    { name: 'Create Invoice', page: 'financials' },
+                    { name: 'New Workflow', page: 'automations' },
+                    { name: 'Model Releases', page: 'vault' }
+                ] : [
+                    { name: 'Create Invoice', page: 'financials' },
+                    { name: 'New Workflow', page: 'automations' },
+                    { name: 'Build Form', page: 'forms' }
+                ];
+
                 var CORA_ALL_PAGES = [
                     {value:'bookings',label:'Bookings & Calendar'},
                     {value:'leads',label:'Leads CRM'},
@@ -6048,6 +6057,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                 window.coraAddPreset = function(name, page) {
                     var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    if (actions.length >= 5) {
+                        if (window.coraShowToast) coraShowToast('Maximum 5 custom shortcuts allowed. Please remove one first.', 'warning');
+                        return;
+                    }
                     if (actions.find(function(a) { return a.name === name && a.page === page; })) {
                         if (window.coraShowToast) coraShowToast('Already added!', 'info');
                         return;
@@ -6057,7 +6070,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     window.coraRenderCustomActions();
                     window.coraRenderCustomActionsList();
                     window.coraRenderPresets();
-                    if (window.coraShowToast) coraShowToast(name + ' added!', 'success');
+                    if (window.coraShowToast) coraShowToast(name + ' added to shortcuts!', 'success');
                 };
 
                 window.coraOpenCustomActionModal = function() {
@@ -6086,6 +6099,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         return;
                     }
                     var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    if (actions.length >= 5) {
+                        if (window.coraShowToast) coraShowToast('Maximum 5 custom shortcuts allowed. Please remove one first.', 'warning');
+                        return;
+                    }
                     actions.push({ name: name, page: page });
                     localStorage.setItem('cora_custom_quick_actions', JSON.stringify(actions));
                     if (nameEl) nameEl.value = '';
@@ -6112,23 +6129,39 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     var list = document.getElementById('cora-custom-actions-list');
                     if (!list) return;
                     var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    var labelEl = list.previousElementSibling;
+                    if (labelEl && labelEl.tagName === 'P') {
+                        labelEl.textContent = 'YOUR SHORTCUTS (' + actions.length + '/5)';
+                    }
                     if (!actions.length) {
                         list.innerHTML = '<p style="font-size:11px;color:#a1a1aa;text-align:center;padding:6px 0;">No shortcuts yet — add one above or pick a suggestion.</p>';
                         return;
                     }
                     list.innerHTML = '<div style="display:flex;flex-direction:column;gap:6px;">' + actions.map(function(a, i) {
                         var iconHtml = window.coraGetPageIconSvg(a.page);
-                        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#f4f4f5;border-radius:10px;"><div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;align-items:center;color:#71717a;width:12px;height:12px;">' + iconHtml + '</span><span style="font-size:12px;font-weight:500;color:#3f3f46;">' + a.name + '</span></div><button onclick="window.coraDeleteCustomAction(' + i + ')" style="background:none;border:none;cursor:pointer;color:#a1a1aa;padding:2px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>';
+                        var activeBadge = i < 3 ? '<span style="font-size:9.5px;font-weight:600;color:#16a34a;background:#f0fdf4;padding:1px 6px;border-radius:10px;border:1px solid #bbf7d0;">Active in bar</span>' : '<span style="font-size:9.5px;color:#71717a;background:#f4f4f5;padding:1px 6px;border-radius:10px;">Saved</span>';
+                        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#f4f4f5;border-radius:10px;"><div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;align-items:center;color:#71717a;width:12px;height:12px;">' + iconHtml + '</span><span style="font-size:12px;font-weight:500;color:#3f3f46;">' + a.name + '</span> ' + activeBadge + '</div><button onclick="window.coraDeleteCustomAction(' + i + ')" style="background:none;border:none;cursor:pointer;color:#a1a1aa;padding:2px;"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>';
                     }).join('') + '</div>';
                 };
 
                 window.coraRenderCustomActions = function() {
-                    var c = document.getElementById('cora-custom-actions-container');
+                    var c = document.getElementById('cora-dynamic-actions-row');
                     if (!c) return;
-                    var actions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]').slice(0, 4);
-                    c.innerHTML = actions.map(function(a) {
+                    var customActions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    
+                    // Exactly 3 dynamic slots in Row 2. Custom actions replace the default dynamic actions from left to right.
+                    var row2Items = [];
+                    for (var i = 0; i < 3; i++) {
+                        if (i < customActions.length) {
+                            row2Items.push(customActions[i]);
+                        } else if (i < CORA_DEFAULT_DYNAMIC_ACTIONS.length) {
+                            row2Items.push(CORA_DEFAULT_DYNAMIC_ACTIONS[i]);
+                        }
+                    }
+                    
+                    c.innerHTML = row2Items.map(function(a) {
                         var iconHtml = window.coraGetPageIconSvg(a.page);
-                        return '<button onclick="coraNavigateTo(\'' + a.page + '\')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer"><span class="text-zinc-500 flex items-center">' + iconHtml + '</span><span>' + a.name + '</span></button>';
+                        return '<button type="button" onclick="coraNavigateTo(\'' + a.page + '\')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-[11px] sm:text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;"><span class="text-zinc-500 flex items-center shrink-0">' + iconHtml + '</span><span>' + a.name + '</span></button>';
                     }).join('');
                 };
 
