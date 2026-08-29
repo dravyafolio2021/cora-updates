@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.7.8
+ * Version: 4.7.9
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.7.8' );
+    define( 'CORA_WORKSPACE_VERSION', '4.7.9' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -6832,6 +6832,11 @@ function cora_canvas_theme_frontend_router() {
         $target_ws = cora_get_workspace_by_slug( $second_part );
         if ( $target_ws ) {
             $target_agency_id = ! empty( $target_ws['agency_id'] ) ? intval( $target_ws['agency_id'] ) : ( ! empty( $target_ws['id'] ) ? intval( $target_ws['id'] ) : 0 );
+        } else {
+            $cora_ws = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+            if ( $cora_ws ) {
+                $target_agency_id = ! empty( $cora_ws['agency_id'] ) ? intval( $cora_ws['agency_id'] ) : ( ! empty( $cora_ws['id'] ) ? intval( $cora_ws['id'] ) : 0 );
+            }
         }
         $target_page_slug = $third_part;
     } elseif ( $second_part === 'site' ) {
@@ -7500,6 +7505,10 @@ function cora_manage_preview_cookie() {
 }
 
 add_filter( 'redirect_canonical', function( $redirect_url, $requested_url ) {
+    $path = trim( wp_parse_url( $requested_url, PHP_URL_PATH ) ?: '', '/' );
+    if ( strpos( $path, 'site/' ) === 0 || $path === 'site' || strpos( $path, 'workspace' ) === 0 ) {
+        return false;
+    }
     $preview_theme_id = function_exists( 'cora_get_preview_theme_id' ) ? cora_get_preview_theme_id() : 0;
     if ( $preview_theme_id > 0 ) {
         $redirect_url = add_query_arg( 'cv_preview_theme', $preview_theme_id, $redirect_url );
