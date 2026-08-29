@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.7.7
+ * Version: 4.7.8
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.7.7' );
+    define( 'CORA_WORKSPACE_VERSION', '4.7.8' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -8601,16 +8601,20 @@ function cora_rest_preview_bar_data( WP_REST_Request $request ) {
         $theme_id
     ), ARRAY_A );
 
+    $ws_ctx = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+    $ws_slug = ! empty( $GLOBALS['cora_active_workspace_site_slug'] ) ? $GLOBALS['cora_active_workspace_site_slug'] : ( ! empty( $ws_ctx['slug'] ) ? $ws_ctx['slug'] : 'workspace' );
+
     return rest_ensure_response( array(
         'theme_id'   => intval( $theme['id'] ),
         'theme_name' => $theme['name'],
+        'ws_slug'    => $ws_slug,
         'pages'      => array_map( fn( $p ) => array(
             'title'       => $p['title'],
             'slug'        => $p['slug'],
             'is_homepage' => intval( $p['is_homepage'] ) === 1,
             'wp_post_id'  => intval( $p['wp_post_id'] ),
         ), $pages ),
-        'canvas_url' => cora_get_origin_relative_url( home_url( '/workspace/canvas' ) ),
+        'canvas_url' => cora_get_origin_relative_url( home_url( '/' . $ws_slug . '/canvas' ) ),
         'ajax_url'   => cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ),
         'nonce'      => wp_create_nonce( 'cora_ajax_nonce' ),
     ) );
@@ -8711,17 +8715,18 @@ function cora_canvas_preview_bar_js() { ob_start(); ?>
       var dropdownItemsHTML = data.pages.map(function(p) {
         var slug = p.slug || '';
         var wpPostId = p.wp_post_id || 0;
+        var isHome = p.is_homepage;
         var isSelected = false;
         if (pageIdParam) {
           isSelected = (parseInt(pageIdParam) === wpPostId);
         } else {
-          isSelected = (p.is_homepage && (currentPath === '' || currentPath === 'index.php'));
+          isSelected = (p.is_homepage && (currentPath === '' || currentPath === 'index.php' || currentPath.endsWith(slug) || currentPath.endsWith('site/' + (data.ws_slug || 'workspace'))));
         }
         if (isSelected) {
           currentPageTitle = p.title;
         }
         var selectedClass = isSelected ? ' selected' : '';
-        return '<li class="cpb-dropdown-item' + selectedClass + '" data-slug="' + slug + '" data-postid="' + wpPostId + '">' + p.title + '</li>';
+        return '<li class="cpb-dropdown-item' + selectedClass + '" data-slug="' + slug + '" data-postid="' + wpPostId + '" data-ishome="' + isHome + '">' + p.title + '</li>';
       }).join('');
 
       // ── Inject styles ──
@@ -8866,8 +8871,10 @@ function cora_canvas_preview_bar_js() { ob_start(); ?>
           item.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            var wpPostId = this.getAttribute('data-postid');
-            var url = SITE_URL + '/?page_id=' + wpPostId + '&cv_preview_theme=' + themeId;
+            var slug = this.getAttribute('data-slug') || '';
+            var isHome = this.getAttribute('data-ishome') === 'true';
+            var wsSlug = data.ws_slug || 'workspace';
+            var url = SITE_URL + '/site/' + wsSlug + (isHome || !slug || slug === 'home' ? '/' : '/' + slug) + '?cv_preview_theme=' + themeId;
             window.location.href = url;
           });
         });
