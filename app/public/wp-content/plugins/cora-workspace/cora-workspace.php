@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.8.1
+ * Version: 4.8.2
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.1' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.2' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -695,6 +695,36 @@ function cora_table_exists( $table_name ) {
     $exists = ( strtolower( (string) $found ) === strtolower( (string) $table_name ) );
     set_transient( $transient_key, $exists ? '1' : '0', DAY_IN_SECONDS );
     $static_table_cache[ $table_name ] = $exists;
+    return $exists;
+}
+}
+
+/**
+ * Check if a database column exists with static memory & 24h transient caching.
+ * Eliminates repetitive SHOW COLUMNS FROM queries per request.
+ */
+if ( ! function_exists( 'cora_column_exists' ) ) {
+function cora_column_exists( $table_name, $column_name ) {
+    static $static_column_cache = array();
+    if ( empty( $table_name ) || empty( $column_name ) ) {
+        return false;
+    }
+    $cache_key = $table_name . '::' . $column_name;
+    if ( isset( $static_column_cache[ $cache_key ] ) ) {
+        return $static_column_cache[ $cache_key ];
+    }
+    $transient_key = 'cora_col_ex_' . md5( $cache_key );
+    $cached = get_transient( $transient_key );
+    if ( false !== $cached ) {
+        $exists = ( '1' === $cached );
+        $static_column_cache[ $cache_key ] = $exists;
+        return $exists;
+    }
+    global $wpdb;
+    $found = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM `{$table_name}` LIKE %s", $column_name ) );
+    $exists = ! empty( $found );
+    set_transient( $transient_key, $exists ? '1' : '0', DAY_IN_SECONDS );
+    $static_column_cache[ $cache_key ] = $exists;
     return $exists;
 }
 }
@@ -23538,13 +23568,19 @@ function cora_user_has_feature_access( $target, $user = null ) {
 
 if ( ! function_exists( 'cora_db_get_agency_id' ) ) {
 function cora_db_get_agency_id() {
+    static $static_agency_id_cache = array();
     $agency_slug = cora_get_current_user_agency_id();
     if ( $agency_slug === 'super' || empty($agency_slug) || $agency_slug === 'agency_1' ) {
         return 1;
     }
+    if ( isset( $static_agency_id_cache[ $agency_slug ] ) ) {
+        return $static_agency_id_cache[ $agency_slug ];
+    }
     global $wpdb;
     $id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_agencies WHERE slug = %s", $agency_slug ) );
-return $id ? intval($id) : 1;
+    $val = $id ? intval($id) : 1;
+    $static_agency_id_cache[ $agency_slug ] = $val;
+    return $val;
 }
 }
 
@@ -33655,8 +33691,15 @@ function cora_check_workspace_update_available( $force = false ) {
 
     $update_info = get_transient( $cache_key );
     if ( false === $update_info ) {
+        // If not forced and running during standard page rendering, return false immediately to eliminate TTFB latency
+        if ( ! $force && ! wp_doing_ajax() && ! isset( $_GET['force_update_check'] ) && ! isset( $_GET['check_update'] ) ) {
+            set_transient( $cache_key, 'none', 1 * HOUR_IN_SECONDS );
+            $static_cache = 'none';
+            return false;
+        }
+
         $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
-        $response = wp_remote_get( add_query_arg( 'cb', time(), $update_url ), array( 'timeout' => 3 ) );
+        $response = wp_remote_get( add_query_arg( 'cb', time(), $update_url ), array( 'timeout' => 2 ) );
         if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
             $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
             if ( $remote_data && ! empty( $remote_data->version ) ) {
@@ -33675,7 +33718,7 @@ function cora_check_workspace_update_available( $force = false ) {
         if ( ! $update_info ) {
             $update_info = 'none';
         }
-        // Cache result for 12 hours instead of 5 minutes to prevent blocking queries
+        // Cache result for 12 hours
         set_transient( $cache_key, $update_info, 12 * HOUR_IN_SECONDS );
     }
     

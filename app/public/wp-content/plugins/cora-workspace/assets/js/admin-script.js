@@ -416,41 +416,75 @@ jQuery(document).ready(function($) {
         }
     };
 
-    // 1. Navigation & Widget-Structured Skeleton System
+    // 1. Navigation & Widget-Structured Realistic Skeleton System (8 Specialized Geometries)
     window.coraShowSkeleton = function(viewType) {
         var overlay = document.getElementById('cora-skeleton-overlay');
         if (!overlay) return;
 
-        var dashSkeleton     = document.getElementById('cora-skeleton-dashboard');
-        var tableSkeleton    = document.getElementById('cora-skeleton-table');
-        var settingsSkeleton = document.getElementById('cora-skeleton-settings');
-        var gridSkeleton     = document.getElementById('cora-skeleton-grid');
+        var dashSkeleton       = document.getElementById('cora-skeleton-dashboard');
+        var kanbanSkeleton     = document.getElementById('cora-skeleton-kanban');
+        var financialsSkeleton = document.getElementById('cora-skeleton-financials');
+        var vaultSkeleton      = document.getElementById('cora-skeleton-vault');
+        var inboxSkeleton      = document.getElementById('cora-skeleton-inbox');
+        var calendarSkeleton   = document.getElementById('cora-skeleton-calendar');
+        var canvasSkeleton     = document.getElementById('cora-skeleton-canvas');
+        var tableSkeleton      = document.getElementById('cora-skeleton-table');
+        var settingsSkeleton   = document.getElementById('cora-skeleton-settings');
+        var gridSkeleton       = document.getElementById('cora-skeleton-grid');
 
         // Hide all instances first
-        if (dashSkeleton)     dashSkeleton.classList.add('hidden');
-        if (tableSkeleton)    tableSkeleton.classList.add('hidden');
-        if (settingsSkeleton) settingsSkeleton.classList.add('hidden');
-        if (gridSkeleton)     gridSkeleton.classList.add('hidden');
+        if (dashSkeleton)       dashSkeleton.classList.add('hidden');
+        if (kanbanSkeleton)     kanbanSkeleton.classList.add('hidden');
+        if (financialsSkeleton) financialsSkeleton.classList.add('hidden');
+        if (vaultSkeleton)      vaultSkeleton.classList.add('hidden');
+        if (inboxSkeleton)      inboxSkeleton.classList.add('hidden');
+        if (calendarSkeleton)   calendarSkeleton.classList.add('hidden');
+        if (canvasSkeleton)     canvasSkeleton.classList.add('hidden');
+        if (tableSkeleton)      tableSkeleton.classList.add('hidden');
+        if (settingsSkeleton)   settingsSkeleton.classList.add('hidden');
+        if (gridSkeleton)       gridSkeleton.classList.add('hidden');
 
-        var vt = (viewType || '').toLowerCase();
+        var vt = (viewType || '').toLowerCase().replace(/_/g, '-');
 
-        if (vt === 'dashboard' || vt === 'home' || !vt) {
+        if (vt === 'dashboard' || vt === 'home' || vt === 'overview' || !vt) {
             if (dashSkeleton) dashSkeleton.classList.remove('hidden');
-        } else if (vt === 'settings' || vt === 'settings-suite' || vt === 'system-settings') {
+        } else if (vt === 'leads' || vt === 'pipeline' || vt === 'crm' || vt === 'funnel') {
+            if (kanbanSkeleton) kanbanSkeleton.classList.remove('hidden');
+            else if (tableSkeleton) tableSkeleton.classList.remove('hidden');
+        } else if (vt === 'financials' || vt === 'invoices' || vt === 'accounting' || vt === 'tax' || vt === 'gst') {
+            if (financialsSkeleton) financialsSkeleton.classList.remove('hidden');
+            else if (tableSkeleton) tableSkeleton.classList.remove('hidden');
+        } else if (vt === 'vault' || vt === 'documents' || vt === 'contracts' || vt === 'proposals') {
+            if (vaultSkeleton) vaultSkeleton.classList.remove('hidden');
+            else if (tableSkeleton) tableSkeleton.classList.remove('hidden');
+        } else if (vt === 'inbox' || vt === 'messages' || vt === 'chat' || vt === 'conversations') {
+            if (inboxSkeleton) inboxSkeleton.classList.remove('hidden');
+            else if (tableSkeleton) tableSkeleton.classList.remove('hidden');
+        } else if (vt === 'calendar' || vt === 'event-timeline' || vt === 'crew-scheduler' || vt === 'bookings' || vt === 'schedule') {
+            if (calendarSkeleton) calendarSkeleton.classList.remove('hidden');
+            else if (tableSkeleton) tableSkeleton.classList.remove('hidden');
+        } else if (vt === 'canvas' || vt === 'visual-builder' || vt === 'builder' || vt === 'theme-builder') {
+            if (canvasSkeleton) canvasSkeleton.classList.remove('hidden');
+            else if (gridSkeleton) gridSkeleton.classList.remove('hidden');
+        } else if (vt === 'settings' || vt === 'settings-suite' || vt === 'system-settings' || vt === 'profile' || vt === 'social-meta') {
             if (settingsSkeleton) settingsSkeleton.classList.remove('hidden');
-        } else if (vt === 'media' || vt === 'canvas' || vt === 'files' || vt === 'gallery') {
+        } else if (vt === 'media' || vt === 'files' || vt === 'gallery' || vt === 'feature-hub') {
             if (gridSkeleton) gridSkeleton.classList.remove('hidden');
         } else {
-            // Default to Notion table skeleton (leads, financials, invoices, users, pages, etc.)
+            // Default to Notion data table skeleton (users, equipment, forms, pages, comments, tools, mcp, rag)
             if (tableSkeleton) tableSkeleton.classList.remove('hidden');
         }
 
         overlay.classList.remove('hidden');
+        overlay.style.display = 'block';
     };
 
     window.coraHideSkeleton = function() {
         var overlay = document.getElementById('cora-skeleton-overlay');
-        if (overlay) overlay.classList.add('hidden');
+        if (overlay) {
+            overlay.classList.add('hidden');
+            overlay.style.display = 'none';
+        }
 
         // Apply smooth fade-in hydration to the visible content wrapper
         var wrapper = document.querySelector('.cora-content-wrapper > *:not(#cora-skeleton-overlay)');
@@ -461,16 +495,52 @@ jQuery(document).ready(function($) {
         }
     };
 
+    // Universal Dynamic In-View Skeleton Helper (for AJAX subtab filtering & table reloads)
+    window.coraRenderSkeleton = function(containerSelector, templateType, count) {
+        var el = typeof containerSelector === 'string' ? document.querySelector(containerSelector) : containerSelector;
+        if (!el) return;
+        var n = count || 4;
+        var type = templateType || 'table-rows';
+        var html = '';
+
+        if (type === 'table-rows') {
+            for (var i = 0; i < n; i++) {
+                html += '<tr class="border-b border-zinc-100 dark:border-zinc-800">' +
+                    '<td class="p-3"><div class="cora-skeleton w-36 h-3.5"></div></td>' +
+                    '<td class="p-3"><div class="cora-skeleton w-20 cora-skeleton-pill"></div></td>' +
+                    '<td class="p-3"><div class="cora-skeleton w-24 h-3"></div></td>' +
+                    '<td class="p-3"><div class="cora-skeleton w-16 h-3"></div></td>' +
+                    '<td class="p-3 text-right"><div class="cora-skeleton w-12 h-6 ml-auto rounded-md"></div></td>' +
+                    '</tr>';
+            }
+        } else if (type === 'cards') {
+            html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">';
+            for (var j = 0; j < n; j++) {
+                html += '<div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-4 space-y-2.5 shadow-xs">' +
+                    '<div class="cora-skeleton w-full h-32 rounded-lg"></div>' +
+                    '<div class="cora-skeleton w-3/4 h-3.5"></div>' +
+                    '<div class="cora-skeleton w-1/2 h-2.5"></div>' +
+                    '</div>';
+            }
+            html += '</div>';
+        }
+        el.innerHTML = html;
+    };
+
     window.coraNavigateTo = function(targetPageId) {
         if (!targetPageId) return;
+
+        // Immediately trigger realistic atomic skeleton preloader to eliminate perceived navigation lag
+        if (typeof window.coraShowSkeleton === 'function') {
+            window.coraShowSkeleton(targetPageId);
+        }
 
         if (window.location.pathname.indexOf('admin.php') !== -1 || window.location.search.indexOf('page=cora-workspace') !== -1) {
             window.location.href = window.location.pathname + '?page=cora-workspace&sub_page=' + encodeURIComponent(targetPageId);
             return;
         }
 
-        // Canonical PWA & Workspace In-App Relative Navigation (Zero CCT browser header fallback)
-        // Using relative paths prevents Android OS Intent Filters from launching Chrome Custom Tabs (CCT)
+        // Canonical PWA & Workspace In-App Relative Navigation
         window.location.href = '/workspace/' + encodeURIComponent(targetPageId);
     };
 

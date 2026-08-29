@@ -4428,7 +4428,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         <!-- Dynamic Content Sections -->
         <div class="cora-content-wrapper p-3 sm:p-5 md:p-6 max-w-full w-full flex-1 space-y-5 sm:space-y-6 min-w-0">
-            <!-- CORA Global Skeleton Preloader -->
+            <!-- CORA Global Skeleton Preloader (8 Realistic Atomic Templates) -->
             <div id="cora-skeleton-overlay" class="hidden w-full" style="display:none;" aria-hidden="true">
               <!-- 1. Dashboard Skeleton Instance -->
               <div id="cora-skeleton-dashboard" class="cora-skeleton-instance w-full space-y-6">
@@ -4474,8 +4474,261 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                   </div>
                 </div>
               </div>
+
+              <!-- 2. CRM / Leads 5-Column Kanban Pipeline Skeleton -->
+              <div id="cora-skeleton-kanban" class="cora-skeleton-instance hidden w-full space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div class="space-y-1.5">
+                    <div class="cora-skeleton w-44 h-6"></div>
+                    <div class="cora-skeleton w-64 h-3.5"></div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="cora-skeleton w-28 cora-skeleton-btn"></div>
+                    <div class="cora-skeleton w-32 cora-skeleton-btn"></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between gap-3 p-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900">
+                  <div class="flex items-center gap-2">
+                    <div class="cora-skeleton w-20 cora-skeleton-pill"></div>
+                    <div class="cora-skeleton w-24 cora-skeleton-pill"></div>
+                    <div class="cora-skeleton w-20 cora-skeleton-pill"></div>
+                  </div>
+                  <div class="cora-skeleton w-48 h-8 rounded-lg"></div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-start">
+                  <!-- Kanban Col 1 -->
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50 p-3 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                      <div class="cora-skeleton w-24 h-4"></div>
+                      <div class="cora-skeleton w-6 h-4 rounded-full"></div>
+                    </div>
+                    <div class="space-y-2.5">
+                      <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 p-3 space-y-2 shadow-xs"><div class="cora-skeleton w-3/4 h-4"></div><div class="cora-skeleton w-1/2 h-3"></div><div class="flex justify-between pt-1"><div class="cora-skeleton w-16 h-4 cora-skeleton-pill"></div><div class="cora-skeleton w-12 h-4"></div></div></div>
+                      <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 p-3 space-y-2 shadow-xs"><div class="cora-skeleton w-2/3 h-4"></div><div class="cora-skeleton w-1/2 h-3"></div><div class="flex justify-between pt-1"><div class="cora-skeleton w-14 h-4 cora-skeleton-pill"></div><div class="cora-skeleton w-12 h-4"></div></div></div>
+                      <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 p-3 space-y-2 shadow-xs"><div class="cora-skeleton w-4/5 h-4"></div><div class="cora-skeleton w-1/3 h-3"></div><div class="flex justify-between pt-1"><div class="cora-skeleton w-16 h-4 cora-skeleton-pill"></div><div class="cora-skeleton w-12 h-4"></div></div></div>
+                    </div>
+                  </div>
+                  <!-- Kanban Col 2 -->
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50 p-3 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                      <div class="cora-skeleton w-20 h-4"></div>
+                      <div class="cora-skeleton w-6 h-4 rounded-full"></div>
+                    </div>
+                    <div class="space-y-2.5">
+                      <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 p-3 space-y-2 shadow-xs"><div class="cora-skeleton w-3/4 h-4"></div><div class="cora-skeleton w-1/2 h-3"></div><div class="flex justify-between pt-1"><div class="cora-skeleton w-16 h-4 cora-skeleton-pill"></div><div class="cora-skeleton w-12 h-4"></div></div></div>
+                      <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 p-3 space-y-2 shadow-xs"><div class="cora-skeleton w-2/3 h-4"></div><div class="cora-skeleton w-1/2 h-3"></div><div class="flex justify-between pt-1"><div class="cora-skeleton w-14 h-4 cora-skeleton-pill"></div><div class="cora-skeleton w-12 h-4"></div></div></div>
+                    </div>
+                  </div>
+                  <!-- Kanban Col 3 -->
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50 p-3 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                      <div class="cora-skeleton w-24 h-4"></div>
+                      <div class="cora-skeleton w-6 h-4 rounded-full"></div>
+                    </div>
+                    <div class="space-y-2.5">
+                      <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 p-3 space-y-2 shadow-xs"><div class="cora-skeleton w-4/5 h-4"></div><div class="cora-skeleton w-1/3 h-3"></div><div class="flex justify-between pt-1"><div class="cora-skeleton w-16 h-4 cora-skeleton-pill"></div><div class="cora-skeleton w-12 h-4"></div></div></div>
+                    </div>
+                  </div>
+                  <!-- Kanban Col 4 -->
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50 p-3 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                      <div class="cora-skeleton w-22 h-4"></div>
+                      <div class="cora-skeleton w-6 h-4 rounded-full"></div>
+                    </div>
+                    <div class="space-y-2.5">
+                      <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 p-3 space-y-2 shadow-xs"><div class="cora-skeleton w-3/4 h-4"></div><div class="cora-skeleton w-1/2 h-3"></div><div class="flex justify-between pt-1"><div class="cora-skeleton w-16 h-4 cora-skeleton-pill"></div><div class="cora-skeleton w-12 h-4"></div></div></div>
+                    </div>
+                  </div>
+                  <!-- Kanban Col 5 -->
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/50 p-3 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                      <div class="cora-skeleton w-20 h-4"></div>
+                      <div class="cora-skeleton w-6 h-4 rounded-full"></div>
+                    </div>
+                    <div class="space-y-2.5">
+                      <div class="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 p-3 space-y-2 shadow-xs"><div class="cora-skeleton w-2/3 h-4"></div><div class="cora-skeleton w-1/2 h-3"></div><div class="flex justify-between pt-1"><div class="cora-skeleton w-14 h-4 cora-skeleton-pill"></div><div class="cora-skeleton w-12 h-4"></div></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Financials Co-founder Skeleton (KPIs + Cashflow Chart + Ledger + Copilot) -->
+              <div id="cora-skeleton-financials" class="cora-skeleton-instance hidden w-full space-y-6">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div class="space-y-1.5">
+                    <div class="cora-skeleton w-56 h-6"></div>
+                    <div class="cora-skeleton w-72 h-3.5"></div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="cora-skeleton w-28 cora-skeleton-btn"></div>
+                    <div class="cora-skeleton w-32 cora-skeleton-btn"></div>
+                  </div>
+                </div>
+                <!-- 4 Top KPI Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-4 space-y-2 shadow-xs"><div class="cora-skeleton w-20 h-3"></div><div class="cora-skeleton w-28 h-6"></div><div class="cora-skeleton w-16 h-2.5"></div></div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-4 space-y-2 shadow-xs"><div class="cora-skeleton w-20 h-3"></div><div class="cora-skeleton w-28 h-6"></div><div class="cora-skeleton w-16 h-2.5"></div></div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-4 space-y-2 shadow-xs"><div class="cora-skeleton w-20 h-3"></div><div class="cora-skeleton w-28 h-6"></div><div class="cora-skeleton w-16 h-2.5"></div></div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-4 space-y-2 shadow-xs"><div class="cora-skeleton w-20 h-3"></div><div class="cora-skeleton w-28 h-6"></div><div class="cora-skeleton w-16 h-2.5"></div></div>
+                </div>
+                <!-- Middle Split: 2/3 Cashflow Chart + 1/3 Needs Attention Ledger -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div class="lg:col-span-2 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-5 space-y-4 shadow-xs" style="min-height: 300px;">
+                    <div class="flex items-center justify-between"><div class="cora-skeleton w-44 h-4"></div><div class="cora-skeleton w-24 h-3"></div></div>
+                    <div class="cora-skeleton w-full h-56 rounded-lg"></div>
+                  </div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-5 space-y-3.5 shadow-xs">
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800"><div class="cora-skeleton w-36 h-4"></div><div class="cora-skeleton w-12 h-3"></div></div>
+                    <div class="space-y-2.5">
+                      <div class="p-2.5 border border-zinc-100 dark:border-zinc-800 rounded-lg space-y-1.5"><div class="cora-skeleton w-3/4 h-3.5"></div><div class="flex justify-between"><div class="cora-skeleton w-16 h-3"></div><div class="cora-skeleton w-12 h-3"></div></div></div>
+                      <div class="p-2.5 border border-zinc-100 dark:border-zinc-800 rounded-lg space-y-1.5"><div class="cora-skeleton w-2/3 h-3.5"></div><div class="flex justify-between"><div class="cora-skeleton w-16 h-3"></div><div class="cora-skeleton w-12 h-3"></div></div></div>
+                      <div class="p-2.5 border border-zinc-100 dark:border-zinc-800 rounded-lg space-y-1.5"><div class="cora-skeleton w-4/5 h-3.5"></div><div class="flex justify-between"><div class="cora-skeleton w-16 h-3"></div><div class="cora-skeleton w-12 h-3"></div></div></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Bottom Floating Copilot Bar -->
+                <div class="flex justify-center pt-2">
+                  <div class="cora-skeleton w-full max-w-2xl h-11 rounded-full"></div>
+                </div>
+              </div>
+
+              <!-- 4. Document Vault & E-Sign Skeleton (KPIs + Filter Tabs + 7-Column Table) -->
+              <div id="cora-skeleton-vault" class="cora-skeleton-instance hidden w-full space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div class="space-y-1.5">
+                    <div class="cora-skeleton w-48 h-6"></div>
+                    <div class="cora-skeleton w-64 h-3.5"></div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="cora-skeleton w-28 cora-skeleton-btn"></div>
+                    <div class="cora-skeleton w-32 cora-skeleton-btn"></div>
+                  </div>
+                </div>
+                <!-- 4 Vault KPI Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-4 space-y-1.5 shadow-xs"><div class="cora-skeleton w-24 h-3"></div><div class="cora-skeleton w-20 h-6"></div></div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-4 space-y-1.5 shadow-xs"><div class="cora-skeleton w-24 h-3"></div><div class="cora-skeleton w-20 h-6"></div></div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-4 space-y-1.5 shadow-xs"><div class="cora-skeleton w-24 h-3"></div><div class="cora-skeleton w-20 h-6"></div></div>
+                  <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-4 space-y-1.5 shadow-xs"><div class="cora-skeleton w-24 h-3"></div><div class="cora-skeleton w-20 h-6"></div></div>
+                </div>
+                <!-- 7-Column Vault Table -->
+                <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-xs overflow-hidden">
+                  <div class="p-3.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2"><div class="cora-skeleton w-20 cora-skeleton-pill"></div><div class="cora-skeleton w-24 cora-skeleton-pill"></div><div class="cora-skeleton w-20 cora-skeleton-pill"></div></div>
+                    <div class="cora-skeleton w-48 h-8 rounded-lg"></div>
+                  </div>
+                  <div class="grid grid-cols-12 gap-3 px-4 py-3 bg-zinc-50/60 dark:bg-zinc-800/40 border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="col-span-3"><div class="cora-skeleton w-28 h-3"></div></div>
+                    <div class="col-span-2"><div class="cora-skeleton w-16 h-3"></div></div>
+                    <div class="col-span-2"><div class="cora-skeleton w-20 h-3"></div></div>
+                    <div class="col-span-2"><div class="cora-skeleton w-16 h-3"></div></div>
+                    <div class="col-span-1"><div class="cora-skeleton w-12 h-3"></div></div>
+                    <div class="col-span-2 text-right"><div class="cora-skeleton w-12 h-3 ml-auto"></div></div>
+                  </div>
+                  <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    <div class="grid grid-cols-12 gap-3 px-4 py-3.5 items-center">
+                      <div class="col-span-3 space-y-1"><div class="cora-skeleton w-36 h-3.5"></div><div class="cora-skeleton w-20 h-2.5"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-16 cora-skeleton-pill"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-24 h-3"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-18 h-3.5"></div></div>
+                      <div class="col-span-1"><div class="cora-skeleton w-12 cora-skeleton-pill"></div></div>
+                      <div class="col-span-2 flex justify-end gap-1.5"><div class="cora-skeleton w-14 h-6 rounded-md"></div></div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 px-4 py-3.5 items-center">
+                      <div class="col-span-3 space-y-1"><div class="cora-skeleton w-32 h-3.5"></div><div class="cora-skeleton w-16 h-2.5"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-16 cora-skeleton-pill"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-20 h-3"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-18 h-3.5"></div></div>
+                      <div class="col-span-1"><div class="cora-skeleton w-12 cora-skeleton-pill"></div></div>
+                      <div class="col-span-2 flex justify-end gap-1.5"><div class="cora-skeleton w-14 h-6 rounded-md"></div></div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 px-4 py-3.5 items-center">
+                      <div class="col-span-3 space-y-1"><div class="cora-skeleton w-40 h-3.5"></div><div class="cora-skeleton w-24 h-2.5"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-16 cora-skeleton-pill"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-28 h-3"></div></div>
+                      <div class="col-span-2"><div class="cora-skeleton w-18 h-3.5"></div></div>
+                      <div class="col-span-1"><div class="cora-skeleton w-12 cora-skeleton-pill"></div></div>
+                      <div class="col-span-2 flex justify-end gap-1.5"><div class="cora-skeleton w-14 h-6 rounded-md"></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. Split-Pane Inbox Skeleton (Folders + Threads List + Chat Canvas) -->
+              <div id="cora-skeleton-inbox" class="cora-skeleton-instance hidden w-full space-y-5">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div class="space-y-1.5"><div class="cora-skeleton w-40 h-6"></div><div class="cora-skeleton w-60 h-3.5"></div></div>
+                  <div class="cora-skeleton cora-skeleton-btn w-28"></div>
+                </div>
+                <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-xs overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[460px]">
+                  <!-- Left Folders -->
+                  <div class="md:col-span-3 border-r border-zinc-100 dark:border-zinc-800 p-4 space-y-2">
+                    <div class="cora-skeleton w-full h-8 rounded-lg"></div>
+                    <div class="cora-skeleton w-full h-8 rounded-lg"></div>
+                    <div class="cora-skeleton w-full h-8 rounded-lg"></div>
+                    <div class="cora-skeleton w-full h-8 rounded-lg"></div>
+                  </div>
+                  <!-- Center Message Threads -->
+                  <div class="md:col-span-4 border-r border-zinc-100 dark:border-zinc-800 divide-y divide-zinc-100 dark:divide-zinc-800">
+                    <div class="p-3.5 space-y-2"><div class="flex justify-between"><div class="cora-skeleton w-24 h-3.5"></div><div class="cora-skeleton w-12 h-2.5"></div></div><div class="cora-skeleton w-full h-3"></div></div>
+                    <div class="p-3.5 space-y-2"><div class="flex justify-between"><div class="cora-skeleton w-28 h-3.5"></div><div class="cora-skeleton w-12 h-2.5"></div></div><div class="cora-skeleton w-full h-3"></div></div>
+                    <div class="p-3.5 space-y-2"><div class="flex justify-between"><div class="cora-skeleton w-20 h-3.5"></div><div class="cora-skeleton w-12 h-2.5"></div></div><div class="cora-skeleton w-full h-3"></div></div>
+                    <div class="p-3.5 space-y-2"><div class="flex justify-between"><div class="cora-skeleton w-32 h-3.5"></div><div class="cora-skeleton w-12 h-2.5"></div></div><div class="cora-skeleton w-full h-3"></div></div>
+                  </div>
+                  <!-- Right Chat View -->
+                  <div class="md:col-span-5 p-5 flex flex-col justify-between space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800"><div class="flex items-center gap-2"><div class="cora-skeleton cora-skeleton-avatar w-7 h-7"></div><div class="cora-skeleton w-28 h-3.5"></div></div><div class="cora-skeleton w-16 cora-skeleton-pill"></div></div>
+                    <div class="space-y-3 py-4 flex-1">
+                      <div class="cora-skeleton w-2/3 h-10 rounded-xl mr-auto"></div>
+                      <div class="cora-skeleton w-1/2 h-8 rounded-xl ml-auto"></div>
+                      <div class="cora-skeleton w-3/4 h-12 rounded-xl mr-auto"></div>
+                    </div>
+                    <div class="cora-skeleton w-full h-10 rounded-lg"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 6. Calendar / Event Schedule Matrix Skeleton -->
+              <div id="cora-skeleton-calendar" class="cora-skeleton-instance hidden w-full space-y-5">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div class="space-y-1.5"><div class="cora-skeleton w-44 h-6"></div><div class="cora-skeleton w-64 h-3.5"></div></div>
+                  <div class="flex gap-2"><div class="cora-skeleton w-24 cora-skeleton-btn"></div><div class="cora-skeleton w-28 cora-skeleton-btn"></div></div>
+                </div>
+                <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-xs overflow-hidden p-4 space-y-4">
+                  <div class="grid grid-cols-7 gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800 text-center">
+                    <div class="cora-skeleton w-full h-4"></div><div class="cora-skeleton w-full h-4"></div><div class="cora-skeleton w-full h-4"></div><div class="cora-skeleton w-full h-4"></div><div class="cora-skeleton w-full h-4"></div><div class="cora-skeleton w-full h-4"></div><div class="cora-skeleton w-full h-4"></div>
+                  </div>
+                  <div class="grid grid-cols-7 gap-3 min-h-[320px]">
+                    <div class="space-y-2 p-2 border border-zinc-100 dark:border-zinc-800 rounded-lg"><div class="cora-skeleton w-full h-8 rounded-md"></div><div class="cora-skeleton w-full h-8 rounded-md"></div></div>
+                    <div class="space-y-2 p-2 border border-zinc-100 dark:border-zinc-800 rounded-lg"><div class="cora-skeleton w-full h-8 rounded-md"></div></div>
+                    <div class="space-y-2 p-2 border border-zinc-100 dark:border-zinc-800 rounded-lg"><div class="cora-skeleton w-full h-8 rounded-md"></div><div class="cora-skeleton w-full h-8 rounded-md"></div></div>
+                    <div class="space-y-2 p-2 border border-zinc-100 dark:border-zinc-800 rounded-lg"></div>
+                    <div class="space-y-2 p-2 border border-zinc-100 dark:border-zinc-800 rounded-lg"><div class="cora-skeleton w-full h-8 rounded-md"></div></div>
+                    <div class="space-y-2 p-2 border border-zinc-100 dark:border-zinc-800 rounded-lg"><div class="cora-skeleton w-full h-8 rounded-md"></div><div class="cora-skeleton w-full h-8 rounded-md"></div></div>
+                    <div class="space-y-2 p-2 border border-zinc-100 dark:border-zinc-800 rounded-lg"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 7. Canvas Site Builder Skeleton (Device Switcher + Preview Frame + PageSpeed) -->
+              <div id="cora-skeleton-canvas" class="cora-skeleton-instance hidden w-full space-y-5">
+                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div class="space-y-1.5"><div class="cora-skeleton w-52 h-6"></div><div class="cora-skeleton w-72 h-3.5"></div></div>
+                  <div class="flex gap-2"><div class="cora-skeleton w-24 cora-skeleton-btn"></div><div class="cora-skeleton w-28 cora-skeleton-btn"></div></div>
+                </div>
+                <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-xs p-3 flex items-center justify-between">
+                  <div class="flex items-center gap-2"><div class="cora-skeleton w-20 cora-skeleton-pill"></div><div class="cora-skeleton w-20 cora-skeleton-pill"></div><div class="cora-skeleton w-20 cora-skeleton-pill"></div></div>
+                  <div class="cora-skeleton w-36 h-8 rounded-lg"></div>
+                </div>
+                <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-xs overflow-hidden h-[420px] p-6 space-y-4">
+                  <div class="cora-skeleton w-full h-12 rounded-lg"></div>
+                  <div class="cora-skeleton w-full h-44 rounded-lg"></div>
+                  <div class="grid grid-cols-3 gap-4"><div class="cora-skeleton w-full h-24 rounded-lg"></div><div class="cora-skeleton w-full h-24 rounded-lg"></div><div class="cora-skeleton w-full h-24 rounded-lg"></div></div>
+                </div>
+              </div>
               
-              <!-- 2. Notion-Style Data Table Skeleton (Leads, Financials, Invoices, Users, Pages) -->
+              <!-- 8. Notion-Style Data Table Skeleton (Users, Equipment, Forms, Pages) -->
               <div id="cora-skeleton-table" class="cora-skeleton-instance hidden w-full space-y-5">
                 <!-- Header & Toolbar -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-100 dark:border-zinc-800">
@@ -4544,7 +4797,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div>
               </div>
 
-              <!-- 3. System Settings Suite Skeleton -->
+              <!-- 9. System Settings Suite Skeleton -->
               <div id="cora-skeleton-settings" class="cora-skeleton-instance hidden w-full space-y-6">
                 <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
                   <div class="space-y-1.5">
@@ -4580,7 +4833,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div>
               </div>
 
-              <!-- 4. Media & Canvas Grid Skeleton -->
+              <!-- 10. Media & Feature Grid Skeleton -->
               <div id="cora-skeleton-grid" class="cora-skeleton-instance hidden w-full space-y-5">
                 <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
                   <div class="space-y-1.5"><div class="cora-skeleton w-40 h-6"></div><div class="cora-skeleton w-60 h-3.5"></div></div>

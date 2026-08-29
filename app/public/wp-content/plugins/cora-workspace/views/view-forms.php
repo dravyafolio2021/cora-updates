@@ -1319,8 +1319,30 @@ $forms_db = $wpdb->get_results( $wpdb->prepare(
     $agency_id
 ), ARRAY_A );
 $prepopulated_forms = array();
-if ( is_array( $forms_db ) ) {
+if ( ! empty( $forms_db ) ) {
+    $form_ids = array_column( $forms_db, 'id' );
+    $in_sql = implode( ',', array_map( 'intval', $form_ids ) );
+
+    // Batch fetch all blocks in 1 query
+    $all_blocks = $wpdb->get_results( "SELECT form_id, blocks_json, logic_json FROM {$wpdb->prefix}cora_form_blocks WHERE form_id IN ($in_sql)", ARRAY_A );
+    $blocks_by_form = array();
+    if ( is_array( $all_blocks ) ) {
+        foreach ( $all_blocks as $blk ) {
+            $blocks_by_form[ intval( $blk['form_id'] ) ] = $blk;
+        }
+    }
+
+    // Batch fetch all submission counts in 1 query
+    $all_counts = $wpdb->get_results( "SELECT form_id, COUNT(*) as cnt FROM {$wpdb->prefix}cora_form_submissions WHERE form_id IN ($in_sql) GROUP BY form_id", ARRAY_A );
+    $counts_by_form = array();
+    if ( is_array( $all_counts ) ) {
+        foreach ( $all_counts as $c ) {
+            $counts_by_form[ intval( $c['form_id'] ) ] = intval( $c['cnt'] );
+        }
+    }
+
     foreach ( $forms_db as $form ) {
+        $fid = intval( $form['id'] );
         if ( empty( $form['form_key'] ) ) {
             $form['form_key'] = 'frm_' . substr( md5( $form['id'] . $form['title'] ), 0, 8 );
             $wpdb->update( $wpdb->prefix . 'cora_forms', array( 'form_key' => $form['form_key'] ), array( 'id' => $form['id'] ) );
@@ -1328,14 +1350,10 @@ if ( is_array( $forms_db ) ) {
         $form['styling'] = json_decode( $form['styling'], true ) ?: array();
         $form['settings'] = json_decode( $form['settings'], true ) ?: array();
         
-        // Fetch blocks
-        $blocks_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_form_blocks WHERE form_id = %d", $form['id'] ), ARRAY_A );
+        $blocks_row = isset( $blocks_by_form[ $fid ] ) ? $blocks_by_form[ $fid ] : null;
         $form['blocks'] = $blocks_row ? (json_decode( $blocks_row['blocks_json'], true ) ?: array()) : array();
         $form['logic'] = $blocks_row ? (json_decode( $blocks_row['logic_json'], true ) ?: array()) : array();
-        
-        // Get response count
-        $resp_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE form_id = %d", $form['id'] ) );
-        $form['submission_count'] = intval( $resp_count );
+        $form['submission_count'] = isset( $counts_by_form[ $fid ] ) ? $counts_by_form[ $fid ] : 0;
         
         $prepopulated_forms[] = $form;
     }
