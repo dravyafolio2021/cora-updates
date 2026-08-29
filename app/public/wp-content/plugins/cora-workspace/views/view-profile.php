@@ -13,6 +13,11 @@ $avatar_url = get_user_meta( $user->ID, 'cora_avatar_url', true );
 $custom_status = get_user_meta( $user->ID, 'cora_custom_status', true ) ?: 'Available';
 $custom_status_msg = get_user_meta( $user->ID, 'cora_custom_status_message', true ) ?: '';
 
+// Authentication Provider Info (Google SSO vs Email & Password)
+$google_id = get_user_meta( $user->ID, 'cora_google_id', true );
+$auth_provider = get_user_meta( $user->ID, 'cora_auth_provider', true );
+$is_google_user = ( ! empty( $google_id ) || $auth_provider === 'google' );
+
 // Generate initials fallback background color based on name hash
 $full_name = trim( $user->display_name );
 if ( empty( $full_name ) ) {
@@ -299,22 +304,23 @@ if ( is_array( $leave_requests ) ) {
         box-shadow: 0 0 8px currentColor;
     }
 
-    /* Bulletproof SaaS Drawer Engine CSS */
+    /* Bulletproof SaaS Drawer Engine CSS (Desktop Side Drawer + Mobile Bottom Sheet) */
     .cora-drawer-overlay {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
         bottom: 0 !important;
-        background-color: rgba(9, 9, 11, 0.25) !important;
-        backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
+        background-color: rgba(9, 9, 11, 0.45) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
         z-index: 999999 !important;
         display: flex !important;
         justify-content: flex-end !important;
+        align-items: stretch !important;
         opacity: 0 !important;
         pointer-events: none !important;
-        transition: opacity 0.3s ease !important;
+        transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     .cora-drawer-overlay.drawer-open {
@@ -327,12 +333,15 @@ if ( is_array( $leave_requests ) ) {
         height: 100% !important;
         width: 100% !important;
         max-width: 460px !important;
-        box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.08), -8px 0 10px -6px rgba(0, 0, 0, 0.08) !important;
+        box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.12), -8px 0 10px -6px rgba(0, 0, 0, 0.08) !important;
         display: flex !important;
         flex-direction: column !important;
         transform: translateX(100%) !important;
         transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
         border-left: 1px solid #e4e4e7 !important;
+        pointer-events: auto !important;
+        user-select: text !important;
+        -webkit-user-select: text !important;
     }
 
     .dark .cora-drawer-sheet {
@@ -342,6 +351,44 @@ if ( is_array( $leave_requests ) ) {
 
     .cora-drawer-overlay.drawer-open .cora-drawer-sheet {
         transform: translateX(0) !important;
+    }
+
+    /* Mobile Bottom-Up Slide Sheet SOP (Rule 1 & Rule 12) */
+    @media (max-width: 767px) {
+        .cora-drawer-overlay {
+            justify-content: center !important;
+            align-items: flex-end !important;
+        }
+        .cora-drawer-sheet {
+            height: auto !important;
+            max-height: 85vh !important;
+            max-width: 100% !important;
+            border-left: 0 !important;
+            border-top: 1px solid #e4e4e7 !important;
+            border-radius: 24px 24px 0 0 !important;
+            transform: translateY(100%) !important;
+            padding-bottom: env(safe-area-inset-bottom, 16px) !important;
+        }
+        .dark .cora-drawer-sheet {
+            border-top: 1px solid #27272a !important;
+            border-left: 0 !important;
+        }
+        .cora-drawer-overlay.drawer-open .cora-drawer-sheet {
+            transform: translateY(0) !important;
+        }
+    }
+
+    /* Form Controls Touch & Typing Snappiness */
+    .cora-input, 
+    #cora-password-drawer-sheet input, 
+    #cora-avatar-crop-dlg input,
+    #cora-password-drawer-sheet button,
+    #cora-avatar-crop-dlg button {
+        user-select: text !important;
+        -webkit-user-select: text !important;
+        touch-action: manipulation !important;
+        -webkit-tap-highlight-color: transparent !important;
+        pointer-events: auto !important;
     }
 
     /* Hide scrollbars for chrome/safari/firefox */
@@ -553,18 +600,30 @@ if ( is_array( $leave_requests ) ) {
 
                 <!-- SaaS Upgraded Security & Password Card -->
                 <div class="cora-glass-card rounded-2xl p-6 shadow-2xs space-y-4">
-                    <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Security Credentials</h3>
+                    <h3 class="text-sm font-extrabold text-zinc-900 border-b border-zinc-100 pb-3 uppercase tracking-wider text-[11px] text-zinc-400">Security &amp; Authentication</h3>
                     
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-2">
                         <div class="space-y-1.5">
                             <div class="flex items-center gap-2">
+                                <?php if ( $is_google_user ) : ?>
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" class="shrink-0"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+                                <span class="text-xs font-extrabold text-zinc-800">Google SSO Authentication</span>
+                                <span class="text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Connected</span>
+                                <?php else : ?>
                                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                <span class="text-xs font-extrabold text-zinc-800 ">Account Password Protection</span>
+                                <span class="text-xs font-extrabold text-zinc-800">Account Password Protection</span>
+                                <?php endif; ?>
                             </div>
-                            <p class="text-[10px] text-zinc-500 ">Encrypted with industry-standard hashing. Last active session audit is active.</p>
+                            <p class="text-[10px] text-zinc-500">
+                                <?php if ( $is_google_user ) : ?>
+                                Connected via Google Account (<?php echo esc_html( $user->user_email ); ?>). You can also configure an optional direct password.
+                                <?php else : ?>
+                                Encrypted with industry-standard hashing. Last active session audit is active.
+                                <?php endif; ?>
+                            </p>
                         </div>
-                        <button onclick="openPasswordDrawer()" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-all cursor-pointer border-0 shadow-xs">
-                            Update Account Password
+                        <button onclick="openPasswordDrawer()" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-all cursor-pointer border-0 shadow-xs whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                            <?php echo $is_google_user ? 'Set Direct Password' : 'Update Account Password'; ?>
                         </button>
                     </div>
                 </div>
@@ -1061,11 +1120,16 @@ if ( is_array( $leave_requests ) ) {
 <!-- ═══ PREMIUM SAAS MULTI-STEP PASSWORD DRAWER SHEET ═════════════════════════ -->
 <div id="cora-password-drawer-sheet" class="cora-drawer-overlay">
     <div class="cora-drawer-sheet" id="password-drawer-card">
+        <!-- Mobile Bottom Sheet Drag Handle -->
+        <div class="flex sm:hidden items-center justify-center pt-3 pb-1 cursor-pointer select-none" onclick="closePasswordDrawer()">
+            <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+        </div>
+
         <!-- Header -->
-        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 ">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
             <div>
-                <h3 class="text-sm font-extrabold text-zinc-900 ">Update Account Password</h3>
-                <p class="text-[9px] text-zinc-450 mt-0.5 uppercase tracking-wider font-extrabold">Identity Verification & Reset</p>
+                <h3 class="text-sm font-extrabold text-zinc-900"><?php echo $is_google_user ? 'Set Direct Account Password' : 'Update Account Password'; ?></h3>
+                <p class="text-[9px] text-zinc-450 mt-0.5 uppercase tracking-wider font-extrabold"><?php echo $is_google_user ? 'Google SSO · Credentials Setup' : 'Identity Verification & Reset'; ?></p>
             </div>
             <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 bg-transparent border-0" onclick="closePasswordDrawer()">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -1074,11 +1138,12 @@ if ( is_array( $leave_requests ) ) {
         
         <!-- Steps Container -->
         <div class="flex-1 overflow-y-auto p-6 space-y-6">
-            <!-- Step 1: Current Password Verification -->
+            <?php if ( ! $is_google_user ) : ?>
+            <!-- Step 1: Current Password Verification (Email & Password Users Only) -->
             <div id="pass-step-1" class="space-y-4">
                 <div class="space-y-1.5">
                     <span class="text-[9px] font-black uppercase text-zinc-455 tracking-wider">Step 01 of 02</span>
-                    <h4 class="text-xs font-black text-zinc-900 ">Verify Your Current Identity</h4>
+                    <h4 class="text-xs font-black text-zinc-900">Verify Your Current Identity</h4>
                     <p class="text-[10px] text-zinc-500 leading-relaxed">To ensure secure updates, confirm your current password before configuring new credentials.</p>
                 </div>
                 
@@ -1093,13 +1158,14 @@ if ( is_array( $leave_requests ) ) {
                     </button>
                 </div>
             </div>
+            <?php endif; ?>
 
-            <!-- Step 2: New Password Setup (Hidden Initially) -->
-            <div id="pass-step-2" class="space-y-4" style="display: none;">
+            <!-- Step 2: New Password Setup -->
+            <div id="pass-step-2" class="space-y-4" style="<?php echo $is_google_user ? '' : 'display: none;'; ?>">
                 <div class="space-y-1.5">
-                    <span class="text-[9px] font-black uppercase text-emerald-600 tracking-wider">Step 02 of 02 · Identity Verified</span>
-                    <h4 class="text-xs font-black text-zinc-900 ">Set Up Your New Credentials</h4>
-                    <p class="text-[10px] text-zinc-500 leading-relaxed">Choose a strong, unique password to replace your active workspace credentials.</p>
+                    <span class="text-[9px] font-black uppercase text-emerald-600 tracking-wider"><?php echo $is_google_user ? 'Google SSO Account · Direct Password' : 'Step 02 of 02 · Identity Verified'; ?></span>
+                    <h4 class="text-xs font-black text-zinc-900"><?php echo $is_google_user ? 'Configure Your Direct Login Password' : 'Set Up Your New Credentials'; ?></h4>
+                    <p class="text-[10px] text-zinc-500 leading-relaxed"><?php echo $is_google_user ? 'Setting a password allows you to sign in with either your Google account or email & password.' : 'Choose a strong, unique password to replace your active workspace credentials.'; ?></p>
                 </div>
                 
                 <div class="space-y-4">
@@ -1124,9 +1190,9 @@ if ( is_array( $leave_requests ) ) {
                     </div>
 
                     <!-- Criteria Checklist -->
-                    <div class="space-y-2 py-2 bg-zinc-50/50 rounded-xl p-3 border border-zinc-100 ">
+                    <div class="space-y-2 py-2 bg-zinc-50/50 rounded-xl p-3 border border-zinc-100">
                         <p class="text-[9px] font-black uppercase text-zinc-455 tracking-wider mb-1.5">Requirements Checklist</p>
-                        <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-zinc-500 ">
+                        <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-zinc-500">
                             <div class="flex items-center gap-1.5" id="req-len">
                                 <span class="chk-icon text-zinc-350">•</span> At least 8 characters
                             </div>
@@ -1143,7 +1209,7 @@ if ( is_array( $leave_requests ) ) {
                     </div>
                     
                     <button onclick="saveNewPasswordAction()" id="btn-save-new-pass" disabled class="w-full py-2.5 bg-zinc-100 text-zinc-400 font-extrabold rounded-xl text-xs transition-colors cursor-not-allowed border-0 shadow-sm flex items-center justify-center gap-2">
-                        Apply Security Update
+                        <?php echo $is_google_user ? 'Save Account Password' : 'Apply Security Update'; ?>
                     </button>
                 </div>
             </div>
@@ -1154,15 +1220,20 @@ if ( is_array( $leave_requests ) ) {
 <!-- ═══ AVATAR CROP DRAWER SHEET ═════════════════════════════════════════════ -->
 <div id="cora-avatar-crop-dlg" class="cora-drawer-overlay">
     <div class="cora-drawer-sheet" id="avatar-crop-card">
-        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 ">
-            <h3 class="text-sm font-extrabold text-zinc-900 ">Crop Profile Photo</h3>
+        <!-- Mobile Bottom Sheet Drag Handle -->
+        <div class="flex sm:hidden items-center justify-center pt-3 pb-1 cursor-pointer select-none" onclick="closeAvatarCrop()">
+            <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+        </div>
+
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
+            <h3 class="text-sm font-extrabold text-zinc-900">Crop Profile Photo</h3>
             <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 bg-transparent border-0" onclick="closeAvatarCrop()">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         
-        <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center bg-zinc-50/20 ">
-            <div class="relative w-72 h-72 border border-dashed border-zinc-300 rounded-lg overflow-hidden flex items-center justify-center bg-zinc-100 ">
+        <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center bg-zinc-50/20">
+            <div class="relative w-72 h-72 border border-dashed border-zinc-300 rounded-lg overflow-hidden flex items-center justify-center bg-zinc-100">
                 <canvas id="crop-canvas" class="max-w-full max-h-full"></canvas>
             </div>
             <p class="text-[10px] text-zinc-400 mt-4 text-center">Drag inside the canvas selection window to adjust position before saving.</p>
@@ -1176,6 +1247,7 @@ if ( is_array( $leave_requests ) ) {
 </div>
 
 <script>
+    var isGoogleUser = <?php echo $is_google_user ? 'true' : 'false'; ?>;
     var origImageSrc = null;
     var cropCanvas = document.getElementById('crop-canvas');
     var cropCtx = cropCanvas.getContext('2d');
@@ -1246,8 +1318,13 @@ if ( is_array( $leave_requests ) ) {
     // ─── UPGRADED SAAS PASSWORD RESET ENGINE ─────────────────────────────────
     function openPasswordDrawer() {
         // Reset steps
-        $('#pass-step-1').show();
-        $('#pass-step-2').hide();
+        if (isGoogleUser) {
+            $('#pass-step-1').hide();
+            $('#pass-step-2').show();
+        } else {
+            $('#pass-step-1').show();
+            $('#pass-step-2').hide();
+        }
         $('#drawer-curr-pass').val('');
         $('#drawer-new-pass').val('');
         $('#drawer-confirm-pass').val('');
@@ -1256,10 +1333,14 @@ if ( is_array( $leave_requests ) ) {
         $('#strength-label').text('Weak').removeClass('text-amber-500 text-emerald-500').addClass('text-zinc-400');
         $('#strength-progress').css('width', '25%').removeClass('bg-amber-500 bg-emerald-500').addClass('bg-red-500');
         $('.chk-icon').text('•').removeClass('text-emerald-500').addClass('text-zinc-350');
-        $('#btn-save-new-pass').prop('disabled', true).removeClass('bg-zinc-900 hover:bg-zinc-800 text-white ').addClass('bg-zinc-100 text-zinc-400 cursor-not-allowed');
+        $('#btn-save-new-pass').prop('disabled', true).removeClass('bg-zinc-900 hover:bg-zinc-800 text-white').addClass('bg-zinc-100 text-zinc-400 cursor-not-allowed');
 
         // Slide open drawer using bulletproof class engine
         $('#cora-password-drawer-sheet').addClass('drawer-open');
+        setTimeout(function() {
+            var inputToFocus = isGoogleUser ? document.getElementById('drawer-new-pass') : document.getElementById('drawer-curr-pass');
+            if (inputToFocus) inputToFocus.focus();
+        }, 350);
     }
 
     function closePasswordDrawer() {
@@ -1286,6 +1367,10 @@ if ( is_array( $leave_requests ) ) {
                 window.coraShowToast('Identity verified successfully.');
                 $('#pass-step-1').fadeOut(200, function() {
                     $('#pass-step-2').fadeIn(200);
+                    setTimeout(function() {
+                        var p = document.getElementById('drawer-new-pass');
+                        if (p) p.focus();
+                    }, 250);
                 });
             } else {
                 window.coraShowToast(res.data.message || 'Incorrect password.');
@@ -1355,15 +1440,15 @@ if ( is_array( $leave_requests ) ) {
         var chk = el.find('.chk-icon');
         if (isValid) {
             chk.text('✓').removeClass('text-zinc-350').addClass('text-emerald-500');
-            el.removeClass('text-zinc-500 ').addClass('text-zinc-800 ');
+            el.removeClass('text-zinc-500').addClass('text-zinc-800');
         } else {
             chk.text('•').removeClass('text-emerald-500').addClass('text-zinc-350');
-            el.removeClass('text-zinc-800 ').addClass('text-zinc-500 ');
+            el.removeClass('text-zinc-800').addClass('text-zinc-500');
         }
     }
 
     function saveNewPasswordAction() {
-        var curr = $('#drawer-curr-pass').val();
+        var curr = isGoogleUser ? 'google_oauth_bypass' : $('#drawer-curr-pass').val();
         var pass = $('#drawer-new-pass').val();
         var btn = $('#btn-save-new-pass');
 
@@ -1376,15 +1461,16 @@ if ( is_array( $leave_requests ) ) {
             new_pass: pass,
             nonce: coraREData.ajaxNonce
         }, function(res) {
-            btn.prop('disabled', false).text('Apply Security Update');
+            btn.prop('disabled', false).text(isGoogleUser ? 'Save Account Password' : 'Apply Security Update');
             if (res.success) {
-                window.coraShowToast('Password updated. Logging you out...');
-                setTimeout(function() {
-                    window.location.href = '<?php echo home_url( "/workspace/login?password_updated=1" ); ?>';
-                }, 1500);
+                window.coraShowToast(res.data.message || 'Password updated successfully.', 'success');
+                closePasswordDrawer();
             } else {
-                window.coraShowToast(res.data.message || 'Failed to change password.');
+                window.coraShowToast(res.data.message || 'Failed to update password.', 'error');
             }
+        }).fail(function() {
+            btn.prop('disabled', false).text(isGoogleUser ? 'Save Account Password' : 'Apply Security Update');
+            window.coraShowToast('Network error while updating password.', 'error');
         });
     }
 
@@ -1615,7 +1701,7 @@ if ( is_array( $leave_requests ) ) {
 
     jQuery(document).ready(function($) {
         var urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('force_password_change')) {
+        if (urlParams.has('force_password_change') && !isGoogleUser) {
             setTimeout(function() {
                 if (window.coraShowToast) {
                     window.coraShowToast('For security reasons, you must change your password to continue.', 'error');

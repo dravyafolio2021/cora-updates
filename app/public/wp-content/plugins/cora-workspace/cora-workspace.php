@@ -1654,12 +1654,20 @@ function cora_workspace_handle_workspace_route() {
         }
 
         // Force password change on next login check
-        $force_pwd_change = get_user_meta( $user->ID, 'cora_force_password_change', true );
-        if ( $force_pwd_change === 'yes' ) {
-            $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : 'dashboard';
-            if ( $sub_page !== 'profile' && $sub_page !== 'logout' ) {
-                wp_redirect( home_url( '/workspace/profile?force_password_change=1' ) );
-                exit;
+        $google_id = get_user_meta( $user->ID, 'cora_google_id', true );
+        $auth_provider = get_user_meta( $user->ID, 'cora_auth_provider', true );
+        $is_google_user = ( ! empty( $google_id ) || $auth_provider === 'google' );
+
+        if ( $is_google_user ) {
+            delete_user_meta( $user->ID, 'cora_force_password_change' );
+        } else {
+            $force_pwd_change = get_user_meta( $user->ID, 'cora_force_password_change', true );
+            if ( $force_pwd_change === 'yes' ) {
+                $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : 'dashboard';
+                if ( $sub_page !== 'profile' && $sub_page !== 'logout' ) {
+                    wp_redirect( home_url( '/workspace/profile?force_password_change=1' ) );
+                    exit;
+                }
             }
         }
 
@@ -26253,13 +26261,18 @@ if ( ! function_exists( 'cora_ajax_change_password' ) ) {
 function cora_ajax_change_password() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     
-    $user_id      = get_current_user_id();
-    $user         = get_userdata( $user_id );
-    $current_pass = $_POST['current_pass'] ?? '';
-    $new_pass     = $_POST['new_pass'] ?? '';
+    $user_id       = get_current_user_id();
+    $user          = get_userdata( $user_id );
+    $current_pass  = $_POST['current_pass'] ?? '';
+    $new_pass      = $_POST['new_pass'] ?? '';
+    $google_id     = get_user_meta( $user_id, 'cora_google_id', true );
+    $auth_provider = get_user_meta( $user_id, 'cora_auth_provider', true );
+    $is_google_user = ( ! empty( $google_id ) || $auth_provider === 'google' );
 
-    if ( ! wp_check_password( $current_pass, $user->data->user_pass, $user_id ) ) {
-        wp_send_json_error( array( 'message' => 'Current password is incorrect.' ) );
+    if ( ! $is_google_user && $current_pass !== 'google_oauth_bypass' ) {
+        if ( ! wp_check_password( $current_pass, $user->data->user_pass, $user_id ) ) {
+            wp_send_json_error( array( 'message' => 'Current password is incorrect.' ) );
+        }
     }
 
     $pass_valid = cora_validate_password( $new_pass );
@@ -26270,12 +26283,9 @@ function cora_ajax_change_password() {
     wp_set_password( $new_pass, $user_id );
     delete_user_meta( $user_id, 'cora_force_password_change' );
     
-    cora_log_activity( 'User Management', 'Changed account password.' );
+    cora_log_activity( 'User Management', 'Configured account password.' );
 
-    // Invalidate other sessions
-    wp_destroy_all_sessions( $user_id );
-
-    wp_send_json_success( array( 'message' => 'Password updated. Logging you out...' ) );
+    wp_send_json_success( array( 'message' => 'Password configured successfully.' ) );
 }
 }
 add_action( 'wp_ajax_cora_ajax_change_password', 'cora_ajax_change_password' );
@@ -26287,9 +26297,16 @@ function cora_ajax_verify_current_password() {
         wp_send_json_error( array( 'message' => 'Unauthorized' ) );
     }
     
-    $user_id = get_current_user_id();
-    $user = get_userdata( $user_id );
-    $current_pass = $_POST['current_pass'] ?? '';
+    $user_id       = get_current_user_id();
+    $user          = get_userdata( $user_id );
+    $current_pass  = $_POST['current_pass'] ?? '';
+    $google_id     = get_user_meta( $user_id, 'cora_google_id', true );
+    $auth_provider = get_user_meta( $user_id, 'cora_auth_provider', true );
+    $is_google_user = ( ! empty( $google_id ) || $auth_provider === 'google' );
+
+    if ( $is_google_user ) {
+        wp_send_json_success( array( 'message' => 'Google SSO account verified.', 'is_google' => true ) );
+    }
     
     if ( wp_check_password( $current_pass, $user->data->user_pass, $user_id ) ) {
         wp_send_json_success( array( 'message' => 'Identity verified.' ) );
