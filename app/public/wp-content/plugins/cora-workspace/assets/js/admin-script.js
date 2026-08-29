@@ -27,6 +27,9 @@ if (typeof window.ajaxurl === 'undefined') {
     window.ajaxurl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
 }
 
+// Safe global fallbacks for editor dropdowns
+window.coraToggleBeehiivDropdown = window.coraToggleBeehiivDropdown || function() {};
+
 // Global AI Model Settings Drawer Controls (Immediate Top-Level Availability)
 window.coraOpenAISettingsDrawer = function(e) {
     if (e && e.stopPropagation) e.stopPropagation();
@@ -10176,7 +10179,9 @@ jQuery(document).ready(function($) {
         }
         // Click outside handler to close open Beehiiv dropdowns
         if (!$(e.target).closest('#beehiiv-dropdown-title-subtitle-wrap, #beehiiv-dropdown-visibility-wrap, #beehiiv-dropdown-authors-wrap, #beehiiv-dropdown-thumbnail-wrap, #beehiiv-dropdown-tags-wrap').length) {
-            window.coraToggleBeehiivDropdown('');
+            if (typeof window.coraToggleBeehiivDropdown === 'function') {
+                window.coraToggleBeehiivDropdown('');
+            }
         }
     });
 

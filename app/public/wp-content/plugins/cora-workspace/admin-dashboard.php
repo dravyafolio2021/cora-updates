@@ -10995,7 +10995,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     jQuery('#cora-header-more-dropdown-menu').addClass('hidden');
                 }
                 if (!jQuery(e.target).closest('#beehiiv-dropdown-title-subtitle-wrap, #beehiiv-dropdown-visibility-wrap, #beehiiv-dropdown-authors-wrap, #beehiiv-dropdown-thumbnail-wrap, #beehiiv-dropdown-tags-wrap, #beehiiv-dropdown-more-wrap').length) {
-                    window.coraToggleBeehiivDropdown('');
+                    if (typeof window.coraToggleBeehiivDropdown === 'function') {
+                        window.coraToggleBeehiivDropdown('');
+                    }
                 }
                 // Close inline selection AI popup if click is outside it and outside the editor
                 if (!jQuery(e.target).closest('#cora-inline-ai-popup').length && !jQuery(e.target).closest('#cora-quill-editor').length) {
