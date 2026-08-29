@@ -1,7 +1,7 @@
 {
     "name": "Cora Workspace",
     "slug": "cora-workspace",
-    "version": "4.6.4",
+    "version": "4.6.5",
     "download_url": "https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.zip",
     "requires": "6.0",
     "tested": "6.7",

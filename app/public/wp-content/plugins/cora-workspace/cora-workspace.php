@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.6.4
+ * Version: 4.6.5
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.6.4' );
+    define( 'CORA_WORKSPACE_VERSION', '4.6.5' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -1082,9 +1082,19 @@ function cora_user_can_access_workspace( $user_id, $workspace_slug ) {
  */
 if ( ! function_exists( 'cora_get_current_workspace_context' ) ) {
 function cora_get_current_workspace_context() {
+    static $is_resolving_context = false;
     if ( isset( $GLOBALS['cora_active_workspace'] ) && ! empty( $GLOBALS['cora_active_workspace'] ) ) {
         return $GLOBALS['cora_active_workspace'];
     }
+    if ( $is_resolving_context ) {
+        return array(
+            'id' => 1,
+            'name' => 'Cora Workspace',
+            'slug' => 'workspace',
+            'industry' => 'real_estate'
+        );
+    }
+    $is_resolving_context = true;
 
     if ( isset( $_GET['workspace'] ) ) {
         $ws = cora_get_workspace_by_slug( sanitize_title( $_GET['workspace'] ) );
@@ -2399,6 +2409,11 @@ add_action( 'init', 'cora_workspace_register_taxonomies' );
  */
 if ( ! function_exists( 'cora_get_active_industry' ) ) {
 function cora_get_active_industry() {
+    static $is_resolving_industry = false;
+    if ( $is_resolving_industry ) {
+        return 'real_estate';
+    }
+    $is_resolving_industry = true;
     // 1. Explicit URL Query Param takes highest priority
     if ( ! empty( $_GET['industry'] ) ) {
         $ind = sanitize_text_field( $_GET['industry'] );
@@ -21962,6 +21977,11 @@ function cora_get_agency_identifiers( $agency_id ) {
 
 if ( ! function_exists( 'cora_get_current_user_agency_id' ) ) {
 function cora_get_current_user_agency_id() {
+    static $is_resolving_agency = false;
+    if ( $is_resolving_agency ) {
+        return 'default';
+    }
+    $is_resolving_agency = true;
     $user_id = get_current_user_id();
     if ( ! $user_id && defined( 'LOGGED_IN_COOKIE' ) && ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
         $validated_id = wp_validate_auth_cookie( $_COOKIE[ LOGGED_IN_COOKIE ], 'logged_in' );
@@ -21971,17 +21991,20 @@ function cora_get_current_user_agency_id() {
         }
     }
     if ( ! $user_id ) {
+        $is_resolving_agency = false;
         return '';
     }
     if ( cora_is_real_shruti() ) {
         $current_ws = cora_get_current_workspace_context();
         if ( ! empty( $current_ws ) && isset( $current_ws['slug'] ) ) {
+            $is_resolving_agency = false;
             if ( $current_ws['slug'] === 'super' ) {
                 return 'super';
             }
             return $current_ws['slug'];
         }
         $impersonated = get_user_meta( $user_id, 'cora_impersonate_agency_id', true );
+        $is_resolving_agency = false;
         if ( ! empty( $impersonated ) ) {
             return $impersonated;
         }
@@ -21996,12 +22019,14 @@ function cora_get_current_user_agency_id() {
             cora_ensure_default_agency_setup();
             $user_agency = get_user_meta( $user_id, 'cora_agency_id', true );
         } else {
+            $is_resolving_agency = false;
             return '';
         }
     }
     if ( $user_agency === 'agency_1' ) {
         $user_agency = 'default';
     }
+    $is_resolving_agency = false;
     return $user_agency;
 }
 }
@@ -25083,6 +25108,14 @@ add_filter( 'pre_update_option_cora_gear_kits', 'cora_pre_update_tenancy_data', 
 
 if ( ! function_exists( 'cora_filter_workspace_branding_option' ) ) {
 function cora_filter_workspace_branding_option( $value, $option_name ) {
+    if ( ! did_action( 'init' ) ) {
+        return $value;
+    }
+    static $is_filtering_branding = false;
+    if ( $is_filtering_branding ) {
+        return $value;
+    }
+    $is_filtering_branding = true;
     $current_ws = cora_get_current_workspace_context();
     if ( ! empty( $current_ws ) && isset( $current_ws['slug'] ) && $current_ws['slug'] !== 'super' ) {
         $ws_option_name = 'cora_' . $current_ws['slug'] . '_' . $option_name;
@@ -25092,6 +25125,7 @@ function cora_filter_workspace_branding_option( $value, $option_name ) {
             $value = maybe_unserialize( $ws_value );
         }
     }
+    $is_filtering_branding = false;
     if ( $option_name === 'cora_sidebar_title' && ( empty( $value ) || strtolower( $value ) === 'cora' || strtolower( $value ) === 'cora real estate' ) ) {
         $ws_name = ( ! empty( $current_ws['name'] ) && strtolower( $current_ws['name'] ) !== 'apex realty group' && strtolower( $current_ws['name'] ) !== 'cora real estate' ) ? $current_ws['name'] : get_user_meta( get_current_user_id(), 'cora_workspace_agency_name', true );
         return ! empty( $ws_name ) ? $ws_name : 'Cora Workspace';
