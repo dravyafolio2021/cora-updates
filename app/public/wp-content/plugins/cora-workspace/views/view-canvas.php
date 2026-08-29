@@ -581,8 +581,8 @@ function cora_get_sparkline_points( $history, $type ) {
                             <div class="flex-1 mx-2 bg-zinc-100 rounded text-[6px] font-mono text-zinc-400 px-2 py-0.5 text-center truncate"><?php echo esc_html( $canvas_display_url ); ?></div>
                         </div>
                         <!-- viewport: 1280px wide × 850px tall → scale 0.21875 → renders 280px × 185px (fills 172px container height perfectly, cropping the bottom) -->
-                        <div class="flex-1 relative overflow-hidden bg-white">
-                            <iframe src="<?php echo esc_url( $canvas_preview_url ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:1280px;height:850px;transform:scale(0.21875);transform-origin:0 0;border:none;"></iframe>
+                        <div class="flex-1 relative overflow-hidden bg-white" style="width: 280px; height: 172px;">
+                            <iframe src="<?php echo esc_url( $canvas_preview_url ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:1280px !important;min-width:1280px !important;max-width:none !important;height:850px !important;min-height:850px !important;max-height:none !important;transform:scale(0.21875);transform-origin:0 0;border:none;display:block;background:#ffffff;"></iframe>
                         </div>
                     </div>
                     <!-- Mobile Frame: 90×200px | scale = 90/390 = 0.230769 (hidden on small mobile screens to prevent layout overflow) -->
@@ -591,8 +591,8 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span class="w-6 h-0.5 rounded-full bg-zinc-300 "></span>
                         </div>
                         <!-- viewport: 390px wide × 850px tall → scale 0.230769 → renders 90px × 196px (fills container height perfectly, cropping the bottom) -->
-                        <div class="flex-1 relative overflow-hidden bg-white">
-                            <iframe src="<?php echo esc_url( $canvas_preview_url ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:390px;height:850px;transform:scale(0.230769);transform-origin:0 0;border:none;"></iframe>
+                        <div class="flex-1 relative overflow-hidden bg-white" style="width: 90px; height: 188px;">
+                            <iframe src="<?php echo esc_url( $canvas_preview_url ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:390px !important;min-width:390px !important;max-width:none !important;height:850px !important;min-height:850px !important;max-height:none !important;transform:scale(0.230769);transform-origin:0 0;border:none;display:block;background:#ffffff;"></iframe>
                         </div>
                     </div>
                 </div>
