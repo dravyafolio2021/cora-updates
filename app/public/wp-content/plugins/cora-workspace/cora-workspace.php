@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.8.4
+ * Version: 4.8.5
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.4' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.5' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -623,6 +623,51 @@ add_filter( 'wp_headers', function( $headers ) {
     }
     return $headers;
 }, 999 );
+
+/**
+ * 9.5 STRICT PAGE LAYOUT TEMPLATES — Expose ONLY 2 clean options:
+ * 1. Default (Header & Footer)
+ * 2. Canvas (No Header / Footer)
+ * Keeps workspace page creator and Elementor editor Page Settings 100% in sync.
+ */
+add_filter( 'theme_page_templates', function( $templates, $theme, $post, $post_type ) {
+    return array(
+        'default'          => __( 'Default (Header & Footer)', 'cora-workspace' ),
+        'elementor_canvas' => __( 'Canvas (No Header / Footer)', 'cora-workspace' ),
+    );
+}, 999, 4 );
+
+add_filter( 'theme_templates', function( $templates, $theme, $post, $post_type ) {
+    return array(
+        'default'          => __( 'Default (Header & Footer)', 'cora-workspace' ),
+        'elementor_canvas' => __( 'Canvas (No Header / Footer)', 'cora-workspace' ),
+    );
+}, 999, 4 );
+
+// Hook Elementor document controls so Page Settings dropdown ONLY offers Default and Canvas
+add_action( 'elementor/element/wp-page/document_settings/before_section_end', 'cora_filter_elementor_page_layout_controls', 999, 2 );
+add_action( 'elementor/element/page/document_settings/before_section_end', 'cora_filter_elementor_page_layout_controls', 999, 2 );
+add_action( 'elementor/element/post/document_settings/before_section_end', 'cora_filter_elementor_page_layout_controls', 999, 2 );
+add_action( 'elementor/element/wp-post/document_settings/before_section_end', 'cora_filter_elementor_page_layout_controls', 999, 2 );
+
+if ( ! function_exists( 'cora_filter_elementor_page_layout_controls' ) ) {
+function cora_filter_elementor_page_layout_controls( $element, $args ) {
+    if ( method_exists( $element, 'get_controls' ) && method_exists( $element, 'update_control' ) ) {
+        $control = $element->get_controls( 'template' );
+        if ( $control ) {
+            $element->update_control( 'template', array(
+                'label'   => __( 'Page Layout', 'cora-workspace' ),
+                'type'    => \Elementor\Controls_Manager::SELECT,
+                'options' => array(
+                    'default'          => __( 'Default (Header & Footer)', 'cora-workspace' ),
+                    'elementor_canvas' => __( 'Canvas (No Header / Footer)', 'cora-workspace' ),
+                ),
+                'default' => 'default',
+            ) );
+        }
+    }
+}
+}
 
 // Also hard-block the wp-admin/update.php install-plugin action via a redirect
 add_action( 'admin_init', function() {
