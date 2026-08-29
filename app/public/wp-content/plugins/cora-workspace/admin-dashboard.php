@@ -3102,7 +3102,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             gbpConnectedVia: '<?php echo esc_js( $cora_gbp_connected_via ); ?>',
             gbpPosts: <?php echo json_encode( array_slice( $cora_gbp_posts, 0, 10 ) ); ?>,
             gbpReviewReplies: <?php echo json_encode( $cora_gbp_review_replies ); ?>,
-            pluginsUrl: "<?php echo esc_url( plugins_url( '/', __FILE__ ) ); ?>"
+            pluginsUrl: "<?php echo esc_url( plugins_url( '/', __FILE__ ) ); ?>",
+            version: "<?php echo esc_js( CORA_WORKSPACE_VERSION ); ?>"
         };
 
         var _coraSidebarToggleLock = false;

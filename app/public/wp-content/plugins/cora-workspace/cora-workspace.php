@@ -33731,7 +33731,11 @@ if ( ! class_exists( 'Cora_Workspace_Plugin_Updater' ) ) {
     }
 }
 
-$cora_workspace_updates_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
+$cora_workspace_updates_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
+if ( empty( $cora_workspace_updates_url ) || strpos( $cora_workspace_updates_url, 'cora-updates' ) !== false ) {
+    $cora_workspace_updates_url = 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json';
+    update_option( 'cora_workspace_updates_server_url', $cora_workspace_updates_url );
+}
 new Cora_Workspace_Plugin_Updater( __FILE__, $cora_workspace_updates_url );
 
 /**
@@ -33760,7 +33764,11 @@ function cora_check_workspace_update_available( $force = false ) {
             return false;
         }
 
-        $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
+        $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
+        if ( empty( $update_url ) || strpos( $update_url, 'cora-updates' ) !== false ) {
+            $update_url = 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json';
+            update_option( 'cora_workspace_updates_server_url', $update_url );
+        }
         $response = wp_remote_get( add_query_arg( 'cb', time(), $update_url ), array( 'timeout' => 2 ) );
         if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
             $remote_data = json_decode( wp_remote_retrieve_body( $response ) );
@@ -33823,7 +33831,11 @@ function cora_ajax_trigger_workspace_update() {
     
     $target_version = sanitize_text_field( $_POST['version'] ?? '' );
     
-    $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json' );
+    $update_url = get_option( 'cora_workspace_updates_server_url', 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json' );
+    if ( empty( $update_url ) || strpos( $update_url, 'cora-updates' ) !== false ) {
+        $update_url = 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json';
+        update_option( 'cora_workspace_updates_server_url', $update_url );
+    }
     $response = wp_remote_get( add_query_arg( 'cb', time(), $update_url ), array( 'timeout' => 20 ) );
     if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
         wp_send_json_error( array( 'message' => 'Failed to reach updates server.' ) );

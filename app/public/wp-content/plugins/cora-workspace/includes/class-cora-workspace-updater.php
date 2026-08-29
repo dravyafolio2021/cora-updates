@@ -7,7 +7,7 @@ class Cora_Workspace_Updater {
     private static $instance = null;
     private $plugin_file = 'cora-workspace/cora-workspace.php';
     private $plugin_slug = 'cora-workspace';
-    private $default_update_url = 'https://raw.githubusercontent.com/dravyafolio2021/cora-updates/main/cora-workspace.json';
+    private $default_update_url = 'https://raw.githubusercontent.com/dravyafolio2021/heycora/main/updates/cora-workspace.json';
 
     public static function get_instance() {
         if ( null === self::$instance ) {
@@ -31,7 +31,12 @@ class Cora_Workspace_Updater {
      * Get the configured updates JSON server URL
      */
     public function get_update_url() {
-        return esc_url_raw( $this->default_update_url );
+        $url = get_option( 'cora_workspace_updates_server_url', $this->default_update_url );
+        if ( empty( $url ) || strpos( $url, 'cora-updates' ) !== false ) {
+            $url = $this->default_update_url;
+            update_option( 'cora_workspace_updates_server_url', $url );
+        }
+        return esc_url_raw( $url );
     }
 
     /**
