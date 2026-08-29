@@ -510,6 +510,24 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         body, body.admin-bar { margin-top: 0 !important; padding-top: 0 !important; }
         #wpcontent, #wpbody, #wpbody-content, #wpwrap { margin-top: 0 !important; padding-top: 0 !important; }
         * html body { margin-top: 0 !important; }
+    
+        /* Guarantee all hidden elements, backdrops, and closed drawers have zero pointer events and zero display */
+        .hidden, [hidden],
+        #cora-sidebar-backdrop.hidden,
+        #cora-ai-sidebar-backdrop.hidden,
+        #cora-notif-backdrop.hidden,
+        #cora-drawer-backdrop.hidden,
+        #cora-inspector-backdrop.hidden,
+        #cora-ai-settings-backdrop.hidden,
+        #cora-pwa-update-drawer-backdrop.hidden,
+        #cora-pwa-update-drawer.hidden,
+        #cora-feedback-drawer.hidden,
+        #cora-feedback-drawer.collapsed {
+            display: none !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+        }
+
     </style>
 
     <style id="cora-workspace-custom-styles">
@@ -4377,7 +4395,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     </aside>
 
     <!-- Sidebar Drawer Backdrop for Mobile/Tablet Viewports -->
-    <div id="cora-sidebar-backdrop" class="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+    <div id="cora-sidebar-backdrop" class="hidden" style="display:none; position:fixed; inset:0; background:rgba(9,9,11,0.2); z-index:40; pointer-events:none;"></div>
 
     <!-- Main Content Pane -->
     <main class="cora-main flex-1 bg-white flex flex-col min-h-screen lg:min-h-0 lg:h-full lg:overflow-y-auto relative pb-16 lg:pb-0 min-w-0 w-full">
@@ -4386,7 +4404,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         <!-- Dynamic Content Sections -->
         <div class="cora-content-wrapper p-3 sm:p-5 md:p-6 max-w-full w-full flex-1 space-y-5 sm:space-y-6 min-w-0">
             <!-- CORA Global Skeleton Preloader -->
-            <div id="cora-skeleton-overlay" class="hidden w-full" aria-hidden="true">
+            <div id="cora-skeleton-overlay" class="hidden w-full" style="display:none;" aria-hidden="true">
               <!-- 1. Dashboard Skeleton Instance -->
               <div id="cora-skeleton-dashboard" class="cora-skeleton-instance w-full space-y-6">
                 <!-- Top Header -->
@@ -7833,7 +7851,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
             <!-- SECTION: TASKS -->
     <!-- Local backdrop for AI bottom sheet sidebar (mobile/tablet only) -->
-    <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden fixed inset-0 bg-black/35 z-[9960] backdrop-blur-[1px] transition-opacity duration-300 cursor-pointer lg:hidden" style="position:fixed !important; inset:0 !important; z-index:9960 !important; background:rgba(0,0,0,0.35) !important; backdrop-filter:blur(1px) !important; -webkit-backdrop-filter:blur(1px) !important;"></div>
+    <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:9960; background:rgba(0,0,0,0.35); backdrop-filter:blur(1px); -webkit-backdrop-filter:blur(1px); pointer-events:none;"></div>
 
     <script>
     window.coraToggleConversationsDropdown = function(e) {
@@ -8355,7 +8373,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     </aside>
 
     <!-- Notifications Backdrop (Desktop Only) -->
-    <div id="cora-notif-backdrop" onclick="window.coraToggleNotificationDrawer(false)" class="hidden fixed inset-0 bg-black/45 backdrop-blur-[4px] z-[9998] transition-opacity duration-300 opacity-0" style="position:fixed; inset:0; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);"></div>
+    <div id="cora-notif-backdrop" onclick="window.coraToggleNotificationDrawer(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:9998; background:rgba(9,9,11,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); pointer-events:none;"></div>
 
     <!-- Notifications Side Drawer Panel -->
     <aside id="cora-notif-dropdown" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[400px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
@@ -12386,9 +12404,9 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 })();
 </script>
 <!-- Global Right-Sliding AI Model Settings Drawer -->
-<div id="cora-ai-settings-backdrop" onclick="window.coraCloseAISettingsDrawer()" class="hidden fixed inset-0 cursor-pointer pointer-events-auto" style="position:fixed; inset:0; background:rgba(9,9,11,0.25); z-index:100000;"></div>
+<div id="cora-ai-settings-backdrop" onclick="window.coraCloseAISettingsDrawer()" class="hidden" style="display:none; position:fixed; inset:0; z-index:100000; background:rgba(9,9,11,0.25); pointer-events:none;"></div>
 
-<div id="cora-ai-settings-drawer" class="fixed top-0 right-0 h-full w-[360px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full select-none" style="position:fixed; top:0; right:0; height:100%; width:360px; max-width:90vw; background:#ffffff; border-left:1px solid #e4e4e7; z-index:100005; display:flex; flex-direction:column; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); box-shadow:-8px 0 30px rgba(0,0,0,0.12);">
+<div id="cora-ai-settings-drawer" class="fixed top-0 right-0 h-full w-[360px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full select-none hidden" style="display:none; position:fixed; top:0; right:0; height:100%; width:360px; max-width:90vw; background:#ffffff; border-left:1px solid #e4e4e7; z-index:100005; flex-direction:column; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); box-shadow:-8px 0 30px rgba(0,0,0,0.12); pointer-events:none;">
     <!-- Drawer Header -->
     <div class="px-5 py-4 border-b border-zinc-150 flex items-center justify-between bg-zinc-50/70 shrink-0">
         <div class="flex items-center gap-2">
@@ -12489,7 +12507,14 @@ window.coraOpenAISettingsDrawer = function(e) {
     var drawer = document.getElementById('cora-ai-settings-drawer');
     if (backdrop && drawer) {
         backdrop.classList.remove('hidden');
-        drawer.style.transform = 'translateX(0)';
+        backdrop.style.display = 'block';
+        backdrop.style.pointerEvents = 'auto';
+        drawer.classList.remove('hidden');
+        drawer.style.display = 'flex';
+        drawer.style.pointerEvents = 'auto';
+        requestAnimationFrame(function() {
+            drawer.style.transform = 'translateX(0)';
+        });
         var savedModel = localStorage.getItem('cora_ai_active_model') || 'gemini';
         var savedTemp = localStorage.getItem('cora_ai_temperature') || '0.7';
         var radio = document.querySelector('input[name="cora_global_ai_model"][value="' + savedModel + '"]');
@@ -12515,7 +12540,14 @@ window.coraCloseAISettingsDrawer = function(e) {
     if (drawer) {
         drawer.style.transform = 'translateX(100%)';
         setTimeout(function() {
-            if (backdrop) backdrop.classList.add('hidden');
+            drawer.classList.add('hidden');
+            drawer.style.display = 'none';
+            drawer.style.pointerEvents = 'none';
+            if (backdrop) {
+                backdrop.classList.add('hidden');
+                backdrop.style.display = 'none';
+                backdrop.style.pointerEvents = 'none';
+            }
         }, 250);
     }
     if (typeof window.coraToggleAISettingsDrawer === 'function') {
@@ -15189,7 +15221,7 @@ if ( cora_is_super_owner() ) :
 </script>
 
 <!-- Dynamic Feedback Modal Pop-up -->
-<div id="cora-feedback-drawer" onclick="window.coraCloseFeedbackDrawer(event)" class="cora-feedback-drawer collapsed fixed inset-0 z-[9995] flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-[2px] transition-all duration-200">
+<div id="cora-feedback-drawer" onclick="window.coraCloseFeedbackDrawer(event)" class="cora-feedback-drawer collapsed hidden" style="display:none; position:fixed; inset:0; z-index:9995; pointer-events:none;">
     <div class="cora-feedback-modal-card w-full max-w-[460px] bg-white border border-zinc-200 shadow-2xl flex flex-col rounded-2xl overflow-hidden transition-all duration-250 transform scale-95 opacity-0" onclick="event.stopPropagation()">
         <!-- Header -->
         <div class="px-5 py-4 border-b border-zinc-200 flex justify-between items-center bg-zinc-50/50 shrink-0">
@@ -15418,7 +15450,7 @@ window.coraSendFeedback = function(method) {
 </script>
 
 <!-- Global Drawer Backdrop -->
-<div id="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()" class="hidden fixed inset-0 bg-black/30 z-[9990] backdrop-blur-[1.5px] transition-opacity duration-200 cursor-pointer"></div>
+<div id="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()" class="hidden" style="display:none; position:fixed; inset:0; z-index:9990; background:rgba(0,0,0,0.3); pointer-events:none;"></div>
 
 <?php if ( $cora_auto_update && ! empty( $cora_target_version ) ) : ?>
 <div id="cora-auto-update-overlay-panel" class="fixed inset-0 z-[999999] bg-zinc-50/90 backdrop-blur-md flex items-center justify-center select-none font-sans">
@@ -15758,9 +15790,9 @@ jQuery(document).ready(function($) {
 </div>
 
 <!-- Universal In-App Update Details Drawer Sheet -->
-<div id="cora-pwa-update-drawer-backdrop" onclick="window.coraClosePwaUpdateDrawer()" class="hidden fixed inset-0 transition-opacity duration-300 cursor-pointer" style="position:fixed !important; inset:0 !important; z-index:1000050 !important; background:rgba(9,9,11,0.55) !important; backdrop-filter:blur(8px) !important; -webkit-backdrop-filter:blur(8px) !important;"></div>
+<div id="cora-pwa-update-drawer-backdrop" onclick="window.coraClosePwaUpdateDrawer()" class="hidden" style="display:none; position:fixed; inset:0; z-index:1000050; background:rgba(9,9,11,0.55); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); pointer-events:none;"></div>
 
-<div id="cora-pwa-update-drawer" class="hidden fixed bottom-0 max-h-[85vh] sm:max-h-[75vh] w-full max-w-lg bg-white border-t sm:border border-zinc-200 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col transition-all duration-300 font-sans select-none pb-[env(safe-area-inset-bottom,16px)]" style="position:fixed !important; bottom:0 !important; left:50% !important; transform:translate(-50%, 100%) !important; z-index:1000060 !important; background:#ffffff !important; opacity:1 !important;">
+<div id="cora-pwa-update-drawer" class="hidden fixed bottom-0 max-h-[85vh] sm:max-h-[75vh] w-full max-w-lg bg-white border-t sm:border border-zinc-200 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col transition-all duration-300 font-sans select-none pb-[env(safe-area-inset-bottom,16px)]" style="display:none; position:fixed; bottom:0; left:50%; transform:translate(-50%, 100%); z-index:1000060; background:#ffffff; pointer-events:none;">
     <!-- Drag indicator handle for mobile -->
     <div class="flex items-center justify-center pt-3 pb-1 cursor-pointer select-none" onclick="window.coraClosePwaUpdateDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>

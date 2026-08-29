@@ -1915,7 +1915,7 @@ jQuery(document).ready(function($) {
             }
             sidebar.removeClass('collapsed');
             quickBtn.addClass('bg-zinc-100 border-zinc-300');
-            backdrop.removeClass('hidden');
+            backdrop.removeClass('hidden').css({ display: 'block', pointerEvents: 'auto' });
             island.addClass('cora-island-docked');
             
             const input = $('#cora-island-ai-input');
@@ -1925,7 +1925,7 @@ jQuery(document).ready(function($) {
         } else {
             sidebar.addClass('collapsed');
             quickBtn.removeClass('bg-zinc-100 border-zinc-300');
-            backdrop.addClass('hidden');
+            backdrop.addClass('hidden').css({ display: 'none', pointerEvents: 'none' });
             island.removeClass('cora-island-docked');
             $('#cora-sidebar-conversations-dropdown').addClass('hidden');
         }
@@ -4439,10 +4439,14 @@ jQuery(document).ready(function($) {
 
         if (backdrop) {
             backdrop.classList.remove('hidden');
+            backdrop.style.display = 'block';
+            backdrop.style.pointerEvents = 'auto';
             backdrop.style.opacity = '1';
         }
 
         drawer.classList.remove('hidden');
+        drawer.style.display = 'flex';
+        drawer.style.pointerEvents = 'auto';
         requestAnimationFrame(() => {
             drawer.style.setProperty('transform', 'translate(-50%, 0)', 'important');
         });
@@ -4460,9 +4464,17 @@ jQuery(document).ready(function($) {
         drawer.style.setProperty('transform', 'translate(-50%, 100%)', 'important');
         if (backdrop) {
             backdrop.style.opacity = '0';
-            setTimeout(() => backdrop.classList.add('hidden'), 300);
+            setTimeout(() => {
+                backdrop.classList.add('hidden');
+                backdrop.style.display = 'none';
+                backdrop.style.pointerEvents = 'none';
+            }, 300);
         }
-        setTimeout(() => drawer.classList.add('hidden'), 310);
+        setTimeout(() => {
+            drawer.classList.add('hidden');
+            drawer.style.display = 'none';
+            drawer.style.pointerEvents = 'none';
+        }, 310);
     };
 
     window.coraShowPwaUpdateBanner = function(oldVer, newVer) {
