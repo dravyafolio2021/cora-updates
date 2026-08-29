@@ -7229,23 +7229,38 @@ function cora_get_sparkline_points( $history, $type ) {
             jQuery('#elementor-blocking-msg').addClass('hidden'); // Explicitly hide blocking panel on successful load
             jQuery('#elementor-editor-iframe').removeClass('hidden');
 
-            // Defensive error observer: check if Elementor threw 403 or preview error or redirected to WP Admin shell inside iframe
+            // Defensive error observer: check if Elementor threw actual visible 403 or preview error or redirected to WP Admin shell
             const iframe = this;
             const checkIframeError = function() {
                 try {
                     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                     if (iframeDoc && iframeDoc.body) {
-                        const bodyText = iframeDoc.body.innerText || '';
-                        const hasErrorMsg = bodyText.includes('The preview could not be loaded') || bodyText.includes('error 403') || bodyText.includes('Error 403');
-                        const errorDialog = iframeDoc.querySelector('.elementor-dialog-type-alert, .elementor-error-dialog, #elementor-preview-debug-area');
+                        const bodyText = (iframeDoc.body.innerText || '').toLowerCase();
+                        const isRealErrorPage = (bodyText.includes('the preview could not be loaded') && bodyText.includes('403')) || 
+                                               (bodyText.includes('error 403') && bodyText.includes('forbidden')) ||
+                                               (bodyText.includes('sorry, you are not allowed to edit this item'));
                         
+                        // Check for VISIBLE error dialogs only (not hidden template wrappers)
+                        let visibleErrorDialog = false;
+                        const errorDialogs = iframeDoc.querySelectorAll('.elementor-dialog-type-alert, .elementor-error-dialog, #elementor-preview-debug-area');
+                        errorDialogs.forEach(function(d) {
+                            if (d && (d.offsetWidth > 0 || d.offsetHeight > 0 || (d.style && d.style.display !== 'none' && window.getComputedStyle(d).display !== 'none'))) {
+                                const alertText = (d.innerText || '').toLowerCase();
+                                if (alertText.includes('error') || alertText.includes('failed') || alertText.includes('blocked') || alertText.includes('could not be loaded')) {
+                                    visibleErrorDialog = true;
+                                }
+                            }
+                        });
+
                         let isWpAdminShell = false;
                         try {
                             const iframeHref = (iframe.contentWindow && iframe.contentWindow.location.href) ? iframe.contentWindow.location.href : '';
-                            isWpAdminShell = iframeDoc.querySelector('#wpadminbar') !== null || iframeDoc.querySelector('#adminmenu') !== null || iframeHref.includes('/wp-admin/edit.php') || iframeHref.includes('/wp-admin/index.php');
+                            isWpAdminShell = (iframeDoc.querySelector('#adminmenu') !== null && !iframeHref.includes('action=elementor')) || 
+                                             iframeHref.includes('/wp-admin/edit.php') || 
+                                             (iframeHref.includes('/wp-admin/index.php') && !iframeHref.includes('action=elementor'));
                         } catch(err) {}
 
-                        if (hasErrorMsg || errorDialog || isWpAdminShell) {
+                        if (isRealErrorPage || visibleErrorDialog || isWpAdminShell) {
                             jQuery('#elementor-editor-iframe').addClass('hidden');
                             jQuery('#iframe-loader').addClass('hidden');
                             if (isWpAdminShell) {
@@ -7259,14 +7274,18 @@ function cora_get_sparkline_points( $history, $type ) {
                             if (typeof window.coraShowToast === 'function') {
                                 window.coraShowToast(isWpAdminShell ? 'Admin dashboard redirect intercepted. Use "Launch Direct Editor".' : 'Editor preview blocked by browser security. Use "Launch Direct Editor".', 'warning');
                             }
+                        } else {
+                            // Editor loaded cleanly
+                            jQuery('#elementor-blocking-msg').addClass('hidden');
+                            jQuery('#elementor-editor-iframe').removeClass('hidden');
                         }
                     }
                 } catch (e) {
-                    // Cross-origin restrictions may prevent reading document text, handled by timeout fallback
+                    // Cross-origin restrictions or normal load
                 }
             };
-            setTimeout(checkIframeError, 800);
-            setTimeout(checkIframeError, 2500);
+            setTimeout(checkIframeError, 1200);
+            setTimeout(checkIframeError, 3500);
         });
     }
 

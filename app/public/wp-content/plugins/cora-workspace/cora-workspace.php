@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.8.2
+ * Version: 4.8.3
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.2' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.3' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -617,7 +617,9 @@ add_action( 'send_headers', function() {
 add_filter( 'wp_headers', function( $headers ) {
     if ( ( isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) || isset( $_GET['elementor-preview'] ) || isset( $_GET['preview_id'] ) ) {
         unset( $headers['X-Frame-Options'] );
-        $headers['Content-Security-Policy'] = "frame-ancestors 'self' " . parse_url( home_url(), PHP_URL_SCHEME ) . '://' . parse_url( home_url(), PHP_URL_HOST );
+        $scheme = parse_url( home_url(), PHP_URL_SCHEME ) ?: 'https';
+        $host = parse_url( home_url(), PHP_URL_HOST ) ?: 'heycora.in';
+        $headers['Content-Security-Policy'] = "frame-ancestors 'self' {$scheme}://*.heycora.in {$scheme}://heycora.in {$scheme}://*.local {$scheme}://cora.local http://localhost:*";
     }
     return $headers;
 }, 999 );
