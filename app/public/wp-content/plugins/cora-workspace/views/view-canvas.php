@@ -243,20 +243,6 @@ function cora_get_sparkline_points( $history, $type ) {
         letter-spacing: 0.05em;
         line-height: 1;
     }
-    .cora-canvas-editor-active .cora-sidebar {
-        width: 64px !important;
-    }
-    .cora-canvas-editor-active .cora-sidebar .cora-nav-text,
-    .cora-canvas-editor-active .cora-sidebar .cora-nav-group-label {
-        display: none !important;
-    }
-    .cora-canvas-editor-active .cora-header {
-        display: none !important;
-    }
-    .cora-canvas-editor-active .cora-content-wrapper {
-        padding-top: 0 !important;
-        padding-left: 64px !important;
-    }
     /* Menu Item Nesting Indentation */
     .menu-item-nested {
         margin-left: 28px !important;
@@ -264,13 +250,18 @@ function cora_get_sparkline_points( $history, $type ) {
         padding-left: 12px;
     }
 
-    /* ── Canvas Level-3 Editor Layout ─────────────────────────────────── */
+    /* ── Canvas Level-3 Editor Layout (Strictly isolated overlay) ────── */
     #canvas-level-3:not(.hidden) {
-        height: 100dvh !important;
-        max-height: 100dvh !important;
-        overflow: hidden !important;
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 100000 !important;
+        background: #ffffff !important;
         display: flex !important;
         flex-direction: column !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        overflow: hidden !important;
     }
     /* Editor topbar takes a fixed height; iframe container fills the rest */
     #cora-parent-editor-topbar {
@@ -289,11 +280,6 @@ function cora_get_sparkline_points( $history, $type ) {
     }
 </style>
 
-<?php if ( ! empty($_editor_resume_url) ) : ?>
-<script>document.body.classList.add('cora-canvas-editor-active');</script>
-<?php else : ?>
-<script>document.body.classList.remove('cora-canvas-editor-active');</script>
-<?php endif; ?>
 <div class="space-y-6" id="cora-canvas-container">
     
     <!-- LEVEL 1 — CANVAS HUB -->
@@ -6945,8 +6931,7 @@ function cora_get_sparkline_points( $history, $type ) {
             badge.text('Draft').removeClass().addClass('ml-1.5 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider select-none bg-zinc-200 text-zinc-700 ');
         }
 
-        // Collapse sidebar and hide header
-        jQuery('body').addClass('cora-canvas-editor-active');
+        // Open Level-3 isolated fullscreen editor overlay
         jQuery('#canvas-level-3').removeClass('hidden');
         jQuery('#iframe-loader').removeClass('hidden');
         jQuery('#elementor-editor-iframe').addClass('hidden');
@@ -7060,7 +7045,6 @@ function cora_get_sparkline_points( $history, $type ) {
         jQuery('#elementor-editor-iframe').attr('src', '');
         jQuery('#cora-parent-editor-topbar').addClass('hidden');
         
-        jQuery('body').removeClass('cora-canvas-editor-active');
         jQuery('#canvas-level-3').addClass('hidden');
         if (canvasState.activeThemeId) {
             fetchThemePages(canvasState.activeThemeId);
