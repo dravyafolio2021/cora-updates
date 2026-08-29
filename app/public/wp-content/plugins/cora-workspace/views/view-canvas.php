@@ -291,6 +291,8 @@ function cora_get_sparkline_points( $history, $type ) {
 
 <?php if ( ! empty($_editor_resume_url) ) : ?>
 <script>document.body.classList.add('cora-canvas-editor-active');</script>
+<?php else : ?>
+<script>document.body.classList.remove('cora-canvas-editor-active');</script>
 <?php endif; ?>
 <div class="space-y-6" id="cora-canvas-container">
     

@@ -18,8 +18,41 @@ if ( ! $live_theme ) {
 }
 $theme_settings = $live_theme ? ( json_decode( $live_theme['settings'], true ) ?: array() ) : array();
 
-$header_template_id = ! empty( $theme_settings['header_template_id'] ) ? intval( $theme_settings['header_template_id'] ) : 0;
-$footer_template_id = ! empty( $theme_settings['footer_template_id'] ) ? intval( $theme_settings['footer_template_id'] ) : 0;
+// Auto-discover published Elementor Header library templates if not explicitly configured
+if ( $header_template_id <= 0 ) {
+    $found_headers = get_posts( array(
+        'post_type'      => 'elementor_library',
+        'posts_per_page' => 1,
+        'post_status'    => 'publish',
+        'meta_query'     => array(
+            array(
+                'key'   => '_elementor_template_type',
+                'value' => 'header',
+            ),
+        ),
+    ) );
+    if ( ! empty( $found_headers ) ) {
+        $header_template_id = $found_headers[0]->ID;
+    }
+}
+
+// Auto-discover published Elementor Footer library templates if not explicitly configured
+if ( $footer_template_id <= 0 ) {
+    $found_footers = get_posts( array(
+        'post_type'      => 'elementor_library',
+        'posts_per_page' => 1,
+        'post_status'    => 'publish',
+        'meta_query'     => array(
+            array(
+                'key'   => '_elementor_template_type',
+                'value' => 'footer',
+            ),
+        ),
+    ) );
+    if ( ! empty( $found_footers ) ) {
+        $footer_template_id = $found_footers[0]->ID;
+    }
+}
 
 echo '<!DOCTYPE html>';
 echo '<html ';
@@ -34,16 +67,47 @@ echo '<body ';
 body_class();
 echo '>';
 
-// 1. Render Elementor Header (Native Theme Builder location or Canvas linked template)
+// 1. Render Elementor Header (Native Theme Builder location, Canvas linked template, or Default Header fallback)
 $header_rendered = false;
 if ( function_exists( 'elementor_theme_do_location' ) ) {
-    $header_rendered = elementor_theme_do_location( 'header' );
+    $header_rendered = (bool) elementor_theme_do_location( 'header' );
 }
 if ( ! $header_rendered && $header_template_id > 0 && class_exists( '\Elementor\Plugin' ) ) {
     $header_content = \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $header_template_id );
     if ( ! empty( $header_content ) ) {
         echo '<header id="cora-canvas-site-header">' . $header_content . '</header>';
+        $header_rendered = true;
     }
+}
+if ( ! $header_rendered ) {
+    $site_name = get_bloginfo( 'name' );
+    $custom_logo_id = get_theme_mod( 'custom_logo' );
+    $logo_img = $custom_logo_id ? wp_get_attachment_image( $custom_logo_id, 'full', false, array( 'class' => 'h-8 w-auto object-contain' ) ) : '';
+    ?>
+    <header id="cora-canvas-site-header" style="width: 100%; background-color: #ffffff; border-bottom: 1px solid #e4e4e7; padding: 14px 24px; position: sticky; top: 0; z-index: 999; display: flex; align-items: center; justify-content: space-between; font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" style="display: flex; align-items: center; gap: 8px; color: #18181b; font-weight: 700; font-size: 16px; text-decoration: none; letter-spacing: -0.01em;">
+                <?php if ( $logo_img ) : ?>
+                    <?php echo $logo_img; ?>
+                <?php else : ?>
+                    <span><?php echo esc_html( $site_name ?: 'Claroverse' ); ?></span>
+                <?php endif; ?>
+            </a>
+        </div>
+        <nav style="display: flex; align-items: center; gap: 20px; font-size: 13px; font-weight: 600;">
+            <?php
+            $pages = get_pages( array( 'number' => 6, 'sort_column' => 'menu_order' ) );
+            if ( ! empty( $pages ) ) {
+                foreach ( $pages as $p ) {
+                    echo '<a href="' . esc_url( get_permalink( $p->ID ) ) . '" style="color: #52525b; text-decoration: none; transition: color 0.15s ease;">' . esc_html( $p->post_title ) . '</a>';
+                }
+            } else {
+                echo '<a href="' . esc_url( home_url( '/' ) ) . '" style="color: #52525b; text-decoration: none;">Home</a>';
+            }
+            ?>
+        </nav>
+    </header>
+    <?php
 }
 
 // 2. Render Page Content
