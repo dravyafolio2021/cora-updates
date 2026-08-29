@@ -4618,6 +4618,12 @@ jQuery(document).ready(function($) {
     };
 
     window.coraCheckForUpdates = function(showFeedback) {
+        // Prevent auto-refresh disruptions during active Canvas Site Builder & Elementor editing sessions
+        const inEditorSession = window.location.search.includes('cv_page=') || window.location.search.includes('action=elementor') || window.location.pathname.includes('/canvas');
+        if (inEditorSession && !showFeedback) {
+            return;
+        }
+
         const btn = document.getElementById('cora-btn-check-updates');
         if (btn && showFeedback) {
             btn.innerHTML = '<svg class="animate-spin" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path></svg> Checking...';
@@ -4639,6 +4645,11 @@ jQuery(document).ready(function($) {
                     } catch(e) {}
 
                     if (installed && installed !== data.version) {
+                        if (inEditorSession) {
+                            // Update version marker silently without reloading or throwing toasts during design work
+                            try { localStorage.setItem('cora_pwa_installed_version', data.version); } catch(e) {}
+                            return;
+                        }
                         const isAutoSilent = localStorage.getItem('cora_auto_update_silent_consent') === 'true';
                         if (isAutoSilent) {
                             if (typeof window.coraShowToast === 'function') {
@@ -4682,9 +4693,14 @@ jQuery(document).ready(function($) {
                 localStorage.setItem('cora_pwa_installed_version', currentVersion);
             } catch(e) {}
         } else if (installedVersion !== currentVersion) {
-            setTimeout(function() {
-                window.coraShowPwaUpdateBanner(installedVersion, currentVersion);
-            }, 1200);
+            const inEditorSession = window.location.search.includes('cv_page=') || window.location.search.includes('action=elementor') || window.location.pathname.includes('/canvas');
+            if (!inEditorSession) {
+                setTimeout(function() {
+                    window.coraShowPwaUpdateBanner(installedVersion, currentVersion);
+                }, 1200);
+            } else {
+                try { localStorage.setItem('cora_pwa_installed_version', currentVersion); } catch(e) {}
+            }
         }
 
         if ('serviceWorker' in navigator) {
@@ -4699,7 +4715,10 @@ jQuery(document).ready(function($) {
                     if (newWorker) {
                         newWorker.addEventListener('statechange', function() {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                window.coraShowPwaUpdateBanner(installedVersion, currentVersion);
+                                const inEditorSession = window.location.search.includes('cv_page=') || window.location.search.includes('action=elementor') || window.location.pathname.includes('/canvas');
+                                if (!inEditorSession) {
+                                    window.coraShowPwaUpdateBanner(installedVersion, currentVersion);
+                                }
                             }
                         });
                     }
@@ -4709,10 +4728,13 @@ jQuery(document).ready(function($) {
             });
         }
 
-        // Silent check on tab re-focus / app foregrounding
+        // Silent check on tab re-focus / app foregrounding (bypassed inside active editor sessions)
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'visible') {
-                window.coraCheckForUpdates(false);
+                const inEditorSession = window.location.search.includes('cv_page=') || window.location.search.includes('action=elementor') || window.location.pathname.includes('/canvas');
+                if (!inEditorSession) {
+                    window.coraCheckForUpdates(false);
+                }
             }
         });
     })();
