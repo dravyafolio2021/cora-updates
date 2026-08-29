@@ -3818,7 +3818,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <div class="flex items-center justify-between px-1 mb-2 select-none">
                             <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Workspaces</span>
                             <?php if ( cora_is_super_owner() ) : ?>
-                                <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded shrink-0">Admin (Shruti)</span>
+                                <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded shrink-0">Studio Admin</span>
                             <?php endif; ?>
                         </div>
                         
@@ -3842,7 +3842,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     <?php if ( $is_super_current ) : ?>
                                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-900 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                     <?php endif; ?>
-                                    <button type="button" class="p-0.5 hover:bg-zinc-200 rounded text-zinc-400 hover:text-zinc-750 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" onclick="event.stopPropagation(); window.coraToggleEditWorkspaceDrawer(true, 0, 'Platform Control Center', 'super', 'enterprise', 'shruti@heycora.in', 'active');">
+                                    <button type="button" class="p-0.5 hover:bg-zinc-200 rounded text-zinc-400 hover:text-zinc-750 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" onclick="event.stopPropagation(); window.coraToggleEditWorkspaceDrawer(true, 0, 'Platform Control Center', 'super', 'enterprise', 'admin@heycora.in', 'active');">
                                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                     </button>
                                 </div>
@@ -3856,7 +3856,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 $ws_item_name = ! empty( $ws_item['name'] ) ? $ws_item['name'] : 'Workspace';
                                 $ws_item_slug = ! empty( $ws_item['slug'] ) ? $ws_item['slug'] : 'workspace';
                                 $ws_item_plan = ! empty( $ws_item['plan'] ) ? $ws_item['plan'] : 'enterprise';
-                                $ws_item_email = ! empty( $ws_item['owner_email'] ) ? $ws_item['owner_email'] : 'shruti@heycora.in';
+                                $ws_item_email = ! empty( $ws_item['owner_email'] ) ? $ws_item['owner_email'] : 'admin@heycora.in';
                                 $ws_item_status = ! empty( $ws_item['status'] ) ? $ws_item['status'] : 'active';
                                 $ws_item_init = strtoupper( substr( $ws_item_name, 0, 1 ) );
                             ?>
@@ -3914,12 +3914,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 $re_url  = add_query_arg( 'set_industry', 'real_estate',       remove_query_arg( array('set_industry','industry') ) );
                 $stu_url = add_query_arg( 'set_industry', 'photography_studio', remove_query_arg( array('set_industry','industry') ) );
             ?>
-            <!-- Industry Switcher Widget (Shruti Only) -->
+            <!-- Industry Switcher Widget (Super Admin Only) -->
             <div class="px-3 pb-1 pt-1 select-none">
                 <div class="bg-zinc-100/80 border border-zinc-200/80 rounded-xl p-1.5 space-y-1">
                     <div class="flex items-center justify-between px-1">
                         <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Industry Mode</span>
-                        <span class="text-[8.5px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded shrink-0">Shruti Only</span>
+                        <span class="text-[8.5px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded shrink-0">Super Admin Only</span>
                     </div>
                     <div class="grid grid-cols-2 gap-1 bg-white p-1 rounded-lg border border-zinc-200/60">
                         <a href="<?php echo esc_url( $re_url ); ?>" class="flex items-center justify-center gap-1 py-1 px-1.5 rounded-md text-[10.5px] font-bold transition-all no-underline <?php echo ($current_industry === 'real_estate') ? 'bg-zinc-950 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900'; ?>">
@@ -4077,7 +4077,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white bg-emerald-500 pointer-events-none" style="position:absolute !important; bottom:0 !important; right:0 !important; z-index:10 !important;"></span>
                     </div>
                     <div class="flex flex-col min-w-0 leading-tight">
-                        <span class="text-sm font-bold text-zinc-900 truncate"><?php echo esc_html(( cora_is_real_shruti() || ( $current_wp_user->exists() && $current_wp_user->user_login === 'cora_admin' ) ) ? 'Shruti' : $current_user_display_name); ?></span>
+                        <span class="text-sm font-bold text-zinc-900 truncate"><?php echo esc_html(( cora_is_real_shruti() || ( $current_wp_user->exists() && $current_wp_user->user_login === 'cora_admin' ) ) ? 'Studio Admin' : $current_user_display_name); ?></span>
                         <span class="text-[11px] text-zinc-500 truncate"><?php echo esc_html($current_wp_user->exists() ? $current_wp_user->user_email : 'dravya.shs@gmail.com'); ?></span>
                     </div>
                 </div>
@@ -4346,7 +4346,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             $current_user_display_name = $current_wp_user->exists() ? $current_wp_user->display_name : 'Dravya Bansal';
             $is_shruti_user = ( cora_is_real_shruti() || ( $current_wp_user->exists() && $current_wp_user->user_login === 'cora_admin' ) );
             if ( $is_shruti_user ) {
-                $current_user_display_name = 'Shruti';
+                $current_user_display_name = 'Studio Admin';
             }
             $current_user_role_label = isset($cora_role_labels[$current_user_role]) ? $cora_role_labels[$current_user_role] : ucfirst($current_user_role);
             if ($current_user_role === 'administrator') {
@@ -14882,7 +14882,7 @@ if ( cora_is_super_owner() ) :
                 document.getElementById('cora-edit-ws-name').value = wsName || '';
                 document.getElementById('cora-edit-ws-slug').value = wsSlug || '';
                 document.getElementById('cora-edit-ws-plan').value = wsPlan || 'enterprise';
-                document.getElementById('cora-edit-ws-owner-email').value = wsOwnerEmail || 'shruti@heycora.in';
+                document.getElementById('cora-edit-ws-owner-email').value = wsOwnerEmail || 'admin@heycora.in';
                 document.getElementById('cora-edit-ws-status').value = wsStatus || 'active';
                 if (document.getElementById('cora-edit-ws-industry')) {
                     document.getElementById('cora-edit-ws-industry').value = (wsIndustry === 'photography' ? 'photography_studio' : (wsIndustry || 'real_estate'));

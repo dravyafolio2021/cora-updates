@@ -1011,31 +1011,37 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
     }
 
     function coraDocsRevertVersion(versionId) {
-        if (!confirm("Are you sure you want to revert to this version backup? The current workspace version will be archived.")) return;
-        
-        jQuery.ajax({
-            url: ajaxurl,
-            method: 'POST',
-            data: {
-                action: 'cora_revert_doc_page',
-                nonce: '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>',
-                version_id: versionId
-            },
-            success: function(response) {
-                if (response.success) {
-                    window.coraShowToast('success', response.data.message || 'Reverted successfully.');
-                    coraDocsCloseHistory();
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 800);
-                } else {
-                    window.coraShowToast('error', response.data.message || 'Failed to revert.');
+        const doRevert = function() {
+            jQuery.ajax({
+                url: ajaxurl,
+                method: 'POST',
+                data: {
+                    action: 'cora_revert_doc_page',
+                    nonce: '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>',
+                    version_id: versionId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        window.coraShowToast('success', response.data.message || 'Reverted successfully.');
+                        coraDocsCloseHistory();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 800);
+                    } else {
+                        window.coraShowToast('error', response.data.message || 'Failed to revert.');
+                    }
+                },
+                error: function() {
+                    window.coraShowToast('error', 'Revert action communication error.');
                 }
-            },
-            error: function() {
-                window.coraShowToast('error', 'Revert action communication error.');
-            }
-        });
+            });
+        };
+
+        if (window.coraConfirmAction) {
+            window.coraConfirmAction('Revert Version Backup', 'Are you sure you want to revert to this version backup? The current workspace version will be archived.', doRevert);
+        } else {
+            doRevert();
+        }
     }
 
     // Changelog Drawer Management

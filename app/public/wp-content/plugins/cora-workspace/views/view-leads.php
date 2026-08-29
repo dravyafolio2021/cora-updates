@@ -804,7 +804,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                                     break;
                                 }
                             }
-                            $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Shruti ');
+                            $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Studio Admin');
                             $assignee_first_name = explode( ' ', $assignee_display_name )[0];
                             $assignee_role = $lead['assignee_role'] ?? 'Super Admin';
                             if ( $assignee_role === 'Super Admin' ) {
@@ -921,7 +921,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                                          <?php echo esc_html( $assignee_init ); ?>
                                      </div>
                                      <div class="min-w-0 flex flex-col">
-                                         <?php $display_role = ($assignee_role === 'Just Shruti' || $assignee_role === 'Super Admin') ? 'Admin' : $assignee_role; ?>
+                                         <?php $display_role = ($assignee_role === 'Super Admin') ? 'Admin' : $assignee_role; ?>
                                          <span class="font-bold text-zinc-900 text-[11px] leading-none truncate"><?php echo esc_html( $assignee_first_name ); ?></span>
                                          <span class="text-[9px] text-zinc-400 leading-none mt-0.5"><?php echo esc_html( $display_role ); ?></span>
                                      </div>
@@ -1046,7 +1046,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                             break;
                         }
                     }
-                    $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Shruti ');
+                    $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Studio Admin');
                     $assignee_first_name = explode( ' ', $assignee_display_name )[0];
                     $assignee_role = 'Team Member';
                     $user_roles = [];
@@ -1164,7 +1164,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                                 <?php echo esc_html( $assignee_initials ); ?>
                             </div>
                             <div class="min-w-0 flex flex-col">
-                                <?php $display_role = ($assignee_role === 'Just Shruti' || $assignee_role === 'Super Admin') ? 'Admin' : $assignee_role; ?>
+                                <?php $display_role = ($assignee_role === 'Super Admin') ? 'Admin' : $assignee_role; ?>
                                 <span class="font-bold text-zinc-900 text-[11px] leading-none truncate"><?php echo esc_html( $assignee_first_name ); ?></span>
                                 <span class="text-[9px] text-zinc-400 leading-none mt-0.5"><?php echo esc_html( $display_role ); ?></span>
                             </div>
@@ -1247,7 +1247,7 @@ if ( empty( $cora_initial_subtab ) || ! in_array( $cora_initial_subtab, array( '
                                         break;
                                     }
                                 }
-                                $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Shruti ');
+                                $assignee_display_name = $assigned_user ? $assigned_user->display_name : ($lead['assignee_name'] ?? 'Studio Admin');
                                 $assignee_initials = strtoupper( substr( $assignee_display_name, 0, 1 ) );
                             ?>
                             <tr class="hover:bg-zinc-50/65 transition-colors cursor-pointer" data-assigned-to="<?php echo esc_attr( $assigned_to_id ); ?>" onclick="coraOpenLeadDetailDrawer('<?php echo esc_attr($lead['id']); ?>')">

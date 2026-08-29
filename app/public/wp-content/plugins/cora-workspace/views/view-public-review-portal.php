@@ -219,15 +219,35 @@ $workspace_name = get_option( 'cora_workspace_name', 'Cora Studio' );
             .catch(err => {
                 btn.disabled = false;
                 btn.innerHTML = '<span>Submit Review</span>';
-                alert('Submission failed. Please try again.');
+                coraShowReviewToast('Submission failed. Please try again.');
             });
+        }
+
+        function coraShowReviewToast(msg) {
+            let toast = document.getElementById('cora-portal-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'cora-portal-toast';
+                toast.className = 'fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-zinc-950 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-xl transition-all duration-300 pointer-events-none opacity-0';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0', '-translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-2');
+            }, 3000);
         }
 
         function coraCopyPublicSnippet() {
             var text = document.getElementById('cora-public-ai-snippet').textContent.trim();
             if (navigator.clipboard) {
-                navigator.clipboard.writeText(text);
-                alert('Snippet copied! Tap below to post on Google.');
+                navigator.clipboard.writeText(text).then(function() {
+                    coraShowReviewToast('Snippet copied to clipboard! Tap below to post on Google.');
+                }).catch(function() {
+                    coraShowReviewToast('Failed to copy snippet to clipboard.');
+                });
             }
         }
     </script>

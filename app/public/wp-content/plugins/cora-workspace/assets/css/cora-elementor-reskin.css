@@ -65,6 +65,27 @@
     left: 0;
     right: 0;
     flex-shrink: 0;
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#cora-editor-toolbar button,
+#cora-editor-toolbar a,
+#cora-editor-toolbar [role="button"],
+.cora-tb-btn,
+.cora-tb-icon-btn,
+.cora-tb-back-btn,
+.cora-tb-publish-btn,
+.cora-tb-preview-btn {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#cora-editor-toolbar button > svg,
+#cora-editor-toolbar button > span,
+#cora-editor-toolbar a > svg,
+#cora-editor-toolbar a > span {
+    pointer-events: none;
 }
 
 /* ── Row base ── */
@@ -1034,4 +1055,17 @@ button[data-event][data-settings*="install-plugin"] {
 .cora-injected-crumb-page {
     color: #18181b !important;
     font-weight: 700 !important;
+}
+
+/* ── Interactive Controls Touch & Select Scoping ── */
+#cora-editor-toolbar button,
+#cora-editor-toolbar a,
+#cora-editor-toolbar [role="button"],
+.cora-tb-back-btn,
+.cora-tb-badge,
+.cora-injected-exit-btn {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
 }

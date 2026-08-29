@@ -4988,20 +4988,27 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     };
 
     window.coraDeleteBrainResource = function(id) {
-        if (!confirm('Are you sure you want to permanently delete this Business Brain resource?')) return;
-        const $ = window.jQuery;
-        $.post(window.coraREWPData.ajaxUrl, {
-            action: 'cora_delete_brain_item',
-            nonce: window.coraREWPData.ajaxNonce,
-            id: id
-        }, function(response) {
-            if (response.success) {
-                if (window.coraShowToast) window.coraShowToast('Resource deleted.', 'success');
-                coraFetchBrainItems();
-            } else {
-                if (window.coraShowToast) window.coraShowToast('Failed to delete resource.', 'error');
-            }
-        });
+        const doDelete = function() {
+            const $ = window.jQuery;
+            $.post(window.coraREWPData.ajaxUrl, {
+                action: 'cora_delete_brain_item',
+                nonce: window.coraREWPData.ajaxNonce,
+                id: id
+            }, function(response) {
+                if (response.success) {
+                    if (window.coraShowToast) window.coraShowToast('Resource deleted.', 'success');
+                    coraFetchBrainItems();
+                } else {
+                    if (window.coraShowToast) window.coraShowToast('Failed to delete resource.', 'error');
+                }
+            });
+        };
+
+        if (window.coraConfirmAction) {
+            window.coraConfirmAction('Delete Brain Resource', 'Are you sure you want to permanently delete this Business Brain resource?', doDelete);
+        } else {
+            doDelete();
+        }
     };
 
     // -------------------------------------------------------------

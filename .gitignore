@@ -1,4 +1,4 @@
-# WordPress files to ignore
+# WordPress core, uploads and ephemeral runtime directories
 /app/public/wp-config.php
 /app/public/wp-content/uploads/
 /app/public/wp-content/upgrade/
@@ -10,7 +10,22 @@
 /conf/
 /logs/
 *.log
+**/*.log
+*.log.*
+app/public/wp-content/debug.log
+ajax_log*.txt
+head_debug.html
+*debug_dump*
+*-debug*.html
+
+# OS and filesystem artifacts
 .DS_Store
+**/.DS_Store
+Thumbs.db
+**/*.bak
+**/*~
+
+# Environment, secrets, and credentials
 .env
 .env*
 *.env
@@ -27,24 +42,48 @@
 *credentials*
 *secret*
 
-# IDE files
+# IDE & Editor artifacts
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Node dependencies
+# Node & package dependencies
 node_modules/
+**/node_modules/
+.npm/
 
-# Production releases and archives
+# Scratch & temporary development scripts
+scratch/
+**/scratch/
+scratch_*
+**/scratch_*
+
+# Duplicate / OS Copy artifacts
+* (1)*
+* (2)*
+* (3)*
+* (4)*
+
+# Production releases and archives (whitelist updates/ releases)
 *.zip
 *.tar.gz
-*.bak
+*.tgz
+*.rar
+*.7z
+!updates/*.zip
 
-# Playwright test artifacts
+# Playwright test artifacts & generated screenshots
 test-results/
+**/test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+tests/e2e/*.png
+tests/**/*.png
 
+# Database dumps
 *.sql
+*.sqlite
+*.sqlite3
 app/sql/
-

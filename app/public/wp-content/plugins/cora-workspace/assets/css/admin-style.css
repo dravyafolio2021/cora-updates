@@ -1,4 +1,12 @@
-/* --- CORA FOR REAL ESTATE PRODUCT TOUR SYSTEM --- */
+/* =============================================================================
+   Cora Platform - Core Admin & Workspace Design System Stylesheet
+   Monochromatic Palette: Zinc ramp (zinc-50 #fafafa to zinc-950 #09090b)
+   Strict Module Isolation & Zero-Regression Architecture
+   ============================================================================= */
+
+/* =============================================================================
+   1. CORA PRODUCT TOUR SYSTEM
+   ============================================================================= */
 .cora-tour-backdrop {
     position: fixed;
     inset: 0;
@@ -16,7 +24,7 @@
     display: block !important;
 }
 
-/* Force element to highlight relative to backdrop */
+/* Element highlight relative to tour backdrop */
 .cora-tour-highlight {
     position: relative !important;
     z-index: 999999 !important;
@@ -24,8 +32,15 @@
     outline: 1px solid #d4d4d8 !important; /* zinc-300 */
     border-color: #d4d4d8 !important;
     background-color: #ffffff !important;
-    pointer-events: auto !important; /* Allow interaction while touring */
+    pointer-events: auto !important;
     transition: box-shadow 0.25s ease-in-out;
+}
+
+.dark .cora-tour-highlight {
+    box-shadow: 0 0 0 8px #18181b, 0 0 0 9999px rgba(9, 9, 11, 0.65) !important;
+    outline-color: #3f3f46 !important;
+    border-color: #3f3f46 !important;
+    background-color: #18181b !important;
 }
 
 /* Floating Tour Popover Box */
@@ -38,7 +53,7 @@
     padding: 16px;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05), 0 0 1px 1px rgba(0, 0, 0, 0.02);
     z-index: 9999999;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 0.2s ease, transform 0.2s ease, top 0.25s ease, left 0.25s ease;
@@ -48,6 +63,13 @@
 .cora-tour-popover.active {
     opacity: 1;
     transform: translateY(0);
+}
+
+.dark .cora-tour-popover {
+    background: #18181b;
+    border-color: #27272a;
+    color: #f4f4f5;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.08);
 }
 
 /* Arrow indicator on Popover */
@@ -81,12 +103,18 @@
     border-left-color: #ffffff;
 }
 
-/* Ensure utility class .hidden strictly overrides flex or grid defaults when applied */
+.dark .cora-tour-popover.arrow-top::after { border-bottom-color: #18181b; }
+.dark .cora-tour-popover.arrow-bottom::after { border-top-color: #18181b; }
+.dark .cora-tour-popover.arrow-left::after { border-right-color: #18181b; }
+.dark .cora-tour-popover.arrow-right::after { border-left-color: #18181b; }
+
+/* =============================================================================
+   2. UTILITY OVERRIDES & RESPONSIVE DISPLAY
+   ============================================================================= */
 .hidden {
     display: none !important;
 }
 
-/* Restore responsive overrides when combined with .hidden */
 @media (min-width: 640px) {
     .sm\:flex.hidden, .hidden.sm\:flex { display: flex !important; }
     .sm\:grid.hidden, .hidden.sm\:grid { display: grid !important; }
@@ -112,37 +140,35 @@
     .xl\:inline-flex.hidden, .hidden.xl\:inline-flex { display: inline-flex !important; }
 }
 
+/* =============================================================================
+   3. DESKTOP DRAWER / MODAL STATE (Right-sliding per Rule #1)
+   ============================================================================= */
+@media (min-width: 641px) {
+    aside.collapsed,
+    div.collapsed[id$="-drawer"],
+    div.collapsed[id$="-sheet"],
+    div.collapsed[id$="-modal"],
+    .cora-drawer-sheet.collapsed,
+    .cora-side-drawer.collapsed {
+        transform: translateX(100%) !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+    }
 
-/* =====================================================================
-   COLLAPSED DRAWER / SHEET STATE
-   All sliding drawers use class="collapsed" to indicate closed state.
-   Without this rule, they sit at full-screen size blocking all clicks.
-   ===================================================================== */
-aside.collapsed,
-div.collapsed[id$="-drawer"],
-div.collapsed[id$="-sheet"],
-div.collapsed[id$="-modal"] {
-    transform: translateX(100%) !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
+    aside:not(.collapsed):not(.hidden),
+    div:not(.collapsed)[id$="-drawer"]:not(.hidden),
+    div:not(.collapsed)[id$="-sheet"]:not(.hidden),
+    .cora-drawer-sheet:not(.collapsed):not(.hidden),
+    .cora-side-drawer:not(.collapsed):not(.hidden) {
+        transform: translateX(0) !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+    }
 }
 
-/* Ensure open drawers are always interactive and fully visible */
-aside:not(.collapsed):not(.hidden),
-div:not(.collapsed)[id$="-drawer"]:not(.hidden),
-div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
-    transform: translateX(0) !important;
-    pointer-events: auto;
-    visibility: visible;
-}
-
-/* =====================================================================
-   WP MEDIA MODAL FIXES
-   Ensure WordPress media library modal buttons are not clipped or
-   hidden by Cora's Tailwind resets or overflow rules.
-   ===================================================================== */
-
-/* Force the media modal toolbar footer to always be visible and pinned at the bottom */
+/* =============================================================================
+   4. WP MEDIA MODAL MONOCHROMATIC STYLING
+   ============================================================================= */
 .media-modal .media-frame-toolbar {
     position: absolute !important;
     left: 0 !important;
@@ -192,16 +218,13 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     float: none !important;
 }
 
-/* Style the native WP select/action button to match Cora monochromatic design */
 .media-frame-toolbar button,
 .media-frame-toolbar .button,
 .media-frame-toolbar .button-primary,
 .media-frame-toolbar .media-button,
 .media-frame-toolbar .media-button-select,
 .media-modal .media-frame-toolbar .button.media-button,
-.media-modal .media-frame-toolbar .button.media-button-select,
-.media-modal .media-frame-toolbar .media-button,
-.media-modal .media-frame-toolbar .media-button-select {
+.media-modal .media-frame-toolbar .button.media-button-select {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -227,15 +250,16 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     text-shadow: none !important;
     text-decoration: none !important;
     white-space: nowrap !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
 }
 
 .media-frame-toolbar button:hover,
 .media-frame-toolbar .button:hover,
 .media-frame-toolbar .button-primary:hover,
 .media-frame-toolbar .media-button:hover,
-.media-frame-toolbar .media-button-select:hover,
-.media-modal .media-frame-toolbar .button.media-button:hover,
-.media-modal .media-frame-toolbar .button.media-button-select:hover {
+.media-frame-toolbar .media-button-select:hover {
     background: #27272a !important;
     border-color: #27272a !important;
 }
@@ -244,11 +268,7 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
 .media-frame-toolbar .button:disabled,
 .media-frame-toolbar .button-primary:disabled,
 .media-frame-toolbar .media-button:disabled,
-.media-frame-toolbar .media-button-select:disabled,
-.media-modal .media-frame-toolbar button.button-primary:disabled,
-.media-modal .media-frame-toolbar button.media-button-select:disabled,
-.media-modal .media-frame-toolbar .media-button:disabled,
-.media-modal .media-frame-toolbar .media-button-select:disabled {
+.media-frame-toolbar .media-button-select:disabled {
     opacity: 0.45 !important;
     cursor: not-allowed !important;
     background: #71717a !important;
@@ -257,14 +277,12 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     pointer-events: none !important;
 }
 
-/* Ensure the attachment sidebar is scrollable so button is reachable */
 .media-modal .attachment-details,
 .media-modal .attachment-info {
     overflow-y: auto !important;
     overflow-x: hidden !important;
 }
 
-/* Fix: WP media modal must sit above Cora drawers (z-index: 99999) and below modal content */
 .media-modal-backdrop {
     z-index: 160000 !important;
 }
@@ -272,17 +290,22 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     z-index: 160100 !important;
 }
 
-/* --- KANBAN & CALENDAR PLANNING UTILITIES --- */
+/* =============================================================================
+   5. KANBAN & PLANNING UTILITIES
+   ============================================================================= */
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
 .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .kanban-card-draggable {
     transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
 }
 
 .kanban-card-draggable:hover {
@@ -298,8 +321,13 @@ div:not(.collapsed)[id$="-sheet"]:not(.hidden) {
     border-radius: 12px;
 }
 
-/* --- CORA THEME & AUTO-DARK CONTROL SYSTEM --- */
-/* Lock elements to Light scheme globally to prevent naive mobile browser force-dark color inversions */
+.dark .kanban-cards-dropzone.bg-zinc-100\/50 {
+    background-color: rgba(39, 39, 42, 0.5) !important;
+}
+
+/* =============================================================================
+   6. THEME & COLOR SCHEME CONTROLS
+   ============================================================================= */
 :root,
 html,
 body,
@@ -308,33 +336,17 @@ body,
     color-scheme: only light !important;
 }
 
-/* Content Suite Horizontal Padding (Flush Alignment) */
+/* Streamlined content suite horizontal flush alignment */
 .cora-ct-panel {
     padding-left: 0 !important;
     padding-right: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
-@media (min-width: 640px) {
-    .cora-ct-panel {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
-}
-@media (min-width: 1024px) {
-    .cora-ct-panel {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
-}
 
-/* =====================================================================
-   MOBILE FLOATING ISLAND THEME AND RESPONSIVENESS
-   ===================================================================== */
+/* =============================================================================
+   7. MOBILE FLOATING ISLAND THEME & RESPONSIVENESS
+   ============================================================================= */
 .cora-island-card {
     background-color: rgba(255, 255, 255, 0.95) !important;
     border: 1px solid #e4e4e7 !important;
@@ -347,10 +359,16 @@ body,
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     box-sizing: border-box !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
 }
 
+.dark .cora-island-card {
+    background-color: rgba(24, 24, 27, 0.95) !important;
+    border-color: #27272a !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 4px 12px -2px rgba(0, 0, 0, 0.3) !important;
+}
 
-/* AI Mode View input pill wrapper */
 .cora-island-input-pill {
     background-color: #f4f4f5 !important;
     border: 1px solid #e4e4e7 !important;
@@ -366,8 +384,11 @@ body,
     height: 100% !important;
 }
 
+.dark .cora-island-input-pill {
+    background-color: #27272a !important;
+    border-color: #3f3f46 !important;
+}
 
-/* Ask AI button inside pill */
 .cora-island-ask-btn {
     height: 34px !important;
     padding: 0 16px !important;
@@ -387,15 +408,23 @@ body,
     box-sizing: border-box !important;
     margin-left: 6px !important;
     transition: background-color 0.15s ease !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
 }
-
 
 .cora-island-ask-btn:hover {
     background-color: #27272a !important;
 }
 
+.dark .cora-island-ask-btn {
+    background-color: #ffffff !important;
+    color: #09090b !important;
+}
 
-/* Mobile Island Buttons */
+.dark .cora-island-ask-btn:hover {
+    background-color: #f4f4f5 !important;
+}
+
 .cora-island-btn-menu {
     width: 40px !important;
     height: 40px !important;
@@ -409,8 +438,14 @@ body,
     flex-shrink: 0 !important;
     cursor: pointer !important;
     outline: none !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
 }
 
+.dark .cora-island-btn-menu {
+    background-color: #27272a !important;
+    color: #f4f4f5 !important;
+}
 
 .cora-island-btn-ai {
     width: 40px !important;
@@ -426,8 +461,16 @@ body,
     cursor: pointer !important;
     outline: none !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
 }
 
+.dark .cora-island-btn-ai {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #f4f4f5 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
+}
 
 .cora-island-btn-menu.hidden,
 .cora-island-btn-ai.hidden {
@@ -445,6 +488,8 @@ body,
     border-radius: 10px !important;
     transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
     position: relative !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
 }
 
 .cora-island-nav-link svg {
@@ -477,11 +522,27 @@ body,
     font-weight: 800 !important;
 }
 
-/* ==========================================================================
-   CORA PERFORMANCE & ATOMIC SKELETON LOADING SYSTEM
-   GPU-accelerated, zero-layout-shift (CLS < 0.05) widget wireframes
-   ========================================================================== */
+.dark .cora-island-nav-link {
+    color: #a1a1aa !important;
+}
 
+.dark .cora-island-nav-link:hover,
+.dark .cora-island-nav-link.cora-active {
+    color: #ffffff !important;
+    background: #27272a !important;
+}
+
+.dark .cora-island-nav-link.cora-active svg {
+    stroke: #ffffff !important;
+}
+
+.dark .cora-island-nav-link.cora-active span {
+    color: #ffffff !important;
+}
+
+/* =============================================================================
+   8. PERFORMANCE & ATOMIC SKELETON LOADING SYSTEM
+   ============================================================================= */
 @keyframes cora-skeleton-shimmer {
     0% {
         background-position: -200% 0;
@@ -526,7 +587,6 @@ body,
     width: 100% !important;
 }
 
-/* Smooth Fade-in Hydration */
 .cora-view-fade-in {
     animation: coraViewFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
@@ -542,8 +602,13 @@ body,
     }
 }
 
-/* === CORA MOBILE PWA HIGH-PERFORMANCE ENGINE === */
-html, body, #cora-workspace, .cora-main, #cora-main-content, .cora-content-wrapper, .cora-page-section {
+/* =============================================================================
+   9. MOBILE VIEWPORT ERGONOMICS & ZERO-HORIZONTAL OVERFLOW (375px-430px)
+   ============================================================================= */
+html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
     -webkit-tap-highlight-color: transparent;
     touch-action: pan-x pan-y;
     -webkit-text-size-adjust: 100%;
@@ -552,12 +617,37 @@ html, body, #cora-workspace, .cora-main, #cora-main-content, .cora-content-wrapp
     overscroll-behavior: contain;
 }
 
-button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-island-nav-link, .cora-island-btn-menu, .cora-island-btn-ai, .cora-island-view {
-    touch-action: manipulation;
+#cora-workspace,
+.cora-main,
+#cora-main-content,
+.cora-content-wrapper,
+.cora-page-section {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
     -webkit-tap-highlight-color: transparent;
+    touch-action: pan-x pan-y;
 }
 
-/* Mobile Bottom Navigation Sheet & Island Interaction */
+/* Mobile Smooth Scroll */
+.cora-main, .cora-sidebar, .cora-drawer-scrollable {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior-y: contain;
+}
+
+/* Safe-Area Padding */
+@supports (padding-top: env(safe-area-inset-top)) {
+    #cora-workspace {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
+
+/* =============================================================================
+   10. MOBILE BOTTOM-UP SLIDE SHEETS (Rule #1 & SOP #12 - Zero Mobile Side Drawers)
+   ============================================================================= */
 #cora-mobile-nav-drawer {
     pointer-events: auto !important;
 }
@@ -574,24 +664,74 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     cursor: pointer !important;
 }
 
-/* Mobile Smooth Scroll */
-.cora-main, .cora-sidebar, .cora-drawer-scrollable {
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    overscroll-behavior-y: contain;
-}
+@media (max-width: 640px) {
+    /* Strict Mobile Bottom Sheet standard for all drawer modals */
+    aside[id$="-drawer"],
+    aside[id$="-sheet"],
+    div[id$="-drawer"],
+    div[id$="-sheet"],
+    .cora-drawer-sheet,
+    .cora-bottom-sheet,
+    .cora-side-drawer {
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        height: auto !important;
+        max-height: 85vh !important;
+        border-radius: 24px 24px 0 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-top: 1px solid #e4e4e7 !important;
+        box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.18) !important;
+        transform: translateY(100%) !important;
+        transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease !important;
+    }
 
-/* Standalone PWA Notch & Safe-Area Padding Support */
-@supports (padding-top: env(safe-area-inset-top)) {
-    #cora-workspace {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
+    aside[id$="-drawer"]:not(.collapsed):not(.hidden),
+    aside[id$="-sheet"]:not(.collapsed):not(.hidden),
+    div[id$="-drawer"]:not(.collapsed):not(.hidden),
+    div[id$="-sheet"]:not(.collapsed):not(.hidden),
+    .cora-drawer-sheet:not(.collapsed):not(.hidden),
+    .cora-bottom-sheet:not(.collapsed):not(.hidden),
+    .cora-side-drawer:not(.collapsed):not(.hidden) {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    aside[id$="-drawer"].collapsed,
+    aside[id$="-sheet"].collapsed,
+    div[id$="-drawer"].collapsed,
+    div[id$="-sheet"].collapsed,
+    .cora-drawer-sheet.collapsed,
+    .cora-bottom-sheet.collapsed,
+    .cora-side-drawer.collapsed {
+        transform: translateY(100%) !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    .dark aside[id$="-drawer"],
+    .dark aside[id$="-sheet"],
+    .dark div[id$="-drawer"],
+    .dark div[id$="-sheet"],
+    .dark .cora-drawer-sheet,
+    .dark .cora-bottom-sheet,
+    .dark .cora-side-drawer {
+        background-color: #18181b !important;
+        border-color: #27272a !important;
+        color: #f4f4f5 !important;
     }
 }
 
-/* === CORA PWA IN-APP PULL TO REFRESH PROMINENT INDICATOR === */
+/* =============================================================================
+   11. PULL TO REFRESH PILL INDICATOR
+   ============================================================================= */
 #cora-pwa-pull-indicator {
     position: fixed;
     top: 68px;
@@ -640,24 +780,17 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
 }
 
 @keyframes coraPtrSpin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .cora-ptr-spinning {
     animation: coraPtrSpin 0.75s linear infinite !important;
 }
 
-
-
-/* ==========================================================================
-   CORA TOAST NOTIFICATION SYSTEM (Top-Center Floating, Priority-Aware)
-   Zero overlap with bottom navigation island bar & drawers
-   ========================================================================== */
+/* =============================================================================
+   12. TOAST NOTIFICATION SYSTEM (Top-Center Floating, Priority-Aware)
+   ============================================================================= */
 #cora-toast-container {
     position: fixed !important;
     top: 68px !important;
@@ -703,6 +836,13 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     opacity: 0 !important;
 }
 
+.dark .cora-toast-card {
+    background: #18181b !important;
+    color: #f4f4f5 !important;
+    border-color: #27272a !important;
+    box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.5), 0 4px 12px -2px rgba(0, 0, 0, 0.3) !important;
+}
+
 .cora-toast-icon-wrap {
     display: flex !important;
     align-items: center !important;
@@ -738,6 +878,12 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     border: 1px solid #e4e4e7 !important;
 }
 
+.dark .cora-toast-info .cora-toast-icon-wrap {
+    background: #27272a !important;
+    color: #f4f4f5 !important;
+    border-color: #3f3f46 !important;
+}
+
 .cora-toast-msg-wrap {
     flex: 1 1 auto !important;
     min-width: 0 !important;
@@ -758,6 +904,7 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
 .cora-toast-error .cora-toast-title { color: #dc2626 !important; }
 .cora-toast-warning .cora-toast-title { color: #d97706 !important; }
 .cora-toast-info .cora-toast-title { color: #71717a !important; }
+.dark .cora-toast-info .cora-toast-title { color: #a1a1aa !important; }
 
 .cora-toast-text {
     font-size: 12.5px !important;
@@ -765,6 +912,10 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     color: #18181b !important;
     line-height: 1.35 !important;
     word-break: break-word !important;
+}
+
+.dark .cora-toast-text {
+    color: #f4f4f5 !important;
 }
 
 .cora-toast-action-btn {
@@ -778,11 +929,22 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     cursor: pointer !important;
     white-space: nowrap !important;
     transition: background 0.15s ease, transform 0.1s ease !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
 }
 
 .cora-toast-action-btn:hover {
     background: #27272a !important;
     transform: scale(1.02) !important;
+}
+
+.dark .cora-toast-action-btn {
+    background: #ffffff !important;
+    color: #09090b !important;
+}
+
+.dark .cora-toast-action-btn:hover {
+    background: #e4e4e7 !important;
 }
 
 .cora-toast-close-btn {
@@ -799,6 +961,8 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     cursor: pointer !important;
     transition: color 0.15s ease, background 0.15s ease !important;
     flex-shrink: 0 !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
 }
 
 .cora-toast-close-btn:hover {
@@ -806,9 +970,18 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     background: #f4f4f5 !important;
 }
 
-/* ==========================================================================
-   CORA MODERN PWA INSTALL BOTTOM SHEET MODAL
-   ========================================================================== */
+.dark .cora-toast-close-btn {
+    color: #71717a !important;
+}
+
+.dark .cora-toast-close-btn:hover {
+    color: #ffffff !important;
+    background: #27272a !important;
+}
+
+/* =============================================================================
+   13. CORA PWA INSTALL MODAL / SHEET
+   ============================================================================= */
 #cora-pwa-install-modal {
     display: none !important;
     position: fixed !important;
@@ -854,6 +1027,10 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
+#cora-pwa-install-modal.cora-pwa-sheet-active #cora-pwa-install-sheet {
+    transform: translateY(0) !important;
+}
+
 @media (min-width: 640px) {
     #cora-pwa-install-modal {
         justify-content: center !important;
@@ -871,16 +1048,19 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
     }
 }
 
-#cora-pwa-install-modal.cora-pwa-sheet-active #cora-pwa-install-sheet {
-    transform: translateY(0) !important;
+.dark #cora-pwa-install-sheet {
+    background: #18181b !important;
+    border-color: #27272a !important;
+    color: #f4f4f5 !important;
 }
 
-
-/* ==========================================================================
-   WORKSPACE TEXT SELECTION INTEGRITY
-   Guarantee standard cursor text selection for content paragraphs, codes, inputs,
-   and descriptions while strictly disabling text selection on all interactive controls.
-   ========================================================================== */
+/* =============================================================================
+   14. WORKSPACE TEXT SELECTION & TOUCH ACTION INTEGRITY
+   Scoped text selection: text selection allowed strictly on readable text
+   (p, h1-h6, table cells, code blocks, inputs, prose).
+   All interactive control elements, pills, chips, tabs, buttons, drag handles
+   strictly enforce user-select: none !important and touch-action: manipulation !important.
+   ============================================================================= */
 #cora-workspace-container p,
 #cora-workspace-container h1,
 #cora-workspace-container h2,
@@ -895,25 +1075,67 @@ button, a, input, select, textarea, [role="button"], .cora-nav-item, .cora-islan
 #cora-workspace-container blockquote,
 #cora-workspace-container input,
 #cora-workspace-container textarea,
-#cora-workspace-container [contenteditable="true"] {
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    -ms-user-select: text;
-    user-select: text;
+#cora-workspace-container [contenteditable="true"],
+#cora-workspace p,
+#cora-workspace h1,
+#cora-workspace h2,
+#cora-workspace h3,
+#cora-workspace h4,
+#cora-workspace h5,
+#cora-workspace h6,
+#cora-workspace td,
+#cora-workspace th,
+#cora-workspace pre,
+#cora-workspace code,
+#cora-workspace blockquote,
+#cora-workspace input,
+#cora-workspace textarea,
+#cora-workspace [contenteditable="true"],
+.cora-selectable,
+.cora-selectable *,
+.cora-prose,
+.cora-prose * {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
 }
 
-/* Restrict select-none strictly to functional control elements */
+/* Strict user-select: none and touch-action: manipulation on all functional controls */
 button,
 button *,
 a,
 a *,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
 .cora-btn,
 .cora-btn *,
 .cora-nav-item,
 .cora-nav-item *,
+.cora-nav-link,
+.cora-nav-link *,
+.cora-tab,
+.cora-tab *,
+.tab-btn,
+.tab-btn *,
 .cora-sidebar,
 .cora-topbar,
 .drag-handle,
+.kanban-card-draggable,
+[draggable="true"],
+.gu-mirror,
+.dragula-handle,
+.cora-chip,
+.cora-chip *,
+.cora-pill,
+.cora-pill *,
+.cora-tag,
+.cora-tag *,
+.cora-badge,
+.cora-badge *,
+.cora-status-pill,
+.cora-status-pill *,
 .cora-island-btn-menu,
 .cora-island-btn-menu *,
 .cora-island-btn-ai,
@@ -925,8 +1147,24 @@ a *,
 .cora-ai-gradient-pill,
 .cora-ai-gradient-pill *,
 .cora-island-view,
+.cora-toggle,
+.cora-toggle *,
+.cora-switch,
+.cora-switch *,
+.segmented-control,
+.segmented-control *,
+.segmented-btn,
+.segmented-btn *,
+[data-accordion],
+.accordion-trigger,
+.cora-toast-close-btn,
+.cora-toast-action-btn,
+.cora-drawer-close,
+.cora-modal-close,
 [role="button"],
 [role="button"] *,
+[role="tab"],
+[role="tab"] *,
 [onclick],
 [onclick] * {
     -webkit-user-select: none !important;

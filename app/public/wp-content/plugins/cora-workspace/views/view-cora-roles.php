@@ -44,7 +44,7 @@ if (!in_array($current_user_role, $allowed_roles) && !cora_is_super_owner()) {
       <div class="w-full bg-zinc-100 rounded-full h-1">
         <div class="bg-zinc-900 rounded-full h-1" style="width:100%"></div>
       </div>
-      <p class="text-xs text-zinc-500 m-0 leading-relaxed">Unrestricted god-level access. Can view all workspaces, impersonate users, and manage the entire Cora platform. Only assigned to Shruti.</p>
+      <p class="text-xs text-zinc-500 m-0 leading-relaxed">Unrestricted god-level access. Can view all workspaces, impersonate users, and manage the entire Cora platform. Assigned only to Platform Super Admins.</p>
       <ul class="space-y-1.5 pl-0 m-0 list-none">
         <li class="flex items-start gap-2 text-xs text-zinc-700 "><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5"><polyline points="20 6 9 17 4 12"></polyline></svg>Platform Control Panel</li>
         <li class="flex items-start gap-2 text-xs text-zinc-700 "><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5"><polyline points="20 6 9 17 4 12"></polyline></svg>Impersonate any user</li>

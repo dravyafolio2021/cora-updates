@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
-# Cora Workspace build script
-# Verifies version synchronization, counts PHP guards, and builds release zip
+# Cora Workspace Release Builder & Packaging Pipeline
+# Verifies version synchronization, safety guards, and packages lean release zip
 # ==============================================================================
 
 set -eo pipefail
@@ -33,7 +33,7 @@ if [ "$HEADER_VERSION" != "$CONSTANT_VERSION" ] || [ "$HEADER_VERSION" != "$MANI
     echo "ERROR: Version mismatch detected!" >&2
     exit 1
 fi
-echo "✅ Versions match."
+echo "✅ Versions match ($HEADER_VERSION)."
 
 # Step 2: Perform sanity check on function_exists guards
 echo "Analyzing PHP function definitions and safety guards..."
@@ -50,7 +50,6 @@ fi
 
 UNGUARDED=$((TOTAL_FUNCTIONS - TOTAL_GUARDS))
 if [ "$UNGUARDED" -gt 5 ]; then
-    # We allow a small number of helper functions if they are nested/ignored, but most must be wrapped
     echo "WARNING: There are $UNGUARDED unguarded functions. Checking safety..."
 fi
 echo "✅ Guard analysis complete."
@@ -63,17 +62,58 @@ cd "$PLUGIN_DIR"
 zip -r -q "$OUTPUT_ZIP" "$PLUGIN_NAME" \
   -x "$PLUGIN_NAME/node_modules/*" \
   -x "$PLUGIN_NAME/.git/*" \
+  -x "$PLUGIN_NAME/.env*" \
+  -x "$PLUGIN_NAME/**/.env*" \
   -x "$PLUGIN_NAME/scratch/*" \
   -x "$PLUGIN_NAME/scratch_*" \
+  -x "$PLUGIN_NAME/**/scratch/*" \
   -x "$PLUGIN_NAME/test-results/*" \
+  -x "$PLUGIN_NAME/**/test-results/*" \
+  -x "$PLUGIN_NAME/tests/*" \
   -x "$PLUGIN_NAME/apex-realty-group/*" \
   -x "$PLUGIN_NAME/package-lock.json" \
+  -x "$PLUGIN_NAME/package.json" \
+  -x "$PLUGIN_NAME/tailwind.config.js" \
+  -x "$PLUGIN_NAME/src/*" \
   -x "$PLUGIN_NAME/*.guide.html" \
   -x "$PLUGIN_NAME/*.html" \
-  -x "$PLUGIN_NAME/*.py" \
-  -x "*/.DS_Store"
+  -x "$PLUGIN_NAME/* (*)*" \
+  -x "$PLUGIN_NAME/**/* (*)*" \
+  -x "$PLUGIN_NAME/*.log" \
+  -x "$PLUGIN_NAME/**/*.log" \
+  -x "$PLUGIN_NAME/*.md" \
+  -x "*/.DS_Store" \
+  -x "*.DS_Store"
 
-echo "✅ Packaging complete: $OUTPUT_ZIP"
+# Step 4: Verification of packaged zip
+echo "Verifying release zip integrity..."
+ZIP_ENTRIES=$(unzip -l "$OUTPUT_ZIP")
+
+# Security check: ensure no .env files leaked into zip
+if echo "$ZIP_ENTRIES" | grep -q "\.env"; then
+    echo "ERROR: Security failure: .env file found in release zip!" >&2
+    exit 1
+fi
+
+# Quality check: ensure no parenthesized duplicates leaked into zip
+if echo "$ZIP_ENTRIES" | grep -E "\([0-9]+\)"; then
+    echo "ERROR: Quality failure: duplicate copy files found in release zip!" >&2
+    exit 1
+fi
+
+# Ensure cora-bridge.py is included
+if ! echo "$ZIP_ENTRIES" | grep -q "cora-workspace/cora-bridge.py"; then
+    echo "ERROR: Missing required MCP asset cora-bridge.py in release zip!" >&2
+    exit 1
+fi
+
+# Ensure main plugin file is included
+if ! echo "$ZIP_ENTRIES" | grep -q "cora-workspace/cora-workspace.php"; then
+    echo "ERROR: Missing main plugin file cora-workspace.php in release zip!" >&2
+    exit 1
+fi
+
+echo "✅ Packaging and security verification complete: $OUTPUT_ZIP"
 ZIP_SIZE=$(du -h "$OUTPUT_ZIP" | cut -f1)
 echo "  Zip file size: $ZIP_SIZE"
 echo "======================================="

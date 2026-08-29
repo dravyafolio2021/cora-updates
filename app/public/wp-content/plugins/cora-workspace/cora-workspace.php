@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.6.7
+ * Version: 4.6.8
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.6.7' );
+    define( 'CORA_WORKSPACE_VERSION', '4.6.8' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -531,6 +531,7 @@ add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
 /**
  * Helper to detect if the current request is for the Elementor App/Theme Builder
  */
+if ( ! function_exists( 'cora_is_elementor_app_request' ) ) {
 function cora_is_elementor_app_request() {
     if ( is_admin() ) {
         if ( isset( $_GET['page'] ) && $_GET['page'] === 'elementor-app' ) {
@@ -546,6 +547,7 @@ function cora_is_elementor_app_request() {
         }
     }
     return false;
+}
 }
 
 /**
@@ -1082,10 +1084,10 @@ function cora_user_can_access_workspace( $user_id, $workspace_slug ) {
  */
 if ( ! function_exists( 'cora_get_current_workspace_context' ) ) {
 function cora_get_current_workspace_context() {
-    static $is_resolving_context = false;
     if ( isset( $GLOBALS['cora_active_workspace'] ) && ! empty( $GLOBALS['cora_active_workspace'] ) ) {
         return $GLOBALS['cora_active_workspace'];
     }
+    static $is_resolving_context = false;
     if ( $is_resolving_context ) {
         return array(
             'id' => 1,
@@ -2409,6 +2411,9 @@ add_action( 'init', 'cora_workspace_register_taxonomies' );
  */
 if ( ! function_exists( 'cora_get_active_industry' ) ) {
 function cora_get_active_industry() {
+    if ( isset( $GLOBALS['cora_active_industry_cached'] ) && ! empty( $GLOBALS['cora_active_industry_cached'] ) ) {
+        return $GLOBALS['cora_active_industry_cached'];
+    }
     static $is_resolving_industry = false;
     if ( $is_resolving_industry ) {
         return 'real_estate';
@@ -2585,7 +2590,7 @@ function cora_workspace_register_roles() {
         remove_role( $role );
     }
 
-    add_role( 'cora_shruti', 'Owner (Shruti)', array( 'read' => true ) );
+    add_role( 'cora_shruti', 'Platform Super Admin', array( 'read' => true ) );
     add_role( 'cora_super_admin', 'Workspace Owner', array( 'read' => true ) );
     add_role( 'cora_manager', 'Manager', array( 'read' => true ) );
     add_role( 'cora_branch_manager', 'Branch Manager', array( 'read' => true ) );
@@ -18343,7 +18348,7 @@ function cora_ajax_fetch_client_tasks() {
                 $role_name = 'Senior Editor';
             } elseif ( stripos( $display_name, 'Priya' ) !== false ) {
                 $role_name = 'Videographer';
-            } elseif ( stripos( $display_name, 'Shruti' ) !== false ) {
+            } elseif ( stripos( $display_name, 'Studio Admin' ) !== false ) {
                 $role_name = 'Super Admin';
             }
             
@@ -24526,7 +24531,7 @@ function cora_seed_3_leads_per_column() {
             'status' => 'New Lead',
             'score' => 'hot',
             'format' => 'Video Production',
-            'assignee_name' => 'Shruti ',
+            'assignee_name' => 'Rohan Verma',
             'assignee_role' => 'Super Admin',
             'assignee_init' => 'SS',
             'checklist' => '0/3 (0%)',
@@ -24581,7 +24586,7 @@ function cora_seed_3_leads_per_column() {
             'status' => 'Contacted',
             'score' => 'hot',
             'format' => 'Photoshoot',
-            'assignee_name' => 'Shruti ',
+            'assignee_name' => 'Rohan Verma',
             'assignee_role' => 'Super Admin',
             'assignee_init' => 'SS',
             'checklist' => '1/2 (50%)',
@@ -24636,7 +24641,7 @@ function cora_seed_3_leads_per_column() {
             'status' => 'Site Visit',
             'score' => 'hot',
             'format' => 'Video Production',
-            'assignee_name' => 'Shruti ',
+            'assignee_name' => 'Rohan Verma',
             'assignee_role' => 'Super Admin',
             'assignee_init' => 'SS',
             'checklist' => '3/4 (75%)',
@@ -24691,7 +24696,7 @@ function cora_seed_3_leads_per_column() {
             'status' => 'Negotiation',
             'score' => 'hot',
             'format' => 'Video Production',
-            'assignee_name' => 'Shruti ',
+            'assignee_name' => 'Rohan Verma',
             'assignee_role' => 'Super Admin',
             'assignee_init' => 'SS',
             'checklist' => '2/3 (66%)',
@@ -24746,7 +24751,7 @@ function cora_seed_3_leads_per_column() {
             'status' => 'Converted',
             'score' => 'hot',
             'format' => 'Video Production',
-            'assignee_name' => 'Shruti ',
+            'assignee_name' => 'Rohan Verma',
             'assignee_role' => 'Super Admin',
             'assignee_init' => 'SS',
             'checklist' => '4/4 (100%)',
@@ -35988,7 +35993,7 @@ function cora_ensure_god_super_admin_account() {
         wp_update_user( array(
             'ID'           => $user_id,
             'display_name' => $god_name,
-            'first_name'   => 'Shruti',
+            'first_name'   => 'Studio Admin',
             'last_name'    => 'Bansal'
         ) );
 
@@ -43220,12 +43225,14 @@ When the user asks you to perform an action, append one of the following tags at
 }
 
 // Helper to extract titles from prompt
+if ( ! function_exists( 'preg_html_title_extract' ) ) {
 function preg_html_title_extract($prompt, &$title) {
     if (preg_match('/(?:titled|about|named|for)\s+["\']?([^"\']+)["\']?/i', $prompt, $matches)) {
         $title = sanitize_text_field($matches[1]);
         return true;
     }
     return false;
+}
 }
 
 // =========================================================================

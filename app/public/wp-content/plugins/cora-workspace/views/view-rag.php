@@ -425,13 +425,12 @@ function editRagResource(id) {
 }
 
 function deleteRagResource(id) {
-    if (!window.coraConfirmAction) {
-        if (!confirm('Are you sure you want to remove this resource from the Living Knowledge Base?')) return;
-        executeDeleteRagResource(id);
-    } else {
+    if (window.coraConfirmAction) {
         window.coraConfirmAction('Remove Knowledge Fragment', 'Are you sure you want to remove this resource fragment from the AI second brain?', function() {
             executeDeleteRagResource(id);
         });
+    } else {
+        executeDeleteRagResource(id);
     }
 }
 

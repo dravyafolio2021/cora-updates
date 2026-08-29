@@ -49,10 +49,23 @@
         };
 
         // Auto-click "Take Over" modal button if it appears
-        setInterval(function () {
-            document.querySelectorAll('button').forEach(function (btn) {
-                if (btn.textContent.trim() === 'Take Over') btn.click();
-            });
+        function handleTakeOver() {
+            var buttons = document.querySelectorAll('button');
+            for (var i = 0; i < buttons.length; i++) {
+                if (buttons[i].textContent.trim() === 'Take Over') {
+                    buttons[i].click();
+                    break;
+                }
+            }
+        }
+        handleTakeOver();
+        var takeOverAttempts = 0;
+        var takeOverInterval = setInterval(function () {
+            handleTakeOver();
+            takeOverAttempts++;
+            if (takeOverAttempts > 20) {
+                clearInterval(takeOverInterval);
+            }
         }, 500);
 
         // Attempt toolbar injection on various Elementor lifecycle hooks
@@ -71,6 +84,7 @@
 
         // MutationObserver for continuous white-labeling + toolbar persistence
         var observer = new MutationObserver(function () {
+            handleTakeOver();
             whiteLabelElementor();
             // Re-inject toolbar if it was removed by Elementor re-renders
             if (!document.getElementById('cora-editor-toolbar')) {

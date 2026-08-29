@@ -241,17 +241,53 @@ jQuery(document).ready(function($) {
         wp.media.prototype = originalMedia.prototype;
     }
 
-    // Sidebar Scroll Persistence
+    // Sidebar Scroll Persistence (Throttled & Passive for 60fps)
     const sidebarScrollContainer = document.getElementById('cora-sidebar-scroll-container');
     if (sidebarScrollContainer) {
         const savedScroll = sessionStorage.getItem('coraSidebarScroll');
         if (savedScroll) {
             sidebarScrollContainer.scrollTop = parseInt(savedScroll, 10);
         }
+        let sidebarScrollRaf = null;
         sidebarScrollContainer.addEventListener('scroll', function() {
-            sessionStorage.setItem('coraSidebarScroll', sidebarScrollContainer.scrollTop);
-        });
+            if (!sidebarScrollRaf) {
+                sidebarScrollRaf = requestAnimationFrame(function() {
+                    sessionStorage.setItem('coraSidebarScroll', sidebarScrollContainer.scrollTop);
+                    sidebarScrollRaf = null;
+                });
+            }
+        }, { passive: true });
     }
+
+    // Platform-Wide Confirmation Drawer System
+    window.coraConfirmAction = function(title, message, onConfirm) {
+        if (typeof jQuery === 'undefined') {
+            if (typeof onConfirm === 'function') onConfirm();
+            return;
+        }
+        const $ = jQuery;
+        if ($('#cora-confirm-modal').length === 0) {
+            $('body').append(`
+                <div id="cora-confirm-modal" class="fixed inset-0 z-[999999] flex items-center justify-center hidden bg-zinc-900/40 backdrop-blur-xs transition-opacity duration-300">
+                    <div class="bg-white border border-zinc-200 rounded-xl p-6 shadow-2xl max-w-sm w-full space-y-4">
+                        <h3 class="text-sm font-bold text-zinc-900" id="cora-confirm-title"></h3>
+                        <p class="text-xs text-zinc-500 leading-relaxed" id="cora-confirm-message"></p>
+                        <div class="flex items-center justify-end gap-3">
+                            <button type="button" class="px-3.5 py-1.5 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-all cursor-pointer" onclick="jQuery('#cora-confirm-modal').addClass('hidden')">Cancel</button>
+                            <button type="button" id="cora-confirm-btn" class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs transition-all cursor-pointer">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+        $('#cora-confirm-title').text(title || 'Confirm Action');
+        $('#cora-confirm-message').text(message || 'Are you sure you want to continue?');
+        $('#cora-confirm-btn').off('click').on('click', function() {
+            $('#cora-confirm-modal').addClass('hidden');
+            if (typeof onConfirm === 'function') onConfirm();
+        });
+        $('#cora-confirm-modal').removeClass('hidden');
+    };
 
     // Custom Toast Notification System (Top-Center Floating, Priority-Aware, Zero Overlap)
     window.coraShowToast = function(message, type = 'info', actionConfig = null) {
@@ -4219,15 +4255,23 @@ jQuery(document).ready(function($) {
         });
     });
 
-    window.coraCopyShareLink = function() {
-        const copyText = document.getElementById("cora-share-link-input");
-        copyText.select();
-        copyText.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(copyText.value).then(() => {
-            window.coraShowToast("Share link copied to clipboard!");
-        }).catch(() => {
-            window.coraShowToast("Failed to copy link.");
-        });
+    window.coraCopyShareLink = function(url) {
+        let textToCopy = (typeof url === 'string' && url.trim()) ? url.trim() : null;
+        if (!textToCopy) {
+            const copyText = document.getElementById("cora-share-link-input");
+            if (copyText && copyText.value) {
+                textToCopy = copyText.value.trim();
+            }
+        }
+        if (textToCopy && navigator.clipboard) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                window.coraShowToast("Shareable link copied to clipboard!", "success");
+            }).catch(() => {
+                window.coraShowToast("Failed to copy link.", "error");
+            });
+        } else {
+            window.coraShowToast("No link available to copy.");
+        }
     };
 
     $('#cora-vault-filters').on('click', '.cora-filter-btn', function() {
@@ -5577,12 +5621,6 @@ jQuery(document).ready(function($) {
             } else {
                 window.coraShowToast(res.data || 'Failed to delete portfolio.');
             }
-        });
-    };
-
-    window.coraCopyShareLink = function(url) {
-        navigator.clipboard.writeText(url).then(function() {
-            window.coraShowToast("Shareable link copied to clipboard!");
         });
     };
 
@@ -10665,21 +10703,15 @@ jQuery(document).ready(function($) {
         setTimeout(() => location.reload(), 1000);
     };
     window.coraOpenCommentReplyModal = function(id, author, excerpt) {
-        $('#cora-reply-comment-id').val(id);
-        $('#cora-reply-target-author').text(author);
-        $('#cora-reply-target-excerpt').text(excerpt);
-        $('#cora-reply-content').val('');
-        $('#cora-modal-reply-comment').addClass('active');
-    };
-    window.coraSubmitCommentReply = function() {
-        const content = $('#cora-reply-content').val().trim();
-        if (!content) {
-            window.coraShowToast("Reply content cannot be empty.");
-            return;
+        if (typeof window.coraOpenCommentReplyDrawer === 'function') {
+            window.coraOpenCommentReplyDrawer(id, author, excerpt);
+        } else {
+            $('#cora-reply-comment-id').val(id);
+            $('#cora-reply-target-author').text(author);
+            $('#cora-reply-target-excerpt').text(excerpt);
+            $('#cora-reply-content').val('');
+            $('#cora-modal-reply-comment').addClass('active');
         }
-        window.coraShowToast("Submitting reply and notifying author...");
-        coraCloseModals();
-        setTimeout(() => location.reload(), 1000);
     };
     window.coraUpdateCommentStatus = function(id, action) {
         window.coraShowToast(`Updating comment #${id} status to: ${action}...`);
@@ -10725,29 +10757,6 @@ jQuery(document).ready(function($) {
     window.coraTriggerImport = function() {
         window.coraShowToast("Scanning import manifest and verifying asset integrity...");
         setTimeout(() => window.coraShowToast("Import simulation complete: 0 errors detected."), 1500);
-    };
-    window.coraConfirmAction = function(title, message, onConfirm) {
-        if ($('#cora-confirm-modal').length === 0) {
-            $('body').append(`
-                <div id="cora-confirm-modal" class="fixed inset-0 z-[999999] flex items-center justify-center hidden bg-zinc-900/40 backdrop-blur-xs transition-opacity duration-300">
-                    <div class="bg-white border border-zinc-200 rounded-xl p-6 shadow-2xl max-w-sm w-full space-y-4">
-                        <h3 class="text-sm font-bold text-zinc-900" id="cora-confirm-title"></h3>
-                        <p class="text-xs text-zinc-500 leading-relaxed" id="cora-confirm-message"></p>
-                        <div class="flex items-center justify-end gap-3">
-                            <button class="px-3.5 py-1.5 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-all cursor-pointer" onclick="$('#cora-confirm-modal').addClass('hidden')">Cancel</button>
-                            <button id="cora-confirm-btn" class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs transition-all cursor-pointer">Confirm</button>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
-        $('#cora-confirm-title').text(title);
-        $('#cora-confirm-message').text(message);
-        $('#cora-confirm-btn').off('click').on('click', function() {
-            $('#cora-confirm-modal').addClass('hidden');
-            onConfirm();
-        });
-        $('#cora-confirm-modal').removeClass('hidden');
     };
 
     window.coraSaveAppearanceSettings = function() {
@@ -11134,75 +11143,6 @@ jQuery(document).ready(function($) {
         img.css('transform', 'rotate(' + currentRotation + 'deg) scale(' + scaleX + ',' + scaleY + ')');
     };
 
-    window.coraSaveEditedImage = function() {
-        const attachmentId = $('#cora-meta-attachment-id').val() || $('#cora-editor-media-select').val();
-        const width = $('#cora-scale-width').val();
-        const height = $('#cora-scale-height').val();
-        const img = $('#cora-editor-preview-img');
-        const rotate = img.data('rotate') || 0;
-        const scaleX = img.data('scalex') || 1;
-        const scaleY = img.data('scaley') || 1;
-        let flip = null;
-        if (scaleX === -1) flip = 'h';
-        else if (scaleY === -1) flip = 'v';
-
-        window.coraShowToast("Saving image transformations...");
-
-        if (typeof coraREData !== 'undefined' && coraREData.ajaxUrl && coraREData.ajaxNonce && attachmentId && attachmentId !== '0') {
-            $.post(coraREData.ajaxUrl, {
-                action: 'cora_save_edited_image',
-                nonce: coraREData.ajaxNonce,
-                attachment_id: attachmentId,
-                rotate: rotate,
-                flip: flip,
-                width: width,
-                height: height
-            }, function(res) {
-                if (res.success) {
-                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Image saved successfully.');
-                } else {
-                    window.coraShowToast('Image saved successfully.');
-                }
-            }).fail(function() {
-                window.coraShowToast('Image saved successfully.');
-            });
-        } else {
-            window.coraShowToast('Image saved successfully.');
-        }
-    };
-
-    window.coraSaveMediaMetadata = function() {
-        const attachmentId = $('#cora-meta-attachment-id').val() || $('#cora-editor-media-select').val();
-        const title = $('#cora-meta-title').val();
-        const alt = $('#cora-meta-alt').val();
-        const caption = $('#cora-meta-caption').val();
-        const description = $('#cora-meta-description').val();
-
-        window.coraShowToast("Updating SEO metadata...");
-
-        if (typeof coraREData !== 'undefined' && coraREData.ajaxUrl && coraREData.ajaxNonce && attachmentId && attachmentId !== '0') {
-            $.post(coraREData.ajaxUrl, {
-                action: 'cora_save_media_metadata',
-                nonce: coraREData.ajaxNonce,
-                attachment_id: attachmentId,
-                title: title,
-                alt: alt,
-                caption: caption,
-                description: description
-            }, function(res) {
-                if (res.success) {
-                    window.coraShowToast(res.data && res.data.message ? res.data.message : 'Media metadata updated successfully.');
-                } else {
-                    window.coraShowToast('Media metadata updated successfully.');
-                }
-            }).fail(function() {
-                window.coraShowToast('Media metadata updated successfully.');
-            });
-        } else {
-            window.coraShowToast('Media metadata updated successfully.');
-        }
-    };
-
     // ==========================================
     // MODULE 5: MEDIA EDITOR SUITE
     // ==========================================
@@ -11559,7 +11499,7 @@ jQuery(document).ready(function($) {
     };
 
     window.coraSaveMediaMetadata = function() {
-        const attachmentId = $('#cora-meta-attachment-id').val() || 0;
+        const attachmentId = $('#cora-meta-attachment-id').val() || $('#cora-editor-media-select').val() || 0;
         const title = $('#cora-meta-title').val() || '';
         const alt = $('#cora-meta-alt').val() || '';
         const caption = $('#cora-meta-caption').val() || '';
@@ -11590,7 +11530,7 @@ jQuery(document).ready(function($) {
     };
 
     window.coraSaveEditedImage = function() {
-        const attachmentId = $('#cora-meta-attachment-id').val() || 0;
+        const attachmentId = $('#cora-meta-attachment-id').val() || $('#cora-editor-media-select').val() || 0;
         const img = $('#cora-editor-preview-img');
         if (!attachmentId || img.length === 0) {
             window.coraShowToast("No media selected to apply transformations.");

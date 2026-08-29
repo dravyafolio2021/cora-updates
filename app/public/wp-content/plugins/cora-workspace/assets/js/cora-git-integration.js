@@ -41,7 +41,14 @@
 
     /* ── Inject Git button (replace Kit) ─────────────────────────────────── */
     function injectGitButton() {
+        var attempts = 0;
         var interval = setInterval(function () {
+            attempts++;
+            if (attempts > 60) {
+                clearInterval(interval);
+                return;
+            }
+
             // Hide Kit button
             var kitBtn = null;
             document.querySelectorAll('button').forEach(function (btn) {

@@ -6,6 +6,6 @@
     "tested": "6.7",
     "sections": {
         "description": "A unified, modular workspace platform for any business industry. Supports Real Estate agencies, Photography Studios, and more — all in one plugin with dynamic module switching, industry onboarding, and one-click auto-updates.",
-        "changelog": "<h4>2.2.1 — Industry Mode Switcher & Workspace Scoping</h4><ul><li><strong>Industry Mode Switcher</strong>: Dedicated Shruti Admin toggle in sidebar header to switch between Real Estate and Studio modes in 1 click.</li><li><strong>Independent Workspace Scoping</strong>: Multi-user workspace data isolation per domain slug (app.heycora.in/{{slug}}).</li><li><strong>Role Permission Seeding</strong>: Updated default capability matrices for all Real Estate and Studio roles.</li></ul>"
+        "changelog": "<h4>2.2.1 — Industry Mode Switcher & Workspace Scoping</h4><ul><li><strong>Industry Mode Switcher</strong>: Dedicated Studio Admin toggle in sidebar header to switch between Real Estate and Studio modes in 1 click.</li><li><strong>Independent Workspace Scoping</strong>: Multi-user workspace data isolation per domain slug (app.heycora.in/{{slug}}).</li><li><strong>Role Permission Seeding</strong>: Updated default capability matrices for all Real Estate and Studio roles.</li></ul>"
     }
 }
