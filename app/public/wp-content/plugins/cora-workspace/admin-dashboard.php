@@ -2015,17 +2015,25 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
 
         @media (max-width: 767px) {
-            /* Force slide from bottom for all drawers on mobile */
+            /* Closed drawers must always be hidden offscreen with zero pointer events on mobile */
             aside.collapsed,
             aside[id*="-drawer"].collapsed,
             aside[id$="-drawer"].collapsed,
+            aside[id*="-drawer"].translate-x-full,
+            aside[id$="-drawer"].translate-x-full,
             [class*="drawer"].collapsed,
             [id*="-drawer"].translate-x-full,
-            [class*="drawer"].translate-x-full {
+            [class*="drawer"].translate-x-full,
+            aside[id$="-drawer"]:not(.open) {
                 transform: translateY(100%) !important;
+                pointer-events: none !important;
+                visibility: hidden !important;
+                display: none !important;
             }
             
-            aside[id$="-drawer"] {
+            /* Only explicitly open drawers slide up as bottom sheet on mobile */
+            aside[id$="-drawer"].open,
+            aside[id*="-drawer"].open {
                 top: auto !important;
                 bottom: 0 !important;
                 left: 0 !important;
@@ -2045,19 +2053,21 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 z-index: 9995 !important;
                 margin-bottom: 0 !important;
                 padding-bottom: 0 !important;
-            }
-            
-            aside[id$="-drawer"].collapsed {
-                transform: translateY(100%) !important;
-                pointer-events: none !important;
-                visibility: hidden !important;
-                display: none !important;
+                pointer-events: auto !important;
+                visibility: visible !important;
+                display: flex !important;
             }
 
             /* Adjust drawer footer for bottom safe area inset */
             aside[id$="-drawer"] .border-t,
             aside[id$="-drawer"] form > div.shrink-0 {
                 padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+            }
+
+            /* Collapsed mobile sidebar */
+            .cora-sidebar.-translate-x-full,
+            .cora-sidebar:not(.open) {
+                pointer-events: none !important;
             }
         }
 
@@ -3712,7 +3722,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <!-- Workspace Main Container (Sidebar + Content Row) -->
     <div class="flex flex-row flex-1 min-h-0 relative w-full lg:overflow-hidden">
     <!-- Workspace Sidebar -->
-    <aside class="cora-sidebar w-64 bg-[#f9fafb]#0c0c0e] border-r border-zinc-200/80 flex flex-col shrink-0 h-[calc(100vh-52px)] fixed lg:sticky top-[52px] left-0 z-50 lg:z-30 transition-all duration-200 transform -translate-x-full lg:translate-x-0">
+    <aside class="cora-sidebar w-64 bg-[#f9fafb] dark:bg-[#0c0c0e] border-r border-zinc-200/80 flex flex-col shrink-0 h-[calc(100vh-52px)] fixed lg:sticky top-[52px] left-0 z-50 lg:z-30 transition-all duration-200 transform -translate-x-full lg:translate-x-0">
         <!-- Sidebar Top Header / Brand Logo & Toggle -->
         <?php
         $cora_active_workspace = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array( 'id' => 1, 'name' => 'Workspace', 'slug' => 'workspace', 'plan' => 'enterprise', 'status' => 'active' );

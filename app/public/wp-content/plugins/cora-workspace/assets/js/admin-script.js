@@ -444,6 +444,11 @@ jQuery(document).ready(function($) {
             const anchor = e.target.closest('a');
             if (!anchor) return;
 
+            // Skip anchor tags with custom onclick handlers, JS protocol, or modal triggers
+            if (anchor.hasAttribute('onclick') || anchor.hasAttribute('data-island-target') || anchor.classList.contains('cora-island-nav-link') || anchor.classList.contains('cora-nav-item')) {
+                return;
+            }
+
             const href = anchor.getAttribute('href');
             if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('tel:') || href.startsWith('mailto:') || href.startsWith('sms:') || href.startsWith('https://wa.me')) {
                 return;
@@ -453,16 +458,15 @@ jQuery(document).ready(function($) {
                 const targetUrl = new URL(anchor.href, window.location.origin);
                 // Retain all internal same-origin links inside the standalone WebApp window
                 if (targetUrl.origin === window.location.origin) {
-                    if (isStandalone) {
+                    if (isStandalone && !anchor.target) {
                         e.preventDefault();
-                        e.stopPropagation();
                         window.location.href = targetUrl.pathname + targetUrl.search + targetUrl.hash;
                     }
                 }
             } catch (err) {
                 // Ignore URL parse errors
             }
-        }, true);
+        }, false);
 
         // 2. High-Performance In-App Pull-to-Refresh Engine (prevents native browser breakout)
         let touchStartY = 0;
