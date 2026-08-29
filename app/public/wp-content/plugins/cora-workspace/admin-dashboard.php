@@ -5315,8 +5315,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </p>
                     </div>
 
-                    <!-- 3. Universal Command Search -->
-                    <div class="w-full max-w-xl mx-auto mt-11 sm:mt-14 mb-8 sm:mb-11 px-2 sm:px-0 relative z-[999]" id="cora-search-container">
+                    <!-- 3. Universal Command Search (Hidden on Mobile) -->
+                    <div class="hidden sm:block w-full max-w-xl mx-auto mt-11 sm:mt-14 mb-8 sm:mb-11 px-2 sm:px-0 relative z-[999]" id="cora-search-container">
                         <div class="relative flex items-center bg-white/95 backdrop-blur-md border border-zinc-200 hover:border-zinc-300 focus-within:border-zinc-900 focus-within:ring-2 focus-within:ring-zinc-900/10 rounded-full shadow-2xs transition-all duration-200 p-1.5 pl-3.5 pr-2">
                             <span class="text-zinc-400 mr-2 flex shrink-0">
                                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
@@ -5356,7 +5356,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
 
                     <!-- 4. Quick Action Shortcuts Pill Bar (3-Row Layout: 2 Permanent, 3 Dynamic, 1 Custom Trigger) -->
-                    <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-2.5 sm:gap-3 py-1 select-none mb-20 sm:mb-28" style="margin-bottom: 80px;">
+                    <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-2.5 sm:gap-3 py-1 select-none mt-5 sm:mt-0 mb-6 sm:mb-28">
                         
                         <!-- Row 1: 2 Permanent Action Chips -->
                         <div id="cora-permanent-actions-row" class="flex items-center justify-center gap-2 sm:gap-2.5 flex-nowrap">
@@ -5436,7 +5436,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         $studio_retainer_calc = $dynamic_revenue_total > 0 ? cora_format_rupees( round( $dynamic_revenue_total * 0.5 ) ) : '₹0';
                     ?>
                     <!-- STUDIO ROW 1: 3 EQUAL COLUMNS (LINEAR / RAYCAST STYLE - 100% REAL DATA) -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 w-full">
+                    <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 w-full">
                         
                         <!-- CARD 1: Retainer Billing & GST Tax -->
                         <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
@@ -5570,7 +5570,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
 
                     <!-- STUDIO ROW 2: 2 COLUMNS (WIDE POST-PRODUCTION + CONTRACTS) -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+                    <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
                         
                         <!-- CARD 4: Autonomous Post-Production Pipeline (Spans 2 Columns) -->
                         <div class="md:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[320px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
@@ -5680,7 +5680,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         $pipeline_val = cora_format_rupees( $dynamic_revenue_total );
                     ?>
                     <!-- REAL ESTATE / GLOBAL ROW 1: 3 EQUAL COLUMNS (LINEAR / RAYCAST STYLE - 100% REAL DATA) -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 w-full">
+                    <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 w-full">
                         
                         <!-- CARD 1: Speed-to-Lead Instant Response Desk -->
                         <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[380px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
@@ -5817,7 +5817,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     </div>
 
                     <!-- REAL ESTATE / GLOBAL ROW 2: 2 COLUMNS (WIDE LEAD FOLLOW-UPS + LOCAL SEO - 100% REAL DATA) -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+                    <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
                         
                         <!-- CARD 4: Autonomous Lead Follow-Up Engine (Spans 2 Columns) -->
                         <div class="md:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-6 flex flex-col justify-between min-h-[320px] shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group">
