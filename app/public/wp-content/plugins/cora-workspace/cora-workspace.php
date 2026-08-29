@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.8.0
+ * Version: 4.8.1
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.0' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.1' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -30164,8 +30164,11 @@ function cora_ajax_canvas_create_page() {
         update_post_meta( $wp_post_id, '_elementor_template_type', 'page' );
         update_post_meta( $wp_post_id, '_elementor_data', wp_slash( json_encode( array() ) ) );
 
-        // Select the appropriate template based on requested layout (always default to Elementor Full Width)
-        update_post_meta( $wp_post_id, '_wp_page_template', 'elementor_header_footer' );
+        // Select the appropriate template based on requested layout:
+        // 'canvas' -> elementor_canvas (No Header / Footer)
+        // 'default' or anything else -> elementor_header_footer (With Header & Footer)
+        $wp_template = ( $template === 'canvas' || $template === 'elementor_canvas' ) ? 'elementor_canvas' : 'elementor_header_footer';
+        update_post_meta( $wp_post_id, '_wp_page_template', $wp_template );
     }
 
     $wpdb->insert(

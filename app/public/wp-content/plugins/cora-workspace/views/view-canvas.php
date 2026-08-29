@@ -2841,12 +2841,10 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2">
-                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Layout Template</label>
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Layout</label>
                     <select id="new-page-template-input" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium">
-                        <option value="agency">Agency</option>
-                        <option value="brokerage">Brokerage</option>
-                        <option value="minimal">Minimal</option>
-                        <option value="landing-page">Landing Page</option>
+                        <option value="default">Default (Header &amp; Footer)</option>
+                        <option value="canvas">Canvas (No Header / Footer)</option>
                     </select>
                 </div>
                 <div class="space-y-2">
@@ -5474,7 +5472,7 @@ function cora_get_sparkline_points( $history, $type ) {
         // Reset inputs
         jQuery('#new-page-title-input').val('');
         jQuery('#new-page-slug-input').val('');
-        jQuery('#new-page-template-input').val('landing-page');
+        jQuery('#new-page-template-input').val('default');
         jQuery('#new-page-status-input').val('draft');
 
         const modal = jQuery('#drawer-new-page');
