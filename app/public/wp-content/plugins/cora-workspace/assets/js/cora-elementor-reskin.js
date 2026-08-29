@@ -662,7 +662,11 @@
     }
 
     function getBackUrl() {
-        return window.location.origin + '/wp-admin/admin.php?page=cora-workspace&sub_page=canvas';
+        if (typeof coraEditorContext !== 'undefined' && coraEditorContext.canvasUrl) {
+            return coraEditorContext.canvasUrl;
+        }
+        var wsSlug = (typeof coraEditorContext !== 'undefined' && coraEditorContext.wsSlug) ? coraEditorContext.wsSlug : 'workspace';
+        return window.location.origin + '/' + wsSlug + '/canvas';
     }
 
     function escHtml(str) {

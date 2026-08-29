@@ -86,7 +86,7 @@ if ( ! $header_rendered ) {
     ?>
     <header id="cora-canvas-site-header" style="width: 100%; background-color: #ffffff; border-bottom: 1px solid #e4e4e7; padding: 14px 24px; position: sticky; top: 0; z-index: 999; display: flex; align-items: center; justify-content: space-between; font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" style="display: flex; align-items: center; gap: 8px; color: #18181b; font-weight: 700; font-size: 16px; text-decoration: none; letter-spacing: -0.01em;">
+            <a href="<?php echo esc_url( function_exists( 'cora_canvas_normalize_tenant_site_url' ) ? cora_canvas_normalize_tenant_site_url( '/' ) : home_url( '/' ) ); ?>" style="display: flex; align-items: center; gap: 8px; color: #18181b; font-weight: 700; font-size: 16px; text-decoration: none; letter-spacing: -0.01em;">
                 <?php if ( $logo_img ) : ?>
                     <?php echo $logo_img; ?>
                 <?php else : ?>
@@ -99,10 +99,11 @@ if ( ! $header_rendered ) {
             $pages = get_pages( array( 'number' => 6, 'sort_column' => 'menu_order' ) );
             if ( ! empty( $pages ) ) {
                 foreach ( $pages as $p ) {
-                    echo '<a href="' . esc_url( get_permalink( $p->ID ) ) . '" style="color: #52525b; text-decoration: none; transition: color 0.15s ease;">' . esc_html( $p->post_title ) . '</a>';
+                    $p_url = function_exists( 'cora_canvas_normalize_tenant_site_url' ) ? cora_canvas_normalize_tenant_site_url( '/' . $p->post_name ) : get_permalink( $p->ID );
+                    echo '<a href="' . esc_url( $p_url ) . '" style="color: #52525b; text-decoration: none; transition: color 0.15s ease;">' . esc_html( $p->post_title ) . '</a>';
                 }
             } else {
-                echo '<a href="' . esc_url( home_url( '/' ) ) . '" style="color: #52525b; text-decoration: none;">Home</a>';
+                echo '<a href="' . esc_url( function_exists( 'cora_canvas_normalize_tenant_site_url' ) ? cora_canvas_normalize_tenant_site_url( '/' ) : home_url( '/' ) ) . '" style="color: #52525b; text-decoration: none;">Home</a>';
             }
             ?>
         </nav>
@@ -150,7 +151,47 @@ if ( isset( $GLOBALS['cora_preview_bar_script'] ) ) {
 }
 
 wp_footer();
-echo '<style>html, body { overflow-x: hidden !important; } body.hostinger-ai-builder-elementor, body.hostinger-ai-builder-gutenberg { padding-top: 0px !important; } #wpadminbar { display: none !important; } body.admin-bar { margin-top: 0 !important; padding-top: 0 !important; } *, *:before, *:after { max-width: 100% !important; box-sizing: border-box !important; }</style>';
-echo '</body>';
-echo '</html>';
+
+$ws_slug_for_js = ! empty( $GLOBALS['cora_active_workspace_site_slug'] ) ? $GLOBALS['cora_active_workspace_site_slug'] : ( ! empty( $ws['slug'] ) ? $ws['slug'] : 'workspace' );
+$preview_theme_id_for_js = function_exists( 'cora_get_preview_theme_id' ) ? intval( cora_get_preview_theme_id() ) : 0;
+?>
+<script id="cora-tenant-link-normalizer">
+(function() {
+    var wsSlug = <?php echo json_encode( $ws_slug_for_js ); ?>;
+    var previewThemeId = <?php echo json_encode( $preview_theme_id_for_js ); ?>;
+    var origin = window.location.origin;
+
+    document.addEventListener('click', function(e) {
+        var anchor = e.target.closest('a');
+        if (!anchor) return;
+        var href = anchor.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+
+        var url;
+        try {
+            url = new URL(href, window.location.href);
+        } catch(err) {
+            return;
+        }
+
+        if (url.origin === origin) {
+            var pathname = url.pathname;
+            if (!pathname.startsWith('/site/') && !pathname.startsWith('/workspace') && !pathname.startsWith('/wp-admin') && !pathname.startsWith('/wp-login')) {
+                e.preventDefault();
+                var cleanPath = pathname.replace(/^\/+/, '');
+                var newPath = cleanPath ? ('/site/' + wsSlug + '/' + cleanPath) : ('/site/' + wsSlug + '/');
+                if (previewThemeId && !url.searchParams.has('cv_preview_theme')) {
+                    url.searchParams.set('cv_preview_theme', previewThemeId);
+                }
+                url.pathname = newPath;
+                window.location.href = url.toString();
+            }
+        }
+    }, true);
+})();
+</script>
+<style>html, body { overflow-x: hidden !important; } body.hostinger-ai-builder-elementor, body.hostinger-ai-builder-gutenberg { padding-top: 0px !important; } #wpadminbar { display: none !important; } body.admin-bar { margin-top: 0 !important; padding-top: 0 !important; } *, *:before, *:after { max-width: 100% !important; box-sizing: border-box !important; }</style>
+</body>
+</html>
+<?php
 exit;

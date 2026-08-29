@@ -74,29 +74,26 @@ $themes = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes O
 // Fetch WP pages for dropdown selectors
 $wp_pages = get_pages();
 
-// Fetch real WordPress nav menus so Canvas UI and Elementor stay in sync
+// Fetch real WordPress nav menus lookup
 $wp_nav_menus_raw = wp_get_nav_menus();
-$wp_nav_menus_for_js = array();
+$wp_nav_menus_by_name = array();
 foreach ( $wp_nav_menus_raw as $nav_menu ) {
-    $menu_items_raw = wp_get_nav_menu_items( $nav_menu->term_id );
-    $menu_items     = array();
-    if ( $menu_items_raw ) {
-        foreach ( $menu_items_raw as $item ) {
-            $menu_items[] = array(
-                'id'     => 'mi_' . $item->ID,
-                'label'  => $item->title,
-                'url'    => $item->url,
-                'newTab' => (bool) $item->target,
-                'level'  => (int) $item->menu_item_parent > 0 ? 1 : 0,
-            );
-        }
-    }
-    $wp_nav_menus_for_js[] = array(
-        'id'         => 'menu_wp_' . $nav_menu->term_id,
-        'wp_term_id' => $nav_menu->term_id,
-        'name'       => $nav_menu->name,
-        'handle'     => $nav_menu->slug,
-        'items'      => $menu_items,
+    $wp_nav_menus_by_name[ strtolower( $nav_menu->name ) ] = $nav_menu->term_id;
+}
+
+// Scoped menus for the active theme
+$theme_menus_for_js = array();
+if ( ! empty( $live_settings['menus'] ) && is_array( $live_settings['menus'] ) ) {
+    $theme_menus_for_js = $live_settings['menus'];
+} else {
+    // Default clean Main menu for the theme
+    $theme_menus_for_js = array(
+        array(
+            'id'     => 'menu_main_' . ( $live_theme ? $live_theme['id'] : 'default' ),
+            'name'   => 'Main menu',
+            'handle' => 'main-menu',
+            'items'  => array(),
+        ),
     );
 }
 
@@ -557,16 +554,9 @@ function cora_get_sparkline_points( $history, $type ) {
                 if ( empty( $ls['seo_title'] ) || empty( $ls['seo_description'] ) ) $seo_issues++;
             }
 
-            // Resolve the actual frontend website homepage URL
-            $live_homepage = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $live_theme['id'] ), ARRAY_A );
-            if ( ! $live_homepage ) {
-                $live_homepage = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY id ASC LIMIT 1", $live_theme['id'] ), ARRAY_A );
-            }
-            $canvas_preview_url = ( $live_homepage && ! empty( $live_homepage['wp_post_id'] ) ) ? get_permalink( intval( $live_homepage['wp_post_id'] ) ) : '';
-            if ( empty( $canvas_preview_url ) ) {
-                $canvas_preview_url = ( $live_homepage && ! empty( $live_homepage['slug'] ) ) ? home_url( '/' . $live_homepage['slug'] . '/' ) : home_url( '/site/' );
-            }
-            $canvas_display_url = wp_parse_url( $canvas_preview_url, PHP_URL_HOST ) . wp_parse_url( $canvas_preview_url, PHP_URL_PATH );
+            // Resolve the actual frontend website homepage URL for active theme in multitenant workspace
+            $canvas_preview_url = home_url( '/site/' . esc_attr( $cora_canvas_slug ) . '/' );
+            $canvas_display_url = wp_parse_url( home_url(), PHP_URL_HOST ) . '/site/' . $cora_canvas_slug;
         ?>
         <div class="bg-white border border-zinc-200 rounded-xl shadow-sm relative overflow-visible" id="active-theme-card">
             <!-- Theme preview: Dual device frames + theme info row -->
@@ -816,7 +806,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     <div data-draft-theme-id="<?php echo $th['id']; ?>" class="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-zinc-50/10 transition-colors <?php echo $is_collapsed ? 'hidden draft-theme-collapsed' : ''; ?>">
                         <div class="flex items-center gap-3.5 min-w-0">
                             <!-- Live iframe thumbnail preview -->
-                            <?php $preview_url = home_url('/?cv_preview_theme=' . $th['id']); ?>
+                            <?php $preview_url = home_url('/site/' . esc_attr($cora_canvas_slug) . '/?cv_preview_theme=' . $th['id']); ?>
                             <div style="width:80px;height:50px;flex-shrink:0;overflow:hidden;position:relative;" class="rounded-lg border border-zinc-200 bg-zinc-100 select-none">
                                 <iframe src="<?php echo esc_url($preview_url); ?>" loading="lazy" sandbox="allow-scripts allow-same-origin" style="width:800px;height:500px;border:none;transform:scale(0.1);transform-origin:0 0;pointer-events:none;position:absolute;top:0;left:0;" tabindex="-1" aria-hidden="true"></iframe>
                             </div>
@@ -861,7 +851,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                         <span>Duplicate</span>
                                     </button>
-                                    <a href="<?php echo home_url('/?cv_preview_theme=' . $th['id']); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors no-underline">
+                                    <a href="<?php echo home_url('/site/' . esc_attr($cora_canvas_slug) . '/?cv_preview_theme=' . $th['id']); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors no-underline">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         <span>Preview theme</span>
                                     </a>
@@ -1143,7 +1133,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <?php if ( ! $is_read_only ) : ?>
                 <button id="activate-theme-header-btn" onclick="triggerActivateThemeFromHeader()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Activate Theme</button>
                 <?php endif; ?>
-                <a id="preview-site-header-btn" href="<?php echo home_url( '/' . esc_attr( $cora_canvas_slug ) . '/' ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm cursor-pointer transition-all hidden">Preview Site</a>
+                <a id="preview-site-header-btn" href="<?php echo home_url( '/site/' . esc_attr( $cora_canvas_slug ) . '/' ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm cursor-pointer transition-all hidden">Preview Site</a>
             </div>
         </div>
 
@@ -1403,7 +1393,7 @@ function cora_get_sparkline_points( $history, $type ) {
             <!-- 1. MENUS LIST VIEW -->
             <div id="menus-list-view" class="space-y-4">
                 <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
-                    <table class="w-full border-collapse text-left">
+                    <table class="w-full table-fixed border-collapse text-left">
                         <thead>
                             <tr class="border-b border-zinc-100 text-[11px] font-bold text-zinc-400 bg-zinc-50/50">
                                 <th class="px-4 py-2.5 w-1/3">
@@ -1412,7 +1402,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
                                     </button>
                                 </th>
-                                <th class="px-4 py-2.5">Menu items</th>
+                                <th class="px-4 py-2.5 w-2/3">Menu items</th>
                             </tr>
                         </thead>
                         <tbody id="menus-table-body">
@@ -1437,8 +1427,8 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- Name & Handle Card -->
                 <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm space-y-3">
                     <div class="space-y-1.5">
-                        <label class="block text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Name</label>
-                        <input type="text" id="menu-name-input" onkeyup="updateMenuNameState(this.value)" class="w-full px-3.5 py-2 border border-zinc-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-zinc-400 bg-white text-zinc-800" <?php echo $is_read_only ? 'readonly' : ''; ?>>
+                        <label class="block text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Name <span class="text-zinc-400 font-normal normal-case">(max 60 chars)</span></label>
+                        <input type="text" id="menu-name-input" maxlength="60" onkeyup="updateMenuNameState(this.value)" class="w-full px-3.5 py-2 border border-zinc-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-zinc-400 bg-white text-zinc-800" <?php echo $is_read_only ? 'readonly' : ''; ?>>
                         <p id="menu-handle-label" class="text-[10px] text-zinc-400 font-mono mt-1.5">Handle: customer-account-main-menu</p>
                     </div>
                 </div>
@@ -4048,9 +4038,9 @@ function cora_get_sparkline_points( $history, $type ) {
         isFreePlan: <?php echo in_array( strtolower( cora_get_active_workspace_plan() ), array( 'free', 'free_tier', 'trial', 'none' ), true ) ? 'true' : 'false'; ?>,
         themes: <?php echo json_encode($themes); ?>,
         pages: [],
-        menus: <?php echo json_encode( $wp_nav_menus_for_js ); ?> || [],
-        wpMenusBase: <?php echo json_encode( $wp_nav_menus_for_js ); ?> || [],
-        activeMenuId: <?php echo ! empty( $wp_nav_menus_for_js ) ? "'menu_wp_" . intval( $wp_nav_menus_for_js[0]['wp_term_id'] ) . "'" : "''" ; ?>,
+        menus: <?php echo json_encode( $theme_menus_for_js ); ?> || [],
+        wpMenusBase: <?php echo json_encode( $theme_menus_for_js ); ?> || [],
+        activeMenuId: <?php echo ! empty( $theme_menus_for_js ) ? "'" . esc_js( $theme_menus_for_js[0]['id'] ) . "'" : "''" ; ?>,
         activeMenuDetailId: null,
         cssEditor: null,
     };
@@ -4725,14 +4715,15 @@ function cora_get_sparkline_points( $history, $type ) {
         jQuery('#canvas-level-2').removeClass('hidden');
 
         jQuery('#dashboard-theme-name').text(name);
+        const wsSiteBase = `${coraREData.siteUrl}/site/<?php echo esc_js($cora_canvas_slug); ?>`;
         if (isLive) {
             jQuery('#dashboard-theme-badge').removeClass('bg-zinc-50 text-zinc-500 border-zinc-200').addClass('bg-green-50 text-green-700 border-green-200').text('Live');
             jQuery('#activate-theme-header-btn').addClass('hidden');
-            jQuery('#preview-site-header-btn').removeClass('hidden').text('Preview Site').attr('href', coraREData.siteUrl);
+            jQuery('#preview-site-header-btn').removeClass('hidden').text('Preview Site').attr('href', wsSiteBase + '/');
         } else {
             jQuery('#dashboard-theme-badge').removeClass('bg-green-50 text-green-700 border-green-200').addClass('bg-zinc-50 text-zinc-500 border-zinc-200').text('Draft');
             jQuery('#activate-theme-header-btn').removeClass('hidden');
-            jQuery('#preview-site-header-btn').removeClass('hidden').text('Preview Theme').attr('href', coraREData.siteUrl + '/?cv_preview_theme=' + id);
+            jQuery('#preview-site-header-btn').removeClass('hidden').text('Preview Theme').attr('href', wsSiteBase + '/?cv_preview_theme=' + id);
         }
 
         // Fetch theme settings and load pages
@@ -5233,15 +5224,25 @@ function cora_get_sparkline_points( $history, $type ) {
         }
 
         pages.forEach(p => {
-            const visibilityPill = getVisibilityPill(p.status, p.scheduled_at);
-            const homeBadge = p.is_homepage == 1
+            const isHomepage = (p.is_homepage == 1);
+            // Homepage is ALWAYS visible / published and can NEVER be hidden
+            const effectiveStatus = isHomepage ? 'published' : (p.status || 'draft');
+            const visibilityPill = getVisibilityPill(effectiveStatus, p.scheduled_at, isHomepage);
+            const homeBadge = isHomepage
                 ? `<span class="ml-2 px-1.5 py-0.5 text-[8px] font-bold rounded-md bg-zinc-100 border border-zinc-200 text-zinc-500 inline-flex items-center gap-0.5"><svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home</span>`
                 : '';
 
-            const wsSiteBase = `${coraREData.siteUrl}/<?php echo esc_js($cora_canvas_slug); ?>`;
-            const previewUrl = p.is_homepage == 1
-                ? `${wsSiteBase}/?cv_preview_theme=${canvasState.activeThemeId}`
-                : `${wsSiteBase}/${p.slug}${p.slug.includes('?') ? '&' : '?'}cv_preview_theme=${canvasState.activeThemeId}`;
+            const wsSiteBase = `${coraREData.siteUrl}/site/<?php echo esc_js($cora_canvas_slug); ?>`;
+            const isDraftTheme = (canvasState.activeThemeIsLive !== true && canvasState.activeThemeIsLive !== 1 && canvasState.activeThemeIsLive !== '1');
+            const previewParam = isDraftTheme ? `cv_preview_theme=${canvasState.activeThemeId}` : '';
+            
+            let previewUrl = '';
+            if (p.is_homepage == 1) {
+                previewUrl = previewParam ? `${wsSiteBase}/?${previewParam}` : `${wsSiteBase}/`;
+            } else {
+                const cleanSlug = (p.slug || '').replace(/^\/+/, '');
+                previewUrl = previewParam ? `${wsSiteBase}/${cleanSlug}?${previewParam}` : `${wsSiteBase}/${cleanSlug}`;
+            }
 
             if (isElementor) {
                 const contentPreview = (p.content && p.content.trim())
@@ -5332,7 +5333,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 `);
             } else {
                 const mappedRoute = window.CORA_PAGE_MAPPINGS ? (window.CORA_PAGE_MAPPINGS[p.id] || '') : '';
-                const relativeWpPath = `/<?php echo esc_js($cora_canvas_slug); ?>${p.is_homepage == 1 ? '' : '/' + p.slug}`;
+                const relativeWpPath = `/site/<?php echo esc_js($cora_canvas_slug); ?>${p.is_homepage == 1 ? '' : '/' + p.slug}`;
 
                 let selectOptions = `<option value="">— Unmapped (Select Route) —</option>`;
                 if (window.CORA_LOVABLE_ROUTES && window.CORA_LOVABLE_ROUTES.length > 0) {
@@ -5441,8 +5442,8 @@ function cora_get_sparkline_points( $history, $type ) {
     }
 
 
-    function getVisibilityPill(status, dateStr) {
-        if (status === 'published' || status === 'publish') {
+    function getVisibilityPill(status, dateStr, isHomepage) {
+        if (isHomepage || status === 'published' || status === 'publish') {
             return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-green-50 text-green-700 border border-green-200"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Visible</span>';
         } else if (status === 'scheduled') {
             return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200 cursor-pointer" title="Scheduled for: ${dateStr}"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Scheduled</span>`;
@@ -5450,7 +5451,7 @@ function cora_get_sparkline_points( $history, $type ) {
         return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-zinc-50 text-zinc-500 border border-zinc-200"><span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>Hidden</span>';
     }
     // keep legacy alias
-    function getStatusPill(status, dateStr) { return getVisibilityPill(status, dateStr); }
+    function getStatusPill(status, dateStr, isHomepage) { return getVisibilityPill(status, dateStr, isHomepage); }
 
     function getSEOIcon(title, desc) {
         if (title && desc) return '<svg viewBox="0 0 24 24" width="13" height="13" stroke="#16a34a" stroke-width="2.5" fill="none" title="SEO complete"><polyline points="20 6 9 17 4 12"/></svg>';
@@ -5496,7 +5497,20 @@ function cora_get_sparkline_points( $history, $type ) {
         jQuery('#edit-page-settings-id').val(pageId);
         jQuery('#edit-page-settings-title').val(title);
         jQuery('#edit-page-settings-slug').val(slug);
-        jQuery('#edit-page-settings-status').val(status === 'published' ? 'publish' : status);
+        
+        const pageObj = canvasState.pages ? canvasState.pages.find(p => p.id == pageId) : null;
+        const isHome = pageObj && (pageObj.is_homepage == 1);
+        if (isHome) {
+            jQuery('#edit-page-settings-status').val('publish').prop('disabled', true);
+            if (!jQuery('#edit-page-settings-status-note').length) {
+                jQuery('#edit-page-settings-status').after('<p id="edit-page-settings-status-note" class="text-[10px] text-zinc-400 font-medium mt-1">Homepage is always visible on your live site</p>');
+            } else {
+                jQuery('#edit-page-settings-status-note').show();
+            }
+        } else {
+            jQuery('#edit-page-settings-status').val(status === 'published' ? 'publish' : status).prop('disabled', false);
+            jQuery('#edit-page-settings-status-note').hide();
+        }
         
         // Populate route options
         const routeSelect = jQuery('#edit-page-settings-lovable-route');
@@ -5893,11 +5907,11 @@ function cora_get_sparkline_points( $history, $type ) {
                 : '—';
             body.append(`
                 <tr onclick="openMenuDetailEditor('${m.id}')" class="border-b border-zinc-100 hover:bg-zinc-50/50 cursor-pointer group transition-colors">
-                    <td class="px-4 py-3 text-xs font-semibold text-zinc-900 group-hover:underline">
-                        ${esc_html(m.name)}
+                    <td class="px-4 py-3 text-xs font-semibold text-zinc-900 group-hover:underline overflow-hidden">
+                        <span class="block truncate w-full font-bold" title="${esc_html(m.name)}">${esc_html(m.name)}</span>
                     </td>
-                    <td class="px-4 py-3 text-[11px] font-medium text-zinc-500">
-                        ${esc_html(previewItems)}
+                    <td class="px-4 py-3 text-[11px] font-medium text-zinc-500 overflow-hidden">
+                        <span class="block truncate w-full text-zinc-500" title="${esc_html(previewItems)}">${esc_html(previewItems)}</span>
                     </td>
                 </tr>
             `);
@@ -6022,18 +6036,18 @@ function cora_get_sparkline_points( $history, $type ) {
                 container.append(renderInlineEditForm(item, idx, false));
             } else {
                 container.append(`
-                    <div class="group/item flex items-center justify-between border border-zinc-200 rounded-lg p-3 hover:bg-zinc-50/30 transition-all bg-white">
-                        <div class="flex items-center gap-3">
-                            <span class="text-zinc-300 cursor-grab hover:text-zinc-500">
+                    <div class="group/item flex items-center justify-between border border-zinc-200 rounded-lg p-3 hover:bg-zinc-50/30 transition-all bg-white min-w-0">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <span class="text-zinc-300 cursor-grab hover:text-zinc-500 flex-shrink-0">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>
                             </span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-bold text-zinc-950">${esc_html(item.label)}</span>
-                                <span class="text-[10px] text-zinc-400 font-mono">${esc_html(item.url)}</span>
+                            <div class="flex items-center gap-2 min-w-0 flex-1">
+                                <span class="text-xs font-bold text-zinc-950 truncate max-w-[260px]" title="${esc_html(item.label)}">${esc_html(item.label)}</span>
+                                <span class="text-[10px] text-zinc-400 font-mono truncate max-w-[220px]" title="${esc_html(item.url)}">${esc_html(item.url)}</span>
                             </div>
                         </div>
                         <?php if ( ! $is_read_only ) : ?>
-                        <div class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                        <div class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity flex-shrink-0">
                             <button onclick="editMenuInlineRow(${idx})" class="px-2 py-1 text-[10px] font-bold text-zinc-600 hover:text-zinc-900 bg-zinc-50 border border-zinc-200 rounded-md cursor-pointer transition-colors border-none bg-transparent">Edit</button>
                             <button onclick="removeMenuDetailItem(${idx})" class="p-1.5 hover:bg-red-50 border border-transparent hover:border-red-100 rounded text-zinc-400 hover:text-red-605 cursor-pointer transition-colors">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -6053,21 +6067,21 @@ function cora_get_sparkline_points( $history, $type ) {
     function renderInlineEditForm(item, index, isNew) {
         return `
             <div class="flex items-start gap-3 border border-zinc-200 rounded-lg p-4 bg-zinc-50/20 relative shadow-sm" id="inline-edit-row-${index}">
-                <div class="pt-2">
+                <div class="pt-2 flex-shrink-0">
                     <span class="text-zinc-300">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>
                     </span>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1 min-w-0">
                     <div class="space-y-1">
-                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Label</label>
-                        <input type="text" id="inline-label-input-${index}" value="${esc_html(item.label)}" placeholder="e.g., About us" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white font-semibold text-zinc-800">
+                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Label <span class="text-zinc-400 font-normal normal-case">(max 50 chars)</span></label>
+                        <input type="text" id="inline-label-input-${index}" maxlength="50" value="${esc_html(item.label)}" placeholder="e.g., About us" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white font-semibold text-zinc-800">
                     </div>
                     
                     <div class="space-y-1 relative">
                         <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Link</label>
-                        <input type="text" id="inline-link-input-${index}" value="${esc_html(item.url)}" placeholder="Search or paste link" onfocus="showLinkSuggestions(${index})" onblur="hideLinkSuggestions(${index})" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white font-semibold text-zinc-800">
+                        <input type="text" id="inline-link-input-${index}" maxlength="200" value="${esc_html(item.url)}" placeholder="Search or paste link" onfocus="showLinkSuggestions(${index})" onblur="hideLinkSuggestions(${index})" class="w-full px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white font-semibold text-zinc-800">
                         
                         <!-- Suggestion Dropdown popup -->
                         <div id="link-suggestions-dropdown-${index}" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-50 text-left font-sans select-none max-h-48 overflow-y-auto">
@@ -6284,16 +6298,22 @@ function cora_get_sparkline_points( $history, $type ) {
 
     function applyInlineItemChange(index, isNew) {
         if (canvasState.isReadOnly) return;
-        const label = jQuery(`#inline-label-input-${index}`).val().trim();
-        const url = jQuery(`#inline-link-input-${index}`).val().trim();
+        let label = jQuery(`#inline-label-input-${index}`).val().trim();
+        let url = jQuery(`#inline-link-input-${index}`).val().trim();
 
         if (!label) {
             window.coraShowToast('Please enter a link label.', 'error');
             return;
         }
+        if (label.length > 50) {
+            label = label.substring(0, 50);
+        }
         if (!url) {
             window.coraShowToast('Please enter or select a destination URL.', 'error');
             return;
+        }
+        if (url.length > 200) {
+            url = url.substring(0, 200);
         }
 
         const currentMenu = canvasState.menus.find(m => m.id === canvasState.activeMenuDetailId);
@@ -6367,7 +6387,7 @@ function cora_get_sparkline_points( $history, $type ) {
             <tr id="inline-new-menu-row" class="bg-zinc-50/50">
                 <td class="px-4 py-3" colspan="2">
                     <div class="flex items-center gap-3">
-                        <input type="text" id="new-menu-inline-name-input" placeholder="Menu name (e.g., Main menu)" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 w-64">
+                        <input type="text" id="new-menu-inline-name-input" maxlength="60" placeholder="Menu name (e.g., Main menu)" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-zinc-400 bg-white text-zinc-800 w-64">
                         <button onclick="saveNewMenuInline()" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all active:scale-95 border-none bg-transparent">Save</button>
                         <button onclick="cancelNewMenuInline()" class="px-3 py-1.5 border border-zinc-200 text-zinc-400 hover:text-zinc-700 rounded-lg text-xs font-bold cursor-pointer transition-all active:scale-95 bg-transparent border-none">Cancel</button>
                     </div>
@@ -6477,12 +6497,19 @@ function cora_get_sparkline_points( $history, $type ) {
             canvasState.activeMenuDetailId = null;
             const settings = safeGetSettings(themeObj);
             
-            // Dynamic menus extraction: prefer saved theme settings, fall back to real WP nav menus
+            // Dynamic menus extraction: prefer saved theme settings
             if (settings && settings.menus && Array.isArray(settings.menus) && settings.menus.length > 0) {
                 canvasState.menus = settings.menus;
             } else {
-                // Seed from real WordPress nav_menu terms (fetched server-side)
-                canvasState.menus = canvasState.wpMenusBase ? canvasState.wpMenusBase.slice() : [];
+                // Scoped clean default Main menu for this theme
+                canvasState.menus = [
+                    {
+                        id: 'menu_main_' + themeId,
+                        name: 'Main menu',
+                        handle: 'main-menu',
+                        items: []
+                    }
+                ];
             }
             if (canvasState.menus.length > 0) {
                 if (!canvasState.menus.some(m => m.id === canvasState.activeMenuId)) {
@@ -6492,14 +6519,14 @@ function cora_get_sparkline_points( $history, $type ) {
                 canvasState.activeMenuId = '';
             }
             
-            jQuery('#setting-site-title').val(settings.site_title || '');
-            jQuery('#setting-site-tagline').val(settings.site_tagline || '');
-            jQuery('#setting-site-description').val(settings.site_description || '');
-            jQuery('#setting-site-favicon').val(settings.site_favicon || '');
-            jQuery('#setting-site-logo').val(settings.site_logo || '');
+            jQuery('#setting-site-title').val(settings.site_title || '<?php echo esc_js( get_option( "blogname", "Cora Workspace" ) ); ?>');
+            jQuery('#setting-site-tagline').val(settings.site_tagline || '<?php echo esc_js( get_option( "blogdescription", "" ) ); ?>');
+            jQuery('#setting-site-description').val(settings.site_description || '<?php echo esc_js( get_option( "blogdescription", "" ) ); ?>');
+            jQuery('#setting-site-favicon').val(settings.site_favicon || '<?php echo esc_js( get_option( "cora_brand_favicon_url", "" ) ); ?>');
+            jQuery('#setting-site-logo').val(settings.site_logo || '<?php echo esc_js( get_option( "cora_brand_logo_url", "" ) ); ?>');
             jQuery('#setting-site-logo-dark').val(settings.site_logo_dark || '');
             jQuery('#setting-og-image').val(settings.og_image || '');
-            jQuery('#setting-title-format').val(settings.title_format || '');
+            jQuery('#setting-title-format').val(settings.title_format || '%title% | %site%');
             
             // Typography
             jQuery('#setting-heading-font').val(settings.heading_font || 'Inter');

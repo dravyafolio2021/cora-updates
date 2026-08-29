@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.7.5
+ * Version: 4.7.7
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.7.5' );
+    define( 'CORA_WORKSPACE_VERSION', '4.7.7' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -1417,6 +1417,16 @@ function cora_workspace_handle_workspace_route() {
     $matched_workspace = null;
     $is_workspace_route = false;
 
+    $admin_subpages = array( 
+        'dashboard', 'canvas', 'users', 'financials', 'content-suite', 'content_suite',
+        'media', 'file-manager', 'vault', 'leads', 'forms', 'emails', 'settings-suite', 
+        'audit-panel', 'super-admin', 'super-users', 'super-appeals', 'super-governance', 
+        'super-announcements', 'super-health', 'super-docs', 'profile', 'reviews-feedback', 'reviews_acquisition',
+        'property-listings', 'team-scheduler', 'crew-scheduler', 'client-task-manager', 
+        'ecosystem', 'tools', 'mcp', 'onboarding', 'gbp', 'auth'
+    );
+    $public_subs = array( 'login', 'forgot-password', 'reset-password', 'setup-account', 'register', 'verify-pending', 'onboarding' );
+
     if ( $first_segment === 'workspace' ) {
         $is_workspace_route = true;
         $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
@@ -1424,16 +1434,17 @@ function cora_workspace_handle_workspace_route() {
         if ( isset( $path_parts[0] ) && strpos( $path_parts[0], '.' ) === false ) {
             $matched_workspace = cora_get_workspace_by_slug( $first_segment );
             if ( $matched_workspace ) {
-                $is_workspace_route = true;
-                $GLOBALS['cora_active_workspace'] = $matched_workspace;
                 $sub_page = isset( $path_parts[1] ) ? sanitize_title( $path_parts[1] ) : '';
+                // Only treat as admin/auth workspace route if sub_page is an admin subpage or public auth subpage
+                if ( in_array( $sub_page, $admin_subpages, true ) || in_array( $sub_page, $public_subs, true ) || $sub_page === 'auth' ) {
+                    $is_workspace_route = true;
+                    $GLOBALS['cora_active_workspace'] = $matched_workspace;
+                }
             }
         }
     }
 
     if ( $is_workspace_route ) {
-        $public_subs = array( 'login', 'forgot-password', 'reset-password', 'setup-account', 'register', 'verify-pending', 'onboarding' );
-
         // ── Public Canvas Website Routes — intercept BEFORE any login check (allows guest visitors) ──────
         if ( ( isset( $sub_page ) && ( $sub_page === 'site' || $sub_page === 'p' ) ) || $first_segment === 'site' ) {
             if ( function_exists( 'cora_canvas_theme_frontend_router' ) ) {
@@ -1923,25 +1934,72 @@ function cora_workspace_on_wp_login( $user_login, $user ) {
 add_action( 'wp_login', 'cora_workspace_on_wp_login', 10, 2 );
 
 /**
- * Restrict non-administrators from accessing the default WP Admin backend entirely
+ * Strict Protection: Prevent any user from accessing default WordPress wp-admin backend.
+ * All traffic is redirected directly to Cora Workspace (/workspace/dashboard, /workspace/canvas, or /workspace/login).
+ * Only backend AJAX, REST, async uploads, and embedded Elementor builder sessions are allowed.
  */
 if ( ! function_exists( 'cora_workspace_restrict_admin_access' ) ) {
 function cora_workspace_restrict_admin_access() {
-    if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-        if ( current_user_can( 'manage_options' ) ) {
-            return;
-        }
-        $user = wp_get_current_user();
-        $roles = (array) $user->roles;
-        if ( in_array( 'cora_super_admin', $roles, true ) || in_array( 'cora_shruti', $roles, true ) ) {
-            return;
-        }
-        wp_redirect( home_url( '/workspace' ) );
+    if ( ! is_admin() ) {
+        return;
+    }
+    
+    // Allow AJAX requests
+    if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+        return;
+    }
+
+    global $pagenow;
+    
+    // 1. Allow AJAX endpoint, async upload, admin post forms
+    if ( in_array( $pagenow, array( 'admin-ajax.php', 'admin-post.php', 'async-upload.php' ), true ) ) {
+        return;
+    }
+
+    // 2. Allow Elementor builder / preview sessions (rendered in Canvas iframe)
+    if ( 'post.php' === $pagenow && isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) {
+        return;
+    }
+    if ( 'admin.php' === $pagenow && isset( $_GET['page'] ) && ( strpos( $_GET['page'], 'elementor' ) !== false || $_GET['page'] === 'elementor-app' ) ) {
+        return;
+    }
+
+    // 3. Emergency platform super admin bypass only if explicit query flag is provided
+    if ( isset( $_GET['cora_allow_wp_admin'] ) && $_GET['cora_allow_wp_admin'] === '1' && function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) {
+        return;
+    }
+
+    // 4. Redirect unauthenticated users to Cora Workspace login
+    if ( ! is_user_logged_in() ) {
+        wp_redirect( home_url( '/workspace/login' ) );
         exit;
     }
+
+    // 5. If hitting legacy ?page=cora-workspace&sub_page=X, route to /{workspace_slug}/{sub_page}
+    $ws_ctx = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+    $ws_slug = ! empty( $ws_ctx['slug'] ) ? $ws_ctx['slug'] : 'workspace';
+
+    if ( isset( $_GET['page'] ) && $_GET['page'] === 'cora-workspace' ) {
+        $sub = isset( $_GET['sub_page'] ) ? sanitize_text_field( $_GET['sub_page'] ) : ( isset( $_GET['sub'] ) ? sanitize_text_field( $_GET['sub'] ) : 'dashboard' );
+        wp_redirect( home_url( '/' . $ws_slug . '/' . $sub ) );
+        exit;
+    }
+
+    // 6. Redirect all other default WordPress admin hits to Cora Workspace Dashboard
+    wp_redirect( home_url( '/' . $ws_slug . '/dashboard' ) );
+    exit;
 }
 }
-add_action( 'admin_init', 'cora_workspace_restrict_admin_access' );
+add_action( 'admin_init', 'cora_workspace_restrict_admin_access', 0 );
+
+// Ensure standard login URL redirects to white-labeled Cora login
+add_filter( 'login_url', function( $login_url, $redirect = '', $force_reauth = false ) {
+    $workspace_login = home_url( '/workspace/login' );
+    if ( ! empty( $redirect ) && strpos( $redirect, 'wp-admin' ) === false ) {
+        $workspace_login = add_query_arg( 'redirect_to', urlencode( $redirect ), $workspace_login );
+    }
+    return $workspace_login;
+}, 10, 3 );
 
 /**
  * Force users_can_register option to enable user signups
@@ -6754,13 +6812,10 @@ function cora_canvas_theme_frontend_router() {
     $matched_ws = cora_get_workspace_by_slug( $first_part );
     $is_explicit_site_request = ( $first_part === 'site' || $second_part === 'site' || $second_part === 'p' );
 
-    // If first_part is a valid workspace slug and second_part is an admin subpage (or empty when accessing dashboard),
-    // skip canvas router so workspace handler can serve dashboard pages.
+    // If first_part is a valid workspace slug and second_part is an admin subpage or auth route,
+    // skip canvas router so workspace handler can serve dashboard / auth pages.
     if ( $matched_ws && ! $is_explicit_site_request ) {
-        if ( empty( $second_part ) && is_user_logged_in() && ! isset( $_GET['cv_preview_theme'] ) && ! isset( $_GET['site'] ) ) {
-            return; // Serves admin dashboard
-        }
-        if ( in_array( $second_part, $admin_subpages ) ) {
+        if ( in_array( $second_part, $admin_subpages, true ) || in_array( $second_part, array( 'login', 'register', 'onboarding', 'forgot-password', 'reset-password' ), true ) || $second_part === 'auth' ) {
             return; // Serves admin subpage
         }
     }
@@ -6787,7 +6842,7 @@ function cora_canvas_theme_frontend_router() {
         }
         $target_page_slug = $third_part;
     } elseif ( $matched_ws ) {
-        // Format: /{workspace_slug} or /{workspace_slug}/{page_slug}
+        // Format: /{workspace_slug} (Homepage) or /{workspace_slug}/{page_slug} (Subpage)
         $target_ws = $matched_ws;
         $target_agency_id = ! empty( $target_ws['agency_id'] ) ? intval( $target_ws['agency_id'] ) : ( ! empty( $target_ws['id'] ) ? intval( $target_ws['id'] ) : 0 );
         $target_page_slug = $second_part;
@@ -6802,6 +6857,7 @@ function cora_canvas_theme_frontend_router() {
 
     $ws_name = ! empty( $target_ws['name'] ) ? $target_ws['name'] : ( ! empty( $second_part ) ? ucfirst( $second_part ) : 'Workspace' );
     $ws_slug = ! empty( $target_ws['slug'] ) ? $target_ws['slug'] : ( ! empty( $second_part ) ? $second_part : 'workspace' );
+    $GLOBALS['cora_active_workspace_site_slug'] = $ws_slug;
 
     // Detect active theme ID (either preview or live for resolved agency)
     $is_preview = false;
@@ -6816,14 +6872,26 @@ function cora_canvas_theme_frontend_router() {
     }
     
     if ( ! $active_theme_id ) {
+        $cand_agency_ids = array();
+        if ( $target_ws ) {
+            if ( ! empty( $target_ws['id'] ) ) $cand_agency_ids[] = intval( $target_ws['id'] );
+            if ( ! empty( $target_ws['owner_user_id'] ) ) $cand_agency_ids[] = intval( $target_ws['owner_user_id'] );
+            if ( ! empty( $target_ws['agency_id'] ) ) $cand_agency_ids[] = intval( $target_ws['agency_id'] );
+        }
         if ( $target_agency_id > 0 ) {
-            $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' ORDER BY id DESC LIMIT 1", $target_agency_id ), ARRAY_A );
+            $cand_agency_ids[] = intval( $target_agency_id );
+        }
+        $cand_agency_ids = array_unique( array_filter( $cand_agency_ids ) );
+
+        if ( ! empty( $cand_agency_ids ) ) {
+            $in_sql = implode( ',', array_map( 'intval', $cand_agency_ids ) );
+            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) AND status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
             if ( ! $live_theme ) {
-                $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d ORDER BY id DESC LIMIT 1", $target_agency_id ), ARRAY_A );
+                $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) ORDER BY id DESC LIMIT 1", ARRAY_A );
             }
             if ( $live_theme ) {
                 $active_theme_id = intval( $live_theme['id'] );
-            } else {
+            } else if ( $target_agency_id > 0 ) {
                 // Auto-provision theme for new tenant workspace agency
                 $active_theme_id = cora_provision_default_canvas_theme_for_agency( $target_agency_id );
             }
@@ -6873,8 +6941,6 @@ function cora_canvas_theme_frontend_router() {
         $requested_post_id = intval( $_GET['preview_id'] );
     } elseif ( isset( $_GET['p'] ) ) {
         $requested_post_id = intval( $_GET['p'] );
-    } else {
-        $requested_post_id = get_queried_object_id();
     }
 
     if ( $requested_post_id > 0 ) {
@@ -6911,10 +6977,16 @@ function cora_canvas_theme_frontend_router() {
 
     if ( ! $canvas_page ) {
         if ( ! empty( $target_page_slug ) && $target_page_slug !== 'home' ) {
-            // 1. Exact slug match in canvas pages
+            // 1. Exact slug match in canvas pages for active theme
             $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1", $active_theme_id, $target_page_slug ), ARRAY_A );
             
-            // 2. Check if target slug matches post_name of a WP post linked to a canvas page
+            // 2. Match by lowercase title or sanitized title
+            if ( ! $canvas_page ) {
+                $target_clean_slug = sanitize_title( $target_page_slug );
+                $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND (LOWER(title) = %s OR slug = %s) LIMIT 1", $active_theme_id, strtolower( $target_page_slug ), $target_clean_slug ), ARRAY_A );
+            }
+
+            // 3. Check if target slug matches post_name of a WP post linked to a canvas page
             if ( ! $canvas_page ) {
                 $post_by_slug = get_page_by_path( $target_page_slug, OBJECT, array( 'page', 'post' ) );
                 if ( $post_by_slug ) {
@@ -6928,17 +7000,20 @@ function cora_canvas_theme_frontend_router() {
                 }
             }
 
-            // 3. Loose match by stripping trailing numbers from post_name (e.g. services-3 -> services)
+            // 4. Loose match by stripping trailing numbers from post_name (e.g. services-3 -> services or about-3 -> about)
             if ( ! $canvas_page ) {
                 $clean_slug = preg_replace( '/-\d+$/', '', $target_page_slug );
                 if ( $clean_slug !== $target_page_slug ) {
-                    $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1", $active_theme_id, $clean_slug ), ARRAY_A );
+                    $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND (slug = %s OR LOWER(title) = %s) LIMIT 1", $active_theme_id, $clean_slug, strtolower( $clean_slug ) ), ARRAY_A );
                 }
             }
         }
         $is_explicit_post_request = ( isset( $_GET['page_id'] ) || isset( $_GET['preview_id'] ) || isset( $_GET['p'] ) );
         if ( ! $canvas_page && ! $is_explicit_post_request && ( empty( $target_page_slug ) || $target_page_slug === 'home' ) ) {
             $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $active_theme_id ), ARRAY_A );
+            if ( ! $canvas_page ) {
+                $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY id ASC LIMIT 1", $active_theme_id ), ARRAY_A );
+            }
         }
     }
 
@@ -8097,26 +8172,9 @@ function cora_get_preview_theme_id() {
 
     // Validate raw theme ID if found
     if ( $raw_theme_id > 0 ) {
-        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT agency_id, status FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $raw_theme_id ), ARRAY_A );
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT id, agency_id, status FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $raw_theme_id ), ARRAY_A );
         if ( $theme ) {
-            $theme_agency = intval( $theme['agency_id'] );
-            $theme_status = $theme['status'];
-
-            // Fail validation if theme belongs to a different agency or is a live theme
-            if ( ( $target_agency_id > 0 && $theme_agency !== $target_agency_id ) || $theme_status === 'live' ) {
-                $request_uri = $_SERVER['REQUEST_URI'];
-                $home_path   = parse_url( home_url(), PHP_URL_PATH );
-                $req_path    = substr( $request_uri, strlen( $home_path ) );
-                $req_path    = trim( parse_url( $req_path, PHP_URL_PATH ), '/' );
-                $is_asset = ( strpos( $req_path, 'assets/' ) === 0 || strpos( $req_path, 'placeholder.svg' ) === 0 || substr( $req_path, -3 ) === '.js' || substr( $req_path, -4 ) === '.css' );
-
-                if ( ! $is_asset && isset( $_COOKIE['cora_preview_theme_id'] ) && intval( $_COOKIE['cora_preview_theme_id'] ) === $raw_theme_id ) {
-                    setcookie( 'cora_preview_theme_id', '', time() - 3600, '/' );
-                    unset( $_COOKIE['cora_preview_theme_id'] );
-                }
-                return 0;
-            }
-            return $raw_theme_id;
+            return intval( $theme['id'] );
         }
     }
 
@@ -8264,31 +8322,74 @@ function cora_canvas_route_preview_pages( $query ) {
 }
 }
 
-// ── Append preview theme query arguments to generated frontend links ──
+// ── Helper to normalize all tenant page and menu links to workspace-level slug structure ──
+if ( ! function_exists( 'cora_canvas_normalize_tenant_site_url' ) ) {
+function cora_canvas_normalize_tenant_site_url( $url ) {
+    if ( empty( $url ) || $url === '#' || strpos( $url, 'javascript:' ) === 0 || strpos( $url, 'mailto:' ) === 0 || strpos( $url, 'tel:' ) === 0 ) {
+        return $url;
+    }
+
+    $ws_slug = ! empty( $GLOBALS['cora_active_workspace_site_slug'] ) ? $GLOBALS['cora_active_workspace_site_slug'] : '';
+    if ( ! $ws_slug ) {
+        $ws_ctx = cora_get_current_workspace_context();
+        $ws_slug = ! empty( $ws_ctx['slug'] ) ? $ws_ctx['slug'] : 'workspace';
+    }
+
+    $home = rtrim( home_url(), '/' );
+    
+    // Relative URLs like "/about" or "e2e-menu-page-9319"
+    if ( strpos( $url, 'http://' ) !== 0 && strpos( $url, 'https://' ) !== 0 ) {
+        $clean_path = ltrim( $url, '/' );
+        if ( strpos( $clean_path, 'site/' ) === 0 ) {
+            $url = home_url( '/' . $clean_path );
+        } elseif ( empty( $clean_path ) || $clean_path === 'home' ) {
+            $url = home_url( '/site/' . $ws_slug . '/' );
+        } else {
+            $url = home_url( '/site/' . $ws_slug . '/' . $clean_path );
+        }
+    } elseif ( strpos( $url, $home ) === 0 ) {
+        // Absolute URLs pointing to this WordPress instance
+        $path = substr( $url, strlen( $home ) );
+        $path_only = trim( parse_url( $path, PHP_URL_PATH ), '/' );
+        $query_str = parse_url( $path, PHP_URL_QUERY );
+
+        if ( strpos( $path_only, 'site/' ) !== 0 && ! in_array( $path_only, array( 'wp-admin', 'wp-login.php', 'workspace', 'api', 'cora-service-worker.js', 'cora-manifest.json' ), true ) ) {
+            if ( empty( $path_only ) || $path_only === 'home' ) {
+                $url = home_url( '/site/' . $ws_slug . '/' );
+            } else {
+                $url = home_url( '/site/' . $ws_slug . '/' . $path_only );
+            }
+            if ( ! empty( $query_str ) ) {
+                $url .= '?' . $query_str;
+            }
+        }
+    }
+
+    $preview_theme_id = cora_get_preview_theme_id();
+    if ( $preview_theme_id > 0 && strpos( $url, home_url() ) !== false && strpos( $url, 'cv_preview_theme=' ) === false ) {
+        $url = add_query_arg( 'cv_preview_theme', $preview_theme_id, $url );
+    }
+
+    return $url;
+}
+}
+
+// ── Append workspace slug & preview theme arguments to generated frontend links ──
 add_filter( 'page_link', 'cora_canvas_append_preview_query_arg', 10, 2 );
 add_filter( 'post_link', 'cora_canvas_append_preview_query_arg', 10, 2 );
 add_filter( 'post_type_link', 'cora_canvas_append_preview_query_arg', 10, 2 );
 if ( ! function_exists( 'cora_canvas_append_preview_query_arg' ) ) {
 function cora_canvas_append_preview_query_arg( $url, $post ) {
-    $preview_theme_id = cora_get_preview_theme_id();
-    if ( $preview_theme_id > 0 ) {
-        if ( strpos( $url, home_url() ) !== false ) {
-            $url = add_query_arg( 'cv_preview_theme', $preview_theme_id, $url );
-        }
-    }
-    return $url;
+    return cora_canvas_normalize_tenant_site_url( $url );
 }
 }
 
-// ── Append preview theme query arguments to custom menus links ──
+// ── Append workspace slug & preview theme arguments to custom nav menus links ──
 add_filter( 'wp_setup_nav_menu_item', 'cora_canvas_filter_menu_item_preview_url' );
 if ( ! function_exists( 'cora_canvas_filter_menu_item_preview_url' ) ) {
 function cora_canvas_filter_menu_item_preview_url( $menu_item ) {
-    $preview_theme_id = cora_get_preview_theme_id();
-    if ( $preview_theme_id > 0 ) {
-        if ( ! empty( $menu_item->url ) && strpos( $menu_item->url, home_url() ) !== false ) {
-            $menu_item->url = add_query_arg( 'cv_preview_theme', $preview_theme_id, $menu_item->url );
-        }
+    if ( ! empty( $menu_item->url ) ) {
+        $menu_item->url = cora_canvas_normalize_tenant_site_url( $menu_item->url );
     }
     return $menu_item;
 }
@@ -8429,11 +8530,8 @@ function cora_canvas_filter_nav_menu_items( $items, $menu, $args ) {
             $post->type = 'custom';
             $post->type_label = 'Custom Link';
             
-            $url = $item['url'] ?? '';
-            if ( ! empty( $url ) && strpos( $url, 'http' ) !== 0 && $url !== '#' ) {
-                $url = home_url( '/' . ltrim( $url, '/' ) );
-            }
-            $post->url = $url;
+            $raw_url = $item['url'] ?? '';
+            $post->url = cora_canvas_normalize_tenant_site_url( $raw_url );
             $post->title = $item['label'] ?? '';
             $post->target = '';
             $post->classes = array();
@@ -20884,6 +20982,11 @@ function cora_workspace_enqueue_elementor_reskin_scripts() {
             $theme_data['themeId']     = intval( $row['id'] );
         }
     }
+    $ws_ctx = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+    $ws_slug = ! empty( $ws_ctx['slug'] ) ? $ws_ctx['slug'] : 'workspace';
+    $theme_data['wsSlug'] = $ws_slug;
+    $theme_data['canvasUrl'] = home_url( '/' . $ws_slug . '/canvas' );
+
     wp_localize_script( 'cora-elementor-reskin-js', 'coraEditorContext', $theme_data );
 
     // Git integration
@@ -29867,6 +29970,43 @@ function cora_ajax_canvas_get_theme_pages() {
     
     $pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY is_homepage DESC, title ASC", $theme_id ), ARRAY_A );
     
+    // Automatic homepage assignment: ensure every theme has exactly one designated homepage automatically
+    $has_homepage = false;
+    if ( is_array( $pages ) && ! empty( $pages ) ) {
+        foreach ( $pages as $p ) {
+            if ( intval( $p['is_homepage'] ) === 1 ) {
+                $has_homepage = true;
+                break;
+            }
+        }
+        
+        if ( ! $has_homepage ) {
+            // Find best candidate for homepage (e.g. slug/title containing 'home', or first page)
+            $home_candidate_id = 0;
+            foreach ( $pages as $p ) {
+                $title_lower = strtolower( trim( $p['title'] ) );
+                $slug_lower  = strtolower( trim( $p['slug'] ) );
+                if ( $title_lower === 'home' || $title_lower === 'homepage' || $slug_lower === 'home' || strpos( $slug_lower, 'home' ) === 0 ) {
+                    $home_candidate_id = intval( $p['id'] );
+                    break;
+                }
+            }
+            if ( ! $home_candidate_id && ! empty( $pages[0]['id'] ) ) {
+                $home_candidate_id = intval( $pages[0]['id'] );
+            }
+            
+            if ( $home_candidate_id > 0 ) {
+                $wpdb->update(
+                    $wpdb->prefix . 'cora_canvas_pages',
+                    array( 'is_homepage' => 1, 'status' => 'published', 'updated_at' => current_time( 'mysql' ) ),
+                    array( 'id' => $home_candidate_id )
+                );
+                // Re-fetch pages with homepage assigned
+                $pages = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY is_homepage DESC, title ASC", $theme_id ), ARRAY_A );
+            }
+        }
+    }
+
     // Self-healing database check: Recreate WordPress pages if they were deleted or are out of sync
     // Also annotate each page with its current WordPress post_status for published/draft detection.
     if ( is_array( $pages ) ) {
@@ -29899,6 +30039,25 @@ function cora_ajax_canvas_get_theme_pages() {
             } else {
                 // Attach the real post_status so the JS can distinguish published from draft pages
                 $pages[$key]['wp_post_status'] = $post->post_status;
+            }
+
+            // Enforce: Homepage is ALWAYS Visible / Published and can NEVER be Hidden
+            if ( intval( $p['is_homepage'] ) === 1 ) {
+                if ( $p['status'] !== 'published' ) {
+                    $wpdb->update(
+                        $wpdb->prefix . 'cora_canvas_pages',
+                        array( 'status' => 'published', 'updated_at' => current_time( 'mysql' ) ),
+                        array( 'id' => intval( $p['id'] ) )
+                    );
+                    $pages[$key]['status'] = 'published';
+                }
+                if ( $wp_post_id > 0 && get_post_status( $wp_post_id ) !== 'publish' ) {
+                    wp_update_post( array(
+                        'ID'          => $wp_post_id,
+                        'post_status' => 'publish'
+                    ) );
+                }
+                $pages[$key]['wp_post_status'] = 'publish';
             }
         }
     }
@@ -30261,6 +30420,19 @@ function cora_ajax_canvas_set_homepage() {
         array( 'is_homepage' => 1, 'updated_at' => current_time('mysql') ),
         array( 'id' => $page_id )
     );
+
+    if ( $theme_id > 0 ) {
+        $theme_row = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( $theme_row ) {
+            $th_settings = json_decode( $theme_row['settings'], true ) ?: array();
+            $th_settings['homepage_page_id'] = $page_id;
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'settings' => json_encode( $th_settings ), 'updated_at' => current_time('mysql') ),
+                array( 'id' => $theme_id )
+            );
+        }
+    }
 
     // Sync homepage selection to WordPress native Reading settings
     cora_canvas_sync_homepage_options();
@@ -36272,11 +36444,14 @@ function cora_workspace_remove_wp_version_query( $src ) {
  * Hook: Redirect standard wp-login.php page loads to the white-labeled Workspace login page.
  */
 add_action( 'init', 'cora_workspace_redirect_login_page' );
+add_action( 'login_init', 'cora_workspace_redirect_login_page' );
 if ( ! function_exists( 'cora_workspace_redirect_login_page' ) ) {
 function cora_workspace_redirect_login_page() {
     global $pagenow;
-    if ( isset($pagenow) && 'wp-login.php' === $pagenow ) {
-        // Prevent redirect loop, verify request arguments
+    if ( ( isset($pagenow) && 'wp-login.php' === $pagenow ) || ( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false ) ) {
+        if ( isset( $_GET['action'] ) && $_GET['action'] === 'logout' ) {
+            return;
+        }
         if ( ! isset($_GET['action']) && ! isset($_POST['wp-submit']) && ! isset($_GET['loggedout']) ) {
             wp_redirect( home_url( '/workspace/login' ) );
             exit;
