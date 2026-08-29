@@ -668,28 +668,30 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
 
 <!-- Action Buttons Row (Clean border-t and mt-auto so it aligns vertically) -->
-                    <div class="flex items-center gap-2 w-full border-t border-zinc-100 pt-3 mt-auto">
-                        <!-- Edit Theme is hidden on mobile, visible on desktop -->
-                        <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true)" class="hidden lg:flex px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold cursor-pointer transition-all items-center gap-1.5 border-none shadow-xs shrink-0">
+                    <div class="flex items-center gap-2 w-full border-t border-zinc-100 pt-3 mt-auto flex-wrap sm:flex-nowrap">
+                        <!-- Primary Customize / Edit Theme CTA (always visible on all screen sizes) -->
+                        <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true)" class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold cursor-pointer transition-all flex items-center gap-1.5 border-none shadow-xs shrink-0 select-none">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                            Edit Theme
+                            Customize
                         </button>
-                        <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="flex-1 lg:flex-none justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5 no-underline">
+                        <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('settings');" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5 select-none shrink-0">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            Settings
+                        </button>
+                        <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5 no-underline select-none shrink-0">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                             Preview
                         </a>
-                        <button onclick="triggerDuplicateTheme(<?php echo $live_theme['id']; ?>)" class="flex-1 lg:flex-none justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5">
+                        <button type="button" onclick="triggerDuplicateTheme(<?php echo $live_theme['id']; ?>)" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5 select-none shrink-0">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             Duplicate
                         </button>
-                        <div class="flex-1 lg:flex-none lg:ml-auto flex items-center gap-2">
+                        <div class="sm:ml-auto flex items-center gap-2 shrink-0">
                             <!-- Three-dot more actions options dropdown -->
                             <div class="relative inline-block w-full">
-                                <button onclick="toggleActiveThemeDropdown(event)" class="w-full justify-center px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5">
-                                    <!-- Leading Ellipsis Icon so it is an Icon Button -->
+                                <button type="button" onclick="toggleActiveThemeDropdown(event)" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-[11px] font-bold text-zinc-700 bg-white cursor-pointer transition-all flex items-center gap-1.5 select-none">
                                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle><circle cx="5" cy="12" r="1.2"></circle></svg>
-                                    <span class="lg:hidden">More</span>
-                                    <span class="hidden lg:inline">More actions</span>
+                                    <span>Actions</span>
                                     <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </button>
                                 <div id="active-theme-dropdown" class="hidden absolute right-0 top-full mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-50 text-left font-sans select-none">
