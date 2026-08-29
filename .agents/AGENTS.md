@@ -46,6 +46,7 @@ The Cora platform enforces a full 5-level Atomic Component Architecture defined 
 ## 8. Safe Execution & Strict Module Isolation (Zero-Regression Policy)
 - **Strict Module Isolation**: Updating, adding, or refactoring one feature, view, component, or module MUST NEVER disturb, break, degrade, or alter the UI layout, state, API contracts, or functionality of any other module across the Cora platform.
 - **Scoped Namespacing**: All CSS styles, DOM selectors, JavaScript event listeners, and global variable keys must be strictly namespaced or scoped to their target component to prevent global collisions or cross-module interference.
+- **Zero Naked Global `!important` Utilities**: NEVER declare un-namespaced global utility overrides with `!important` (such as `.hidden { display: none !important; }`). All visibility, collapse, modal, drawer, and backdrop lifecycle states MUST use component-scoped state classes (e.g. `.cora-drawer.collapsed`, `.cora-modal:not(.open)`, `.cora-overlay:not(.open)`), letting Tailwind's native compiled utility classes cascade cleanly.
 - **Zero Side Effects**: Modifying shared utilities, core tokens (`cora-design-tokens.js`), or AJAX routers (`cora-workspace.php`) requires auditing all dependent views to guarantee backward compatibility and zero side effects.
 - **Mandatory Regression Verification**: Before completing any task, execute regression verification checks across neighboring modules to confirm that existing workflows remain 100% functional and intact.
 

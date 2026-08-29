@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Calculator, Sparkles, ArrowRight, FileCheck, CheckCircle2 } from 'lucide-react';
+import { Calculator, Sparkles, ArrowRight, FileCheck, CheckCircle2, Code } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -24,6 +24,15 @@ const TOOLS = [
     icon: Sparkles,
     badge: 'AI Powered',
     badgeColor: 'bg-purple-100 text-purple-900',
+    runs: 'Free Forever',
+  },
+  {
+    slug: 'embed-builder',
+    title: 'Autonomous AI Copilot & Embed Builder',
+    description: 'Generate customizable embeddable widgets for Framer, Webflow, WordPress, and Shopify to capture leads and bookings.',
+    icon: Code,
+    badge: 'Developer Tool',
+    badgeColor: 'bg-zinc-100 text-zinc-900 border border-zinc-200',
     runs: 'Free Forever',
   },
 ];

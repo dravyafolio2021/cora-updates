@@ -1,5 +1,5 @@
 import { test, expect, request } from '@playwright/test';
-import { login } from './helpers';
+import { login, cleanupE2EThemes } from './helpers';
 
 test.describe('Canvas Front-End Management System E2E Tests', () => {
   let consoleErrors: string[] = [];
@@ -18,14 +18,16 @@ test.describe('Canvas Front-End Management System E2E Tests', () => {
     page.on('pageerror', err => {
       console.log(`PAGE EXCEPTION: ${err.message}\nStack:\n${err.stack}`);
       // Filter out native Elementor exceptions that are unrelated to Cora's codebase
-      if (!err.message.includes('components') && 
-          !err.message.includes('elementor') && 
-          !err.message.includes('Mui') && 
-          !err.message.includes('404') && 
-          !err.message.includes('403') && 
-          !err.message.includes('Failed to load resource') && 
-          !err.message.includes('Unexpected token') && 
-          !err.message.includes('Invalid or unexpected token')) {
+      const isElementorNative = (err.stack && (err.stack.includes('elementor') || err.stack.includes('elementor-pro'))) ||
+                                err.message.includes('elementor') ||
+                                err.message.includes('components') ||
+                                err.message.includes('Mui') ||
+                                err.message.includes('404') ||
+                                err.message.includes('403') ||
+                                err.message.includes('Failed to load resource') ||
+                                err.message.includes('Unexpected token') ||
+                                err.message.includes('Invalid or unexpected token');
+      if (!isElementorNative) {
         consoleErrors.push(err.message);
       }
     });
@@ -63,7 +65,7 @@ test.describe('Canvas Front-End Management System E2E Tests', () => {
     await page.waitForSelector('#drawer-new-theme.opacity-0');
 
     // 3. Edit Active Theme to enter Level 2 Theme Dashboard
-    await page.click('button:has-text("Edit Theme")');
+    await page.click('button:has-text("Customize")');
     await page.waitForSelector('#canvas-level-2', { state: 'visible' });
     await page.waitForSelector('#canvas-level-1', { state: 'hidden' });
 
@@ -268,7 +270,7 @@ test.describe('Canvas Front-End Management System E2E Tests', () => {
 
     // Confirm error toast
     const toast = page.locator('#cora-toast-container');
-    await expect(toast).toContainText('Invalid Kit');
+    await expect(toast).toContainText('Invalid Elementor Kit');
 
     // 2. Test Positive Case: Upload valid kit
     await page.fill('#import-kit-name-input', 'E2E Imported Theme Kit');
@@ -280,7 +282,16 @@ test.describe('Canvas Front-End Management System E2E Tests', () => {
     await page.waitForSelector('#canvas-level-1', { state: 'visible' });
     await expect(page.locator('body')).toContainText('E2E Imported Theme Kit');
 
-    // Cleanup temp files
+    // Cleanup temp files and test themes immediately
     execSync('rm -rf /tmp/good-kit /tmp/bad-kit /tmp/good-kit.zip /tmp/bad-kit.zip');
+    cleanupE2EThemes();
+  });
+
+  test.afterEach(async () => {
+    cleanupE2EThemes();
+  });
+
+  test.afterAll(() => {
+    cleanupE2EThemes();
   });
 });

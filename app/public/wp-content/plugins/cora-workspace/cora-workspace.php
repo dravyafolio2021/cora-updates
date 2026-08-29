@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.7.4
+ * Version: 4.7.5
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.7.4' );
+    define( 'CORA_WORKSPACE_VERSION', '4.7.5' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -8208,35 +8208,13 @@ function cora_canvas_route_preview_pages( $query ) {
 
     if ( ! $canvas_page ) {
         if ( empty( $path ) ) {
-            // Respect static front page from Reading settings if it belongs to the active theme
-            $page_on_front = intval( get_option( 'page_on_front', 0 ) );
-            $show_on_front = get_option( 'show_on_front' );
+            // 1. Check if theme has an explicit designated homepage (is_homepage = 1)
+            $canvas_page = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1",
+                $preview_theme_id
+            ), ARRAY_A );
 
-            $live_theme_id = 0;
-            $target_agency_id = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 0;
-            if ( $target_agency_id > 0 ) {
-                $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' LIMIT 1", $target_agency_id ), ARRAY_A );
-            } else {
-                $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
-            }
-            if ( $live_theme ) {
-                $live_theme_id = intval( $live_theme['id'] );
-            }
-            $is_previewing_draft = ( $preview_theme_id !== $live_theme_id );
-
-            if ( 'page' === $show_on_front && $page_on_front > 0 ) {
-                $canvas_page = $wpdb->get_row( $wpdb->prepare(
-                    "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND wp_post_id = %d LIMIT 1",
-                    $preview_theme_id,
-                    $page_on_front
-                ), ARRAY_A );
-
-                // If not in cora_canvas_pages, but it's the live theme and the post exists in WP, do not hijack!
-                if ( ! $canvas_page && ! $is_previewing_draft && get_post( $page_on_front ) ) {
-                    return; // Let WP load it normally
-                }
-            }
-            // Fallback: load theme default homepage from settings if no static front page is set
+            // 2. Check homepage_page_id stored in theme settings
             if ( ! $canvas_page ) {
                 $theme = $wpdb->get_row( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d LIMIT 1", $preview_theme_id ), ARRAY_A );
                 if ( $theme ) {
@@ -8250,6 +8228,27 @@ function cora_canvas_route_preview_pages( $query ) {
                         ), ARRAY_A );
                     }
                 }
+            }
+
+            // 3. Fallback: check static front page from Reading settings if it belongs to this theme
+            if ( ! $canvas_page ) {
+                $page_on_front = intval( get_option( 'page_on_front', 0 ) );
+                $show_on_front = get_option( 'show_on_front' );
+                if ( 'page' === $show_on_front && $page_on_front > 0 ) {
+                    $canvas_page = $wpdb->get_row( $wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND wp_post_id = %d LIMIT 1",
+                        $preview_theme_id,
+                        $page_on_front
+                    ), ARRAY_A );
+                }
+            }
+
+            // 4. Final fallback: pick first page belonging to this theme
+            if ( ! $canvas_page ) {
+                $canvas_page = $wpdb->get_row( $wpdb->prepare(
+                    "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY is_homepage DESC, id ASC LIMIT 1",
+                    $preview_theme_id
+                ), ARRAY_A );
             }
         } else {
             // Resolve theme page by slug
@@ -28794,16 +28793,35 @@ function cora_duplicate_wp_post( $post_id, $new_title = '' ) {
 }
 }
 
+if ( ! function_exists( 'cora_canvas_get_draft_theme_limit' ) ) {
+/**
+ * Dynamic draft theme quota limit:
+ * - Free accounts: 3 draft themes
+ * - Paid accounts (Starter, Pro, Enterprise, Agency, etc.): 20 draft themes
+ */
+function cora_canvas_get_draft_theme_limit( $user_id = 0 ) {
+    if ( ! function_exists( 'cora_get_active_workspace_plan' ) ) {
+        return 20;
+    }
+    $plan = strtolower( cora_get_active_workspace_plan( $user_id ) );
+    if ( in_array( $plan, array( 'free', 'free_tier', 'trial', 'none' ), true ) ) {
+        return 3;
+    }
+    return 20;
+}
+}
+
 if ( ! function_exists( 'cora_ajax_canvas_create_theme' ) ) {
 function cora_ajax_canvas_create_theme() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
     cora_canvas_ajax_permission_check( true );
     global $wpdb;
 
-    // Enforce 10 draft theme limit
+    // Enforce tier-based draft theme limit (Free: 3, Paid: 20)
+    $limit = cora_canvas_get_draft_theme_limit();
     $draft_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE status != 'live'" );
-    if ( intval( $draft_count ) >= 10 ) {
-        wp_send_json_error( array( 'message' => 'You have reached the maximum limit of 10 draft themes. Please delete an existing draft theme first.' ) );
+    if ( intval( $draft_count ) >= $limit ) {
+        wp_send_json_error( array( 'message' => sprintf( 'You have reached the maximum limit of %d draft themes for your workspace plan. Please delete an existing draft theme or upgrade your account.', $limit ) ) );
     }
 
     $name = sanitize_text_field( $_POST['name'] );
@@ -29305,7 +29323,7 @@ function cora_ajax_canvas_delete_theme() {
     wp_send_json_success();
 }
 }
-add_action( 'wp_ajax_cora_ajax_delete_theme', 'cora_ajax_canvas_delete_theme' );
+add_action( 'wp_ajax_cora_ajax_delete_theme', 'cora_ajax_delete_theme' );
 
 if ( ! function_exists( 'cora_ajax_canvas_duplicate_theme' ) ) {
 function cora_ajax_canvas_duplicate_theme() {
@@ -29313,10 +29331,14 @@ function cora_ajax_canvas_duplicate_theme() {
     cora_canvas_ajax_permission_check( true );
     global $wpdb;
 
-    // Check draft limit
+    // Check tier-based draft limit (Free: 3, Paid: 20)
+    $limit = cora_canvas_get_draft_theme_limit();
     $draft_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE status != 'live'" );
-    if ( intval( $draft_count ) >= 10 ) {
-        wp_send_json_error( array( 'message' => 'You have reached the maximum limit of 10 draft themes. Please delete an existing draft theme first.' ) );
+    if ( intval( $draft_count ) >= $limit ) {
+        wp_send_json_error( array(
+            'message'   => sprintf( 'You have reached the maximum limit of %d draft themes for your workspace plan.', $limit ),
+            'next_step' => 'Please delete an existing draft theme or upgrade your workspace plan to create more.'
+        ) );
     }
 
     $theme_id = intval( $_POST['theme_id'] );
@@ -29405,7 +29427,10 @@ function cora_ajax_canvas_duplicate_theme() {
         cora_log_activity( 'Canvas', "Duplicated theme id {$theme_id} to {$new_id}." );
         wp_send_json_success();
     }
-    wp_send_json_error( 'Theme not found.' );
+    wp_send_json_error( array(
+        'message'   => 'Theme not found.',
+        'next_step' => 'Please refresh the page and try duplicating again.'
+    ) );
 }
 }
 add_action( 'wp_ajax_cora_ajax_duplicate_theme', 'cora_ajax_canvas_duplicate_theme' );
@@ -29416,33 +29441,68 @@ add_action( 'wp_ajax_cora_ajax_duplicate_theme', 'cora_ajax_canvas_duplicate_the
 if ( ! function_exists( 'cora_validate_and_import_elementor_kit' ) ) {
 function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
     if ( ! class_exists( 'ZipArchive' ) ) {
-        return new WP_Error( 'zip_missing', 'PHP ZipArchive extension is not enabled on this server.' );
+        return new WP_Error( 'zip_missing', 'PHP ZipArchive extension is not enabled on this server.', array(
+            'next_step' => 'Contact your hosting provider to enable the PHP Zip extension.'
+        ) );
     }
 
     $zip = new ZipArchive;
     if ( $zip->open( $file_path ) !== TRUE ) {
-        return new WP_Error( 'zip_open_failed', 'Failed to open ZIP file.' );
+        return new WP_Error( 'zip_open_failed', 'Failed to open ZIP archive. The file may be damaged or incomplete.', array(
+            'next_step' => 'Re-download or re-export the ZIP file and try uploading again.'
+        ) );
     }
 
-    $is_elementor_kit = false;
+    $is_elementor_kit    = false;
     $is_compatible_theme = false;
     $templates_to_import = array();
-    $style_css_content = '';
+    $style_css_content   = '';
 
-    // Loop through files inside ZIP
+    // 1. First, check if manifest.json exists and read its templates list
     for ( $i = 0; $i < $zip->numFiles; $i++ ) {
         $filename = $zip->getNameIndex( $i );
-        
-        // 1. Check for template kit manifest.json
         if ( basename( $filename ) === 'manifest.json' ) {
             $content = $zip->getFromIndex( $i );
             $manifest_data = json_decode( $content, true );
-            if ( json_last_error() === JSON_ERROR_NONE && isset( $manifest_data['templates'] ) ) {
+            if ( json_last_error() === JSON_ERROR_NONE && isset( $manifest_data['templates'] ) && is_array( $manifest_data['templates'] ) ) {
                 $is_elementor_kit = true;
+                foreach ( $manifest_data['templates'] as $tpl_meta ) {
+                    $tpl_file = isset( $tpl_meta['file'] ) ? $tpl_meta['file'] : ( isset( $tpl_meta['path'] ) ? $tpl_meta['path'] : '' );
+                    if ( ! empty( $tpl_file ) ) {
+                        $tpl_content = $zip->getFromName( $tpl_file );
+                        if ( $tpl_content === false ) {
+                            // Try finding file by relative match in zip
+                            for ( $j = 0; $j < $zip->numFiles; $j++ ) {
+                                $entry_name = $zip->getNameIndex( $j );
+                                if ( basename( $entry_name ) === basename( $tpl_file ) ) {
+                                    $tpl_content = $zip->getFromIndex( $j );
+                                    break;
+                                }
+                            }
+                        }
+                        if ( $tpl_content !== false ) {
+                            $templates_to_import[] = array(
+                                'title'   => isset( $tpl_meta['title'] ) ? sanitize_text_field( $tpl_meta['title'] ) : basename( $tpl_file, '.json' ),
+                                'content' => $tpl_content,
+                                'type'    => isset( $tpl_meta['type'] ) ? $tpl_meta['type'] : 'page',
+                            );
+                        }
+                    }
+                }
             }
         }
+    }
+
+    // 2. Loop through files inside ZIP for style.css or direct JSON templates
+    for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+        $filename = $zip->getNameIndex( $i );
         
-        // 2. Check for style.css (Theme)
+        // Skip macOS __MACOSX metadata folders
+        if ( strpos( $filename, '__MACOSX' ) !== false || basename( $filename )[0] === '.' ) {
+            continue;
+        }
+
+        // Check for style.css (Theme)
         if ( basename( $filename ) === 'style.css' ) {
             $style_css_content = $zip->getFromIndex( $i );
             if ( preg_match( '/Theme Name:\s*(.*)/i', $style_css_content, $matches ) ) {
@@ -29453,18 +29513,48 @@ function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
             }
         }
 
-        // 3. Scan JSON files for Elementor page builder structures
+        // Scan JSON files for Elementor page builder structures
         if ( pathinfo( $filename, PATHINFO_EXTENSION ) === 'json' && basename( $filename ) !== 'manifest.json' ) {
             $content = $zip->getFromIndex( $i );
             $json_data = json_decode( $content, true );
-            if ( json_last_error() === JSON_ERROR_NONE ) {
-                // Elementor template JSON structure check
-                if ( isset( $json_data['type'] ) && ( isset( $json_data['content'] ) || isset( $json_data['page_settings'] ) ) ) {
-                    $templates_to_import[] = array(
-                        'title' => isset( $json_data['title'] ) ? sanitize_text_field( $json_data['title'] ) : basename( $filename, '.json' ),
-                        'content' => $content,
-                        'type' => $json_data['type']
-                    );
+            if ( json_last_error() === JSON_ERROR_NONE && ( is_array( $json_data ) || is_object( $json_data ) ) ) {
+                // Check if valid Elementor JSON (object with properties OR raw array of element sections)
+                $is_valid_tpl = false;
+                $tpl_type = 'page';
+
+                if ( is_array( $json_data ) && ! empty( $json_data ) ) {
+                    // Check if object-like associative array
+                    if ( isset( $json_data['content'] ) || isset( $json_data['page_settings'] ) || isset( $json_data['elements'] ) || isset( $json_data['widgets'] ) || isset( $json_data['type'] ) || isset( $json_data['version'] ) ) {
+                        $is_valid_tpl = true;
+                        if ( isset( $json_data['type'] ) ) {
+                            $tpl_type = $json_data['type'];
+                        }
+                    } elseif ( isset( $json_data[0] ) && ( isset( $json_data[0]['elType'] ) || isset( $json_data[0]['id'] ) || isset( $json_data[0]['elements'] ) ) ) {
+                        // Raw array of sections / containers (standard Elementor single template export)
+                        $is_valid_tpl = true;
+                        $tpl_type = 'page';
+                    }
+                }
+
+                if ( $is_valid_tpl ) {
+                    $tpl_title = ( is_array( $json_data ) && isset( $json_data['title'] ) ) ? sanitize_text_field( $json_data['title'] ) : basename( $filename, '.json' );
+                    // Clean up title from filename if generic
+                    $tpl_title = ucwords( str_replace( array( '-', '_' ), ' ', $tpl_title ) );
+                    
+                    $already_exists = false;
+                    foreach ( $templates_to_import as $existing_tpl ) {
+                        if ( $existing_tpl['title'] === $tpl_title ) {
+                            $already_exists = true;
+                            break;
+                        }
+                    }
+                    if ( ! $already_exists ) {
+                        $templates_to_import[] = array(
+                            'title'   => $tpl_title,
+                            'content' => $content,
+                            'type'    => $tpl_type,
+                        );
+                    }
                     $is_elementor_kit = true;
                 }
             }
@@ -29473,7 +29563,13 @@ function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
 
     if ( ! $is_elementor_kit && ! $is_compatible_theme ) {
         $zip->close();
-        return new WP_Error( 'invalid_kit', 'Invalid Kit: This ZIP does not contain a valid Elementor Template Kit or an Elementor-compatible theme.' );
+        return new WP_Error(
+            'invalid_kit',
+            'Invalid Elementor Kit Archive: No Elementor template JSON files or manifest.json were found in this ZIP archive.',
+            array(
+                'next_step' => 'Please upload an Elementor Template Kit (.zip) containing template JSON files (exported from Elementor or Envato Elements), rather than a full WordPress theme installer.'
+            )
+        );
     }
 
     global $wpdb;
@@ -29523,11 +29619,31 @@ function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
     );
     $theme_id = $wpdb->insert_id;
 
-    // Import template pages
+    // 1. Identify which templates to import as pages
+    $candidate_templates = array();
     foreach ( $templates_to_import as $tpl ) {
-        if ( $tpl['type'] !== 'page' ) {
-            continue;
+        if ( ! $has_page_type || in_array( $tpl['type'], array( 'page', 'single-page', 'landing-page' ), true ) ) {
+            $candidate_templates[] = $tpl;
         }
+    }
+    if ( empty( $candidate_templates ) ) {
+        $candidate_templates = $templates_to_import;
+    }
+
+    // 2. Find best homepage candidate
+    $homepage_idx = 0;
+    foreach ( $candidate_templates as $k => $tpl ) {
+        if ( preg_match( '/\b(home|homepage|front|index|landing)\b/i', $tpl['title'] ) ) {
+            $homepage_idx = $k;
+            break;
+        }
+    }
+
+    $homepage_wp_post_id = 0;
+
+    // 3. Import candidate template pages
+    foreach ( $candidate_templates as $k => $tpl ) {
+        $is_home = ( $k === $homepage_idx ) ? 1 : 0;
 
         $wp_post_id = wp_insert_post( array(
             'post_title'   => $tpl['title'],
@@ -29537,9 +29653,25 @@ function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
         ) );
 
         if ( ! is_wp_error( $wp_post_id ) ) {
+            if ( $is_home ) {
+                $homepage_wp_post_id = $wp_post_id;
+            }
+
             $tpl_data = json_decode( $tpl['content'], true );
-            if ( isset( $tpl_data['content'] ) ) {
-                update_post_meta( $wp_post_id, '_elementor_data', wp_slash( json_encode( $tpl_data['content'] ) ) );
+            $elementor_content = array();
+
+            if ( is_array( $tpl_data ) ) {
+                if ( isset( $tpl_data['content'] ) && is_array( $tpl_data['content'] ) ) {
+                    $elementor_content = $tpl_data['content'];
+                } elseif ( isset( $tpl_data['elements'] ) && is_array( $tpl_data['elements'] ) ) {
+                    $elementor_content = $tpl_data['elements'];
+                } elseif ( isset( $tpl_data[0] ) && is_array( $tpl_data[0] ) ) {
+                    $elementor_content = $tpl_data;
+                }
+            }
+
+            if ( ! empty( $elementor_content ) ) {
+                update_post_meta( $wp_post_id, '_elementor_data', wp_slash( json_encode( $elementor_content ) ) );
             }
             update_post_meta( $wp_post_id, '_elementor_edit_mode', 'builder' );
             update_post_meta( $wp_post_id, '_elementor_template_type', 'page' );
@@ -29554,7 +29686,7 @@ function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
                     'title' => $tpl['title'],
                     'slug' => sanitize_title( $tpl['title'] ),
                     'status' => 'draft',
-                    'is_homepage' => 0,
+                    'is_homepage' => $is_home,
                     'template' => 'default',
                     'created_by' => get_current_user_id(),
                     'created_at' => current_time('mysql'),
@@ -29563,6 +29695,22 @@ function cora_validate_and_import_elementor_kit( $file_path, $theme_name ) {
                 array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s', '%s' )
             );
         }
+    }
+
+    // 4. Update theme settings with designated homepage_page_id
+    if ( $homepage_wp_post_id > 0 ) {
+        $existing_settings = json_decode( $wpdb->get_var( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ) ), true ) ?: array();
+        $existing_settings['homepage_page_id'] = $homepage_wp_post_id;
+        $wpdb->update(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array(
+                'settings'   => json_encode( $existing_settings ),
+                'updated_at' => current_time('mysql')
+            ),
+            array( 'id' => $theme_id ),
+            array( '%s', '%s' ),
+            array( '%d' )
+        );
     }
 
     $zip->close();
@@ -29579,14 +29727,21 @@ function cora_ajax_canvas_import_kit() {
     cora_canvas_ajax_permission_check( true );
     global $wpdb;
 
-    // Enforce 10 draft theme limit
+    // Enforce tier-based draft theme limit (Free: 3, Paid: 20)
+    $limit = cora_canvas_get_draft_theme_limit();
     $draft_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE status != 'live'" );
-    if ( intval( $draft_count ) >= 10 ) {
-        wp_send_json_error( 'You have reached the maximum limit of 10 draft themes. Please delete an existing draft theme first.' );
+    if ( intval( $draft_count ) >= $limit ) {
+        wp_send_json_error( array(
+            'message'   => sprintf( 'You have reached the maximum limit of %d draft themes for your workspace plan.', $limit ),
+            'next_step' => 'Please delete an existing draft theme or upgrade your workspace plan to create more.'
+        ) );
     }
     
     if ( empty( $_FILES['kit_zip'] ) ) {
-        wp_send_json_error( 'No file uploaded.' );
+        wp_send_json_error( array(
+            'message'   => 'No file was uploaded.',
+            'next_step' => 'Please choose or drag-and-drop a valid Elementor Kit (.zip) file and try again.'
+        ) );
     }
 
     $theme_name = sanitize_text_field( $_POST['theme_name'] );
@@ -29598,11 +29753,18 @@ function cora_ajax_canvas_import_kit() {
     $imported = cora_validate_and_import_elementor_kit( $file['tmp_name'], $theme_name );
 
     if ( is_wp_error( $imported ) ) {
-        wp_send_json_error( $imported->get_error_message() );
+        $error_data = $imported->get_error_data();
+        $next_step  = is_array( $error_data ) && isset( $error_data['next_step'] ) ? $error_data['next_step'] : 'Ensure the ZIP is an Elementor Template Kit containing template JSON files and try again.';
+        wp_send_json_error( array(
+            'message'   => $imported->get_error_message(),
+            'next_step' => $next_step,
+        ) );
     }
 
     cora_log_activity( 'Canvas', "Imported Elementor Kit/Theme '{$theme_name}'." );
-    wp_send_json_success();
+    wp_send_json_success( array(
+        'message' => "Theme '{$theme_name}' was imported successfully."
+    ) );
 }
 }
 add_action( 'wp_ajax_cora_ajax_import_kit', 'cora_ajax_canvas_import_kit' );
@@ -29613,34 +29775,83 @@ function cora_ajax_canvas_scan_kit() {
     cora_canvas_ajax_permission_check( true );
 
     if ( empty( $_FILES['kit_zip'] ) ) {
-        wp_send_json_error( 'No file uploaded.' );
+        wp_send_json_error( array(
+            'message'   => 'No file uploaded.',
+            'next_step' => 'Select a valid .zip file.'
+        ) );
     }
 
     $file = $_FILES['kit_zip'];
     if ( ! class_exists( 'ZipArchive' ) ) {
-        wp_send_json_error( 'PHP ZipArchive extension is not enabled on this server.' );
+        wp_send_json_error( array(
+            'message'   => 'PHP ZipArchive extension is not enabled on this server.',
+            'next_step' => 'Contact server admin to enable php-zip.'
+        ) );
     }
 
     $zip = new ZipArchive;
     if ( $zip->open( $file['tmp_name'] ) !== TRUE ) {
-        wp_send_json_error( 'Failed to open ZIP file.' );
+        wp_send_json_error( array(
+            'message'   => 'Failed to open ZIP file.',
+            'next_step' => 'Verify the file is not corrupted.'
+        ) );
     }
 
     $pages = array();
+    
+    // Check manifest.json first
     for ( $i = 0; $i < $zip->numFiles; $i++ ) {
         $filename = $zip->getNameIndex( $i );
-        // Scan JSON files (excluding manifest.json)
-        if ( pathinfo( $filename, PATHINFO_EXTENSION ) === 'json' && basename( $filename ) !== 'manifest.json' ) {
+        if ( basename( $filename ) === 'manifest.json' ) {
             $content = $zip->getFromIndex( $i );
-            $json_data = json_decode( $content, true );
-            if ( json_last_error() === JSON_ERROR_NONE ) {
-                if ( isset( $json_data['type'] ) && $json_data['type'] === 'page' ) {
-                    $pages[] = isset( $json_data['title'] ) ? sanitize_text_field( $json_data['title'] ) : basename( $filename, '.json' );
+            $manifest_data = json_decode( $content, true );
+            if ( json_last_error() === JSON_ERROR_NONE && isset( $manifest_data['templates'] ) && is_array( $manifest_data['templates'] ) ) {
+                foreach ( $manifest_data['templates'] as $tpl_meta ) {
+                    if ( ! empty( $tpl_meta['title'] ) ) {
+                        $pages[] = sanitize_text_field( $tpl_meta['title'] );
+                    }
+                }
+            }
+        }
+    }
+
+    // Direct JSON template inspection if manifest didn't yield pages
+    if ( empty( $pages ) ) {
+        for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+            $filename = $zip->getNameIndex( $i );
+            // Skip macOS metadata
+            if ( strpos( $filename, '__MACOSX' ) !== false || basename( $filename )[0] === '.' ) {
+                continue;
+            }
+            if ( pathinfo( $filename, PATHINFO_EXTENSION ) === 'json' && basename( $filename ) !== 'manifest.json' ) {
+                $content = $zip->getFromIndex( $i );
+                $json_data = json_decode( $content, true );
+                if ( json_last_error() === JSON_ERROR_NONE && is_array( $json_data ) && ! empty( $json_data ) ) {
+                    $is_valid = false;
+                    if ( isset( $json_data['content'] ) || isset( $json_data['page_settings'] ) || isset( $json_data['elements'] ) || isset( $json_data['widgets'] ) || isset( $json_data['type'] ) || isset( $json_data['version'] ) ) {
+                        $is_valid = true;
+                    } elseif ( isset( $json_data[0] ) && ( isset( $json_data[0]['elType'] ) || isset( $json_data[0]['id'] ) || isset( $json_data[0]['elements'] ) ) ) {
+                        $is_valid = true;
+                    }
+                    if ( $is_valid ) {
+                        $title = isset( $json_data['title'] ) ? sanitize_text_field( $json_data['title'] ) : basename( $filename, '.json' );
+                        $title = ucwords( str_replace( array( '-', '_' ), ' ', $title ) );
+                        if ( ! in_array( $title, $pages, true ) ) {
+                            $pages[] = $title;
+                        }
+                    }
                 }
             }
         }
     }
     $zip->close();
+
+    if ( empty( $pages ) ) {
+        wp_send_json_error( array(
+            'message'   => 'No Elementor page templates found in this ZIP archive.',
+            'next_step' => 'Please upload an Elementor Template Kit (.zip) containing template JSON files (e.g. from Envato Elements or Elementor exports).'
+        ) );
+    }
 
     wp_send_json_success( array( 'pages' => $pages ) );
 }

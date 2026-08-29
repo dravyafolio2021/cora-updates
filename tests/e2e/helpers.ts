@@ -54,3 +54,25 @@ export async function login(page: Page, username?: string, password?: string) {
   });
 }
 
+export function cleanupE2EThemes() {
+  const phpBin = '/Applications/Local.app/Contents/Resources/extraResources/lightning-services/php-8.2.29+0/bin/darwin-arm64/bin/php';
+  const phpCode = `
+    require 'app/public/wp-load.php';
+    global $wpdb;
+    $ids = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE name LIKE 'E2E%' OR name LIKE 'Temp E2E%' OR name LIKE '%Catalog Theme%' OR name LIKE '%Draft Starter Theme%'");
+    if (!empty($ids)) {
+      $p = implode(',', array_map('intval', $ids));
+      $pids = $wpdb->get_col("SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id IN ($p)");
+      foreach ($pids as $pid) {
+        if ($pid > 0) wp_delete_post(intval($pid), true);
+      }
+      $wpdb->query("DELETE FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id IN ($p)");
+      $wpdb->query("DELETE FROM {$wpdb->prefix}cora_canvas_themes WHERE id IN ($p)");
+    }
+  `;
+  try {
+    const { execFileSync } = require('child_process');
+    execFileSync(phpBin, ['-r', phpCode], { stdio: 'pipe' });
+  } catch (e) {}
+}
+

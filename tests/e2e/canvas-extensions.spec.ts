@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { login } from './helpers';
+import { execSync } from 'child_process';
+import { login, cleanupE2EThemes } from './helpers';
 
 test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () => {
 
@@ -15,6 +16,25 @@ test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () 
     // Assert Level 1 headers and panels are visible
     await expect(page.locator('#canvas-level-1 h1')).toContainText('Themes');
     await expect(page.locator('h3:has-text("Draft themes")')).toBeVisible();
+
+    // Ensure at least 1 draft theme exists in the library
+    const hasDrafts = await page.evaluate(() => {
+      const themes = (window as any).canvasState?.themes || [];
+      return themes.some((t: any) => t.status !== 'live');
+    });
+    if (!hasDrafts) {
+      await page.evaluate(async () => {
+        const { ajaxUrl, ajaxNonce } = (window as any).coraREData;
+        const fd = new FormData();
+        fd.append('action', 'cora_ajax_create_theme');
+        fd.append('name', 'E2E Draft Starter Theme');
+        fd.append('start_from', 'blank');
+        fd.append('nonce', ajaxNonce);
+        await fetch(ajaxUrl, { method: 'POST', body: fd });
+      });
+      await page.reload();
+      await page.waitForSelector('#canvas-level-1', { state: 'visible' });
+    }
 
     // Verify Draft theme items exist and test "Edit theme" navigation to Level 2
     const editThemeBtn = page.locator('#draft-themes-library-card button:has-text("Edit theme")').first();
@@ -133,16 +153,17 @@ test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () 
     await page.waitForSelector('#canvas-level-1', { state: 'visible', timeout: 10000 });
   });
 
-  test('Should enforce maximum limit of 10 draft themes and reject creation beyond limit', async ({ page }) => {
+  test('Should enforce draft theme quota limit (3 for free, 20 for paid) and reject creation beyond limit', async ({ page }) => {
     await login(page);
     await page.goto('/workspace/canvas');
     await page.waitForSelector('#canvas-level-1', { state: 'visible' });
 
-    // Grab nonce and ajaxUrl
-    const { ajaxUrl, nonce } = await page.evaluate(() => {
+    // Grab nonce, ajaxUrl and dynamic draftLimit
+    const { ajaxUrl, nonce, draftLimit } = await page.evaluate(() => {
       return {
         ajaxUrl: (window as any).coraREData.ajaxUrl,
-        nonce: (window as any).coraREData.ajaxNonce
+        nonce: (window as any).coraREData.ajaxNonce,
+        draftLimit: (window as any).canvasState.draftLimit || 20
       };
     });
 
@@ -150,56 +171,46 @@ test.describe('Canvas Advanced Extensions & Competitor Alignment E2E Tests', () 
       return (window as any).canvasState.themes.filter((t: any) => t.status !== 'live').length;
     });
 
-    // Create draft themes until we reach 10
-    const createdThemeIds: number[] = [];
-    const themesToCreate = 10 - currentDraftsCount;
-    for (let i = 0; i < themesToCreate; i++) {
-      const res = await page.evaluate(async ({ ajaxUrl, nonce, i }) => {
+    try {
+      // Create draft themes until we reach the quota limit
+      const themesToCreate = draftLimit - currentDraftsCount;
+      for (let i = 0; i < themesToCreate; i++) {
+        const res = await page.evaluate(async ({ ajaxUrl, nonce, i }) => {
+          const fd = new FormData();
+          fd.append('action', 'cora_ajax_create_theme');
+          fd.append('name', `Temp E2E Draft ${i}`);
+          fd.append('start_from', 'blank');
+          fd.append('nonce', nonce);
+          const response = await fetch(ajaxUrl, { method: 'POST', body: fd });
+          return response.json();
+        }, { ajaxUrl, nonce, i });
+        expect(res.success).toBe(true);
+      }
+
+      // Try to create an additional theme beyond limit, it should fail
+      const failCreateRes = await page.evaluate(async ({ ajaxUrl, nonce }) => {
         const fd = new FormData();
         fd.append('action', 'cora_ajax_create_theme');
-        fd.append('name', `Temp E2E Draft ${i}`);
+        fd.append('name', 'Temp E2E Draft Failed');
         fd.append('start_from', 'blank');
         fd.append('nonce', nonce);
         const response = await fetch(ajaxUrl, { method: 'POST', body: fd });
         return response.json();
-      }, { ajaxUrl, nonce, i });
-      expect(res.success).toBe(true);
+      }, { ajaxUrl, nonce });
+
+      expect(failCreateRes.success).toBe(false);
+      expect(failCreateRes.data.message || failCreateRes.data).toContain(`maximum limit of ${draftLimit} draft themes`);
+    } finally {
+      cleanupE2EThemes();
     }
+  });
 
-    // Try to create the 11th theme, it should fail
-    const failCreateRes = await page.evaluate(async ({ ajaxUrl, nonce }) => {
-      const fd = new FormData();
-      fd.append('action', 'cora_ajax_create_theme');
-      fd.append('name', 'Temp E2E Draft Failed');
-      fd.append('start_from', 'blank');
-      fd.append('nonce', nonce);
-      const response = await fetch(ajaxUrl, { method: 'POST', body: fd });
-      return response.json();
-    }, { ajaxUrl, nonce });
+  test.afterEach(() => {
+    cleanupE2EThemes();
+  });
 
-    expect(failCreateRes.success).toBe(false);
-    expect(failCreateRes.data.message || failCreateRes.data).toContain('maximum limit of 10 draft themes');
-
-    // Reload page to get all themes in state
-    await page.reload();
-    await page.waitForSelector('#canvas-level-1', { state: 'visible' });
-
-    // Clean up created E2E draft themes
-    const draftsToDelete = await page.evaluate(() => {
-      return (window as any).canvasState.themes
-        .filter((t: any) => t.name.startsWith('Temp E2E Draft'))
-        .map((t: any) => t.id);
-    });
-
-    for (const themeId of draftsToDelete) {
-      await page.evaluate(async ({ ajaxUrl, nonce, themeId }) => {
-        const fd = new FormData();
-        fd.append('action', 'cora_ajax_delete_theme');
-        fd.append('theme_id', themeId.toString());
-        fd.append('nonce', nonce);
-        await fetch(ajaxUrl, { method: 'POST', body: fd });
-      }, { ajaxUrl, nonce, themeId });
-    }
+  test.afterAll(() => {
+    cleanupE2EThemes();
   });
 
 });

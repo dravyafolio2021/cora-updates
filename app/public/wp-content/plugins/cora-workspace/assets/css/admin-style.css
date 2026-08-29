@@ -109,35 +109,46 @@
 .dark .cora-tour-popover.arrow-right::after { border-left-color: #18181b; }
 
 /* =============================================================================
-   2. UTILITY OVERRIDES & RESPONSIVE DISPLAY
+   2. COMPONENT-SCOPED DISPLAY GUARANTEES
    ============================================================================= */
-.hidden {
-    display: none !important;
-}
 
-@media (min-width: 640px) {
-    .sm\:flex.hidden, .hidden.sm\:flex { display: flex !important; }
-    .sm\:grid.hidden, .hidden.sm\:grid { display: grid !important; }
-    .sm\:block.hidden, .hidden.sm\:block { display: block !important; }
-    .sm\:inline-flex.hidden, .hidden.sm\:inline-flex { display: inline-flex !important; }
+/* Workspace Header: Desktop and Mobile display isolation */
+.cora-topbar-desktop {
+    display: none;
 }
-@media (min-width: 768px) {
-    .md\:flex.hidden, .hidden.md\:flex { display: flex !important; }
-    .md\:grid.hidden, .hidden.md\:grid { display: grid !important; }
-    .md\:block.hidden, .hidden.md\:block { display: block !important; }
-    .md\:inline-flex.hidden, .hidden.md\:inline-flex { display: inline-flex !important; }
+.cora-topbar-mobile {
+    display: flex;
 }
 @media (min-width: 1024px) {
-    .lg\:flex.hidden, .hidden.lg\:flex { display: flex !important; }
-    .lg\:grid.hidden, .hidden.lg\:grid { display: grid !important; }
-    .lg\:block.hidden, .hidden.lg\:block { display: block !important; }
-    .lg\:inline-flex.hidden, .hidden.lg\:inline-flex { display: inline-flex !important; }
+    .cora-topbar-desktop,
+    #cora-global-topbar > .cora-topbar-desktop,
+    header#cora-global-topbar .cora-topbar-desktop {
+        display: flex !important;
+    }
+    .cora-topbar-mobile,
+    #cora-global-topbar > .cora-topbar-mobile,
+    header#cora-global-topbar .cora-topbar-mobile {
+        display: none !important;
+    }
 }
-@media (min-width: 1280px) {
-    .xl\:flex.hidden, .hidden.xl\:flex { display: flex !important; }
-    .xl\:grid.hidden, .hidden.xl\:grid { display: grid !important; }
-    .xl\:block.hidden, .hidden.xl\:block { display: block !important; }
-    .xl\:inline-flex.hidden, .hidden.xl\:inline-flex { display: inline-flex !important; }
+@media (max-width: 1023.98px) {
+    .cora-topbar-desktop,
+    #cora-global-topbar > .cora-topbar-desktop,
+    header#cora-global-topbar .cora-topbar-desktop {
+        display: none !important;
+    }
+    .cora-topbar-mobile,
+    #cora-global-topbar > .cora-topbar-mobile,
+    header#cora-global-topbar .cora-topbar-mobile {
+        display: flex !important;
+    }
+}
+
+/* Platform AI Stack display hook */
+@media (min-width: 768px) {
+    .cora-platform-stack {
+        display: flex !important;
+    }
 }
 
 /* =============================================================================

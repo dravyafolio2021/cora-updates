@@ -59,16 +59,17 @@ if ($_cv_page_id > 0) {
     }
 }
 
+$draft_limit   = function_exists( 'cora_canvas_get_draft_theme_limit' ) ? cora_canvas_get_draft_theme_limit() : 20;
 $all_draft_ids = $wpdb->get_col( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status != 'live' ORDER BY id DESC" );
-if ( count( $all_draft_ids ) > 10 ) {
-    $to_delete_ids = array_slice( $all_draft_ids, 10 );
+if ( count( $all_draft_ids ) > $draft_limit ) {
+    $to_delete_ids = array_slice( $all_draft_ids, $draft_limit );
     $ids_placeholder = implode( ',', array_map( 'intval', $to_delete_ids ) );
     $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_canvas_themes WHERE id IN ($ids_placeholder)" );
     // Delete associated pages to prevent orphaned records
     $wpdb->query( "DELETE FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id IN ($ids_placeholder)" );
 }
 
-$themes = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY status = 'live' DESC, id DESC", ARRAY_A );
+$themes = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY status = 'live' DESC, updated_at DESC, id DESC", ARRAY_A );
 
 // Fetch WP pages for dropdown selectors
 $wp_pages = get_pages();
@@ -303,12 +304,12 @@ function cora_get_sparkline_points( $history, $type ) {
                         </button>
                         
                         <!-- Gemini Button -->
-                        <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-8 h-8 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 flex items-center justify-center text-blue-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
+                        <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-8 h-8 rounded-full border-0 bg-blue-50/70 hover:bg-blue-100/50 flex items-center justify-center text-blue-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
                         </button>
                         
                         <!-- Perplexity Button -->
-                        <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 flex items-center justify-center text-zinc-650 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
+                        <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 flex items-center justify-center text-zinc-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
                         </button>
                         
@@ -344,7 +345,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     </button>
                     
                     <!-- Gemini Button -->
-                    <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-8 h-8 rounded-full border-0 bg-blue-5/70 hover:bg-blue-100/50 flex items-center justify-center text-blue-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
+                    <button onclick="coraAskExternalPlatform('gemini')" class="group relative w-8 h-8 rounded-full border-0 bg-blue-50/70 hover:bg-blue-100/50 flex items-center justify-center text-blue-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 3 !important; margin-left: -6px !important;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="w-4 h-4"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask Gemini
@@ -353,7 +354,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     </button>
                     
                     <!-- Perplexity Button -->
-                    <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 flex items-center justify-center text-zinc-650 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
+                    <button onclick="coraAskExternalPlatform('perplexity')" class="group relative w-8 h-8 rounded-full border-0 bg-zinc-50/50 hover:bg-zinc-100/80 flex items-center justify-center text-zinc-600 transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 hover:z-50 shadow-2xs cursor-pointer focus:outline-none" style="z-index: 2 !important; margin-left: -6px !important;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line></svg>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 bg-zinc-950 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask Perplexity
@@ -570,29 +571,50 @@ function cora_get_sparkline_points( $history, $type ) {
         <div class="bg-white border border-zinc-200 rounded-xl shadow-sm relative overflow-visible" id="active-theme-card">
             <!-- Theme preview: Dual device frames + theme info row -->
             <div class="p-5 flex flex-col lg:flex-row items-stretch lg:items-center gap-6">
-                <!-- Left device frames block -->
-                <div class="flex gap-4 shrink-0 justify-center lg:justify-start items-center">
-                    <!-- Desktop Frame: 280×200px | scale = 280/1280 = 0.21875 -->
-                    <div class="rounded-xl border border-zinc-200 relative shadow-sm overflow-hidden flex flex-col bg-white select-none pointer-events-none shrink-0" style="width: 280px; height: 200px;">
-                        <div class="flex items-center gap-1 px-2.5 py-2 border-b border-zinc-100 shrink-0 bg-zinc-50/50 ">
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                            <div class="flex-1 mx-2 bg-zinc-100 rounded text-[6px] font-mono text-zinc-400 px-2 py-0.5 text-center truncate"><?php echo esc_html( $canvas_display_url ); ?></div>
+                <!-- Left device frames block: Desktop + Overlapping/Anchored Mobile Frame -->
+                <div class="relative shrink-0 flex items-center justify-center lg:justify-start" style="min-width: 280px; max-width: 320px;">
+                    <!-- Desktop Browser Frame -->
+                    <div class="rounded-xl border border-zinc-200 shadow-xs overflow-hidden flex flex-col bg-white select-none pointer-events-none" style="width: 280px; height: 185px;">
+                        <!-- Browser Top Bar -->
+                        <div class="flex items-center gap-1.5 px-3 py-1.5 border-b border-zinc-100 shrink-0 bg-zinc-50/80">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                            <div class="flex-1 mx-2 bg-zinc-100/80 rounded px-2 py-0.5 text-[7px] font-mono text-zinc-400 text-center truncate">
+                                <?php echo esc_html( $canvas_display_url ); ?>
+                            </div>
                         </div>
-                        <!-- viewport: 1280px wide × 850px tall → scale 0.21875 → renders 280px × 185px (fills 172px container height perfectly, cropping the bottom) -->
-                        <div class="flex-1 relative overflow-hidden bg-white" style="width: 280px; height: 172px;">
-                            <iframe src="<?php echo esc_url( $canvas_preview_url ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:1280px !important;min-width:1280px !important;max-width:none !important;height:850px !important;min-height:850px !important;max-height:none !important;transform:scale(0.21875);transform-origin:0 0;border:none;display:block;background:#ffffff;"></iframe>
+                        <!-- Browser Viewport (1280x850 scaled to 280x157) -->
+                        <div class="flex-1 relative overflow-hidden bg-zinc-50">
+                            <iframe 
+                                src="<?php echo esc_url( $canvas_preview_url ); ?>" 
+                                loading="lazy"
+                                sandbox="allow-scripts allow-same-origin"
+                                class="absolute border-none pointer-events-none" 
+                                style="top:0;left:0;width:1280px;height:850px;transform:scale(0.21875);transform-origin:0 0;background:#ffffff;"
+                                tabindex="-1"
+                                aria-hidden="true">
+                            </iframe>
                         </div>
                     </div>
-                    <!-- Mobile Frame: 90×200px | scale = 90/390 = 0.230769 (hidden on small mobile screens to prevent layout overflow) -->
-                    <div class="hidden sm:flex rounded-xl border-2 border-zinc-200 shadow-sm overflow-hidden flex-col bg-white select-none pointer-events-none shrink-0" style="width: 90px; height: 200px;">
-                        <div class="shrink-0 flex items-center justify-center py-1 bg-zinc-50/50 border-b border-zinc-100 ">
-                            <span class="w-6 h-0.5 rounded-full bg-zinc-300 "></span>
+
+                    <!-- Mobile Device Frame (Anchored Bottom-Right Smartphone Mockup) -->
+                    <div class="absolute -right-2 -bottom-2 rounded-xl border-2 border-zinc-900 shadow-xl overflow-hidden flex flex-col bg-zinc-900 select-none pointer-events-none shrink-0 z-10" style="width: 82px; height: 164px;">
+                        <!-- Mobile Dynamic Island / Speaker Pill -->
+                        <div class="shrink-0 flex items-center justify-center py-1 bg-zinc-900">
+                            <span class="w-4 h-1 rounded-full bg-zinc-700"></span>
                         </div>
-                        <!-- viewport: 390px wide × 850px tall → scale 0.230769 → renders 90px × 196px (fills container height perfectly, cropping the bottom) -->
-                        <div class="flex-1 relative overflow-hidden bg-white" style="width: 90px; height: 188px;">
-                            <iframe src="<?php echo esc_url( $canvas_preview_url ); ?>" class="absolute border-none pointer-events-none" style="top:0;left:0;width:390px !important;min-width:390px !important;max-width:none !important;height:850px !important;min-height:850px !important;max-height:none !important;transform:scale(0.230769);transform-origin:0 0;border:none;display:block;background:#ffffff;"></iframe>
+                        <!-- Mobile Viewport (390x800 scaled to 82x150) -->
+                        <div class="flex-1 relative overflow-hidden bg-white rounded-b-[10px]">
+                            <iframe 
+                                src="<?php echo esc_url( $canvas_preview_url ); ?>" 
+                                loading="lazy"
+                                sandbox="allow-scripts allow-same-origin"
+                                class="absolute border-none pointer-events-none" 
+                                style="top:0;left:0;width:390px;height:715px;transform:scale(0.21);transform-origin:0 0;background:#ffffff;"
+                                tabindex="-1"
+                                aria-hidden="true">
+                            </iframe>
                         </div>
                     </div>
                 </div>
@@ -618,27 +640,27 @@ function cora_get_sparkline_points( $history, $type ) {
 
                         <!-- Optimization Feature Badges Wrap Row (Sleek, pill-shaped monochromatic tags with no borders/outlines) -->
                         <div class="flex flex-wrap gap-1.5 mt-1">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 Optimized
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                                 Core Web Vitals
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                 SEO Ready
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect></svg>
                                 Responsive
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
                                 Accessibility AA
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-750 ">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 text-[9.5px] font-semibold text-zinc-700">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                                 Elementor
                             </span>
@@ -682,24 +704,27 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <span>Actions</span>
                                     <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </button>
-                                <div id="active-theme-dropdown" class="hidden absolute right-0 top-full mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-50 text-left font-sans select-none">
-                                    <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold transition-colors decoration-none">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                        View
+                                <div id="active-theme-dropdown" class="hidden absolute right-0 top-full mt-1.5 w-56 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-50 text-left font-sans select-none">
+                                    <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold transition-colors decoration-none">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        <span>View</span>
                                     </a>
-                                    <button onclick="triggerRenameTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                        Rename
+                                    <button onclick="triggerRenameTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                        <span>Rename</span>
                                     </button>
                                     <div class="border-t border-zinc-100 my-1"></div>
-                                    <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('code');" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
-                                        Edit code
+                                    <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('code');" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                        <span>Edit code</span>
                                     </button>
-                                    <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('settings');" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
-                                        Edit default theme content
+                                    <button onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('settings');" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                        <span>Edit default theme content</span>
                                     </button>
-                                    <button onclick="triggerDownloadTheme(<?php echo $live_theme['id']; ?>)" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
-                                        Download theme file
+                                    <button onclick="triggerDownloadTheme(<?php echo $live_theme['id']; ?>)" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                        <span>Download theme file</span>
                                     </button>
                                 </div>
                             </div>
@@ -707,189 +732,21 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
                 </div>
             </div>
-        </div>
-            <?php
-            $score_status_text = 'Needs improve';
-            $score_status_color = 'text-amber-600';
-            $score_radial_color = '#f59e0b';
-            if ( intval( $ps_score ) >= 90 ) {
-                $score_status_text = 'Good';
-                $score_status_color = 'text-green-650';
-                $score_radial_color = '#22c55e';
-            } elseif ( intval( $ps_score ) < 50 ) {
-                $score_status_text = 'Poor';
-                $score_status_color = 'text-red-600';
-                $score_radial_color = '#ef4444';
-            }
-            ?>
-            <!-- Performance + Statistics cards in a row (responsive stack on mobile) -->
-            <div class="flex flex-col md:flex-row gap-5 items-stretch mt-6">
-                <!-- Performance Insights Card -->
-                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between" id="performance-insights-card">
-                    <div>
-                        <h3 class="text-sm font-black text-zinc-900 mb-4">Performance insights</h3>
-                        <div class="flex items-center gap-4 mb-4">
-                            <!-- Circular Score Radial -->
-                            <div class="relative w-16 h-16 shrink-0">
-                                <svg viewBox="0 0 36 36" class="w-16 h-16 -rotate-90">
-                                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f4f4f5" stroke-width="3"></circle>
-                                    <circle id="pagespeed-radial-score" cx="18" cy="18" r="15.9" fill="none" stroke="<?php echo $score_radial_color; ?>" stroke-width="3" stroke-dasharray="<?php echo intval($ps_score); ?> <?php echo 100 - intval($ps_score); ?>" stroke-linecap="round"></circle>
-                                </svg>
-                                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span id="pagespeed-radial-val" class="text-base font-black text-zinc-900 leading-none"><?php echo esc_html($ps_score); ?></span>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="text-xs font-bold text-zinc-700 ">Performance score</div>
-                                <div id="pagespeed-score-status" class="text-sm font-black <?php echo $score_status_color; ?> mt-0.5"><?php echo esc_html($score_status_text); ?></div>
-                                <div class="text-[10px] text-zinc-400 mt-1 flex items-center gap-1">
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-green-500"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                                    Faster than <span id="pagespeed-faster-pct"><?php echo max(10, min(99, intval($ps_score) - 16)); ?></span>% of websites
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Core Web Vitals Metrics Grid -->
-                        <div class="grid grid-cols-3 gap-2 py-2 px-3 bg-zinc-50/50 rounded-lg border border-zinc-100 mb-5">
-                            <div class="text-center">
-                                <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">LCP</div>
-                                <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_lcp); ?></div>
-                            </div>
-                            <div class="text-center border-l border-zinc-100 ">
-                                <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">INP</div>
-                                <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_inp); ?></div>
-                            </div>
-                            <div class="text-center border-l border-zinc-100 ">
-                                <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">CLS</div>
-                                <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_cls); ?></div>
-                            </div>
-                        </div>
-
-                        <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Top opportunities</div>
-                        <div id="pagespeed-opportunities-list" class="space-y-2">
-                            <?php foreach ($ps_opps as $opp) : 
-                                $opp_severity = $opp['severity'] ?? 'Medium';
-                                $opp_badge_class = 'bg-zinc-150/60 text-zinc-650 border border-zinc-250/20';
-                                if ($opp_severity === 'High') {
-                                    $opp_badge_class = 'bg-red-50 text-red-700 border border-red-200/50';
-                                } elseif ($opp_severity === 'Medium') {
-                                    $opp_badge_class = 'bg-amber-50 text-amber-700 border border-amber-200/50';
-                                }
-                                $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
-                                if (stripos($opp['label'], 'javascript') !== false || stripos($opp['label'], 'js') !== false) {
-                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
-                                } elseif (stripos($opp['label'], 'image') !== false) {
-                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
-                                } elseif (stripos($opp['label'], 'inp') !== false || stripos($opp['label'], 'paint') !== false || stripos($opp['label'], 'blocking') !== false) {
-                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
-                                }
-                            ?>
-                            <div class="flex items-center justify-between p-2.5 bg-zinc-50/50 hover:bg-zinc-50 border border-zinc-100 rounded-lg cursor-pointer transition-all group" onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...');">
-                                <div class="flex items-center gap-2.5 min-w-0">
-                                    <div class="w-6 h-6 rounded bg-white border border-zinc-200/60 flex items-center justify-center shrink-0">
-                                        <?php echo $opp_icon; ?>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <div class="text-[10px] font-bold text-zinc-800 truncate"><?php echo esc_html($opp['label']); ?></div>
-                                        <div class="text-[9px] text-zinc-400 mt-0.5"><?php echo esc_html($opp['savings']); ?></div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2 shrink-0 ml-2">
-                                    <span class="px-2 py-0.5 text-[8px] font-bold rounded-full <?php echo $opp_badge_class; ?>"><?php echo esc_html($opp_severity); ?></span>
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-350 group-hover:text-zinc-700 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <button onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } else { window.coraShowToast('Loading full performance report...'); }" class="mt-4 text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-none bg-transparent p-0 transition-colors w-max font-sans">View full performance report</button>
-                </div>
-
-                <!-- Website Statistics Card -->
-                <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between" id="website-statistics-card">
-                    <div>
-                        <h3 class="text-sm font-black text-zinc-900 mb-4 font-sans">Website statistics</h3>
-                        <div class="space-y-1">
-                            <?php
-                            $stats_rows = [
-                                ['label' => 'Pages', 'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>', 'value' => count($live_stats), 'delta' => '+5', 'positive' => true, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
-                                ['label' => 'Published', 'icon' => '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>', 'value' => $pub_count, 'delta' => 'No change', 'neutral' => true, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
-                                ['label' => 'Drafts', 'icon' => '<path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>', 'value' => $dr_count, 'delta' => '-3', 'positive' => false, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
-                                ['label' => 'Active Listings', 'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>', 'value' => $cora_listings_count, 'delta' => '+1', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('listings'); }"],
-                                ['label' => 'Client Leads', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>', 'value' => $cora_leads_count, 'delta' => '+7', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('leads'); }"],
-                                ['label' => 'Total Bookings', 'icon' => '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>', 'value' => $cora_bookings_count, 'delta' => '+2', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('bookings'); }"],
-                            ];
-                            $total_rows = count($stats_rows);
-                            foreach ($stats_rows as $index => $row) :
-                            ?>
-                            <div onclick="<?php echo $row['action']; ?>" class="flex items-center justify-between py-2 hover:bg-zinc-50/50 px-2 -mx-2 rounded-lg cursor-pointer transition-colors group">
-                                <div class="flex items-center gap-2.5 text-xs font-semibold text-zinc-700 font-sans">
-                                    <div class="w-6 h-6 rounded bg-zinc-100/60 flex items-center justify-center text-zinc-450 transition-colors group-hover:bg-zinc-200/50 shrink-0">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><?php echo $row['icon']; ?></svg>
-                                    </div>
-                                    <?php echo esc_html($row['label']); ?>
-                                </div>
-                                <div class="flex items-center gap-3 font-sans">
-                                    <span class="text-xs font-black text-zinc-900 "><?php echo $row['value']; ?></span>
-                                    <?php if (!empty($row['neutral'])) : ?>
-                                        <span class="text-[10px] text-zinc-400 font-semibold"><?php echo esc_html($row['delta']); ?></span>
-                                    <?php elseif ($row['positive']) : ?>
-                                        <span class="text-[10px] text-green-600 font-bold"><?php echo esc_html($row['delta']); ?></span>
-                                    <?php else : ?>
-                                        <span class="text-[10px] text-red-500 font-bold"><?php echo esc_html($row['delta']); ?></span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <?php if ($index < $total_rows - 1) : ?>
-                            <div class="h-px bg-zinc-100/60 my-0.5"></div>
-                            <?php endif; ?>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                </div>
-            </div><!-- end flex row -->
-
-        <!-- Recommended For You Banner -->
-        <?php 
-        $rec_opp = $ps_opps[0] ?? array('label' => 'Reduce JavaScript execution', 'savings' => 'Potential savings: ~210ms', 'severity' => 'Medium');
-        $rec_metric = 'INP';
-        $rec_metric_val = $ps_inp;
-        $rec_target = '150ms';
-        if (stripos($rec_opp['label'], 'lcp') !== false || stripos($rec_opp['label'], 'image') !== false || stripos($rec_opp['label'], 'render') !== false) {
-            $rec_metric = 'LCP';
-            $rec_metric_val = $ps_lcp;
-            $rec_target = '2.5s';
-        }
-        $rec_desc = 'Your INP score is poor. Consider optimizing JavaScript execution and reducing main-thread work.';
-        if ($rec_metric === 'LCP') {
-            $rec_desc = 'Optimize your images, leverage CDNs, and scale them appropriately to improve Largest Contentful Paint (LCP).';
-        }
-        ?>
-        <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4" id="recommended-banner">
-            <div class="flex items-start gap-3">
-                <div class="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5">
-                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-blue-600"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                </div>
-                <div>
-                    <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Recommended for you</div>
-                    <div id="pagespeed-rec-title" class="text-sm font-black text-zinc-900 mt-0.5"><?php echo esc_html($rec_opp['label']); ?></div>
-                    <div id="pagespeed-rec-desc" class="text-xs text-zinc-500 mt-0.5 max-w-md"><?php echo esc_html($rec_desc); ?></div>
-                    <div class="mt-2 flex items-center gap-2">
-                        <span class="text-[10px] text-zinc-400 font-semibold">Estimated improvement</span>
-                        <span id="pagespeed-rec-metric-lbl" class="text-[10px] font-bold text-zinc-600 "><?php echo esc_html($rec_metric); ?></span>
-                        <span class="text-[10px] font-black text-zinc-900 "><span id="pagespeed-rec-metric-from"><?php echo esc_html($rec_metric_val); ?></span> <span class="text-zinc-400 font-normal">→</span> <span id="pagespeed-rec-metric-to" class="text-green-600"><?php echo esc_html($rec_target); ?></span></span>
-                    </div>
-                </div>
-            </div>
-            <button onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...', 'success');" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all border-none shadow-xs shrink-0">
-                Optimize now
-            </button>
         </div>
         <?php endif; ?>
 
         <!-- Theme Library Card (Shopify Style) -->
-        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm " id="draft-themes-library-card">
+        <?php 
+        $draft_themes = [];
+        foreach ( $themes as $th ) {
+            if ( $th['status'] !== 'live' ) {
+                $draft_themes[] = $th;
+            }
+        }
+        $total_drafts = count( $draft_themes );
+        $has_drafts   = $total_drafts > 0;
+        ?>
+        <div class="bg-white border border-zinc-200 rounded-xl shadow-sm mt-6" id="draft-themes-library-card">
             <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-white shrink-0 rounded-t-xl">
                 <div class="flex items-center gap-3">
                     <!-- Dashed Rectangle Grid Icon Box -->
@@ -897,7 +754,12 @@ function cora_get_sparkline_points( $history, $type ) {
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" stroke-dasharray="3 3" fill="none" class="text-zinc-650"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-zinc-900 leading-tight">Draft themes</h3>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-zinc-900 leading-tight">Draft themes</h3>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200" title="Workspace plan draft theme quota">
+                                <?php echo esc_html( $total_drafts ); ?> / <?php echo esc_html( $draft_limit ); ?> Drafts
+                            </span>
+                        </div>
                         <p class="text-[10px] text-zinc-400 font-medium mt-0.5">These themes are only visible to you. You can work on them before publishing.</p>
                     </div>
                 </div>
@@ -907,32 +769,26 @@ function cora_get_sparkline_points( $history, $type ) {
                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-550"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
                     <!-- Add Theme Dropdown Menu -->
-                    <div id="import-theme-dropdown" class="hidden absolute right-0 mt-1.5 w-44 bg-white border border-zinc-250 rounded-xl shadow-xl py-1 z-35 text-left text-[11px] font-semibold">
+                    <div id="import-theme-dropdown" class="hidden absolute right-0 mt-1.5 w-48 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-35 text-left text-[11px] font-semibold">
                         <button onclick="openImportKitDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-555"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                             Upload ZIP file
                         </button>
                         <button onclick="openGithubConnectDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">
-                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-555"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
                             Connect from GitHub
                         </button>
                         <div class="border-t border-zinc-100 my-1"></div>
-                        <button onclick="openCoraHubDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">Browse free themes</button>
+                        <button onclick="openCoraHubDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                            Browse free themes
+                        </button>
                     </div>
                 </div>
             </div>
             
             <div class="divide-y divide-zinc-200 rounded-b-xl">
                 <?php 
-                $draft_themes = [];
-                foreach ( $themes as $th ) {
-                    if ( $th['status'] !== 'live' ) {
-                        $draft_themes[] = $th;
-                    }
-                }
-                $total_drafts = count( $draft_themes );
-                $has_drafts = $total_drafts > 0;
-                
                 $draft_index = 0;
                 foreach ( $draft_themes as $th ) {
                     $draft_index++;
@@ -941,17 +797,18 @@ function cora_get_sparkline_points( $history, $type ) {
                     // Get pages count
                     $th_pages = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $th['id'] ) );
                     
-                    // Real last-edited timestamp from DB
-                    $ts = ( !empty( $th['updated_at'] ) && $th['updated_at'] !== '0000-00-00 00:00:00' )
-                        ? strtotime( $th['updated_at'] )
-                        : ( !empty( $th['created_at'] ) ? strtotime( $th['created_at'] ) : 0 );
+                    // Real last-edited or imported timestamp from DB
+                    $has_been_edited = ( !empty( $th['updated_at'] ) && $th['updated_at'] !== '0000-00-00 00:00:00' && $th['updated_at'] !== $th['created_at'] );
+                    $ts = $has_been_edited ? strtotime( $th['updated_at'] ) : ( !empty( $th['created_at'] ) ? strtotime( $th['created_at'] ) : 0 );
+                    $prefix = $has_been_edited ? 'Last edited ' : 'Imported ';
+
                     if ( $ts > 0 ) {
                         $diff = time() - $ts;
-                        if ( $diff < 60 )             $modified_time = 'Last edited just now';
-                        elseif ( $diff < 3600 )       $modified_time = 'Last edited ' . round( $diff / 60 ) . 'm ago';
-                        elseif ( $diff < 86400 )      $modified_time = 'Last edited ' . round( $diff / 3600 ) . 'h ago';
-                        elseif ( $diff < 172800 )     $modified_time = 'Last edited yesterday';
-                        else                          $modified_time = 'Last edited ' . date( 'M j', $ts );
+                        if ( $diff < 60 )             $modified_time = $has_been_edited ? 'Last edited just now' : 'Imported just now';
+                        elseif ( $diff < 3600 )       $modified_time = $prefix . max(1, round( $diff / 60 )) . 'm ago';
+                        elseif ( $diff < 86400 )      $modified_time = $prefix . round( $diff / 3600 ) . 'h ago';
+                        elseif ( $diff < 172800 )     $modified_time = $prefix . 'yesterday';
+                        else                          $modified_time = $prefix . date( 'M j', $ts );
                     } else {
                         $modified_time = 'Not yet saved';
                     }
@@ -995,16 +852,37 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                                 </button>
                                 
-                                <div id="draft-actions-menu-<?php echo $th['id']; ?>" class="hidden absolute right-0 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-[9999] text-left font-sans select-none">
-                                    <button onclick="triggerRenameTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">Rename</button>
-                                    <button onclick="triggerDuplicateTheme(<?php echo $th['id']; ?>)" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">Duplicate</button>
-                                    <a href="<?php echo home_url('/?cv_preview_theme=' . $th['id']); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors no-underline">Preview theme</a>
+                                <div id="draft-actions-menu-<?php echo $th['id']; ?>" class="hidden absolute right-0 w-56 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-[9999] text-left font-sans select-none">
+                                    <button onclick="triggerRenameTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                        <span>Rename</span>
+                                    </button>
+                                    <button onclick="triggerDuplicateTheme(<?php echo $th['id']; ?>)" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                        <span>Duplicate</span>
+                                    </button>
+                                    <a href="<?php echo home_url('/?cv_preview_theme=' . $th['id']); ?>" target="_blank" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors no-underline">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        <span>Preview theme</span>
+                                    </a>
                                     <div class="border-t border-zinc-100 my-1"></div>
-                                    <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false); switchTab('code');" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">Edit code</button>
-                                    <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false); switchTab('settings');" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">Edit default theme content</button>
-                                    <button onclick="triggerDownloadTheme(<?php echo $th['id']; ?>)" class="w-full px-3 py-2 text-xs text-zinc-850 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">Download theme file</button>
+                                    <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false); switchTab('code');" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                        <span>Edit code</span>
+                                    </button>
+                                    <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false); switchTab('settings');" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                        <span>Edit default theme content</span>
+                                    </button>
+                                    <button onclick="triggerDownloadTheme(<?php echo $th['id']; ?>)" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                        <span>Download theme file</span>
+                                    </button>
                                     <div class="border-t border-zinc-100 my-1"></div>
-                                    <button onclick="triggerDeleteTheme(<?php echo $th['id']; ?>)" class="w-full px-3 py-2 text-xs text-red-650 hover:bg-red-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">Delete</button>
+                                    <button onclick="triggerDeleteTheme(<?php echo $th['id']; ?>)" class="w-full px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-red-500 shrink-0"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                        <span>Delete</span>
+                                    </button>
                                 </div>
                             </div>
 
@@ -1021,13 +899,227 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
             
             <?php if ( $total_drafts > 3 ) : ?>
-            <div class="p-3.5 border-t border-zinc-200 text-center bg-zinc-50/10 rounded-b-xl">
+            <div id="cora-show-all-drafts-wrap" class="p-3.5 border-t border-zinc-200 text-center bg-zinc-50/10 rounded-b-xl">
                 <button onclick="showAllDraftThemes(event)" class="text-xs font-bold text-blue-600 hover:text-blue-800 border-none bg-transparent cursor-pointer flex items-center justify-center gap-1 w-full select-none">
                     Show all draft themes
                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-blue-600"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
             </div>
             <?php endif; ?>
+        </div>
+
+        <!-- Collapsible Performance & Insights Block (Moved below Draft Themes) -->
+        <?php
+        $score_status_text = 'Needs improve';
+        $score_status_color = 'text-amber-600';
+        $score_radial_color = '#f59e0b';
+        if ( intval( $ps_score ) >= 90 ) {
+            $score_status_text = 'Good';
+            $score_status_color = 'text-green-650';
+            $score_radial_color = '#22c55e';
+        } elseif ( intval( $ps_score ) < 50 ) {
+            $score_status_text = 'Poor';
+            $score_status_color = 'text-red-600';
+            $score_radial_color = '#ef4444';
+        }
+
+        $rec_opp = $ps_opps[0] ?? array('label' => 'Reduce JavaScript execution', 'savings' => 'Potential savings: ~210ms', 'severity' => 'Medium');
+        $rec_metric = 'INP';
+        $rec_metric_val = $ps_inp;
+        $rec_target = '150ms';
+        if (stripos($rec_opp['label'], 'lcp') !== false || stripos($rec_opp['label'], 'image') !== false || stripos($rec_opp['label'], 'render') !== false) {
+            $rec_metric = 'LCP';
+            $rec_metric_val = $ps_lcp;
+            $rec_target = '2.5s';
+        }
+        $rec_desc = 'Your INP score is poor. Consider optimizing JavaScript execution and reducing main-thread work.';
+        if ($rec_metric === 'LCP') {
+            $rec_desc = 'Optimize your images, leverage CDNs, and scale them appropriately to improve Largest Contentful Paint (LCP).';
+        }
+        ?>
+        <div class="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm mt-6 select-none" id="performance-insights-card">
+            <!-- Minimizable Toggle Header -->
+            <div class="flex items-center justify-between cursor-pointer" onclick="togglePerformanceSection()">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-650"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="text-sm font-bold text-zinc-900 leading-tight">Performance &amp; Optimization</h3>
+                            <span class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-full <?php echo (intval($ps_score) >= 90) ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'; ?>">
+                                Score: <?php echo esc_html($ps_score); ?>/100 · <?php echo esc_html($score_status_text); ?>
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2.5 text-[10px] text-zinc-400 font-medium mt-0.5">
+                            <span>INP: <b class="text-zinc-700"><?php echo esc_html($ps_inp); ?></b></span>
+                            <span>·</span>
+                            <span>LCP: <b class="text-zinc-700"><?php echo esc_html($ps_lcp); ?></b></span>
+                            <span>·</span>
+                            <span>CLS: <b class="text-zinc-700"><?php echo esc_html($ps_cls); ?></b></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="px-3 py-1.5 border border-zinc-200 hover:border-zinc-300 rounded-lg text-xs font-bold text-zinc-800 bg-white cursor-pointer transition-all flex items-center gap-1.5 select-none shadow-xs">
+                        <span id="cora-perf-toggle-label">Show insights</span>
+                        <svg id="cora-perf-toggle-chevron" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-550 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Collapsible Body Content -->
+            <div id="cora-performance-collapsible-body" class="hidden mt-4 pt-4 border-t border-zinc-100 space-y-5">
+                <!-- Recommended For You Banner (Improve INP) -->
+                <div class="bg-zinc-50/60 border border-zinc-200/80 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" id="recommended-banner">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-blue-600"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        </div>
+                        <div>
+                            <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Recommended for you</div>
+                            <div id="pagespeed-rec-title" class="text-xs font-black text-zinc-900 mt-0.5"><?php echo esc_html($rec_opp['label']); ?></div>
+                            <div id="pagespeed-rec-desc" class="text-[11px] text-zinc-500 mt-0.5 max-w-md"><?php echo esc_html($rec_desc); ?></div>
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="text-[10px] text-zinc-400 font-semibold">Estimated improvement</span>
+                                <span id="pagespeed-rec-metric-lbl" class="text-[10px] font-bold text-zinc-600 "><?php echo esc_html($rec_metric); ?></span>
+                                <span class="text-[10px] font-black text-zinc-900 "><span id="pagespeed-rec-metric-from"><?php echo esc_html($rec_metric_val); ?></span> <span class="text-zinc-400 font-normal">→</span> <span id="pagespeed-rec-metric-to" class="text-green-600"><?php echo esc_html($rec_target); ?></span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...', 'success');" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all border-none shadow-xs shrink-0">
+                        Optimize now
+                    </button>
+                </div>
+
+                <!-- Performance Insights + Website Statistics Cards -->
+                <div class="flex flex-col md:flex-row gap-5 items-stretch">
+                    <!-- Performance Insights Card -->
+                    <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-xs font-black text-zinc-900 mb-4">Performance breakdown</h4>
+                            <div class="flex items-center gap-4 mb-4">
+                                <!-- Circular Score Radial -->
+                                <div class="relative w-16 h-16 shrink-0">
+                                    <svg viewBox="0 0 36 36" class="w-16 h-16 -rotate-90">
+                                        <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f4f4f5" stroke-width="3"></circle>
+                                        <circle id="pagespeed-radial-score" cx="18" cy="18" r="15.9" fill="none" stroke="<?php echo $score_radial_color; ?>" stroke-width="3" stroke-dasharray="<?php echo intval($ps_score); ?> <?php echo 100 - intval($ps_score); ?>" stroke-linecap="round"></circle>
+                                    </svg>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span id="pagespeed-radial-val" class="text-base font-black text-zinc-900 leading-none"><?php echo esc_html($ps_score); ?></span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-zinc-700 ">Performance score</div>
+                                    <div id="pagespeed-score-status" class="text-sm font-black <?php echo $score_status_color; ?> mt-0.5"><?php echo esc_html($score_status_text); ?></div>
+                                    <div class="text-[10px] text-zinc-400 mt-1 flex items-center gap-1">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none" class="text-green-500"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                        Faster than <span id="pagespeed-faster-pct"><?php echo max(10, min(99, intval($ps_score) - 16)); ?></span>% of websites
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Core Web Vitals Metrics Grid -->
+                            <div class="grid grid-cols-3 gap-2 py-2 px-3 bg-zinc-50/50 rounded-lg border border-zinc-100 mb-5">
+                                <div class="text-center">
+                                    <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">LCP</div>
+                                    <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_lcp); ?></div>
+                                </div>
+                                <div class="text-center border-l border-zinc-100 ">
+                                    <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">INP</div>
+                                    <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_inp); ?></div>
+                                </div>
+                                <div class="text-center border-l border-zinc-100 ">
+                                    <div class="text-[8.5px] text-zinc-400 font-bold uppercase tracking-wider">CLS</div>
+                                    <div class="text-xs font-black text-zinc-800 mt-0.5"><?php echo esc_html($ps_cls); ?></div>
+                                </div>
+                            </div>
+
+                            <div class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Top opportunities</div>
+                            <div id="pagespeed-opportunities-list" class="space-y-2">
+                                <?php foreach ($ps_opps as $opp) : 
+                                    $opp_severity = $opp['severity'] ?? 'Medium';
+                                    $opp_badge_class = 'bg-zinc-150/60 text-zinc-650 border border-zinc-250/20';
+                                    if ($opp_severity === 'High') {
+                                        $opp_badge_class = 'bg-red-50 text-red-700 border border-red-200/50';
+                                    } elseif ($opp_severity === 'Medium') {
+                                        $opp_badge_class = 'bg-amber-50 text-amber-700 border border-amber-200/50';
+                                    }
+                                    $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+                                    if (stripos($opp['label'], 'javascript') !== false || stripos($opp['label'], 'js') !== false) {
+                                        $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>';
+                                    } elseif (stripos($opp['label'], 'image') !== false) {
+                                        $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
+                                    } elseif (stripos($opp['label'], 'inp') !== false || stripos($opp['label'], 'paint') !== false || stripos($opp['label'], 'blocking') !== false) {
+                                        $opp_icon = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+                                    }
+                                ?>
+                                <div class="flex items-center justify-between p-2.5 bg-zinc-50/50 hover:bg-zinc-50 border border-zinc-100 rounded-lg cursor-pointer transition-all group" onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } window.coraShowToast('Opening optimization guide...');">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-6 h-6 rounded bg-white border border-zinc-200/60 flex items-center justify-center shrink-0">
+                                            <?php echo $opp_icon; ?>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="text-[10px] font-bold text-zinc-800 truncate"><?php echo esc_html($opp['label']); ?></div>
+                                            <div class="text-[9px] text-zinc-400 mt-0.5"><?php echo esc_html($opp['savings']); ?></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0 ml-2">
+                                        <span class="px-2 py-0.5 text-[8px] font-bold rounded-full <?php echo $opp_badge_class; ?>"><?php echo esc_html($opp_severity); ?></span>
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-350 group-hover:text-zinc-700 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <button onclick="if (typeof openPageSpeedSettingsDrawer === 'function') { openPageSpeedSettingsDrawer(); } else { window.coraShowToast('Loading full performance report...'); }" class="mt-4 text-[10px] font-bold text-zinc-500 hover:text-zinc-900 cursor-pointer border-none bg-transparent p-0 transition-colors w-max font-sans">View full performance report</button>
+                    </div>
+
+                    <!-- Website Statistics Card -->
+                    <div class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between" id="website-statistics-card">
+                        <div>
+                            <h4 class="text-xs font-black text-zinc-900 mb-4 font-sans">Website statistics</h4>
+                            <div class="space-y-1">
+                                <?php
+                                $stats_rows = [
+                                    ['label' => 'Pages', 'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>', 'value' => count($live_stats), 'delta' => '+5', 'positive' => true, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
+                                    ['label' => 'Published', 'icon' => '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>', 'value' => $pub_count, 'delta' => 'No change', 'neutral' => true, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
+                                    ['label' => 'Drafts', 'icon' => '<path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>', 'value' => $dr_count, 'delta' => '-3', 'positive' => false, 'action' => "if (typeof window.switchTab === 'function') { window.switchTab('pages'); }"],
+                                    ['label' => 'Active Listings', 'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>', 'value' => $cora_listings_count, 'delta' => '+1', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('listings'); }"],
+                                    ['label' => 'Client Leads', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>', 'value' => $cora_leads_count, 'delta' => '+7', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('leads'); }"],
+                                    ['label' => 'Total Bookings', 'icon' => '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>', 'value' => $cora_bookings_count, 'delta' => '+2', 'positive' => true, 'action' => "if (typeof window.coraNavigateTo === 'function') { window.coraNavigateTo('bookings'); }"],
+                                ];
+                                $total_rows = count($stats_rows);
+                                foreach ($stats_rows as $index => $row) :
+                                ?>
+                                <div onclick="<?php echo $row['action']; ?>" class="flex items-center justify-between py-2 hover:bg-zinc-50/50 px-2 -mx-2 rounded-lg cursor-pointer transition-colors group">
+                                    <div class="flex items-center gap-2.5 text-xs font-semibold text-zinc-700 font-sans">
+                                        <div class="w-6 h-6 rounded bg-zinc-100/60 flex items-center justify-center text-zinc-450 transition-colors group-hover:bg-zinc-200/50 shrink-0">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><?php echo $row['icon']; ?></svg>
+                                        </div>
+                                        <?php echo esc_html($row['label']); ?>
+                                    </div>
+                                    <div class="flex items-center gap-3 font-sans">
+                                        <span class="text-xs font-black text-zinc-900 "><?php echo $row['value']; ?></span>
+                                        <?php if (!empty($row['neutral'])) : ?>
+                                            <span class="text-[10px] text-zinc-400 font-semibold"><?php echo esc_html($row['delta']); ?></span>
+                                        <?php elseif ($row['positive']) : ?>
+                                            <span class="text-[10px] text-green-600 font-bold"><?php echo esc_html($row['delta']); ?></span>
+                                        <?php else : ?>
+                                            <span class="text-[10px] text-red-500 font-bold"><?php echo esc_html($row['delta']); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <?php if ($index < $total_rows - 1) : ?>
+                                <div class="h-px bg-zinc-100/60 my-0.5"></div>
+                                <?php endif; ?>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
         </div>
     </div>
@@ -1073,22 +1165,31 @@ function cora_get_sparkline_points( $history, $type ) {
             <div class="flex items-center gap-2">
                 <!-- Action button for Pages tab -->
                 <?php if ( ! $is_read_only ) : ?>
-                <button onclick="openNewPageDrawer()" id="tab-action-pages" class="tab-action-btn px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Add page</button>
+                <button onclick="openNewPageDrawer()" id="tab-action-pages" class="tab-action-btn px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 border-none">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Add page</span>
+                </button>
                 <?php endif; ?>
 
                 <!-- Action buttons for Menus tab -->
                 <?php if ( ! $is_read_only ) : ?>
                 <div id="tab-action-menus" class="tab-action-btn hidden flex items-center gap-2">
-                    <button onclick="window.coraShowToast('URL Redirects panel loading...', 'success')" id="menu-btn-redirects" class="px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">URL redirects</button>
-                    <button onclick="triggerCreateNewMenu()" id="menu-btn-create" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Create menu</button>
-                    <button onclick="duplicateActiveMenu()" id="menu-btn-duplicate" class="hidden px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Duplicate</button>
-                    <button onclick="deleteActiveMenu()" id="menu-btn-delete" class="hidden px-3 py-1.5 border border-red-200 text-red-600 bg-white hover:bg-red-50 rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Delete menu</button>
+                    <button onclick="window.coraShowToast('URL Redirects panel loading...', 'success')" id="menu-btn-redirects" class="px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-[11px] font-bold shadow-xs cursor-pointer transition-all active:scale-95">URL redirects</button>
+                    <button onclick="triggerCreateNewMenu()" id="menu-btn-create" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 border-none">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Create menu</span>
+                    </button>
+                    <button onclick="duplicateActiveMenu()" id="menu-btn-duplicate" class="hidden px-3 py-1.5 border border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50 rounded-lg text-[11px] font-bold shadow-xs cursor-pointer transition-all active:scale-95">Duplicate</button>
+                    <button onclick="deleteActiveMenu()" id="menu-btn-delete" class="hidden px-3 py-1.5 border border-red-200 text-red-600 bg-white hover:bg-red-50 rounded-lg text-[11px] font-bold shadow-xs cursor-pointer transition-all active:scale-95">Delete menu</button>
                 </div>
                 <?php endif; ?>
 
                 <!-- Action button for Theme Settings tab -->
                 <?php if ( ! $is_read_only ) : ?>
-                <button onclick="saveThemeSettings()" id="tab-action-settings" class="tab-action-btn hidden px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-sm cursor-pointer transition-all active:scale-95">Save Settings</button>
+                <button onclick="saveThemeSettings()" id="tab-action-settings" class="tab-action-btn hidden px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 border-none">
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    <span>Save Settings</span>
+                </button>
                 <?php endif; ?>
             </div>
         </div>
@@ -3554,12 +3655,12 @@ function cora_get_sparkline_points( $history, $type ) {
 
                 <!-- Method Tab Switcher -->
                 <div style="display:grid;grid-template-columns:1fr 1fr;background:#f4f4f5;border-radius:14px;padding:4px;gap:3px;margin-bottom:20px;">
-                    <button onclick="wizardSetSubMode('upload')" id="wiz-tab-upload" class="atw-tab atw-tab-on" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:11px;font-size:11.5px;font-weight:700;transition:all .18s;font-family:inherit;">
+                    <button type="button" onclick="wizardSetSubMode('upload')" id="wiz-tab-upload" class="atw-tab atw-tab-on" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:11px;font-size:11.5px;font-weight:700;transition:all .18s;font-family:inherit;">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                         Upload Kit (.zip)
                     </button>
-                    <button onclick="wizardSetSubMode('github')" id="wiz-tab-github" class="atw-tab atw-tab-off" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:11px;font-size:11.5px;font-weight:700;transition:all .18s;font-family:inherit;">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    <button type="button" onclick="if(typeof window.coraShowToast==='function'){window.coraShowToast('GitHub sync is for headless / code-based themes. For Elementor, please upload an Elementor Template Kit (.zip).', 'info');}else{console.log('GitHub sync locked for Elementor');}" id="wiz-tab-github" class="atw-tab atw-tab-off" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:11px;font-size:11.5px;font-weight:700;transition:all .18s;font-family:inherit;opacity:0.5;cursor:not-allowed;" title="GitHub sync is locked for Elementor themes">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         Connect GitHub
                     </button>
                 </div>
@@ -3943,6 +4044,8 @@ function cora_get_sparkline_points( $history, $type ) {
         activePageId: null,
         activeTab: 'pages',
         isReadOnly: <?php echo $is_read_only ? 'true' : 'false'; ?>,
+        draftLimit: <?php echo intval( $draft_limit ); ?>,
+        isFreePlan: <?php echo in_array( strtolower( cora_get_active_workspace_plan() ), array( 'free', 'free_tier', 'trial', 'none' ), true ) ? 'true' : 'false'; ?>,
         themes: <?php echo json_encode($themes); ?>,
         pages: [],
         menus: <?php echo json_encode( $wp_nav_menus_for_js ); ?> || [],
@@ -4192,6 +4295,12 @@ function cora_get_sparkline_points( $history, $type ) {
     // --- Level 1 Theme Functions ---
     function openNewThemeDrawer() {
         if (canvasState.isReadOnly) return;
+        const currentDrafts = (canvasState.themes || []).filter(t => t.status !== 'live').length;
+        const limit = canvasState.draftLimit || 20;
+        if (currentDrafts >= limit) {
+            window.coraShowToast('Draft theme limit reached (' + limit + ' max for your plan). Please delete an existing draft or upgrade your account.', 'error');
+            return;
+        }
         const modal = jQuery('#drawer-new-theme');
         modal.removeClass('hidden');
         setTimeout(() => {
@@ -4210,6 +4319,12 @@ function cora_get_sparkline_points( $history, $type ) {
 
     function openImportKitDrawer() {
         if (canvasState.isReadOnly) return;
+        const currentDrafts = (canvasState.themes || []).filter(t => t.status !== 'live').length;
+        const limit = canvasState.draftLimit || 20;
+        if (currentDrafts >= limit) {
+            window.coraShowToast('Draft theme limit reached (' + limit + ' max for your plan). Please delete an existing draft or upgrade your account.', 'error');
+            return;
+        }
         jQuery('#drawer-import-kit').removeClass('opacity-0').css({'opacity': '1'});
         jQuery('#drawer-import-kit-card').removeClass('translate-x-full').addClass('translate-x-0');
         // Reset file upload state
@@ -4228,16 +4343,16 @@ function cora_get_sparkline_points( $history, $type ) {
         const name = jQuery('#import-kit-name-input').val().trim();
         const fileInput = document.getElementById('import-kit-file-input');
         if (!name) {
-            window.coraShowToast('Please specify a theme name.');
+            window.coraShowToast('Please specify a theme workspace name.', 'warning');
             return;
         }
-        if (fileInput.files.length === 0) {
-            window.coraShowToast('Please select a ZIP template kit file.');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            window.coraShowToast('Please select or drop an Elementor Kit (.zip) file.', 'warning');
             return;
         }
         const file = fileInput.files[0];
         
-        window.coraShowToast('Importing and validating Elementor template kit...');
+        window.coraShowToast('Importing and validating Elementor template kit...', 'info');
         
         const formData = new FormData();
         formData.append('action', 'cora_ajax_import_kit');
@@ -4251,17 +4366,20 @@ function cora_get_sparkline_points( $history, $type ) {
             data: formData,
             processData: false,
             contentType: false,
-            success: function(res) {
+            success: function(rawRes) {
+                const res = typeof window.wizParseAjaxResponse === 'function' ? window.wizParseAjaxResponse(rawRes) : rawRes;
                 if (res.success) {
-                    window.coraShowToast('Elementor Kit imported successfully!');
+                    window.coraShowToast('Elementor Kit imported successfully!', 'success');
                     closeImportKitDrawer();
                     setTimeout(function() { window.location.reload(); }, 800);
                 } else {
-                    window.coraShowToast(res.data || 'Failed to import kit.');
+                    const errMsg = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to import kit.');
+                    const nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Ensure the ZIP is an Elementor Template Kit (containing JSON template files) and try again.';
+                    window.coraShowToast(errMsg + ' — Next Step: ' + nextStep, 'error');
                 }
             },
             error: function() {
-                window.coraShowToast('Failed to upload kit file.');
+                window.coraShowToast('Failed to upload kit file. Next Step: Check your network and server upload limits.', 'error');
             }
         });
     }
@@ -4270,11 +4388,101 @@ function cora_get_sparkline_points( $history, $type ) {
         jQuery('#import-kit-file-input').on('change', function() {
             const files = this.files;
             if (files.length > 0) {
-                jQuery('#import-file-name-display').text(files[0].name);
+                const f = files[0];
+                jQuery('#import-file-name-display').text(f.name);
+                const currentName = jQuery('#import-kit-name-input').val().trim();
+                if (!currentName && typeof window.wizFormatThemeNameFromFilename === 'function') {
+                    jQuery('#import-kit-name-input').val(window.wizFormatThemeNameFromFilename(f.name));
+                }
             } else {
                 jQuery('#import-file-name-display').text('Click to select or drag & drop ZIP here');
             }
         });
+
+        // Setup Drag & Drop for Add Theme Wizard Dropzone
+        var wizardDropzone = document.getElementById('wiz-dropzone-label');
+        if (wizardDropzone) {
+            ['dragenter', 'dragover'].forEach(function(evName) {
+                wizardDropzone.addEventListener(evName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    wizardDropzone.style.borderColor = '#18181b';
+                    wizardDropzone.style.background = '#f4f4f5';
+                }, false);
+            });
+            ['dragleave'].forEach(function(evName) {
+                wizardDropzone.addEventListener(evName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    wizardDropzone.style.borderColor = '#d4d4d8';
+                    wizardDropzone.style.background = 'white';
+                }, false);
+            });
+            wizardDropzone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                wizardDropzone.style.borderColor = '#d4d4d8';
+                wizardDropzone.style.background = 'white';
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    var droppedFile = e.dataTransfer.files[0];
+                    var inputEl = document.getElementById('wiz-kit-file');
+                    if (inputEl) {
+                        try {
+                            var dt = new DataTransfer();
+                            dt.items.add(droppedFile);
+                            inputEl.files = dt.files;
+                        } catch (err) {}
+                    }
+                    if (typeof window.wizardProcessSelectedFile === 'function') {
+                        window.wizardProcessSelectedFile(droppedFile);
+                    }
+                }
+            }, false);
+        }
+
+        // Setup Drag & Drop for Import Kit Drawer Dropzone
+        var drawerDropzone = document.querySelector('#drawer-import-kit .border-dashed');
+        if (drawerDropzone) {
+            ['dragenter', 'dragover'].forEach(function(evName) {
+                drawerDropzone.addEventListener(evName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    drawerDropzone.classList.add('border-zinc-500', 'bg-zinc-100');
+                }, false);
+            });
+            ['dragleave'].forEach(function(evName) {
+                drawerDropzone.addEventListener(evName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    drawerDropzone.classList.remove('border-zinc-500', 'bg-zinc-100');
+                }, false);
+            });
+            drawerDropzone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                drawerDropzone.classList.remove('border-zinc-500', 'bg-zinc-100');
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    var droppedFile = e.dataTransfer.files[0];
+                    if (!droppedFile.name.toLowerCase().endsWith('.zip')) {
+                        window.coraShowToast('Please drop a valid .zip Elementor Kit archive.', 'warning');
+                        return;
+                    }
+                    var fileInput = document.getElementById('import-kit-file-input');
+                    if (fileInput) {
+                        try {
+                            var dt = new DataTransfer();
+                            dt.items.add(droppedFile);
+                            fileInput.files = dt.files;
+                        } catch(err) {}
+                    }
+                    jQuery('#import-file-name-display').text(droppedFile.name);
+                    const currentName = jQuery('#import-kit-name-input').val().trim();
+                    if (!currentName && typeof window.wizFormatThemeNameFromFilename === 'function') {
+                        jQuery('#import-kit-name-input').val(window.wizFormatThemeNameFromFilename(droppedFile.name));
+                    }
+                }
+            }, false);
+        }
 
         // Quick-insert snippets handlers (avoiding inline quote escaping issues)
         jQuery(document).on('click', '.quick-insert-btn-head', function() {
@@ -4449,6 +4657,13 @@ function cora_get_sparkline_points( $history, $type ) {
     }
 
     function triggerDuplicateTheme(id) {
+        if (canvasState.isReadOnly) return;
+        const currentDrafts = (canvasState.themes || []).filter(t => t.status !== 'live').length;
+        const limit = canvasState.draftLimit || 20;
+        if (currentDrafts >= limit) {
+            window.coraShowToast('Draft theme limit reached (' + limit + ' max for your plan). Please delete an existing draft or upgrade your account.', 'error');
+            return;
+        }
         window.coraShowToast('Duplicating theme...');
         jQuery.post(coraREData.ajaxUrl, {
             action: 'cora_ajax_duplicate_theme',
@@ -4456,10 +4671,11 @@ function cora_get_sparkline_points( $history, $type ) {
             nonce: coraREData.ajaxNonce
         }, function(res) {
             if (res.success) {
-                window.coraShowToast('Theme duplicated successfully.');
+                window.coraShowToast('Theme duplicated successfully.', 'success');
                 setTimeout(function() { window.location.reload(); }, 800);
             } else {
-                window.coraShowToast('Failed to duplicate.');
+                const msg = res.data && res.data.message ? res.data.message : (res.data || 'Failed to duplicate.');
+                window.coraShowToast(msg, 'error');
             }
         });
     }
@@ -7437,12 +7653,29 @@ function cora_get_sparkline_points( $history, $type ) {
 
     window.showAllDraftThemes = function(e) {
         if (e) e.preventDefault();
-        document.querySelectorAll('.draft-theme-collapsed').forEach(row => {
+        document.querySelectorAll('.draft-theme-collapsed').forEach(function(row) {
             row.classList.remove('hidden');
         });
-        const btnContainer = e.currentTarget.closest('.p-3.5');
+        var btnContainer = document.getElementById('cora-show-all-drafts-wrap') || (e && e.currentTarget ? e.currentTarget.parentElement : null);
         if (btnContainer) {
             btnContainer.classList.add('hidden');
+        }
+    };
+
+    window.togglePerformanceSection = function() {
+        var body = document.getElementById('cora-performance-collapsible-body');
+        var chevron = document.getElementById('cora-perf-toggle-chevron');
+        var label = document.getElementById('cora-perf-toggle-label');
+        if (!body) return;
+        var isHidden = body.classList.contains('hidden');
+        if (isHidden) {
+            body.classList.remove('hidden');
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+            if (label) label.textContent = 'Hide insights';
+        } else {
+            body.classList.add('hidden');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+            if (label) label.textContent = 'Show insights';
         }
     };
 
@@ -7785,8 +8018,49 @@ function cora_get_sparkline_points( $history, $type ) {
         if (rl) { rl.style.borderColor = '#d4d4d8'; rl.querySelector('div').style.background = 'transparent'; }
     }
 
+    // ── Safe JSON and Response Parser ─────────────────────────
+    function wizParseAjaxResponse(rawRes) {
+        if (typeof rawRes === 'object' && rawRes !== null) {
+            return rawRes;
+        }
+        if (typeof rawRes === 'string') {
+            try {
+                var firstBrace = rawRes.indexOf('{');
+                var lastBrace = rawRes.lastIndexOf('}');
+                if (firstBrace > -1 && lastBrace > -1) {
+                    return JSON.parse(rawRes.substring(firstBrace, lastBrace + 1));
+                }
+            } catch (e) {
+                console.error('JSON parsing exception:', e, rawRes);
+            }
+            return { success: false, data: { message: rawRes.trim() || 'Invalid server response.' } };
+        }
+        return { success: false, data: { message: 'Unexpected server response format.' } };
+    }
+    window.wizParseAjaxResponse = wizParseAjaxResponse;
+
+    // Format clean theme name from ZIP filename
+    function wizFormatThemeNameFromFilename(filename) {
+        if (!filename) return '';
+        var base = filename.replace(/\.zip$/i, '');
+        // Remove common packaging labels
+        base = base.replace(/[-_]?(elementor[-_]?template[-_]?kit|elementor[-_]?kit|template[-_]?kit|wordpress|theme|envato|v?\d+(\.\d+)*)/gi, ' ');
+        base = base.replace(/[-_]+/g, ' ').trim();
+        if (!base) base = filename.replace(/\.zip$/i, '').replace(/[-_]+/g, ' ').trim();
+        return base.split(' ').filter(Boolean).map(function(w) {
+            return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join(' ') || 'Imported Elementor Theme';
+    }
+    window.wizFormatThemeNameFromFilename = wizFormatThemeNameFromFilename;
+
     // ── Sub-mode tabs ──────────────────────────────────────────
     window.wizardSetSubMode = function(mode) {
+        if (_wizBuilder === 'elementor' && mode === 'github') {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('GitHub sync is for headless / code-based themes. For Elementor, please upload an Elementor Template Kit (.zip).', 'info');
+            }
+            mode = 'upload';
+        }
         _wizSubMode = mode;
         var uploadArea = document.getElementById('wiz-upload-area');
         var githubArea = document.getElementById('wiz-github-area');
@@ -7807,15 +8081,29 @@ function cora_get_sparkline_points( $history, $type ) {
         wizPushUrl({ wm: mode });
     };
 
-    // ── File input ─────────────────────────────────────────────
-    window.wizardKitFileSelected = function(input) {
-        var file = input.files[0];
+    // ── File input & Drag-Drop Processing ──────────────────────
+    window._wizSelectedKitFile = null;
+
+    window.wizardProcessSelectedFile = function(file) {
         if (!file) return;
+        if (!file.name.toLowerCase().endsWith('.zip')) {
+            showToast('Please select a valid Elementor Kit (.zip) file.', 'warning');
+            return;
+        }
+
+        window._wizSelectedKitFile = file;
 
         var sel = document.getElementById('wiz-kit-selected');
-        var name = document.getElementById('wiz-kit-filename');
+        var nameEl = document.getElementById('wiz-kit-filename');
         if (sel) sel.style.display = 'flex';
-        if (name) name.textContent = file.name;
+        if (nameEl) nameEl.textContent = file.name;
+
+        // Auto-populate Theme Name if empty or previously set
+        var themeNameInput = document.getElementById('wiz-theme-name');
+        var formattedName = wizFormatThemeNameFromFilename(file.name);
+        if (themeNameInput) {
+            themeNameInput.value = formattedName;
+        }
 
         var scanContainer = document.getElementById('wiz-kit-scanned-container');
         var scanList = document.getElementById('wiz-kit-scanned-list');
@@ -7823,28 +8111,29 @@ function cora_get_sparkline_points( $history, $type ) {
 
         if (scanContainer) scanContainer.style.display = 'block';
         if (scanList) {
-            scanList.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;width:100%;font-size:12px;color:#71717a;"><svg class="animate-spin" style="width:14px;height:14px;animation:spin 1s linear infinite;" viewBox="0 0 24 24" fill="none"><circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path style="opacity:.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>Scanning ZIP archive and indexing pages...</div>';
+            scanList.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;width:100%;font-size:12px;color:#71717a;"><svg class="animate-spin" style="width:14px;height:14px;animation:wizSpin 1s linear infinite;" viewBox="0 0 24 24" fill="none"><circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path style="opacity:.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>Scanning ZIP archive and indexing pages...</div>';
         }
         if (scanCount) scanCount.textContent = 'Reading...';
 
         var formData = new FormData();
         formData.append('action', 'cora_ajax_scan_kit');
         formData.append('kit_zip', file);
-        formData.append('nonce', coraREData.ajaxNonce);
+        formData.append('nonce', safeNonce);
 
         jQuery.ajax({
-            url: coraREData.ajaxUrl,
+            url: safeAjaxUrl,
             method: 'POST',
             data: formData,
             processData: false,
             contentType: false,
-            success: function(res) {
+            success: function(rawRes) {
+                var res = wizParseAjaxResponse(rawRes);
                 if (res.success && res.data && res.data.pages) {
                     var pages = res.data.pages;
                     if (scanCount) scanCount.textContent = pages.length + ' ' + (pages.length === 1 ? 'page' : 'pages');
                     if (scanList) {
                         if (pages.length === 0) {
-                            scanList.innerHTML = '<span style="font-size:12px;color:#ef4444;">No Elementor page templates found in this Kit.</span>';
+                            scanList.innerHTML = '<div style="padding:10px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;width:100%;"><p style="font-size:11.5px;font-weight:800;color:#991b1b;margin:0 0 3px;">No page templates found</p><p style="font-size:10.5px;color:#7f1d1d;line-height:1.45;margin:0;"><strong>Next Step:</strong> Ensure this ZIP is an Elementor Template Kit (containing JSON page templates or manifest.json) rather than a full WordPress theme.</p></div>';
                         } else {
                             scanList.innerHTML = '';
                             pages.forEach(function(title) {
@@ -7856,15 +8145,27 @@ function cora_get_sparkline_points( $history, $type ) {
                         }
                     }
                 } else {
-                    if (scanCount) scanCount.textContent = 'Error';
-                    if (scanList) scanList.innerHTML = '<span style="font-size:12px;color:#ef4444;">' + (res.data || 'Failed to scan archive.') + '</span>';
+                    var errMsg = res.data && res.data.message ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to scan archive.');
+                    var nextStep = res.data && res.data.next_step ? res.data.next_step : 'Ensure the ZIP is an Elementor Template Kit (containing .json template files) and try again.';
+                    if (scanCount) scanCount.textContent = 'Invalid Archive';
+                    if (scanList) {
+                        scanList.innerHTML = '<div style="padding:10px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;width:100%;"><p style="font-size:11.5px;font-weight:800;color:#991b1b;margin:0 0 4px;display:flex;align-items:center;gap:5px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' + errMsg + '</p><p style="font-size:10.5px;color:#7f1d1d;line-height:1.45;margin:0;"><strong>Next Step:</strong> ' + nextStep + '</p></div>';
+                    }
+                    showToast(errMsg, 'error');
                 }
             },
             error: function() {
                 if (scanCount) scanCount.textContent = 'Error';
-                if (scanList) scanList.innerHTML = '<span style="font-size:12px;color:#ef4444;">Connection failed during ZIP scanning.</span>';
+                if (scanList) scanList.innerHTML = '<div style="padding:8px 10px;background:#fef2f2;border:1px solid #fee2e2;border-radius:8px;width:100%;font-size:11px;color:#b91c1c;">Connection failed during ZIP scanning. Next Step: Check your network and try again.</div>';
+                showToast('Connection failed during ZIP scanning.', 'error');
             }
         });
+    };
+
+    window.wizardKitFileSelected = function(input) {
+        if (input && input.files && input.files.length) {
+            window.wizardProcessSelectedFile(input.files[0]);
+        }
     };
 
     window.wizardClearFile = function() {
@@ -7876,6 +8177,8 @@ function cora_get_sparkline_points( $history, $type ) {
         if (scanContainer) scanContainer.style.display = 'none';
         var scanList = document.getElementById('wiz-kit-scanned-list');
         if (scanList) scanList.innerHTML = '';
+        var themeNameInput = document.getElementById('wiz-theme-name');
+        if (themeNameInput) themeNameInput.value = '';
     };
 
     // ── Lovable Wizard Helpers ─────────────────────────────────
@@ -8328,14 +8631,18 @@ function cora_get_sparkline_points( $history, $type ) {
         };
 
         if (_wizBuilder === 'elementor' && _wizSubMode === 'upload') {
+            var fileToUpload = (kitFile && kitFile.files && kitFile.files[0]) ? kitFile.files[0] : window._wizSelectedKitFile;
+            if (!fileToUpload) {
+                showToast('Please select or drop an Elementor Kit (.zip) file.', 'warning');
+                if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                return;
+            }
             showToast('Uploading and importing Elementor Kit...', 'info');
 
             var formData = new FormData();
             formData.append('action', 'cora_ajax_import_kit');
             formData.append('theme_name', name);
-            if (kitFile && kitFile.files[0]) {
-                formData.append('kit_zip', kitFile.files[0]);
-            }
+            formData.append('kit_zip', fileToUpload);
             formData.append('nonce', safeNonce);
 
             jQuery.ajax({
@@ -8345,31 +8652,20 @@ function cora_get_sparkline_points( $history, $type ) {
                 processData: false,
                 contentType: false,
                 success: function(rawRes) {
-                    console.log('Elementor Kit import raw response:', rawRes);
-                    var res;
-                    try {
-                        var firstBrace = rawRes.indexOf('{');
-                        var lastBrace = rawRes.lastIndexOf('}');
-                        if (firstBrace > -1 && lastBrace > -1) {
-                            res = JSON.parse(rawRes.substring(firstBrace, lastBrace + 1));
-                        } else {
-                            res = { success: false, data: rawRes.trim() };
-                        }
-                    } catch (e) {
-                        res = { success: false, data: 'JSON Parse Error: ' + rawRes };
-                    }
-
+                    var res = typeof wizParseAjaxResponse === 'function' ? wizParseAjaxResponse(rawRes) : rawRes;
                     if (res.success) {
                         showToast('Theme "' + name + '" successfully imported with pages!', 'success');
                         closeAddThemeWizard();
                         setTimeout(function() { window.location.reload(); }, 900);
                     } else {
-                        showToast(res.data || 'Failed to import Elementor Kit.', 'error');
+                        var errMsg = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to import Elementor Kit.');
+                        var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Ensure the ZIP is a valid Elementor Template Kit and try again.';
+                        showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
                         if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                     }
                 },
                 error: function() {
-                    showToast('Failed to upload Elementor Kit.', 'error');
+                    showToast('Failed to upload Elementor Kit. Next Step: Check your network and server upload limits.', 'error');
                     if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                 }
             });
@@ -8405,32 +8701,21 @@ function cora_get_sparkline_points( $history, $type ) {
             data: postData,
             dataType: 'text',
             success: function(rawRes) {
-                console.log('Create theme raw response:', rawRes);
-                var res;
-                try {
-                    var firstBrace = rawRes.indexOf('{');
-                    var lastBrace = rawRes.lastIndexOf('}');
-                    if (firstBrace > -1 && lastBrace > -1) {
-                        res = JSON.parse(rawRes.substring(firstBrace, lastBrace + 1));
-                    } else {
-                        res = { success: false, data: { message: rawRes.trim() } };
-                    }
-                } catch (e) {
-                    res = { success: false, data: { message: 'JSON Parse Error: ' + rawRes } };
-                }
-
+                var res = typeof wizParseAjaxResponse === 'function' ? wizParseAjaxResponse(rawRes) : rawRes;
                 if (res.success) {
                     var successMsg = _wizBuilder === 'lovable' ? 'Lovable theme "' + name + '" connected!' : 'Theme "' + name + '" synced from GitHub!';
                     showToast(successMsg, 'success');
                     closeAddThemeWizard();
                     setTimeout(function() { window.location.reload(); }, 900);
                 } else {
-                    showToast(res.data.message || 'Failed to create theme workspace.', 'error');
+                    var errMsg = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to create theme workspace.');
+                    var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Verify your configuration and try again.';
+                    showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
                     if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                 }
             },
             error: function() {
-                showToast('Connection failed. Please check backend settings.', 'error');
+                showToast('Connection failed. Next Step: Check your network and try again.', 'error');
                 if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
             }
         });
