@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.14
+ * Version: 4.8.15
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.14' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.15' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -19373,18 +19373,88 @@ function cora_ws_ajax_disconnect_lovable() {
 add_action( 'wp_ajax_cora_disconnect_lovable', 'cora_ws_ajax_disconnect_lovable' );
 
 /**
+ * Helper: Get current active platform language
+ */
+if ( ! function_exists( 'cora_get_current_language' ) ) {
+function cora_get_current_language() {
+    // 1. Check direct cookie
+    if ( ! empty( $_COOKIE['cora_lang'] ) ) {
+        $l = sanitize_text_field( $_COOKIE['cora_lang'] );
+        if ( in_array( $l, array( 'en', 'hi', 'es', 'fr', 'de', 'bn', 'te', 'mr', 'ta', 'gu', 'kn', 'ml', 'pa', 'or' ), true ) ) {
+            return $l;
+        }
+    }
+    // 2. Check Google Translate cookie (e.g. /en/hi)
+    if ( ! empty( $_COOKIE['googtrans'] ) ) {
+        $gt = trim( sanitize_text_field( $_COOKIE['googtrans'] ), '/' );
+        $parts = explode( '/', $gt );
+        $target = end( $parts );
+        if ( in_array( $target, array( 'en', 'hi', 'es', 'fr', 'de', 'bn', 'te', 'mr', 'ta', 'gu', 'kn', 'ml', 'pa', 'or' ), true ) ) {
+            return $target;
+        }
+    }
+    // 3. Check user meta
+    $user_id = get_current_user_id();
+    if ( $user_id ) {
+        $user_lang = get_user_meta( $user_id, 'cora_user_language', true );
+        if ( ! empty( $user_lang ) && in_array( $user_lang, array( 'en', 'hi', 'es', 'fr', 'de', 'bn', 'te', 'mr', 'ta', 'gu', 'kn', 'ml', 'pa', 'or' ), true ) ) {
+            return $user_lang;
+        }
+    }
+    // 4. Fallback to workspace option
+    return get_option( 'cora_workspace_language', 'en' );
+}
+}
+
+/**
  * AJAX Action: Save Platform Language
  */
 if ( ! function_exists( 'cora_ajax_save_platform_language' ) ) {
 function cora_ajax_save_platform_language() {
     check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
-    if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'User is not authenticated.' ) );
     }
 
     $language = isset( $_POST['language'] ) ? sanitize_text_field( $_POST['language'] ) : 'en';
-    update_option( 'cora_workspace_language', $language );
-    wp_send_json_success( array( 'message' => 'Workspace language updated.' ) );
+    $allowed = array( 'en', 'hi', 'es', 'fr', 'de', 'bn', 'te', 'mr', 'ta', 'gu', 'kn', 'ml', 'pa', 'or' );
+    if ( ! in_array( $language, $allowed, true ) ) {
+        $language = 'en';
+    }
+
+    // Save for the individual user
+    $user_id = get_current_user_id();
+    if ( $user_id ) {
+        update_user_meta( $user_id, 'cora_user_language', $language );
+    }
+
+    // If super owner or admin, also update the default workspace setting
+    if ( cora_is_super_owner() || current_user_can( 'manage_options' ) ) {
+        update_option( 'cora_workspace_language', $language );
+    }
+
+    // Attempt to set server cookies for instant persistence
+    if ( ! headers_sent() ) {
+        $cookie_domain = '';
+        if ( ! empty( $_SERVER['HTTP_HOST'] ) && strpos( $_SERVER['HTTP_HOST'], '.' ) !== false ) {
+            $host = preg_replace( '/:\d+$/', '', $_SERVER['HTTP_HOST'] );
+            // Use domain cookie for heycora.in subdomains
+            if ( substr( $host, -9 ) === 'heycora.in' ) {
+                $cookie_domain = '.heycora.in';
+            }
+        }
+        setcookie( 'cora_lang', $language, time() + 31536000, '/', $cookie_domain, is_ssl(), false );
+        if ( $language !== 'en' ) {
+            setcookie( 'googtrans', '/en/' . $language, time() + 31536000, '/', $cookie_domain, false, false );
+        } else {
+            setcookie( 'googtrans', '', time() - 3600, '/', $cookie_domain, false, false );
+        }
+    }
+
+    wp_send_json_success( array(
+        'message'  => 'Workspace language updated successfully.',
+        'language' => $language
+    ) );
 }
 }
 add_action( 'wp_ajax_cora_save_platform_language', 'cora_ajax_save_platform_language' );

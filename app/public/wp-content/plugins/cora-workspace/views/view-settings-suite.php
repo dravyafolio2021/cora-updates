@@ -758,7 +758,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div>
                         <label>Platform Language</label>
                         <select id="cora-settings-suite-language-select" name="cora_workspace_language" class="cora-language-selector" style="width: 100%; padding: 10px 14px; font-size: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;" onchange="if(window.coraSetLanguage) window.coraSetLanguage(this.value, true);">
-                            <?php $lang = get_option('cora_workspace_language', 'en'); ?>
+                            <?php $lang = function_exists('cora_get_current_language') ? cora_get_current_language() : get_option('cora_workspace_language', 'en'); ?>
                             <option value="en" <?php selected( $lang, 'en' ); ?>>English</option>
                             <option value="hi" <?php selected( $lang, 'hi' ); ?>>Hindi (हिन्दी)</option>
                             <option value="es" <?php selected( $lang, 'es' ); ?>>Spanish (Español)</option>

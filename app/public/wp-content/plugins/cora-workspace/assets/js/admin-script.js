@@ -11965,20 +11965,29 @@ jQuery(document).ready(function($) {
         // 2. Sync all UI dropdowns & labels
         window.coraSyncLanguageUI();
 
-        // 3. Set Google Translate cookies for string translation
-        if (newLang !== 'en') {
-            document.cookie = "googtrans=/en/" + newLang + "; path=/";
-            if (window.location.hostname.indexOf('.') !== -1) {
-                document.cookie = "googtrans=/en/" + newLang + "; path=/; domain=" + window.location.hostname;
-            }
-        } else {
-            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            if (window.location.hostname.indexOf('.') !== -1) {
-                document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname;
+        // 3. Set Cookies (1-year persistence)
+        let cookieDomain = '';
+        if (window.location.hostname.indexOf('.') !== -1) {
+            if (window.location.hostname.endsWith('heycora.in')) {
+                cookieDomain = '; domain=.heycora.in';
+            } else {
+                cookieDomain = '; domain=' + window.location.hostname;
             }
         }
 
-        // 4. Save language to backend options
+        if (newLang !== 'en') {
+            document.cookie = "googtrans=/en/" + newLang + "; path=/; max-age=31536000" + cookieDomain;
+            document.cookie = "cora_lang=" + newLang + "; path=/; max-age=31536000" + cookieDomain;
+            document.cookie = "googtrans=/en/" + newLang + "; path=/; max-age=31536000";
+            document.cookie = "cora_lang=" + newLang + "; path=/; max-age=31536000";
+        } else {
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/" + cookieDomain;
+            document.cookie = "cora_lang=en; path=/; max-age=31536000" + cookieDomain;
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "cora_lang=en; path=/; max-age=31536000";
+        }
+
+        // 4. Save language to backend options & user meta
         if (typeof coraREData !== 'undefined' && coraREData.ajaxUrl && coraREData.ajaxNonce) {
             $.post(coraREData.ajaxUrl, {
                 action: 'cora_save_platform_language',
@@ -11990,14 +11999,18 @@ jQuery(document).ready(function($) {
         // 5. UI feedback toast
         if (triggerToast && typeof window.coraShowToast === 'function') {
             const langName = window.coraLanguages[newLang] || newLang;
-            window.coraShowToast("Display language updated to " + langName + ".");
+            window.coraShowToast("Display language updated to " + langName + ".", "success");
         }
 
-        // 6. Apply translation update via refresh if language actually changed
-        if (newLang !== prevLang) {
+        // 6. Apply translation update
+        const gtCombo = document.querySelector('.goog-te-combo');
+        if (gtCombo) {
+            gtCombo.value = newLang;
+            gtCombo.dispatchEvent(new Event('change'));
+        } else if (newLang !== prevLang) {
             setTimeout(function() {
                 window.location.reload();
-            }, 600);
+            }, 300);
         }
     };
 

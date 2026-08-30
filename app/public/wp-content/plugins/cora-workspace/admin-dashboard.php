@@ -3886,6 +3886,24 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     } );
     $cora_display_name = $current_wp_user->display_name ? $current_wp_user->display_name : ($current_wp_user->first_name ? $current_wp_user->first_name : 'Dravya Bansal');
     $cora_initials = strtoupper(substr($cora_display_name, 0, 1));
+    $cora_current_language = function_exists( 'cora_get_current_language' ) ? cora_get_current_language() : 'en';
+    $cora_supported_languages = array(
+        'en' => 'English',
+        'hi' => 'Hindi (हिन्दी)',
+        'es' => 'Spanish (Español)',
+        'fr' => 'French (Français)',
+        'de' => 'German (Deutsch)',
+        'bn' => 'Bengali (বাংলা)',
+        'te' => 'Telugu (తెలుగు)',
+        'mr' => 'Marathi (मराठी)',
+        'ta' => 'Tamil (தமிழ்)',
+        'gu' => 'Gujarati (ગુજરાતી)',
+        'kn' => 'Kannada (ಕನ್ನಡ)',
+        'ml' => 'Malayalam (മലയാളം)',
+        'pa' => 'Punjabi (ਪੰਜਾਬੀ)',
+        'or' => 'Odia (ଓଡ଼ିଆ)',
+    );
+    $cora_current_lang_label = isset( $cora_supported_languages[ $cora_current_language ] ) ? $cora_supported_languages[ $cora_current_language ] : 'English';
 
     // Impersonation banner check
     $is_impersonating = false;
@@ -4034,6 +4052,98 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
     window.openPasswordDrawer = window.coraOpenPasswordDrawer;
     window.closePasswordDrawer = window.coraClosePasswordDrawer;
+
+    /* Hoisted Global Language Engine */
+    window.coraLanguages = {
+        'en': 'English',
+        'hi': 'Hindi (हिन्दी)',
+        'es': 'Spanish (Español)',
+        'fr': 'French (Français)',
+        'de': 'German (Deutsch)',
+        'bn': 'Bengali (বাংলা)',
+        'te': 'Telugu (తెలుగు)',
+        'mr': 'Marathi (मराठी)',
+        'ta': 'Tamil (தமிழ்)',
+        'gu': 'Gujarati (ગુજરાતી)',
+        'kn': 'Kannada (ಕನ್ನಡ)',
+        'ml': 'Malayalam (മലയാളം)',
+        'pa': 'Punjabi (ਪੰਜਾਬੀ)',
+        'or': 'Odia (ଓଡ଼ିଆ)'
+    };
+
+    window.coraSyncLanguageUI = function(lang) {
+        var currentLang = lang || localStorage.getItem('cora_platform_language') || localStorage.getItem('cora_workspace_language') || '<?php echo esc_js( $cora_current_language ); ?>' || 'en';
+        document.querySelectorAll('.cora-language-selector, #cora-language-selector, #cora-platform-language-select, #cora-popover-language-select, #cora-header-language-select, #cora-settings-suite-language-select, select[name="cora_workspace_language"]').forEach(function(el) {
+            el.value = currentLang;
+        });
+        var labelText = window.coraLanguages[currentLang] || 'English';
+        document.querySelectorAll('.cora-current-language-label').forEach(function(el) {
+            el.textContent = labelText;
+        });
+    };
+
+    window.coraSetLanguage = function(newLang, triggerToast) {
+        if (typeof triggerToast === 'undefined') triggerToast = true;
+        if (!newLang || !window.coraLanguages[newLang]) newLang = 'en';
+        var prevLang = localStorage.getItem('cora_platform_language') || '<?php echo esc_js( $cora_current_language ); ?>' || 'en';
+
+        // 1. Save language preference in localStorage
+        localStorage.setItem('cora_platform_language', newLang);
+        localStorage.setItem('cora_workspace_language', newLang);
+
+        // 2. Set Cookies (1-year expiration)
+        var cookieDomain = '';
+        if (window.location.hostname.indexOf('.') !== -1) {
+            if (window.location.hostname.endsWith('heycora.in')) {
+                cookieDomain = '; domain=.heycora.in';
+            } else {
+                cookieDomain = '; domain=' + window.location.hostname;
+            }
+        }
+        
+        if (newLang !== 'en') {
+            document.cookie = "googtrans=/en/" + newLang + "; path=/; max-age=31536000" + cookieDomain;
+            document.cookie = "cora_lang=" + newLang + "; path=/; max-age=31536000" + cookieDomain;
+            document.cookie = "googtrans=/en/" + newLang + "; path=/; max-age=31536000";
+            document.cookie = "cora_lang=" + newLang + "; path=/; max-age=31536000";
+        } else {
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/" + cookieDomain;
+            document.cookie = "cora_lang=en; path=/; max-age=31536000" + cookieDomain;
+            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "cora_lang=en; path=/; max-age=31536000";
+        }
+
+        // 3. Sync all UI elements immediately
+        window.coraSyncLanguageUI(newLang);
+
+        // 4. Save language to backend options & user meta
+        var ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        var nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+        if (typeof jQuery !== 'undefined') {
+            jQuery.post(ajaxUrl, {
+                action: 'cora_save_platform_language',
+                nonce: nonce,
+                language: newLang
+            });
+        }
+
+        // 5. Toast feedback
+        if (triggerToast && typeof window.coraShowToast === 'function') {
+            var langName = window.coraLanguages[newLang] || newLang;
+            window.coraShowToast("Display language updated to " + langName + ".", "success");
+        }
+
+        // 6. If Google Translate select is present, trigger it, otherwise reload
+        var gtCombo = document.querySelector('.goog-te-combo');
+        if (gtCombo) {
+            gtCombo.value = newLang;
+            gtCombo.dispatchEvent(new Event('change'));
+        } else if (newLang !== prevLang) {
+            setTimeout(function() {
+                window.location.reload();
+            }, 300);
+        }
+    };
     </script>
 
     <!-- Global Brand & Customized Blocks Top Navbar (Shopify Style Unified Header) -->
@@ -4532,23 +4642,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <div class="px-2 py-1.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-1 select-none my-0.5">
                         <div class="flex items-center justify-between px-1">
                             <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Language</span>
-                            <span class="cora-current-language-label text-[9px] font-bold px-1.5 py-0.2 bg-zinc-900 text-white rounded uppercase">English</span>
+                            <span class="cora-current-language-label text-[9px] font-bold px-1.5 py-0.2 bg-zinc-900 text-white rounded uppercase"><?php echo esc_html( $cora_current_lang_label ); ?></span>
                         </div>
                         <select id="cora-language-selector" class="cora-language-selector w-full bg-white border border-zinc-200 text-zinc-800 text-xs font-semibold rounded-lg px-2 py-1.5 outline-none cursor-pointer transition-colors" onchange="if(window.coraSetLanguage) window.coraSetLanguage(this.value, true);">
-                            <option value="en">English</option>
-                            <option value="hi">Hindi (हिन्दी)</option>
-                            <option value="es">Spanish (Español)</option>
-                            <option value="fr">French (Français)</option>
-                            <option value="de">German (Deutsch)</option>
-                            <option value="bn">Bengali (বাংলা)</option>
-                            <option value="te">Telugu (తెలుగు)</option>
-                            <option value="mr">Marathi (मराठी)</option>
-                            <option value="ta">Tamil (தமிழ்)</option>
-                            <option value="gu">Gujarati (ગુજરાતી)</option>
-                            <option value="kn">Kannada (ಕನ್ನಡ)</option>
-                            <option value="ml">Malayalam (മലയാളം)</option>
-                            <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
-                            <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                            <?php foreach ( $cora_supported_languages as $l_code => $l_name ) : ?>
+                            <option value="<?php echo esc_attr( $l_code ); ?>" <?php selected( $cora_current_language, $l_code ); ?>><?php echo esc_html( $l_name ); ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
@@ -5997,20 +6096,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                         <span class="text-xs font-medium">Language</span>
                                     </div>
                                     <select id="cora-header-language-select" class="cora-language-selector bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium rounded-lg px-2 py-1 outline-none border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer" onchange="if(window.coraSetLanguage) window.coraSetLanguage(this.value, true);">
-                                        <option value="en">English</option>
-                                        <option value="hi">Hindi (हिन्दी)</option>
-                                        <option value="es">Spanish (Español)</option>
-                                        <option value="fr">French (Français)</option>
-                                        <option value="de">German (Deutsch)</option>
-                                        <option value="bn">Bengali (বাংলা)</option>
-                                        <option value="te">Telugu (తెలుగు)</option>
-                                        <option value="mr">Marathi (मराठी)</option>
-                                        <option value="ta">Tamil (தமிழ்)</option>
-                                        <option value="gu">Gujarati (ગુજરાતી)</option>
-                                        <option value="kn">Kannada (ಕನ್ನಡ)</option>
-                                        <option value="ml">Malayalam (മലയാളം)</option>
-                                        <option value="pa">Punjabi (ਪੰਜਾਬী)</option>
-                                        <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                                        <?php foreach ( $cora_supported_languages as $l_code => $l_name ) : ?>
+                                        <option value="<?php echo esc_attr( $l_code ); ?>" <?php selected( $cora_current_language, $l_code ); ?>><?php echo esc_html( $l_name ); ?></option>
+                                        <?php endforeach; ?>
                                     </select>
                                 </div>
 
@@ -8784,20 +8872,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Platform Language</label>
                             <select id="cora-platform-language-select" class="cora-language-selector w-full border border-zinc-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:border-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-200 transition-all appearance-none cursor-pointer" onchange="if(window.coraSetLanguage) window.coraSetLanguage(this.value, false);">
-                                <option value="en">English</option>
-                                <option value="hi">Hindi (हिन्दी)</option>
-                                <option value="es">Spanish (Español)</option>
-                                <option value="fr">French (Français)</option>
-                                <option value="de">German (Deutsch)</option>
-                                <option value="bn">Bengali (বাংলা)</option>
-                                <option value="te">Telugu (తెలుగు)</option>
-                                <option value="mr">Marathi (मराठी)</option>
-                                <option value="ta">Tamil (தமிழ்)</option>
-                                <option value="gu">Gujarati (ગુજરાતી)</option>
-                                <option value="kn">Kannada (ಕನ್ನಡ)</option>
-                                <option value="ml">Malayalam (മലയാളം)</option>
-                                <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
-                                <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                                <?php foreach ( $cora_supported_languages as $l_code => $l_name ) : ?>
+                                <option value="<?php echo esc_attr( $l_code ); ?>" <?php selected( $cora_current_language, $l_code ); ?>><?php echo esc_html( $l_name ); ?></option>
+                                <?php endforeach; ?>
                             </select>
                             <span class="text-[10px] text-zinc-400">Change the display language of the entire platform.</span>
                         </div>
@@ -16723,40 +16800,66 @@ body {
 </style>
 <script type="text/javascript">
 (function() {
-    // Synchronize the server-saved language preference directly to localStorage
-    const serverLang = '<?php echo esc_js( get_option( 'cora_workspace_language', 'en' ) ); ?>';
-    if (serverLang) {
-        localStorage.setItem('cora_platform_language', serverLang);
-        localStorage.setItem('cora_workspace_language', serverLang);
+    var serverLang = '<?php echo esc_js( $cora_current_language ); ?>';
+    var localLang = localStorage.getItem('cora_platform_language') || localStorage.getItem('cora_workspace_language');
+    
+    // Resolve active language (respect user selection)
+    var selectedLang = localLang || serverLang || 'en';
+    if (serverLang && serverLang !== 'en' && !localLang) {
+        selectedLang = serverLang;
     }
-    const selectedLang = serverLang || localStorage.getItem('cora_platform_language') || 'en';
-    if (selectedLang !== 'en') {
-        // Set standard Google Translate cookie
-        document.cookie = "googtrans=/en/" + selectedLang + "; path=/";
-        if (window.location.hostname.indexOf('.') !== -1) {
-            document.cookie = "googtrans=/en/" + selectedLang + "; path=/; domain=" + window.location.hostname;
+    
+    // Keep localStorage in sync with selected language
+    localStorage.setItem('cora_platform_language', selectedLang);
+    localStorage.setItem('cora_workspace_language', selectedLang);
+
+    // Synchronize all dropdowns and badges in DOM
+    if (typeof window.coraSyncLanguageUI === 'function') {
+        window.coraSyncLanguageUI(selectedLang);
+    }
+
+    var cookieDomain = '';
+    if (window.location.hostname.indexOf('.') !== -1) {
+        if (window.location.hostname.endsWith('heycora.in')) {
+            cookieDomain = '; domain=.heycora.in';
+        } else {
+            cookieDomain = '; domain=' + window.location.hostname;
         }
+    }
+
+    if (selectedLang !== 'en') {
+        // Set standard Google Translate & Cora language cookies (1-year persistence)
+        document.cookie = "googtrans=/en/" + selectedLang + "; path=/; max-age=31536000" + cookieDomain;
+        document.cookie = "cora_lang=" + selectedLang + "; path=/; max-age=31536000" + cookieDomain;
+        document.cookie = "googtrans=/en/" + selectedLang + "; path=/; max-age=31536000";
+        document.cookie = "cora_lang=" + selectedLang + "; path=/; max-age=31536000";
 
         // Load Google Translate script
         window.googleTranslateElementInit = function() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                autoDisplay: false
-            }, 'google_translate_element');
+            try {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en',
+                    includedLanguages: 'en,hi,es,fr,de,bn,te,mr,ta,gu,kn,ml,pa,or',
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                    autoDisplay: false
+                }, 'google_translate_element');
+            } catch(e) {}
         };
 
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.async = true;
-        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-        document.body.appendChild(script);
-    } else {
-        // Clear cookie if English
-        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        if (window.location.hostname.indexOf('.') !== -1) {
-            document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname;
+        if (!document.getElementById('cora-google-translate-script')) {
+            var script = document.createElement('script');
+            script.id = 'cora-google-translate-script';
+            script.type = 'text/javascript';
+            script.async = true;
+            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            document.head.appendChild(script);
         }
+    } else {
+        // Clear cookies if English
+        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/" + cookieDomain;
+        document.cookie = "cora_lang=en; path=/; max-age=31536000" + cookieDomain;
+        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "cora_lang=en; path=/; max-age=31536000";
     }
 })();
 </script>
@@ -18520,4 +18623,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </body>
-</html>
+</html><
