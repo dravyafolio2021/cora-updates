@@ -5560,28 +5560,34 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     <!-- Internal Hero Container (Slightly colored soft container with rounded-3xl corners) -->
                     <div class="cora-dashboard-hero-card w-full select-none">
 
-                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Always 4 Cards, Ultra-Compact Micro Scale, Mobile 2-Cols, Desktop 4-Cols Centered) -->
-                        <div class="w-full max-w-[500px] sm:max-w-[540px] mx-auto grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-10 sm:mb-14 select-none">
+                        <!-- 1. Dynamic Mini Telemetry Metrics Row (Always 4 Cards, Ultra-Clean Executive Cockpit) -->
+                        <div class="w-full max-w-[520px] sm:max-w-[560px] mx-auto grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-8 sm:mb-12 select-none">
                             <?php 
                             $display_telemetry = ! empty( $telemetry_metrics ) ? array_slice( $telemetry_metrics, 0, 4 ) : array();
                             foreach ( $display_telemetry as $metric ) : 
                                 $badge_val = isset($metric['badge']) ? $metric['badge'] : '';
-                                $badge_class = isset($metric['badge_class']) ? $metric['badge_class'] : 'text-zinc-500 dark:text-zinc-400';
                                 $icon_html = isset($metric['icon']) ? $metric['icon'] : '';
                             ?>
-                            <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/80 dark:border-zinc-800 px-2.5 py-1.5 sm:px-3 sm:py-2 flex flex-col justify-between min-h-[44px] shadow-3xs hover:shadow-2xs transition-all hover:border-zinc-300 dark:hover:border-zinc-700">
-                                <div class="flex items-center justify-between gap-1 leading-none">
-                                    <span class="text-[8px] sm:text-[8.5px] font-semibold <?php echo esc_attr( $badge_class ); ?> truncate">
+                            <div class="group relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-2.5 sm:p-3 flex flex-col justify-between min-h-[58px] shadow-3xs hover:shadow-xs transition-all hover:border-zinc-300 dark:hover:border-zinc-700 select-none overflow-hidden">
+                                <!-- Micro Subtle Top Accent Highlight on Hover -->
+                                <div class="absolute top-0 inset-x-0 h-[1.5px] bg-zinc-200/60 dark:bg-zinc-800 group-hover:bg-zinc-900 dark:group-hover:bg-zinc-100 transition-colors"></div>
+                                
+                                <!-- Top Row: Monospace Header & Vector Icon -->
+                                <div class="flex items-center justify-between gap-1 leading-none mb-1.5">
+                                    <span class="text-[9px] sm:text-[9.5px] font-mono font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate">
                                         <?php echo esc_html( $badge_val ); ?>
                                     </span>
-                                    <div class="w-3.5 h-3.5 rounded-[4px] bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/60 dark:border-zinc-700/60 flex items-center justify-center text-zinc-400 dark:text-zinc-500 shrink-0">
+                                    <div class="w-4 h-4 rounded-md bg-zinc-100/80 dark:bg-zinc-800/80 flex items-center justify-center text-zinc-400 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors shrink-0">
                                         <?php echo $icon_html; ?>
                                     </div>
                                 </div>
-                                <div class="flex items-baseline justify-between gap-1 pt-1 leading-none">
-                                    <div class="text-[13px] sm:text-[14px] font-extrabold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
+
+                                <!-- Bottom Row: Metric Value + Live Indicator Dot -->
+                                <div class="flex items-baseline justify-between gap-1 leading-none">
+                                    <div class="text-[15px] sm:text-[16px] font-extrabold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight leading-none truncate">
                                         <?php echo esc_html( $metric['value'] ); ?>
                                     </div>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block opacity-80 shrink-0"></span>
                                 </div>
                             </div>
                             <?php endforeach; ?>
