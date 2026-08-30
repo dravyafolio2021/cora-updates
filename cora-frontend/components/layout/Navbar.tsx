@@ -1056,39 +1056,53 @@ export function Navbar() {
                   </div>
                 )}
 
-                {/* ── DROPDOWN: RESOURCES (3 ARTISTIC VISUAL CARDS: FREE TOOLS, GUIDES, ARTICLES/COMPARE) ── */}
+                {/* ── DROPDOWN: RESOURCES (CLEAN MONOCHROMATIC UI PREVIEW CARDS) ── */}
                 {activeDropdown === 'resources' && (
-                  <div className="grid grid-cols-3 gap-6 items-stretch">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
 
-                    {/* Card 1: Free Public Tools (Solid Soft Lavender / Periwinkle) */}
+                    {/* Card 1: Free Micro-Tools & Calculators */}
                     <Link
                       href="/tools"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[28px] bg-[#EEF2FF] hover:bg-[#E0E7FF] border-0 p-6 sm:p-7 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[270px]"
+                      className="group rounded-2xl bg-white border border-zinc-200/90 hover:border-zinc-950 p-6 flex flex-col justify-between hover:shadow-md transition-all duration-200"
                     >
-                      <div className="space-y-1.5 z-10 max-w-[190px]">
-                        <h3 className="font-display text-2xl font-bold text-zinc-950 tracking-tight leading-tight">
-                          Free Tools
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                            CALCULATORS &amp; AI
+                          </span>
+                          <span className="text-[9px] font-mono font-semibold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">
+                            ZERO LOGIN
+                          </span>
+                        </div>
+                        <h3 className="text-base font-bold text-zinc-950 tracking-tight mb-1 group-hover:text-black">
+                          Free Micro-Tools
                         </h3>
-                        <p className="text-zinc-600 text-xs font-normal leading-relaxed">
-                          Instant calculators &amp; AI generators with zero login
+                        <p className="text-zinc-500 text-xs font-normal leading-relaxed mb-5">
+                          Instant GST tax breakdown, real estate MLS copywriter &amp; client embed builders.
                         </p>
+
+                        {/* UI Preview Block: Mini GST Breakdown Widget */}
+                        <div className="rounded-xl bg-zinc-50 border border-zinc-200/80 p-3 font-mono text-[11px] space-y-1.5 group-hover:bg-zinc-100/60 transition-colors">
+                          <div className="flex items-center justify-between text-zinc-400 text-[10px]">
+                            <span>TAX CALCULATION</span>
+                            <span className="font-semibold text-zinc-700">SAC 998381</span>
+                          </div>
+                          <div className="flex items-center justify-between text-zinc-900 font-semibold">
+                            <span>Shoot Base:</span>
+                            <span>₹1,50,000</span>
+                          </div>
+                          <div className="flex items-center justify-between text-zinc-500 text-[10px] pt-1.5 border-t border-zinc-200/70">
+                            <span>+ 18% GST (CGST/SGST):</span>
+                            <span className="font-bold text-zinc-900">₹27,000</span>
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Relatable 3D Tool & Calculator Artwork */}
-                      <div className="absolute -right-3 -bottom-3 w-[165px] h-[165px] rounded-2xl overflow-hidden shadow-md border-2 border-white/80 pointer-events-none transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-2">
-                        <Image
-                          src="/images/cora_nav_tools_relatable.png"
-                          alt="Free Tools 3D Calculator & Tax Generator"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="pt-6 z-10">
-                        <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-indigo-950 group-hover:translate-x-1 transition-transform">
+                      <div className="pt-5 mt-4 border-t border-zinc-100 flex items-center justify-between">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900 group-hover:text-black">
                           <span>Browse all micro-tools</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
+                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-0.5 transition-transform" />
                         </span>
                       </div>
                     </Link>
@@ -1097,64 +1111,94 @@ export function Navbar() {
                     <Link
                       href="/docs"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[28px] bg-[#E0F2FE] hover:bg-[#BAE6FD] border-0 p-6 sm:p-7 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[270px]"
+                      className="group rounded-2xl bg-white border border-zinc-200/90 hover:border-zinc-950 p-6 flex flex-col justify-between hover:shadow-md transition-all duration-200"
                     >
-                      <div className="space-y-1.5 z-10 max-w-[190px]">
-                        <h3 className="font-display text-2xl font-bold text-zinc-950 tracking-tight leading-tight">
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                            DEVELOPER &amp; REST APIS
+                          </span>
+                          <span className="text-[9px] font-mono font-semibold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">
+                            25 SPECS
+                          </span>
+                        </div>
+                        <h3 className="text-base font-bold text-zinc-950 tracking-tight mb-1 group-hover:text-black">
                           Documentation
                         </h3>
-                        <p className="text-zinc-600 text-xs font-normal leading-relaxed">
-                          23 architecture guides, REST APIs &amp; studio SOPs
+                        <p className="text-zinc-500 text-xs font-normal leading-relaxed mb-5">
+                          25 architecture guides, REST API specs, RBAC matrix &amp; developer quickstarts.
                         </p>
+
+                        {/* UI Preview Block: Mini Terminal Code Block */}
+                        <div className="rounded-xl bg-zinc-950 text-zinc-300 p-3 font-mono text-[11px] space-y-1.5 border border-zinc-800 shadow-2xs">
+                          <div className="flex items-center justify-between text-[10px] text-zinc-500 pb-1 border-b border-zinc-800">
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                              <span>REST v1</span>
+                            </span>
+                            <span className="text-zinc-400">200 OK</span>
+                          </div>
+                          <div className="text-zinc-300 truncate text-[11px]">
+                            <span className="text-zinc-500">GET</span> /api/v1/workspaces/active
+                          </div>
+                          <div className="text-[10px] text-zinc-500 flex items-center justify-between pt-0.5">
+                            <span>tenant_id: &quot;studio_re&quot;</span>
+                            <span className="text-zinc-400">12ms</span>
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Relatable 3D Playbook & Legal Document Artwork */}
-                      <div className="absolute -right-3 -bottom-3 w-[165px] h-[165px] rounded-2xl overflow-hidden shadow-md border-2 border-white/80 pointer-events-none transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
-                        <Image
-                          src="/images/cora_nav_guides_relatable.png"
-                          alt="Documentation & Developer Hub"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="pt-6 z-10">
-                        <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-sky-950 group-hover:translate-x-1 transition-transform">
-                          <span>Browse 23 docs &amp; APIs</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
+                      <div className="pt-5 mt-4 border-t border-zinc-100 flex items-center justify-between">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900 group-hover:text-black">
+                          <span>Browse 25 docs &amp; specs</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-0.5 transition-transform" />
                         </span>
                       </div>
                     </Link>
 
-                    {/* Card 3: Articles & Market Comparisons (Solid Soft Mint Green) */}
+                    {/* Card 3: Articles & Market Comparisons */}
                     <Link
                       href="/articles"
                       onClick={() => setActiveDropdown(null)}
-                      className="group relative rounded-[28px] bg-[#DCFCE7] hover:bg-[#D1FAE5] border-0 p-6 sm:p-7 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[270px]"
+                      className="group rounded-2xl bg-white border border-zinc-200/90 hover:border-zinc-950 p-6 flex flex-col justify-between hover:shadow-md transition-all duration-200"
                     >
-                      <div className="space-y-1.5 z-10 max-w-[190px]">
-                        <h3 className="font-display text-2xl font-bold text-zinc-950 tracking-tight leading-tight">
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                            BENCHMARKS &amp; GUIDES
+                          </span>
+                          <span className="text-[9px] font-mono font-semibold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">
+                            24 ARTICLES
+                          </span>
+                        </div>
+                        <h3 className="text-base font-bold text-zinc-950 tracking-tight mb-1 group-hover:text-black">
                           Articles &amp; Compare
                         </h3>
-                        <p className="text-zinc-600 text-xs font-normal leading-relaxed">
-                          Side-by-side benchmarks vs legacy market stacks
+                        <p className="text-zinc-500 text-xs font-normal leading-relaxed mb-5">
+                          Side-by-side benchmarks vs HoneyBook, Studio Ninja, HubSpot &amp; legacy stacks.
                         </p>
+
+                        {/* UI Preview Block: Mini Benchmark Comparison Matrix */}
+                        <div className="rounded-xl bg-zinc-50 border border-zinc-200/80 p-3 text-[11px] space-y-1.5 group-hover:bg-zinc-100/60 transition-colors">
+                          <div className="flex items-center justify-between text-zinc-400 font-mono text-[10px]">
+                            <span>CAPABILITY</span>
+                            <span>CORA VS LEGACY</span>
+                          </div>
+                          <div className="flex items-center justify-between font-medium text-zinc-900">
+                            <span>18% GST Tax Engine</span>
+                            <span className="text-[11px] font-mono font-bold text-zinc-900">Native ✓</span>
+                          </div>
+                          <div className="flex items-center justify-between text-zinc-500 text-[10px] pt-1.5 border-t border-zinc-200/70">
+                            <span>SaaS Subscriptions:</span>
+                            <span className="font-semibold text-zinc-900 font-mono">1 App vs 5</span>
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Relatable 3D Benchmark & Analytics Comparison Artwork */}
-                      <div className="absolute -right-3 -bottom-3 w-[165px] h-[165px] rounded-2xl overflow-hidden shadow-md border-2 border-white/80 pointer-events-none transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-2">
-                        <Image
-                          src="/images/cora_nav_compare_relatable.png"
-                          alt="Articles & Compare Benchmarks Matrix"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="pt-6 z-10">
-                        <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-emerald-950 group-hover:translate-x-1 transition-transform">
-                          <span>Browse all 8 comparisons</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
+                      <div className="pt-5 mt-4 border-t border-zinc-100 flex items-center justify-between">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900 group-hover:text-black">
+                          <span>Browse all 24 guides</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-0.5 transition-transform" />
                         </span>
                       </div>
                     </Link>
