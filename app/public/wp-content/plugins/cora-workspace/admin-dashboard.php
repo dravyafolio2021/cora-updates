@@ -2847,6 +2847,18 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
         }
 
+        /* Hero Center Greeting & Search Block Spacing */
+        .cora-hero-center-block {
+            padding-top: 36px !important;
+            padding-bottom: 40px !important;
+        }
+        @media (min-width: 768px) {
+            .cora-hero-center-block {
+                padding-top: 56px !important;
+                padding-bottom: 60px !important;
+            }
+        }
+
         /* Minimalist Toast-Style Dashboard To-Do Block */
         .cora-dashboard-todo-container {
             display: none !important;
@@ -5548,121 +5560,126 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <?php endforeach; ?>
                         </div>
 
-                        <!-- 2. Centered Welcome Greeting Section -->
-                        <div class="text-center px-4 relative pb-0">
-                            <h1 id="cora-dynamic-greeting-title" data-user-name="<?php echo esc_attr($user_first_name); ?>" class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-1 leading-tight">
-                                <?php echo esc_html($greeting_title); ?>
-                            </h1>
-                            <p class="text-xs sm:text-sm md:text-base font-medium text-zinc-500 leading-tight m-0">
-                                Your AI Agent is active. Let's build something great.
-                            </p>
-                        </div>
+                        <!-- 2 & 3 & 4. Centered Welcome Greeting, Command Search & Quick Action Shortcuts (Spacious Top & Bottom Padding) -->
+                        <div class="cora-hero-center-block w-full max-w-2xl mx-auto py-8 sm:py-14 my-2 sm:my-5 flex flex-col items-center justify-center select-none">
 
-                        <!-- 3. Universal Command Search -->
-                        <div class="w-full max-w-xl mx-auto mt-4 sm:mt-10 mb-3.5 sm:mb-8 px-2 sm:px-0 relative z-[999]" id="cora-search-container">
-                            <div class="relative flex items-center bg-white/95 backdrop-blur-md border border-zinc-200 hover:border-zinc-300 focus-within:border-zinc-900 focus-within:ring-2 focus-within:ring-zinc-900/10 rounded-full shadow-2xs transition-all duration-200 p-1.5 pl-3.5 pr-2">
-                                <span class="text-zinc-400 mr-2 flex shrink-0">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                    </svg>
-                                </span>
-                                
-                                <input type="text" 
-                                       id="cora-inline-command-input"
-                                       placeholder="Ask or search anything, or press ⌘K..." 
-                                       class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-xs sm:text-sm py-1.5 px-1 text-zinc-900 placeholder:text-zinc-400 cursor-pointer"
-                                       autocomplete="off" />
-                                       
-                                <div class="flex items-center gap-1.5 shrink-0">
-                                    <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded">⌘K</kbd>
-                                    <button type="button" onclick="window.coraTriggerVoiceAI('#cora-inline-command-input', window.coraTriggerCommandAI)" class="cora-voice-input-btn flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Speak to Voice AI">
-                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                                    </button>
-                                    <button onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-950 text-white transition-colors cursor-pointer shadow-xs border-0" title="Send to AI Agent">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <line x1="12" y1="19" x2="12" y2="5"></line>
-                                            <polyline points="5 12 12 5 19 12"></polyline>
+                            <!-- Centered Welcome Greeting Section -->
+                            <div class="text-center px-4 relative pb-0 mb-4 sm:mb-6">
+                                <h1 id="cora-dynamic-greeting-title" data-user-name="<?php echo esc_attr($user_first_name); ?>" class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-1.5 leading-tight">
+                                    <?php echo esc_html($greeting_title); ?>
+                                </h1>
+                                <p class="text-xs sm:text-sm md:text-base font-medium text-zinc-500 leading-tight m-0">
+                                    Your AI Agent is active. Let's build something great.
+                                </p>
+                            </div>
+
+                            <!-- Universal Command Search -->
+                            <div class="w-full max-w-xl mx-auto mb-4 sm:mb-6 px-2 sm:px-0 relative z-[999]" id="cora-search-container">
+                                <div class="relative flex items-center bg-white/95 backdrop-blur-md border border-zinc-200 hover:border-zinc-300 focus-within:border-zinc-900 focus-within:ring-2 focus-within:ring-zinc-900/10 rounded-full shadow-2xs transition-all duration-200 p-1.5 pl-3.5 pr-2">
+                                    <span class="text-zinc-400 mr-2 flex shrink-0">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                         </svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Dropdown Palette -->
-                            <div id="cora-inline-command-palette" class="absolute left-0 right-0 top-full mt-2 z-[9999] hidden bg-white border border-zinc-200 rounded-2xl shadow-2xl flex-col transition-all duration-200">
-                                <div class="flex items-center gap-1.5 px-4 py-2 border-b border-zinc-100 bg-zinc-50/50 overflow-x-auto shrink-0 select-none no-scrollbar">
-                                    <button type="button" class="cora-search-pill active text-[10px] font-semibold px-3 py-1 rounded-full border border-zinc-200 bg-zinc-900 text-white transition-all cursor-pointer" data-filter="all">Overview</button>
-                                    <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="pages">Pages</button>
-                                    <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="leads">Leads</button>
-                                    <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="settings">Settings</button>
-                                    <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="listings">Listings</button>
-                                </div>
-                                <div id="cora-inline-command-results" class="overflow-y-auto p-2" style="height: 260px;"></div>
-                            </div>
-                        </div>
-
-                        <!-- 4. Quick Action Shortcuts Pill Bar (3-Row Centered Layout) -->
-                        <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-2 sm:gap-2.5 py-0 select-none">
-                            
-                            <!-- Row 1: 2 Action Chips (Upload Media & Write Article) -->
-                            <div id="cora-actions-row-1" class="flex items-center justify-center gap-2 flex-nowrap">
-                                <button type="button" onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                    <span>Upload Media</span>
-                                </button>
-                                <button type="button" onclick="coraNavigateTo('blogs')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                    <span>Write Article</span>
-                                </button>
-                            </div>
-
-                            <!-- Row 2: 3 Action Chips (View Crew, New Workflow, Build Form) -->
-                            <div id="cora-actions-row-2" class="flex items-center justify-center gap-2 max-w-full overflow-x-auto no-scrollbar">
-                                <?php if ( $is_studio ) : ?>
-                                <button type="button" onclick="coraNavigateTo('equipment')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-                                    <span>View Crew</span>
-                                </button>
-                                <button type="button" onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                    <span>New Workflow</span>
-                                </button>
-                                <button type="button" onclick="coraNavigateTo('forms')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                    <span>Build Form</span>
-                                </button>
-                                <?php else : ?>
-                                <button type="button" onclick="coraNavigateTo('users')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-                                    <span>View Crew</span>
-                                </button>
-                                <button type="button" onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                    <span>New Workflow</span>
-                                </button>
-                                <button type="button" onclick="coraNavigateTo('forms')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                    <span>Build Form</span>
-                                </button>
-                                <?php endif; ?>
-                            </div>
-
-                            <!-- Row 3: Custom Shortcuts Trigger Button (Centered with Purple Gradient Outline) -->
-                            <div id="cora-actions-row-3" class="flex items-center justify-center">
-                                <button type="button" onclick="window.coraOpenCustomActionModal()" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <span class="cora-ai-gradient-pill-inner">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-purple-600 shrink-0">
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        </svg>
-                                        <span>Custom Shortcuts</span>
                                     </span>
-                                </button>
+                                    
+                                    <input type="text" 
+                                           id="cora-inline-command-input" 
+                                           placeholder="Ask or search anything, or press ⌘K..." 
+                                           class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-xs sm:text-sm py-1.5 px-1 text-zinc-900 placeholder:text-zinc-400 cursor-pointer" 
+                                           autocomplete="off" />
+                                           
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded">⌘K</kbd>
+                                        <button type="button" onclick="window.coraTriggerVoiceAI('#cora-inline-command-input', window.coraTriggerCommandAI)" class="cora-voice-input-btn flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Speak to Voice AI">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                                        </button>
+                                        <button onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-950 text-white transition-colors cursor-pointer shadow-xs border-0" title="Send to AI Agent">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="12" y1="19" x2="12" y2="5"></line>
+                                                <polyline points="5 12 12 5 19 12"></polyline>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Dropdown Palette -->
+                                <div id="cora-inline-command-palette" class="absolute left-0 right-0 top-full mt-2 z-[9999] hidden bg-white border border-zinc-200 rounded-2xl shadow-2xl flex-col transition-all duration-200">
+                                    <div class="flex items-center gap-1.5 px-4 py-2 border-b border-zinc-100 bg-zinc-50/50 overflow-x-auto shrink-0 select-none no-scrollbar">
+                                        <button type="button" class="cora-search-pill active text-[10px] font-semibold px-3 py-1 rounded-full border border-zinc-200 bg-zinc-900 text-white transition-all cursor-pointer" data-filter="all">Overview</button>
+                                        <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="pages">Pages</button>
+                                        <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="leads">Leads</button>
+                                        <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="settings">Settings</button>
+                                        <button type="button" class="cora-search-pill text-[10px] font-medium px-3 py-1 rounded-full border border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-55 transition-all cursor-pointer" data-filter="listings">Listings</button>
+                                    </div>
+                                    <div id="cora-inline-command-results" class="overflow-y-auto p-2" style="height: 260px;"></div>
+                                </div>
                             </div>
-                        </div>
+
+                            <!-- Quick Action Shortcuts Pill Bar (3-Row Centered Layout) -->
+                            <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-2 sm:gap-2.5 py-0 select-none">
+                                
+                                <!-- Row 1: 2 Action Chips (Upload Media & Write Article) -->
+                                <div id="cora-actions-row-1" class="flex items-center justify-center gap-2 flex-nowrap">
+                                    <button type="button" onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                        <span>Upload Media</span>
+                                    </button>
+                                    <button type="button" onclick="coraNavigateTo('blogs')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                        <span>Write Article</span>
+                                    </button>
+                                </div>
+
+                                <!-- Row 2: 3 Action Chips (View Crew, New Workflow, Build Form) -->
+                                <div id="cora-actions-row-2" class="flex items-center justify-center gap-2 max-w-full overflow-x-auto no-scrollbar">
+                                    <?php if ( $is_studio ) : ?>
+                                    <button type="button" onclick="coraNavigateTo('equipment')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+                                        <span>View Crew</span>
+                                    </button>
+                                    <button type="button" onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                        <span>New Workflow</span>
+                                    </button>
+                                    <button type="button" onclick="coraNavigateTo('forms')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        <span>Build Form</span>
+                                    </button>
+                                    <?php else : ?>
+                                    <button type="button" onclick="coraNavigateTo('users')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+                                        <span>View Crew</span>
+                                    </button>
+                                    <button type="button" onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                        <span>New Workflow</span>
+                                    </button>
+                                    <button type="button" onclick="coraNavigateTo('forms')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        <span>Build Form</span>
+                                    </button>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- Row 3: Custom Shortcuts Trigger Button (Centered with Purple Gradient Outline) -->
+                                <div id="cora-actions-row-3" class="flex items-center justify-center">
+                                    <button type="button" onclick="window.coraOpenCustomActionModal()" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <span class="cora-ai-gradient-pill-inner">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-purple-600 shrink-0">
+                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            </svg>
+                                            <span>Custom Shortcuts</span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div> <!-- .cora-hero-center-block -->
 
                         <!-- 5. Toast-Styled Daily To-Do & Task Overview (Toast Block Design, In-Place Done Styling, Smart Bottom Drawer) -->
-                        <div class="cora-dashboard-todo-container w-full select-none" id="cora-dashboard-todo-app">
+                        <div class="cora-dashboard-todo-container w-full select-none pt-2 sm:pt-4" id="cora-dashboard-todo-app">
                             
                             <!-- Header Bar: Day Overview Tabs, Notification Preferences & Smart Add Trigger -->
                             <div class="flex items-center justify-between px-0.5 pt-1 mb-1">
