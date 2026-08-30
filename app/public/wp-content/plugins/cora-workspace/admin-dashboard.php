@@ -2793,8 +2793,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-page-dashboard {
             background-color: #FBFaf7 !important; /* Premium beige / warm cream background */
             background-image: none !important;
-            border-top-left-radius: 24px !important;
-            border-top-right-radius: 24px !important;
+            border-top-left-radius: 28px !important;
+            border-top-right-radius: 28px !important;
             border-bottom-left-radius: 0px !important;
             border-bottom-right-radius: 0px !important;
             border: none !important;
@@ -2811,8 +2811,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         @media (min-width: 768px) {
             #cora-page-dashboard {
                 padding: 32px 24px 0px 24px !important;
-                border-top-left-radius: 28px !important;
-                border-top-right-radius: 28px !important;
+                border-top-left-radius: 32px !important;
+                border-top-right-radius: 32px !important;
                 min-height: calc(100vh - 72px) !important;
             }
         }
@@ -2820,9 +2820,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             background-color: #121214 !important;
         }
 
-        /* Hero container inside beige dashboard section */
+        /* Hero container: Beige background, slightly rounded top corners, zero border/shadow */
         .cora-dashboard-hero-card {
-            background: transparent !important;
+            background-color: #FBFaf7 !important;
+            border-top-left-radius: 28px !important;
+            border-top-right-radius: 28px !important;
+            border-bottom-left-radius: 0px !important;
+            border-bottom-right-radius: 0px !important;
             border: none !important;
             box-shadow: none !important;
             padding: 0px !important;
@@ -2830,8 +2834,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             width: 100% !important;
             margin-bottom: 28px !important;
         }
+        .dark .cora-dashboard-hero-card {
+            background-color: #121214 !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
         @media (min-width: 768px) {
             .cora-dashboard-hero-card {
+                border-top-left-radius: 32px !important;
+                border-top-right-radius: 32px !important;
                 margin-bottom: 36px !important;
             }
         }
