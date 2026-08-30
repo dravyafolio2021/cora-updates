@@ -988,7 +988,7 @@ export function Navbar() {
 
                     {/* Card 3: Articles & Market Comparisons (Solid Soft Mint Green) */}
                     <Link
-                      href="/compare"
+                      href="/articles"
                       onClick={() => setActiveDropdown(null)}
                       className="group relative rounded-[28px] bg-[#DCFCE7] hover:bg-[#D1FAE5] border-0 p-6 sm:p-7 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 min-h-[270px]"
                     >
@@ -1314,10 +1314,14 @@ export function Navbar() {
               {activeMobileSubmenu === 'resources' && (
                 <div className="space-y-3 animate-in fade-in slide-in-from-right-3 duration-150">
                   <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
-                    FREE TOOLS &amp; PLAYBOOKS
+                    ARTICLES &amp; FREE TOOLS
                   </span>
+                  <Link href="/articles" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/70"><Sparkles className="w-4 h-4" /></div>
+                    <div><div className="text-sm font-bold text-zinc-950">Articles &amp; Compare</div><div className="text-xs text-zinc-500">24 guides, playbooks &amp; benchmarks</div></div>
+                  </Link>
                   <Link href="/tools/gst-calculator" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/70"><Receipt className="w-4 h-4" /></div>
+                    <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-200/70"><Receipt className="w-4 h-4" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">18% GST Calculator</div><div className="text-xs text-zinc-500">Live reverse tax &amp; split math</div></div>
                   </Link>
                   <Link href="/tools/listing-ai" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">

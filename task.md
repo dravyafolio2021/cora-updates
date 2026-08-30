@@ -1,19 +1,23 @@
-# Task List - Custom Workspace Mode
+# Task List: Comprehensive Articles, Educational Guides & Comparisons Ecosystem
 
-- `[ ]` 1. Create the Custom Workspace Module Class
-  - `[ ]` Create `modules/custom-workspace/class-custom-module.php` with dynamic navigation filtering
-  - `[ ]` Register the custom module in `modules/class-cora-module-registry.php`
-- `[ ]` 2. Enable Custom Industry Option in Backend
-  - `[ ]` Whitelist `custom` in `cora_get_active_industry()` in `cora-workspace.php`
-  - `[ ]` Support `custom` activation in `cora_ajax_onboarding_activate_workspace()`
-  - `[ ]` Register the `cora_save_custom_features` AJAX handler
-- `[ ]` 3. Implement Interactive Module Toggles in View Page
-  - `[ ]` Modify `views/view-feature-hub.php` to render custom checkboxes/switches if active industry is `custom`
-  - `[ ]` Add jQuery handlers to post toggled states to `cora_save_custom_features` AJAX action
-- `[ ]` 4. Update Admin Dashboard Settings dropdowns and Onboarding cards
-  - `[ ]` Add "Custom Workspace" option in Settings Suite dropdown
-  - `[ ]` Add "Custom Workspace" option in Super Admin Workspace Edit drawer
-  - `[x]` Add `#cora-island-ai-popover` HTML structure to `#cora-mobile-floating-island` in `admin-dashboard.php`
-- `[/]` Add interactive toggle & click-outside event handlers in `assets/js/admin-script.js` and resolve any syntax issues
-  - `[ ]` Bump version to `3.4.18`
-  - `[ ]` Deploy updates to staging and demo environments
+- `[/]` 1. Master Data Layer & Taxonomy
+  - `[ ]` Create `cora-frontend/lib/articles-data.ts` containing 20+ comprehensive, long-form educational articles, how-to guides, playbooks, and product comparisons across 6 distinct categories.
+  - `[ ]` Update `cora-frontend/lib/seo-schema.ts` with structured JSON-LD generators for `Article`, `HowTo`, `FAQPage`, `ProductCompare`, and `BreadcrumbList`.
+  - `[ ]` Link comparisons in `cora-frontend/lib/comparisons-data.ts` to the central articles taxonomy.
+- `[ ]` 2. UI Components & Layout Templates
+  - `[ ]` Build `cora-frontend/components/articles/ArticleCard.tsx` (Monochromatic Notion/Linear styled cards with category pills, read time, and difficulty indicators).
+  - `[ ]` Build `cora-frontend/components/articles/ArticleTOC.tsx` (Sticky scroll-spy Table of Contents with smooth section scrolling).
+  - `[ ]` Build `cora-frontend/components/articles/ArticleHero.tsx` (Author bio, date stamps, category breadcrumb, and social share buttons).
+  - `[ ]` Build `cora-frontend/components/articles/RelatedArticles.tsx` (Semantic cross-linking recommendations).
+- `[ ]` 3. Next.js Routing Architecture
+  - `[ ]` Build `cora-frontend/app/articles/page.tsx` (Master Knowledge Hub with live search, category tabs, featured hero, and newsletter capture).
+  - `[ ]` Build `cora-frontend/app/articles/[category]/page.tsx` (Dedicated Category Hub with category SEO metadata and breadcrumbs).
+  - `[ ]` Build `cora-frontend/app/articles/[category]/[slug]/page.tsx` (Authoritative long-form article template with key takeaways, markdown body, interactive widgets, FAQs accordion, and structured schema).
+- `[ ]` 4. Search Engine & LLM Optimization (SEO / GEO)
+  - `[ ]` Update `cora-frontend/app/sitemap.ts` with all dynamic category and article routes.
+  - `[ ]` Update `Navbar.tsx` and `Footer.tsx` with direct links to the new Articles & Compare ecosystem.
+- `[ ]` 5. Verification, Build & Production Deployment
+  - `[ ]` Execute Next.js SSG build (`npm run build`).
+  - `[ ]` Commit and push to Git remotes.
+  - `[ ]` Deploy live to production via `python3 scripts/deploy_frontend.py`.
+  - `[ ]` Verify live HTTP 200 responses across all generated routes.

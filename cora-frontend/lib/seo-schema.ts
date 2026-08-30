@@ -1,3 +1,5 @@
+import type { Article, ArticleCategory } from './articles-data';
+
 export function generatePlatformSchemas() {
   const organizationSchema = {
     "@context": "https://schema.org",
@@ -33,7 +35,7 @@ export function generatePlatformSchemas() {
     "@id": "https://heycora.in/#website",
     "url": "https://heycora.in",
     "name": "Cora",
-    "description": "A connected website and business workspace for service businesses and agencies.",
+    "description": "A connected website and business workspace for service businesses and creative agencies.",
     "publisher": {
       "@id": "https://heycora.in/#organization"
     }
@@ -43,7 +45,7 @@ export function generatePlatformSchemas() {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "@id": "https://heycora.in/#software",
-    "name": "Cora",
+    "name": "Cora Studio OS",
     "operatingSystem": "Web, macOS, Windows, iOS, Android (PWA)",
     "applicationCategory": "BusinessApplication, CRMApplication, FinancialApplication",
     "description": "Cora connects a service business website with enquiries, client workflows, documents, billing, and AI assistance in one workspace.",
@@ -70,30 +72,9 @@ export function generatePlatformSchemas() {
       {
         "@type": "Offer",
         "name": "India Studio Pro Plan",
-        "price": "4999",
+        "price": "3999",
         "priceCurrency": "INR",
-        "description": "2,500 AI Agent Runs/mo, All Pro Features, UPI & RuPay Direct Billing, Full GST Invoicing (B2B)."
-      },
-      {
-        "@type": "Offer",
-        "name": "Starter Workspace Plan",
-        "price": "9",
-        "priceCurrency": "USD",
-        "description": "5,000 AI Agent Runs/mo, Claude 3.5 Sonnet Access, Custom Workspace Domain."
-      },
-      {
-        "@type": "Offer",
-        "name": "Pro Studio Plan",
-        "price": "19",
-        "priceCurrency": "USD",
-        "description": "10,000 AI Agent Runs/mo, All Frontier Models (Claude, GPT-4o, Gemini), 3 Team Seats, GST Invoicing."
-      },
-      {
-        "@type": "Offer",
-        "name": "Scale & Production House Plan",
-        "price": "39",
-        "priceCurrency": "USD",
-        "description": "Unlimited AI Executions, 10 Team Seats, Custom Personas, 99.95% SLA."
+        "description": "All 20 Modules, Multi-Model Frontier AI, UPI & RuPay Direct Billing, 18% GST Invoicing."
       }
     ]
   };
@@ -115,7 +96,7 @@ export function generatePlatformSchemas() {
         "name": "How does Cora compare to HoneyBook and Studio Ninja?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Unlike HoneyBook and Studio Ninja, Cora features native 18% CGST/SGST/IGST tax calculation, WhatsApp dispatch automation, autonomous AI voice-to-scope drafting, and saves creative businesses over ₹65,000 to ₹4.5 Lakhs annually."
+          "text": "Unlike HoneyBook and Studio Ninja, Cora features native 18% CGST/SGST/IGST tax calculation, WhatsApp dispatch automation, autonomous AI voice-to-scope drafting, and saves creative businesses over ₹57,000 to ₹4.5 Lakhs annually."
         }
       },
       {
@@ -125,25 +106,91 @@ export function generatePlatformSchemas() {
           "@type": "Answer",
           "text": "Yes, Cora's E-Signature Vault generates cryptographic SHA-256 audit stamps including signer IP address, timestamp, and device fingerprint, compliant with Section 65B of the Indian Information Technology Act 2000 and the US ESIGN Act."
         }
-      },
-      {
-        "@type": "Question",
-        "name": "Does Cora train public AI models on my proprietary media or shoot data?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "No. Cora enforces a strict Zero AI Model Training Guarantee. Your photos, 4K RAW video assets, client proposals, and rate cards are never used to train public LLMs or foundation models."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Is there a free trial or money-back guarantee?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Cora offers a Free Forever plan with 1,000 monthly AI actions and unlimited funnels, plus an unconditional 14-day 100% money-back guarantee on all paid plans with self-serve 1-click cancellation."
-        }
       }
     ]
   };
 
   return [organizationSchema, webSiteSchema, softwareApplicationSchema, faqSchema];
+}
+
+export function generateArticleSchema(article: Article) {
+  return {
+    "@context": "https://schema.org",
+    "@type": article.category === 'product-guides' ? "HowTo" : "TechArticle",
+    "headline": article.title,
+    "description": article.description,
+    "image": "https://heycora.in/images/cora_hero_landscape.jpg",
+    "author": {
+      "@type": "Person",
+      "name": article.author.name,
+      "jobTitle": article.author.role
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Cora Platforms Inc.",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://heycora.in/apple-touch-icon.png"
+      }
+    },
+    "datePublished": article.publishedAt,
+    "dateModified": article.updatedAt,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://heycora.in/articles/${article.category}/${article.slug}`
+    }
+  };
+}
+
+export function generateArticleBreadcrumbs(category: ArticleCategory, article?: Article) {
+  const items = [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://heycora.in"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Articles & Guides",
+      "item": "https://heycora.in/articles"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": category.name,
+      "item": `https://heycora.in/articles/${category.id}`
+    }
+  ];
+
+  if (article) {
+    items.push({
+      "@type": "ListItem",
+      "position": 4,
+      "name": article.shortTitle || article.title,
+      "item": `https://heycora.in/articles/${category.id}/${article.slug}`
+    });
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": items
+  };
+}
+
+export function generateArticleFaqSchema(faqs: { question: string; answer: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map((f) => ({
+      "@type": "Question",
+      "name": f.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": f.answer
+      }
+    }))
+  };
 }

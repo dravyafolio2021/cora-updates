@@ -112,9 +112,10 @@ export function Footer() {
               </div>
               <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-600 font-medium">
                 <li><Link href="/features" className="hover:text-zinc-950 transition-colors">Features</Link></li>
-                <li><Link href="/docs" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-950">Documentation</Link></li>
-                <li><Link href="/blog/" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-950">Blog &amp; Guides</Link></li>
-                <li><Link href="/demo" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-950">Get A Demo</Link></li>
+                <li><Link href="/articles" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-950">Articles &amp; Guides</Link></li>
+                <li><Link href="/docs" className="hover:text-zinc-950 transition-colors">Documentation</Link></li>
+                <li><Link href="/blog/" className="hover:text-zinc-950 transition-colors">Blog &amp; WordPress</Link></li>
+                <li><Link href="/demo" className="hover:text-zinc-950 transition-colors">Get A Demo</Link></li>
                 <li><Link href="/ai-agent" className="hover:text-zinc-950 transition-colors">AI Co-Founder</Link></li>
                 <li><Link href="/use-cases" className="hover:text-zinc-950 transition-colors">Use Cases</Link></li>
                 <li><Link href="/pricing" className="hover:text-zinc-950 transition-colors">Pricing</Link></li>
