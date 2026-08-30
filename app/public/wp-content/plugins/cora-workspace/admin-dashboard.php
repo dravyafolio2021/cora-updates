@@ -2779,7 +2779,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-page-dashboard {
             background-color: #ffffff !important;
             background-image: none !important;
-            padding: 16px 12px 60px 12px !important;
+            padding: 16px 12px 0px 12px !important;
             border: none !important;
             box-shadow: none !important;
             transition: background-color 0.3s ease;
@@ -2807,23 +2807,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             flex: 1 1 auto !important;
         }
 
-        /* Internal Hero Container (Slightly colored soft container with rounded-3xl corners) */
+        /* Internal Hero Container (Beige background, rounded top, meeting bottom edge on mobile) */
         .cora-dashboard-hero-card {
-            background-color: #f7f7f8 !important; /* Soft slightly-colored container */
-            border-radius: 28px !important;
-            border: 1px solid rgba(228, 228, 231, 0.7) !important;
+            background-color: #FBFaf7 !important; /* Premium beige / warm cream background */
+            border: 1px solid rgba(228, 224, 216, 0.85) !important;
             box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
-            padding: 32px 16px 36px 16px !important;
             box-sizing: border-box !important;
             width: 100% !important;
-            margin-bottom: 28px !important;
-        }
-        @media (min-width: 768px) {
-            .cora-dashboard-hero-card {
-                padding: 40px 32px 48px 32px !important;
-                border-radius: 32px !important;
-                margin-bottom: 32px !important;
-            }
         }
         .dark .cora-dashboard-hero-card {
             background-color: #18181b !important;
@@ -2832,6 +2822,29 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         /* Mobile vs Desktop Scoped Rules for Dashboard */
         @media (max-width: 767px) {
+            #cora-page-dashboard {
+                padding: 12px 10px 0px 10px !important;
+            }
+            .cora-dashboard-mockup-wrapper {
+                padding: 0px !important;
+                margin-bottom: 0px !important;
+                flex: 1 1 auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                min-height: 100% !important;
+            }
+            .cora-dashboard-hero-card {
+                border-top-left-radius: 24px !important;
+                border-top-right-radius: 24px !important;
+                border-bottom-left-radius: 0px !important;
+                border-bottom-right-radius: 0px !important;
+                border-bottom: none !important;
+                margin-bottom: 0px !important;
+                flex: 1 1 auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                padding: 24px 14px 88px 14px !important;
+            }
             #cora-search-container {
                 display: none !important;
             }
@@ -2840,14 +2853,20 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
             #cora-quick-actions-bar {
                 margin-top: 18px !important;
-                margin-bottom: 4px !important;
-            }
-            .cora-dashboard-hero-card {
-                margin-bottom: 16px !important;
-                padding-bottom: 24px !important;
+                margin-bottom: 0px !important;
             }
         }
         @media (min-width: 768px) {
+            .cora-dashboard-mockup-wrapper {
+                padding-bottom: 40px !important;
+            }
+            .cora-dashboard-hero-card {
+                padding: 40px 32px 48px 32px !important;
+                border-radius: 32px !important;
+                border-bottom: 1px solid rgba(228, 224, 216, 0.85) !important;
+                margin-bottom: 32px !important;
+                flex: 0 0 auto !important;
+            }
             #cora-search-container {
                 display: block !important;
             }
