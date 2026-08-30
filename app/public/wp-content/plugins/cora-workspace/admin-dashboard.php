@@ -2847,9 +2847,38 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
         }
 
-        /* Mobile Real-Time Tasks & Tomorrow Planner */
-        .cora-dashboard-mobile-tasks-flow {
+        /* Minimalist Dashboard To-Do & Task List (Slim Height, Micro Toast Style) */
+        .cora-dashboard-todo-container {
             display: none !important;
+        }
+        .cora-todo-item-card {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(228, 228, 231, 0.8) !important;
+            border-radius: 12px !important;
+            padding: 8px 12px !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
+            transition: all 0.2s ease !important;
+            min-height: 42px !important;
+            box-sizing: border-box !important;
+        }
+        .dark .cora-todo-item-card {
+            background-color: #18181b !important;
+            border-color: #27272a !important;
+        }
+        .cora-todo-item-card.is-done {
+            opacity: 0.55 !important;
+            background-color: rgba(244, 244, 245, 0.6) !important;
+        }
+        .dark .cora-todo-item-card.is-done {
+            background-color: rgba(24, 24, 27, 0.4) !important;
+        }
+        .cora-todo-item-card.is-done .cora-todo-title {
+            text-decoration: line-through !important;
+            color: #71717a !important;
         }
 
         /* Mobile vs Desktop Scoped Rules for Dashboard */
@@ -2875,11 +2904,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             .cora-dashboard-decision-grid {
                 display: none !important;
             }
-            .cora-dashboard-mobile-tasks-flow {
+            .cora-dashboard-todo-container {
                 display: flex !important;
                 flex-direction: column !important;
-                gap: 12px !important;
-                margin-top: 22px !important;
+                gap: 8px !important;
+                margin-top: 18px !important;
                 width: 100% !important;
             }
             #cora-quick-actions-bar {
@@ -2903,7 +2932,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             .cora-dashboard-decision-grid {
                 display: grid !important;
             }
-            .cora-dashboard-mobile-tasks-flow {
+            .cora-dashboard-todo-container {
                 display: none !important;
             }
             #cora-quick-actions-bar {
@@ -5532,150 +5561,246 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             </div>
                         </div>
 
-                        <!-- 5. Mobile Real-Time Task & Upcoming Workflow Planner (Cards in a Column) -->
-                        <div class="cora-dashboard-mobile-tasks-flow w-full select-none">
+                        <!-- 5. Minimalist Daily To-Do & Task List (Slim Height, Micro Toast Style, Actionable) -->
+                        <div class="cora-dashboard-todo-container w-full select-none" id="cora-dashboard-todo-app">
                             
-                            <!-- Section Title Header -->
-                            <div class="flex items-center justify-between px-1 pt-2">
-                                <div class="flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                                    <span>Today's Real-Time Flow</span>
+                            <!-- Header Bar: Segmented Tabs & Add Trigger -->
+                            <div class="flex items-center justify-between px-0.5 pt-1 mb-0.5">
+                                <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/80 p-0.5 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60">
+                                    <button type="button" onclick="window.coraFilterDashboardTasks('today', this)" id="cora-todo-tab-today" class="cora-todo-tab active text-[10px] font-semibold px-2.5 py-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs transition-all cursor-pointer">
+                                        Today <span id="cora-todo-count-today" class="ml-0.5 opacity-60 font-mono text-[9px]"></span>
+                                    </button>
+                                    <button type="button" onclick="window.coraFilterDashboardTasks('tomorrow', this)" id="cora-todo-tab-tomorrow" class="cora-todo-tab text-[10px] font-medium px-2.5 py-1 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer">
+                                        Tomorrow <span id="cora-todo-count-tomorrow" class="ml-0.5 opacity-60 font-mono text-[9px]"></span>
+                                    </button>
+                                    <button type="button" onclick="window.coraFilterDashboardTasks('done', this)" id="cora-todo-tab-done" class="cora-todo-tab text-[10px] font-medium px-2.5 py-1 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-all cursor-pointer">
+                                        Done <span id="cora-todo-count-done" class="ml-0.5 opacity-60 font-mono text-[9px]"></span>
+                                    </button>
                                 </div>
-                                <span class="text-[10px] font-mono font-medium text-zinc-500 dark:text-zinc-400 bg-white/80 dark:bg-zinc-800/80 border border-zinc-200/60 dark:border-zinc-700/60 px-2 py-0.5 rounded-full">
-                                    <?php echo date('D, M j'); ?>
-                                </span>
+
+                                <button type="button" onclick="window.coraToggleTodoInput()" class="text-[10px] font-mono font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center gap-1 bg-white/90 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/70 px-2 py-1 rounded-lg cursor-pointer transition-all shadow-3xs" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    <span>Add Task</span>
+                                </button>
                             </div>
 
-                            <!-- CARD 1: Real-time Task / Upcoming Workflow Today -->
-                            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-4 shadow-3xs flex flex-col gap-2.5 transition-all text-left">
-                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
-                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
-                                        <span>Next Up &bull; 11:30 AM</span>
-                                    </div>
-                                    <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 font-semibold">
-                                        Active Flow
-                                    </span>
-                                </div>
-                                
-                                <div>
-                                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-1">
-                                        <?php if ( $is_studio ) : ?>
-                                            Studio Commercial Shoot &amp; Lighting Setup
-                                        <?php else : ?>
-                                            Inbound Lead Follow-up: DLF Cybercity Phase II
-                                        <?php endif; ?>
-                                    </h3>
-                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
-                                        <?php if ( $is_studio ) : ?>
-                                            AI Agent drafted client shotlist &amp; equipment gear checklist. Crew confirmed.
-                                        <?php else : ?>
-                                            AI Agent prepared property dossier &amp; dispatched WhatsApp invitation to buyer prospect.
-                                        <?php endif; ?>
-                                    </p>
-                                </div>
-
-                                <div class="flex items-center gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800/80">
-                                    <button type="button" onclick="coraNavigateTo('<?php echo $is_studio ? 'bookings' : 'leads'; ?>')" class="flex-1 bg-zinc-900 hover:bg-zinc-950 text-white text-xs font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer select-none transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                        <span>Start Workflow</span>
-                                    </button>
-                                    <button type="button" onclick="coraNavigateTo('ai-assistants')" class="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 border border-zinc-200 dark:border-zinc-700 cursor-pointer select-none transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <span>AI Summary</span>
-                                    </button>
-                                </div>
+                            <!-- Quick Inline Add Input Row (Collapsible) -->
+                            <div id="cora-todo-quick-input-row" class="hidden flex items-center gap-2 py-1 px-2.5 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl shadow-3xs transition-all">
+                                <input type="text" 
+                                       id="cora-todo-input-field" 
+                                       placeholder="Add task & press enter..." 
+                                       class="flex-1 bg-transparent border-0 text-xs py-1 px-1 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none" 
+                                       onkeydown="if(event.key==='Enter') window.coraAddDashboardTask();" />
+                                <button type="button" onclick="window.coraAddDashboardTask();" class="bg-zinc-900 hover:bg-zinc-950 text-white text-[10px] font-medium px-2.5 py-1 rounded-lg shadow-3xs cursor-pointer">
+                                    Save
+                                </button>
                             </div>
 
-                            <!-- CARD 2: Immediate Action & Approvals -->
-                            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-4 shadow-3xs flex flex-col gap-2.5 transition-all text-left">
-                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
-                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block"></span>
-                                        <span>Action Required &bull; Today</span>
-                                    </div>
-                                    <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200/60 font-semibold">
-                                        E-Sign Pending
-                                    </span>
-                                </div>
-                                
-                                <div>
-                                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-1">
-                                        <?php if ( $is_studio ) : ?>
-                                            50% Retainer Invoice &amp; Model Release Form
-                                        <?php else : ?>
-                                            Token Agreement &amp; GST Tax Invoice
-                                        <?php endif; ?>
-                                    </h3>
-                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
-                                        Digital agreement link active. Client verified phone number via OTP; awaiting final signature.
-                                    </p>
-                                </div>
+                            <!-- Tasks List Container (Rendered Dynamically via JS) -->
+                            <div id="cora-dashboard-todo-list" class="flex flex-col gap-1.5 w-full"></div>
+                        </div> <!-- .cora-dashboard-todo-container -->
 
-                                <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-2.5 flex items-center justify-between text-xs font-mono">
-                                    <span class="text-zinc-500">Security Vault</span>
-                                    <span class="font-bold text-zinc-900 dark:text-zinc-100">1 / 2 Signatures Completed</span>
-                                </div>
+                        <script>
+                        (function() {
+                            var activeFilter = 'today';
+                            var todayStr = new Date().toISOString().split('T')[0];
+                            var tomorrow = new Date();
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+                            var tomorrowStr = tomorrow.toISOString().split('T')[0];
 
-                                <div class="flex items-center gap-2 pt-1">
-                                    <button type="button" onclick="coraNavigateTo('documents')" class="w-full bg-white dark:bg-zinc-800 hover:bg-zinc-50 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 text-xs font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer select-none transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                        <span>Open Vault &amp; Sign</span>
-                                    </button>
-                                </div>
-                            </div>
+                            function getTasks() {
+                                var saved = localStorage.getItem('cora_dashboard_todo_tasks');
+                                if (saved) {
+                                    try { return JSON.parse(saved); } catch(e) {}
+                                }
+                                var isStudio = typeof coraREData !== 'undefined' && (coraREData.activeIndustry === 'photography-studio' || coraREData.activeIndustry === 'photography_studio');
+                                var initialTasks = [
+                                    {
+                                        id: 'tsk_1',
+                                        title: isStudio ? 'Equipment gear check & battery pack charging' : 'Follow up with lead: Inbound inquiry',
+                                        time: '10:30 AM',
+                                        date: todayStr,
+                                        status: 'todo'
+                                    },
+                                    {
+                                        id: 'tsk_2',
+                                        title: isStudio ? 'Review 50% deposit invoice & GST breakdown' : 'Verify token agreement in document vault',
+                                        time: '02:00 PM',
+                                        date: todayStr,
+                                        status: 'todo'
+                                    },
+                                    {
+                                        id: 'tsk_3',
+                                        title: isStudio ? 'Commercial shoot & studio lighting setup' : 'Site showing at Emerald Heights',
+                                        time: '11:00 AM',
+                                        date: tomorrowStr,
+                                        status: 'todo'
+                                    }
+                                ];
+                                localStorage.setItem('cora_dashboard_todo_tasks', JSON.stringify(initialTasks));
+                                return initialTasks;
+                            }
 
-                            <!-- CARD 3: Tomorrow's Agenda & AI Planning Ahead -->
-                            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-4 shadow-3xs flex flex-col gap-2.5 transition-all text-left">
-                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
-                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                        <span>Plan Ahead &bull; Tomorrow (<?php echo date('D, M j', strtotime('+1 day')); ?>)</span>
-                                    </div>
-                                    <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 font-semibold">
-                                        3 Scheduled
-                                    </span>
-                                </div>
-                                
-                                <div>
-                                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-2">
-                                        Tomorrow's Action Plan
-                                    </h3>
-                                    
-                                    <!-- Micro Agenda Timeline -->
-                                    <div class="space-y-2 text-xs">
-                                        <div class="flex items-start gap-2 bg-zinc-50 dark:bg-zinc-800/40 p-2 rounded-lg border border-zinc-100 dark:border-zinc-800">
-                                            <span class="text-[10px] font-mono font-semibold text-zinc-400 shrink-0 mt-0.5">10:00 AM</span>
-                                            <span class="text-zinc-700 dark:text-zinc-300 font-medium">
-                                                <?php echo $is_studio ? 'Gear Check & Location Scout: Emerald Studio' : 'Site Showing at Emerald Heights (3 Confirmed)'; ?>
-                                            </span>
-                                        </div>
-                                        <div class="flex items-start gap-2 bg-zinc-50 dark:bg-zinc-800/40 p-2 rounded-lg border border-zinc-100 dark:border-zinc-800">
-                                            <span class="text-[10px] font-mono font-semibold text-zinc-400 shrink-0 mt-0.5">02:30 PM</span>
-                                            <span class="text-zinc-700 dark:text-zinc-300 font-medium">
-                                                Automated WhatsApp Follow-up for 4 High-Intent Prospects
-                                            </span>
-                                        </div>
-                                        <div class="flex items-start gap-2 bg-zinc-50 dark:bg-zinc-800/40 p-2 rounded-lg border border-zinc-100 dark:border-zinc-800">
-                                            <span class="text-[10px] font-mono font-semibold text-zinc-400 shrink-0 mt-0.5">05:00 PM</span>
-                                            <span class="text-zinc-700 dark:text-zinc-300 font-medium">
-                                                End-of-Day Revenue Settlement &amp; GST Ledger Export
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                            function saveTasks(tasks) {
+                                localStorage.setItem('cora_dashboard_todo_tasks', JSON.stringify(tasks));
+                                render();
+                            }
 
-                                <div class="flex items-center gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
-                                    <button type="button" onclick="coraNavigateTo('bookings')" class="flex-1 bg-zinc-900 hover:bg-zinc-950 text-white text-xs font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer select-none transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                        <span>Add Task</span>
-                                    </button>
-                                    <button type="button" onclick="window.coraShowToast('AI Morning Briefing scheduled for tomorrow 8:00 AM.', 'success')" class="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 border border-zinc-200 dark:border-zinc-700 cursor-pointer select-none transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <span>Auto-Briefing</span>
-                                    </button>
-                                </div>
-                            </div>
+                            window.coraToggleTodoInput = function() {
+                                var row = document.getElementById('cora-todo-quick-input-row');
+                                if (!row) return;
+                                row.classList.toggle('hidden');
+                                if (!row.classList.contains('hidden')) {
+                                    var inp = document.getElementById('cora-todo-input-field');
+                                    if (inp) inp.focus();
+                                }
+                            };
 
-                        </div> <!-- .cora-dashboard-mobile-tasks-flow -->
+                            window.coraFilterDashboardTasks = function(filter, btn) {
+                                activeFilter = filter;
+                                document.querySelectorAll('.cora-todo-tab').forEach(function(el) {
+                                    el.classList.remove('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-900', 'dark:text-zinc-100', 'shadow-3xs', 'font-semibold');
+                                    el.classList.add('text-zinc-500', 'dark:text-zinc-400', 'font-medium');
+                                });
+                                if (btn) {
+                                    btn.classList.add('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-900', 'dark:text-zinc-100', 'shadow-3xs', 'font-semibold');
+                                    btn.classList.remove('text-zinc-500', 'dark:text-zinc-400', 'font-medium');
+                                }
+                                render();
+                            };
+
+                            window.coraToggleTaskDone = function(taskId, e) {
+                                if (e && e.stopPropagation) e.stopPropagation();
+                                var tasks = getTasks();
+                                var task = tasks.find(function(t) { return t.id === taskId; });
+                                if (!task) return;
+                                task.status = task.status === 'done' ? 'todo' : 'done';
+                                saveTasks(tasks);
+                                if (window.coraShowToast) {
+                                    window.coraShowToast(task.status === 'done' ? 'Task marked as completed' : 'Task marked active', 'info');
+                                }
+                            };
+
+                            window.coraPostponeTask = function(taskId, e) {
+                                if (e && e.stopPropagation) e.stopPropagation();
+                                var tasks = getTasks();
+                                var task = tasks.find(function(t) { return t.id === taskId; });
+                                if (!task) return;
+                                task.date = tomorrowStr;
+                                task.time = 'Tomorrow';
+                                saveTasks(tasks);
+                                if (window.coraShowToast) {
+                                    window.coraShowToast('Task postponed to tomorrow', 'info');
+                                }
+                            };
+
+                            window.coraRemoveTask = function(taskId, e) {
+                                if (e && e.stopPropagation) e.stopPropagation();
+                                var tasks = getTasks().filter(function(t) { return t.id !== taskId; });
+                                saveTasks(tasks);
+                                if (window.coraShowToast) {
+                                    window.coraShowToast('Task removed', 'info');
+                                }
+                            };
+
+                            window.coraAddDashboardTask = function() {
+                                var inp = document.getElementById('cora-todo-input-field');
+                                if (!inp || !inp.value.trim()) return;
+                                var val = inp.value.trim();
+                                var tasks = getTasks();
+                                var newTask = {
+                                    id: 'tsk_' + Date.now(),
+                                    title: val,
+                                    time: 'Today',
+                                    date: activeFilter === 'tomorrow' ? tomorrowStr : todayStr,
+                                    status: 'todo'
+                                };
+                                tasks.unshift(newTask);
+                                inp.value = '';
+                                var row = document.getElementById('cora-todo-quick-input-row');
+                                if (row) row.classList.add('hidden');
+                                saveTasks(tasks);
+                                if (window.coraShowToast) {
+                                    window.coraShowToast('Task added to ' + (newTask.date === tomorrowStr ? 'tomorrow' : 'today'), 'success');
+                                }
+                            };
+
+                            function escapeHtml(str) {
+                                if (!str) return '';
+                                return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                            }
+
+                            function render() {
+                                var listEl = document.getElementById('cora-dashboard-todo-list');
+                                if (!listEl) return;
+
+                                var tasks = getTasks();
+                                var todayTasks = tasks.filter(function(t) { return t.status !== 'done' && t.date === todayStr; });
+                                var tomorrowTasks = tasks.filter(function(t) { return t.status !== 'done' && t.date === tomorrowStr; });
+                                var doneTasks = tasks.filter(function(t) { return t.status === 'done'; });
+
+                                var cToday = document.getElementById('cora-todo-count-today');
+                                var cTomorrow = document.getElementById('cora-todo-count-tomorrow');
+                                var cDone = document.getElementById('cora-todo-count-done');
+                                if (cToday) cToday.textContent = todayTasks.length ? '(' + todayTasks.length + ')' : '';
+                                if (cTomorrow) cTomorrow.textContent = tomorrowTasks.length ? '(' + tomorrowTasks.length + ')' : '';
+                                if (cDone) cDone.textContent = doneTasks.length ? '(' + doneTasks.length + ')' : '';
+
+                                var displayList = [];
+                                if (activeFilter === 'today') {
+                                    displayList = todayTasks;
+                                } else if (activeFilter === 'tomorrow') {
+                                    displayList = tomorrowTasks;
+                                } else if (activeFilter === 'done') {
+                                    displayList = doneTasks;
+                                }
+
+                                if (!displayList.length) {
+                                    var emptyMsg = activeFilter === 'done' ? 'No completed tasks yet.' : (activeFilter === 'tomorrow' ? 'No tasks scheduled for tomorrow.' : 'All tasks completed for today.');
+                                    listEl.innerHTML = '<div class="py-2.5 px-3 text-center text-xs text-zinc-400 dark:text-zinc-500 bg-white/40 dark:bg-zinc-800/30 rounded-xl border border-dashed border-zinc-200/80 dark:border-zinc-700/60 font-mono">' + emptyMsg + '</div>';
+                                    return;
+                                }
+
+                                var html = '';
+                                displayList.forEach(function(task) {
+                                    var isDone = task.status === 'done';
+                                    html += '<div class="cora-todo-item-card ' + (isDone ? 'is-done' : '') + '" data-task-id="' + task.id + '">';
+                                    html += '  <div class="flex items-center gap-2 min-w-0 flex-1">';
+                                    html += '    <button type="button" onclick="window.coraToggleTaskDone(\'' + task.id + '\', event)" class="w-4 h-4 rounded-[4px] border ' + (isDone ? 'bg-zinc-900 dark:bg-zinc-100 border-zinc-900 dark:border-zinc-100 text-white dark:text-zinc-900' : 'border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:border-zinc-500') + ' flex items-center justify-center shrink-0 cursor-pointer transition-all" title="' + (isDone ? 'Mark as pending' : 'Mark as completed') + '">';
+                                    if (isDone) {
+                                        html += '      <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                                    }
+                                    html += '    </button>';
+                                    html += '    <span class="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 shrink-0">';
+                                    html += escapeHtml(task.time || (task.date === todayStr ? 'Today' : 'Tomorrow'));
+                                    html += '    </span>';
+                                    html += '    <span class="cora-todo-title text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">';
+                                    html += escapeHtml(task.title);
+                                    html += '    </span>';
+                                    html += '  </div>';
+                                    html += '  <div class="flex items-center gap-1 shrink-0">';
+                                    if (!isDone) {
+                                        html += '    <button type="button" onclick="window.coraPostponeTask(\'' + task.id + '\', event)" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Postpone to tomorrow" style="touch-action: manipulation;">';
+                                        html += '      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+                                        html += '    </button>';
+                                    }
+                                    html += '    <button type="button" onclick="window.coraRemoveTask(\'' + task.id + '\', event)" class="p-1 text-zinc-400 hover:text-red-600 dark:hover:text-red-400 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Remove task" style="touch-action: manipulation;">';
+                                    html += '      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+                                    html += '    </button>';
+                                    html += '  </div>';
+                                    html += '</div>';
+                                });
+
+                                listEl.innerHTML = html;
+                            }
+
+                            if (document.readyState === 'loading') {
+                                document.addEventListener('DOMContentLoaded', render);
+                            } else {
+                                render();
+                            }
+                        })();
+                        </script>
 
                     </div> <!-- .cora-dashboard-hero-card -->
 
