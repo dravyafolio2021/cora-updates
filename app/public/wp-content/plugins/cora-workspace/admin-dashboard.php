@@ -3000,7 +3000,45 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             background: #18181b !important;
             border-color: #27272a !important;
         }
-        #cora-notif-bottom-drawer.active {
+        /* Universal Voice AI Assistant Bottom Drawer Sheet */
+        #cora-universal-voice-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(9, 9, 11, 0.45) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            z-index: 10060 !important;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        #cora-universal-voice-overlay.active {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        #cora-universal-voice-drawer {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            max-width: 480px !important;
+            margin: 0 auto !important;
+            background: #ffffff !important;
+            border-top: 1px solid rgba(228, 228, 231, 0.9) !important;
+            border-top-left-radius: 28px !important;
+            border-top-right-radius: 28px !important;
+            box-shadow: 0 -12px 36px -4px rgba(0, 0, 0, 0.15) !important;
+            z-index: 10061 !important;
+            transform: translateY(100%) !important;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            padding: 16px 20px 24px 20px !important;
+            box-sizing: border-box !important;
+        }
+        .dark #cora-universal-voice-drawer {
+            background: #18181b !important;
+            border-color: #27272a !important;
+        }
+        #cora-universal-voice-drawer.active {
             transform: translateY(0%) !important;
         }
 
@@ -5620,7 +5658,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                        autocomplete="off" />
                                        
                                 <div class="flex items-center gap-1.5 shrink-0">
-                                    <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 border border-zinc-200 rounded">⌘K</kbd>
+                                    <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded">⌘K</kbd>
+                                    <button type="button" onclick="window.coraTriggerVoiceAI('#cora-inline-command-input', window.coraTriggerCommandAI)" class="cora-voice-input-btn flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Speak to Voice AI">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                                    </button>
                                     <button onclick="window.coraTriggerCommandAI()" class="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-zinc-900 hover:bg-zinc-950 text-white transition-colors cursor-pointer shadow-xs border-0" title="Send to AI Agent">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                             <line x1="12" y1="19" x2="12" y2="5"></line>
@@ -5798,6 +5839,59 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 <button type="button" onclick="window.coraCloseNotifSettings(); if(window.coraOpenWorkspaceSettings) window.coraOpenWorkspaceSettings('notifications');" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 underline font-medium cursor-pointer">
                                     More settings &rarr;
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Universal Voice AI Assistant Bottom Drawer Sheet (Global Reusable Modal for Search & AI Inputs) -->
+                        <div id="cora-universal-voice-overlay" onclick="window.coraCloseUniversalVoice()"></div>
+                        <div id="cora-universal-voice-drawer" class="select-none">
+                            <!-- Drag handle -->
+                            <div class="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3"></div>
+                            
+                            <!-- Header -->
+                            <div class="flex items-center justify-between pb-2.5 mb-2 border-b border-zinc-100 dark:border-zinc-800">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                    <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Cora Voice AI</h3>
+                                </div>
+                                <button type="button" onclick="window.coraCloseUniversalVoice()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+
+                            <!-- Voice Center Action View -->
+                            <div class="flex flex-col items-center justify-center py-2 text-center">
+                                <!-- Big Pulsing Mic Button -->
+                                <div class="relative my-2 flex items-center justify-center">
+                                    <button type="button" id="cora-universal-voice-mic-btn" onclick="window.coraToggleUniversalVoiceRecording()" class="cora-voice-mic-btn w-20 h-20 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer border-4 border-zinc-100 dark:border-zinc-800" title="Tap to speak">
+                                        <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="1.9" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                                    </button>
+                                </div>
+
+                                <!-- Dynamic Status & Prompts -->
+                                <div class="mt-2 mb-3 space-y-1">
+                                    <div id="cora-universal-voice-status" class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Tap mic to speak</div>
+                                    <div id="cora-universal-voice-sub" class="text-xs text-zinc-400 dark:text-zinc-500 max-w-[280px] mx-auto leading-relaxed">Ask anything, search CRM records, or query your workspace.</div>
+                                </div>
+
+                                <!-- Live Real-Time Transcript Display Card -->
+                                <div id="cora-universal-transcript-card" class="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 min-h-[48px] max-h-[120px] overflow-y-auto mb-3 text-left hidden">
+                                    <div class="flex items-start gap-2">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0 mt-0.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path></svg>
+                                        <span id="cora-universal-transcript-text" class="flex-1 font-medium italic"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div id="cora-universal-voice-actions" class="w-full flex items-center gap-2">
+                                    <button type="button" onclick="window.coraExecuteUniversalVoiceAI()" id="cora-universal-voice-ask-btn" class="flex-1 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white text-xs font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer select-none transition-all active:scale-[0.98]">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                        <span>Ask Cora AI</span>
+                                    </button>
+                                    <button type="button" onclick="window.coraInsertUniversalVoiceText()" class="text-xs font-medium text-zinc-600 dark:text-zinc-300 py-2.5 px-3 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer">
+                                        Insert text
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -6645,6 +6739,191 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                                 listEl.innerHTML = html;
                             }
+
+                            /* =========================================================================
+                               UNIVERSAL CORA VOICE AI ENGINE (Global Voice Layer for All Inputs)
+                               ========================================================================= */
+                            var _activeVoiceTargetInput = null;
+                            var _activeVoiceSubmitCallback = null;
+                            var _universalVoiceRecognition = null;
+                            var _isUniversalVoiceListening = false;
+                            var _latestVoiceTranscript = '';
+
+                            window.coraTriggerVoiceAI = function(targetSelector, submitCallback) {
+                                _activeVoiceTargetInput = typeof targetSelector === 'string' ? document.querySelector(targetSelector) : targetSelector;
+                                _activeVoiceSubmitCallback = typeof submitCallback === 'function' ? submitCallback : null;
+                                _latestVoiceTranscript = '';
+
+                                var drawer = document.getElementById('cora-universal-voice-drawer');
+                                var overlay = document.getElementById('cora-universal-voice-overlay');
+                                var statusTitle = document.getElementById('cora-universal-voice-status');
+                                var statusSub = document.getElementById('cora-universal-voice-sub');
+                                var transcriptCard = document.getElementById('cora-universal-transcript-card');
+                                var transcriptText = document.getElementById('cora-universal-transcript-text');
+                                var micBtn = document.getElementById('cora-universal-voice-mic-btn');
+
+                                if (transcriptCard) transcriptCard.classList.add('hidden');
+                                if (transcriptText) transcriptText.textContent = '';
+                                if (statusTitle) statusTitle.textContent = 'Tap mic to speak';
+                                if (statusSub) statusSub.textContent = 'Ask anything, search CRM records, or query your workspace.';
+                                if (micBtn) micBtn.classList.remove('is-listening');
+
+                                if (overlay) overlay.classList.add('active');
+                                if (drawer) drawer.classList.add('active');
+
+                                // Auto-start recording immediately for responsive voice UX
+                                setTimeout(function() {
+                                    window.coraToggleUniversalVoiceRecording(true);
+                                }, 180);
+                            };
+
+                            window.coraCloseUniversalVoice = function() {
+                                if (_isUniversalVoiceListening && _universalVoiceRecognition) {
+                                    try { _universalVoiceRecognition.stop(); } catch(e) {}
+                                }
+                                _isUniversalVoiceListening = false;
+                                var micBtn = document.getElementById('cora-universal-voice-mic-btn');
+                                if (micBtn) micBtn.classList.remove('is-listening');
+
+                                var drawer = document.getElementById('cora-universal-voice-drawer');
+                                var overlay = document.getElementById('cora-universal-voice-overlay');
+                                if (drawer) drawer.classList.remove('active');
+                                if (overlay) overlay.classList.remove('active');
+                            };
+
+                            window.coraToggleUniversalVoiceRecording = function(forceStart) {
+                                var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+                                var micBtn = document.getElementById('cora-universal-voice-mic-btn');
+                                var statusTitle = document.getElementById('cora-universal-voice-status');
+                                var statusSub = document.getElementById('cora-universal-voice-sub');
+                                var transcriptCard = document.getElementById('cora-universal-transcript-card');
+                                var transcriptText = document.getElementById('cora-universal-transcript-text');
+
+                                if (_isUniversalVoiceListening && !forceStart) {
+                                    _isUniversalVoiceListening = false;
+                                    if (_universalVoiceRecognition) {
+                                        try { _universalVoiceRecognition.stop(); } catch(e) {}
+                                    }
+                                    if (micBtn) micBtn.classList.remove('is-listening');
+                                    if (statusTitle) statusTitle.textContent = 'Tap mic to speak';
+                                    return;
+                                }
+
+                                if (!SpeechRec) {
+                                    var manualText = prompt("Voice microphone not supported on this browser. Enter voice query:");
+                                    if (manualText) {
+                                        _latestVoiceTranscript = manualText;
+                                        window.coraExecuteUniversalVoiceAI();
+                                    } else {
+                                        window.coraCloseUniversalVoice();
+                                    }
+                                    return;
+                                }
+
+                                try {
+                                    _universalVoiceRecognition = new SpeechRec();
+                                    _universalVoiceRecognition.lang = 'en-US';
+                                    _universalVoiceRecognition.interimResults = true;
+                                    _universalVoiceRecognition.maxAlternatives = 1;
+
+                                    _universalVoiceRecognition.onstart = function() {
+                                        _isUniversalVoiceListening = true;
+                                        if (micBtn) micBtn.classList.add('is-listening');
+                                        if (statusTitle) statusTitle.innerHTML = '<span class="text-rose-500 font-extrabold tracking-wide animate-pulse">Listening...</span>';
+                                        if (statusSub) statusSub.textContent = 'Speak your question or search query clearly...';
+                                        if (transcriptCard) transcriptCard.classList.remove('hidden');
+                                        if (transcriptText) transcriptText.textContent = 'Listening for speech...';
+                                    };
+
+                                    _universalVoiceRecognition.onresult = function(event) {
+                                        var current = '';
+                                        for (var i = 0; i < event.results.length; ++i) {
+                                            current += event.results[i][0].transcript;
+                                        }
+                                        if (current) {
+                                            // Apply domain phonetic corrections
+                                            current = current
+                                                .replace(/\bb2b\s+beating\b/gi, 'B2B meeting')
+                                                .replace(/\bbeating\b/gi, 'meeting')
+                                                .replace(/\btoken\s+agreemen\b/gi, 'token agreement')
+                                                .replace(/\bgst\s+invois\b/gi, 'GST invoice')
+                                                .replace(/\bdlf\s+cyber\s*city\b/gi, 'DLF Cybercity')
+                                                .replace(/\bpottery\b/gi, 'property')
+                                                .replace(/\bphoto\s*shoot\b/gi, 'photoshoot');
+
+                                            _latestVoiceTranscript = current;
+                                            if (transcriptText) transcriptText.textContent = '“' + current + '”';
+                                            if (statusTitle) statusTitle.innerHTML = '<span class="text-zinc-900 dark:text-zinc-100 font-bold">Query Captured</span>';
+                                        }
+                                    };
+
+                                    _universalVoiceRecognition.onerror = function(event) {
+                                        _isUniversalVoiceListening = false;
+                                        if (micBtn) micBtn.classList.remove('is-listening');
+                                        if (statusTitle) statusTitle.textContent = 'Tap mic to speak';
+                                        if (window.coraShowToast) window.coraShowToast('Voice capture: ' + (event.error || 'Check microphone'), 'warning');
+                                    };
+
+                                    _universalVoiceRecognition.onend = function() {
+                                        _isUniversalVoiceListening = false;
+                                        if (micBtn) micBtn.classList.remove('is-listening');
+                                        if (_latestVoiceTranscript && statusTitle) {
+                                            statusTitle.innerHTML = '<span class="text-emerald-600 dark:text-emerald-400 font-bold">Ready to Send</span>';
+                                        }
+                                    };
+
+                                    _universalVoiceRecognition.start();
+                                } catch(e) {
+                                    _isUniversalVoiceListening = false;
+                                    if (micBtn) micBtn.classList.remove('is-listening');
+                                    if (window.coraShowToast) window.coraShowToast('Microphone initialization failed', 'error');
+                                }
+                            };
+
+                            window.coraExecuteUniversalVoiceAI = function() {
+                                var text = (_latestVoiceTranscript || '').trim();
+                                if (!text) {
+                                    if (window.coraShowToast) window.coraShowToast('Please speak a query first', 'warning');
+                                    return;
+                                }
+
+                                if (_activeVoiceTargetInput) {
+                                    _activeVoiceTargetInput.value = text;
+                                    _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
+                                }
+
+                                var callback = _activeVoiceSubmitCallback;
+                                var targetEl = _activeVoiceTargetInput;
+                                window.coraCloseUniversalVoice();
+
+                                if (typeof callback === 'function') {
+                                    callback(text);
+                                } else if (targetEl && targetEl.id === 'cora-inline-command-input' && typeof window.coraTriggerCommandAI === 'function') {
+                                    window.coraTriggerCommandAI();
+                                } else if (targetEl && targetEl.id === 'cora-island-ai-input' && typeof window.coraSubmitIslandAI === 'function') {
+                                    window.coraSubmitIslandAI();
+                                } else if (targetEl && targetEl.id === 'cora-command-input') {
+                                    targetEl.focus();
+                                    targetEl.dispatchEvent(new Event('input', { bubbles: true }));
+                                } else {
+                                    if (window.coraShowToast) window.coraShowToast('Voice query inserted: ' + text, 'success');
+                                }
+                            };
+
+                            window.coraInsertUniversalVoiceText = function() {
+                                var text = (_latestVoiceTranscript || '').trim();
+                                if (!text) {
+                                    if (window.coraShowToast) window.coraShowToast('Please speak first', 'warning');
+                                    return;
+                                }
+                                if (_activeVoiceTargetInput) {
+                                    _activeVoiceTargetInput.value = text;
+                                    _activeVoiceTargetInput.focus();
+                                    _activeVoiceTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
+                                }
+                                window.coraCloseUniversalVoice();
+                                if (window.coraShowToast) window.coraShowToast('Voice text inserted', 'success');
+                            };
 
                             if (document.readyState === 'loading') {
                                 document.addEventListener('DOMContentLoaded', render);
@@ -13717,10 +13996,14 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             <!-- STATE 2: AI Input / Prompt Bar (Middle) -->
             <div id="cora-island-view-ai" class="cora-island-view hidden flex-1 mx-1.5 flex items-center" style="display: none; flex: 1 1 auto; height: 40px !important;">
                 <div class="cora-island-input-pill">
-                    <div style="display: flex; align-items: center; flex: 1; min-w: 0; height: 100%;">
+                    <div style="display: flex; align-items: center; flex: 1; min-width: 0; height: 100%;">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0" style="margin-right: 6px; flex-shrink: 0; color: #71717a !important;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         <input type="text" id="cora-island-ai-input" placeholder="Search articles, opportunities..." class="w-full bg-transparent border-none outline-none text-xs text-zinc-900 placeholder-zinc-400 pl-1 pr-1 font-sans focus:outline-none focus:ring-0" style="border: none !important; outline: none !important; box-shadow: none !important; font-size: 13px !important; background: transparent !important; color: #18181b !important; padding: 0 !important; margin: 0 !important;" onkeydown="if(event.key==='Enter'){ coraSubmitIslandAI(); }">
                     </div>
+                    <!-- Voice AI Mic Button -->
+                    <button type="button" onclick="window.coraTriggerVoiceAI('#cora-island-ai-input', window.coraSubmitIslandAI)" class="cora-island-mic-btn p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center justify-center shrink-0 cursor-pointer" style="margin-right: 4px; touch-action: manipulation;" title="Speak to Voice AI">
+                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    </button>
                     <button type="button" onclick="coraSubmitIslandAI()" class="cora-island-ask-btn">
                         Ask AI
                     </button>
@@ -14576,6 +14859,9 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         <div class="flex items-center gap-3 px-4 border-b border-zinc-100 py-3.5 shrink-0">
             <svg class="text-zinc-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input type="text" id="cora-command-input" placeholder="Search pages, settings, leads, or listings..." class="flex-1 text-sm bg-transparent border-0 outline-none focus:ring-0 text-zinc-900 placeholder-zinc-400 py-0.5" autocomplete="off">
+            <button type="button" onclick="window.coraTriggerVoiceAI('#cora-command-input')" class="p-1 text-zinc-400 hover:text-zinc-900 transition-colors flex items-center justify-center shrink-0 cursor-pointer" title="Speak to Voice AI">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
             <kbd class="text-[9px] font-mono bg-zinc-100 px-1.5 py-0.5 rounded text-zinc-450 border border-zinc-200/60 shadow-sm shrink-0">⌘K</kbd>
         </div>
 

@@ -251,6 +251,9 @@ function _cora_fmt_k( $n ) {
                        placeholder="<?php echo esc_attr( $_cfg['placeholder'] ); ?>"
                        onkeydown="coraAgentHandleKeyDown(event)">
                 <span class="cora-agent-k-indicator">&#8984; K</span>
+                <button onclick="if(window.coraTriggerVoiceAI){window.coraTriggerVoiceAI('#cora-agent-input-field', coraSubmitAgentQuery);}" type="button" class="cora-agent-mic-btn" id="cora-agent-mic-btn" title="Speak to Voice AI">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                </button>
                 <button onclick="coraSubmitAgentQuery()" type="button" class="cora-agent-sparkle-btn" id="cora-agent-submit-btn" title="Ask AI">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"></path>
@@ -698,6 +701,35 @@ function _cora_fmt_k( $n ) {
     background: #18181b;
     border-color: #27272a;
     color: #a1a1aa;
+}
+
+/* ── Voice AI Mic Button ─────────────────────────────────────────── */
+.cora-agent-mic-btn {
+    background: transparent;
+    color: #71717a;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    padding: 0;
+    margin-right: 4px;
+}
+.cora-agent-mic-btn:hover {
+    color: #18181b;
+    background: rgba(0, 0, 0, 0.05);
+}
+.dark .cora-agent-mic-btn {
+    color: #a1a1aa;
+}
+.dark .cora-agent-mic-btn:hover {
+    color: #f4f4f5;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* ── Sparkle Submit Button (Purple AI accent) ─────────────────────── */
