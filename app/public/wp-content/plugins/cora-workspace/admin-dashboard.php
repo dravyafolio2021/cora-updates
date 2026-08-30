@@ -3039,16 +3039,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             border-color: #27272a !important;
         }
         /* Universal Header Profile Popover & Mobile Sheet Styles */
+        /* Universal Header Profile Popover (Modal Anchored Directly Below Top-Right Avatar Icon) */
         #cora-header-profile-backdrop {
             position: fixed !important;
             inset: 0 !important;
-            background: rgba(9, 9, 11, 0.45) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
+            background: transparent !important;
             z-index: 99990 !important;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
         #cora-header-profile-backdrop.active {
             opacity: 1 !important;
@@ -3056,43 +3054,37 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
         #cora-header-profile-popover {
             position: fixed !important;
+            top: 50px !important;
+            right: 12px !important;
+            left: auto !important;
+            bottom: auto !important;
+            width: 305px !important;
+            max-width: calc(100vw - 20px) !important;
+            max-height: calc(100vh - 64px) !important;
+            overflow-y: auto !important;
+            overscroll-behavior: contain !important;
+            border-radius: 20px !important;
+            border: 1px solid rgba(228, 228, 231, 0.95) !important;
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
             z-index: 99995 !important;
             box-sizing: border-box !important;
             flex-direction: column !important;
+            transform-origin: top right !important;
         }
-        /* Desktop: Anchored below topbar right avatar button */
-        @media (min-width: 768px) {
-            #cora-header-profile-popover {
-                top: 52px !important;
-                right: 16px !important;
-                left: auto !important;
-                bottom: auto !important;
-                width: 315px !important;
-                max-width: calc(100vw - 32px) !important;
-                border-radius: 20px !important;
-                transform-origin: top right !important;
-            }
+        .dark #cora-header-profile-popover {
+            background: rgba(24, 24, 27, 0.98) !important;
+            border-color: #27272a !important;
+            box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
         }
-        /* Mobile: Bottom-up executive sheet (Rule 12 compliant) */
-        @media (max-width: 767.98px) {
+        @media (max-width: 640px) {
             #cora-header-profile-popover {
-                top: auto !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                width: 100% !important;
-                max-width: 480px !important;
-                margin: 0 auto !important;
-                border-top-left-radius: 28px !important;
-                border-top-right-radius: 28px !important;
-                border-bottom-left-radius: 0px !important;
-                border-bottom-right-radius: 0px !important;
-                border-top: 1px solid rgba(228, 228, 231, 0.9) !important;
-                box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25) !important;
-                padding-bottom: max(20px, env(safe-area-inset-bottom, 20px)) !important;
-            }
-            .dark #cora-header-profile-popover {
-                border-top-color: #27272a !important;
+                top: 48px !important;
+                right: 8px !important;
+                width: 295px !important;
+                max-width: calc(100vw - 16px) !important;
             }
         }
 
@@ -5767,12 +5759,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             </div>
                         </div>
 
-                        <!-- Universal Header Profile Popover Card & Mobile Sheet (Document Root Level) -->
+                        <!-- Universal Header Profile Popover Card (Modal Document Root Level) -->
                         <div id="cora-header-profile-backdrop" onclick="window.coraCloseProfilePopover()"></div>
                         <div id="cora-header-profile-popover" class="hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 p-3.5 gap-2.5 animate-in fade-in zoom-in-95 duration-150 select-none">
-                            <!-- Mobile Drag Handle -->
-                            <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-1 md:hidden"></div>
-
                             <!-- 1. Executive User Profile Header -->
                             <div class="flex items-center gap-3 px-1 py-0.5 select-none">
                                 <div class="relative w-10 h-10 shrink-0">
