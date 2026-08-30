@@ -5635,15 +5635,70 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <!-- Drag handle -->
                             <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3"></div>
                             
-                            <!-- Drawer Header -->
+                            <!-- Drawer Header with Voice AI Trigger -->
                             <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
                                 <div class="flex items-center gap-2">
                                     <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
                                     <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">New Task &amp; Agenda Item</h3>
                                 </div>
-                                <button type="button" onclick="window.coraCloseTaskDrawer()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <div class="flex items-center gap-1.5">
+                                    <!-- Voice AI Mic Button -->
+                                    <button type="button" id="cora-drawer-voice-btn" onclick="window.coraToggleTaskVoice()" class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700 text-[11px] font-semibold transition-all cursor-pointer shadow-3xs" style="touch-action: manipulation;" title="Speak task details with Voice AI">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="text-purple-600 dark:text-purple-400 shrink-0"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                                        <span id="cora-voice-btn-label">Voice AI</span>
+                                    </button>
+                                    <button type="button" onclick="window.coraCloseTaskDrawer()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Voice Listening Live Banner -->
+                            <div id="cora-voice-listening-banner" class="hidden mt-3 bg-zinc-900 dark:bg-zinc-950 text-white rounded-2xl p-3 flex items-center justify-between shadow-xs border border-zinc-800">
+                                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block animate-ping shrink-0"></span>
+                                    <div class="min-w-0">
+                                        <div class="text-[10.5px] font-mono font-bold uppercase tracking-wider text-rose-400">Listening to Voice...</div>
+                                        <div class="text-xs text-zinc-300 font-medium truncate">e.g., "Schedule urgent site meeting tomorrow 10 AM"</div>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="window.coraToggleTaskVoice()" class="shrink-0 bg-white hover:bg-zinc-100 text-zinc-900 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-3xs cursor-pointer">
+                                    Stop
                                 </button>
+                            </div>
+
+                            <!-- AI Draft Mode Approval Card -->
+                            <div id="cora-voice-draft-card" class="hidden mt-3 bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200/80 dark:border-purple-800/60 rounded-2xl p-3.5 flex flex-col gap-2.5 transition-all">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5 text-[10.5px] font-mono font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-300">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-purple-600"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                        <span>AI Draft &bull; Awaiting Approval</span>
+                                    </div>
+                                    <span id="cora-draft-pill-prio" class="text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200/60">URGENT</span>
+                                </div>
+
+                                <!-- Speech Transcript Quote -->
+                                <div class="bg-white/90 dark:bg-zinc-900/90 rounded-xl p-2 border border-purple-100 dark:border-purple-900/60 text-xs italic text-zinc-700 dark:text-zinc-200 font-sans leading-relaxed" id="cora-draft-transcript-text">
+                                    "Schedule this task on urgent basis for tomorrow 10 AM to call client"
+                                </div>
+
+                                <!-- Extracted Meta Pills -->
+                                <div class="flex items-center gap-2 text-[10px] font-mono">
+                                    <span class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded-md text-zinc-700 dark:text-zinc-300 font-semibold" id="cora-draft-pill-day">Tomorrow</span>
+                                    <span class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded-md text-zinc-700 dark:text-zinc-300 font-semibold" id="cora-draft-pill-time">10:00 AM</span>
+                                    <span class="text-zinc-400">Review &amp; approve below</span>
+                                </div>
+
+                                <!-- Approval / Reject Action Buttons -->
+                                <div class="flex items-center gap-2 pt-1 border-t border-purple-100 dark:border-purple-900/40">
+                                    <button type="button" onclick="window.coraApproveDraftTask()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer select-none transition-all active:scale-[0.98]">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        <span>Approve &amp; Save Task</span>
+                                    </button>
+                                    <button type="button" onclick="window.coraRejectDraft()" class="bg-white dark:bg-zinc-900 hover:bg-zinc-100 text-zinc-700 dark:text-zinc-300 text-xs font-medium py-2 px-3 rounded-xl border border-zinc-200 dark:border-zinc-700 cursor-pointer select-none transition-all">
+                                        <span>Discard</span>
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- Form Elements -->
@@ -5724,6 +5779,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             var drawerSelectedPriority = 'high';
                             var drawerSelectedDay = 'today';
 
+                            var voiceRecognition = null;
+                            var isVoiceListening = false;
+
                             function getTasks() {
                                 var saved = localStorage.getItem('cora_dashboard_todo_tasks');
                                 if (saved) {
@@ -5785,6 +5843,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     overlay.classList.remove('active');
                                     drawer.classList.remove('active');
                                 }
+                                if (isVoiceListening) {
+                                    window.coraToggleTaskVoice();
+                                }
                             };
 
                             window.coraSetDrawerPriority = function(prio, btn) {
@@ -5813,6 +5874,178 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 }
                             };
 
+                            /* --- Voice AI Speech Transcription & Intent Extraction --- */
+                            window.coraToggleTaskVoice = function() {
+                                var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+                                var voiceBtn = document.getElementById('cora-drawer-voice-btn');
+                                var voiceLabel = document.getElementById('cora-voice-btn-label');
+                                var voiceBanner = document.getElementById('cora-voice-listening-banner');
+
+                                if (isVoiceListening) {
+                                    isVoiceListening = false;
+                                    if (voiceRecognition) {
+                                        try { voiceRecognition.stop(); } catch(e) {}
+                                    }
+                                    if (voiceBtn) {
+                                        voiceBtn.classList.remove('bg-rose-500', 'text-white', 'border-rose-600', 'animate-pulse');
+                                        voiceBtn.classList.add('bg-zinc-100', 'text-zinc-800');
+                                    }
+                                    if (voiceLabel) voiceLabel.textContent = 'Voice AI';
+                                    if (voiceBanner) voiceBanner.classList.add('hidden');
+                                    return;
+                                }
+
+                                if (!SpeechRec) {
+                                    var manualText = prompt("Voice microphone not supported on this browser. Type natural command (e.g. 'Schedule urgent client meeting for tomorrow 10 AM'):");
+                                    if (manualText) {
+                                        window.coraAnalyzeVoiceIntent(manualText);
+                                    }
+                                    return;
+                                }
+
+                                try {
+                                    voiceRecognition = new SpeechRec();
+                                    voiceRecognition.lang = 'en-US';
+                                    voiceRecognition.interimResults = false;
+                                    voiceRecognition.maxAlternatives = 1;
+
+                                    voiceRecognition.onstart = function() {
+                                        isVoiceListening = true;
+                                        if (voiceBtn) {
+                                            voiceBtn.classList.remove('bg-zinc-100', 'text-zinc-800');
+                                            voiceBtn.classList.add('bg-rose-500', 'text-white', 'border-rose-600', 'animate-pulse');
+                                        }
+                                        if (voiceLabel) voiceLabel.textContent = 'Listening...';
+                                        if (voiceBanner) voiceBanner.classList.remove('hidden');
+                                        if (window.coraShowToast) window.coraShowToast('Listening... Speak your task details', 'info');
+                                    };
+
+                                    voiceRecognition.onresult = function(event) {
+                                        var transcript = event.results[0][0].transcript;
+                                        window.coraToggleTaskVoice(); // stop listening
+                                        window.coraAnalyzeVoiceIntent(transcript);
+                                    };
+
+                                    voiceRecognition.onerror = function(event) {
+                                        window.coraToggleTaskVoice(); // stop listening
+                                        if (window.coraShowToast) window.coraShowToast('Voice capture error: ' + (event.error || 'Check microphone'), 'warning');
+                                    };
+
+                                    voiceRecognition.onend = function() {
+                                        if (isVoiceListening) {
+                                            window.coraToggleTaskVoice();
+                                        }
+                                    };
+
+                                    voiceRecognition.start();
+                                } catch(e) {
+                                    window.coraToggleTaskVoice();
+                                    if (window.coraShowToast) window.coraShowToast('Microphone error', 'error');
+                                }
+                            };
+
+                            /* --- NLP Semantic Intent Analysis --- */
+                            window.coraAnalyzeVoiceIntent = function(transcript) {
+                                if (!transcript || !transcript.trim()) return;
+                                var raw = transcript.trim();
+                                var lower = raw.toLowerCase();
+
+                                // 1. Priority Detection
+                                var prio = 'normal';
+                                if (lower.includes('urgent') || lower.includes('emergency') || lower.includes('asap') || lower.includes('critical') || lower.includes('priority')) {
+                                    prio = 'urgent';
+                                } else if (lower.includes('high') || lower.includes('important') || lower.includes('crucial')) {
+                                    prio = 'high';
+                                }
+
+                                // 2. Day Detection
+                                var day = 'today';
+                                if (lower.includes('tomorrow') || lower.includes('next day') || lower.includes('day after')) {
+                                    day = 'tomorrow';
+                                }
+
+                                // 3. Time Slot Detection
+                                var timeSlot = '11:30 AM';
+                                if (lower.includes('10 am') || lower.includes('10:00 am') || lower.includes('10:00') || lower.includes('morning') || lower.includes('early')) {
+                                    timeSlot = '10:00 AM';
+                                } else if (lower.includes('11:30') || lower.includes('11 am') || lower.includes('noon') || lower.includes('midday')) {
+                                    timeSlot = '11:30 AM';
+                                } else if (lower.includes('2:30') || lower.includes('2 pm') || lower.includes('3 pm') || lower.includes('afternoon')) {
+                                    timeSlot = '02:30 PM';
+                                } else if (lower.includes('5 pm') || lower.includes('5:00') || lower.includes('6 pm') || lower.includes('evening') || lower.includes('night') || lower.includes('end of day')) {
+                                    timeSlot = '05:00 PM';
+                                } else if (lower.includes('flexible') || lower.includes('anytime')) {
+                                    timeSlot = 'Flexible';
+                                }
+
+                                // 4. Clean Action / Task Title Extraction
+                                var cleanTitle = raw;
+                                cleanTitle = cleanTitle.replace(/^(please\s+)?(schedule|create|add|set|remind me to|make a task to|i need to|we need to)\s+/i, '');
+                                cleanTitle = cleanTitle.replace(/(on\s+)?(urgent\s+basis|urgently|high\s+priority|asap)/gi, '');
+                                cleanTitle = cleanTitle.replace(/(for\s+)?(tomorrow|today)(\s+(at\s+)?(10\s*am|11:30\s*am|2:30\s*pm|5\s*pm|\d{1,2}(:\d{2})?\s*(am|pm)?))?/gi, '');
+                                cleanTitle = cleanTitle.replace(/(at\s+)?(10\s*am|11:30\s*am|2:30\s*pm|5\s*pm|\d{1,2}(:\d{2})?\s*(am|pm)?)/gi, '');
+                                cleanTitle = cleanTitle.replace(/\s+/g, ' ').trim();
+                                if (cleanTitle.length > 0) {
+                                    cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
+                                } else {
+                                    cleanTitle = raw;
+                                }
+
+                                // Pre-fill input fields
+                                var inp = document.getElementById('cora-drawer-task-input');
+                                if (inp) inp.value = cleanTitle;
+
+                                var timeSel = document.getElementById('cora-drawer-time-slot');
+                                if (timeSel) timeSel.value = timeSlot;
+
+                                // Sync priority buttons
+                                var prioBtns = document.querySelectorAll('#cora-drawer-prio-group button');
+                                if (prio === 'urgent' && prioBtns[0]) window.coraSetDrawerPriority('urgent', prioBtns[0]);
+                                else if (prio === 'high' && prioBtns[1]) window.coraSetDrawerPriority('high', prioBtns[1]);
+                                else if (prioBtns[2]) window.coraSetDrawerPriority('normal', prioBtns[2]);
+
+                                // Sync day buttons
+                                var dayBtns = document.querySelectorAll('#cora-drawer-day-group button');
+                                if (day === 'tomorrow' && dayBtns[1]) window.coraSetDrawerDay('tomorrow', dayBtns[1]);
+                                else if (dayBtns[0]) window.coraSetDrawerDay('today', dayBtns[0]);
+
+                                // Show AI Draft Approval Card
+                                var draftCard = document.getElementById('cora-voice-draft-card');
+                                var draftTranscript = document.getElementById('cora-draft-transcript-text');
+                                var draftPillPrio = document.getElementById('cora-draft-pill-prio');
+                                var draftPillDay = document.getElementById('cora-draft-pill-day');
+                                var draftPillTime = document.getElementById('cora-draft-pill-time');
+
+                                if (draftTranscript) draftTranscript.textContent = '“' + raw + '”';
+                                if (draftPillPrio) {
+                                    draftPillPrio.textContent = prio.toUpperCase();
+                                    draftPillPrio.className = 'text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-full ' + 
+                                        (prio === 'urgent' ? 'bg-rose-100 text-rose-700 border border-rose-200/60 dark:bg-rose-950 dark:text-rose-300' : 
+                                        (prio === 'high' ? 'bg-amber-100 text-amber-800 border border-amber-200/60 dark:bg-amber-950 dark:text-amber-300' : 'bg-zinc-200 text-zinc-700 border border-zinc-300 dark:bg-zinc-800 dark:text-zinc-300'));
+                                }
+                                if (draftPillDay) draftPillDay.textContent = day === 'tomorrow' ? 'Tomorrow' : 'Today';
+                                if (draftPillTime) draftPillTime.textContent = timeSlot;
+
+                                if (draftCard) draftCard.classList.remove('hidden');
+
+                                if (window.coraShowToast) {
+                                    window.coraShowToast('Voice transcribed: AI drafted task preview', 'info');
+                                }
+                            };
+
+                            /* --- Draft Approval & Rejection Handlers --- */
+                            window.coraApproveDraftTask = function() {
+                                window.coraSubmitDrawerTask();
+                            };
+
+                            window.coraRejectDraft = function() {
+                                var draftCard = document.getElementById('cora-voice-draft-card');
+                                if (draftCard) draftCard.classList.add('hidden');
+                                var inp = document.getElementById('cora-drawer-task-input');
+                                if (inp) inp.value = '';
+                                if (window.coraShowToast) window.coraShowToast('Draft discarded. Ready for new input.', 'info');
+                            };
+
                             window.coraSubmitDrawerTask = function() {
                                 var inp = document.getElementById('cora-drawer-task-input');
                                 if (!inp || !inp.value.trim()) return;
@@ -5831,10 +6064,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 };
                                 tasks.unshift(newTask);
                                 inp.value = '';
+                                
+                                var draftCard = document.getElementById('cora-voice-draft-card');
+                                if (draftCard) draftCard.classList.add('hidden');
+
                                 window.coraCloseTaskDrawer();
                                 saveTasks(tasks);
                                 if (window.coraShowToast) {
-                                    window.coraShowToast('Task added to ' + (drawerSelectedDay === 'tomorrow' ? 'tomorrow' : 'today'), 'success');
+                                    window.coraShowToast('Task created: ' + newTask.title, 'success');
                                 }
                             };
 
@@ -5948,7 +6185,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     } else if (prio === 'urgent') {
                                         html += '    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
                                     } else {
-                                        html += '    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>';
+                                        html += '    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle></svg>';
                                     }
                                     html += '  </button>';
 
@@ -5991,7 +6228,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                     </div> <!-- .cora-dashboard-hero-card -->
 
-                    <!-- 5. Dynamic AI Agency Decision & Guidance Cards Grid -->
                     
                     <?php if ( $is_studio ) : 
                         $active_shoots_count = count( $recent_active_showings );
