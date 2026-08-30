@@ -5717,97 +5717,68 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <div id="cora-dashboard-todo-list" class="flex flex-col gap-2 w-full"></div>
                         </div> <!-- .cora-dashboard-todo-container -->
 
-                        <!-- Notification & Email Preferences Bottom Drawer Sheet -->
+                        <!-- Notification & Email Preferences Bottom Drawer Sheet (Ultra-Minimalist & Effortless) -->
                         <div id="cora-notif-drawer-overlay" onclick="window.coraCloseNotifSettings()"></div>
                         <div id="cora-notif-bottom-drawer" class="select-none">
                             <!-- Drag handle -->
-                            <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3"></div>
+                            <div class="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3"></div>
                             
-                            <!-- Header -->
-                            <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+                            <!-- Clean Minimal Header -->
+                            <div class="flex items-center justify-between pb-2.5 mb-1 border-b border-zinc-100 dark:border-zinc-800">
                                 <div class="flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Schedule Alerts &amp; Reports</h3>
+                                    <span class="w-2 h-2 rounded-full bg-zinc-900 dark:bg-zinc-100 inline-block"></span>
+                                    <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Schedule Alerts</h3>
                                 </div>
                                 <button type="button" onclick="window.coraCloseNotifSettings()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                 </button>
                             </div>
 
-                            <!-- Settings Controls -->
-                            <div class="space-y-3.5 pt-3">
-                                <!-- 1. PWA Push Notification Permission -->
-                                <div class="bg-zinc-50 dark:bg-zinc-800/60 p-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-700/70 flex items-center justify-between">
-                                    <div class="space-y-0.5 min-w-0 pr-2">
-                                        <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                                            <span>Mobile &amp; PWA Push Alerts</span>
-                                        </div>
-                                        <div class="text-[11px] text-zinc-500 dark:text-zinc-400" id="cora-notif-perm-status">Real-time alerts directly on your device.</div>
+                            <!-- Effortless Minimal Row List (Instant Auto-Saving) -->
+                            <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+                                <!-- Row 1: Push Reminders Toggle -->
+                                <div class="py-2.5 flex items-center justify-between">
+                                    <div class="space-y-0.5 pr-2">
+                                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Push Reminders</div>
+                                        <div class="text-[11px] text-zinc-400 dark:text-zinc-500" id="cora-notif-perm-status">Pre-task alarms on this device</div>
                                     </div>
-                                    <button type="button" id="cora-toggle-push-btn" onclick="window.coraTogglePushPermission()" class="px-2.5 py-1 rounded-xl text-xs font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer shadow-3xs transition-all">
+                                    <button type="button" id="cora-toggle-push-btn" onclick="window.coraTogglePushPermission()" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer transition-all shadow-3xs">
                                         Enable
                                     </button>
                                 </div>
 
-                                <!-- 2. Pre-Task Reminder Advance Timing -->
-                                <div>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400">PRE-TASK REMINDER ADVANCE</label>
-                                        <span class="text-[10px] text-zinc-400 font-mono">Push + In-App Alarm</span>
+                                <!-- Row 2: Advance Timing (Segmented Minimal Pills) -->
+                                <div class="py-2.5 flex items-center justify-between">
+                                    <div class="space-y-0.5 pr-2">
+                                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Advance Alert</div>
+                                        <div class="text-[11px] text-zinc-400 dark:text-zinc-500">Lead time before task start</div>
                                     </div>
-                                    <div class="grid grid-cols-3 gap-2" id="cora-notif-advance-group">
-                                        <button type="button" onclick="window.coraSetNotifAdvance(15, this)" class="cora-advance-btn text-xs font-medium py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">
-                                            15 Mins
-                                        </button>
-                                        <button type="button" onclick="window.coraSetNotifAdvance(30, this)" class="cora-advance-btn active text-xs font-semibold py-1.5 px-2 rounded-xl border border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-3xs transition-all cursor-pointer">
-                                            30 Mins (Default)
-                                        </button>
-                                        <button type="button" onclick="window.coraSetNotifAdvance(60, this)" class="cora-advance-btn text-xs font-medium py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">
-                                            1 Hour
-                                        </button>
+                                    <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60" id="cora-notif-advance-group">
+                                        <button type="button" onclick="window.coraSetNotifAdvance(15, this)" class="cora-advance-btn text-[10.5px] font-medium px-2 py-1 rounded-md text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">15m</button>
+                                        <button type="button" onclick="window.coraSetNotifAdvance(30, this)" class="cora-advance-btn active text-[10.5px] font-semibold px-2 py-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs transition-all cursor-pointer">30m</button>
+                                        <button type="button" onclick="window.coraSetNotifAdvance(60, this)" class="cora-advance-btn text-[10.5px] font-medium px-2 py-1 rounded-md text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">1h</button>
                                     </div>
                                 </div>
 
-                                <!-- 3. Digest & Reports Toggles -->
-                                <div class="space-y-2 pt-1 border-t border-zinc-100 dark:border-zinc-800">
-                                    <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 mb-1">DIGESTS &amp; EMAIL REPORTS</label>
-                                    
-                                    <!-- Morning Briefing Toggle -->
-                                    <label class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/70 dark:border-zinc-700/60 cursor-pointer">
-                                        <div class="space-y-0.5">
-                                            <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Daily Morning Briefing (09:00 AM)</div>
-                                            <div class="text-[10.5px] text-zinc-500 dark:text-zinc-400">Push &amp; email summary of today's schedule.</div>
-                                        </div>
-                                        <input type="checkbox" id="cora-pref-morning-digest" class="w-4 h-4 rounded text-zinc-900 accent-zinc-900 dark:accent-zinc-100 cursor-pointer" checked />
-                                    </label>
-
-                                    <!-- Evening Wrap-Up Toggle -->
-                                    <label class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/70 dark:border-zinc-700/60 cursor-pointer">
-                                        <div class="space-y-0.5">
-                                            <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Daily Evening Wrap-Up (07:00 PM)</div>
-                                            <div class="text-[10.5px] text-zinc-500 dark:text-zinc-400">Overview report of completed milestones &amp; tomorrow's plan.</div>
-                                        </div>
-                                        <input type="checkbox" id="cora-pref-evening-digest" class="w-4 h-4 rounded text-zinc-900 accent-zinc-900 dark:accent-zinc-100 cursor-pointer" checked />
-                                    </label>
-
-                                    <!-- Email Alerts Toggle -->
-                                    <label class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/70 dark:border-zinc-700/60 cursor-pointer">
-                                        <div class="space-y-0.5">
-                                            <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Email Delivery to Workspace Members</div>
-                                            <div class="text-[10.5px] text-zinc-500 dark:text-zinc-400">Send copies to workspace owner and assignees.</div>
-                                        </div>
-                                        <input type="checkbox" id="cora-pref-email-enabled" class="w-4 h-4 rounded text-zinc-900 accent-zinc-900 dark:accent-zinc-100 cursor-pointer" checked />
+                                <!-- Row 3: Daily Email Digest Toggle -->
+                                <div class="py-2.5 flex items-center justify-between">
+                                    <div class="space-y-0.5 pr-2">
+                                        <div class="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Daily Email Digest</div>
+                                        <div class="text-[11px] text-zinc-400 dark:text-zinc-500">Morning briefing &amp; evening summary</div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="cora-pref-email-enabled" onchange="window.coraAutoSaveNotifPref()" class="sr-only peer" checked />
+                                        <div class="w-8 h-4.5 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-zinc-900 dark:peer-checked:bg-zinc-100"></div>
                                     </label>
                                 </div>
+                            </div>
 
-                                <!-- Save Action Button -->
-                                <div class="pt-2">
-                                    <button type="button" onclick="window.coraSaveNotificationPrefs()" class="w-full bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white text-xs font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-3xs cursor-pointer select-none transition-all active:scale-[0.98]" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        <span>Save Notification Preferences</span>
-                                    </button>
-                                </div>
+                            <!-- Subtle Footer: Instant saved indicator & Settings Link -->
+                            <div class="pt-2.5 mt-1 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[10.5px]">
+                                <span id="cora-notif-autosave-status" class="text-zinc-400 font-mono">Auto-saved to workspace</span>
+                                <button type="button" onclick="window.coraCloseNotifSettings(); if(window.coraOpenWorkspaceSettings) window.coraOpenWorkspaceSettings('notifications');" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 underline font-medium cursor-pointer">
+                                    More settings &rarr;
+                                </button>
                             </div>
                         </div>
 
@@ -6089,10 +6060,34 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             window.coraSetNotifAdvance = function(mins, btn) {
                                 currentAdvanceMins = mins;
                                 document.querySelectorAll('#cora-notif-advance-group button').forEach(function(el) {
-                                    el.className = 'cora-advance-btn text-xs font-medium py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer';
+                                    el.className = 'cora-advance-btn text-[10.5px] font-medium px-2 py-1 rounded-md text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer';
                                 });
                                 if (btn) {
-                                    btn.className = 'cora-advance-btn active text-xs font-semibold py-1.5 px-2 rounded-xl border border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-3xs transition-all cursor-pointer';
+                                    btn.className = 'cora-advance-btn active text-[10.5px] font-semibold px-2 py-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs transition-all cursor-pointer';
+                                }
+                                window.coraAutoSaveNotifPref();
+                            };
+
+                            window.coraAutoSaveNotifPref = function() {
+                                var emailCheck = document.getElementById('cora-pref-email-enabled');
+                                var statusEl = document.getElementById('cora-notif-autosave-status');
+
+                                var prefs = {
+                                    pushEnabled: ('Notification' in window) && Notification.permission === 'granted',
+                                    advanceMins: currentAdvanceMins,
+                                    morningDigest: true,
+                                    eveningDigest: true,
+                                    emailEnabled: emailCheck ? emailCheck.checked : true
+                                };
+
+                                saveNotifPrefs(prefs);
+                                if (statusEl) {
+                                    statusEl.textContent = 'Saved ✓';
+                                    statusEl.classList.add('text-emerald-500');
+                                    setTimeout(function() {
+                                        statusEl.textContent = 'Auto-saved to workspace';
+                                        statusEl.classList.remove('text-emerald-500');
+                                    }, 1800);
                                 }
                             };
 
@@ -6108,17 +6103,17 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 }
 
                                 if (Notification.permission === 'granted') {
-                                    permStatusEl.textContent = 'Active & granted (30m pre-task alarms enabled).';
-                                    toggleBtn.textContent = 'Enabled ✓';
-                                    toggleBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-700 cursor-default';
+                                    permStatusEl.textContent = 'Active (30m pre-task alarms enabled)';
+                                    toggleBtn.textContent = 'Active ✓';
+                                    toggleBtn.className = 'px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-300/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700 cursor-default';
                                 } else if (Notification.permission === 'denied') {
-                                    permStatusEl.textContent = 'Blocked by browser. Allow in browser settings.';
+                                    permStatusEl.textContent = 'Blocked by browser permissions.';
                                     toggleBtn.textContent = 'Blocked';
-                                    toggleBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 cursor-default';
+                                    toggleBtn.className = 'px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 cursor-default';
                                 } else {
-                                    permStatusEl.textContent = 'Tap to allow notifications on this device.';
+                                    permStatusEl.textContent = 'Tap to allow on this device.';
                                     toggleBtn.textContent = 'Enable';
-                                    toggleBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer shadow-3xs transition-all';
+                                    toggleBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer shadow-3xs transition-all';
                                 }
                             }
 
@@ -6127,6 +6122,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 if (Notification.permission === 'default') {
                                     Notification.requestPermission().then(function(perm) {
                                         updatePushStatusUI();
+                                        window.coraAutoSaveNotifPref();
                                         if (perm === 'granted' && window.coraShowToast) {
                                             window.coraShowToast('Notifications enabled! 30-minute alarms active.', 'success');
                                             // Register service worker push subscription if present
@@ -6141,27 +6137,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                         }
                                     });
                                 } else if (Notification.permission === 'granted') {
-                                    if (window.coraShowToast) window.coraShowToast('Notifications are already active on this device', 'info');
-                                }
-                            };
-
-                            window.coraSaveNotificationPrefs = function() {
-                                var morningCheck = document.getElementById('cora-pref-morning-digest');
-                                var eveningCheck = document.getElementById('cora-pref-evening-digest');
-                                var emailCheck = document.getElementById('cora-pref-email-enabled');
-
-                                var prefs = {
-                                    pushEnabled: ('Notification' in window) && Notification.permission === 'granted',
-                                    advanceMins: currentAdvanceMins,
-                                    morningDigest: morningCheck ? morningCheck.checked : true,
-                                    eveningDigest: eveningCheck ? eveningCheck.checked : true,
-                                    emailEnabled: emailCheck ? emailCheck.checked : true
-                                };
-
-                                saveNotifPrefs(prefs);
-                                window.coraCloseNotifSettings();
-                                if (window.coraShowToast) {
-                                    window.coraShowToast('Notification preferences saved', 'success');
+                                    if (window.coraShowToast) window.coraShowToast('Push alerts are already active on this device', 'info');
                                 }
                             };
 
