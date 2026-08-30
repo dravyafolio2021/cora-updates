@@ -6002,7 +6002,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     </div>
                                     <div class="flex items-center gap-1.5">
                                         <!-- Switch back to Voice button -->
-                                        <button type="button" onclick="window.coraSwitchDrawerMode('voice')" class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700 text-[11px] font-semibold transition-all cursor-pointer shadow-3xs" style="touch-action: manipulation;" title="Switch to Voice AI">
+                                        <button type="button" id="cora-drawer-voice-switch-btn" onclick="window.coraSwitchDrawerMode('voice')" class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700 text-[11px] font-semibold transition-all cursor-pointer shadow-3xs" style="touch-action: manipulation;" title="Switch to Voice AI">
                                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                                             <span>Voice Mode</span>
                                         </button>
@@ -6027,7 +6027,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     <div>
                                         <div class="flex items-center justify-between mb-1">
                                             <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400">TASK DESCRIPTION</label>
-                                            <span class="text-[10px] text-zinc-400">Editable &bull; correct any text</span>
+                                            <span class="text-[10px] text-zinc-400">Editable &bull; details &amp; milestones</span>
                                         </div>
                                         <input type="text" 
                                                id="cora-drawer-task-input" 
@@ -6072,10 +6072,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                         <div>
                                             <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 mb-1">TIME SLOT</label>
                                             <select id="cora-drawer-time-slot" class="w-full bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs py-2 px-2.5 text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                                                <option value="09:00 AM">09:00 AM (Early)</option>
                                                 <option value="10:00 AM">10:00 AM (Morning)</option>
                                                 <option value="11:30 AM" selected>11:30 AM (Midday)</option>
                                                 <option value="02:30 PM">02:30 PM (Afternoon)</option>
                                                 <option value="05:00 PM">05:00 PM (Evening)</option>
+                                                <option value="07:00 PM">07:00 PM (Night)</option>
                                                 <option value="Flexible">Flexible / Anytime</option>
                                             </select>
                                         </div>
@@ -6083,9 +6085,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                                     <!-- Action Buttons -->
                                     <div class="pt-2 flex items-center gap-2">
+                                        <button type="button" id="cora-drawer-delete-btn" onclick="window.coraDeleteEditingTask()" class="hidden py-3 px-3.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/60 transition-all cursor-pointer flex items-center justify-center shadow-3xs" title="Delete this task" style="touch-action: manipulation;">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        </button>
                                         <button type="button" onclick="window.coraSubmitDrawerTask()" class="flex-1 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white text-xs font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-3xs cursor-pointer select-none transition-all active:scale-[0.98]" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                            <span>Save Task</span>
+                                            <span id="cora-drawer-submit-btn-text">Save Task</span>
                                         </button>
                                     </div>
                                 </div>
@@ -6102,6 +6107,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                             var drawerSelectedPriority = 'high';
                             var drawerSelectedDay = 'today';
+                            var _editingTaskId = null;
 
                             var voiceRecognition = null;
                             var isVoiceListening = false;
@@ -6387,18 +6393,122 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             };
 
                             window.coraOpenTaskDrawer = function() {
+                                _editingTaskId = null;
                                 var overlay = document.getElementById('cora-task-drawer-overlay');
                                 var drawer = document.getElementById('cora-task-bottom-drawer');
                                 if (overlay && drawer) {
+                                    // Reset form controls
+                                    var formTitle = document.getElementById('cora-drawer-form-title');
+                                    if (formTitle) formTitle.textContent = 'Task Details & Schedule';
+                                    var submitBtnText = document.getElementById('cora-drawer-submit-btn-text');
+                                    if (submitBtnText) submitBtnText.textContent = 'Save Task';
+                                    var delBtn = document.getElementById('cora-drawer-delete-btn');
+                                    if (delBtn) delBtn.classList.add('hidden');
+                                    var voiceSwitchBtn = document.getElementById('cora-drawer-voice-switch-btn');
+                                    if (voiceSwitchBtn) voiceSwitchBtn.classList.remove('hidden');
+
+                                    var inp = document.getElementById('cora-drawer-task-input');
+                                    if (inp) inp.value = '';
+                                    var transcriptBanner = document.getElementById('cora-voice-transcript-banner');
+                                    if (transcriptBanner) transcriptBanner.classList.add('hidden');
+
+                                    // Reset priority & day
+                                    drawerSelectedPriority = 'high';
+                                    drawerSelectedDay = 'today';
+                                    var prioBtns = document.querySelectorAll('#cora-drawer-prio-group button');
+                                    if (prioBtns[1]) window.coraSetDrawerPriority('high', prioBtns[1]);
+                                    var dayBtns = document.querySelectorAll('#cora-drawer-day-group button');
+                                    if (dayBtns[0]) window.coraSetDrawerDay('today', dayBtns[0]);
+                                    var timeSel = document.getElementById('cora-drawer-time-slot');
+                                    if (timeSel) timeSel.value = '11:30 AM';
+
                                     overlay.classList.add('active');
                                     drawer.classList.add('active');
-                                    // Always default to Voice-First View
+                                    // Default to Voice-First View
                                     window.coraSwitchDrawerMode('voice');
                                     var statusTitle = document.getElementById('cora-voice-status-title');
                                     var statusSub = document.getElementById('cora-voice-status-sub');
                                     if (statusTitle) statusTitle.textContent = 'Tap to speak your task';
                                     if (statusSub) statusSub.textContent = 'e.g. “Schedule urgent token contract review for tomorrow 10 AM”';
                                 }
+                            };
+
+                            window.coraEditTask = function(taskId, e) {
+                                if (e && e.stopPropagation) e.stopPropagation();
+                                var tasks = getTasks();
+                                var task = tasks.find(function(t) { return t.id === taskId; });
+                                if (!task) return;
+
+                                _editingTaskId = taskId;
+
+                                var overlay = document.getElementById('cora-task-drawer-overlay');
+                                var drawer = document.getElementById('cora-task-bottom-drawer');
+                                if (!overlay || !drawer) return;
+
+                                // Set title and button text for edit mode
+                                var formTitle = document.getElementById('cora-drawer-form-title');
+                                if (formTitle) formTitle.textContent = 'Edit Task';
+                                var submitBtnText = document.getElementById('cora-drawer-submit-btn-text');
+                                if (submitBtnText) submitBtnText.textContent = 'Save Changes';
+                                var delBtn = document.getElementById('cora-drawer-delete-btn');
+                                if (delBtn) delBtn.classList.remove('hidden');
+                                var voiceSwitchBtn = document.getElementById('cora-drawer-voice-switch-btn');
+                                if (voiceSwitchBtn) voiceSwitchBtn.classList.add('hidden');
+
+                                // Populate inputs
+                                var inp = document.getElementById('cora-drawer-task-input');
+                                if (inp) inp.value = task.title || '';
+
+                                // Populate priority
+                                var prio = task.priority || 'normal';
+                                drawerSelectedPriority = prio;
+                                var prioBtns = document.querySelectorAll('#cora-drawer-prio-group button');
+                                if (prio === 'urgent' && prioBtns[0]) window.coraSetDrawerPriority('urgent', prioBtns[0]);
+                                else if (prio === 'high' && prioBtns[1]) window.coraSetDrawerPriority('high', prioBtns[1]);
+                                else if (prioBtns[2]) window.coraSetDrawerPriority('normal', prioBtns[2]);
+
+                                // Populate schedule day
+                                var day = (task.date === tomorrowStr) ? 'tomorrow' : 'today';
+                                drawerSelectedDay = day;
+                                var dayBtns = document.querySelectorAll('#cora-drawer-day-group button');
+                                if (day === 'tomorrow' && dayBtns[1]) window.coraSetDrawerDay('tomorrow', dayBtns[1]);
+                                else if (dayBtns[0]) window.coraSetDrawerDay('today', dayBtns[0]);
+
+                                // Populate time slot
+                                var timeSel = document.getElementById('cora-drawer-time-slot');
+                                if (timeSel) {
+                                    var targetTime = task.time || '11:30 AM';
+                                    var timeFound = false;
+                                    for (var i = 0; i < timeSel.options.length; i++) {
+                                        if (timeSel.options[i].value === targetTime) {
+                                            timeSel.selectedIndex = i;
+                                            timeFound = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!timeFound && targetTime) {
+                                        var opt = document.createElement('option');
+                                        opt.value = targetTime;
+                                        opt.textContent = targetTime;
+                                        opt.selected = true;
+                                        timeSel.appendChild(opt);
+                                    }
+                                }
+
+                                var transcriptBanner = document.getElementById('cora-voice-transcript-banner');
+                                if (transcriptBanner) transcriptBanner.classList.add('hidden');
+
+                                overlay.classList.add('active');
+                                drawer.classList.add('active');
+                                // Open directly in Form View
+                                window.coraSwitchDrawerMode('form');
+                            };
+
+                            window.coraDeleteEditingTask = function() {
+                                if (!_editingTaskId) return;
+                                var taskId = _editingTaskId;
+                                window.coraCloseTaskDrawer();
+                                window.coraRemoveTask(taskId);
                             };
 
                             window.coraCloseTaskDrawer = function() {
@@ -6626,24 +6736,47 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 var targetDate = drawerSelectedDay === 'tomorrow' ? tomorrowStr : todayStr;
 
                                 var tasks = getTasks();
-                                var newTask = {
-                                    id: 'tsk_' + Date.now(),
-                                    title: inp.value.trim(),
-                                    priority: drawerSelectedPriority,
-                                    time: timeVal,
-                                    date: targetDate,
-                                    status: 'todo'
-                                };
-                                tasks.unshift(newTask);
-                                inp.value = '';
-                                
-                                var transcriptBanner = document.getElementById('cora-voice-transcript-banner');
-                                if (transcriptBanner) transcriptBanner.classList.add('hidden');
 
-                                window.coraCloseTaskDrawer();
-                                saveTasks(tasks);
-                                if (window.coraShowToast) {
-                                    window.coraShowToast('Task created: ' + newTask.title, 'success');
+                                if (_editingTaskId) {
+                                    var taskIdx = tasks.findIndex(function(t) { return t.id === _editingTaskId; });
+                                    if (taskIdx !== -1) {
+                                        tasks[taskIdx].title = inp.value.trim();
+                                        tasks[taskIdx].priority = drawerSelectedPriority;
+                                        tasks[taskIdx].time = timeVal;
+                                        tasks[taskIdx].date = targetDate;
+                                    }
+                                    var updatedTitle = inp.value.trim();
+                                    _editingTaskId = null;
+                                    inp.value = '';
+                                    
+                                    var transcriptBanner = document.getElementById('cora-voice-transcript-banner');
+                                    if (transcriptBanner) transcriptBanner.classList.add('hidden');
+
+                                    window.coraCloseTaskDrawer();
+                                    saveTasks(tasks);
+                                    if (window.coraShowToast) {
+                                        window.coraShowToast('Task updated: ' + updatedTitle, 'success');
+                                    }
+                                } else {
+                                    var newTask = {
+                                        id: 'tsk_' + Date.now(),
+                                        title: inp.value.trim(),
+                                        priority: drawerSelectedPriority,
+                                        time: timeVal,
+                                        date: targetDate,
+                                        status: 'todo'
+                                    };
+                                    tasks.unshift(newTask);
+                                    inp.value = '';
+                                    
+                                    var transcriptBanner = document.getElementById('cora-voice-transcript-banner');
+                                    if (transcriptBanner) transcriptBanner.classList.add('hidden');
+
+                                    window.coraCloseTaskDrawer();
+                                    saveTasks(tasks);
+                                    if (window.coraShowToast) {
+                                        window.coraShowToast('Task created: ' + newTask.title, 'success');
+                                    }
                                 }
                             };
 
@@ -6769,19 +6902,22 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     }
                                     html += '  </button>';
 
-                                    // Toast Message Wrapper (Header badge + Task title)
-                                    html += '  <div class="flex-1 min-w-0 pr-1">';
+                                    // Toast Message Wrapper (Header badge + Task title) — Clickable to edit task
+                                    html += '  <div onclick="window.coraEditTask(\'' + task.id + '\', event)" class="flex-1 min-w-0 pr-1 cursor-pointer select-none group/task-title" title="Click to edit task details" style="touch-action: manipulation;">';
                                     html += '    <div class="flex items-center gap-1.5 mb-0.5">';
                                     html += '      <span class="text-[10px] font-extrabold uppercase tracking-wider ' + badgeClass + '">' + badgeLabel + '</span>';
                                     html += '      <span class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 font-medium">&bull; ' + escapeHtml(task.time || (task.date === todayStr ? 'Today' : 'Tomorrow')) + '</span>';
                                     html += '    </div>';
-                                    html += '    <div class="cora-todo-text text-xs font-semibold text-zinc-900 dark:text-zinc-100 leading-snug truncate ' + (isDone ? 'line-through text-zinc-400 dark:text-zinc-500' : '') + '">';
+                                    html += '    <div class="cora-todo-text text-xs font-semibold text-zinc-900 dark:text-zinc-100 leading-snug truncate group-hover/task-title:text-zinc-600 dark:group-hover/task-title:text-zinc-300 transition-colors ' + (isDone ? 'line-through text-zinc-400 dark:text-zinc-500' : '') + '">';
                                     html += escapeHtml(task.title);
                                     html += '    </div>';
                                     html += '  </div>';
 
-                                    // Right Micro Actions (Postpone & Remove)
-                                    html += '  <div class="flex items-center gap-1 shrink-0">';
+                                    // Right Micro Actions (Edit, Postpone & Remove)
+                                    html += '  <div class="flex items-center gap-0.5 sm:gap-1 shrink-0">';
+                                    html += '    <button type="button" onclick="window.coraEditTask(\'' + task.id + '\', event)" class="p-1.5 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Edit task details, time, priority" style="touch-action: manipulation;">';
+                                    html += '      <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>';
+                                    html += '    </button>';
                                     if (!isDone) {
                                         html += '    <button type="button" onclick="window.coraPostponeTask(\'' + task.id + '\', event)" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Postpone to tomorrow" style="touch-action: manipulation;">';
                                         html += '      <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
