@@ -4542,7 +4542,7 @@ jQuery(document).ready(function($) {
     };
 
     window.coraShowPwaUpdateBanner = function(oldVer, newVer) {
-        const targetVer = newVer || (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.8.11';
+        const targetVer = newVer || (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.8.12';
         
         // Show floating pill
         const pill = document.getElementById('cora-pwa-update-pill');
@@ -4577,7 +4577,7 @@ jQuery(document).ready(function($) {
             btn.disabled = true;
         });
 
-        const currentVersion = (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.8.11';
+        const currentVersion = (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.8.12';
         try {
             localStorage.setItem('cora_pwa_installed_version', currentVersion);
         } catch(e) {}
@@ -4682,7 +4682,7 @@ jQuery(document).ready(function($) {
 
     // Auto-detect updates on launch, visibility change, and ServiceWorker events
     (function initPwaUpdateWatcher() {
-        const currentVersion = (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.8.11';
+        const currentVersion = (window.coraREData && window.coraREData.version) || (typeof coraREWPData !== 'undefined' ? coraREWPData.version : '') || '4.8.12';
         let installedVersion = null;
         try {
             installedVersion = localStorage.getItem('cora_pwa_installed_version');

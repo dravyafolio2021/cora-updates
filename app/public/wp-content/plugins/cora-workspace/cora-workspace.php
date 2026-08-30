@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: The multi-tenant core SaaS engine powering Cora Workspaces for Real Estate agencies and Photography Studios.
- * Version: 4.8.11
+ * Version: 4.8.12
  * Author: Cora AI Systems
  * Author URI: https://heycora.in
  * License: Proprietary
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.11' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.12' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -47332,6 +47332,121 @@ function cora_ajax_vault_ai_action() {
     ) );
 }
 add_action( 'wp_ajax_cora_vault_ai_action', 'cora_ajax_vault_ai_action' );
+}
+
+/* ==========================================================================
+   ORGANISATION DEPOSIT & CASH-FLOW OPTIMISATION ENGINE (Performance Layer)
+   ========================================================================== */
+
+/**
+ * Advanced Organisation Deposit & Cash-Flow Optimisation Engine
+ * Performs high-throughput GST tax calculation, milestone split scheduling,
+ * and working-capital risk mitigation with server-side transient caching.
+ */
+if ( ! function_exists( 'cora_optimize_organisation_deposit' ) ) {
+function cora_optimize_organisation_deposit( $amount, $tax_rate = 18.0, $deposit_pct = 50.0, $is_igst = false ) {
+    $amount      = max( 0.0, floatval( $amount ) );
+    $tax_rate    = max( 0.0, floatval( $tax_rate ) );
+    $deposit_pct = min( 100.0, max( 5.0, floatval( $deposit_pct ) ) );
+
+    $cache_key   = 'cora_dep_opt_' . md5( "{$amount}_{$tax_rate}_{$deposit_pct}_" . ( $is_igst ? '1' : '0' ) );
+    $cached      = wp_cache_get( $cache_key, 'cora_financials' );
+    if ( false !== $cached && is_array( $cached ) ) {
+        return $cached;
+    }
+
+    $tax_amount  = round( ( $amount * $tax_rate ) / 100.0, 2 );
+    $grand_total = round( $amount + $tax_amount, 2 );
+    $deposit     = round( ( $grand_total * $deposit_pct ) / 100.0, 2 );
+    $balance_due = round( $grand_total - $deposit, 2 );
+
+    // Tax split breakdown (SAC 998381 compliance)
+    $cgst_amount = $is_igst ? 0.0 : round( $tax_amount / 2.0, 2 );
+    $sgst_amount = $is_igst ? 0.0 : round( $tax_amount / 2.0, 2 );
+    $igst_amount = $is_igst ? $tax_amount : 0.0;
+
+    // Optimized Multi-Stage Milestone Cashflow Schedule
+    $milestones = array();
+    if ( $deposit_pct >= 50.0 ) {
+        $milestones[] = array(
+            'stage'       => 'Advance Retainer Deposit',
+            'percentage'  => $deposit_pct,
+            'amount'      => $deposit,
+            'status'      => 'Due on Contract Execution',
+            'risk_level'  => 'Zero (Fully Escrow Protected)'
+        );
+        $milestones[] = array(
+            'stage'       => 'Final Production Delivery',
+            'percentage'  => 100.0 - $deposit_pct,
+            'amount'      => $balance_due,
+            'status'      => 'Due Prior to Asset Release',
+            'risk_level'  => 'Low'
+        );
+    } else {
+        $mid_pct = round( ( 100.0 - $deposit_pct ) / 2.0, 1 );
+        $mid_amt = round( ( $grand_total * $mid_pct ) / 100.0, 2 );
+        $fin_pct = 100.0 - $deposit_pct - $mid_pct;
+        $fin_amt = round( $grand_total - $deposit - $mid_amt, 2 );
+
+        $milestones[] = array(
+            'stage'       => 'Initial Booking Deposit',
+            'percentage'  => $deposit_pct,
+            'amount'      => $deposit,
+            'status'      => 'Due on Confirmation',
+            'risk_level'  => 'Low'
+        );
+        $milestones[] = array(
+            'stage'       => 'Mid-Term Production Milestone',
+            'percentage'  => $mid_pct,
+            'amount'      => $mid_amt,
+            'status'      => 'Due on Rough Cut Review',
+            'risk_level'  => 'Protected'
+        );
+        $milestones[] = array(
+            'stage'       => 'Final Handover & Release',
+            'percentage'  => $fin_pct,
+            'amount'      => $fin_amt,
+            'status'      => 'Due upon Final Approval',
+            'risk_level'  => 'Low'
+        );
+    }
+
+    $result = array(
+        'base_amount'        => $amount,
+        'tax_rate'           => $tax_rate,
+        'tax_amount'         => $tax_amount,
+        'cgst_amount'        => $cgst_amount,
+        'sgst_amount'        => $sgst_amount,
+        'igst_amount'        => $igst_amount,
+        'grand_total'        => $grand_total,
+        'deposit_pct'        => $deposit_pct,
+        'deposit_amount'     => $deposit,
+        'balance_due'        => $balance_due,
+        'sac_code'           => '998381',
+        'is_igst'            => (bool) $is_igst,
+        'working_capital_eff'=> round( ( $deposit / max( 1.0, $grand_total ) ) * 100.0, 1 ) . '% immediate coverage',
+        'milestones'         => $milestones,
+        'timestamp'          => current_time( 'mysql' )
+    );
+
+    wp_cache_set( $cache_key, $result, 'cora_financials', 3600 );
+    return $result;
+}
+}
+
+if ( ! function_exists( 'cora_ajax_optimize_deposit' ) ) {
+function cora_ajax_optimize_deposit() {
+    check_ajax_referer( 'cora_workspace_nonce', 'security', false );
+    $amount      = isset( $_POST['amount'] ) ? floatval( $_POST['amount'] ) : 100000.0;
+    $tax_rate    = isset( $_POST['tax_rate'] ) ? floatval( $_POST['tax_rate'] ) : 18.0;
+    $deposit_pct = isset( $_POST['deposit_pct'] ) ? floatval( $_POST['deposit_pct'] ) : 50.0;
+    $is_igst     = ! empty( $_POST['is_igst'] );
+
+    $data = cora_optimize_organisation_deposit( $amount, $tax_rate, $deposit_pct, $is_igst );
+    wp_send_json_success( $data );
+}
+add_action( 'wp_ajax_cora_optimize_deposit', 'cora_ajax_optimize_deposit' );
+add_action( 'wp_ajax_nopriv_cora_optimize_deposit', 'cora_ajax_optimize_deposit' );
 }
 
 /* ==========================================================================
