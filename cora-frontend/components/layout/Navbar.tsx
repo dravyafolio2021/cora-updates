@@ -4,26 +4,26 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { 
-  ChevronDown, 
+import {
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ArrowRight, 
-  Sparkles, 
-  ShieldCheck, 
-  Receipt, 
-  Send, 
-  FileText, 
-  HardDrive, 
-  Cpu, 
-  Camera, 
-  Building2, 
-  Film, 
-  User, 
-  Layers, 
-  Menu, 
-  X, 
-  Zap, 
+  ArrowRight,
+  Sparkles,
+  ShieldCheck,
+  Receipt,
+  Send,
+  FileText,
+  HardDrive,
+  Cpu,
+  Camera,
+  Building2,
+  Film,
+  User,
+  Layers,
+  Menu,
+  X,
+  Zap,
   ExternalLink,
   MessageSquare,
   Bot,
@@ -37,7 +37,9 @@ import {
   Users2,
   Calendar,
   Code,
-  BarChart2
+  BarChart2,
+  Briefcase,
+  Scale
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 import { MODULE_GLYPH_MAP } from '@/components/features/ModuleAppGlyphs';
@@ -136,7 +138,7 @@ export function Navbar() {
         className="w-full fixed top-0 left-0 right-0 z-50 px-2 sm:px-4 md:px-6 transition-all duration-300"
         onMouseLeave={handleMouseLeave}
       >
-        <div 
+        <div
           className={`w-full max-w-[1240px] mx-auto px-5 sm:px-8 py-3 transition-all duration-300 ${
             hasSolidBg
               ? 'bg-white/95 backdrop-blur-md rounded-b-[24px] sm:rounded-b-[28px] border-b border-x border-zinc-200/90 shadow-[0_12px_36px_rgba(0,0,0,0.07)]'
@@ -144,7 +146,7 @@ export function Navbar() {
           }`}
         >
           <div className="flex items-center justify-between gap-4">
-            
+
             {/* ── Brand Logo & Main Nav Items Group ── */}
             <div className="flex items-center gap-7 lg:gap-9">
               <Link
@@ -157,7 +159,7 @@ export function Navbar() {
 
               {/* ── Desktop Navigation: Features, Industries, Resources, Pricing, Company ── */}
               <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold text-zinc-800 font-sans">
-                
+
                 {/* 1. Features Dropdown */}
                 <div
                   className="relative py-1.5"
@@ -306,7 +308,7 @@ export function Navbar() {
 
             {/* ── Right Actions: AI AGENT USP Trigger + Primary CTA + Minimal Mobile Menu ── */}
             <div className="flex items-center gap-2 sm:gap-3">
-              
+
               {/* AI AGENT Direct Funnel Link (Core USP - Hidden on Mobile) */}
               <Link
                 href="/ai-agent"
@@ -360,12 +362,12 @@ export function Navbar() {
               onMouseLeave={handleMouseLeave}
             >
               <div className="w-full max-w-[1240px] mx-auto rounded-[28px] bg-white border border-zinc-200/90 shadow-[0px_25px_70px_rgba(0,0,0,0.12)] p-8 sm:p-10 animate-in fade-in slide-in-from-top-3 duration-200">
-                
+
                 {/* ── DROPDOWN: FEATURES (20 BUILT MODULES ACROSS 4 EQUAL PILLARS) ── */}
                 {activeDropdown === 'features' && (
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
-                      
+
                       {/* 1. INTELLIGENCE & AI */}
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between pb-2 mb-1 border-b border-zinc-100">
@@ -789,128 +791,194 @@ export function Navbar() {
                   </div>
                 )}
 
-                {/* ── DROPDOWN: INDUSTRIES (5 HIGH-CONVICTION CREATIVE VERTICALS) ── */}
+                {/* ── DROPDOWN: INDUSTRIES (8 CORE PROFESSIONAL SERVICE BUSINESS TYPES) ── */}
                 {activeDropdown === 'industries' && (
                   <div className="grid grid-cols-12 gap-8 items-stretch">
-                    
-                    {/* Left 8 Cols: 5 Focused Vertical Cards */}
-                    <div className="col-span-8 space-y-4">
-                      <div className="flex items-center justify-between">
+
+                    {/* Left 8 Cols: 8 Focused Professional Service Workspaces */}
+                    <div className="col-span-8 space-y-3">
+                      <div className="flex items-center justify-between pb-1 border-b border-zinc-100">
                         <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                          TARGET PRODUCTION WORKSPACES
+                          TARGET PROFESSIONAL SERVICE BUSINESSES
                         </span>
-                        <span className="text-[10px] font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/80">
-                          PRE-SEEDED SCHEMAS
+                        <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/80">
+                          8 PRE-SEEDED SCHEMAS
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
-                        
-                        {/* 1. Commercial Studios */}
+                      <div className="grid grid-cols-2 gap-2.5">
+
+                        {/* 1. Photography & Film Studios */}
                         <Link
                           href="/use-cases#commercial-studios"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-3 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
+                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
                         >
-                          <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 border border-orange-200/60 group-hover:scale-105 transition-transform">
+                          <div className="w-8 h-8 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 border border-orange-200/60 group-hover:scale-105 transition-transform">
                             <Camera className="w-4 h-4" />
                           </div>
                           <div>
-                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Commercial Photo &amp; Film</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">4K RAW vaults, gear inventory &amp; model releases</div>
+                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Photography &amp; Film Studios</div>
+                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Shoots, 4K RAW vaults, crew call sheets &amp; client proofing</div>
                           </div>
                         </Link>
 
-                        {/* 2. Real Estate */}
-                        <Link
-                          href="/use-cases#real-estate-media"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-3 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200/60 group-hover:scale-105 transition-transform">
-                            <Building2 className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Real Estate &amp; Brokerages</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Property catalog, shoot tours &amp; MLS AI copy</div>
-                          </div>
-                        </Link>
-
-                        {/* 3. Wedding & Events */}
-                        <Link
-                          href="/use-cases#wedding-events"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-3 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-200/60 group-hover:scale-105 transition-transform">
-                            <Sparkles className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Wedding &amp; Event Production</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Multi-day call sheets, crew dispatch &amp; GST</div>
-                          </div>
-                        </Link>
-
-                        {/* 4. Interior Design */}
-                        <Link
-                          href="/use-cases#interior-design"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-3 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-200/60 group-hover:scale-105 transition-transform">
-                            <LayoutTemplate className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Interior &amp; Architecture</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Milestone sign-offs &amp; visual asset registries</div>
-                          </div>
-                        </Link>
-
-                        {/* 5. Creative Agencies (Span 2) */}
+                        {/* 2. Creative & Marketing Agencies */}
                         <Link
                           href="/use-cases#creative-agencies"
                           onClick={() => setActiveDropdown(null)}
-                          className="col-span-2 flex items-start gap-3 p-3 rounded-2xl bg-zinc-50/70 hover:bg-zinc-100/70 border border-zinc-200/60 transition-all group"
+                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
                         >
-                          <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60 group-hover:scale-105 transition-transform">
+                          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60 group-hover:scale-105 transition-transform">
                             <Cpu className="w-4 h-4" />
                           </div>
-                          <div className="flex-1 flex items-center justify-between">
-                            <div>
-                              <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Creative &amp; Growth Agencies</div>
-                              <div className="text-[11px] text-zinc-500 font-normal mt-0.5">Content AI studio, Kanban deal pipelines &amp; recurring retainer billing</div>
-                            </div>
-                            <span className="text-xs font-bold text-zinc-900 group-hover:translate-x-0.5 transition-transform shrink-0 pr-2">
-                              Explore →
-                            </span>
+                          <div>
+                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Creative &amp; Marketing Agencies</div>
+                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Monthly retainers, campaign sprints &amp; client review portals</div>
+                          </div>
+                        </Link>
+
+                        {/* 3. Real Estate Agencies & Media */}
+                        <Link
+                          href="/use-cases#real-estate-media"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 border border-sky-200/60 group-hover:scale-105 transition-transform">
+                            <Building2 className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Real Estate Agencies &amp; Media</div>
+                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Listings catalog, property shoots, tours &amp; MLS AI copy</div>
+                          </div>
+                        </Link>
+
+                        {/* 4. Architecture & Design Studios */}
+                        <Link
+                          href="/use-cases#interior-design"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-200/60 group-hover:scale-105 transition-transform">
+                            <LayoutTemplate className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Architecture &amp; Design Studios</div>
+                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Milestone sign-offs, 3D render vaults &amp; stage billing</div>
+                          </div>
+                        </Link>
+
+                        {/* 5. Consulting & Advisory Firms */}
+                        <Link
+                          href="/use-cases#creative-agencies"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200/60 group-hover:scale-105 transition-transform">
+                            <Briefcase className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Consulting &amp; Advisory Firms</div>
+                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Diagnostic scopes, fixed-fee advisory &amp; executive retainers</div>
+                          </div>
+                        </Link>
+
+                        {/* 6. Legal & Law Practices */}
+                        <Link
+                          href="/use-cases#commercial-studios"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-200/60 group-hover:scale-105 transition-transform">
+                            <Scale className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Legal &amp; Law Practices</div>
+                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">SHA-256 e-signs, client retainers &amp; IT Act compliance</div>
+                          </div>
+                        </Link>
+
+                        {/* 7. Finance & Accounting Firms */}
+                        <Link
+                          href="/use-cases#creative-agencies"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60 group-hover:scale-105 transition-transform">
+                            <Receipt className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Finance &amp; Accounting Firms</div>
+                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Tax filing compliance, 18% GST audit vaults &amp; retainers</div>
+                          </div>
+                        </Link>
+
+                        {/* 8. Stage & Equipment Rentals */}
+                        <Link
+                          href="/use-cases#interior-design"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-200/60 group-hover:scale-105 transition-transform">
+                            <Film className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-zinc-950 group-hover:text-black">Stage &amp; Equipment Rentals</div>
+                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Hourly floor bookings, serialized gear checkouts &amp; deposits</div>
                           </div>
                         </Link>
 
                       </div>
                     </div>
 
-                    {/* Right 4 Cols: Industry Benchmark Highlight Card */}
-                    <div className="col-span-4">
-                      <div className="h-full rounded-2xl bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0A0D12] text-white p-6 relative overflow-hidden flex flex-col justify-between border border-zinc-800 shadow-lg">
-                        <div className="space-y-2">
-                          <span className="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider block">
-                            TAILORED INDUSTRY SCHEMAS
+                    {/* Right 4 Cols: Built For Every Scale Spotlight Card */}
+                    <div className="col-span-4 flex flex-col justify-between rounded-2xl bg-zinc-950 text-white p-5 border border-zinc-800 shadow-md">
+                      <div>
+                        <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80 mb-3">
+                          <span className="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider">
+                            BUILT FOR EVERY SCALE
                           </span>
-                          <h4 className="font-display text-sm font-bold text-white leading-snug">
-                            Every workspace automatically seeds industry-specific contract templates, rate cards, and HSN tax codes.
-                          </h4>
+                          <span className="text-[9px] font-mono font-bold text-zinc-400 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded">
+                            SOLO TO ENTERPRISE
+                          </span>
                         </div>
 
-                        <div className="pt-4 border-t border-zinc-800/80">
-                          <Link
-                            href="/use-cases"
-                            onClick={() => setActiveDropdown(null)}
-                            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors"
-                          >
-                            <span>Compare all industry workflows</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </Link>
+                        <div className="space-y-2 text-xs">
+                          <div className="p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-800/60 flex items-start gap-2.5">
+                            <span className="text-emerald-400 font-mono font-bold text-[11px] shrink-0 mt-0.5">01</span>
+                            <div>
+                              <span className="font-bold text-white block">Solo Practice (1 Person)</span>
+                              <span className="text-[11px] text-zinc-400 font-normal leading-snug">Zero-admin setup, 1-click contracts &amp; instant 18% GST invoices.</span>
+                            </div>
+                          </div>
+
+                          <div className="p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-800/60 flex items-start gap-2.5">
+                            <span className="text-sky-400 font-mono font-bold text-[11px] shrink-0 mt-0.5">02</span>
+                            <div>
+                              <span className="font-bold text-white block">Boutique Studio (2–10 Team)</span>
+                              <span className="text-[11px] text-zinc-400 font-normal leading-snug">Crew &amp; team dispatch, shared asset vaults &amp; milestone billing.</span>
+                            </div>
+                          </div>
+
+                          <div className="p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-800/60 flex items-start gap-2.5">
+                            <span className="text-purple-400 font-mono font-bold text-[11px] shrink-0 mt-0.5">03</span>
+                            <div>
+                              <span className="font-bold text-white block">Enterprise Firm (10+ Team)</span>
+                              <span className="text-[11px] text-zinc-400 font-normal leading-snug">Multi-tenant RBAC, client review portals &amp; multi-branch audit logs.</span>
+                            </div>
+                          </div>
                         </div>
+                      </div>
+
+                      <div className="pt-3 border-t border-zinc-800/80 mt-3 flex items-center justify-between">
+                        <Link
+                          href="/use-cases"
+                          onClick={() => setActiveDropdown(null)}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors group/link"
+                        >
+                          <span>Explore all industry schemas</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 transition-transform" />
+                        </Link>
                       </div>
                     </div>
 
@@ -920,7 +988,7 @@ export function Navbar() {
                 {/* ── DROPDOWN: RESOURCES (3 ARTISTIC VISUAL CARDS: FREE TOOLS, GUIDES, ARTICLES/COMPARE) ── */}
                 {activeDropdown === 'resources' && (
                   <div className="grid grid-cols-3 gap-6 items-stretch">
-                    
+
                     {/* Card 1: Free Public Tools (Solid Soft Lavender / Periwinkle) */}
                     <Link
                       href="/tools"
@@ -1034,7 +1102,7 @@ export function Navbar() {
         ══════════════════════════════════════════════════════════════════ */}
         {mobileMenuOpen && (
           <div className="lg:hidden fixed inset-0 bg-white z-[999] flex flex-col justify-between p-6 sm:p-8 animate-in fade-in duration-150">
-            
+
             {/* 1. Header Bar */}
             <div className="flex items-center justify-between pb-6 border-b border-zinc-100 shrink-0">
               {activeMobileSubmenu ? (
@@ -1072,7 +1140,7 @@ export function Navbar() {
 
             {/* 2. Middle Content (Scrollable if necessary) */}
             <div className="flex-1 overflow-y-auto py-4">
-              
+
               {/* Level 1: Main Category List (Matching Desktop Header Order) */}
               {!activeMobileSubmenu && (
                 <div className="space-y-1 text-base font-semibold text-zinc-900">
@@ -1155,7 +1223,7 @@ export function Navbar() {
               {/* Level 2 Submenu: Features (4 Balanced Pillars) */}
               {activeMobileSubmenu === 'features' && (
                 <div className="space-y-5 animate-in fade-in slide-in-from-right-3 duration-150">
-                  
+
                   {/* Pillar 1: Intelligence & AI */}
                   <div className="space-y-1">
                     <div className="flex items-center justify-between pb-1 mb-1 border-b border-zinc-100">
@@ -1277,35 +1345,47 @@ export function Navbar() {
                 </div>
               )}
 
-              {/* Level 2 Submenu: Industries (5 Focused Creative Verticals) */}
+              {/* Level 2 Submenu: Industries (8 Core Professional Service Business Types) */}
               {activeMobileSubmenu === 'industries' && (
                 <div className="space-y-3 animate-in fade-in slide-in-from-right-3 duration-150">
                   <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
-                    TARGET PRODUCTION WORKSPACES
+                    PROFESSIONAL SERVICE WORKSPACES
                   </span>
                   <Link href="/use-cases#commercial-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-200/60"><Camera className="w-4 h-4" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">Commercial Photo &amp; Film</div><div className="text-xs text-zinc-500">4K RAW vaults, gear inventory &amp; releases</div></div>
-                  </Link>
-                  <Link href="/use-cases#real-estate-media" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200/60"><Building2 className="w-4 h-4" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">Real Estate &amp; Brokerages</div><div className="text-xs text-zinc-500">Property listings &amp; MLS AI copy</div></div>
+                    <div className="w-8 h-8 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 border border-orange-200/60"><Camera className="w-4 h-4" /></div>
+                    <div><div className="text-xs font-bold text-zinc-950">Photography &amp; Film Studios</div><div className="text-[11px] text-zinc-500">Shoots, 4K RAW vaults, crew call sheets &amp; proofing</div></div>
                   </Link>
                   <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/60"><Cpu className="w-4 h-4" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">Creative Retainers &amp; Agencies</div><div className="text-xs text-zinc-500">Monthly retainers &amp; review portals</div></div>
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60"><Cpu className="w-4 h-4" /></div>
+                    <div><div className="text-xs font-bold text-zinc-950">Creative &amp; Marketing Agencies</div><div className="text-[11px] text-zinc-500">Monthly retainers, campaign sprints &amp; review portals</div></div>
                   </Link>
-                  <Link href="/use-cases#wedding-events" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-200/60"><Sparkles className="w-4 h-4" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">Wedding &amp; Event Cinema</div><div className="text-xs text-zinc-500">Multi-day call sheets &amp; advance GST</div></div>
+                  <Link href="/use-cases#real-estate-media" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 border border-sky-200/60"><Building2 className="w-4 h-4" /></div>
+                    <div><div className="text-xs font-bold text-zinc-950">Real Estate Agencies &amp; Media</div><div className="text-[11px] text-zinc-500">Listings catalog, property shoots &amp; MLS AI copy</div></div>
                   </Link>
                   <Link href="/use-cases#interior-design" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200/60"><LayoutTemplate className="w-4 h-4" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">Studio Stage &amp; Gear Rentals</div><div className="text-xs text-zinc-500">Floor scheduling &amp; serialized checkouts</div></div>
+                    <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-200/60"><LayoutTemplate className="w-4 h-4" /></div>
+                    <div><div className="text-xs font-bold text-zinc-950">Architecture &amp; Design Studios</div><div className="text-[11px] text-zinc-500">Milestone sign-offs, 3D render vaults &amp; stage billing</div></div>
+                  </Link>
+                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200/60"><Briefcase className="w-4 h-4" /></div>
+                    <div><div className="text-xs font-bold text-zinc-950">Consulting &amp; Advisory Firms</div><div className="text-[11px] text-zinc-500">Diagnostic scopes, fixed fees &amp; executive retainers</div></div>
+                  </Link>
+                  <Link href="/use-cases#commercial-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-200/60"><Scale className="w-4 h-4" /></div>
+                    <div><div className="text-xs font-bold text-zinc-950">Legal &amp; Law Practices</div><div className="text-[11px] text-zinc-500">SHA-256 e-signs, client retainers &amp; IT Act compliance</div></div>
+                  </Link>
+                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60"><Receipt className="w-4 h-4" /></div>
+                    <div><div className="text-xs font-bold text-zinc-950">Finance &amp; Accounting Firms</div><div className="text-[11px] text-zinc-500">Tax compliance, 18% GST audit vaults &amp; retainers</div></div>
+                  </Link>
+                  <Link href="/use-cases#interior-design" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-200/60"><Film className="w-4 h-4" /></div>
+                    <div><div className="text-xs font-bold text-zinc-950">Stage &amp; Equipment Rentals</div><div className="text-[11px] text-zinc-500">Hourly floor bookings, serialized gear loans &amp; deposits</div></div>
                   </Link>
                   <div className="pt-2">
                     <Link href="/use-cases" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-zinc-950 flex items-center gap-1.5 hover:text-zinc-600 transition-colors">
-                      <span>Explore all industry schemas</span>
+                      <span>Explore all 8 industry schemas</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
