@@ -2847,6 +2847,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
         }
 
+        /* Mobile Real-Time Tasks & Tomorrow Planner */
+        .cora-dashboard-mobile-tasks-flow {
+            display: none !important;
+        }
+
         /* Mobile vs Desktop Scoped Rules for Dashboard */
         @media (max-width: 767px) {
             .cora-dashboard-mockup-wrapper {
@@ -2870,6 +2875,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             .cora-dashboard-decision-grid {
                 display: none !important;
             }
+            .cora-dashboard-mobile-tasks-flow {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+                margin-top: 22px !important;
+                width: 100% !important;
+            }
             #cora-quick-actions-bar {
                 margin-top: 0px !important;
                 margin-bottom: 0px !important;
@@ -2890,6 +2902,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
             .cora-dashboard-decision-grid {
                 display: grid !important;
+            }
+            .cora-dashboard-mobile-tasks-flow {
+                display: none !important;
             }
             #cora-quick-actions-bar {
                 margin-top: 0px !important;
@@ -5516,6 +5531,151 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 </button>
                             </div>
                         </div>
+
+                        <!-- 5. Mobile Real-Time Task & Upcoming Workflow Planner (Cards in a Column) -->
+                        <div class="cora-dashboard-mobile-tasks-flow w-full select-none">
+                            
+                            <!-- Section Title Header -->
+                            <div class="flex items-center justify-between px-1 pt-2">
+                                <div class="flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                    <span>Today's Real-Time Flow</span>
+                                </div>
+                                <span class="text-[10px] font-mono font-medium text-zinc-500 dark:text-zinc-400 bg-white/80 dark:bg-zinc-800/80 border border-zinc-200/60 dark:border-zinc-700/60 px-2 py-0.5 rounded-full">
+                                    <?php echo date('D, M j'); ?>
+                                </span>
+                            </div>
+
+                            <!-- CARD 1: Real-time Task / Upcoming Workflow Today -->
+                            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-4 shadow-3xs flex flex-col gap-2.5 transition-all text-left">
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                                        <span>Next Up &bull; 11:30 AM</span>
+                                    </div>
+                                    <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 font-semibold">
+                                        Active Flow
+                                    </span>
+                                </div>
+                                
+                                <div>
+                                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-1">
+                                        <?php if ( $is_studio ) : ?>
+                                            Studio Commercial Shoot &amp; Lighting Setup
+                                        <?php else : ?>
+                                            Inbound Lead Follow-up: DLF Cybercity Phase II
+                                        <?php endif; ?>
+                                    </h3>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                        <?php if ( $is_studio ) : ?>
+                                            AI Agent drafted client shotlist &amp; equipment gear checklist. Crew confirmed.
+                                        <?php else : ?>
+                                            AI Agent prepared property dossier &amp; dispatched WhatsApp invitation to buyer prospect.
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800/80">
+                                    <button type="button" onclick="coraNavigateTo('<?php echo $is_studio ? 'bookings' : 'leads'; ?>')" class="flex-1 bg-zinc-900 hover:bg-zinc-950 text-white text-xs font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer select-none transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                        <span>Start Workflow</span>
+                                    </button>
+                                    <button type="button" onclick="coraNavigateTo('ai-assistants')" class="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 border border-zinc-200 dark:border-zinc-700 cursor-pointer select-none transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <span>AI Summary</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- CARD 2: Immediate Action & Approvals -->
+                            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-4 shadow-3xs flex flex-col gap-2.5 transition-all text-left">
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block"></span>
+                                        <span>Action Required &bull; Today</span>
+                                    </div>
+                                    <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200/60 font-semibold">
+                                        E-Sign Pending
+                                    </span>
+                                </div>
+                                
+                                <div>
+                                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-1">
+                                        <?php if ( $is_studio ) : ?>
+                                            50% Retainer Invoice &amp; Model Release Form
+                                        <?php else : ?>
+                                            Token Agreement &amp; GST Tax Invoice
+                                        <?php endif; ?>
+                                    </h3>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-relaxed">
+                                        Digital agreement link active. Client verified phone number via OTP; awaiting final signature.
+                                    </p>
+                                </div>
+
+                                <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-2.5 flex items-center justify-between text-xs font-mono">
+                                    <span class="text-zinc-500">Security Vault</span>
+                                    <span class="font-bold text-zinc-900 dark:text-zinc-100">1 / 2 Signatures Completed</span>
+                                </div>
+
+                                <div class="flex items-center gap-2 pt-1">
+                                    <button type="button" onclick="coraNavigateTo('documents')" class="w-full bg-white dark:bg-zinc-800 hover:bg-zinc-50 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 text-xs font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer select-none transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        <span>Open Vault &amp; Sign</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- CARD 3: Tomorrow's Agenda & AI Planning Ahead -->
+                            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 p-4 shadow-3xs flex flex-col gap-2.5 transition-all text-left">
+                                <div class="flex items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                        <span>Plan Ahead &bull; Tomorrow (<?php echo date('D, M j', strtotime('+1 day')); ?>)</span>
+                                    </div>
+                                    <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 font-semibold">
+                                        3 Scheduled
+                                    </span>
+                                </div>
+                                
+                                <div>
+                                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-2">
+                                        Tomorrow's Action Plan
+                                    </h3>
+                                    
+                                    <!-- Micro Agenda Timeline -->
+                                    <div class="space-y-2 text-xs">
+                                        <div class="flex items-start gap-2 bg-zinc-50 dark:bg-zinc-800/40 p-2 rounded-lg border border-zinc-100 dark:border-zinc-800">
+                                            <span class="text-[10px] font-mono font-semibold text-zinc-400 shrink-0 mt-0.5">10:00 AM</span>
+                                            <span class="text-zinc-700 dark:text-zinc-300 font-medium">
+                                                <?php echo $is_studio ? 'Gear Check & Location Scout: Emerald Studio' : 'Site Showing at Emerald Heights (3 Confirmed)'; ?>
+                                            </span>
+                                        </div>
+                                        <div class="flex items-start gap-2 bg-zinc-50 dark:bg-zinc-800/40 p-2 rounded-lg border border-zinc-100 dark:border-zinc-800">
+                                            <span class="text-[10px] font-mono font-semibold text-zinc-400 shrink-0 mt-0.5">02:30 PM</span>
+                                            <span class="text-zinc-700 dark:text-zinc-300 font-medium">
+                                                Automated WhatsApp Follow-up for 4 High-Intent Prospects
+                                            </span>
+                                        </div>
+                                        <div class="flex items-start gap-2 bg-zinc-50 dark:bg-zinc-800/40 p-2 rounded-lg border border-zinc-100 dark:border-zinc-800">
+                                            <span class="text-[10px] font-mono font-semibold text-zinc-400 shrink-0 mt-0.5">05:00 PM</span>
+                                            <span class="text-zinc-700 dark:text-zinc-300 font-medium">
+                                                End-of-Day Revenue Settlement &amp; GST Ledger Export
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
+                                    <button type="button" onclick="coraNavigateTo('bookings')" class="flex-1 bg-zinc-900 hover:bg-zinc-950 text-white text-xs font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-3xs cursor-pointer select-none transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        <span>Add Task</span>
+                                    </button>
+                                    <button type="button" onclick="window.coraShowToast('AI Morning Briefing scheduled for tomorrow 8:00 AM.', 'success')" class="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 border border-zinc-200 dark:border-zinc-700 cursor-pointer select-none transition-all" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <span>Auto-Briefing</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div> <!-- .cora-dashboard-mobile-tasks-flow -->
 
                     </div> <!-- .cora-dashboard-hero-card -->
 
