@@ -6085,16 +6085,19 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                         </div>
 
                                         <div>
-                                            <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 mb-1">TIME SLOT</label>
-                                            <select id="cora-drawer-time-slot" class="w-full bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs py-2 px-2.5 text-zinc-900 dark:text-zinc-100 focus:outline-none">
-                                                <option value="09:00 AM">09:00 AM (Early)</option>
-                                                <option value="10:00 AM">10:00 AM (Morning)</option>
-                                                <option value="11:30 AM" selected>11:30 AM (Midday)</option>
-                                                <option value="02:30 PM">02:30 PM (Afternoon)</option>
-                                                <option value="05:00 PM">05:00 PM (Evening)</option>
-                                                <option value="07:00 PM">07:00 PM (Night)</option>
-                                                <option value="Flexible">Flexible / Anytime</option>
-                                            </select>
+                                            <div class="flex items-center justify-between mb-1">
+                                                <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400">TIME OF DAY</label>
+                                                <button type="button" id="cora-drawer-flexible-btn" onclick="window.coraToggleFlexibleTime(this)" class="text-[10px] font-mono font-medium text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors cursor-pointer" title="Set as Flexible (Anytime)">
+                                                    Flexible
+                                                </button>
+                                            </div>
+                                            <div class="relative flex items-center">
+                                                <input type="time" 
+                                                       id="cora-drawer-time-slot" 
+                                                       value="11:30" 
+                                                       step="60"
+                                                       class="w-full bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs py-2 px-3 text-zinc-900 dark:text-zinc-100 font-mono font-semibold focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-400 cursor-pointer" />
+                                            </div>
                                         </div>
                                     </div>
 
@@ -6386,6 +6389,57 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             // Run alarm check every 30 seconds
                             setInterval(checkTaskScheduleAlarms, 30000);
 
+                            window.coraFormatTime12h = function(time24) {
+                                if (!time24 || time24 === 'Flexible') return 'Flexible';
+                                var parts = ('' + time24).trim().split(':');
+                                if (parts.length < 2) return time24;
+                                var h = parseInt(parts[0], 10);
+                                var m = parts[1].substring(0, 2);
+                                if (isNaN(h)) return time24;
+                                var ampm = h >= 12 ? 'PM' : 'AM';
+                                var h12 = h % 12;
+                                if (h12 === 0) h12 = 12;
+                                var hStr = h12 < 10 ? '0' + h12 : '' + h12;
+                                return hStr + ':' + m + ' ' + ampm;
+                            };
+
+                            window.coraParseTimeTo24h = function(time12) {
+                                if (!time12 || time12 === 'Flexible') return '11:30';
+                                var match = ('' + time12).match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+                                if (!match) return '11:30';
+                                var h = parseInt(match[1], 10);
+                                var m = match[2];
+                                var ampm = match[3] ? match[3].toUpperCase() : null;
+                                if (ampm === 'PM' && h < 12) h += 12;
+                                if (ampm === 'AM' && h === 12) h = 0;
+                                var hStr = h < 10 ? '0' + h : '' + h;
+                                return hStr + ':' + m;
+                            };
+
+                            window.coraToggleFlexibleTime = function(btn) {
+                                var timeInput = document.getElementById('cora-drawer-time-slot');
+                                var flexBtn = btn || document.getElementById('cora-drawer-flexible-btn');
+                                if (!timeInput) return;
+                                var isFlex = timeInput.dataset.isFlexible === 'true';
+                                if (isFlex) {
+                                    timeInput.dataset.isFlexible = 'false';
+                                    timeInput.disabled = false;
+                                    timeInput.classList.remove('opacity-40');
+                                    if (flexBtn) {
+                                        flexBtn.classList.remove('text-zinc-900', 'dark:text-zinc-100', 'font-bold', 'underline');
+                                        flexBtn.classList.add('text-zinc-400');
+                                    }
+                                } else {
+                                    timeInput.dataset.isFlexible = 'true';
+                                    timeInput.disabled = true;
+                                    timeInput.classList.add('opacity-40');
+                                    if (flexBtn) {
+                                        flexBtn.classList.add('text-zinc-900', 'dark:text-zinc-100', 'font-bold', 'underline');
+                                        flexBtn.classList.remove('text-zinc-400');
+                                    }
+                                }
+                            };
+
                             window.coraSetDrawerPriority = function(prio, btn) {
                                 drawerSelectedPriority = prio;
                                 document.querySelectorAll('.cora-prio-btn').forEach(function(el) {
@@ -6475,8 +6529,20 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     if (prioBtns[1] && window.coraSetDrawerPriority) window.coraSetDrawerPriority('high', prioBtns[1]);
                                     var dayBtns = document.querySelectorAll('#cora-drawer-day-group button');
                                     if (dayBtns[0] && window.coraSetDrawerDay) window.coraSetDrawerDay('today', dayBtns[0]);
-                                    var timeSel = document.getElementById('cora-drawer-time-slot');
-                                    if (timeSel) timeSel.value = '11:30 AM';
+                                    
+                                    // Reset time picker to current/default time
+                                    var timeInput = document.getElementById('cora-drawer-time-slot');
+                                    if (timeInput) {
+                                        timeInput.value = '11:30';
+                                        timeInput.dataset.isFlexible = 'false';
+                                        timeInput.disabled = false;
+                                        timeInput.classList.remove('opacity-40');
+                                    }
+                                    var flexBtn = document.getElementById('cora-drawer-flexible-btn');
+                                    if (flexBtn) {
+                                        flexBtn.classList.remove('text-zinc-900', 'dark:text-zinc-100', 'font-bold', 'underline');
+                                        flexBtn.classList.add('text-zinc-400');
+                                    }
 
                                     // Default to Voice-First View
                                     window.coraSwitchDrawerMode('voice');
@@ -6531,23 +6597,27 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 else if (dayBtns[0]) window.coraSetDrawerDay('today', dayBtns[0]);
 
                                 // Populate time slot
-                                var timeSel = document.getElementById('cora-drawer-time-slot');
-                                if (timeSel) {
-                                    var targetTime = task.time || '11:30 AM';
-                                    var timeFound = false;
-                                    for (var i = 0; i < timeSel.options.length; i++) {
-                                        if (timeSel.options[i].value === targetTime) {
-                                            timeSel.selectedIndex = i;
-                                            timeFound = true;
-                                            break;
+                                var timeInput = document.getElementById('cora-drawer-time-slot');
+                                var flexBtn = document.getElementById('cora-drawer-flexible-btn');
+                                if (timeInput) {
+                                    if (task.time === 'Flexible' || task.time === 'flexible' || task.time === 'Anytime') {
+                                        timeInput.value = '11:30';
+                                        timeInput.dataset.isFlexible = 'true';
+                                        timeInput.disabled = true;
+                                        timeInput.classList.add('opacity-40');
+                                        if (flexBtn) {
+                                            flexBtn.classList.add('text-zinc-900', 'dark:text-zinc-100', 'font-bold', 'underline');
+                                            flexBtn.classList.remove('text-zinc-400');
                                         }
-                                    }
-                                    if (!timeFound && targetTime) {
-                                        var opt = document.createElement('option');
-                                        opt.value = targetTime;
-                                        opt.textContent = targetTime;
-                                        opt.selected = true;
-                                        timeSel.appendChild(opt);
+                                    } else {
+                                        timeInput.value = window.coraParseTimeTo24h(task.time || '11:30 AM');
+                                        timeInput.dataset.isFlexible = 'false';
+                                        timeInput.disabled = false;
+                                        timeInput.classList.remove('opacity-40');
+                                        if (flexBtn) {
+                                            flexBtn.classList.remove('text-zinc-900', 'dark:text-zinc-100', 'font-bold', 'underline');
+                                            flexBtn.classList.add('text-zinc-400');
+                                        }
                                     }
                                 }
 
@@ -6719,8 +6789,28 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     setTimeout(function() { inp.focus(); }, 150);
                                 }
 
-                                var timeSel = document.getElementById('cora-drawer-time-slot');
-                                if (timeSel) timeSel.value = timeSlot;
+                                var timeInput = document.getElementById('cora-drawer-time-slot');
+                                var flexBtn = document.getElementById('cora-drawer-flexible-btn');
+                                if (timeInput) {
+                                    if (timeSlot === 'Flexible' || timeSlot === 'flexible') {
+                                        timeInput.dataset.isFlexible = 'true';
+                                        timeInput.disabled = true;
+                                        timeInput.classList.add('opacity-40');
+                                        if (flexBtn) {
+                                            flexBtn.classList.add('text-zinc-900', 'dark:text-zinc-100', 'font-bold', 'underline');
+                                            flexBtn.classList.remove('text-zinc-400');
+                                        }
+                                    } else {
+                                        timeInput.dataset.isFlexible = 'false';
+                                        timeInput.disabled = false;
+                                        timeInput.classList.remove('opacity-40');
+                                        timeInput.value = window.coraParseTimeTo24h(timeSlot);
+                                        if (flexBtn) {
+                                            flexBtn.classList.remove('text-zinc-900', 'dark:text-zinc-100', 'font-bold', 'underline');
+                                            flexBtn.classList.add('text-zinc-400');
+                                        }
+                                    }
+                                }
 
                                 // Sync priority buttons
                                 var prioBtns = document.querySelectorAll('#cora-drawer-prio-group button');
@@ -6747,8 +6837,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             window.coraSubmitDrawerTask = function() {
                                 var inp = document.getElementById('cora-drawer-task-input');
                                 if (!inp || !inp.value.trim()) return;
-                                var timeSel = document.getElementById('cora-drawer-time-slot');
-                                var timeVal = timeSel ? timeSel.value : '11:30 AM';
+                                var timeInput = document.getElementById('cora-drawer-time-slot');
+                                var timeVal = '11:30 AM';
+                                if (timeInput) {
+                                    if (timeInput.dataset.isFlexible === 'true') {
+                                        timeVal = 'Flexible';
+                                    } else if (timeInput.value) {
+                                        timeVal = window.coraFormatTime12h(timeInput.value);
+                                    }
+                                }
                                 var targetDate = drawerSelectedDay === 'tomorrow' ? tomorrowStr : todayStr;
 
                                 var tasks = getTasks();
