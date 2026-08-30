@@ -2858,15 +2858,25 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 min-height: 100% !important;
                 padding-bottom: 88px !important; /* clearance for floating island nav */
             }
+            #cora-dynamic-greeting-title {
+                margin-bottom: 2px !important;
+                line-height: 1.15 !important;
+            }
             #cora-search-container {
-                display: none !important;
+                display: block !important;
+                margin-top: 14px !important;
+                margin-bottom: 14px !important;
             }
             .cora-dashboard-decision-grid {
                 display: none !important;
             }
             #cora-quick-actions-bar {
-                margin-top: 18px !important;
+                margin-top: 0px !important;
                 margin-bottom: 0px !important;
+                gap: 7px !important;
+            }
+            #cora-actions-row-1, #cora-actions-row-2, #cora-actions-row-3 {
+                gap: 6px !important;
             }
         }
         @media (min-width: 768px) {
@@ -2875,6 +2885,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
             #cora-search-container {
                 display: block !important;
+                margin-top: 28px !important;
+                margin-bottom: 24px !important;
             }
             .cora-dashboard-decision-grid {
                 display: grid !important;
@@ -2882,6 +2894,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             #cora-quick-actions-bar {
                 margin-top: 0px !important;
                 margin-bottom: 0px !important;
+                gap: 10px !important;
             }
         }
 
@@ -5395,17 +5408,17 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </div>
 
                         <!-- 2. Centered Welcome Greeting Section -->
-                        <div class="text-center px-4 space-y-2.5 relative pb-1">
-                            <h1 id="cora-dynamic-greeting-title" data-user-name="<?php echo esc_attr($user_first_name); ?>" class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-900">
+                        <div class="text-center px-4 relative pb-0">
+                            <h1 id="cora-dynamic-greeting-title" data-user-name="<?php echo esc_attr($user_first_name); ?>" class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-1 leading-tight">
                                 <?php echo esc_html($greeting_title); ?>
                             </h1>
-                            <p class="text-xs sm:text-sm md:text-base font-medium text-zinc-500 leading-tight">
+                            <p class="text-xs sm:text-sm md:text-base font-medium text-zinc-500 leading-tight m-0">
                                 Your AI Agent is active. Let's build something great.
                             </p>
                         </div>
 
                         <!-- 3. Universal Command Search -->
-                        <div class="w-full max-w-xl mx-auto mt-10 sm:mt-12 mb-7 sm:mb-9 px-2 sm:px-0 relative z-[999]" id="cora-search-container">
+                        <div class="w-full max-w-xl mx-auto mt-4 sm:mt-10 mb-3.5 sm:mb-8 px-2 sm:px-0 relative z-[999]" id="cora-search-container">
                             <div class="relative flex items-center bg-white/95 backdrop-blur-md border border-zinc-200 hover:border-zinc-300 focus-within:border-zinc-900 focus-within:ring-2 focus-within:ring-zinc-900/10 rounded-full shadow-2xs transition-all duration-200 p-1.5 pl-3.5 pr-2">
                                 <span class="text-zinc-400 mr-2 flex shrink-0">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
@@ -5416,7 +5429,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 
                                 <input type="text" 
                                        id="cora-inline-command-input"
-                                       placeholder="Ask Cora anything, search records, or press ⌘K..." 
+                                       placeholder="Ask or search anything, or press ⌘K..." 
                                        class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-xs sm:text-sm py-1.5 px-1 text-zinc-900 placeholder:text-zinc-400 cursor-pointer"
                                        autocomplete="off" />
                                        
@@ -5445,10 +5458,10 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         </div>
 
                         <!-- 4. Quick Action Shortcuts Pill Bar (3-Row Centered Layout) -->
-                        <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-2.5 sm:gap-3 py-1 select-none">
+                        <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-2 sm:gap-2.5 py-0 select-none">
                             
                             <!-- Row 1: 2 Action Chips (Upload Media & Write Article) -->
-                            <div id="cora-actions-row-1" class="flex items-center justify-center gap-2 sm:gap-2.5 flex-nowrap">
+                            <div id="cora-actions-row-1" class="flex items-center justify-center gap-2 flex-nowrap">
                                 <button type="button" onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                     <span>Upload Media</span>
@@ -5460,7 +5473,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             </div>
 
                             <!-- Row 2: 3 Action Chips (View Crew, New Workflow, Build Form) -->
-                            <div id="cora-actions-row-2" class="flex items-center justify-center gap-2 sm:gap-2.5 max-w-full overflow-x-auto no-scrollbar py-0.5">
+                            <div id="cora-actions-row-2" class="flex items-center justify-center gap-2 max-w-full overflow-x-auto no-scrollbar">
                                 <?php if ( $is_studio ) : ?>
                                 <button type="button" onclick="coraNavigateTo('equipment')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
@@ -5491,7 +5504,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             </div>
 
                             <!-- Row 3: Custom Shortcuts Trigger Button (Centered with Purple Gradient Outline) -->
-                            <div id="cora-actions-row-3" class="flex items-center justify-center pt-0.5">
+                            <div id="cora-actions-row-3" class="flex items-center justify-center">
                                 <button type="button" onclick="window.coraOpenCustomActionModal()" class="cora-ai-gradient-pill select-none whitespace-nowrap shrink-0" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                                     <span class="cora-ai-gradient-pill-inner">
                                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" class="text-purple-600 shrink-0">
