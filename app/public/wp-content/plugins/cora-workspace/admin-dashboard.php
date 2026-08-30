@@ -511,7 +511,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #wpcontent, #wpbody, #wpbody-content, #wpwrap { margin-top: 0 !important; padding-top: 0 !important; }
         * html body { margin-top: 0 !important; }
     
-        /* Guarantee all closed drawers and backdrops have zero pointer events and zero display */
+        /* Guarantee all closed drawers, popovers and backdrops have zero pointer events and zero display */
         #cora-sidebar-backdrop.hidden,
         #cora-ai-sidebar-backdrop.hidden,
         #cora-notif-backdrop.hidden,
@@ -521,7 +521,14 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-pwa-update-drawer-backdrop.hidden,
         #cora-pwa-update-drawer.hidden,
         #cora-feedback-drawer.hidden,
-        #cora-feedback-drawer.collapsed {
+        #cora-feedback-drawer.collapsed,
+        #cora-header-profile-popover.hidden,
+        #cora-header-ai-usage-popover.hidden,
+        #cora-sidebar-notif-popover.hidden,
+        #cora-sidebar-rag-popover.hidden,
+        #cora-skeleton-overlay.hidden,
+        #cora-pwa-install-modal.hidden,
+        #cora-custom-actions-drawer.translate-x-full {
             display: none !important;
             pointer-events: none !important;
             visibility: hidden !important;
@@ -2928,6 +2935,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
             padding: 16px 20px 28px 20px !important;
             box-sizing: border-box !important;
+            pointer-events: none !important;
         }
         .dark #cora-task-bottom-drawer {
             background: #18181b !important;
@@ -2935,6 +2943,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
         #cora-task-bottom-drawer.active {
             transform: translateY(0%) !important;
+            pointer-events: auto !important;
         }
 
         /* Dedicated Golden Standard Password Bottom Drawer */
@@ -2977,7 +2986,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             padding: 16px 20px 28px 20px !important;
             box-sizing: border-box !important;
             margin-bottom: 0 !important;
-            pointer-events: auto !important;
+            pointer-events: none !important;
         }
         .dark #cora-password-bottom-drawer,
         .dark #cora-avatar-bottom-drawer {
@@ -2987,6 +2996,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         #cora-password-bottom-drawer.active,
         #cora-avatar-bottom-drawer.active {
             transform: translateY(0%) !important;
+            pointer-events: auto !important;
         }
 
         /* Voice-First Assistant Ripple & Pulse Animation */
@@ -3060,6 +3070,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
             padding: 16px 20px 28px 20px !important;
             box-sizing: border-box !important;
+            pointer-events: none !important;
         }
         .dark #cora-notif-bottom-drawer {
             background: #18181b !important;
@@ -3067,6 +3078,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
         #cora-notif-bottom-drawer.active {
             transform: translateY(0%) !important;
+            pointer-events: auto !important;
         }
         /* Universal Voice AI Assistant Bottom Drawer Sheet */
         #cora-universal-voice-overlay {
@@ -3102,6 +3114,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
             padding: 16px 20px 24px 20px !important;
             box-sizing: border-box !important;
+            pointer-events: none !important;
         }
         .dark #cora-universal-voice-drawer {
             background: #18181b !important;
@@ -3109,6 +3122,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
         #cora-universal-voice-drawer.active {
             transform: translateY(0%) !important;
+            pointer-events: auto !important;
         }
         /* Universal Header Profile Popover & Mobile Sheet Styles */
         /* Universal Header Profile Popover (Modal Anchored Directly Below Top-Right Avatar Icon) */
@@ -14399,7 +14413,7 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
                         $icon_color = '#71717a';
                     }
                 ?>
-                <a href="javascript:void(0)" onclick="if(typeof window.coraNavigateTo==='function'){ event.preventDefault(); window.coraToggleMobileNavDrawer(false); window.coraNavigateTo('<?php echo esc_js($target); ?>'); } else { window.coraToggleMobileNavDrawer(false); }" style="display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid; border-radius:12px; text-decoration:none; transition:all 0.15s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer; pointer-events:auto; <?php echo $bar_style; ?>">
+                <a href="<?php echo esc_url( home_url( '/' . $cora_ws_slug . '/' . $target ) ); ?>" onclick="window.coraMobileNavNavigate(event, '<?php echo esc_js($target); ?>')" style="display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid; border-radius:12px; text-decoration:none; transition:all 0.15s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer; pointer-events:auto; <?php echo $bar_style; ?>">
                     <span class="cora-mobile-nav-icon-wrapper" style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; color:<?php echo $icon_color; ?>; flex-shrink:0;">
                         <?php echo $item['icon']; ?>
                     </span>
@@ -14420,6 +14434,29 @@ if ( ! empty( $nav_groups ) && is_array( $nav_groups ) ) {
 
 <script>
 (function() {
+    window.coraMobileNavNavigate = function(e, target) {
+        if (e && typeof e.preventDefault === 'function') {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        var drawer = document.getElementById('cora-mobile-nav-drawer');
+        var sheet  = document.getElementById('cora-mobile-nav-drawer-sheet');
+        if (sheet) sheet.style.transform = 'translateY(100%)';
+        if (drawer) {
+            setTimeout(function() {
+                drawer.style.display = 'none';
+                drawer.style.pointerEvents = 'none';
+            }, 280);
+        }
+        document.body.style.overflow = '';
+
+        if (typeof window.coraNavigateTo === 'function') {
+            window.coraNavigateTo(target);
+        } else {
+            window.location.href = '/workspace/' + encodeURIComponent(target);
+        }
+    };
+
     window.coraToggleMobileNavDrawer = function(forceShow, fromPopState) {
         var drawer  = document.getElementById('cora-mobile-nav-drawer');
         var sheet   = document.getElementById('cora-mobile-nav-drawer-sheet');

@@ -272,10 +272,10 @@ export default async function IntegrationDetailPage({
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-7">
               {[
-                ['/wordpress/alternative-for-agencies/', 'WordPress alternative for agencies'],
-                ['/wordpress/elementor-alternative-for-agencies/', 'Elementor alternative for agencies'],
-                ['/wordpress/woocommerce-alternative-for-service-businesses/', 'WooCommerce alternative for service businesses'],
-                ['/wordpress/content-publishing-workflow-for-agencies/', 'A simpler agency content workflow'],
+                ['/blog/wordpress/alternative-for-agencies/', 'WordPress alternative for agencies'],
+                ['/blog/elementor/elementor-alternative-for-agencies/', 'Elementor alternative for agencies'],
+                ['/blog/woocommerce/woocommerce-alternative-for-service-businesses/', 'WooCommerce alternative for service businesses'],
+                ['/blog/content-marketing/content-publishing-workflow-for-agencies/', 'A simpler agency content workflow'],
               ].map(([href, label]) => (
                 <Link key={href} href={href} className="flex items-center justify-between rounded-2xl border border-zinc-200 p-5 text-sm font-bold hover:border-zinc-400 transition-colors">
                   <span>{label}</span>

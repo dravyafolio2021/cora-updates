@@ -19,11 +19,15 @@ Cora should not claim that every business must abandon WordPress. The practical 
 
 ```text
 /
-├── /wordpress/                                      Topic and decision hub
-│   ├── /alternative-for-agencies/                  Category alternative
-│   ├── /elementor-alternative-for-agencies/        Page-builder frustration
-│   ├── /woocommerce-alternative-for-service-businesses/ Transaction-model mismatch
-│   └── /content-publishing-workflow-for-agencies/  Manual publishing problem
+├── /blog/                                           All articles and categories
+│   ├── /wordpress/                                 WordPress category hub
+│   │   └── /alternative-for-agencies/              Category alternative article
+│   ├── /elementor/                                 Elementor category hub
+│   │   └── /elementor-alternative-for-agencies/    Page-builder frustration article
+│   ├── /woocommerce/                               WooCommerce category hub
+│   │   └── /woocommerce-alternative-for-service-businesses/ Transaction-model article
+│   └── /content-marketing/                         Content marketing category hub
+│       └── /content-publishing-workflow-for-agencies/ Manual publishing article
 ├── /integrations/wordpress/                        Product integration and setup
 ├── /compare/                                       Named software comparisons
 ├── /use-cases/                                     Industry and workflow proof
@@ -31,13 +35,15 @@ Cora should not claim that every business must abandon WordPress. The practical 
 └── /docs/                                          Technical and implementation proof
 ```
 
-The WordPress hub links to every supporting guide. Each guide links to three related guides. The existing WordPress integration page links into the cluster, and the global footer provides a persistent crawl path.
+The blog directory links to every category and article. Each category links to its articles, and each article links to three related articles. The existing WordPress integration page links into the cluster, and the global footer provides a persistent crawl path.
+
+The canonical blog URL pattern is `/blog/{category}/{topic}/`. Keeping all editorial content under `/blog/` avoids collisions with product routes and makes the publishing system easier to extend. Categories organize discovery; they should not be created merely to repeat a keyword.
 
 ## First content and intent map
 
 | Page | Primary search intent | Reader | Product bridge |
 | --- | --- | --- | --- |
-| WordPress hub | WordPress alternatives and workflow help | Agency founder exploring options | Choose a specific bottleneck |
+| Blog directory | Website, workflow, SEO, and AI-search help | Service-business founder exploring ideas | Choose a relevant category |
 | WordPress alternative for agencies | Replace or simplify WordPress agency stack | Creative or service agency | Connect Cora before migrating |
 | Elementor alternative for agencies | Escape maintenance and publishing dependence | Founder or marketer | Test structured pages and connected enquiries |
 | WooCommerce alternative for services | Sell services without forcing them into a cart | Agency, consultant, production team | Use a client workflow for custom work |
@@ -60,7 +66,7 @@ Every new search page must ship with all of these fields:
 - One relevant next action with a trackable `source` value.
 - Inclusion in the generated sitemap and `llms.txt`.
 
-The current implementation stores these fields in `lib/wordpress-content.ts` and renders them through one reusable route. Add a new entry only when it answers a meaningfully different question.
+The current implementation stores article content in `lib/wordpress-content.ts`, assigns categories in `lib/blog-data.ts`, and renders it through reusable blog routes. Add a new entry only when it answers a meaningfully different question. As more topics are added, split content into domain-specific data files while keeping `lib/blog-data.ts` as the shared index.
 
 ## Next content queue
 
@@ -91,7 +97,7 @@ Do not build all of these at once. Publish the next page after a question repeat
 2. Deploy and confirm that each new URL returns HTTP 200 on its final trailing-slash URL.
 3. Confirm `https://heycora.in/robots.txt` and `https://heycora.in/sitemap.xml` are public.
 4. Submit the sitemap in Google Search Console and Bing Webmaster Tools.
-5. Inspect the WordPress hub URL in Search Console and request indexing once after deployment.
+5. Inspect the blog directory and the highest-priority article URL in Search Console and request indexing once after deployment.
 6. Validate structured data and inspect the rendered canonical on one hub, guide, integration, and comparison page.
 7. Record impressions, clicks, queries, relevant signups, and conversations by landing page every week.
 

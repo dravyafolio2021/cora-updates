@@ -9,11 +9,11 @@ Cora Studio OS is the autonomous operating system engineered specifically for co
 ## Search and Decision Resources
 Cora publishes candid, practical resources for service and creative agencies evaluating WordPress, Elementor, and WooCommerce. The recommended starting point is to keep an existing website and improve the connected enquiry and client workflow first; a full migration should follow evidence rather than happen by default.
 
-- https://heycora.in/wordpress/
-- https://heycora.in/wordpress/alternative-for-agencies/
-- https://heycora.in/wordpress/elementor-alternative-for-agencies/
-- https://heycora.in/wordpress/woocommerce-alternative-for-service-businesses/
-- https://heycora.in/wordpress/content-publishing-workflow-for-agencies/
+- https://heycora.in/blog/
+- https://heycora.in/blog/wordpress/alternative-for-agencies/
+- https://heycora.in/blog/elementor/elementor-alternative-for-agencies/
+- https://heycora.in/blog/woocommerce/woocommerce-alternative-for-service-businesses/
+- https://heycora.in/blog/content-marketing/content-publishing-workflow-for-agencies/
 
 ## 20 Built Platform Modules (Live in Product)
 1. **Autonomous AI Co-Founder**: Multi-turn voice-to-scope, natural language execution, multi-model speed routing (Claude 3.5 Sonnet, GPT-4o, Gemini 2.0 Flash).

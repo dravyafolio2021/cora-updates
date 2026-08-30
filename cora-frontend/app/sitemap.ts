@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { BUILT_MODULES } from '@/lib/features-data';
 import { DOCS_DATA } from '@/lib/docs-data';
-import { WORDPRESS_CONTENT } from '@/lib/wordpress-content';
+import { BLOG_CATEGORIES, BLOG_POSTS, getBlogPostUrl } from '@/lib/blog-data';
 
 export const dynamic = 'force-static';
 
@@ -9,9 +9,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://heycora.in';
   const now = new Date();
 
-  const wordpressUrls = WORDPRESS_CONTENT.map((page) => ({
-    url: `${baseUrl}/wordpress/${page.slug}/`,
-    lastModified: page.updatedAt,
+  const blogCategoryUrls = BLOG_CATEGORIES.map((category) => ({
+    url: `${baseUrl}/blog/${category.slug}/`,
+    lastModified: '2026-08-30',
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
+  const blogPostUrls = BLOG_POSTS.map((post) => ({
+    url: `${baseUrl}${getBlogPostUrl(post)}`,
+    lastModified: post.updatedAt,
     changeFrequency: 'monthly' as const,
     priority: 0.85,
   }));
@@ -38,12 +45,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/wordpress/`,
+      url: `${baseUrl}/blog/`,
       lastModified: '2026-08-30',
       changeFrequency: 'weekly',
       priority: 0.9,
     },
-    ...wordpressUrls,
+    ...blogCategoryUrls,
+    ...blogPostUrls,
     {
       url: `${baseUrl}/docs`,
       lastModified: now,

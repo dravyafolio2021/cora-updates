@@ -7,11 +7,11 @@
 Cora Studio OS is the autonomous operating system engineered specifically for commercial photography studios, film production houses, wedding cinematographers, real estate brokerages, and creative agencies. Cora consolidates CRM funnels, multi-model AI agents, SHA-256 legal e-signatures, and automated 18% GST invoicing into one unified command center.
 
 ## WordPress, Elementor & WooCommerce Decision Guides
-- **WordPress Topic Hub**: https://heycora.in/wordpress/ (Decide what to keep, connect, or replace.)
-- **WordPress Alternative for Agencies**: https://heycora.in/wordpress/alternative-for-agencies/ (Publishing, leads, and client operations without a forced migration.)
-- **Elementor Alternative for Agencies**: https://heycora.in/wordpress/elementor-alternative-for-agencies/ (For teams whose page builder has become a maintenance bottleneck.)
-- **WooCommerce Alternative for Service Businesses**: https://heycora.in/wordpress/woocommerce-alternative-for-service-businesses/ (When a service workflow fits better than a product cart.)
-- **Agency Content Publishing Workflow**: https://heycora.in/wordpress/content-publishing-workflow-for-agencies/ (A question-led system for research, writing, metadata, links, schema, and publishing.)
+- **Cora Blog**: https://heycora.in/blog/ (All categories and articles.)
+- **WordPress Alternative for Agencies**: https://heycora.in/blog/wordpress/alternative-for-agencies/ (Publishing, leads, and client operations without a forced migration.)
+- **Elementor Alternative for Agencies**: https://heycora.in/blog/elementor/elementor-alternative-for-agencies/ (For teams whose page builder has become a maintenance bottleneck.)
+- **WooCommerce Alternative for Service Businesses**: https://heycora.in/blog/woocommerce/woocommerce-alternative-for-service-businesses/ (When a service workflow fits better than a product cart.)
+- **Agency Content Publishing Workflow**: https://heycora.in/blog/content-marketing/content-publishing-workflow-for-agencies/ (A question-led system for research, writing, metadata, links, schema, and publishing.)
 
 ## 20 Built Platform Modules (Live in Product)
 1. **Autonomous AI Co-Founder**: Multi-turn voice-to-scope, natural language execution, multi-model speed routing (Claude 3.5 Sonnet, GPT-4o, Gemini 2.0 Flash).

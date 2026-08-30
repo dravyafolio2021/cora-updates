@@ -541,7 +541,16 @@ jQuery(document).ready(function($) {
         }
 
         // Canonical PWA & Workspace In-App Relative Navigation
-        window.location.href = '/workspace/' + encodeURIComponent(targetPageId);
+        var baseSlug = 'workspace';
+        if (typeof window.coraWorkspaceSlug === 'string' && window.coraWorkspaceSlug) {
+            baseSlug = window.coraWorkspaceSlug;
+        } else {
+            var pathParts = window.location.pathname.split('/').filter(Boolean);
+            if (pathParts.length > 0 && pathParts[0] !== 'wp-admin' && pathParts[0] !== 'wp-login.php') {
+                baseSlug = pathParts[0];
+            }
+        }
+        window.location.href = '/' + baseSlug + '/' + encodeURIComponent(targetPageId);
     };
 
     // ─── PWA Standalone Mode In-App Navigation & Pull-To-Refresh Engine ───────
