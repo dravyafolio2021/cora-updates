@@ -2962,6 +2962,48 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             100% { transform: scale(1.45); opacity: 0; }
         }
 
+        /* Notification Preferences Bottom Drawer Sheet */
+        #cora-notif-drawer-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(9, 9, 11, 0.45) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            z-index: 10050 !important;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        #cora-notif-drawer-overlay.active {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        #cora-notif-bottom-drawer {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            max-width: 500px !important;
+            margin: 0 auto !important;
+            background: #ffffff !important;
+            border-top: 1px solid rgba(228, 228, 231, 0.9) !important;
+            border-top-left-radius: 28px !important;
+            border-top-right-radius: 28px !important;
+            box-shadow: 0 -12px 36px -4px rgba(0, 0, 0, 0.15) !important;
+            z-index: 10051 !important;
+            transform: translateY(100%) !important;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            padding: 16px 20px 28px 20px !important;
+            box-sizing: border-box !important;
+        }
+        .dark #cora-notif-bottom-drawer {
+            background: #18181b !important;
+            border-color: #27272a !important;
+        }
+        #cora-notif-bottom-drawer.active {
+            transform: translateY(0%) !important;
+        }
+
         /* Mobile vs Desktop Scoped Rules for Dashboard */
         @media (max-width: 767px) {
             .cora-dashboard-mockup-wrapper {
@@ -2989,7 +3031,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 8px !important;
-                margin-top: 28px !important;
+                margin-top: 36px !important;
                 width: 100% !important;
             }
             #cora-quick-actions-bar {
@@ -5645,7 +5687,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         <!-- 5. Toast-Styled Daily To-Do & Task Overview (Toast Block Design, In-Place Done Styling, Smart Bottom Drawer) -->
                         <div class="cora-dashboard-todo-container w-full select-none" id="cora-dashboard-todo-app">
                             
-                            <!-- Header Bar: Day Overview Tabs & Smart Add Trigger -->
+                            <!-- Header Bar: Day Overview Tabs, Notification Preferences & Smart Add Trigger -->
                             <div class="flex items-center justify-between px-0.5 pt-1 mb-1">
                                 <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/80 p-0.5 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60">
                                     <button type="button" onclick="window.coraFilterDashboardTasks('today', this)" id="cora-todo-tab-today" class="cora-todo-tab active text-[10px] font-semibold px-2.5 py-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs transition-all cursor-pointer">
@@ -5656,15 +5698,118 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     </button>
                                 </div>
 
-                                <button type="button" onclick="window.coraOpenTaskDrawer()" class="text-[10px] font-mono font-medium text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center gap-1 bg-white/90 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/70 px-2.5 py-1 rounded-lg cursor-pointer transition-all shadow-3xs hover:bg-zinc-50 dark:hover:bg-zinc-700" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                    <span>Add Task</span>
-                                </button>
+                                <div class="flex items-center gap-1.5">
+                                    <!-- Notification & Email Preferences Button -->
+                                    <button type="button" onclick="window.coraOpenNotifSettings()" id="cora-task-notif-btn" class="text-[10px] font-mono font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center gap-1 bg-white/90 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/70 px-2 py-1 rounded-lg cursor-pointer transition-all shadow-3xs hover:bg-zinc-50 dark:hover:bg-zinc-700" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;" title="Configure 30-min reminders & email digests">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                        <span>Alerts</span>
+                                    </button>
+
+                                    <!-- Add Task Voice-First Trigger -->
+                                    <button type="button" onclick="window.coraOpenTaskDrawer()" class="text-[10px] font-mono font-medium text-zinc-800 dark:text-zinc-100 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center gap-1 bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/70 px-2.5 py-1 rounded-lg cursor-pointer transition-all shadow-3xs hover:bg-zinc-50 dark:hover:bg-zinc-700 font-semibold" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        <span>Add Task</span>
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- Tasks List Container (Rendered Dynamically via JS in Toast-Card Style) -->
                             <div id="cora-dashboard-todo-list" class="flex flex-col gap-2 w-full"></div>
                         </div> <!-- .cora-dashboard-todo-container -->
+
+                        <!-- Notification & Email Preferences Bottom Drawer Sheet -->
+                        <div id="cora-notif-drawer-overlay" onclick="window.coraCloseNotifSettings()"></div>
+                        <div id="cora-notif-bottom-drawer" class="select-none">
+                            <!-- Drag handle -->
+                            <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-3"></div>
+                            
+                            <!-- Header -->
+                            <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Schedule Alerts &amp; Reports</h3>
+                                </div>
+                                <button type="button" onclick="window.coraCloseNotifSettings()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" style="touch-action: manipulation;">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+
+                            <!-- Settings Controls -->
+                            <div class="space-y-3.5 pt-3">
+                                <!-- 1. PWA Push Notification Permission -->
+                                <div class="bg-zinc-50 dark:bg-zinc-800/60 p-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-700/70 flex items-center justify-between">
+                                    <div class="space-y-0.5 min-w-0 pr-2">
+                                        <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                            <span>Mobile &amp; PWA Push Alerts</span>
+                                        </div>
+                                        <div class="text-[11px] text-zinc-500 dark:text-zinc-400" id="cora-notif-perm-status">Real-time alerts directly on your device.</div>
+                                    </div>
+                                    <button type="button" id="cora-toggle-push-btn" onclick="window.coraTogglePushPermission()" class="px-2.5 py-1 rounded-xl text-xs font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer shadow-3xs transition-all">
+                                        Enable
+                                    </button>
+                                </div>
+
+                                <!-- 2. Pre-Task Reminder Advance Timing -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400">PRE-TASK REMINDER ADVANCE</label>
+                                        <span class="text-[10px] text-zinc-400 font-mono">Push + In-App Alarm</span>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-2" id="cora-notif-advance-group">
+                                        <button type="button" onclick="window.coraSetNotifAdvance(15, this)" class="cora-advance-btn text-xs font-medium py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">
+                                            15 Mins
+                                        </button>
+                                        <button type="button" onclick="window.coraSetNotifAdvance(30, this)" class="cora-advance-btn active text-xs font-semibold py-1.5 px-2 rounded-xl border border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-3xs transition-all cursor-pointer">
+                                            30 Mins (Default)
+                                        </button>
+                                        <button type="button" onclick="window.coraSetNotifAdvance(60, this)" class="cora-advance-btn text-xs font-medium py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer">
+                                            1 Hour
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Digest & Reports Toggles -->
+                                <div class="space-y-2 pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                                    <label class="block text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 mb-1">DIGESTS &amp; EMAIL REPORTS</label>
+                                    
+                                    <!-- Morning Briefing Toggle -->
+                                    <label class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/70 dark:border-zinc-700/60 cursor-pointer">
+                                        <div class="space-y-0.5">
+                                            <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Daily Morning Briefing (09:00 AM)</div>
+                                            <div class="text-[10.5px] text-zinc-500 dark:text-zinc-400">Push &amp; email summary of today's schedule.</div>
+                                        </div>
+                                        <input type="checkbox" id="cora-pref-morning-digest" class="w-4 h-4 rounded text-zinc-900 accent-zinc-900 dark:accent-zinc-100 cursor-pointer" checked />
+                                    </label>
+
+                                    <!-- Evening Wrap-Up Toggle -->
+                                    <label class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/70 dark:border-zinc-700/60 cursor-pointer">
+                                        <div class="space-y-0.5">
+                                            <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Daily Evening Wrap-Up (07:00 PM)</div>
+                                            <div class="text-[10.5px] text-zinc-500 dark:text-zinc-400">Overview report of completed milestones &amp; tomorrow's plan.</div>
+                                        </div>
+                                        <input type="checkbox" id="cora-pref-evening-digest" class="w-4 h-4 rounded text-zinc-900 accent-zinc-900 dark:accent-zinc-100 cursor-pointer" checked />
+                                    </label>
+
+                                    <!-- Email Alerts Toggle -->
+                                    <label class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/70 dark:border-zinc-700/60 cursor-pointer">
+                                        <div class="space-y-0.5">
+                                            <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Email Delivery to Workspace Members</div>
+                                            <div class="text-[10.5px] text-zinc-500 dark:text-zinc-400">Send copies to workspace owner and assignees.</div>
+                                        </div>
+                                        <input type="checkbox" id="cora-pref-email-enabled" class="w-4 h-4 rounded text-zinc-900 accent-zinc-900 dark:accent-zinc-100 cursor-pointer" checked />
+                                    </label>
+                                </div>
+
+                                <!-- Save Action Button -->
+                                <div class="pt-2">
+                                    <button type="button" onclick="window.coraSaveNotificationPrefs()" class="w-full bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white text-xs font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-3xs cursor-pointer select-none transition-all active:scale-[0.98]" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        <span>Save Notification Preferences</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Smart Add Task Bottom Drawer Sheet (Voice-First Assistant Architecture) -->
                         <div id="cora-task-drawer-overlay" onclick="window.coraCloseTaskDrawer()"></div>
@@ -5819,6 +5964,35 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             var voiceRecognition = null;
                             var isVoiceListening = false;
 
+                            // Notification Preferences State
+                            var defaultNotifPrefs = {
+                                pushEnabled: false,
+                                advanceMins: 30,
+                                morningDigest: true,
+                                eveningDigest: true,
+                                emailEnabled: true
+                            };
+
+                            function getNotifPrefs() {
+                                var saved = localStorage.getItem('cora_task_notification_prefs');
+                                if (saved) {
+                                    try { return Object.assign({}, defaultNotifPrefs, JSON.parse(saved)); } catch(e) {}
+                                }
+                                return Object.assign({}, defaultNotifPrefs);
+                            }
+
+                            function saveNotifPrefs(prefs) {
+                                localStorage.setItem('cora_task_notification_prefs', JSON.stringify(prefs));
+                                // Sync to server if endpoint available
+                                if (window.fetch) {
+                                    fetch('/wp-json/cora-workspace/v1/task-preferences', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(prefs)
+                                    }).catch(function() {});
+                                }
+                            }
+
                             function getTasks() {
                                 var saved = localStorage.getItem('cora_dashboard_todo_tasks');
                                 if (saved) {
@@ -5858,7 +6032,191 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             function saveTasks(tasks) {
                                 localStorage.setItem('cora_dashboard_todo_tasks', JSON.stringify(tasks));
                                 render();
+                                // Sync to backend for AI agent training & persistent storage
+                                if (window.fetch) {
+                                    fetch('/wp-json/cora-workspace/v1/tasks', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ tasks: tasks })
+                                    }).catch(function() {});
+                                }
                             }
+
+                            /* --- Notification Preferences Drawer Handlers --- */
+                            window.coraOpenNotifSettings = function() {
+                                var overlay = document.getElementById('cora-notif-drawer-overlay');
+                                var drawer = document.getElementById('cora-notif-bottom-drawer');
+                                if (!overlay || !drawer) return;
+
+                                var prefs = getNotifPrefs();
+                                var morningCheck = document.getElementById('cora-pref-morning-digest');
+                                var eveningCheck = document.getElementById('cora-pref-evening-digest');
+                                var emailCheck = document.getElementById('cora-pref-email-enabled');
+                                if (morningCheck) morningCheck.checked = !!prefs.morningDigest;
+                                if (eveningCheck) eveningCheck.checked = !!prefs.eveningDigest;
+                                if (emailCheck) emailCheck.checked = !!prefs.emailEnabled;
+
+                                // Sync advance pill buttons
+                                var advanceBtns = document.querySelectorAll('#cora-notif-advance-group button');
+                                advanceBtns.forEach(function(btn) {
+                                    btn.className = 'cora-advance-btn text-xs font-medium py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer';
+                                });
+                                if (prefs.advanceMins === 15 && advanceBtns[0]) {
+                                    advanceBtns[0].className = 'cora-advance-btn active text-xs font-semibold py-1.5 px-2 rounded-xl border border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-3xs transition-all cursor-pointer';
+                                } else if (prefs.advanceMins === 60 && advanceBtns[2]) {
+                                    advanceBtns[2].className = 'cora-advance-btn active text-xs font-semibold py-1.5 px-2 rounded-xl border border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-3xs transition-all cursor-pointer';
+                                } else if (advanceBtns[1]) {
+                                    advanceBtns[1].className = 'cora-advance-btn active text-xs font-semibold py-1.5 px-2 rounded-xl border border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-3xs transition-all cursor-pointer';
+                                }
+
+                                // Check notification permission status
+                                updatePushStatusUI();
+
+                                overlay.classList.add('active');
+                                drawer.classList.add('active');
+                            };
+
+                            window.coraCloseNotifSettings = function() {
+                                var overlay = document.getElementById('cora-notif-drawer-overlay');
+                                var drawer = document.getElementById('cora-notif-bottom-drawer');
+                                if (overlay && drawer) {
+                                    overlay.classList.remove('active');
+                                    drawer.classList.remove('active');
+                                }
+                            };
+
+                            var currentAdvanceMins = 30;
+                            window.coraSetNotifAdvance = function(mins, btn) {
+                                currentAdvanceMins = mins;
+                                document.querySelectorAll('#cora-notif-advance-group button').forEach(function(el) {
+                                    el.className = 'cora-advance-btn text-xs font-medium py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer';
+                                });
+                                if (btn) {
+                                    btn.className = 'cora-advance-btn active text-xs font-semibold py-1.5 px-2 rounded-xl border border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-3xs transition-all cursor-pointer';
+                                }
+                            };
+
+                            function updatePushStatusUI() {
+                                var permStatusEl = document.getElementById('cora-notif-perm-status');
+                                var toggleBtn = document.getElementById('cora-toggle-push-btn');
+                                if (!permStatusEl || !toggleBtn) return;
+
+                                if (!('Notification' in window)) {
+                                    permStatusEl.textContent = 'Push alerts not supported in this browser.';
+                                    toggleBtn.style.display = 'none';
+                                    return;
+                                }
+
+                                if (Notification.permission === 'granted') {
+                                    permStatusEl.textContent = 'Active & granted (30m pre-task alarms enabled).';
+                                    toggleBtn.textContent = 'Enabled ✓';
+                                    toggleBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-700 cursor-default';
+                                } else if (Notification.permission === 'denied') {
+                                    permStatusEl.textContent = 'Blocked by browser. Allow in browser settings.';
+                                    toggleBtn.textContent = 'Blocked';
+                                    toggleBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 cursor-default';
+                                } else {
+                                    permStatusEl.textContent = 'Tap to allow notifications on this device.';
+                                    toggleBtn.textContent = 'Enable';
+                                    toggleBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer shadow-3xs transition-all';
+                                }
+                            }
+
+                            window.coraTogglePushPermission = function() {
+                                if (!('Notification' in window)) return;
+                                if (Notification.permission === 'default') {
+                                    Notification.requestPermission().then(function(perm) {
+                                        updatePushStatusUI();
+                                        if (perm === 'granted' && window.coraShowToast) {
+                                            window.coraShowToast('Notifications enabled! 30-minute alarms active.', 'success');
+                                            // Register service worker push subscription if present
+                                            if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+                                                navigator.serviceWorker.ready.then(function(reg) {
+                                                    reg.showNotification('Cora Workspace Alerts Active', {
+                                                        body: 'You will receive advance reminders 30m before scheduled tasks.',
+                                                        icon: '/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png'
+                                                    });
+                                                }).catch(function() {});
+                                            }
+                                        }
+                                    });
+                                } else if (Notification.permission === 'granted') {
+                                    if (window.coraShowToast) window.coraShowToast('Notifications are already active on this device', 'info');
+                                }
+                            };
+
+                            window.coraSaveNotificationPrefs = function() {
+                                var morningCheck = document.getElementById('cora-pref-morning-digest');
+                                var eveningCheck = document.getElementById('cora-pref-evening-digest');
+                                var emailCheck = document.getElementById('cora-pref-email-enabled');
+
+                                var prefs = {
+                                    pushEnabled: ('Notification' in window) && Notification.permission === 'granted',
+                                    advanceMins: currentAdvanceMins,
+                                    morningDigest: morningCheck ? morningCheck.checked : true,
+                                    eveningDigest: eveningCheck ? eveningCheck.checked : true,
+                                    emailEnabled: emailCheck ? emailCheck.checked : true
+                                };
+
+                                saveNotifPrefs(prefs);
+                                window.coraCloseNotifSettings();
+                                if (window.coraShowToast) {
+                                    window.coraShowToast('Notification preferences saved', 'success');
+                                }
+                            };
+
+                            /* --- Client-Side Alarm Monitor for 30m / Advance Pre-Task Alerts --- */
+                            var notifiedTaskIds = {};
+                            function checkTaskScheduleAlarms() {
+                                if (!('Notification' in window) || Notification.permission !== 'granted') return;
+                                var prefs = getNotifPrefs();
+                                var advanceMs = (prefs.advanceMins || 30) * 60 * 1000;
+                                var tasks = getTasks();
+                                var now = new Date();
+
+                                tasks.forEach(function(task) {
+                                    if (task.status === 'done' || notifiedTaskIds[task.id]) return;
+                                    if (!task.time || task.time === 'Flexible') return;
+
+                                    // Parse time string (e.g. "11:30 AM", "02:30 PM")
+                                    var match = task.time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+                                    if (!match) return;
+                                    var hours = parseInt(match[1], 10);
+                                    var minutes = parseInt(match[2], 10);
+                                    var ampm = (match[3] || '').toUpperCase();
+                                    if (ampm === 'PM' && hours < 12) hours += 12;
+                                    if (ampm === 'AM' && hours === 12) hours = 0;
+
+                                    var taskDate = new Date(task.date || todayStr);
+                                    taskDate.setHours(hours, minutes, 0, 0);
+
+                                    var diff = taskDate.getTime() - now.getTime();
+                                    // If diff is between 0 and advanceMs (e.g. within 30 minutes), fire notification!
+                                    if (diff > 0 && diff <= advanceMs) {
+                                        notifiedTaskIds[task.id] = true;
+                                        var minutesLeft = Math.round(diff / 60000);
+                                        var notifTitle = '⏰ Task Reminder: Starts in ' + minutesLeft + 'm';
+                                        var notifBody = task.title + ' (' + (task.priority ? task.priority.toUpperCase() : 'NORMAL') + ' at ' + task.time + ')';
+
+                                        if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+                                            navigator.serviceWorker.ready.then(function(reg) {
+                                                reg.showNotification(notifTitle, {
+                                                    body: notifBody,
+                                                    icon: '/wp-content/plugins/cora-workspace/assets/pwa/icon_192.png',
+                                                    data: { url: '/workspace/dashboard' }
+                                                });
+                                            }).catch(function() {
+                                                new Notification(notifTitle, { body: notifBody });
+                                            });
+                                        } else {
+                                            new Notification(notifTitle, { body: notifBody });
+                                        }
+                                    }
+                                });
+                            }
+
+                            // Run alarm check every 30 seconds
+                            setInterval(checkTaskScheduleAlarms, 30000);
 
                             window.coraSwitchDrawerMode = function(mode) {
                                 var voiceView = document.getElementById('cora-drawer-voice-view');
@@ -5999,11 +6357,23 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 }
                             };
 
-                            /* --- NLP Semantic Intent Analysis & Review Transition --- */
+                            /* --- High-Accuracy Domain Vocabulary & NLP Entity Extraction --- */
                             window.coraAnalyzeVoiceIntent = function(transcript) {
                                 if (!transcript || !transcript.trim()) return;
                                 var raw = transcript.trim();
-                                var lower = raw.toLowerCase();
+                                
+                                // Phonetic & terminology corrections for real estate & studio
+                                var normalized = raw
+                                    .replace(/\bb2b\s+beating\b/gi, 'B2B meeting')
+                                    .replace(/\bbeating\b/gi, 'meeting')
+                                    .replace(/\bbattery\s+pac\b/gi, 'battery pack')
+                                    .replace(/\btoken\s+agreemen\b/gi, 'token agreement')
+                                    .replace(/\bgst\s+invois\b/gi, 'GST invoice')
+                                    .replace(/\bdlf\s+cyber\s*city\b/gi, 'DLF Cybercity')
+                                    .replace(/\bpottery\b/gi, 'property')
+                                    .replace(/\bphoto\s*shoot\b/gi, 'photoshoot');
+
+                                var lower = normalized.toLowerCase();
 
                                 // 1. Priority Detection
                                 var prio = 'normal';
@@ -6019,9 +6389,29 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     day = 'tomorrow';
                                 }
 
-                                // 3. Time Slot Detection
+                                // 3. Time Slot Detection (Relative & Absolute)
                                 var timeSlot = '11:30 AM';
-                                if (lower.includes('10 am') || lower.includes('10:00 am') || lower.includes('10:00') || lower.includes('morning') || lower.includes('early')) {
+                                var now = new Date();
+
+                                if (lower.includes('in 30 min') || lower.includes('in 30 minute')) {
+                                    var t = new Date(now.getTime() + 30 * 60000);
+                                    var h = t.getHours(), m = t.getMinutes();
+                                    var ap = h >= 12 ? 'PM' : 'AM';
+                                    h = h % 12 || 12;
+                                    timeSlot = (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
+                                } else if (lower.includes('in 15 min') || lower.includes('in 15 minute')) {
+                                    var t = new Date(now.getTime() + 15 * 60000);
+                                    var h = t.getHours(), m = t.getMinutes();
+                                    var ap = h >= 12 ? 'PM' : 'AM';
+                                    h = h % 12 || 12;
+                                    timeSlot = (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
+                                } else if (lower.includes('in 1 hour') || lower.includes('in an hour')) {
+                                    var t = new Date(now.getTime() + 60 * 60000);
+                                    var h = t.getHours(), m = t.getMinutes();
+                                    var ap = h >= 12 ? 'PM' : 'AM';
+                                    h = h % 12 || 12;
+                                    timeSlot = (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
+                                } else if (lower.includes('10 am') || lower.includes('10:00 am') || lower.includes('10:00') || lower.includes('morning') || lower.includes('early')) {
                                     timeSlot = '10:00 AM';
                                 } else if (lower.includes('11:30') || lower.includes('11 am') || lower.includes('noon') || lower.includes('midday')) {
                                     timeSlot = '11:30 AM';
@@ -6034,7 +6424,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 }
 
                                 // 4. Clean Action / Task Title Extraction
-                                var cleanTitle = raw;
+                                var cleanTitle = normalized;
                                 cleanTitle = cleanTitle.replace(/^(please\s+)?(schedule|create|add|set|remind me to|make a task to|i need to|we need to)\s+/i, '');
                                 cleanTitle = cleanTitle.replace(/(on\s+)?(urgent\s+basis|urgently|high\s+priority|asap)/gi, '');
                                 cleanTitle = cleanTitle.replace(/(for\s+)?(tomorrow|today)(\s+(at\s+)?(10\s*am|11:30\s*am|2:30\s*pm|5\s*pm|\d{1,2}(:\d{2})?\s*(am|pm)?))?/gi, '');
@@ -6043,7 +6433,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 if (cleanTitle.length > 0) {
                                     cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
                                 } else {
-                                    cleanTitle = raw;
+                                    cleanTitle = normalized;
                                 }
 
                                 // Switch to Form / Review Mode
@@ -6073,7 +6463,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 // Show transcript quote banner
                                 var transcriptBanner = document.getElementById('cora-voice-transcript-banner');
                                 var quoteText = document.getElementById('cora-transcript-quote-text');
-                                if (quoteText) quoteText.textContent = '“' + raw + '”';
+                                if (quoteText) quoteText.textContent = '“' + normalized + '”';
                                 if (transcriptBanner) transcriptBanner.classList.remove('hidden');
 
                                 if (window.coraShowToast) {
@@ -6182,8 +6572,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 var displayList = (activeFilter === 'tomorrow') ? tomorrowTasks : todayTasks;
 
                                 if (!displayList.length) {
-                                    var emptyMsg = (activeFilter === 'tomorrow') ? 'No tasks scheduled for tomorrow.' : 'No tasks for today. Tap "+ Add Task" to schedule.';
-                                    listEl.innerHTML = '<div class="py-3 px-3 text-center text-xs text-zinc-400 dark:text-zinc-500 bg-white/40 dark:bg-zinc-800/30 rounded-2xl border border-dashed border-zinc-200/90 dark:border-zinc-700/60 font-mono">' + emptyMsg + '</div>';
+                                    var dayLabel = (activeFilter === 'tomorrow') ? 'tomorrow' : 'today';
+                                    var emptyHtml = '<div class="py-4 px-4 bg-white/70 dark:bg-zinc-900/60 rounded-2xl border border-dashed border-zinc-200/90 dark:border-zinc-800 text-center space-y-1.5 shadow-3xs transition-all">';
+                                    emptyHtml += '  <div class="flex items-center justify-center gap-1.5 text-[10px] font-mono font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">';
+                                    emptyHtml += '    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>';
+                                    emptyHtml += '    <span>Agenda Synchronized</span>';
+                                    emptyHtml += '  </div>';
+                                    emptyHtml += '  <div class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">No scheduled tasks for ' + dayLabel + '</div>';
+                                    emptyHtml += '  <div class="text-[11px] text-zinc-400 dark:text-zinc-500 max-w-[260px] mx-auto leading-normal">Speak with Voice Assistant or tap "+ Add Task" to schedule your next milestone.</div>';
+                                    emptyHtml += '</div>';
+                                    listEl.innerHTML = emptyHtml;
                                     return;
                                 }
 

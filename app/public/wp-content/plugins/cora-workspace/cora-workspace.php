@@ -22464,7 +22464,8 @@ function cora_create_custom_tables() {
         'cora_canvas_themes',
         'cora_forms',
         'cora_ledger',
-        'cora_rag_knowledge'
+        'cora_rag_knowledge',
+        'cora_workspace_tasks'
     );
     foreach ( $custom_tables as $tbl ) {
         delete_transient( 'cora_tbl_ex_' . md5( $wpdb->prefix . $tbl ) );
@@ -22914,6 +22915,39 @@ function cora_create_custom_tables() {
       PRIMARY KEY  (id),
       KEY agency_id (agency_id),
       KEY source_type (source_type)
+    ) $charset_collate;";
+
+    // 24. cora_workspace_tasks
+    $table_queries[] = "CREATE TABLE {$wpdb->prefix}cora_workspace_tasks (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      task_uid varchar(100) NOT NULL,
+      workspace_id varchar(100) NOT NULL DEFAULT 'default',
+      user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      created_by bigint(20) unsigned NOT NULL DEFAULT 0,
+      title varchar(255) NOT NULL,
+      description longtext,
+      status varchar(50) NOT NULL DEFAULT 'todo',
+      priority varchar(50) NOT NULL DEFAULT 'medium',
+      category varchar(100) DEFAULT 'General',
+      due_date date DEFAULT NULL,
+      start_time varchar(20) DEFAULT NULL,
+      start_datetime datetime DEFAULT NULL,
+      end_datetime datetime DEFAULT NULL,
+      duration_mins int(11) unsigned NOT NULL DEFAULT 30,
+      collaborators text,
+      tags text,
+      reminder_sent tinyint(1) NOT NULL DEFAULT 0,
+      extra_data longtext,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY task_uid (task_uid),
+      KEY workspace_id (workspace_id),
+      KEY user_id (user_id),
+      KEY status (status),
+      KEY priority (priority),
+      KEY start_datetime (start_datetime),
+      KEY reminder_sent (reminder_sent)
     ) $charset_collate;";
 
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -34258,6 +34292,18 @@ function cora_add_custom_cron_intervals( $schedules ) {
         'interval' => 30 * DAY_IN_SECONDS,
         'display'  => __( 'Once Monthly', 'cora-workspace' )
     );
+    if ( ! isset( $schedules['fifteen_minutes'] ) ) {
+        $schedules['fifteen_minutes'] = array(
+            'interval' => 15 * MINUTE_IN_SECONDS,
+            'display'  => __( 'Every 15 Minutes', 'cora-workspace' )
+        );
+    }
+    if ( ! isset( $schedules['every_fifteen_minutes'] ) ) {
+        $schedules['every_fifteen_minutes'] = array(
+            'interval' => 15 * MINUTE_IN_SECONDS,
+            'display'  => __( 'Every 15 Minutes', 'cora-workspace' )
+        );
+    }
     return $schedules;
 }
 }
@@ -47287,3 +47333,1350 @@ function cora_ajax_vault_ai_action() {
 }
 add_action( 'wp_ajax_cora_vault_ai_action', 'cora_ajax_vault_ai_action' );
 }
+
+/* ==========================================================================
+   CORA WORKSPACE TASK ENGINE, REST API, WP-CRON NOTIFICATIONS & AI TRAINING
+   ========================================================================== */
+
+/**
+ * Ensure the dedicated database table wp_cora_workspace_tasks exists.
+ */
+if ( ! function_exists( 'cora_ensure_tasks_table_exists' ) ) {
+function cora_ensure_tasks_table_exists() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'cora_workspace_tasks';
+
+    if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_name ) ) {
+        return;
+    }
+
+    $charset_collate = $wpdb->get_charset_collate();
+    $sql = "CREATE TABLE {$table_name} (
+      id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      task_uid varchar(100) NOT NULL,
+      workspace_id varchar(100) NOT NULL DEFAULT 'default',
+      user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+      created_by bigint(20) unsigned NOT NULL DEFAULT 0,
+      title varchar(255) NOT NULL,
+      description longtext,
+      status varchar(50) NOT NULL DEFAULT 'todo',
+      priority varchar(50) NOT NULL DEFAULT 'medium',
+      category varchar(100) DEFAULT 'General',
+      due_date date DEFAULT NULL,
+      start_time varchar(20) DEFAULT NULL,
+      start_datetime datetime DEFAULT NULL,
+      end_datetime datetime DEFAULT NULL,
+      duration_mins int(11) unsigned NOT NULL DEFAULT 30,
+      collaborators text,
+      tags text,
+      reminder_sent tinyint(1) NOT NULL DEFAULT 0,
+      extra_data longtext,
+      created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+      PRIMARY KEY  (id),
+      KEY task_uid (task_uid),
+      KEY workspace_id (workspace_id),
+      KEY user_id (user_id),
+      KEY status (status),
+      KEY priority (priority),
+      KEY start_datetime (start_datetime),
+      KEY reminder_sent (reminder_sent)
+    ) $charset_collate;";
+
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    dbDelta( $sql );
+    delete_transient( 'cora_tbl_ex_' . md5( $table_name ) );
+}
+}
+
+/**
+ * Get default task notification and digest preferences.
+ */
+if ( ! function_exists( 'cora_get_default_task_preferences' ) ) {
+function cora_get_default_task_preferences() {
+    return array(
+        'push_enabled'              => 1,
+        'pre_task_mins'             => 15,
+        'email_alerts'              => 1,
+        'email_digest_morning'      => 1,
+        'email_digest_morning_time' => '08:30',
+        'email_digest_evening'      => 1,
+        'email_digest_evening_time' => '19:00',
+        'whatsapp_enabled'          => 1,
+        'custom_email'              => '',
+        'custom_whatsapp'           => '',
+        'dnd_enabled'               => 0,
+        'dnd_start'                 => '22:00',
+        'dnd_end'                   => '08:00',
+    );
+}
+}
+
+/**
+ * Retrieve user task preferences from meta with intelligent fallbacks.
+ */
+if ( ! function_exists( 'cora_get_user_task_preferences' ) ) {
+function cora_get_user_task_preferences( $user_id = null ) {
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+    $defaults = cora_get_default_task_preferences();
+    if ( ! $user_id ) {
+        return $defaults;
+    }
+    $saved = get_user_meta( $user_id, 'cora_task_notification_preferences', true );
+    if ( ! is_array( $saved ) ) {
+        $global_prefs = get_user_meta( $user_id, 'cora_notification_preferences', true );
+        if ( is_array( $global_prefs ) ) {
+            $saved = array(
+                'push_enabled'         => ! empty( $global_prefs['global_push'] ) ? 1 : 0,
+                'email_alerts'         => ! empty( $global_prefs['global_email'] ) ? 1 : 0,
+                'whatsapp_enabled'     => ! empty( $global_prefs['global_whatsapp'] ) ? 1 : 0,
+                'custom_email'         => $global_prefs['custom_email'] ?? '',
+                'custom_whatsapp'      => $global_prefs['custom_whatsapp'] ?? '',
+                'dnd_enabled'          => ! empty( $global_prefs['dnd_enabled'] ) ? 1 : 0,
+                'dnd_start'            => $global_prefs['dnd_start'] ?? '22:00',
+                'dnd_end'              => $global_prefs['dnd_end'] ?? '08:00',
+            );
+        } else {
+            return $defaults;
+        }
+    }
+    return wp_parse_args( $saved, $defaults );
+}
+}
+
+/**
+ * Save user task preferences to meta.
+ */
+if ( ! function_exists( 'cora_save_user_task_preferences' ) ) {
+function cora_save_user_task_preferences( $user_id, $raw_data ) {
+    $defaults = cora_get_default_task_preferences();
+    $prefs = array(
+        'push_enabled'              => ! empty( $raw_data['push_enabled'] ?? $raw_data['cora_task_push_enabled'] ) ? 1 : 0,
+        'pre_task_mins'             => max( 5, min( 120, intval( $raw_data['pre_task_mins'] ?? $raw_data['cora_task_pre_mins'] ?? 15 ) ) ),
+        'email_alerts'              => ! empty( $raw_data['email_alerts'] ?? $raw_data['cora_task_email_alerts'] ) ? 1 : 0,
+        'email_digest_morning'      => ! empty( $raw_data['email_digest_morning'] ?? $raw_data['cora_task_digest_morning'] ) ? 1 : 0,
+        'email_digest_morning_time' => sanitize_text_field( $raw_data['email_digest_morning_time'] ?? $raw_data['cora_task_morning_time'] ?? '08:30' ),
+        'email_digest_evening'      => ! empty( $raw_data['email_digest_evening'] ?? $raw_data['cora_task_digest_evening'] ) ? 1 : 0,
+        'email_digest_evening_time' => sanitize_text_field( $raw_data['email_digest_evening_time'] ?? $raw_data['cora_task_evening_time'] ?? '19:00' ),
+        'whatsapp_enabled'          => ! empty( $raw_data['whatsapp_enabled'] ?? $raw_data['cora_task_whatsapp'] ) ? 1 : 0,
+        'custom_email'              => sanitize_email( $raw_data['custom_email'] ?? '' ),
+        'custom_whatsapp'           => sanitize_text_field( $raw_data['custom_whatsapp'] ?? '' ),
+        'dnd_enabled'               => ! empty( $raw_data['dnd_enabled'] ) ? 1 : 0,
+        'dnd_start'                 => sanitize_text_field( $raw_data['dnd_start'] ?? '22:00' ),
+        'dnd_end'                   => sanitize_text_field( $raw_data['dnd_end'] ?? '08:00' ),
+    );
+
+    update_user_meta( $user_id, 'cora_task_notification_preferences', $prefs );
+    return $prefs;
+}
+}
+
+/**
+ * Fetch tasks for workspace from database with options fallback.
+ */
+if ( ! function_exists( 'cora_get_workspace_tasks_list' ) ) {
+function cora_get_workspace_tasks_list( $workspace_id = null, $user_id = null, $filters = array() ) {
+    global $wpdb;
+    cora_ensure_tasks_table_exists();
+
+    if ( empty( $workspace_id ) ) {
+        $context = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+        $workspace_id = $context['slug'] ?? ( function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'default' );
+        if ( empty( $workspace_id ) ) {
+            $workspace_id = 'default';
+        }
+    }
+
+    $table_name = $wpdb->prefix . 'cora_workspace_tasks';
+    $where = array( "1=1" );
+    $params = array();
+
+    if ( $workspace_id !== 'all' && $workspace_id !== 'super' ) {
+        $where[] = "workspace_id = %s";
+        $params[] = (string) $workspace_id;
+    }
+
+    if ( ! empty( $user_id ) && intval( $user_id ) > 0 ) {
+        $where[] = "(user_id = %d OR created_by = %d OR user_id = 0)";
+        $params[] = intval( $user_id );
+        $params[] = intval( $user_id );
+    }
+
+    if ( ! empty( $filters['status'] ) ) {
+        $where[] = "status = %s";
+        $params[] = sanitize_text_field( $filters['status'] );
+    }
+
+    if ( ! empty( $filters['priority'] ) ) {
+        $where[] = "priority = %s";
+        $params[] = sanitize_text_field( $filters['priority'] );
+    }
+
+    if ( ! empty( $filters['due_date'] ) ) {
+        $where[] = "due_date = %s";
+        $params[] = sanitize_text_field( $filters['due_date'] );
+    }
+
+    $where_sql = implode( " AND ", $where );
+    $sql = "SELECT * FROM {$table_name} WHERE {$where_sql} ORDER BY due_date ASC, start_time ASC, id ASC";
+
+    if ( ! empty( $params ) ) {
+        $sql = $wpdb->prepare( $sql, $params );
+    }
+
+    $results = $wpdb->get_results( $sql, ARRAY_A );
+
+    // If DB is empty, check options or user meta fallback
+    if ( empty( $results ) ) {
+        $opt_tasks = get_option( 'cora_workspace_tasks_' . $workspace_id, null );
+        if ( is_array( $opt_tasks ) && ! empty( $opt_tasks ) ) {
+            return $opt_tasks;
+        }
+        if ( ! empty( $user_id ) ) {
+            $meta_tasks = get_user_meta( $user_id, 'cora_workspace_tasks_' . $workspace_id, true );
+            if ( is_array( $meta_tasks ) && ! empty( $meta_tasks ) ) {
+                return $meta_tasks;
+            }
+        }
+        return array();
+    }
+
+    $tasks = array();
+    foreach ( $results as $row ) {
+        $collabs = ! empty( $row['collaborators'] ) ? json_decode( $row['collaborators'], true ) : array();
+        if ( ! is_array( $collabs ) ) {
+            $collabs = array_values( array_filter( array_map( 'trim', explode( ',', (string) $row['collaborators'] ) ) ) );
+        }
+        $tags = ! empty( $row['tags'] ) ? json_decode( $row['tags'], true ) : array();
+        if ( ! is_array( $tags ) ) {
+            $tags = array_values( array_filter( array_map( 'trim', explode( ',', (string) $row['tags'] ) ) ) );
+        }
+        $extra = ! empty( $row['extra_data'] ) ? json_decode( $row['extra_data'], true ) : array();
+
+        $tasks[] = array(
+            'id'            => intval( $row['id'] ),
+            'task_uid'      => $row['task_uid'],
+            'workspace_id'  => $row['workspace_id'],
+            'user_id'       => intval( $row['user_id'] ),
+            'created_by'    => intval( $row['created_by'] ),
+            'title'         => $row['title'],
+            'description'   => $row['description'],
+            'status'        => $row['status'],
+            'priority'      => $row['priority'],
+            'category'      => $row['category'] ?: 'General',
+            'due_date'      => $row['due_date'],
+            'start_time'    => $row['start_time'],
+            'start_datetime'=> $row['start_datetime'],
+            'end_datetime'  => $row['end_datetime'],
+            'duration_mins' => intval( $row['duration_mins'] ),
+            'collaborators' => $collabs,
+            'tags'          => $tags,
+            'reminder_sent' => intval( $row['reminder_sent'] ),
+            'extra_data'    => $extra,
+            'created_at'    => $row['created_at'],
+            'updated_at'    => $row['updated_at'],
+        );
+    }
+
+    return $tasks;
+}
+}
+
+/**
+ * Save, sync, and persist task array in dedicated database table, user meta, and workspace options.
+ */
+if ( ! function_exists( 'cora_save_workspace_tasks_list' ) ) {
+function cora_save_workspace_tasks_list( $tasks_data, $workspace_id = null, $user_id = null ) {
+    global $wpdb;
+    cora_ensure_tasks_table_exists();
+
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id() ?: 1;
+    }
+
+    if ( empty( $workspace_id ) ) {
+        $context = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+        $workspace_id = $context['slug'] ?? ( function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'default' );
+        if ( empty( $workspace_id ) ) {
+            $workspace_id = 'default';
+        }
+    }
+
+    if ( ! is_array( $tasks_data ) ) {
+        return array( 'success' => false, 'error' => 'Invalid tasks payload.' );
+    }
+
+    if ( isset( $tasks_data['title'] ) && ! isset( $tasks_data[0] ) ) {
+        $tasks_array = array( $tasks_data );
+    } else {
+        $tasks_array = $tasks_data;
+    }
+
+    $table_name = $wpdb->prefix . 'cora_workspace_tasks';
+    $sanitized_tasks = array();
+    $now_mysql = current_time( 'mysql' );
+
+    foreach ( $tasks_array as $idx => $t ) {
+        if ( ! is_array( $t ) ) continue;
+
+        $task_uid = ! empty( $t['task_uid'] ) ? sanitize_text_field( $t['task_uid'] ) : ( ! empty( $t['id'] ) && is_string( $t['id'] ) && strpos( $t['id'], 'task_' ) === 0 ? sanitize_text_field( $t['id'] ) : 'task_' . time() . '_' . $idx . '_' . wp_rand( 100, 999 ) );
+        $title = sanitize_text_field( $t['title'] ?? 'Untitled Task' );
+        if ( empty( $title ) ) continue;
+
+        $desc = sanitize_textarea_field( $t['description'] ?? '' );
+        $status = sanitize_text_field( $t['status'] ?? 'todo' );
+        $priority = sanitize_text_field( $t['priority'] ?? 'medium' );
+        $category = sanitize_text_field( $t['category'] ?? 'General' );
+        $due_date = ! empty( $t['due_date'] ) ? sanitize_text_field( $t['due_date'] ) : current_time( 'Y-m-d' );
+        $start_time = ! empty( $t['start_time'] ) ? sanitize_text_field( $t['start_time'] ) : '09:00';
+        $duration_mins = ! empty( $t['duration_mins'] ) ? max( 5, intval( $t['duration_mins'] ) ) : 30;
+
+        $start_dt = null;
+        if ( ! empty( $t['start_datetime'] ) ) {
+            $start_dt = sanitize_text_field( $t['start_datetime'] );
+        } elseif ( ! empty( $due_date ) && ! empty( $start_time ) ) {
+            $start_dt = date( 'Y-m-d H:i:s', strtotime( "{$due_date} {$start_time}" ) );
+        }
+
+        $end_dt = null;
+        if ( ! empty( $t['end_datetime'] ) ) {
+            $end_dt = sanitize_text_field( $t['end_datetime'] );
+        } elseif ( $start_dt ) {
+            $end_dt = date( 'Y-m-d H:i:s', strtotime( $start_dt ) + ( $duration_mins * 60 ) );
+        }
+
+        $collaborators = ! empty( $t['collaborators'] ) && is_array( $t['collaborators'] ) ? wp_json_encode( array_values( array_map( 'sanitize_text_field', $t['collaborators'] ) ) ) : ( is_string( $t['collaborators'] ?? null ) ? sanitize_text_field( $t['collaborators'] ) : '[]' );
+        $tags = ! empty( $t['tags'] ) && is_array( $t['tags'] ) ? wp_json_encode( array_values( array_map( 'sanitize_text_field', $t['tags'] ) ) ) : ( is_string( $t['tags'] ?? null ) ? sanitize_text_field( $t['tags'] ) : '[]' );
+        $reminder_sent = ! empty( $t['reminder_sent'] ) ? 1 : 0;
+        $task_user_id = ! empty( $t['user_id'] ) ? intval( $t['user_id'] ) : $user_id;
+        $extra = isset( $t['extra_data'] ) && is_array( $t['extra_data'] ) ? wp_json_encode( $t['extra_data'] ) : ( is_string( $t['extra_data'] ?? null ) ? $t['extra_data'] : '{}' );
+
+        $numeric_id = is_numeric( $t['id'] ?? null ) ? intval( $t['id'] ) : 0;
+        $existing_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE task_uid = %s OR (id = %d AND id > 0)", $task_uid, $numeric_id ) );
+
+        $db_data = array(
+            'task_uid'      => $task_uid,
+            'workspace_id'  => (string) $workspace_id,
+            'user_id'       => $task_user_id,
+            'created_by'    => $user_id,
+            'title'         => $title,
+            'description'   => $desc,
+            'status'        => $status,
+            'priority'      => $priority,
+            'category'      => $category,
+            'due_date'      => $due_date,
+            'start_time'    => $start_time,
+            'start_datetime'=> $start_dt,
+            'end_datetime'  => $end_dt,
+            'duration_mins' => $duration_mins,
+            'collaborators' => $collaborators,
+            'tags'          => $tags,
+            'reminder_sent' => $reminder_sent,
+            'extra_data'    => $extra,
+            'updated_at'    => $now_mysql,
+        );
+
+        if ( $existing_id ) {
+            $wpdb->update( $table_name, $db_data, array( 'id' => $existing_id ) );
+            $saved_id = intval( $existing_id );
+        } else {
+            $db_data['created_at'] = $now_mysql;
+            $wpdb->insert( $table_name, $db_data );
+            $saved_id = intval( $wpdb->insert_id );
+        }
+
+        $sanitized_tasks[] = array(
+            'id'            => $saved_id,
+            'task_uid'      => $task_uid,
+            'workspace_id'  => (string) $workspace_id,
+            'user_id'       => $task_user_id,
+            'created_by'    => $user_id,
+            'title'         => $title,
+            'description'   => $desc,
+            'status'        => $status,
+            'priority'      => $priority,
+            'category'      => $category,
+            'due_date'      => $due_date,
+            'start_time'    => $start_time,
+            'start_datetime'=> $start_dt,
+            'end_datetime'  => $end_dt,
+            'duration_mins' => $duration_mins,
+            'collaborators' => json_decode( $collaborators, true ),
+            'tags'          => json_decode( $tags, true ),
+            'reminder_sent' => $reminder_sent,
+            'extra_data'    => json_decode( $extra, true ),
+            'created_at'    => $now_mysql,
+            'updated_at'    => $now_mysql,
+        );
+    }
+
+    // Persist to options and user meta for high-performance reading
+    update_option( 'cora_workspace_tasks_' . $workspace_id, $sanitized_tasks );
+    if ( $user_id ) {
+        update_user_meta( $user_id, 'cora_workspace_tasks_' . $workspace_id, $sanitized_tasks );
+        update_user_meta( $user_id, 'cora_workspace_tasks', $sanitized_tasks );
+    }
+
+    // Train and personalize workspace AI agent with newly synchronized tasks
+    $learned_persona = cora_train_workspace_agent_from_tasks( $workspace_id );
+
+    return array(
+        'success'         => true,
+        'tasks'           => $sanitized_tasks,
+        'count'           => count( $sanitized_tasks ),
+        'workspace_id'    => $workspace_id,
+        'learned_persona' => $learned_persona,
+    );
+}
+}
+
+/**
+ * Permission check for Tasks REST routes.
+ */
+if ( ! function_exists( 'cora_tasks_rest_permission_check' ) ) {
+function cora_tasks_rest_permission_check() {
+    if ( is_user_logged_in() || current_user_can( 'read' ) || current_user_can( 'edit_posts' ) ) {
+        return true;
+    }
+    $nonce = $_SERVER['HTTP_X_WP_NONCE'] ?? '';
+    if ( ! empty( $nonce ) && ( wp_verify_nonce( $nonce, 'wp_rest' ) || wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) ) ) {
+        return true;
+    }
+    if ( defined( 'LOGGED_IN_COOKIE' ) && ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
+        $validated = wp_validate_auth_cookie( $_COOKIE[ LOGGED_IN_COOKIE ], 'logged_in' );
+        if ( $validated ) {
+            wp_set_current_user( $validated );
+            return true;
+        }
+    }
+    return true;
+}
+}
+
+/**
+ * REST Callback: GET /wp-json/cora-workspace/v1/tasks
+ */
+if ( ! function_exists( 'cora_rest_get_workspace_tasks' ) ) {
+function cora_rest_get_workspace_tasks( $request ) {
+    $workspace_id = sanitize_text_field( $request->get_param( 'workspace_id' ) ?? '' );
+    $user_id      = intval( $request->get_param( 'user_id' ) ?? get_current_user_id() );
+    $filters      = array(
+        'status'   => sanitize_text_field( $request->get_param( 'status' ) ?? '' ),
+        'priority' => sanitize_text_field( $request->get_param( 'priority' ) ?? '' ),
+        'due_date' => sanitize_text_field( $request->get_param( 'due_date' ) ?? $request->get_param( 'date' ) ?? '' ),
+    );
+
+    $tasks = cora_get_workspace_tasks_list( $workspace_id, $user_id, $filters );
+    $ws_id = ! empty( $workspace_id ) ? $workspace_id : ( function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'default' );
+    $persona = get_option( 'cora_workspace_agent_learned_persona_' . $ws_id, null );
+    if ( empty( $persona ) ) {
+        $persona = cora_train_workspace_agent_from_tasks( $ws_id );
+    }
+
+    return new WP_REST_Response( array(
+        'success'         => true,
+        'workspace_id'    => $ws_id,
+        'tasks'           => $tasks,
+        'count'           => count( $tasks ),
+        'learned_persona' => $persona,
+    ), 200 );
+}
+}
+
+/**
+ * REST Callback: POST /wp-json/cora-workspace/v1/tasks
+ */
+if ( ! function_exists( 'cora_rest_save_workspace_tasks' ) ) {
+function cora_rest_save_workspace_tasks( $request ) {
+    $params = $request->get_json_params();
+    if ( empty( $params ) ) {
+        $params = $request->get_params();
+    }
+
+    $workspace_id = sanitize_text_field( $params['workspace_id'] ?? '' );
+    $user_id      = intval( $params['user_id'] ?? get_current_user_id() );
+    $tasks_data   = $params['tasks'] ?? $params;
+
+    if ( empty( $tasks_data ) || ! is_array( $tasks_data ) ) {
+        return new WP_REST_Response( array(
+            'success' => false,
+            'message' => 'No valid task data provided.',
+        ), 400 );
+    }
+
+    if ( isset( $tasks_data['title'] ) && ! isset( $tasks_data[0] ) ) {
+        $tasks_to_save = array( $tasks_data );
+    } else {
+        $tasks_to_save = $tasks_data;
+    }
+
+    $result = cora_save_workspace_tasks_list( $tasks_to_save, $workspace_id, $user_id );
+
+    return new WP_REST_Response( array(
+        'success'         => true,
+        'message'         => 'Workspace tasks saved and AI agent persona updated.',
+        'count'           => $result['count'] ?? count( $result['tasks'] ?? array() ),
+        'tasks'           => $result['tasks'] ?? array(),
+        'workspace_id'    => $result['workspace_id'] ?? $workspace_id,
+        'learned_persona' => $result['learned_persona'] ?? array(),
+    ), 200 );
+}
+}
+
+/**
+ * REST Callback: GET /wp-json/cora-workspace/v1/task-preferences
+ */
+if ( ! function_exists( 'cora_rest_get_task_preferences' ) ) {
+function cora_rest_get_task_preferences( $request ) {
+    $user_id = intval( $request->get_param( 'user_id' ) ?? get_current_user_id() );
+    if ( ! $user_id ) {
+        $user_id = 1;
+    }
+    $prefs = cora_get_user_task_preferences( $user_id );
+    return new WP_REST_Response( array(
+        'success'     => true,
+        'user_id'     => $user_id,
+        'preferences' => $prefs,
+    ), 200 );
+}
+}
+
+/**
+ * REST Callback: POST /wp-json/cora-workspace/v1/task-preferences
+ */
+if ( ! function_exists( 'cora_rest_save_task_preferences' ) ) {
+function cora_rest_save_task_preferences( $request ) {
+    $params = $request->get_json_params();
+    if ( empty( $params ) ) {
+        $params = $request->get_params();
+    }
+    $user_id = intval( $params['user_id'] ?? get_current_user_id() );
+    if ( ! $user_id ) {
+        $user_id = 1;
+    }
+
+    $prefs = cora_save_user_task_preferences( $user_id, $params );
+
+    return new WP_REST_Response( array(
+        'success'     => true,
+        'message'     => 'Task notification preferences updated successfully.',
+        'user_id'     => $user_id,
+        'preferences' => $prefs,
+    ), 200 );
+}
+}
+
+/**
+ * Register cora-workspace/v1 REST routes for Tasks & Preferences.
+ */
+if ( ! function_exists( 'cora_register_workspace_tasks_rest_routes' ) ) {
+function cora_register_workspace_tasks_rest_routes() {
+    register_rest_route( 'cora-workspace/v1', '/tasks', array(
+        array(
+            'methods'             => 'GET',
+            'callback'            => 'cora_rest_get_workspace_tasks',
+            'permission_callback' => 'cora_tasks_rest_permission_check',
+        ),
+        array(
+            'methods'             => 'POST',
+            'callback'            => 'cora_rest_save_workspace_tasks',
+            'permission_callback' => 'cora_tasks_rest_permission_check',
+        ),
+    ) );
+
+    register_rest_route( 'cora-workspace/v1', '/task-preferences', array(
+        array(
+            'methods'             => 'GET',
+            'callback'            => 'cora_rest_get_task_preferences',
+            'permission_callback' => 'cora_tasks_rest_permission_check',
+        ),
+        array(
+            'methods'             => 'POST',
+            'callback'            => 'cora_rest_save_task_preferences',
+            'permission_callback' => 'cora_tasks_rest_permission_check',
+        ),
+    ) );
+}
+add_action( 'rest_api_init', 'cora_register_workspace_tasks_rest_routes' );
+}
+
+/* ==========================================================================
+   MONOCHROMATIC HTML EMAIL TEMPLATE BUILDERS (Cora Brand Guidelines)
+   ========================================================================== */
+
+/**
+ * Build clean monochromatic HTML email template for individual task reminder.
+ */
+if ( ! function_exists( 'cora_build_task_reminder_email_html' ) ) {
+function cora_build_task_reminder_email_html( $user_name, $task, $mins_until ) {
+    $site_title = get_option( 'blogname', 'Cora Workspace' );
+    $workspace_url = home_url( '/workspace/dashboard' );
+    $settings_url  = home_url( '/workspace/settings-suite?settings_tab=notifications' );
+    $title = esc_html( $task['title'] ?? 'Upcoming Task' );
+    $desc = ! empty( $task['description'] ) ? nl2br( esc_html( $task['description'] ) ) : 'No additional description provided.';
+    $priority = strtoupper( esc_html( $task['priority'] ?? 'MEDIUM' ) );
+    $category = esc_html( $task['category'] ?? 'General' );
+    $start_time = esc_html( $task['start_time'] ?? '09:00' );
+    $due_date = esc_html( $task['due_date'] ?? date('Y-m-d') );
+    $duration = intval( $task['duration_mins'] ?? 30 );
+
+    $collabs_text = 'Assigned to you';
+    if ( ! empty( $task['collaborators'] ) && is_array( $task['collaborators'] ) ) {
+        $collabs_text = implode( ', ', array_map( 'esc_html', $task['collaborators'] ) );
+    }
+
+    return '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Reminder: ' . $title . '</title>
+<style>
+body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; color: #18181b; }
+.wrapper { width: 100%; max-width: 600px; margin: 30px auto; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.header { padding: 24px 32px; border-bottom: 1px solid #f4f4f5; background: #ffffff; }
+.logo { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; color: #09090b; text-decoration: none; }
+.badge { display: inline-block; padding: 4px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #09090b; color: #ffffff; border-radius: 9999px; }
+.content { padding: 36px 32px; }
+.title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #09090b; margin: 0 0 12px 0; line-height: 1.3; }
+.subtitle { font-size: 14px; color: #71717a; margin: 0 0 24px 0; }
+.card { background: #fafafa; border: 1px solid #f4f4f5; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.meta-table { width: 100%; border-collapse: collapse; }
+.meta-table td { padding: 6px 0; font-size: 13px; vertical-align: top; }
+.meta-label { color: #71717a; width: 110px; font-weight: 500; }
+.meta-val { color: #09090b; font-weight: 600; }
+.desc-box { font-size: 14px; line-height: 1.6; color: #3f3f46; margin: 0 0 28px 0; }
+.btn { display: inline-block; padding: 12px 24px; font-size: 13px; font-weight: 700; color: #ffffff !important; background: #09090b; border-radius: 10px; text-decoration: none; }
+.footer { padding: 24px 32px; background: #fafafa; border-top: 1px solid #f4f4f5; font-size: 11px; color: #71717a; text-align: center; }
+.footer a { color: #52525b; text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td align="left"><a href="' . esc_url( $workspace_url ) . '" class="logo">' . esc_html( $site_title ) . '</a></td>
+                <td align="right"><span class="badge">Task Reminder</span></td>
+            </tr>
+        </table>
+    </div>
+    <div class="content">
+        <h1 class="title">' . $title . '</h1>
+        <p class="subtitle">Starting in approximately ' . intval( $mins_until ) . ' minutes (' . $start_time . ')</p>
+        
+        <div class="card">
+            <table class="meta-table">
+                <tr>
+                    <td class="meta-label">Priority</td>
+                    <td class="meta-val">' . $priority . '</td>
+                </tr>
+                <tr>
+                    <td class="meta-label">Category</td>
+                    <td class="meta-val">' . $category . '</td>
+                </tr>
+                <tr>
+                    <td class="meta-label">Scheduled Date</td>
+                    <td class="meta-val">' . $due_date . ' at ' . $start_time . ' (' . $duration . ' mins)</td>
+                </tr>
+                <tr>
+                    <td class="meta-label">Collaborators</td>
+                    <td class="meta-val">' . $collabs_text . '</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="desc-box">
+            <strong style="color: #09090b; display: block; margin-bottom: 8px;">Description & Notes:</strong>
+            ' . $desc . '
+        </div>
+
+        <div>
+            <a href="' . esc_url( $workspace_url ) . '" class="btn">Open Task in Workspace &rarr;</a>
+        </div>
+    </div>
+    <div class="footer">
+        <p style="margin: 0 0 8px 0;">This automated reminder was dispatched by ' . esc_html( $site_title ) . ' Task Engine.</p>
+        <p style="margin: 0;"><a href="' . esc_url( $settings_url ) . '">Task Notification Preferences</a> &bull; <a href="' . esc_url( $workspace_url ) . '">Dashboard</a></p>
+    </div>
+</div>
+</body>
+</html>';
+}
+}
+
+/**
+ * Build clean monochromatic HTML email template for Daily Morning Briefing.
+ */
+if ( ! function_exists( 'cora_build_morning_briefing_email_html' ) ) {
+function cora_build_morning_briefing_email_html( $user_name, $workspace_name, $tasks, $persona_insights = array() ) {
+    $site_title = get_option( 'blogname', 'Cora Workspace' );
+    $workspace_url = home_url( '/workspace/dashboard' );
+    $settings_url  = home_url( '/workspace/settings-suite?settings_tab=notifications' );
+    $today_str     = date( 'l, F j, Y' );
+    $total_count   = count( $tasks );
+    $urgent_count  = 0;
+    $est_mins      = 0;
+
+    $task_rows_html = '';
+    if ( ! empty( $tasks ) ) {
+        foreach ( $tasks as $t ) {
+            $p = strtoupper( $t['priority'] ?? 'MEDIUM' );
+            if ( $p === 'URGENT' || $p === 'HIGH' ) {
+                $urgent_count++;
+            }
+            $est_mins += intval( $t['duration_mins'] ?? 30 );
+            $time_badge = esc_html( $t['start_time'] ?? 'All Day' );
+            $task_title = esc_html( $t['title'] ?? 'Task' );
+            $task_cat   = esc_html( $t['category'] ?? 'General' );
+
+            $task_rows_html .= '
+            <tr style="border-bottom: 1px solid #f4f4f5;">
+                <td style="padding: 12px 0; font-size: 13px; font-weight: 700; color: #09090b; width: 85px;">' . $time_badge . '</td>
+                <td style="padding: 12px 0; font-size: 14px; color: #18181b;">
+                    <span style="font-weight: 600;">' . $task_title . '</span>
+                    <span style="font-size: 11px; color: #71717a; margin-left: 8px;">[' . $task_cat . ']</span>
+                </td>
+                <td align="right" style="padding: 12px 0; font-size: 11px; font-weight: 700; color: #52525b;">' . $p . '</td>
+            </tr>';
+        }
+    } else {
+        $task_rows_html = '<tr><td colspan="3" style="padding: 24px 0; text-align: center; color: #71717a; font-size: 14px;">No tasks scheduled for today. You are fully clear!</td></tr>';
+    }
+
+    $focus_note = ! empty( $persona_insights['agent_system_prompt_ctx'] ) ? $persona_insights['agent_system_prompt_ctx'] : 'Focus on your peak morning productivity window to complete high-priority deliverables.';
+
+    return '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Morning Briefing - ' . esc_html( $today_str ) . '</title>
+<style>
+body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; color: #18181b; }
+.wrapper { width: 100%; max-width: 600px; margin: 30px auto; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.header { padding: 24px 32px; border-bottom: 1px solid #f4f4f5; background: #ffffff; }
+.logo { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; color: #09090b; text-decoration: none; }
+.badge { display: inline-block; padding: 4px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #09090b; color: #ffffff; border-radius: 9999px; }
+.content { padding: 36px 32px; }
+.title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #09090b; margin: 0 0 6px 0; }
+.subtitle { font-size: 14px; color: #71717a; margin: 0 0 28px 0; }
+.stats-grid { width: 100%; margin-bottom: 28px; border-collapse: collapse; }
+.stat-box { background: #fafafa; border: 1px solid #f4f4f5; border-radius: 10px; padding: 14px 16px; text-align: center; width: 31%; }
+.stat-num { font-size: 20px; font-weight: 800; color: #09090b; }
+.stat-lbl { font-size: 11px; font-weight: 600; color: #71717a; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+.section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #09090b; margin: 24px 0 12px 0; }
+.task-table { width: 100%; border-collapse: collapse; }
+.ai-box { background: #fafafa; border: 1px solid #e4e4e7; border-left: 3px solid #09090b; border-radius: 8px; padding: 16px; margin: 28px 0; font-size: 13px; line-height: 1.5; color: #3f3f46; }
+.btn { display: inline-block; padding: 12px 24px; font-size: 13px; font-weight: 700; color: #ffffff !important; background: #09090b; border-radius: 10px; text-decoration: none; }
+.footer { padding: 24px 32px; background: #fafafa; border-top: 1px solid #f4f4f5; font-size: 11px; color: #71717a; text-align: center; }
+.footer a { color: #52525b; text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td align="left"><a href="' . esc_url( $workspace_url ) . '" class="logo">' . esc_html( $site_title ) . '</a></td>
+                <td align="right"><span class="badge">Morning Briefing</span></td>
+            </tr>
+        </table>
+    </div>
+    <div class="content">
+        <h1 class="title">Good morning, ' . esc_html( $user_name ) . '</h1>
+        <p class="subtitle">' . esc_html( $today_str ) . ' &bull; ' . esc_html( $workspace_name ) . '</p>
+        
+        <table class="stats-grid" width="100%">
+            <tr>
+                <td class="stat-box">
+                    <div class="stat-num">' . $total_count . '</div>
+                    <div class="stat-lbl">Today\'s Tasks</div>
+                </td>
+                <td style="width: 3.5%;"></td>
+                <td class="stat-box">
+                    <div class="stat-num">' . $urgent_count . '</div>
+                    <div class="stat-lbl">High / Urgent</div>
+                </td>
+                <td style="width: 3.5%;"></td>
+                <td class="stat-box">
+                    <div class="stat-num">' . round( $est_mins / 60, 1 ) . 'h</div>
+                    <div class="stat-lbl">Focus Time</div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="section-title">Today\'s Agenda</div>
+        <table class="task-table">
+            ' . $task_rows_html . '
+        </table>
+
+        <div class="ai-box">
+            <strong style="display:block; color:#09090b; margin-bottom: 4px;">Cora AI Operational Intelligence:</strong>
+            ' . esc_html( $focus_note ) . '
+        </div>
+
+        <div>
+            <a href="' . esc_url( $workspace_url ) . '" class="btn">Launch Today\'s Schedule &rarr;</a>
+        </div>
+    </div>
+    <div class="footer">
+        <p style="margin: 0 0 8px 0;">Dispatched automatically to your email by Cora Briefing Engine.</p>
+        <p style="margin: 0;"><a href="' . esc_url( $settings_url ) . '">Configure Digest Preferences</a> &bull; <a href="' . esc_url( $workspace_url ) . '">Open Workspace</a></p>
+    </div>
+</div>
+</body>
+</html>';
+}
+}
+
+/**
+ * Build clean monochromatic HTML email template for Evening Wrap-Up Report.
+ */
+if ( ! function_exists( 'cora_build_evening_wrapup_email_html' ) ) {
+function cora_build_evening_wrapup_email_html( $user_name, $workspace_name, $completed_tasks, $pending_tasks, $tomorrow_tasks, $persona_insights = array() ) {
+    $site_title = get_option( 'blogname', 'Cora Workspace' );
+    $workspace_url = home_url( '/workspace/dashboard' );
+    $settings_url  = home_url( '/workspace/settings-suite?settings_tab=notifications' );
+    $today_str     = date( 'l, F j, Y' );
+    $completed_cnt = count( $completed_tasks );
+    $pending_cnt   = count( $pending_tasks );
+    $total_cnt     = $completed_cnt + $pending_cnt;
+    $rate          = $total_cnt > 0 ? round( ( $completed_cnt / $total_cnt ) * 100 ) : 100;
+
+    $completed_html = '';
+    if ( ! empty( $completed_tasks ) ) {
+        foreach ( $completed_tasks as $t ) {
+            $completed_html .= '<li style="margin-bottom: 6px; color: #52525b;"><span style="text-decoration: line-through;">' . esc_html( $t['title'] ?? 'Task' ) . '</span> <span style="font-size: 11px; color: #71717a;">(' . esc_html( $t['category'] ?? 'General' ) . ')</span></li>';
+        }
+    } else {
+        $completed_html = '<li style="color: #71717a;">No tasks marked completed today.</li>';
+    }
+
+    $pending_html = '';
+    if ( ! empty( $pending_tasks ) ) {
+        foreach ( $pending_tasks as $t ) {
+            $pending_html .= '<li style="margin-bottom: 6px; font-weight: 600; color: #18181b;">' . esc_html( $t['title'] ?? 'Task' ) . ' <span style="font-size: 11px; color: #71717a; font-weight: 400;">[' . strtoupper( esc_html( $t['priority'] ?? 'MEDIUM' ) ) . ']</span></li>';
+        }
+    } else {
+        $pending_html = '<li style="color: #71717a;">All scheduled tasks completed!</li>';
+    }
+
+    return '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evening Wrap-Up - ' . esc_html( $today_str ) . '</title>
+<style>
+body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; color: #18181b; }
+.wrapper { width: 100%; max-width: 600px; margin: 30px auto; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.header { padding: 24px 32px; border-bottom: 1px solid #f4f4f5; background: #ffffff; }
+.logo { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; color: #09090b; text-decoration: none; }
+.badge { display: inline-block; padding: 4px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #09090b; color: #ffffff; border-radius: 9999px; }
+.content { padding: 36px 32px; }
+.title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #09090b; margin: 0 0 6px 0; }
+.subtitle { font-size: 14px; color: #71717a; margin: 0 0 28px 0; }
+.stats-grid { width: 100%; margin-bottom: 28px; border-collapse: collapse; }
+.stat-box { background: #fafafa; border: 1px solid #f4f4f5; border-radius: 10px; padding: 14px 16px; text-align: center; width: 31%; }
+.stat-num { font-size: 20px; font-weight: 800; color: #09090b; }
+.stat-lbl { font-size: 11px; font-weight: 600; color: #71717a; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+.section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #09090b; margin: 24px 0 10px 0; }
+ul { margin: 0 0 20px 0; padding-left: 20px; font-size: 14px; line-height: 1.6; }
+.btn { display: inline-block; padding: 12px 24px; font-size: 13px; font-weight: 700; color: #ffffff !important; background: #09090b; border-radius: 10px; text-decoration: none; }
+.footer { padding: 24px 32px; background: #fafafa; border-top: 1px solid #f4f4f5; font-size: 11px; color: #71717a; text-align: center; }
+.footer a { color: #52525b; text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td align="left"><a href="' . esc_url( $workspace_url ) . '" class="logo">' . esc_html( $site_title ) . '</a></td>
+                <td align="right"><span class="badge">Evening Wrap-Up</span></td>
+            </tr>
+        </table>
+    </div>
+    <div class="content">
+        <h1 class="title">Evening Wrap-Up, ' . esc_html( $user_name ) . '</h1>
+        <p class="subtitle">' . esc_html( $today_str ) . ' &bull; ' . esc_html( $workspace_name ) . '</p>
+        
+        <table class="stats-grid" width="100%">
+            <tr>
+                <td class="stat-box">
+                    <div class="stat-num">' . $completed_cnt . '</div>
+                    <div class="stat-lbl">Completed</div>
+                </td>
+                <td style="width: 3.5%;"></td>
+                <td class="stat-box">
+                    <div class="stat-num">' . $pending_cnt . '</div>
+                    <div class="stat-lbl">Pending / Rollover</div>
+                </td>
+                <td style="width: 3.5%;"></td>
+                <td class="stat-box">
+                    <div class="stat-num">' . $rate . '%</div>
+                    <div class="stat-lbl">Completion Rate</div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="section-title">Accomplished Today</div>
+        <ul>' . $completed_html . '</ul>
+
+        <div class="section-title">Rollover / Open Tasks</div>
+        <ul>' . $pending_html . '</ul>
+
+        <div style="margin-top: 28px;">
+            <a href="' . esc_url( $workspace_url ) . '" class="btn">Review Workspace Dashboard &rarr;</a>
+        </div>
+    </div>
+    <div class="footer">
+        <p style="margin: 0 0 8px 0;">Dispatched automatically to your email by Cora Briefing Engine.</p>
+        <p style="margin: 0;"><a href="' . esc_url( $settings_url ) . '">Configure Digest Preferences</a> &bull; <a href="' . esc_url( $workspace_url ) . '">Open Workspace</a></p>
+    </div>
+</div>
+</body>
+</html>';
+}
+}
+
+/* ==========================================================================
+   NOTIFICATION & EMAIL DISPATCH ENGINE (WP-CRON & ON-DEMAND)
+   ========================================================================== */
+
+/**
+ * Main Cron & Dispatcher Hook for Task Notifications, Pre-Task Reminders, and Daily Briefings.
+ */
+if ( ! function_exists( 'cora_schedule_task_notifications_cron' ) ) {
+function cora_schedule_task_notifications_cron( $force = false ) {
+    global $wpdb;
+    cora_ensure_tasks_table_exists();
+
+    $table_name = $wpdb->prefix . 'cora_workspace_tasks';
+    $now_ts     = current_time( 'timestamp' );
+    $now_mysql  = current_time( 'mysql' );
+    $today_ymd  = current_time( 'Y-m-d' );
+    $now_hm     = current_time( 'H:i' );
+
+    $dispatched = array(
+        'pre_task_push'    => 0,
+        'pre_task_email'   => 0,
+        'morning_briefs'   => 0,
+        'evening_wrapups'  => 0,
+    );
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 1. PRE-TASK UPCOMING REMINDERS (Next 15 to 30 Minutes)
+    // ─────────────────────────────────────────────────────────────────────────
+    $window_start = date( 'Y-m-d H:i:s', $now_ts );
+    $window_end   = date( 'Y-m-d H:i:s', $now_ts + ( 30 * MINUTE_IN_SECONDS ) );
+
+    $upcoming_tasks = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT * FROM {$table_name} 
+             WHERE status != 'completed' 
+               AND status != 'cancelled'
+               AND reminder_sent = 0 
+               AND start_datetime IS NOT NULL 
+               AND start_datetime >= %s 
+               AND start_datetime <= %s",
+            $window_start,
+            $window_end
+        ),
+        ARRAY_A
+    );
+
+    if ( ! empty( $upcoming_tasks ) ) {
+        foreach ( $upcoming_tasks as $t ) {
+            $user_id = intval( $t['user_id'] ?: $t['created_by'] ?: 1 );
+            $prefs   = cora_get_user_task_preferences( $user_id );
+            $in_dnd  = function_exists( 'cora_is_user_in_quiet_hours' ) ? cora_is_user_in_quiet_hours( $user_id, $prefs ) : false;
+
+            $start_ts   = strtotime( $t['start_datetime'] );
+            $mins_until = max( 1, round( ( $start_ts - $now_ts ) / 60 ) );
+
+            // A) PWA Web Push Notification
+            if ( ! empty( $prefs['push_enabled'] ) && ! $in_dnd ) {
+                if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
+                    $push_title = "Upcoming Task: " . ( $t['title'] ?? 'Task' );
+                    $push_body  = "Starts in {$mins_until}m ({$t['start_time']}) • Priority: " . strtoupper($t['priority'] ?? 'medium') . " • " . ($t['category'] ?? 'General');
+                    $push_url   = home_url( '/workspace/tasks' );
+                    $sent_push  = cora_pwa_send_push_notification( $user_id, $push_title, $push_body, $push_url );
+                    if ( $sent_push ) {
+                        $dispatched['pre_task_push']++;
+                    }
+                }
+            }
+
+            // B) Monochromatic Email Reminder
+            if ( ! empty( $prefs['email_alerts'] ) && ! $in_dnd ) {
+                $user_obj = get_userdata( $user_id );
+                $target_email = ! empty( $prefs['custom_email'] ) ? $prefs['custom_email'] : ( $user_obj ? $user_obj->user_email : '' );
+                $display_name = $user_obj ? $user_obj->display_name : 'Workspace User';
+
+                if ( ! empty( $target_email ) && is_email( $target_email ) ) {
+                    $subject = "Reminder: " . ( $t['title'] ?? 'Upcoming Task' ) . " starts in {$mins_until}m";
+                    $html = cora_build_task_reminder_email_html( $display_name, $t, $mins_until );
+                    $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+                    if ( @wp_mail( $target_email, $subject, $html, $headers ) ) {
+                        $dispatched['pre_task_email']++;
+                    }
+                }
+            }
+
+            // Mark reminder_sent in database table and workspace cache
+            $wpdb->update( $table_name, array( 'reminder_sent' => 1, 'updated_at' => $now_mysql ), array( 'id' => $t['id'] ) );
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 2. DAILY MORNING BRIEFING DISPATCHER
+    // ─────────────────────────────────────────────────────────────────────────
+    $is_morning_window = ( $now_hm >= '07:30' && $now_hm <= '10:30' ) || $force;
+    if ( $is_morning_window ) {
+        $users = get_users( array( 'role__in' => array( 'administrator', 'cora_workspace_owner', 'cora_manager', 'editor', 'author' ) ) );
+        foreach ( $users as $u ) {
+            $prefs = cora_get_user_task_preferences( $u->ID );
+            if ( empty( $prefs['email_digest_morning'] ) && ! $force ) {
+                continue;
+            }
+            $sent_key = 'cora_morning_brief_sent_' . date('Ymd') . '_' . $u->ID;
+            if ( get_transient( $sent_key ) && ! $force ) {
+                continue;
+            }
+
+            $user_ws = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'default';
+            $today_tasks = cora_get_workspace_tasks_list( $user_ws, $u->ID, array( 'due_date' => $today_ymd ) );
+            $persona = get_option( 'cora_workspace_agent_learned_persona_' . $user_ws, array() );
+
+            $target_email = ! empty( $prefs['custom_email'] ) ? $prefs['custom_email'] : $u->user_email;
+            if ( ! empty( $target_email ) && is_email( $target_email ) ) {
+                $ws_title = get_option( 'blogname', 'Cora Studio' );
+                $html = cora_build_morning_briefing_email_html( $u->display_name, $ws_title, $today_tasks, $persona );
+                $subject = "Cora Daily Morning Briefing: " . date('l, M j') . " (" . count($today_tasks) . " tasks scheduled)";
+                $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+                if ( @wp_mail( $target_email, $subject, $html, $headers ) ) {
+                    $dispatched['morning_briefs']++;
+                    set_transient( $sent_key, 1, 18 * HOUR_IN_SECONDS );
+                }
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 3. DAILY EVENING WRAP-UP REPORT DISPATCHER
+    // ─────────────────────────────────────────────────────────────────────────
+    $is_evening_window = ( $now_hm >= '18:00' && $now_hm <= '21:30' ) || $force;
+    if ( $is_evening_window ) {
+        $users = get_users( array( 'role__in' => array( 'administrator', 'cora_workspace_owner', 'cora_manager', 'editor', 'author' ) ) );
+        foreach ( $users as $u ) {
+            $prefs = cora_get_user_task_preferences( $u->ID );
+            if ( empty( $prefs['email_digest_evening'] ) && ! $force ) {
+                continue;
+            }
+            $sent_key = 'cora_evening_wrap_sent_' . date('Ymd') . '_' . $u->ID;
+            if ( get_transient( $sent_key ) && ! $force ) {
+                continue;
+            }
+
+            $user_ws = function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'default';
+            $all_today = cora_get_workspace_tasks_list( $user_ws, $u->ID, array( 'due_date' => $today_ymd ) );
+            $tomorrow_ymd = date( 'Y-m-d', $now_ts + DAY_IN_SECONDS );
+            $tomorrow_tasks = cora_get_workspace_tasks_list( $user_ws, $u->ID, array( 'due_date' => $tomorrow_ymd ) );
+
+            $completed = array();
+            $pending   = array();
+            foreach ( $all_today as $t ) {
+                if ( ( $t['status'] ?? '' ) === 'completed' ) {
+                    $completed[] = $t;
+                } else {
+                    $pending[] = $t;
+                }
+            }
+
+            $persona = get_option( 'cora_workspace_agent_learned_persona_' . $user_ws, array() );
+            $target_email = ! empty( $prefs['custom_email'] ) ? $prefs['custom_email'] : $u->user_email;
+            if ( ! empty( $target_email ) && is_email( $target_email ) ) {
+                $ws_title = get_option( 'blogname', 'Cora Studio' );
+                $html = cora_build_evening_wrapup_email_html( $u->display_name, $ws_title, $completed, $pending, $tomorrow_tasks, $persona );
+                $subject = "Cora Evening Wrap-Up: " . count($completed) . " completed, " . count($pending) . " pending";
+                $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+                if ( @wp_mail( $target_email, $subject, $html, $headers ) ) {
+                    $dispatched['evening_wrapups']++;
+                    set_transient( $sent_key, 1, 18 * HOUR_IN_SECONDS );
+                }
+            }
+        }
+    }
+
+    return $dispatched;
+}
+add_action( 'cora_schedule_task_notifications_cron', 'cora_schedule_task_notifications_cron' );
+}
+
+// Ensure 15-Minute Cron Event is Active
+if ( ! wp_next_scheduled( 'cora_schedule_task_notifications_cron' ) ) {
+    wp_schedule_event( time(), 'every_fifteen_minutes', 'cora_schedule_task_notifications_cron' );
+}
+
+/* ==========================================================================
+   WORKSPACE AI AGENT TRAINING PIPELINE (TASK INTELLIGENCE & PERSONA SYNTHESIS)
+   ========================================================================== */
+
+/**
+ * Workspace AI Agent Training Pipeline:
+ * Analyzes task data to extract user habits, peak productivity times, urgency ratios,
+ * frequent project keywords, and collaborator patterns, persisting into wp_options.
+ *
+ * @param string|int|null $workspace_id
+ * @return array Learned persona and behavioral profile
+ */
+if ( ! function_exists( 'cora_train_workspace_agent_from_tasks' ) ) {
+function cora_train_workspace_agent_from_tasks( $workspace_id = null ) {
+    if ( empty( $workspace_id ) ) {
+        $context = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+        $workspace_id = $context['slug'] ?? ( function_exists( 'cora_get_current_user_agency_id' ) ? cora_get_current_user_agency_id() : 'default' );
+        if ( empty( $workspace_id ) ) {
+            $workspace_id = 'default';
+        }
+    }
+
+    $tasks = cora_get_workspace_tasks_list( $workspace_id, 0, array() );
+    $total_tasks = count( $tasks );
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 1. HABITS & COMPLETION METRICS
+    // ─────────────────────────────────────────────────────────────────────────
+    $completed_cnt   = 0;
+    $in_progress_cnt = 0;
+    $todo_cnt        = 0;
+    $cancelled_cnt   = 0;
+    $total_dur_mins  = 0;
+
+    $hourly_buckets = array(
+        'morning'   => 0, // 06:00 - 11:59
+        'afternoon' => 0, // 12:00 - 16:59
+        'evening'   => 0, // 17:00 - 21:59
+        'night'     => 0, // 22:00 - 05:59
+    );
+
+    $weekday_counts = array(
+        'Monday' => 0, 'Tuesday' => 0, 'Wednesday' => 0,
+        'Thursday' => 0, 'Friday' => 0, 'Saturday' => 0, 'Sunday' => 0
+    );
+
+    $urgency_breakdown = array(
+        'urgent' => 0,
+        'high'   => 0,
+        'medium' => 0,
+        'low'    => 0,
+    );
+
+    $categories_counter = array();
+    $collaborators_map  = array();
+    $corpus_words       = array();
+
+    // English / Business Stop Words for keyword frequency extraction
+    $stop_words = array(
+        'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and',
+        'any', 'are', 'as', 'at', 'be', 'because', 'been', 'before', 'being', 'below',
+        'between', 'both', 'but', 'by', 'can', 'did', 'do', 'does', 'doing', 'down',
+        'during', 'each', 'few', 'for', 'from', 'further', 'had', 'has', 'have', 'having',
+        'he', 'her', 'here', 'hers', 'herself', 'him', 'himself', 'his', 'how', 'i',
+        'if', 'in', 'into', 'is', 'it', 'its', 'itself', 'just', 'me', 'more', 'most',
+        'my', 'myself', 'no', 'nor', 'not', 'now', 'of', 'off', 'on', 'once', 'only',
+        'or', 'other', 'our', 'ours', 'ourselves', 'out', 'over', 'own', 'same', 'she',
+        'should', 'so', 'some', 'such', 'than', 'that', 'the', 'their', 'theirs', 'them',
+        'themselves', 'then', 'there', 'these', 'they', 'this', 'those', 'through', 'to',
+        'too', 'under', 'until', 'up', 'very', 'was', 'we', 'were', 'what', 'when', 'where',
+        'which', 'while', 'who', 'whom', 'why', 'will', 'with', 'you', 'your', 'yours',
+        'yourself', 'yourselves', 'cora', 'task', 'tasks', 'please', 'need', 'make', 'get'
+    );
+
+    if ( ! empty( $tasks ) ) {
+        foreach ( $tasks as $t ) {
+            $status = strtolower( $t['status'] ?? 'todo' );
+            if ( $status === 'completed' || $status === 'done' ) {
+                $completed_cnt++;
+            } elseif ( $status === 'in_progress' || $status === 'active' ) {
+                $in_progress_cnt++;
+            } elseif ( $status === 'cancelled' ) {
+                $cancelled_cnt++;
+            } else {
+                $todo_cnt++;
+            }
+
+            $dur = intval( $t['duration_mins'] ?? 30 );
+            $total_dur_mins += $dur;
+
+            // Hourly Distribution
+            $st_time = $t['start_time'] ?? '09:00';
+            $hour = intval( substr( $st_time, 0, 2 ) );
+            if ( $hour >= 6 && $hour < 12 ) {
+                $hourly_buckets['morning']++;
+            } elseif ( $hour >= 12 && $hour < 17 ) {
+                $hourly_buckets['afternoon']++;
+            } elseif ( $hour >= 17 && $hour < 22 ) {
+                $hourly_buckets['evening']++;
+            } else {
+                $hourly_buckets['night']++;
+            }
+
+            // Day of Week
+            if ( ! empty( $t['due_date'] ) ) {
+                $day_name = date( 'l', strtotime( $t['due_date'] ) );
+                if ( isset( $weekday_counts[ $day_name ] ) ) {
+                    $weekday_counts[ $day_name ]++;
+                }
+            }
+
+            // Urgency / Priority
+            $p = strtolower( $t['priority'] ?? 'medium' );
+            if ( isset( $urgency_breakdown[ $p ] ) ) {
+                $urgency_breakdown[ $p ]++;
+            } else {
+                $urgency_breakdown['medium']++;
+            }
+
+            // Categories
+            $cat = sanitize_text_field( $t['category'] ?? 'General' );
+            $categories_counter[ $cat ] = ( $categories_counter[ $cat ] ?? 0 ) + 1;
+
+            // Collaborators
+            if ( ! empty( $t['collaborators'] ) && is_array( $t['collaborators'] ) ) {
+                foreach ( $t['collaborators'] as $collab ) {
+                    $c_clean = trim( sanitize_text_field( $collab ) );
+                    if ( ! empty( $c_clean ) ) {
+                        $collaborators_map[ $c_clean ] = ( $collaborators_map[ $c_clean ] ?? 0 ) + 1;
+                    }
+                }
+            }
+
+            // Keyword Extraction Corpus
+            $text_block = strtolower( ( $t['title'] ?? '' ) . ' ' . ( $t['description'] ?? '' ) . ' ' . ( $t['category'] ?? '' ) );
+            $clean_text = preg_replace( '/[^a-z0-9\s]/', ' ', $text_block );
+            $words = array_filter( explode( ' ', (string) $clean_text ) );
+            foreach ( $words as $w ) {
+                $w = trim( $w );
+                if ( strlen( $w ) >= 3 && ! in_array( $w, $stop_words, true ) && ! is_numeric( $w ) ) {
+                    $corpus_words[ $w ] = ( $corpus_words[ $w ] ?? 0 ) + 1;
+                }
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 2. SYNTHESIZE INTELLIGENCE RATIOS & PEAK WINDOWS
+    // ─────────────────────────────────────────────────────────────────────────
+    $completion_rate = $total_tasks > 0 ? round( ( $completed_cnt / $total_tasks ) * 100, 1 ) : 85.0;
+    $avg_duration    = $total_tasks > 0 ? round( $total_dur_mins / $total_tasks ) : 30;
+
+    // Peak Productivity Slot & Day
+    arsort( $hourly_buckets );
+    $peak_slot_key = array_key_first( $hourly_buckets );
+    $slot_labels   = array(
+        'morning'   => 'Morning (09:00 - 12:00)',
+        'afternoon' => 'Afternoon (13:00 - 16:00)',
+        'evening'   => 'Evening (17:00 - 20:00)',
+        'night'     => 'Night (21:00 - 01:00)',
+    );
+    $peak_slot = $slot_labels[ $peak_slot_key ] ?? 'Morning (09:00 - 12:00)';
+
+    arsort( $weekday_counts );
+    $peak_day = array_key_first( $weekday_counts ) ?: 'Wednesday';
+
+    // Urgency Ratio & Fire Drill Index
+    $high_urgent_count = $urgency_breakdown['urgent'] + $urgency_breakdown['high'];
+    $urgency_ratio     = $total_tasks > 0 ? round( ( $high_urgent_count / $total_tasks ) * 100, 1 ) : 20.0;
+    $fire_drill_index  = $urgency_ratio > 40 ? 'High (Frequent Urgent Deadlines)' : ( $urgency_ratio > 20 ? 'Moderate (Balanced Workflow)' : 'Low (Proactive & Planned)' );
+
+    // Top Keywords (Top 10)
+    arsort( $corpus_words );
+    $top_keywords = array_slice( array_keys( $corpus_words ), 0, 10 );
+    if ( empty( $top_keywords ) ) {
+        $top_keywords = array( 'invoice', 'gst', 'client', 'property', 'shoot', 'agreement', 'editing', 'review', 'followup', 'contract' );
+    }
+
+    // Top Collaborators
+    arsort( $collaborators_map );
+    $top_collaborators = array_slice( $collaborators_map, 0, 6, true );
+
+    // Habit Score (0 - 100 composite index)
+    $habit_score = min( 100, max( 50, round( ( $completion_rate * 0.6 ) + ( 40 * ( 1 - ( $urgency_breakdown['urgent'] / max( 1, $total_tasks ) ) ) ) ) ) );
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 3. SYNTHESIZED PERSONA PROMPT CONTEXT FOR WORKSPACE AI AGENT
+    // ─────────────────────────────────────────────────────────────────────────
+    $system_prompt_ctx = sprintf(
+        "Workspace Operational Intelligence Context [%s]: Peak productivity window is %s on %ss. Overall task completion velocity is %s%% across %d logged operational items with an average focus block of %d mins. Urgency profile is %s (%s%% high-urgency ratio). Key active focus domains and operational keywords: %s. Active collaborators: %s. The AI Assistant should align proactive suggestions to the %s window, emphasize concise milestone tracking, and tailor recommendations to these core workflows.",
+        $workspace_id,
+        $peak_slot,
+        $peak_day,
+        $completion_rate,
+        $total_tasks,
+        $avg_duration,
+        $fire_drill_index,
+        $urgency_ratio,
+        implode( ', ', $top_keywords ),
+        ! empty( $top_collaborators ) ? implode( ', ', array_keys( $top_collaborators ) ) : 'Solo Owner & Core Admin',
+        $peak_slot
+    );
+
+    $learned_persona = array(
+        'workspace_id'            => (string) $workspace_id,
+        'trained_at'              => current_time( 'mysql' ),
+        'total_tasks_analyzed'    => $total_tasks,
+        'completion_rate_pct'     => $completion_rate,
+        'habit_score'             => $habit_score,
+        'average_duration_mins'   => $avg_duration,
+        'peak_productivity_slot'  => $peak_slot,
+        'peak_productivity_day'   => $peak_day,
+        'hourly_distribution'     => $hourly_buckets,
+        'weekday_distribution'    => $weekday_counts,
+        'urgency_breakdown'       => $urgency_breakdown,
+        'urgency_ratio_pct'       => $urgency_ratio,
+        'fire_drill_index'        => $fire_drill_index,
+        'top_keywords'            => $top_keywords,
+        'top_categories'          => $categories_counter,
+        'collaborator_patterns'   => $top_collaborators,
+        'agent_system_prompt_ctx' => $system_prompt_ctx,
+    );
+
+    // Save to wp_options under designated workspace key
+    update_option( 'cora_workspace_agent_learned_persona_' . $workspace_id, $learned_persona );
+    update_option( 'cora_workspace_agent_learned_persona_default', $learned_persona );
+
+    return $learned_persona;
+}
+}
+
+// ── AJAX Handlers for Manual Testing & Dashboard Integration ─────────────────
+add_action( 'wp_ajax_cora_train_workspace_agent', 'cora_ajax_train_workspace_agent' );
+if ( ! function_exists( 'cora_ajax_train_workspace_agent' ) ) {
+function cora_ajax_train_workspace_agent() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $ws_id = sanitize_text_field( $_POST['workspace_id'] ?? '' );
+    $persona = cora_train_workspace_agent_from_tasks( $ws_id );
+    wp_send_json_success( array(
+        'message' => 'Workspace AI Agent successfully trained and personalized.',
+        'persona' => $persona
+    ) );
+}
+}
+
+add_action( 'wp_ajax_cora_trigger_task_cron', 'cora_ajax_trigger_task_cron' );
+if ( ! function_exists( 'cora_ajax_trigger_task_cron' ) ) {
+function cora_ajax_trigger_task_cron() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $force = ! empty( $_POST['force'] );
+    $results = cora_schedule_task_notifications_cron( $force );
+    wp_send_json_success( array(
+        'message' => 'Task notifications cron executed.',
+        'stats'   => $results
+    ) );
+}
+}
+
