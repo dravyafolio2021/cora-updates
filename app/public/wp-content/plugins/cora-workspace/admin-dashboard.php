@@ -2938,6 +2938,58 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             transform: translateY(0%) !important;
         }
 
+        /* Dedicated Golden Standard Password Bottom Drawer */
+        #cora-password-drawer-overlay,
+        #cora-avatar-crop-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(9, 9, 11, 0.45) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            z-index: 10060 !important;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        #cora-password-drawer-overlay.active,
+        #cora-avatar-crop-overlay.active {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        #cora-password-bottom-drawer,
+        #cora-avatar-bottom-drawer {
+            display: block !important;
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            max-width: 500px !important;
+            margin: 0 auto !important;
+            background: #ffffff !important;
+            border-top: 1px solid rgba(228, 228, 231, 0.9) !important;
+            border-top-left-radius: 28px !important;
+            border-top-right-radius: 28px !important;
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            box-shadow: 0 -12px 36px -4px rgba(0, 0, 0, 0.15) !important;
+            z-index: 10061 !important;
+            transform: translateY(100%) !important;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            padding: 16px 20px 28px 20px !important;
+            box-sizing: border-box !important;
+            margin-bottom: 0 !important;
+            pointer-events: auto !important;
+        }
+        .dark #cora-password-bottom-drawer,
+        .dark #cora-avatar-bottom-drawer {
+            background: #18181b !important;
+            border-color: #27272a !important;
+        }
+        #cora-password-bottom-drawer.active,
+        #cora-avatar-bottom-drawer.active {
+            transform: translateY(0%) !important;
+        }
+
         /* Voice-First Assistant Ripple & Pulse Animation */
         .cora-voice-mic-btn {
             position: relative;
@@ -3961,6 +4013,27 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             backdrop.classList.remove('active');
         }
     };
+
+    window.coraOpenPasswordDrawer = function() {
+        var overlay = document.getElementById('cora-password-drawer-overlay');
+        var drawer = document.getElementById('cora-password-bottom-drawer');
+        if (overlay) overlay.classList.add('active');
+        if (drawer) drawer.classList.add('active');
+        setTimeout(function() {
+            var p = document.getElementById('drawer-curr-pass') || document.getElementById('drawer-new-pass');
+            if (p) p.focus();
+        }, 300);
+    };
+
+    window.coraClosePasswordDrawer = function() {
+        var overlay = document.getElementById('cora-password-drawer-overlay');
+        var drawer = document.getElementById('cora-password-bottom-drawer');
+        if (overlay) overlay.classList.remove('active');
+        if (drawer) drawer.classList.remove('active');
+    };
+
+    window.openPasswordDrawer = window.coraOpenPasswordDrawer;
+    window.closePasswordDrawer = window.coraClosePasswordDrawer;
     </script>
 
     <!-- Global Brand & Customized Blocks Top Navbar (Shopify Style Unified Header) -->
