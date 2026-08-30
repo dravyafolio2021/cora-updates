@@ -39,7 +39,8 @@ import {
   Code,
   BarChart2,
   Briefcase,
-  Scale
+  Scale,
+  Clapperboard
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 import { MODULE_GLYPH_MAP } from '@/components/features/ModuleAppGlyphs';
@@ -791,197 +792,267 @@ export function Navbar() {
                   </div>
                 )}
 
-                {/* ── DROPDOWN: INDUSTRIES (8 CORE PROFESSIONAL SERVICE BUSINESS TYPES) ── */}
+                {/* ── DROPDOWN: INDUSTRIES (4-COLUMN CLEAN MINIMALIST ARCHITECTURE) ── */}
                 {activeDropdown === 'industries' && (
-                  <div className="grid grid-cols-12 gap-8 items-stretch">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
 
-                    {/* Left 8 Cols: 8 Focused Professional Service Workspaces */}
-                    <div className="col-span-8 space-y-3">
-                      <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-                        <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">
-                          TARGET PROFESSIONAL SERVICE BUSINESSES
+                      {/* Column 1: Studio & Production */}
+                      <div className="space-y-3.5">
+                        <span className="text-[11px] font-bold font-mono tracking-wider text-zinc-400 uppercase block pb-1 border-b border-zinc-100">
+                          Studio &amp; Production
                         </span>
-                        <span className="text-[10px] font-mono font-semibold text-zinc-600 bg-zinc-100 px-2.5 py-0.5 rounded-full border border-zinc-200">
-                          8 PRE-CONFIGURED WORKSPACES
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2.5">
-
-                        {/* 1. Photography & Film Studios */}
-                        <Link
-                          href="/use-cases#commercial-studios"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all">
-                            <Camera className="w-4 h-4 stroke-[1.8]" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-zinc-950 group-hover:text-black">Photography &amp; Film Studios</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Shoots, 4K RAW vaults, crew call sheets &amp; client proofing</div>
-                          </div>
-                        </Link>
-
-                        {/* 2. Creative & Marketing Agencies */}
-                        <Link
-                          href="/use-cases#creative-agencies"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all">
-                            <Cpu className="w-4 h-4 stroke-[1.8]" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-zinc-950 group-hover:text-black">Creative &amp; Marketing Agencies</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Monthly retainers, campaign sprints &amp; client review portals</div>
-                          </div>
-                        </Link>
-
-                        {/* 3. Real Estate Agencies & Media */}
-                        <Link
-                          href="/use-cases#real-estate-media"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all">
-                            <Building2 className="w-4 h-4 stroke-[1.8]" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-zinc-950 group-hover:text-black">Real Estate Agencies &amp; Media</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Listings catalog, property shoots, tours &amp; MLS AI copy</div>
-                          </div>
-                        </Link>
-
-                        {/* 4. Architecture & Design Studios */}
-                        <Link
-                          href="/use-cases#interior-design"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all">
-                            <LayoutTemplate className="w-4 h-4 stroke-[1.8]" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-zinc-950 group-hover:text-black">Architecture &amp; Design Studios</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Milestone sign-offs, 3D render vaults &amp; stage billing</div>
-                          </div>
-                        </Link>
-
-                        {/* 5. Consulting & Advisory Firms */}
-                        <Link
-                          href="/use-cases#creative-agencies"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all">
-                            <Briefcase className="w-4 h-4 stroke-[1.8]" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-zinc-950 group-hover:text-black">Consulting &amp; Advisory Firms</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Diagnostic scopes, fixed-fee advisory &amp; executive retainers</div>
-                          </div>
-                        </Link>
-
-                        {/* 6. Legal & Law Practices */}
-                        <Link
-                          href="/use-cases#commercial-studios"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all">
-                            <Scale className="w-4 h-4 stroke-[1.8]" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-zinc-950 group-hover:text-black">Legal &amp; Law Practices</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">SHA-256 e-signs, client retainers &amp; IT Act compliance</div>
-                          </div>
-                        </Link>
-
-                        {/* 7. Finance & Accounting Firms */}
-                        <Link
-                          href="/use-cases#creative-agencies"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all">
-                            <Receipt className="w-4 h-4 stroke-[1.8]" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-zinc-950 group-hover:text-black">Finance &amp; Accounting Firms</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Tax filing compliance, 18% GST audit vaults &amp; retainers</div>
-                          </div>
-                        </Link>
-
-                        {/* 8. Stage & Equipment Rentals */}
-                        <Link
-                          href="/use-cases#interior-design"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/80 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all">
-                            <Film className="w-4 h-4 stroke-[1.8]" />
-                          </div>
-                          <div>
-                            <div className="text-xs font-semibold text-zinc-950 group-hover:text-black">Stage &amp; Equipment Rentals</div>
-                            <div className="text-[11px] text-zinc-500 font-normal mt-0.5 leading-snug">Hourly floor bookings, serialized gear checkouts &amp; deposits</div>
-                          </div>
-                        </Link>
-
-                      </div>
-                    </div>
-
-                    {/* Right 4 Cols: Built For Every Scale Spotlight Card */}
-                    <div className="col-span-4 flex flex-col justify-between rounded-2xl bg-zinc-950 text-white p-5 border border-zinc-800 shadow-lg">
-                      <div>
-                        <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80 mb-3">
-                          <span className="text-[10px] font-mono font-bold text-zinc-300 uppercase tracking-wider">
-                            BUILT FOR EVERY SCALE
-                          </span>
-                          <span className="text-[9px] font-mono font-semibold text-zinc-400 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded">
-                            SOLO TO ENTERPRISE
-                          </span>
-                        </div>
-
-                        <div className="space-y-2 text-xs">
-                          <div className="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 flex items-start gap-2.5">
-                            <span className="text-zinc-400 font-mono font-bold text-[11px] shrink-0 mt-0.5">01</span>
-                            <div>
-                              <span className="font-semibold text-white block">Solo Practice (1 Person)</span>
-                              <span className="text-[11px] text-zinc-400 font-normal leading-snug">Zero-admin setup, 1-click contracts &amp; instant 18% GST invoices.</span>
+                        <div className="space-y-2.5">
+                          <Link
+                            href="/use-cases#commercial-studios"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Camera className="w-4 h-4 stroke-[1.8]" />
                             </div>
-                          </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Photography Studios
+                            </span>
+                          </Link>
 
-                          <div className="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 flex items-start gap-2.5">
-                            <span className="text-zinc-400 font-mono font-bold text-[11px] shrink-0 mt-0.5">02</span>
-                            <div>
-                              <span className="font-semibold text-white block">Boutique Studio (2–10 Team)</span>
-                              <span className="text-[11px] text-zinc-400 font-normal leading-snug">Crew &amp; team dispatch, shared asset vaults &amp; milestone billing.</span>
+                          <Link
+                            href="/use-cases#film-production"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Clapperboard className="w-4 h-4 stroke-[1.8]" />
                             </div>
-                          </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Film &amp; Video Production
+                            </span>
+                          </Link>
 
-                          <div className="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 flex items-start gap-2.5">
-                            <span className="text-zinc-400 font-mono font-bold text-[11px] shrink-0 mt-0.5">03</span>
-                            <div>
-                              <span className="font-semibold text-white block">Enterprise Firm (10+ Team)</span>
-                              <span className="text-[11px] text-zinc-400 font-normal leading-snug">Multi-tenant RBAC, client review portals &amp; multi-branch audit logs.</span>
+                          <Link
+                            href="/use-cases#real-estate-media"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Building2 className="w-4 h-4 stroke-[1.8]" />
                             </div>
-                          </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Real Estate Media
+                            </span>
+                          </Link>
+
+                          <Link
+                            href="/use-cases#stage-rentals"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Film className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Stage &amp; Gear Rentals
+                            </span>
+                          </Link>
                         </div>
                       </div>
 
-                      <div className="pt-3 border-t border-zinc-800/80 mt-3 flex items-center justify-between">
-                        <Link
-                          href="/use-cases"
-                          onClick={() => setActiveDropdown(null)}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-200 hover:text-white transition-colors group/link"
-                        >
-                          <span>Explore all industry schemas</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-white group-hover/link:translate-x-0.5 transition-all" />
-                        </Link>
+                      {/* Column 2: Design & Agencies */}
+                      <div className="space-y-3.5">
+                        <span className="text-[11px] font-bold font-mono tracking-wider text-zinc-400 uppercase block pb-1 border-b border-zinc-100">
+                          Design &amp; Agencies
+                        </span>
+                        <div className="space-y-2.5">
+                          <Link
+                            href="/use-cases#creative-agencies"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Cpu className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Creative Agencies
+                            </span>
+                          </Link>
+
+                          <Link
+                            href="/use-cases#interior-design"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <LayoutTemplate className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Architecture &amp; Design
+                            </span>
+                          </Link>
+
+                          <Link
+                            href="/use-cases#solo-creators"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Sparkles className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Creators &amp; Talent
+                            </span>
+                          </Link>
+
+                          <Link
+                            href="/use-cases#fashion-editorial"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Layers className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Fashion &amp; Editorial
+                            </span>
+                          </Link>
+                        </div>
                       </div>
+
+                      {/* Column 3: Professional Services */}
+                      <div className="space-y-3.5">
+                        <span className="text-[11px] font-bold font-mono tracking-wider text-zinc-400 uppercase block pb-1 border-b border-zinc-100">
+                          Professional Services
+                        </span>
+                        <div className="space-y-2.5">
+                          <Link
+                            href="/use-cases#commercial-studios"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Scale className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Legal &amp; Law Practices
+                            </span>
+                          </Link>
+
+                          <Link
+                            href="/use-cases#creative-agencies"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Briefcase className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Consulting &amp; Advisory
+                            </span>
+                          </Link>
+
+                          <Link
+                            href="/use-cases#creative-agencies"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Receipt className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Finance &amp; Accounting
+                            </span>
+                          </Link>
+
+                          <Link
+                            href="/use-cases#creative-agencies"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <ShieldCheck className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Clinics &amp; Wellness
+                            </span>
+                          </Link>
+                        </div>
+                      </div>
+
+                      {/* Column 4: Scale & Deployment */}
+                      <div className="space-y-3.5">
+                        <span className="text-[11px] font-bold font-mono tracking-wider text-zinc-400 uppercase block pb-1 border-b border-zinc-100">
+                          Scale &amp; Deployment
+                        </span>
+                        <div className="space-y-2.5">
+                          <Link
+                            href="/use-cases#solo-creators"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <User className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Solo Practice (1 Person)
+                            </span>
+                          </Link>
+
+                          <Link
+                            href="/use-cases#commercial-studios"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Building2 className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Boutique Studio (2–10)
+                            </span>
+                          </Link>
+
+                          <Link
+                            href="/use-cases#creative-agencies"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Layers className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Enterprise Firm (10+)
+                            </span>
+                          </Link>
+
+                          <Link
+                            href="/features/custom-workspace"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-zinc-100/90 text-zinc-700 flex items-center justify-center shrink-0 border border-zinc-200/60 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
+                              <Zap className="w-4 h-4 stroke-[1.8]" />
+                            </div>
+                            <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-black tracking-tight">
+                              Custom Workspace Mode
+                            </span>
+                          </Link>
+                        </div>
+                      </div>
+
                     </div>
 
+                    {/* Bottom Bar */}
+                    <div className="-mx-8 -mb-8 sm:-mx-10 sm:-mb-10 mt-6 px-8 sm:px-10 py-3.5 bg-zinc-50/90 rounded-b-[28px] border-t border-zinc-100 flex items-center justify-between">
+                      <span className="text-xs text-zinc-500 font-medium">
+                        Pre-seeded legal contracts, GST tax math &amp; workflows for 12+ verticals
+                      </span>
+                      <Link
+                        href="/use-cases"
+                        onClick={() => setActiveDropdown(null)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900 hover:text-black transition-colors group/link"
+                      >
+                        <span>Explore all industry solutions</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover/link:translate-x-0.5 transition-all" />
+                      </Link>
+                    </div>
                   </div>
                 )}
 
