@@ -3909,6 +3909,60 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     </script>
     <?php endif; ?>
 
+    <script>
+    /* Hoisted Global Popover Handlers for Topbar & Views */
+    window.coraCloseAllPopovers = function(exceptId) {
+        const popoverIds = ['cora-profile-popover', 'cora-role-popover', 'cora-branch-popover', 'cora-org-popover', 'cora-header-profile-popover'];
+        popoverIds.forEach(function(id) {
+            if (id === exceptId) return;
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('hidden');
+                el.style.display = 'none';
+            }
+        });
+        const profileBackdrop = document.getElementById('cora-header-profile-backdrop');
+        if (profileBackdrop && (!exceptId || exceptId !== 'cora-header-profile-popover')) {
+            profileBackdrop.classList.remove('active');
+        }
+    };
+
+    window.coraToggleProfilePopover = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const popover = document.getElementById('cora-header-profile-popover');
+        const backdrop = document.getElementById('cora-header-profile-backdrop');
+        if (!popover) {
+            if (typeof window.coraNavigateTo === 'function') {
+                window.coraNavigateTo('profile');
+            }
+            return;
+        }
+        const isHidden = popover.classList.contains('hidden') || popover.style.display === 'none';
+        if (window.coraCloseAllPopovers) window.coraCloseAllPopovers('cora-header-profile-popover');
+        if (isHidden) {
+            popover.classList.remove('hidden');
+            popover.style.display = 'flex';
+            if (backdrop) backdrop.classList.add('active');
+        } else {
+            popover.classList.add('hidden');
+            popover.style.display = 'none';
+            if (backdrop) backdrop.classList.remove('active');
+        }
+    };
+
+    window.coraCloseProfilePopover = function() {
+        const popover = document.getElementById('cora-header-profile-popover');
+        const backdrop = document.getElementById('cora-header-profile-backdrop');
+        if (popover) {
+            popover.classList.add('hidden');
+            popover.style.display = 'none';
+        }
+        if (backdrop) {
+            backdrop.classList.remove('active');
+        }
+    };
+    </script>
+
     <!-- Global Brand & Customized Blocks Top Navbar (Shopify Style Unified Header) -->
     <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] text-white px-4 md:px-6 py-2 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="position: sticky !important; top: 0 !important; background-color: #09090b !important; z-index: 9999 !important; min-height: 48px;">
         <div class="cora-topbar-desktop w-full items-center justify-between gap-4">

@@ -622,7 +622,7 @@ if ( is_array( $leave_requests ) ) {
                                 <?php endif; ?>
                             </p>
                         </div>
-                        <button onclick="openPasswordDrawer()" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-all cursor-pointer border-0 shadow-xs whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                        <button type="button" onclick="window.openPasswordDrawer()" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-all cursor-pointer border-0 shadow-xs whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                             <?php echo $is_google_user ? 'Set Direct Password' : 'Update Account Password'; ?>
                         </button>
                     </div>
@@ -1118,10 +1118,10 @@ if ( is_array( $leave_requests ) ) {
 </div>
 
 <!-- ═══ PREMIUM SAAS MULTI-STEP PASSWORD DRAWER SHEET ═════════════════════════ -->
-<div id="cora-password-drawer-sheet" class="cora-drawer-overlay">
-    <div class="cora-drawer-sheet" id="password-drawer-card">
+<div id="cora-password-drawer-sheet" class="cora-drawer-overlay" onclick="if(event.target===this) window.closePasswordDrawer();" style="touch-action: manipulation; pointer-events: none;">
+    <div class="cora-drawer-sheet" id="password-drawer-card" onclick="event.stopPropagation();" style="touch-action: manipulation; user-select: text !important; -webkit-user-select: text !important; pointer-events: auto !important;">
         <!-- Mobile Bottom Sheet Drag Handle -->
-        <div class="flex sm:hidden items-center justify-center pt-3 pb-1 cursor-pointer select-none" onclick="closePasswordDrawer()">
+        <div class="flex sm:hidden items-center justify-center pt-3 pb-1 cursor-pointer select-none" onclick="window.closePasswordDrawer()">
             <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
         </div>
 
@@ -1131,7 +1131,7 @@ if ( is_array( $leave_requests ) ) {
                 <h3 class="text-sm font-extrabold text-zinc-900"><?php echo $is_google_user ? 'Set Direct Account Password' : 'Update Account Password'; ?></h3>
                 <p class="text-[9px] text-zinc-450 mt-0.5 uppercase tracking-wider font-extrabold"><?php echo $is_google_user ? 'Google SSO · Credentials Setup' : 'Identity Verification & Reset'; ?></p>
             </div>
-            <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 bg-transparent border-0" onclick="closePasswordDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors bg-transparent border-0" onclick="window.closePasswordDrawer()">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
@@ -1150,10 +1150,10 @@ if ( is_array( $leave_requests ) ) {
                 <div class="space-y-3">
                     <div>
                         <label class="block text-[10px] font-extrabold text-zinc-700 mb-1.5 uppercase tracking-wider">Current Password</label>
-                        <input type="password" id="drawer-curr-pass" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="Enter active password...">
+                        <input type="password" id="drawer-curr-pass" onkeydown="if(event.key==='Enter') window.verifyCurrentPasswordStep();" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="Enter active password..." style="user-select: text !important; -webkit-user-select: text !important; pointer-events: auto !important; cursor: text !important;">
                     </div>
                     
-                    <button onclick="verifyCurrentPasswordStep()" id="btn-verify-identity" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
+                    <button type="button" onclick="window.verifyCurrentPasswordStep()" id="btn-verify-identity" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-extrabold rounded-xl text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center justify-center gap-2">
                         Verify Identity Credentials
                     </button>
                 </div>
@@ -1171,11 +1171,11 @@ if ( is_array( $leave_requests ) ) {
                 <div class="space-y-4">
                     <div>
                         <label class="block text-[10px] font-extrabold text-zinc-700 mb-1.5 uppercase tracking-wider">New Password</label>
-                        <input type="password" id="drawer-new-pass" oninput="validatePasswordStrength()" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="At least 8 characters...">
+                        <input type="password" id="drawer-new-pass" oninput="window.validatePasswordStrength()" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="At least 8 characters..." style="user-select: text !important; -webkit-user-select: text !important; pointer-events: auto !important; cursor: text !important;">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-zinc-700 mb-1.5 uppercase tracking-wider">Confirm New Password</label>
-                        <input type="password" id="drawer-confirm-pass" oninput="validatePasswordStrength()" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="Re-type new password...">
+                        <input type="password" id="drawer-confirm-pass" oninput="window.validatePasswordStrength()" onkeydown="if(event.key==='Enter') window.saveNewPasswordAction();" class="cora-input w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none" placeholder="Re-type new password..." style="user-select: text !important; -webkit-user-select: text !important; pointer-events: auto !important; cursor: text !important;">
                     </div>
                     
                     <!-- Real-time Password Strength Indicator Bar -->
@@ -1208,7 +1208,7 @@ if ( is_array( $leave_requests ) ) {
                         </div>
                     </div>
                     
-                    <button onclick="saveNewPasswordAction()" id="btn-save-new-pass" disabled class="w-full py-2.5 bg-zinc-100 text-zinc-400 font-extrabold rounded-xl text-xs transition-colors cursor-not-allowed border-0 shadow-sm flex items-center justify-center gap-2">
+                    <button type="button" onclick="window.saveNewPasswordAction()" id="btn-save-new-pass" disabled class="w-full py-2.5 bg-zinc-100 text-zinc-400 font-extrabold rounded-xl text-xs transition-colors cursor-not-allowed border-0 shadow-sm flex items-center justify-center gap-2">
                         <?php echo $is_google_user ? 'Save Account Password' : 'Apply Security Update'; ?>
                     </button>
                 </div>
@@ -1218,16 +1218,16 @@ if ( is_array( $leave_requests ) ) {
 </div>
 
 <!-- ═══ AVATAR CROP DRAWER SHEET ═════════════════════════════════════════════ -->
-<div id="cora-avatar-crop-dlg" class="cora-drawer-overlay">
-    <div class="cora-drawer-sheet" id="avatar-crop-card">
+<div id="cora-avatar-crop-dlg" class="cora-drawer-overlay" onclick="if(event.target===this) window.closeAvatarCrop();" style="touch-action: manipulation; pointer-events: none;">
+    <div class="cora-drawer-sheet" id="avatar-crop-card" onclick="event.stopPropagation();" style="touch-action: manipulation; user-select: text !important; -webkit-user-select: text !important; pointer-events: auto !important;">
         <!-- Mobile Bottom Sheet Drag Handle -->
-        <div class="flex sm:hidden items-center justify-center pt-3 pb-1 cursor-pointer select-none" onclick="closeAvatarCrop()">
+        <div class="flex sm:hidden items-center justify-center pt-3 pb-1 cursor-pointer select-none" onclick="window.closeAvatarCrop()">
             <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
         </div>
 
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50">
             <h3 class="text-sm font-extrabold text-zinc-900">Crop Profile Photo</h3>
-            <button class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 bg-transparent border-0" onclick="closeAvatarCrop()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors bg-transparent border-0" onclick="window.closeAvatarCrop()">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
@@ -1240,8 +1240,8 @@ if ( is_array( $leave_requests ) ) {
         </div>
         
         <div class="p-5 border-t border-zinc-200 bg-zinc-50/50 flex items-center justify-end gap-3 font-extrabold">
-            <button onclick="closeAvatarCrop()" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs transition-colors cursor-pointer shadow-xs border-0">Cancel</button>
-            <button onclick="saveCroppedAvatar()" class="px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs transition-colors cursor-pointer shadow-xs border-0">Apply Crop</button>
+            <button type="button" onclick="window.closeAvatarCrop()" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs transition-colors cursor-pointer shadow-xs border-0">Cancel</button>
+            <button type="button" onclick="window.saveCroppedAvatar()" class="px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs transition-colors cursor-pointer shadow-xs border-0">Apply Crop</button>
         </div>
     </div>
 </div>
@@ -1249,45 +1249,47 @@ if ( is_array( $leave_requests ) ) {
 <script>
     var isGoogleUser = <?php echo $is_google_user ? 'true' : 'false'; ?>;
     var origImageSrc = null;
-    var cropCanvas = document.getElementById('crop-canvas');
-    var cropCtx = cropCanvas.getContext('2d');
     var cropImg = new Image();
 
-    // Custom Profile Tab Switcher
-    function switchProfileTab(tabId) {
-        $('.profile-pane').removeClass('pane-active');
-        $('#' + tabId).addClass('pane-active');
-        
-        $('.profile-tab-btn').removeClass('tab-active');
-        $('#btn-' + tabId).addClass('tab-active');
-        
-        localStorage.setItem('cora_profile_active_tab', tabId);
-        
-        if (tabId === 'tab-activity') {
-            paginateActivityLogs();
-        }
+    function getCoraAjaxData() {
+        return {
+            ajaxUrl: (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php'),
+            ajaxNonce: (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : ''
+        };
     }
 
-    $(document).ready(function() {
-        var activeTab = localStorage.getItem('cora_profile_active_tab') || 'tab-info';
-        switchProfileTab(activeTab);
-    });
+    // Custom Profile Tab Switcher
+    window.switchProfileTab = function(tabId) {
+        if (typeof jQuery !== 'undefined') {
+            jQuery('.profile-pane').removeClass('pane-active');
+            jQuery('#' + tabId).addClass('pane-active');
+            
+            jQuery('.profile-tab-btn').removeClass('tab-active');
+            jQuery('#btn-' + tabId).addClass('tab-active');
+        }
+        
+        try { localStorage.setItem('cora_profile_active_tab', tabId); } catch(e) {}
+        
+        if (tabId === 'tab-activity' && window.paginateActivityLogs) {
+            window.paginateActivityLogs();
+        }
+    };
 
     // ─── DYNAMIC PAGINATION ENGINE FOR ACTIVITY LOGS ──────────────────────────
     var activityCurrentPage = 1;
     var activityRowsPerPage = 10;
     
-    function paginateActivityLogs() {
-        var rows = $('#activity-logs-table-body tr');
+    window.paginateActivityLogs = function() {
+        if (typeof jQuery === 'undefined') return;
+        var rows = jQuery('#activity-logs-table-body tr');
         var totalRows = rows.length;
         
-        // Hide pagination footer if there are no logs or table is empty
         if (totalRows <= 1 && rows.find('td').attr('colspan') !== undefined) {
-            $('#activity-pagination-container').hide();
+            jQuery('#activity-pagination-container').hide();
             return;
         }
         
-        $('#activity-pagination-container').show();
+        jQuery('#activity-pagination-container').show();
         var totalPages = Math.ceil(totalRows / activityRowsPerPage);
         if (totalPages < 1) totalPages = 1;
         
@@ -1300,113 +1302,117 @@ if ( is_array( $leave_requests ) ) {
         
         rows.slice(start, end).show();
         
-        // Update footer description info
         var showingStart = start + 1;
         var showingEnd = Math.min(end, totalRows);
-        $('#activity-pagination-info').text(`Showing ${showingStart}-${showingEnd} of ${totalRows} entries (Last 7 Days)`);
+        jQuery('#activity-pagination-info').text('Showing ' + showingStart + '-' + showingEnd + ' of ' + totalRows + ' entries (Last 7 Days)');
         
-        // Disable page buttons at endpoints
-        $('#btn-activity-prev').prop('disabled', activityCurrentPage === 1);
-        $('#btn-activity-next').prop('disabled', activityCurrentPage === totalPages);
-    }
+        jQuery('#btn-activity-prev').prop('disabled', activityCurrentPage === 1);
+        jQuery('#btn-activity-next').prop('disabled', activityCurrentPage === totalPages);
+    };
     
-    function changeActivityPage(dir) {
+    window.changeActivityPage = function(dir) {
         activityCurrentPage += dir;
-        paginateActivityLogs();
-    }
+        window.paginateActivityLogs();
+    };
 
     // ─── UPGRADED SAAS PASSWORD RESET ENGINE ─────────────────────────────────
-    function openPasswordDrawer() {
-        // Reset steps
-        if (isGoogleUser) {
-            $('#pass-step-1').hide();
-            $('#pass-step-2').show();
-        } else {
-            $('#pass-step-1').show();
-            $('#pass-step-2').hide();
+    window.openPasswordDrawer = function() {
+        if (typeof jQuery !== 'undefined') {
+            if (isGoogleUser) {
+                jQuery('#pass-step-1').hide();
+                jQuery('#pass-step-2').show();
+            } else {
+                jQuery('#pass-step-1').show();
+                jQuery('#pass-step-2').hide();
+            }
+            jQuery('#drawer-curr-pass').val('');
+            jQuery('#drawer-new-pass').val('');
+            jQuery('#drawer-confirm-pass').val('');
+            
+            jQuery('#strength-label').text('Weak').removeClass('text-amber-500 text-emerald-500').addClass('text-zinc-400');
+            jQuery('#strength-progress').css('width', '25%').removeClass('bg-amber-500 bg-emerald-500').addClass('bg-red-500');
+            jQuery('.chk-icon').text('•').removeClass('text-emerald-500').addClass('text-zinc-350');
+            jQuery('#btn-save-new-pass').prop('disabled', true).removeClass('bg-zinc-900 hover:bg-zinc-800 text-white').addClass('bg-zinc-100 text-zinc-400 cursor-not-allowed');
         }
-        $('#drawer-curr-pass').val('');
-        $('#drawer-new-pass').val('');
-        $('#drawer-confirm-pass').val('');
-        
-        // Reset indicators
-        $('#strength-label').text('Weak').removeClass('text-amber-500 text-emerald-500').addClass('text-zinc-400');
-        $('#strength-progress').css('width', '25%').removeClass('bg-amber-500 bg-emerald-500').addClass('bg-red-500');
-        $('.chk-icon').text('•').removeClass('text-emerald-500').addClass('text-zinc-350');
-        $('#btn-save-new-pass').prop('disabled', true).removeClass('bg-zinc-900 hover:bg-zinc-800 text-white').addClass('bg-zinc-100 text-zinc-400 cursor-not-allowed');
 
-        // Slide open drawer using bulletproof class engine
-        $('#cora-password-drawer-sheet').addClass('drawer-open');
+        var drawer = document.getElementById('cora-password-drawer-sheet');
+        if (drawer) {
+            drawer.classList.add('drawer-open');
+        }
         setTimeout(function() {
             var inputToFocus = isGoogleUser ? document.getElementById('drawer-new-pass') : document.getElementById('drawer-curr-pass');
-            if (inputToFocus) inputToFocus.focus();
-        }, 350);
-    }
+            if (inputToFocus) {
+                inputToFocus.focus();
+            }
+        }, 300);
+    };
 
-    function closePasswordDrawer() {
-        $('#cora-password-drawer-sheet').removeClass('drawer-open');
-    }
+    window.closePasswordDrawer = function() {
+        var drawer = document.getElementById('cora-password-drawer-sheet');
+        if (drawer) {
+            drawer.classList.remove('drawer-open');
+        }
+    };
 
-    function verifyCurrentPasswordStep() {
-        var curr = $('#drawer-curr-pass').val();
+    window.verifyCurrentPasswordStep = function() {
+        var curr = (document.getElementById('drawer-curr-pass') || {}).value || '';
         if (!curr) {
-            window.coraShowToast('Enter your current password.');
+            if (window.coraShowToast) window.coraShowToast('Enter your current password.', 'warning');
             return;
         }
 
-        var btn = $('#btn-verify-identity');
+        var btn = jQuery('#btn-verify-identity');
         btn.prop('disabled', true).text('Verifying Credentials...');
 
-        $.post(coraREData.ajaxUrl, {
+        var cfg = getCoraAjaxData();
+        jQuery.post(cfg.ajaxUrl, {
             action: 'cora_ajax_verify_current_password',
             current_pass: curr,
-            nonce: coraREData.ajaxNonce
+            nonce: cfg.ajaxNonce
         }, function(res) {
             btn.prop('disabled', false).text('Verify Identity Credentials');
             if (res.success) {
-                window.coraShowToast('Identity verified successfully.');
-                $('#pass-step-1').fadeOut(200, function() {
-                    $('#pass-step-2').fadeIn(200);
+                if (window.coraShowToast) window.coraShowToast('Identity verified successfully.', 'success');
+                jQuery('#pass-step-1').fadeOut(200, function() {
+                    jQuery('#pass-step-2').fadeIn(200);
                     setTimeout(function() {
                         var p = document.getElementById('drawer-new-pass');
                         if (p) p.focus();
                     }, 250);
                 });
             } else {
-                window.coraShowToast(res.data.message || 'Incorrect password.');
+                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Incorrect password.', 'error');
             }
+        }).fail(function() {
+            btn.prop('disabled', false).text('Verify Identity Credentials');
+            if (window.coraShowToast) window.coraShowToast('Network error while verifying password.', 'error');
         });
-    }
+    };
 
-    function validatePasswordStrength() {
-        var pass = $('#drawer-new-pass').val();
-        var confirm = $('#drawer-confirm-pass').val();
+    window.validatePasswordStrength = function() {
+        var pass = (document.getElementById('drawer-new-pass') || {}).value || '';
+        var confirm = (document.getElementById('drawer-confirm-pass') || {}).value || '';
 
-        // 1. Length Check
         var lenVal = pass.length >= 8;
-        updateCheckmark('req-len', lenVal);
+        window.updateCheckmark('req-len', lenVal);
 
-        // 2. Uppercase Check
         var upVal = /[A-Z]/.test(pass);
-        updateCheckmark('req-up', upVal);
+        window.updateCheckmark('req-up', upVal);
 
-        // 3. Lowercase Check
         var loVal = /[a-z]/.test(pass);
-        updateCheckmark('req-lo', loVal);
+        window.updateCheckmark('req-lo', loVal);
 
-        // 4. Number Check
         var numVal = /[0-9]/.test(pass);
-        updateCheckmark('req-num', numVal);
+        window.updateCheckmark('req-num', numVal);
 
-        // Calculate score
         var score = 0;
         if (lenVal) score++;
         if (upVal) score++;
         if (loVal) score++;
         if (numVal) score++;
 
-        var strengthProgress = $('#strength-progress');
-        var strengthLabel = $('#strength-label');
+        var strengthProgress = jQuery('#strength-progress');
+        var strengthLabel = jQuery('#strength-label');
 
         if (score <= 1) {
             strengthLabel.text('Weak').removeClass('text-amber-500 text-emerald-500').addClass('text-zinc-400');
@@ -1419,11 +1425,10 @@ if ( is_array( $leave_requests ) ) {
             strengthProgress.css('width', '100%').removeClass('bg-red-500 bg-amber-500').addClass('bg-emerald-500');
         }
 
-        // Match passwords and checklist checks to enable Apply button
         var isMatch = pass === confirm && pass.length > 0;
         var isValid = lenVal && upVal && loVal && numVal && isMatch;
 
-        var saveBtn = $('#btn-save-new-pass');
+        var saveBtn = jQuery('#btn-save-new-pass');
         if (isValid) {
             saveBtn.prop('disabled', false)
                 .removeClass('bg-zinc-100 text-zinc-400 cursor-not-allowed')
@@ -1433,10 +1438,10 @@ if ( is_array( $leave_requests ) ) {
                 .removeClass('bg-zinc-900 hover:bg-zinc-800 text-white cursor-pointer')
                 .addClass('bg-zinc-100 text-zinc-400 cursor-not-allowed');
         }
-    }
+    };
 
-    function updateCheckmark(id, isValid) {
-        var el = $('#' + id);
+    window.updateCheckmark = function(id, isValid) {
+        var el = jQuery('#' + id);
         var chk = el.find('.chk-icon');
         if (isValid) {
             chk.text('✓').removeClass('text-zinc-350').addClass('text-emerald-500');
@@ -1445,113 +1450,117 @@ if ( is_array( $leave_requests ) ) {
             chk.text('•').removeClass('text-emerald-500').addClass('text-zinc-350');
             el.removeClass('text-zinc-800').addClass('text-zinc-500');
         }
-    }
+    };
 
-    function saveNewPasswordAction() {
-        var curr = isGoogleUser ? 'google_oauth_bypass' : $('#drawer-curr-pass').val();
-        var pass = $('#drawer-new-pass').val();
-        var btn = $('#btn-save-new-pass');
+    window.saveNewPasswordAction = function() {
+        var curr = isGoogleUser ? 'google_oauth_bypass' : (document.getElementById('drawer-curr-pass') || {}).value || '';
+        var pass = (document.getElementById('drawer-new-pass') || {}).value || '';
+        var btn = jQuery('#btn-save-new-pass');
 
         btn.prop('disabled', true).text('Updating Security Credentials...');
-        window.coraShowToast('Updating your workspace password...');
+        if (window.coraShowToast) window.coraShowToast('Updating your workspace password...', 'info');
 
-        $.post(coraREData.ajaxUrl, {
+        var cfg = getCoraAjaxData();
+        jQuery.post(cfg.ajaxUrl, {
             action: 'cora_ajax_change_password',
             current_pass: curr,
             new_pass: pass,
-            nonce: coraREData.ajaxNonce
+            nonce: cfg.ajaxNonce
         }, function(res) {
             btn.prop('disabled', false).text(isGoogleUser ? 'Save Account Password' : 'Apply Security Update');
             if (res.success) {
-                window.coraShowToast(res.data.message || 'Password updated successfully.', 'success');
-                closePasswordDrawer();
+                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Password updated successfully.', 'success');
+                window.closePasswordDrawer();
             } else {
-                window.coraShowToast(res.data.message || 'Failed to update password.', 'error');
+                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to update password.', 'error');
             }
         }).fail(function() {
             btn.prop('disabled', false).text(isGoogleUser ? 'Save Account Password' : 'Apply Security Update');
-            window.coraShowToast('Network error while updating password.', 'error');
+            if (window.coraShowToast) window.coraShowToast('Network error while updating password.', 'error');
         });
-    }
+    };
 
     // Update Status Broadcast Handler
-    function coraUpdateUserStatus(e) {
-        e.preventDefault();
-        var status = $('#user-status-select').val();
-        var msg = $('#user-status-msg').val().trim();
+    window.coraUpdateUserStatus = function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var status = jQuery('#user-status-select').val();
+        var msg = jQuery('#user-status-msg').val().trim();
         
-        window.coraShowToast('Broadcasting status update...');
+        if (window.coraShowToast) window.coraShowToast('Broadcasting status update...', 'info');
         
-        $.post(coraREData.ajaxUrl, {
+        var cfg = getCoraAjaxData();
+        jQuery.post(cfg.ajaxUrl, {
             action: 'cora_ajax_update_user_custom_status',
             status: status,
             message: msg,
-            nonce: coraREData.ajaxNonce
+            nonce: cfg.ajaxNonce
         }, function(res) {
             if (res.success) {
-                window.coraShowToast('Status broadcast updated successfully.');
+                if (window.coraShowToast) window.coraShowToast('Status broadcast updated successfully.', 'success');
                 setTimeout(function() {
                     window.location.reload();
                 }, 1000);
             } else {
-                window.coraShowToast(res.data.message || 'Failed to update status.');
+                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to update status.', 'error');
             }
         });
-    }
+    };
 
     // Submit Leave Request Facility Handler
-    function coraRequestLeave(e) {
-        e.preventDefault();
-        var type = $('#leave-type').val();
-        var start = $('#leave-start').val();
-        var end = $('#leave-end').val();
-        var reason = $('#leave-reason').val().trim();
+    window.coraRequestLeave = function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var type = jQuery('#leave-type').val();
+        var start = jQuery('#leave-start').val();
+        var end = jQuery('#leave-end').val();
+        var reason = jQuery('#leave-reason').val().trim();
         
-        window.coraShowToast('Submitting leave request...');
+        if (window.coraShowToast) window.coraShowToast('Submitting leave request...', 'info');
         
-        $.post(coraREData.ajaxUrl, {
+        var cfg = getCoraAjaxData();
+        jQuery.post(cfg.ajaxUrl, {
             action: 'cora_ajax_request_leave',
             type: type,
             start_date: start,
             end_date: end,
             reason: reason,
-            nonce: coraREData.ajaxNonce
+            nonce: cfg.ajaxNonce
         }, function(res) {
             if (res.success) {
-                window.coraShowToast('Leave request submitted successfully.');
+                if (window.coraShowToast) window.coraShowToast('Leave request submitted successfully.', 'success');
                 setTimeout(function() {
                     window.location.reload();
                 }, 1000);
             } else {
-                window.coraShowToast(res.data.message || 'Failed to submit leave request.');
+                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to submit leave request.', 'error');
             }
         });
-    }
+    };
 
     // Approve/Reject Leave Status Updates (Admins Only)
-    function coraUpdateLeaveStatus(leaveId, status) {
-        window.coraShowToast('Updating leave request status...');
+    window.coraUpdateLeaveStatus = function(leaveId, status) {
+        if (window.coraShowToast) window.coraShowToast('Updating leave request status...', 'info');
         
-        $.post(coraREData.ajaxUrl, {
+        var cfg = getCoraAjaxData();
+        jQuery.post(cfg.ajaxUrl, {
             action: 'cora_ajax_update_leave_status',
             leave_id: leaveId,
             status: status,
-            nonce: coraREData.ajaxNonce
+            nonce: cfg.ajaxNonce
         }, function(res) {
             if (res.success) {
-                window.coraShowToast('Leave request updated successfully.');
+                if (window.coraShowToast) window.coraShowToast('Leave request updated successfully.', 'success');
                 setTimeout(function() {
                     window.location.reload();
                 }, 1000);
             } else {
-                window.coraShowToast(res.data.message || 'Failed to update leave.');
+                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to update leave.', 'error');
             }
         });
-    }
+    };
 
     // Clock In/Out punches with geofencing validation
-    function coraPunchAttendance(type) {
-        var statusDiv = $('#punch-status-text');
+    window.coraPunchAttendance = function(type) {
+        var statusDiv = jQuery('#punch-status-text');
         statusDiv.removeClass('text-red-500 text-emerald-500').addClass('text-zinc-500').text('Acquiring verified location...').show();
         
         if (navigator.geolocation) {
@@ -1566,13 +1575,14 @@ if ( is_array( $leave_requests ) ) {
                     user: 'Current User'
                 };
                 
-                $.post(coraREData.ajaxUrl, {
+                var cfg = getCoraAjaxData();
+                jQuery.post(cfg.ajaxUrl, {
                     action: 'cora_save_attendance',
-                    nonce: coraREData.ajaxNonce,
+                    nonce: cfg.ajaxNonce,
                     log: JSON.stringify(logData)
                 }, function(res) {
                     if (res.success) {
-                        window.coraShowToast("Punch logged successfully");
+                        if (window.coraShowToast) window.coraShowToast("Punch logged successfully", "success");
                         statusDiv.removeClass('text-zinc-500').addClass('text-emerald-500').text('Logged punch successfully. Reloading...');
                         setTimeout(function() {
                             window.location.reload();
@@ -1587,14 +1597,14 @@ if ( is_array( $leave_requests ) ) {
         } else {
             statusDiv.removeClass('text-zinc-500').addClass('text-red-500 ').text('Geolocation is not supported by your browser.');
         }
-    }
+    };
 
-    function loadAvatarCrop(e) {
+    window.loadAvatarCrop = function(e) {
         var file = e.target.files[0];
         if (!file) return;
 
         if (file.size > 2 * 1024 * 1024) {
-            window.coraShowToast('File is too large. Max size is 2MB.');
+            if (window.coraShowToast) window.coraShowToast('File is too large. Max size is 2MB.', 'error');
             return;
         }
 
@@ -1602,88 +1612,98 @@ if ( is_array( $leave_requests ) ) {
         reader.onload = function(event) {
             origImageSrc = event.target.result;
             cropImg.onload = function() {
-                // Set canvas to forced square size
-                cropCanvas.width = 300;
-                cropCanvas.height = 300;
-                
-                // Draw square centered cropped image on canvas
-                var size = Math.min(cropImg.width, cropImg.height);
-                var x = (cropImg.width - size) / 2;
-                var y = (cropImg.height - size) / 2;
-                
-                cropCtx.drawImage(cropImg, x, y, size, size, 0, 0, 300, 300);
-                
-                // Slide open drawer using bulletproof class engine
-                $('#cora-avatar-crop-dlg').addClass('drawer-open');
+                var canvas = document.getElementById('crop-canvas');
+                if (canvas) {
+                    canvas.width = 300;
+                    canvas.height = 300;
+                    var ctx = canvas.getContext('2d');
+                    if (ctx) {
+                        var size = Math.min(cropImg.width, cropImg.height);
+                        var x = (cropImg.width - size) / 2;
+                        var y = (cropImg.height - size) / 2;
+                        ctx.drawImage(cropImg, x, y, size, size, 0, 0, 300, 300);
+                    }
+                }
+                var drawer = document.getElementById('cora-avatar-crop-dlg');
+                if (drawer) {
+                    drawer.classList.add('drawer-open');
+                }
             };
             cropImg.src = origImageSrc;
         };
         reader.readAsDataURL(file);
-    }
+    };
 
-    function closeAvatarCrop() {
-        $('#cora-avatar-crop-dlg').removeClass('drawer-open');
-        $('#avatar-input').val('');
-    }
+    window.closeAvatarCrop = function() {
+        var drawer = document.getElementById('cora-avatar-crop-dlg');
+        if (drawer) {
+            drawer.classList.remove('drawer-open');
+        }
+        var inp = document.getElementById('avatar-input');
+        if (inp) inp.value = '';
+    };
 
-    function saveCroppedAvatar() {
-        var dataUrl = cropCanvas.toDataURL('image/jpeg', 0.85);
-        closeAvatarCrop();
-        window.coraShowToast('Saving profile photo...');
+    window.saveCroppedAvatar = function() {
+        var canvas = document.getElementById('crop-canvas');
+        if (!canvas) return;
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        window.closeAvatarCrop();
+        if (window.coraShowToast) window.coraShowToast('Saving profile photo...', 'info');
 
-        $.post(coraREData.ajaxUrl, {
+        var cfg = getCoraAjaxData();
+        jQuery.post(cfg.ajaxUrl, {
             action: 'cora_ajax_update_avatar',
             avatar_data: dataUrl,
-            nonce: coraREData.ajaxNonce
+            nonce: cfg.ajaxNonce
         }, function(res) {
             if (res.success) {
-                window.coraShowToast('Profile photo updated.');
-                $('#profile-avatar-img').attr('src', res.data.url).show();
-                $('#profile-avatar-fallback').hide();
-                
-                // Update nav avatar if matches
-                $('.cora-user-profile img').attr('src', res.data.url);
+                if (window.coraShowToast) window.coraShowToast('Profile photo updated.', 'success');
+                jQuery('#profile-avatar-img').attr('src', res.data.url).show();
+                jQuery('#profile-avatar-fallback').hide();
+                jQuery('.cora-user-profile img').attr('src', res.data.url);
             } else {
-                window.coraShowToast(res.data.message || 'Failed to save avatar.');
+                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to save avatar.', 'error');
             }
         });
-    }
+    };
 
-    function coraSaveProfileInfo(e) {
-        e.preventDefault();
-        var fname = $('#profile-first-name').val().trim();
-        var lname = $('#profile-last-name').val().trim();
-        var phone = $('#profile-phone').val().trim();
+    window.coraSaveProfileInfo = function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var fname = jQuery('#profile-first-name').val().trim();
+        var lname = jQuery('#profile-last-name').val().trim();
+        var phone = jQuery('#profile-phone').val().trim();
 
-        $.post(coraREData.ajaxUrl, {
+        var cfg = getCoraAjaxData();
+        jQuery.post(cfg.ajaxUrl, {
             action: 'cora_ajax_save_profile_info',
             first_name: fname,
             last_name: lname,
             phone: phone,
-            nonce: coraREData.ajaxNonce
+            nonce: cfg.ajaxNonce
         }, function(res) {
             if (res.success) {
-                window.coraShowToast('Profile updated successfully.');
+                if (window.coraShowToast) window.coraShowToast('Profile updated successfully.', 'success');
             } else {
-                window.coraShowToast(res.data.message || 'Failed to update profile.');
+                if (window.coraShowToast) window.coraShowToast(res.data.message || 'Failed to update profile.', 'error');
             }
         });
-    }
+    };
 
-    function coraLogOutOtherSessions() {
+    window.coraLogOutOtherSessions = function() {
         const performLogout = function() {
-            window.coraShowToast('Logging out other devices...');
-            $.post(coraREData.ajaxUrl, {
+            if (window.coraShowToast) window.coraShowToast('Logging out other devices...', 'info');
+            var cfg = getCoraAjaxData();
+            jQuery.post(cfg.ajaxUrl, {
                 action: 'cora_ajax_logout_other_sessions',
-                nonce: coraREData.ajaxNonce
+                nonce: cfg.ajaxNonce
             }, function(res) {
                 if (res.success) {
-                    window.coraShowToast('Successfully logged out other devices.');
+                    if (window.coraShowToast) window.coraShowToast('Successfully logged out other devices.', 'success');
                     setTimeout(function() {
                         window.location.reload();
                     }, 1000);
                 } else {
-                    window.coraShowToast('Logout failed.');
+                    if (window.coraShowToast) window.coraShowToast('Logout failed.', 'error');
                 }
             });
         };
@@ -1697,17 +1717,25 @@ if ( is_array( $leave_requests ) ) {
         } else {
             performLogout();
         }
-    }
+    };
 
     jQuery(document).ready(function($) {
+        var activeTab = 'tab-info';
+        try {
+            activeTab = localStorage.getItem('cora_profile_active_tab') || 'tab-info';
+        } catch(e) {}
+        if (window.switchProfileTab) {
+            window.switchProfileTab(activeTab);
+        }
+
         var urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('force_password_change') && !isGoogleUser) {
             setTimeout(function() {
                 if (window.coraShowToast) {
                     window.coraShowToast('For security reasons, you must change your password to continue.', 'error');
                 }
-                if (typeof openPasswordDrawer === 'function') {
-                    openPasswordDrawer();
+                if (typeof window.openPasswordDrawer === 'function') {
+                    window.openPasswordDrawer();
                 }
             }, 500);
         }
