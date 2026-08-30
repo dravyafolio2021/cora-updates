@@ -29,7 +29,7 @@ const features = [
     tag: 'Legal & Tax Math',
     title: 'Document Vault & GST Invoicing',
     description: 'Issue legally binding digital contracts with cryptographic audit logs, combined with full Indian B2B GST tax calculation (CGST+SGST/IGST).',
-    points: ['100% compliant e-signatures', 'Instant B2B GST invoices with GSTIN check', 'Razorpay & UPI direct settlement'],
+    points: ['Tamper-evident e-signature records', 'B2B GST invoice workflows with GSTIN fields', 'Razorpay & UPI payment options'],
   },
   {
     icon: Search,

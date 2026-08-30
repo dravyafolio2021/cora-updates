@@ -1,7 +1,6 @@
 import { MetadataRoute } from 'next';
 import { BUILT_MODULES } from '@/lib/features-data';
 import { DOCS_DATA } from '@/lib/docs-data';
-import { BLOG_CATEGORIES, BLOG_POSTS, getBlogPostUrl } from '@/lib/blog-data';
 import { ARTICLES_DATA, ARTICLE_CATEGORIES } from '@/lib/articles-data';
 
 export const dynamic = 'force-static';
@@ -12,31 +11,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Articles & Categories Hub
   const articleCategoryUrls = ARTICLE_CATEGORIES.map((category) => ({
-    url: `${baseUrl}/articles/${category.id}`,
+    url: `${baseUrl}/articles/${category.id}/`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.85,
   }));
 
   const articleUrls = ARTICLES_DATA.map((article) => ({
-    url: `${baseUrl}/articles/${article.category}/${article.slug}`,
+    url: `${baseUrl}/articles/${article.category}/${article.slug}/`,
     lastModified: article.updatedAt,
     changeFrequency: 'weekly' as const,
     priority: 0.9,
-  }));
-
-  const blogCategoryUrls = BLOG_CATEGORIES.map((category) => ({
-    url: `${baseUrl}/blog/${category.slug}/`,
-    lastModified: '2026-08-30',
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }));
-
-  const blogPostUrls = BLOG_POSTS.map((post) => ({
-    url: `${baseUrl}${getBlogPostUrl(post)}`,
-    lastModified: post.updatedAt,
-    changeFrequency: 'monthly' as const,
-    priority: 0.85,
   }));
 
   const featureUrls = BUILT_MODULES.map((mod) => ({
@@ -61,21 +46,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/articles`,
+      url: `${baseUrl}/articles/`,
       lastModified: now,
       changeFrequency: 'daily',
       priority: 0.95,
     },
     ...articleCategoryUrls,
     ...articleUrls,
-    {
-      url: `${baseUrl}/blog/`,
-      lastModified: '2026-08-30',
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    ...blogCategoryUrls,
-    ...blogPostUrls,
     {
       url: `${baseUrl}/docs`,
       lastModified: now,

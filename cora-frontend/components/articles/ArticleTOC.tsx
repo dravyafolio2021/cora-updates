@@ -33,8 +33,8 @@ export function ArticleTOC({ toc }: ArticleTOCProps) {
   if (!toc || toc.length === 0) return null;
 
   return (
-    <nav className="sticky top-28 space-y-3 p-5 rounded-2xl bg-zinc-50/80 border border-zinc-200/80 backdrop-blur-xs">
-      <div className="flex items-center gap-2 pb-2.5 border-b border-zinc-200/60 text-xs font-mono font-bold text-zinc-900 uppercase tracking-wider">
+    <nav className="sticky top-28 space-y-3 border-t-2 border-zinc-950 py-5">
+      <div className="flex items-center gap-2 pb-2.5 border-b border-zinc-300 text-[10px] font-mono font-bold text-zinc-900 uppercase tracking-[0.18em]">
         <ListOrdered className="w-3.5 h-3.5 text-zinc-500" />
         <span>Table of Contents</span>
       </div>
@@ -53,10 +53,10 @@ export function ArticleTOC({ toc }: ArticleTOCProps) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }
                 }}
-                className={`block py-1 px-2.5 rounded-lg transition-all line-clamp-1 ${
+                className={`block border-l-2 py-1.5 pl-3 transition-all line-clamp-1 ${
                   isActive
-                    ? 'bg-zinc-950 text-white font-semibold shadow-2xs'
-                    : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'
+                    ? 'border-[#B6422B] text-zinc-950 font-semibold'
+                    : 'border-transparent text-zinc-600 hover:border-zinc-400 hover:text-zinc-950'
                 }`}
               >
                 {item.title}

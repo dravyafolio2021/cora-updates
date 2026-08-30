@@ -12,11 +12,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Articles, How-To Guides & Comparisons | Cora Studio OS',
     description: 'Master creative studio operations, Indian 18% GST invoicing, autonomous AI agents, SHA-256 e-sign contracts, and side-by-side product comparisons.',
-    url: 'https://heycora.in/articles',
+    url: 'https://heycora.in/articles/',
     type: 'website',
   },
   alternates: {
-    canonical: 'https://heycora.in/articles',
+    canonical: 'https://heycora.in/articles/',
   }
 };
 
@@ -26,7 +26,7 @@ export default function ArticlesPage() {
 
   return (
     <div className="min-h-screen bg-[#FBFaf7] text-zinc-900 selection:bg-zinc-950 selection:text-white pt-24 pb-20">
-      
+
       {/* ── Top Header Hero ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         <div className="max-w-3xl space-y-4">
@@ -45,7 +45,7 @@ export default function ArticlesPage() {
         </div>
 
         {/* ── Category Quick-Nav Tickers ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 pt-10">
           {ARTICLE_CATEGORIES.map((cat) => (
             <Link
               key={cat.id}
@@ -72,7 +72,7 @@ export default function ArticlesPage() {
       {/* ── Featured Spotlight & Design-Reference Card ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          
+
           {/* Main Featured Article (8 Cols) */}
           <div className="lg:col-span-8">
             <ArticleCard article={mainFeatured} featured={true} />

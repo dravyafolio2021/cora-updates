@@ -5,8 +5,6 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /wp-admin/
-Disallow: /wp-includes/
 
 # Google
 User-agent: Googlebot
@@ -23,13 +21,16 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
-User-agent: Claude-Web
+User-agent: Claude-SearchBot
 Allow: /
 
-User-agent: anthropic-ai
+User-agent: Claude-User
 Allow: /
 
 # OpenAI ChatGPT
+User-agent: OAI-SearchBot
+Allow: /
+
 User-agent: GPTBot
 Allow: /
 

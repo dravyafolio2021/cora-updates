@@ -29,10 +29,10 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     openGraph: {
       title: `${cat.name} | Cora Studio OS`,
       description: cat.description,
-      url: `https://heycora.in/articles/${cat.id}`,
+      url: `https://heycora.in/articles/${cat.id}/`,
     },
     alternates: {
-      canonical: `https://heycora.in/articles/${cat.id}`,
+      canonical: `https://heycora.in/articles/${cat.id}/`,
     }
   };
 }
@@ -50,7 +50,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <div className="min-h-screen bg-[#FBFaf7] text-zinc-900 selection:bg-zinc-950 selection:text-white pt-24 pb-20">
-      
+
       {/* Schema.org Breadcrumbs */}
       <script
         type="application/ld+json"
@@ -58,7 +58,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-12">
-        
+
         {/* Breadcrumb & Hero Header */}
         <div className="space-y-4 max-w-3xl">
           <Link
@@ -105,7 +105,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {ARTICLE_CATEGORIES.filter((c) => c.id !== cat.id).map((otherCat) => (
               <Link
                 key={otherCat.id}

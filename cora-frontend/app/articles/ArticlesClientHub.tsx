@@ -42,7 +42,7 @@ export function ArticlesClientHub({ initialArticles }: ArticlesClientHubProps) {
       {/* ── Search & Filter Controls Bar ── */}
       <div className="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] space-y-4">
         <div className="flex flex-col sm:flex-row items-center gap-4">
-          
+
           {/* Search Input */}
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />

@@ -39,13 +39,13 @@ export function ArticleHero({ article }: ArticleHeroProps) {
         <div className="flex items-center gap-2">
           <Link
             href={`/articles/${article.category}`}
-            className="px-2.5 py-1 rounded-md bg-zinc-100 text-[11px] font-mono font-bold text-zinc-700 hover:bg-zinc-200 transition-colors uppercase tracking-wider"
+            className="border-b border-zinc-400 pb-0.5 text-[10px] font-mono font-bold text-zinc-700 hover:border-zinc-950 transition-colors uppercase tracking-[0.18em]"
           >
             {article.categoryLabel}
           </Link>
           <button
             onClick={handleShare}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-medium text-zinc-700 transition-all shadow-2xs"
+            className="inline-flex items-center gap-1.5 border-b border-zinc-400 pb-0.5 text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-700 transition-all hover:border-zinc-950"
             title="Share article"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-zinc-500" />}

@@ -114,7 +114,6 @@ export function Footer() {
                 <li><Link href="/features" className="hover:text-zinc-950 transition-colors">Features</Link></li>
                 <li><Link href="/articles" className="hover:text-zinc-950 transition-colors font-semibold text-zinc-950">Articles &amp; Guides</Link></li>
                 <li><Link href="/docs" className="hover:text-zinc-950 transition-colors">Documentation</Link></li>
-                <li><Link href="/blog/" className="hover:text-zinc-950 transition-colors">Blog &amp; WordPress</Link></li>
                 <li><Link href="/demo" className="hover:text-zinc-950 transition-colors">Get A Demo</Link></li>
                 <li><Link href="/ai-agent" className="hover:text-zinc-950 transition-colors">AI Co-Founder</Link></li>
                 <li><Link href="/use-cases" className="hover:text-zinc-950 transition-colors">Use Cases</Link></li>
@@ -133,7 +132,6 @@ export function Footer() {
                 <li><Link href="/compare/cora-vs-studio-ninja" className="hover:text-zinc-950 transition-colors">vs Studio Ninja</Link></li>
                 <li><Link href="/compare/cora-vs-hubspot" className="hover:text-zinc-950 transition-colors">vs HubSpot</Link></li>
                 <li><Link href="/compare/cora-vs-docusign" className="hover:text-zinc-950 transition-colors">vs DocuSign</Link></li>
-                <li><Link href="/blog/wordpress/alternative-for-agencies/" className="hover:text-zinc-950 transition-colors">vs WordPress Stack</Link></li>
                 <li><Link href="/compare" className="hover:text-zinc-950 transition-colors text-emerald-700 font-bold">All Comparisons &rarr;</Link></li>
               </ul>
             </div>

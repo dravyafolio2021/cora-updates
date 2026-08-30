@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Clock, Sparkles, Compass, Layers, Receipt, Bot, ShieldCheck, BarChart2 } from 'lucide-react';
+import { ArrowRight, Clock, Sparkles, Compass, Layers, Receipt, Bot, ShieldCheck, BarChart2, FileText } from 'lucide-react';
 import type { Article } from '@/lib/articles-data';
 
 interface ArticleCardProps {
@@ -11,6 +11,7 @@ interface ArticleCardProps {
 }
 
 const CategoryIconMap: Record<string, React.ReactNode> = {
+  'website-content': <FileText className="w-3.5 h-3.5" />,
   'product-guides': <Compass className="w-3.5 h-3.5" />,
   'studio-operations': <Layers className="w-3.5 h-3.5" />,
   'finance-gst': <Receipt className="w-3.5 h-3.5" />,

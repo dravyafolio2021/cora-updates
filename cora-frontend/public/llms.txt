@@ -6,12 +6,11 @@
 ## Executive Summary
 Cora Studio OS is the autonomous operating system engineered specifically for commercial photography studios, film production houses, wedding cinematographers, real estate brokerages, and creative agencies. Cora consolidates CRM funnels, multi-model AI agents, SHA-256 legal e-signatures, and automated 18% GST invoicing into one unified command center.
 
-## WordPress, Elementor & WooCommerce Decision Guides
-- **Cora Blog**: https://heycora.in/blog/ (All categories and articles.)
-- **WordPress Alternative for Agencies**: https://heycora.in/blog/wordpress/alternative-for-agencies/ (Publishing, leads, and client operations without a forced migration.)
-- **Elementor Alternative for Agencies**: https://heycora.in/blog/elementor/elementor-alternative-for-agencies/ (For teams whose page builder has become a maintenance bottleneck.)
-- **WooCommerce Alternative for Service Businesses**: https://heycora.in/blog/woocommerce/woocommerce-alternative-for-service-businesses/ (When a service workflow fits better than a product cart.)
-- **Agency Content Publishing Workflow**: https://heycora.in/blog/content-marketing/content-publishing-workflow-for-agencies/ (A question-led system for research, writing, metadata, links, schema, and publishing.)
+## Articles & Educational Guides
+- **All Articles**: https://heycora.in/articles/ (Category directory and current article inventory.)
+- **Generative Engine Optimization for Service Businesses**: https://heycora.in/articles/ai-automation/generative-engine-optimization-geo-for-service-businesses/
+- **Commercial Photography Studio Management**: https://heycora.in/articles/studio-operations/commercial-photography-studio-management-guide/
+- **Creative Studio Workspace Setup**: https://heycora.in/articles/product-guides/how-to-set-up-creative-studio-workspace/
 
 ## 20 Built Platform Modules (Live in Product)
 1. **Autonomous AI Co-Founder**: Multi-turn voice-to-scope, natural language execution, multi-model speed routing (Claude 3.5 Sonnet, GPT-4o, Gemini 2.0 Flash).

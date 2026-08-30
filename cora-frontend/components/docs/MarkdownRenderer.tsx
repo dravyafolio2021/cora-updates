@@ -127,7 +127,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
 
     if (line.startsWith('## ')) {
       const title = line.replace('## ', '');
-      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const id = title.toLowerCase().replace(/^\d+\.\s*/, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       blocks.push(
         <h2 id={id} key={`h2-${i}`} className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight mt-10 mb-3 pt-4 border-t border-zinc-100 scroll-mt-24">
           {title}
@@ -139,7 +139,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
 
     if (line.startsWith('### ')) {
       const title = line.replace('### ', '');
-      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const id = title.toLowerCase().replace(/^\d+\.\s*/, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       blocks.push(
         <h3 id={id} key={`h3-${i}`} className="font-display text-base sm:text-lg font-semibold text-zinc-900 tracking-tight mt-6 mb-2 scroll-mt-24">
           {title}

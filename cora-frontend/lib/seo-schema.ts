@@ -114,30 +114,30 @@ export function generatePlatformSchemas() {
 }
 
 export function generateArticleSchema(article: Article) {
+  const articleUrl = `https://heycora.in/articles/${article.category}/${article.slug}/`;
+
   return {
     "@context": "https://schema.org",
-    "@type": article.category === 'product-guides' ? "HowTo" : "TechArticle",
+    "@type": "Article",
+    "@id": `${articleUrl}#article`,
     "headline": article.title,
     "description": article.description,
     "image": "https://heycora.in/images/cora_hero_landscape.jpg",
     "author": {
-      "@type": "Person",
+      "@type": "Organization",
       "name": article.author.name,
-      "jobTitle": article.author.role
+      "description": article.author.role
     },
     "publisher": {
-      "@type": "Organization",
-      "name": "Cora Platforms Inc.",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://heycora.in/apple-touch-icon.png"
-      }
+      "@id": "https://heycora.in/#organization"
     },
+    "articleSection": article.categoryLabel,
+    "inLanguage": "en-IN",
     "datePublished": article.publishedAt,
     "dateModified": article.updatedAt,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://heycora.in/articles/${article.category}/${article.slug}`
+      "@id": articleUrl
     }
   };
 }
@@ -154,13 +154,13 @@ export function generateArticleBreadcrumbs(category: ArticleCategory, article?: 
       "@type": "ListItem",
       "position": 2,
       "name": "Articles & Guides",
-      "item": "https://heycora.in/articles"
+      "item": "https://heycora.in/articles/"
     },
     {
       "@type": "ListItem",
       "position": 3,
       "name": category.name,
-      "item": `https://heycora.in/articles/${category.id}`
+      "item": `https://heycora.in/articles/${category.id}/`
     }
   ];
 
@@ -169,7 +169,7 @@ export function generateArticleBreadcrumbs(category: ArticleCategory, article?: 
       "@type": "ListItem",
       "position": 4,
       "name": article.shortTitle || article.title,
-      "item": `https://heycora.in/articles/${category.id}/${article.slug}`
+      "item": `https://heycora.in/articles/${category.id}/${article.slug}/`
     });
   }
 

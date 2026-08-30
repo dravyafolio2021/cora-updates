@@ -2,7 +2,7 @@ export interface Article {
   slug: string;
   title: string;
   shortTitle: string;
-  category: 'product-guides' | 'studio-operations' | 'finance-gst' | 'ai-automation' | 'legal-contracts' | 'comparisons';
+  category: 'website-content' | 'product-guides' | 'studio-operations' | 'finance-gst' | 'ai-automation' | 'legal-contracts' | 'comparisons';
   categoryLabel: string;
   eyebrow: string;
   description: string;
@@ -20,13 +20,14 @@ export interface Article {
   keyTakeaways: string[];
   toc: { id: string; title: string }[];
   interactiveWidget?: 'gst-calculator' | 'deal-simulator' | 'comparison-matrix' | 'none';
+  visualGuide?: 'publishing-postmortem';
   content: string;
   faqs: { question: string; answer: string }[];
   relatedSlugs: string[];
 }
 
 export interface ArticleCategory {
-  id: 'product-guides' | 'studio-operations' | 'finance-gst' | 'ai-automation' | 'legal-contracts' | 'comparisons';
+  id: 'website-content' | 'product-guides' | 'studio-operations' | 'finance-gst' | 'ai-automation' | 'legal-contracts' | 'comparisons';
   name: string;
   label: string;
   tagline: string;
@@ -36,6 +37,15 @@ export interface ArticleCategory {
 }
 
 export const ARTICLE_CATEGORIES: ArticleCategory[] = [
+  {
+    id: 'website-content',
+    name: 'Websites, Content & Organic Growth',
+    label: 'Websites & Content',
+    tagline: 'Turn a static website into a discoverable business system',
+    description: 'First-hand experiments and practical systems for agency websites, WordPress publishing, useful content, SEO, and AI-search discovery.',
+    iconName: 'FileText',
+    badge: 'Organic Growth',
+  },
   {
     id: 'product-guides',
     name: 'Product & How-To Guides',
@@ -49,7 +59,7 @@ export const ARTICLE_CATEGORIES: ArticleCategory[] = [
     id: 'studio-operations',
     name: 'Studio Operations & Scale',
     label: 'Operations & Scale',
-    tagline: 'Run 8-figure creative productions with zero friction',
+    tagline: 'Run complex creative productions with less operational friction',
     description: 'Operational playbooks for commercial photo & film studios, real estate media agencies, luxury wedding teams, and gear rental logistics.',
     iconName: 'Layers',
     badge: 'Playbooks',
@@ -93,6 +103,148 @@ export const ARTICLE_CATEGORIES: ArticleCategory[] = [
 ];
 
 export const ARTICLES_DATA: Article[] = [
+  // ════════════════════════════════════════════════════════════════════════
+  // ── WEBSITES, CONTENT & ORGANIC GROWTH ─────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════
+  {
+    slug: 'why-our-agency-published-no-articles-for-two-months',
+    title: 'Why Our Agency Published No Articles for Two Months',
+    shortTitle: 'Why We Stopped Publishing',
+    category: 'website-content',
+    categoryLabel: 'Websites & Content',
+    eyebrow: 'A Founder’s Publishing Postmortem',
+    description: 'Our agency website went live, but the blog stayed empty. Here is why the WordPress publishing workflow failed and the simpler Git-based system we built.',
+    readTime: '7 min read',
+    difficulty: 'Beginner',
+    publishedAt: '2026-08-30',
+    updatedAt: '2026-08-30',
+    featured: true,
+    author: {
+      name: 'Dravya Bansal',
+      role: 'Founder, Cora',
+      avatar: '/images/dravya_bansal.jpg',
+    },
+    keyTakeaways: [
+      'The publishing problem was not a lack of ideas; it was a workflow with too many repeated decisions and tool handoffs.',
+      'Research, drafting, formatting, metadata, internal links, and WordPress publishing had become separate jobs.',
+      'We replaced the ad-hoc process with a reusable article contract and Git-based publishing instead of adding a CMS.',
+      'Our goal is to publish fewer, more useful pages based on questions real service businesses repeatedly ask.'
+    ],
+    toc: [
+      { id: 'why-we-published-zero-posts', title: '1. Why We Published Zero Posts' },
+      { id: 'the-workflow-was-the-real-problem', title: '2. The Workflow Was the Real Problem' },
+      { id: 'what-we-built-instead', title: '3. What We Built Instead' },
+      { id: 'why-we-did-not-add-a-cms', title: '4. Why We Did Not Add a CMS' },
+      { id: 'our-new-publishing-rule', title: '5. Our New Publishing Rule' },
+    ],
+    interactiveWidget: 'none',
+    visualGuide: 'publishing-postmortem',
+    content: `
+Our agency website had been live for roughly two months, but we had not published a single useful article. That was uncomfortable because we help other businesses with marketing, design, development, and ecommerce—and yet our own website was behaving like a brochure.
+
+The problem was not that we had nothing to say. We regularly answer questions about websites, leads, content, proposals, client operations, and the tools service businesses use. The problem was the distance between having a useful answer and turning it into a finished page.
+
+This is the postmortem of that failure and the publishing system we are building for Cora.
+
+---
+
+## 1. Why We Published Zero Posts
+
+The old process began with a blank page and too many open tabs.
+
+We had to decide what to write, search for the topic manually, collect useful references, prepare a draft in one tool, revise it somewhere else, and then move everything into WordPress. Publishing still required formatting headings, checking links, writing metadata, adding FAQs, choosing internal links, and making sure the page looked right.
+
+None of those tasks is individually difficult. Together, they created enough friction that publishing was always postponed behind client delivery.
+
+This distinction matters. Telling a busy agency founder to “be more consistent” does not fix a system that makes every article feel like a small website project.
+
+---
+
+## 2. The Workflow Was the Real Problem
+
+Our website could display an article, but it did not help us create or operate the article.
+
+The research context lived in one place. The draft lived in another. WordPress was the final destination, but it did not know the buyer question, the intended audience, the internal links we wanted, or what should happen after a reader became interested in Cora.
+
+The workflow had five recurring failure points:
+
+1. **Research started from zero.** We were searching broadly instead of beginning with questions already heard in conversations.
+2. **The draft crossed too many tools.** Every transfer created formatting work and lost context.
+3. **SEO happened at the end.** Titles, descriptions, links, and FAQs became an extra checklist after the writing was supposedly finished.
+4. **The page had no operating connection.** Publishing and the post-enquiry client workflow were treated as separate systems.
+5. **There was no definition of done.** Every article invited a new debate about structure, length, and presentation.
+
+The lesson was simple: our content problem was an operations problem.
+
+---
+
+## 3. What We Built Instead
+
+We created one reusable article structure inside the marketing-site repository. Every article now has a defined category, URL, title, description, author, dates, key takeaways, table of contents, body, FAQs, related pages, and next action.
+
+When an article is added and the production build passes, the site automatically generates:
+
+- The article at \`/articles/{category}/{slug}/\`.
+- Its category page and article card.
+- A canonical URL and social metadata.
+- Article, breadcrumb, and FAQ structured data.
+- Sitemap inclusion.
+- Related-article links.
+
+We also added a publishing check that catches missing canonicals, duplicate metadata, absent schema, blocked crawlers, missing sitemap entries, and risky absolute claims before a page is pushed.
+
+This does not make the content useful by itself. It removes repeated publishing work so our attention can stay on whether the answer is honest, original, and helpful.
+
+Google’s own guidance recommends helpful, reliable, people-first content and warns against generating many pages without adding value. That matches the system we want: use AI to accelerate research and structure, while keeping a human responsible for the experience, evidence, and final claims. See [Google’s guidance on generative AI content](https://developers.google.com/search/docs/fundamentals/using-gen-ai-content).
+
+---
+
+## 4. Why We Did Not Add a CMS
+
+A CMS may become useful later when non-technical contributors need independent editorial workflows, permissions, scheduled publishing, or a visual preview system.
+
+At this stage it would also introduce another database, API, authentication layer, integration, and source of publishing failure. Our current team already works from the repository, so Git gives us version history, reviewable changes, predictable builds, and deployment through the same process as the rest of the website.
+
+That tradeoff will not be right for every company. For us, the simplest system is the one we are most likely to use consistently.
+
+---
+
+## 5. Our New Publishing Rule
+
+We are not committing to fifty generic articles. We are committing to answering one repeated buyer question at a time.
+
+A new article must begin with evidence that the question matters: something we experienced ourselves, heard repeatedly in conversations, observed during onboarding, or found in real search and community data. If an existing page already answers the question, we improve that page rather than manufacture another keyword variation.
+
+Our first cluster will focus on the problems we understand directly:
+
+- WordPress and Elementor maintenance for agencies.
+- Why agency websites stop publishing.
+- What should happen after a visitor submits an enquiry.
+- Why service businesses struggle to fit custom projects into WooCommerce.
+- How website content connects to leads, proposals, documents, billing, and delivery.
+
+The objective is not traffic at any cost. It is to become a useful source for the exact businesses Cora is being built to serve—and to learn from the questions that bring them to us.
+    `,
+    faqs: [
+      {
+        question: 'Why did the agency stop publishing articles?',
+        answer: 'The team had useful ideas, but research, drafting, formatting, SEO, internal linking, and WordPress publishing were fragmented across several manual steps. Client delivery consistently took priority over that workflow.'
+      },
+      {
+        question: 'Why use Git instead of a CMS for publishing?',
+        answer: 'The current team already works in the repository. Git provides reviewable changes, version history, static generation, and deployment without adding another database, API, authentication layer, or content integration.'
+      },
+      {
+        question: 'Does AI write and publish every Cora article automatically?',
+        answer: 'No. AI can help with research, structure, and drafting, but a human remains responsible for the original experience, sources, product accuracy, claims, internal links, and final publication decision.'
+      }
+    ],
+    relatedSlugs: [
+      'generative-engine-optimization-geo-for-service-businesses',
+      'commercial-photography-studio-management-guide',
+      'how-autonomous-ai-co-founders-run-creative-studios'
+    ]
+  },
   // ════════════════════════════════════════════════════════════════════════
   // ── 1. PRODUCT & HOW-TO GUIDES ─────────────────────────────────────────
   // ════════════════════════════════════════════════════════════════════════
@@ -143,7 +295,7 @@ To get started, authenticate into your workspace portal at \`https://app.heycora
 
 ## 2. Configuring GSTIN & Legal Entity
 
-Proper legal and tax configuration ensures every contract and tax invoice generated by Cora is 100% compliant with Indian statutory requirements:
+Accurate legal and tax settings help Cora produce consistent invoice and contract records. Your accountant or legal adviser should review the final configuration for your business and jurisdiction:
 
 - **Studio Display Name**: Set your registered commercial trade name (e.g. *Apex Cinema & Photo Works*).
 - **Brand Assets**: Upload your SVG or transparent PNG logos for both light and dark modes (recommended resolution: 512x512px).
@@ -269,7 +421,7 @@ Immediately upon signature execution:
     faqs: [
       {
         question: 'Are Cora e-signatures legally admissible in Indian courts?',
-        answer: 'Yes. Cora electronic signatures strictly comply with Sections 4 and 5 of the Indian Information Technology Act, 2000, supported by tamper-evident SHA-256 checksums and audit logs.'
+        answer: 'Cora records signatures with timestamps and tamper-evident checksums. Enforceability and evidentiary admissibility depend on the agreement, signature method, implementation, and facts of the dispute, so obtain qualified legal advice for important contracts.'
       },
       {
         question: 'Can clients sign from their mobile phones?',
@@ -796,12 +948,12 @@ In Cora, SAC 998381 is pre-seeded across all invoice line items. The generated P
   },
   {
     slug: 'how-to-calculate-advance-gst-and-input-tax-credit',
-    title: 'How Creative Studios Calculate Advance GST and Claim 100% Input Tax Credit (ITC)',
+    title: 'How Creative Studios Calculate Advance GST and Evaluate Input Tax Credit (ITC)',
     shortTitle: 'ITC & Advance Tax Calculation',
     category: 'finance-gst',
     categoryLabel: 'Finance & GST',
     eyebrow: 'Tax Optimization',
-    description: 'Learn how to maximize your Input Tax Credit on camera gear purchases, studio stage rentals, and software subscriptions while automating advance tax reserves.',
+    description: 'Learn how Indian creative studios evaluate Input Tax Credit eligibility for gear, rentals, and software while planning advance-tax reserves with professional advice.',
     readTime: '6 min read',
     difficulty: 'Advanced',
     publishedAt: '2026-08-30',
@@ -986,7 +1138,7 @@ Using keyword-dense semantic chunking in MySQL/SQLite, the AI Co-Founder accesse
 - Your customized legal indemnity and copyright licensing clauses.
 - Your active camera gear catalog and crew shift schedules.
 
-This prevents generic hallucinations and guarantees every generated proposal reflects your studio’s exact pricing standards.
+This grounding can reduce generic output and help proposals reflect the studio’s supplied pricing standards, but every generated proposal still requires human review.
 
 ---
 
@@ -1228,7 +1380,7 @@ Every Cora landing page and article automatically renders valid JSON-LD schemas 
       'Electronic contracts and digital signatures are legally recognized under the Indian IT Act, 2000.',
       'Section 10A explicitly validates contracts formed through electronic communications and digital records.',
       'Audit logs capturing IP addresses, browser user-agents, and timestamps establish non-repudiation.',
-      'SHA-256 cryptographic hashes guarantee document integrity and prevent post-signature tampering.'
+      'SHA-256 cryptographic hashes help detect whether a document changed after the hash was generated.'
     ],
     toc: [
       { id: 'statutory-framework', title: '1. Statutory Framework of the IT Act, 2000' },
@@ -1348,7 +1500,7 @@ Handle unpredictable weather delays on outdoor productions:
     category: 'legal-contracts',
     categoryLabel: 'Legal & E-Signs',
     eyebrow: 'Cryptographic Security',
-    description: 'Learn how SHA-256 hashing creates tamper-evident digital certificates that guarantee contract integrity and eliminate forgery.',
+    description: 'Learn how SHA-256 hashing creates tamper-evident document fingerprints that help detect later changes to a contract file.',
     readTime: '5 min read',
     difficulty: 'Advanced',
     publishedAt: '2026-08-30',
@@ -1362,7 +1514,7 @@ Handle unpredictable weather delays on outdoor productions:
       'Scanned paper PDFs can be easily edited or forged using standard PDF manipulation tools.',
       'SHA-256 generates an immutable 256-bit cryptographic fingerprint of the contract PDF.',
       'Altering even a single character or punctuation mark changes the hash entirely, exposing tampering immediately.',
-      'Provides indisputable cryptographic proof in commercial legal disputes.'
+      'Provides technical evidence that can help compare a disputed file with the originally recorded document.'
     ],
     toc: [
       { id: 'flaws-of-traditional-pdfs', title: '1. Vulnerabilities of Traditional PDFs' },

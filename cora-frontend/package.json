@@ -6,7 +6,10 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "lint": "next lint"
+    "lint": "next lint",
+    "validate:articles": "node scripts/validate-articles.mjs",
+    "check:publish": "npm run build && npm run validate:articles",
+    "indexnow:articles": "node scripts/submit-indexnow.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
