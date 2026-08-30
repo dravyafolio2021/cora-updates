@@ -2912,6 +2912,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             pointer-events: auto !important;
         }
         #cora-task-bottom-drawer {
+            display: block !important;
             position: fixed !important;
             bottom: 0 !important;
             left: 0 !important;
@@ -2991,6 +2992,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             pointer-events: auto !important;
         }
         #cora-notif-bottom-drawer {
+            display: block !important;
             position: fixed !important;
             bottom: 0 !important;
             left: 0 !important;
@@ -3032,6 +3034,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             pointer-events: auto !important;
         }
         #cora-universal-voice-drawer {
+            display: block !important;
             position: fixed !important;
             bottom: 0 !important;
             left: 0 !important;
@@ -6383,6 +6386,44 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             // Run alarm check every 30 seconds
                             setInterval(checkTaskScheduleAlarms, 30000);
 
+                            window.coraSetDrawerPriority = function(prio, btn) {
+                                drawerSelectedPriority = prio;
+                                document.querySelectorAll('.cora-prio-btn').forEach(function(el) {
+                                    el.className = 'cora-prio-btn flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer';
+                                });
+                                if (btn) {
+                                    if (prio === 'urgent') {
+                                        btn.className = 'cora-prio-btn active flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-rose-300 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs font-semibold transition-all cursor-pointer';
+                                    } else if (prio === 'high') {
+                                        btn.className = 'cora-prio-btn active flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold transition-all cursor-pointer';
+                                    } else {
+                                        btn.className = 'cora-prio-btn active flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-zinc-400 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-semibold transition-all cursor-pointer';
+                                    }
+                                }
+                            };
+
+                            window.coraSetDrawerDay = function(day, btn) {
+                                drawerSelectedDay = day;
+                                document.querySelectorAll('.cora-day-btn').forEach(function(el) {
+                                    el.classList.remove('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-900', 'dark:text-zinc-100', 'shadow-3xs', 'font-semibold');
+                                    el.classList.add('text-zinc-500', 'dark:text-zinc-400', 'font-medium');
+                                });
+                                if (btn) {
+                                    btn.classList.add('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-900', 'dark:text-zinc-100', 'shadow-3xs', 'font-semibold');
+                                    btn.classList.remove('text-zinc-500', 'dark:text-zinc-400', 'font-medium');
+                                }
+                            };
+
+                            window.coraCloseTaskDrawer = function() {
+                                var overlay = document.getElementById('cora-task-drawer-overlay');
+                                var drawer = document.getElementById('cora-task-bottom-drawer');
+                                if (overlay) overlay.classList.remove('active');
+                                if (drawer) drawer.classList.remove('active');
+                                if (isVoiceListening) {
+                                    window.coraToggleTaskVoice();
+                                }
+                            };
+
                             window.coraSwitchDrawerMode = function(mode) {
                                 var voiceView = document.getElementById('cora-drawer-voice-view');
                                 var formView = document.getElementById('cora-drawer-form-view');
@@ -6408,6 +6449,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 _editingTaskId = null;
                                 var overlay = document.getElementById('cora-task-drawer-overlay');
                                 var drawer = document.getElementById('cora-task-bottom-drawer');
+                                if (overlay) overlay.classList.add('active');
+                                if (drawer) drawer.classList.add('active');
+
                                 if (overlay && drawer) {
                                     // Reset form controls
                                     var formTitle = document.getElementById('cora-drawer-form-title');
@@ -6428,14 +6472,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                     drawerSelectedPriority = 'high';
                                     drawerSelectedDay = 'today';
                                     var prioBtns = document.querySelectorAll('#cora-drawer-prio-group button');
-                                    if (prioBtns[1]) window.coraSetDrawerPriority('high', prioBtns[1]);
+                                    if (prioBtns[1] && window.coraSetDrawerPriority) window.coraSetDrawerPriority('high', prioBtns[1]);
                                     var dayBtns = document.querySelectorAll('#cora-drawer-day-group button');
-                                    if (dayBtns[0]) window.coraSetDrawerDay('today', dayBtns[0]);
+                                    if (dayBtns[0] && window.coraSetDrawerDay) window.coraSetDrawerDay('today', dayBtns[0]);
                                     var timeSel = document.getElementById('cora-drawer-time-slot');
                                     if (timeSel) timeSel.value = '11:30 AM';
 
-                                    overlay.classList.add('active');
-                                    drawer.classList.add('active');
                                     // Default to Voice-First View
                                     window.coraSwitchDrawerMode('voice');
                                     var statusTitle = document.getElementById('cora-voice-status-title');
@@ -6455,6 +6497,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                                 var overlay = document.getElementById('cora-task-drawer-overlay');
                                 var drawer = document.getElementById('cora-task-bottom-drawer');
+                                if (overlay) overlay.classList.add('active');
+                                if (drawer) drawer.classList.add('active');
                                 if (!overlay || !drawer) return;
 
                                 // Set title and button text for edit mode
@@ -6510,8 +6554,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 var transcriptBanner = document.getElementById('cora-voice-transcript-banner');
                                 if (transcriptBanner) transcriptBanner.classList.add('hidden');
 
-                                overlay.classList.add('active');
-                                drawer.classList.add('active');
                                 // Open directly in Form View
                                 window.coraSwitchDrawerMode('form');
                             };
@@ -6521,44 +6563,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 var taskId = _editingTaskId;
                                 window.coraCloseTaskDrawer();
                                 window.coraRemoveTask(taskId);
-                            };
-
-                            window.coraCloseTaskDrawer = function() {
-                                var overlay = document.getElementById('cora-task-drawer-overlay');
-                                var drawer = document.getElementById('cora-task-bottom-drawer');
-                                if (overlay && drawer) {
-                                    overlay.classList.remove('active');
-                                    drawer.classList.remove('active');
-                                }
-                                if (isVoiceListening) {
-                                    window.coraToggleTaskVoice();
-                                }
-                            };
-
-                            window.coraSetDrawerPriority = function(prio, btn) {
-                                drawerSelectedPriority = prio;
-                                document.querySelectorAll('.cora-prio-btn').forEach(function(el) {
-                                    el.className = 'cora-prio-btn flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-600 dark:text-zinc-300 transition-all cursor-pointer';
-                                });
-                                if (prio === 'urgent') {
-                                    btn.className = 'cora-prio-btn active flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-rose-300 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs font-semibold transition-all cursor-pointer';
-                                } else if (prio === 'high') {
-                                    btn.className = 'cora-prio-btn active flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-semibold transition-all cursor-pointer';
-                                } else {
-                                    btn.className = 'cora-prio-btn active flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border border-zinc-400 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-semibold transition-all cursor-pointer';
-                                }
-                            };
-
-                            window.coraSetDrawerDay = function(day, btn) {
-                                drawerSelectedDay = day;
-                                document.querySelectorAll('.cora-day-btn').forEach(function(el) {
-                                    el.classList.remove('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-900', 'dark:text-zinc-100', 'shadow-3xs', 'font-semibold');
-                                    el.classList.add('text-zinc-500', 'dark:text-zinc-400', 'font-medium');
-                                });
-                                if (btn) {
-                                    btn.classList.add('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-900', 'dark:text-zinc-100', 'shadow-3xs', 'font-semibold');
-                                    btn.classList.remove('text-zinc-500', 'dark:text-zinc-400', 'font-medium');
-                                }
                             };
 
                             /* --- Voice-First Speech Transcription & Intent Extraction --- */
