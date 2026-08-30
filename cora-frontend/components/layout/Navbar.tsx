@@ -36,7 +36,8 @@ import {
   CheckSquare,
   Users2,
   Calendar,
-  Code
+  Code,
+  BarChart2
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 import { MODULE_GLYPH_MAP } from '@/components/features/ModuleAppGlyphs';
@@ -1043,7 +1044,7 @@ export function Navbar() {
                   className="flex items-center gap-1.5 text-sm font-bold text-zinc-950 hover:text-black py-1"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  <span>Back</span>
+                  <span className="capitalize">{activeMobileSubmenu === 'features' ? 'All Features' : activeMobileSubmenu}</span>
                 </button>
               ) : (
                 <Link href="/" onClick={() => setMobileMenuOpen(false)} className="font-display text-xl font-bold text-zinc-950 tracking-tight">
@@ -1070,240 +1071,241 @@ export function Navbar() {
             </div>
 
             {/* 2. Middle Content (Scrollable if necessary) */}
-            <div className="flex-1 overflow-y-auto py-6">
+            <div className="flex-1 overflow-y-auto py-4">
               
-              {/* Level 1: Main Category List (Clay style) */}
+              {/* Level 1: Main Category List (Matching Desktop Header Order) */}
               {!activeMobileSubmenu && (
                 <div className="space-y-1 text-base font-semibold text-zinc-900">
-                  {/* AI Co-Founders & Get A Demo Featured Row on Mobile */}
-                  <div className="grid grid-cols-2 gap-2 mb-3">
-                    <Link
-                      href="/ai-agent"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-3 rounded-2xl bg-zinc-950 text-white flex flex-col justify-between shadow-sm transition-all min-h-[72px]"
-                    >
-                      <div className="flex items-center justify-between">
-                        <Sparkles className="w-4 h-4 text-amber-400" />
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">
-                          AI
-                        </span>
+                  {/* AI Co-Founder Full-Width Flagship USP Hero Card */}
+                  <Link
+                    href="/ai-agent"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="p-4 rounded-2xl bg-zinc-950 text-white flex items-center justify-between shadow-md transition-all mb-4 border border-zinc-800 group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
+                        <Sparkles className="w-5 h-5" />
                       </div>
-                      <span className="font-bold text-xs">AI Co-Founder</span>
-                    </Link>
-
-                    <Link
-                      href="/demo"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-3 rounded-2xl bg-white border border-zinc-200 text-zinc-950 flex flex-col justify-between shadow-2xs transition-all min-h-[72px] hover:bg-zinc-50"
-                    >
-                      <div className="flex items-center justify-between">
-                        <ArrowRight className="w-4 h-4 text-zinc-500" />
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-700">
-                          LIVE
-                        </span>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm text-white">AI Co-Founder</span>
+                          <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            FLAGSHIP USP
+                          </span>
+                        </div>
+                        <p className="text-xs text-zinc-400 font-normal mt-0.5 line-clamp-1">
+                          Autonomous operations triage &amp; RAG memory
+                        </p>
                       </div>
-                      <span className="font-bold text-xs">Get A Demo</span>
-                    </Link>
-                  </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:translate-x-1 group-hover:text-white transition-transform shrink-0" />
+                  </Link>
 
+                  {/* 1. Features */}
                   <button
                     type="button"
-                    onClick={() => setActiveMobileSubmenu('product')}
-                    className="w-full py-4 flex items-center justify-between text-left hover:text-black transition-colors"
+                    onClick={() => setActiveMobileSubmenu('features')}
+                    className="w-full py-3.5 flex items-center justify-between text-left hover:text-black transition-colors"
                   >
-                    <span>Product</span>
+                    <span>Features</span>
                     <ChevronRight className="w-4 h-4 text-zinc-400" />
                   </button>
 
+                  {/* 2. Industries */}
                   <button
                     type="button"
-                    onClick={() => setActiveMobileSubmenu('use-cases')}
-                    className="w-full py-4 flex items-center justify-between text-left hover:text-black transition-colors"
+                    onClick={() => setActiveMobileSubmenu('industries')}
+                    className="w-full py-3.5 flex items-center justify-between text-left hover:text-black transition-colors"
                   >
-                    <span>Use Cases</span>
+                    <span>Industries</span>
                     <ChevronRight className="w-4 h-4 text-zinc-400" />
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setActiveMobileSubmenu('compare')}
-                    className="w-full py-4 flex items-center justify-between text-left hover:text-black transition-colors"
-                  >
-                    <span>Compare</span>
-                    <ChevronRight className="w-4 h-4 text-zinc-400" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveMobileSubmenu('integrations')}
-                    className="w-full py-4 flex items-center justify-between text-left hover:text-black transition-colors"
-                  >
-                    <span>Integrations</span>
-                    <ChevronRight className="w-4 h-4 text-zinc-400" />
-                  </button>
-
+                  {/* 3. Resources */}
                   <button
                     type="button"
                     onClick={() => setActiveMobileSubmenu('resources')}
-                    className="w-full py-4 flex items-center justify-between text-left hover:text-black transition-colors"
+                    className="w-full py-3.5 flex items-center justify-between text-left hover:text-black transition-colors"
                   >
                     <span>Resources</span>
                     <ChevronRight className="w-4 h-4 text-zinc-400" />
                   </button>
 
+                  {/* 4. Pricing (Direct Link) */}
+                  <Link
+                    href="/pricing"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full py-3.5 flex items-center justify-between hover:text-black transition-colors block"
+                  >
+                    <span>Pricing</span>
+                  </Link>
+
+                  {/* 5. Company */}
                   <button
                     type="button"
                     onClick={() => setActiveMobileSubmenu('company')}
-                    className="w-full py-4 flex items-center justify-between text-left hover:text-black transition-colors"
+                    className="w-full py-3.5 flex items-center justify-between text-left hover:text-black transition-colors"
                   >
                     <span>Company</span>
                     <ChevronRight className="w-4 h-4 text-zinc-400" />
                   </button>
-
-                  <Link
-                    href="/pricing"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-4 flex items-center justify-between hover:text-black transition-colors block"
-                  >
-                    <span>Pricing</span>
-                  </Link>
                 </div>
               )}
 
-              {/* Level 2 Submenu: Product */}
-              {activeMobileSubmenu === 'product' && (
-                <div className="space-y-3 animate-in fade-in slide-in-from-right-3 duration-150">
-                  <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
-                    CORE WORKSPACE MODULES
-                  </span>
-                  <Link href="/ai-agent" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60">
-                      <Sparkles className="w-4 h-4 text-zinc-700" />
+              {/* Level 2 Submenu: Features (4 Balanced Pillars) */}
+              {activeMobileSubmenu === 'features' && (
+                <div className="space-y-5 animate-in fade-in slide-in-from-right-3 duration-150">
+                  
+                  {/* Pillar 1: Intelligence & AI */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-zinc-100">
+                      <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                        Intelligence &amp; AI
+                      </span>
+                      <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md">
+                        FLAGSHIP
+                      </span>
                     </div>
-                    <div><div className="text-sm font-bold text-zinc-950">AI Agent Workspace</div><div className="text-xs text-zinc-500">Autonomous co-founder &amp; memory</div></div>
-                  </Link>
-                  <Link href="/features/gst-invoicing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60">
-                      <Receipt className="w-4 h-4 text-zinc-700" />
+                    <Link href="/features/ai-cofounder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Bot className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">AI Co-Founder</div><div className="text-[11px] text-zinc-500">Autonomous triage &amp; quotes</div></div>
+                    </Link>
+                    <Link href="/features/content-ai" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Sparkles className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Content AI &amp; GEO</div><div className="text-[11px] text-zinc-500">3-Act viral scripts &amp; SEO</div></div>
+                    </Link>
+                    <Link href="/features/rag-mcp" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><BrainCircuit className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">RAG Memory MCP</div><div className="text-[11px] text-zinc-500">Semantic memory &amp; IDE connection</div></div>
+                    </Link>
+                    <Link href="/features/voice-to-scope" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Zap className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Voice-to-Scope</div><div className="text-[11px] text-zinc-500">Audio briefs to structured contracts</div></div>
+                    </Link>
+                  </div>
+
+                  {/* Pillar 2: Sales & Pipeline */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-zinc-100">
+                      <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                        Sales &amp; Pipeline
+                      </span>
+                      <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                        GROWTH
+                      </span>
                     </div>
-                    <div><div className="text-sm font-bold text-zinc-950">18% GST Invoicing</div><div className="text-xs text-zinc-500">CGST/SGST automated splitting</div></div>
-                  </Link>
-                  <Link href="/features/esign-vault" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60">
-                      <FileText className="w-4 h-4 text-zinc-700" />
+                    <Link href="/features/lead-crm" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Kanban className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Kanban Lead CRM</div><div className="text-[11px] text-zinc-500">Visual deal stages &amp; WhatsApp</div></div>
+                    </Link>
+                    <Link href="/features/canvas-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><LayoutTemplate className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Funnel Builder</div><div className="text-[11px] text-zinc-500">Landing pages &amp; reels</div></div>
+                    </Link>
+                    <Link href="/features/form-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><FormInput className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Visual Forms</div><div className="text-[11px] text-zinc-500">Dynamic briefs &amp; call-time intake</div></div>
+                    </Link>
+                    <Link href="/features/review-portal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Star className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">5★ Review Portal</div><div className="text-[11px] text-zinc-500">Sentiment routing &amp; Google sync</div></div>
+                    </Link>
+                  </div>
+
+                  {/* Pillar 3: Operations & Legal */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-zinc-100">
+                      <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                        Operations &amp; Legal
+                      </span>
+                      <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                        LEGAL TECH
+                      </span>
                     </div>
-                    <div><div className="text-sm font-bold text-zinc-950">SHA-256 E-Sign Vault</div><div className="text-xs text-zinc-500">IT Act 2000 digital contracts</div></div>
-                  </Link>
-                  <Link href="/features/lead-crm" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60">
-                      <Kanban className="w-4 h-4 text-zinc-700" />
+                    <Link href="/features/esign-vault" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><FileText className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">SHA-256 E-Signs</div><div className="text-[11px] text-zinc-500">5-Step legally binding contracts</div></div>
+                    </Link>
+                    <Link href="/features/crew-dispatch" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Send className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Crew Dispatch</div><div className="text-[11px] text-zinc-500">Automated call sheets &amp; conflicts</div></div>
+                    </Link>
+                    <Link href="/features/master-calendar" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Calendar className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Master Calendar</div><div className="text-[11px] text-zinc-500">Multi-location shoot scheduling</div></div>
+                    </Link>
+                    <Link href="/features/task-board" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><CheckSquare className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Task Board</div><div className="text-[11px] text-zinc-500">Post-production &amp; proofing</div></div>
+                    </Link>
+                  </div>
+
+                  {/* Pillar 4: Finance & Assets */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-zinc-100">
+                      <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                        Finance &amp; Assets
+                      </span>
+                      <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                        INDIA GST
+                      </span>
                     </div>
-                    <div><div className="text-sm font-bold text-zinc-950">Kanban Lead CRM</div><div className="text-xs text-zinc-500">Milestones &amp; WhatsApp dispatch</div></div>
-                  </Link>
-                  <Link href="/features/crew-dispatch" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60">
-                      <Send className="w-4 h-4 text-zinc-700" />
-                    </div>
-                    <div><div className="text-sm font-bold text-zinc-950">Crew &amp; Gear Dispatch</div><div className="text-xs text-zinc-500">Automated shoot call sheets</div></div>
-                  </Link>
+                    <Link href="/features/gst-invoicing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Receipt className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">18% GST Invoicing</div><div className="text-[11px] text-zinc-500">CGST/SGST auto-splitting &amp; SAC</div></div>
+                    </Link>
+                    <Link href="/features/asset-gear" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Camera className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Gear &amp; Inventory</div><div className="text-[11px] text-zinc-500">Equipment registry &amp; checkouts</div></div>
+                    </Link>
+                    <Link href="/features/media-hub" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Film className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Media Hub &amp; RAW</div><div className="text-[11px] text-zinc-500">Library &amp; 4K client galleries</div></div>
+                    </Link>
+                    <Link href="/features/rbac-system" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><ShieldCheck className="w-4 h-4" /></div>
+                      <div><div className="text-xs font-bold text-zinc-950">Multi-Tenant RBAC</div><div className="text-[11px] text-zinc-500">30-Point security matrix</div></div>
+                    </Link>
+                  </div>
+
                   <div className="pt-2">
                     <Link href="/features" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-zinc-950 flex items-center gap-1.5 hover:text-zinc-600 transition-colors">
-                      <span>View all 20 modules &amp; roadmap</span>
+                      <span>Explore all 20 modules &amp; roadmap</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                 </div>
               )}
 
-              {/* Level 2 Submenu: Use Cases */}
-              {activeMobileSubmenu === 'use-cases' && (
+              {/* Level 2 Submenu: Industries (5 Focused Creative Verticals) */}
+              {activeMobileSubmenu === 'industries' && (
                 <div className="space-y-3 animate-in fade-in slide-in-from-right-3 duration-150">
                   <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
-                    INDUSTRY WORKSPACES
+                    TARGET PRODUCTION WORKSPACES
                   </span>
                   <Link href="/use-cases#commercial-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60"><Camera className="w-4 h-4 text-zinc-700" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">Commercial Photo &amp; Film</div><div className="text-xs text-zinc-500">Gear checkouts &amp; 4K RAW proofing</div></div>
+                    <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-200/60"><Camera className="w-4 h-4" /></div>
+                    <div><div className="text-sm font-bold text-zinc-950">Commercial Photo &amp; Film</div><div className="text-xs text-zinc-500">4K RAW vaults, gear inventory &amp; releases</div></div>
                   </Link>
                   <Link href="/use-cases#real-estate-media" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60"><Building2 className="w-4 h-4 text-zinc-700" /></div>
+                    <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200/60"><Building2 className="w-4 h-4" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">Real Estate &amp; Brokerages</div><div className="text-xs text-zinc-500">Property listings &amp; MLS AI copy</div></div>
                   </Link>
+                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/60"><Cpu className="w-4 h-4" /></div>
+                    <div><div className="text-sm font-bold text-zinc-950">Creative Retainers &amp; Agencies</div><div className="text-xs text-zinc-500">Monthly retainers &amp; review portals</div></div>
+                  </Link>
                   <Link href="/use-cases#wedding-events" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/60"><Sparkles className="w-4 h-4 text-zinc-700" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">Wedding &amp; Event Production</div><div className="text-xs text-zinc-500">Multi-day call sheets &amp; advance GST</div></div>
+                    <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-200/60"><Sparkles className="w-4 h-4" /></div>
+                    <div><div className="text-sm font-bold text-zinc-950">Wedding &amp; Event Cinema</div><div className="text-xs text-zinc-500">Multi-day call sheets &amp; advance GST</div></div>
                   </Link>
-                  <Link href="/use-cases#interior-design" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200/70"><LayoutTemplate className="w-4 h-4" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">Interior &amp; Architecture</div><div className="text-xs text-zinc-500">Milestone stage billing &amp; contracts</div></div>
-                  </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/70"><Cpu className="w-4 h-4" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">Creative &amp; Growth Agencies</div><div className="text-xs text-zinc-500">Monthly retainers &amp; review portals</div></div>
-                  </Link>
-                </div>
-              )}
-
-              {/* Level 2 Submenu: Compare */}
-              {activeMobileSubmenu === 'compare' && (
-                <div className="space-y-3 animate-in fade-in slide-in-from-right-3 duration-150">
-                  <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
-                    HEAD-TO-HEAD BENCHMARKS
-                  </span>
-                  <Link href="/compare/cora-vs-honeybook" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">Cora vs HoneyBook</div><div className="text-xs text-zinc-500">Save ₹65k/yr + Native GST</div></div>
-                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                  </Link>
-                  <Link href="/compare/cora-vs-studio-ninja" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">Cora vs Studio Ninja</div><div className="text-xs text-zinc-500">Modern UI + Autonomous AI Agents</div></div>
-                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                  </Link>
-                  <Link href="/compare/cora-vs-hubspot" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">Cora vs HubSpot CRM</div><div className="text-xs text-zinc-500">Save ₹4.5L/yr without seat penalties</div></div>
-                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                  </Link>
-                  <Link href="/compare/cora-vs-docusign" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">Cora vs DocuSign</div><div className="text-xs text-zinc-500">Unlimited SHA-256 digital envelopes</div></div>
-                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  <Link href="/use-cases#interior-design" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200/60"><LayoutTemplate className="w-4 h-4" /></div>
+                    <div><div className="text-sm font-bold text-zinc-950">Studio Stage &amp; Gear Rentals</div><div className="text-xs text-zinc-500">Floor scheduling &amp; serialized checkouts</div></div>
                   </Link>
                   <div className="pt-2">
-                    <Link href="/compare" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
-                      <span>View all 8 comparison benchmarks</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                </div>
-              )}
-
-              {/* Level 2 Submenu: Integrations */}
-              {activeMobileSubmenu === 'integrations' && (
-                <div className="space-y-3 animate-in fade-in slide-in-from-right-3 duration-150">
-                  <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
-                    WEBSITE CONNECTORS &amp; EMBEDS
-                  </span>
-                  <Link href="/integrations/framer" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">Framer Connector</div><div className="text-xs text-zinc-500">Client portals, e-signs &amp; 18% GST</div></div>
-                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                  </Link>
-                  <Link href="/integrations/webflow" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">Webflow Connector</div><div className="text-xs text-zinc-500">Form webhooks &amp; WhatsApp dispatch</div></div>
-                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                  </Link>
-                  <Link href="/integrations/wordpress" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">WordPress Connector</div><div className="text-xs text-zinc-500">Replace 6 heavy plugins with 1 script</div></div>
-                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                  </Link>
-                  <Link href="/integrations/shopify" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">Shopify Custom Quotes</div><div className="text-xs text-zinc-500">High-ticket production &amp; 50/50 split</div></div>
-                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                  </Link>
-                  <Link href="/tools/embed-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl bg-zinc-50 border border-zinc-200/80">
-                    <div className="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center"><Code className="w-4 h-4 text-emerald-400" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">1-Click Embed Builder</div><div className="text-xs text-zinc-500">Generate script/iframe snippets</div></div>
-                  </Link>
-                  <div className="pt-2">
-                    <Link href="/integrations" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
-                      <span>View all integration guides</span>
+                    <Link href="/use-cases" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-zinc-950 flex items-center gap-1.5 hover:text-zinc-600 transition-colors">
+                      <span>Explore all industry schemas</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
@@ -1314,23 +1316,27 @@ export function Navbar() {
               {activeMobileSubmenu === 'resources' && (
                 <div className="space-y-3 animate-in fade-in slide-in-from-right-3 duration-150">
                   <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
-                    ARTICLES &amp; FREE TOOLS
+                    KNOWLEDGE, GUIDES &amp; BENCHMARKS
                   </span>
                   <Link href="/articles" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/70"><Sparkles className="w-4 h-4" /></div>
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200/70"><Sparkles className="w-4 h-4" /></div>
                     <div><div className="text-sm font-bold text-zinc-950">Articles &amp; Compare</div><div className="text-xs text-zinc-500">24 guides, playbooks &amp; benchmarks</div></div>
                   </Link>
-                  <Link href="/tools/gst-calculator" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-200/70"><Receipt className="w-4 h-4" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">18% GST Calculator</div><div className="text-xs text-zinc-500">Live reverse tax &amp; split math</div></div>
-                  </Link>
-                  <Link href="/tools/listing-ai" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200/70"><Sparkles className="w-4 h-4" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">Real Estate AI Writer</div><div className="text-xs text-zinc-500">Viral Instagram &amp; MLS descriptions</div></div>
+                  <Link href="/docs" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                    <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center border border-sky-200/70"><FileText className="w-4 h-4" /></div>
+                    <div><div className="text-sm font-bold text-zinc-950">Documentation &amp; APIs</div><div className="text-xs text-zinc-500">25 architecture guides &amp; REST specs</div></div>
                   </Link>
                   <Link href="/tools" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200/70"><Layers className="w-4 h-4" /></div>
-                    <div><div className="text-sm font-bold text-zinc-950">All Free Tools</div><div className="text-xs text-zinc-500">Rate card creators &amp; calculators</div></div>
+                    <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center border border-indigo-200/70"><Receipt className="w-4 h-4" /></div>
+                    <div><div className="text-sm font-bold text-zinc-950">Free Tools &amp; Calculators</div><div className="text-xs text-zinc-500">18% GST calculator &amp; AI writer</div></div>
+                  </Link>
+                  <Link href="/compare" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-700 flex items-center justify-center border border-zinc-200/70"><BarChart2 className="w-4 h-4" /></div>
+                    <div><div className="text-sm font-bold text-zinc-950">Head-to-Head Comparisons</div><div className="text-xs text-zinc-500">vs HoneyBook, Studio Ninja, HubSpot</div></div>
+                  </Link>
+                  <Link href="/blog/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center border border-purple-200/70"><Layers className="w-4 h-4" /></div>
+                    <div><div className="text-sm font-bold text-zinc-950">WordPress &amp; Agency Blog</div><div className="text-xs text-zinc-500">Publishing &amp; stack alternatives</div></div>
                   </Link>
                 </div>
               )}
@@ -1342,7 +1348,7 @@ export function Navbar() {
                     COMPANY &amp; ECOSYSTEM
                   </span>
                   <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">About &amp; Story</div><div className="text-xs text-zinc-500">Mission and Dravya Bansal</div></div>
+                    <div><div className="text-sm font-bold text-zinc-950">About &amp; Story</div><div className="text-xs text-zinc-500">Mission and leadership</div></div>
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                   </Link>
                   <Link href="/brand" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
@@ -1350,7 +1356,7 @@ export function Navbar() {
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                   </Link>
                   <Link href="/security" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">Security &amp; SOC-2</div><div className="text-xs text-zinc-500">AES-256 &amp; IT Act 2000</div></div>
+                    <div><div className="text-sm font-bold text-zinc-950">Security &amp; Trust</div><div className="text-xs text-zinc-500">AES-256 &amp; IT Act 2000</div></div>
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                   </Link>
                   <Link href="/sla" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
@@ -1366,7 +1372,7 @@ export function Navbar() {
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                   </Link>
                   <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-50">
-                    <div><div className="text-sm font-bold text-zinc-950">Advisory Desk</div><div className="text-xs text-zinc-500">Direct contact &amp; support</div></div>
+                    <div><div className="text-sm font-bold text-zinc-950">Advisory Desk &amp; Support</div><div className="text-xs text-zinc-500">Direct contact &amp; inquiry</div></div>
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                   </Link>
                 </div>
