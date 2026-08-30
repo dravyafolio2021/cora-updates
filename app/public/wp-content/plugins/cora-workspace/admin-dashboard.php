@@ -3038,8 +3038,62 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             background: #18181b !important;
             border-color: #27272a !important;
         }
-        #cora-universal-voice-drawer.active {
-            transform: translateY(0%) !important;
+        /* Universal Header Profile Popover & Mobile Sheet Styles */
+        #cora-header-profile-backdrop {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(9, 9, 11, 0.45) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            z-index: 99990 !important;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        #cora-header-profile-backdrop.active {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        #cora-header-profile-popover {
+            position: fixed !important;
+            z-index: 99995 !important;
+            box-sizing: border-box !important;
+            flex-direction: column !important;
+        }
+        /* Desktop: Anchored below topbar right avatar button */
+        @media (min-width: 768px) {
+            #cora-header-profile-popover {
+                top: 52px !important;
+                right: 16px !important;
+                left: auto !important;
+                bottom: auto !important;
+                width: 315px !important;
+                max-width: calc(100vw - 32px) !important;
+                border-radius: 20px !important;
+                transform-origin: top right !important;
+            }
+        }
+        /* Mobile: Bottom-up executive sheet (Rule 12 compliant) */
+        @media (max-width: 767.98px) {
+            #cora-header-profile-popover {
+                top: auto !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                max-width: 480px !important;
+                margin: 0 auto !important;
+                border-top-left-radius: 28px !important;
+                border-top-right-radius: 28px !important;
+                border-bottom-left-radius: 0px !important;
+                border-bottom-right-radius: 0px !important;
+                border-top: 1px solid rgba(228, 228, 231, 0.9) !important;
+                box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25) !important;
+                padding-bottom: max(20px, env(safe-area-inset-bottom, 20px)) !important;
+            }
+            .dark #cora-header-profile-popover {
+                border-top-color: #27272a !important;
+            }
         }
 
         /* Mobile vs Desktop Scoped Rules for Dashboard */
@@ -3914,135 +3968,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 </div>
             </div>
         </div>
-        </div>
-
-        <!-- Header User Profile Popover Card (Shared Desktop & Mobile, Ultra-Clean Modal-State Popover) -->
-        <div id="cora-header-profile-popover" class="hidden fixed top-[54px] right-3 sm:right-5 w-[295px] sm:w-[315px] max-w-[calc(100vw-24px)] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-2xl shadow-zinc-950/15 dark:shadow-black/70 p-3.5 z-[9990] gap-2.5 animate-in fade-in zoom-in-95 duration-150 select-none" style="flex-direction:column;">
-            <!-- 1. Executive User Profile Header -->
-            <div class="flex items-center gap-3 px-1 py-0.5 select-none">
-                <div class="relative w-10 h-10 shrink-0">
-                    <?php if ( $current_user_avatar ) : ?>
-                        <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-10 h-10 rounded-full object-cover shrink-0 select-none border border-zinc-200/80 dark:border-zinc-700/80 ring-2 ring-white dark:ring-zinc-900 block" alt="<?php echo esc_attr($current_user_display_name); ?>" />
-                    <?php else : ?>
-                        <div class="w-10 h-10 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center font-bold text-xs uppercase shrink-0 select-none shadow-3xs ring-2 ring-white dark:ring-zinc-900">
-                            <?php echo esc_html(substr($current_user_display_name, 0, 2)); ?>
-                        </div>
-                    <?php endif; ?>
-                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-zinc-900 bg-emerald-500 pointer-events-none" style="position:absolute !important; bottom:0 !important; right:0 !important; z-index:10 !important;"></span>
-                </div>
-                <div class="flex flex-col min-w-0 flex-1 leading-tight">
-                    <div class="flex items-center justify-between gap-1.5">
-                        <span class="text-[13px] font-bold text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html($current_user_display_name); ?></span>
-                        <span class="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 shrink-0">Owner</span>
-                    </div>
-                    <span class="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono truncate mt-0.5"><?php echo esc_html($current_wp_user->exists() ? $current_wp_user->user_email : 'owner.studio@cora.local'); ?></span>
-                </div>
-            </div>
-
-            <!-- 2. Attendance / Duty Status (Sleek Inline Pill Control) -->
-            <div class="p-2 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/70 dark:border-zinc-700/60 rounded-xl flex items-center justify-between select-none">
-                <div class="space-y-0.5 pl-1">
-                    <div class="flex items-center gap-1.5">
-                        <span id="cora-punch-popover-dot" class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                        <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-punch-popover-status">Active Duty</span>
-                    </div>
-                    <div class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono" id="cora-punch-popover-time">Punched in at 4:14 PM</div>
-                </div>
-                <div class="flex items-center gap-1 bg-white dark:bg-zinc-900 p-0.5 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 shrink-0">
-                    <button type="button" onclick="headerLogPunch('in')" id="cora-header-punch-in" class="bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-[10.5px] font-bold px-2.5 py-1 rounded-md transition-all cursor-pointer shadow-3xs select-none">In</button>
-                    <button type="button" onclick="headerLogPunch('out')" id="cora-header-punch-out" class="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 text-[10.5px] font-medium px-2.5 py-1 rounded-md transition-all cursor-pointer select-none">Out</button>
-                </div>
-            </div>
-            <p id="cora-punch-popover-feedback" class="text-[10px] text-center text-zinc-400 hidden -mt-1"></p>
-
-            <!-- 3. Workspace AI & Quick Links List (Linear / Notion Style) -->
-            <div class="flex flex-col gap-0.5 pt-0.5">
-                <!-- AI Engine Indicator -->
-                <div class="w-full px-2.5 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/30 flex items-center justify-between border border-zinc-100 dark:border-zinc-800/60">
-                    <div class="flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300">Cora AI Agent</span>
-                    </div>
-                    <span class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">Gemini 3.5 Flash</span>
-                </div>
-
-                <!-- Profile -->
-                <button class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="coraNavigateTo('profile'); $('#cora-header-profile-popover').addClass('hidden');">
-                    <div class="flex items-center gap-2.5">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        <span>Profile &amp; Account</span>
-                    </div>
-                    <span class="text-zinc-300 dark:text-zinc-600 text-xs">&rsaquo;</span>
-                </button>
-
-                <!-- Workspace Settings -->
-                <button class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="coraNavigateTo('settings-suite'); $('#cora-header-profile-popover').addClass('hidden');">
-                    <div class="flex items-center gap-2.5">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l-.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                        <span>Workspace Settings</span>
-                    </div>
-                    <span class="text-[10px] text-zinc-400 font-mono px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">⌘.</span>
-                </button>
-
-                <!-- Talk to Founder -->
-                <a href="https://wa.me/919817059266?text=Hi%20Cora%20Founder%2C%20I%20have%20a%20question%20about%20my%20workspace." target="_blank" rel="noopener noreferrer" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium flex items-center justify-between cursor-pointer transition-colors no-underline" onclick="$('#cora-header-profile-popover').addClass('hidden');">
-                    <div class="flex items-center gap-2.5">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        <span>Talk to Founder</span>
-                    </div>
-                    <span class="text-[9.5px] font-medium text-zinc-500 dark:text-zinc-400 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded">Direct Line</span>
-                </a>
-
-                <!-- Language Selector Row -->
-                <div class="px-2.5 py-1.5 flex items-center justify-between text-xs rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                    <div class="flex items-center gap-2.5 text-zinc-700 dark:text-zinc-300">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                        <span class="text-xs font-medium">Language</span>
-                    </div>
-                    <select id="cora-header-language-select" class="cora-language-selector bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium rounded-lg px-2 py-1 outline-none border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer" onchange="if(window.coraSetLanguage) window.coraSetLanguage(this.value, true);">
-                        <option value="en">English</option>
-                        <option value="hi">Hindi (हिन्दी)</option>
-                        <option value="es">Spanish (Español)</option>
-                        <option value="fr">French (Français)</option>
-                        <option value="de">German (Deutsch)</option>
-                        <option value="bn">Bengali (বাংলা)</option>
-                        <option value="te">Telugu (తెలుగు)</option>
-                        <option value="mr">Marathi (मराठी)</option>
-                        <option value="ta">Tamil (தமிழ்)</option>
-                        <option value="gu">Gujarati (ગુજરાતી)</option>
-                        <option value="kn">Kannada (ಕನ್ನಡ)</option>
-                        <option value="ml">Malayalam (മലയാളം)</option>
-                        <option value="pa">Punjabi (ਪੰਜਾਬী)</option>
-                        <option value="or">Odia (ଓଡ଼ିଆ)</option>
-                    </select>
-                </div>
-
-                <?php if ( cora_is_super_owner() ) : ?>
-                <!-- Role Preview Row -->
-                <div class="px-2.5 py-1.5 flex items-center justify-between text-xs rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                    <div class="flex items-center gap-2.5 text-zinc-700 dark:text-zinc-300">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        <span class="text-xs font-medium">Role Preview</span>
-                    </div>
-                    <select class="cora-role-preview-select bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium rounded-lg px-2 py-1 outline-none border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer" onchange="coraSwitchRolePreview(this.value)">
-                        <option value="administrator">Super Admin</option>
-                        <?php foreach ( $cora_role_labels as $r_key => $r_label ) :
-                            if ( $r_key === 'administrator' ) continue;
-                        ?>
-                        <option value="<?php echo esc_attr( $r_key ); ?>"><?php echo esc_html( $r_label ); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- 4. Sign Out -->
-            <div class="border-t border-zinc-100 dark:border-zinc-800/80 pt-1.5">
-                <a href="<?php echo esc_url( wp_logout_url( home_url() ) ); ?>" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-500 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400 rounded-xl hover:bg-rose-50/50 dark:hover:bg-rose-950/20 font-medium flex items-center gap-2.5 transition-colors select-none no-underline">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                    <span>Sign out</span>
-                </a>
-            </div>
         </div>
         
         <div class="cora-topbar-mobile w-full items-center justify-between bg-transparent py-0.5" style="gap: 10px !important;">
@@ -5839,6 +5764,139 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                                 <button type="button" onclick="window.coraCloseNotifSettings(); if(window.coraOpenWorkspaceSettings) window.coraOpenWorkspaceSettings('notifications');" class="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 underline font-medium cursor-pointer">
                                     More settings &rarr;
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Universal Header Profile Popover Card & Mobile Sheet (Document Root Level) -->
+                        <div id="cora-header-profile-backdrop" onclick="window.coraCloseProfilePopover()"></div>
+                        <div id="cora-header-profile-popover" class="hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 p-3.5 gap-2.5 animate-in fade-in zoom-in-95 duration-150 select-none">
+                            <!-- Mobile Drag Handle -->
+                            <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-1 md:hidden"></div>
+
+                            <!-- 1. Executive User Profile Header -->
+                            <div class="flex items-center gap-3 px-1 py-0.5 select-none">
+                                <div class="relative w-10 h-10 shrink-0">
+                                    <?php if ( $current_user_avatar ) : ?>
+                                        <img src="<?php echo esc_url($current_user_avatar); ?>" class="w-10 h-10 rounded-full object-cover shrink-0 select-none border border-zinc-200/80 dark:border-zinc-700/80 ring-2 ring-white dark:ring-zinc-900 block" alt="<?php echo esc_attr($current_user_display_name); ?>" />
+                                    <?php else : ?>
+                                        <div class="w-10 h-10 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center font-bold text-xs uppercase shrink-0 select-none shadow-3xs ring-2 ring-white dark:ring-zinc-900">
+                                            <?php echo esc_html(substr($current_user_display_name, 0, 2)); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-zinc-900 bg-emerald-500 pointer-events-none" style="position:absolute !important; bottom:0 !important; right:0 !important; z-index:10 !important;"></span>
+                                </div>
+                                <div class="flex flex-col min-w-0 flex-1 leading-tight">
+                                    <div class="flex items-center justify-between gap-1.5">
+                                        <span class="text-[13px] font-bold text-zinc-900 dark:text-zinc-100 truncate"><?php echo esc_html($current_user_display_name); ?></span>
+                                        <span class="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 shrink-0">Owner</span>
+                                    </div>
+                                    <span class="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono truncate mt-0.5"><?php echo esc_html($current_wp_user->exists() ? $current_wp_user->user_email : 'owner.studio@cora.local'); ?></span>
+                                </div>
+                            </div>
+
+                            <!-- 2. Attendance / Duty Status (Sleek Inline Pill Control) -->
+                            <div class="p-2 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/70 dark:border-zinc-700/60 rounded-xl flex items-center justify-between select-none">
+                                <div class="space-y-0.5 pl-1">
+                                    <div class="flex items-center gap-1.5">
+                                        <span id="cora-punch-popover-dot" class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200" id="cora-punch-popover-status">Active Duty</span>
+                                    </div>
+                                    <div class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono" id="cora-punch-popover-time">Punched in at 4:14 PM</div>
+                                </div>
+                                <div class="flex items-center gap-1 bg-white dark:bg-zinc-900 p-0.5 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 shrink-0">
+                                    <button type="button" onclick="headerLogPunch('in')" id="cora-header-punch-in" class="bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-[10.5px] font-bold px-2.5 py-1 rounded-md transition-all cursor-pointer shadow-3xs select-none">In</button>
+                                    <button type="button" onclick="headerLogPunch('out')" id="cora-header-punch-out" class="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 text-[10.5px] font-medium px-2.5 py-1 rounded-md transition-all cursor-pointer select-none">Out</button>
+                                </div>
+                            </div>
+                            <p id="cora-punch-popover-feedback" class="text-[10px] text-center text-zinc-400 hidden -mt-1"></p>
+
+                            <!-- 3. Workspace AI & Quick Links List (Linear / Notion Style) -->
+                            <div class="flex flex-col gap-0.5 pt-0.5">
+                                <!-- AI Engine Indicator -->
+                                <div class="w-full px-2.5 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/30 flex items-center justify-between border border-zinc-100 dark:border-zinc-800/60">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300">Cora AI Agent</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">Gemini 3.5 Flash</span>
+                                </div>
+
+                                <!-- Profile -->
+                                <button class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="coraNavigateTo('profile'); window.coraCloseProfilePopover();">
+                                    <div class="flex items-center gap-2.5">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        <span>Profile &amp; Account</span>
+                                    </div>
+                                    <span class="text-zinc-300 dark:text-zinc-600 text-xs">&rsaquo;</span>
+                                </button>
+
+                                <!-- Workspace Settings -->
+                                <button class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="coraNavigateTo('settings-suite'); window.coraCloseProfilePopover();">
+                                    <div class="flex items-center gap-2.5">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l-.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                        <span>Workspace Settings</span>
+                                    </div>
+                                    <span class="text-[10px] text-zinc-400 font-mono px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">⌘.</span>
+                                </button>
+
+                                <!-- Talk to Founder -->
+                                <a href="https://wa.me/919817059266?text=Hi%20Cora%20Founder%2C%20I%20have%20a%20question%20about%20my%20workspace." target="_blank" rel="noopener noreferrer" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium flex items-center justify-between cursor-pointer transition-colors no-underline" onclick="window.coraCloseProfilePopover();">
+                                    <div class="flex items-center gap-2.5">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                        <span>Talk to Founder</span>
+                                    </div>
+                                    <span class="text-[9.5px] font-medium text-zinc-500 dark:text-zinc-400 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded">Direct Line</span>
+                                </a>
+
+                                <!-- Language Selector Row -->
+                                <div class="px-2.5 py-1.5 flex items-center justify-between text-xs rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                                    <div class="flex items-center gap-2.5 text-zinc-700 dark:text-zinc-300">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                        <span class="text-xs font-medium">Language</span>
+                                    </div>
+                                    <select id="cora-header-language-select" class="cora-language-selector bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium rounded-lg px-2 py-1 outline-none border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer" onchange="if(window.coraSetLanguage) window.coraSetLanguage(this.value, true);">
+                                        <option value="en">English</option>
+                                        <option value="hi">Hindi (हिन्दी)</option>
+                                        <option value="es">Spanish (Español)</option>
+                                        <option value="fr">French (Français)</option>
+                                        <option value="de">German (Deutsch)</option>
+                                        <option value="bn">Bengali (বাংলা)</option>
+                                        <option value="te">Telugu (తెలుగు)</option>
+                                        <option value="mr">Marathi (मराठी)</option>
+                                        <option value="ta">Tamil (தமிழ்)</option>
+                                        <option value="gu">Gujarati (ગુજરાતી)</option>
+                                        <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                                        <option value="ml">Malayalam (മലയാളം)</option>
+                                        <option value="pa">Punjabi (ਪੰਜਾਬী)</option>
+                                        <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                                    </select>
+                                </div>
+
+                                <?php if ( cora_is_super_owner() ) : ?>
+                                <!-- Role Preview Row -->
+                                <div class="px-2.5 py-1.5 flex items-center justify-between text-xs rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                                    <div class="flex items-center gap-2.5 text-zinc-700 dark:text-zinc-300">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                        <span class="text-xs font-medium">Role Preview</span>
+                                    </div>
+                                    <select class="cora-role-preview-select bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium rounded-lg px-2 py-1 outline-none border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer" onchange="coraSwitchRolePreview(this.value)">
+                                        <option value="administrator">Super Admin</option>
+                                        <?php foreach ( $cora_role_labels as $r_key => $r_label ) :
+                                            if ( $r_key === 'administrator' ) continue;
+                                        ?>
+                                        <option value="<?php echo esc_attr( $r_key ); ?>"><?php echo esc_html( $r_label ); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- 4. Sign Out -->
+                            <div class="border-t border-zinc-100 dark:border-zinc-800/80 pt-1.5">
+                                <a href="<?php echo esc_url( wp_logout_url( home_url() ) ); ?>" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-500 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400 rounded-xl hover:bg-rose-50/50 dark:hover:bg-rose-950/20 font-medium flex items-center gap-2.5 transition-colors select-none no-underline">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                                    <span>Sign out</span>
+                                </a>
                             </div>
                         </div>
 
@@ -14676,20 +14734,39 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
                 }
             }
         });
+        const profileBackdrop = document.getElementById('cora-header-profile-backdrop');
+        if (profileBackdrop && (!exceptId || exceptId !== 'cora-header-profile-popover')) {
+            profileBackdrop.classList.remove('active');
+        }
     };
 
     window.coraToggleProfilePopover = function(e) {
         if (e && e.stopPropagation) e.stopPropagation();
         const popover = document.getElementById('cora-header-profile-popover');
+        const backdrop = document.getElementById('cora-header-profile-backdrop');
         if (!popover) return;
         const isHidden = popover.classList.contains('hidden') || popover.style.display === 'none';
         window.coraCloseAllPopovers('cora-header-profile-popover');
         if (isHidden) {
             popover.classList.remove('hidden');
             popover.style.display = 'flex';
+            if (backdrop) backdrop.classList.add('active');
         } else {
             popover.classList.add('hidden');
             popover.style.display = 'none';
+            if (backdrop) backdrop.classList.remove('active');
+        }
+    };
+
+    window.coraCloseProfilePopover = function() {
+        const popover = document.getElementById('cora-header-profile-popover');
+        const backdrop = document.getElementById('cora-header-profile-backdrop');
+        if (popover) {
+            popover.classList.add('hidden');
+            popover.style.display = 'none';
+        }
+        if (backdrop) {
+            backdrop.classList.remove('active');
         }
     };
 
@@ -14833,9 +14910,11 @@ window.coraCurrentView = <?php echo json_encode( $sub_page === 'super-admin' ? '
         // Close profile popover when clicking outside
         document.addEventListener('click', function(e) {
             const popover = document.getElementById('cora-header-profile-popover');
+            const backdrop = document.getElementById('cora-header-profile-backdrop');
             if (popover && !popover.classList.contains('hidden') && !e.target.closest('.cora-header-profile-btn') && !e.target.closest('#cora-header-profile-popover')) {
                 popover.classList.add('hidden');
                 popover.style.display = 'none';
+                if (backdrop) backdrop.classList.remove('active');
             }
         });
 
