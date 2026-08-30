@@ -3012,6 +3012,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             background: #18181b !important;
             border-color: #27272a !important;
         }
+        #cora-notif-bottom-drawer.active {
+            transform: translateY(0%) !important;
+        }
         /* Universal Voice AI Assistant Bottom Drawer Sheet */
         #cora-universal-voice-overlay {
             position: fixed !important;
@@ -3049,6 +3052,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         .dark #cora-universal-voice-drawer {
             background: #18181b !important;
             border-color: #27272a !important;
+        }
+        #cora-universal-voice-drawer.active {
+            transform: translateY(0%) !important;
         }
         /* Universal Header Profile Popover & Mobile Sheet Styles */
         /* Universal Header Profile Popover (Modal Anchored Directly Below Top-Right Avatar Icon) */
