@@ -1,12 +1,20 @@
 import { MetadataRoute } from 'next';
 import { BUILT_MODULES } from '@/lib/features-data';
 import { DOCS_DATA } from '@/lib/docs-data';
+import { WORDPRESS_CONTENT } from '@/lib/wordpress-content';
 
 export const dynamic = 'force-static';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://heycora.in';
   const now = new Date();
+
+  const wordpressUrls = WORDPRESS_CONTENT.map((page) => ({
+    url: `${baseUrl}/wordpress/${page.slug}/`,
+    lastModified: page.updatedAt,
+    changeFrequency: 'monthly' as const,
+    priority: 0.85,
+  }));
 
   const featureUrls = BUILT_MODULES.map((mod) => ({
     url: `${baseUrl}/features/${mod.slug}`,
@@ -29,6 +37,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 1.0,
     },
+    {
+      url: `${baseUrl}/wordpress/`,
+      lastModified: '2026-08-30',
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    ...wordpressUrls,
     {
       url: `${baseUrl}/docs`,
       lastModified: now,

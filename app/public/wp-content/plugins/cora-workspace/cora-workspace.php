@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.15
+ * Version: 4.8.20
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.15' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.20' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -22234,9 +22234,18 @@ function cora_get_agency_identifiers( $agency_id ) {
     }
     
     global $wpdb;
-    $agency_ids = array( $agency_id );
+    $agency_ids = array( (string) $agency_id );
     $agency_row = null;
     
+    if ( $agency_id === 'workspace' || $agency_id === 'default' ) {
+        $ind = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'real_estate';
+        if ( $ind === 'photography_studio' || $ind === 'photography' || $ind === 'studio' ) {
+            $agency_ids = array_merge( $agency_ids, array( 'studio', '2', 'agency_2', 'photography_studio', 'photography' ) );
+        } else {
+            $agency_ids = array_merge( $agency_ids, array( 'real-estate', '1', 'agency_1', 'real_estate', 'default', 'workspace' ) );
+        }
+    }
+
     $table_exists = cora_table_exists( $wpdb->prefix . 'cora_agencies' );
     if ( $table_exists ) {
         if ( is_numeric( $agency_id ) ) {

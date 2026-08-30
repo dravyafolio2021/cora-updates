@@ -95,29 +95,53 @@ if ( $is_studio_mode ) {
 
 // Build user roles labels dynamically (including custom roles)
 $role_labels = cora_get_all_roles();
-if ( ! cora_is_real_shruti() ) {
+if ( ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) ) {
     unset( $role_labels['administrator'], $role_labels['cora_shruti'] );
 }
 
 // Fetch all users in active agency (multi-tenant scope)
-$user_query_args = array();
-if ( $current_agency !== 'super' ) {
-    $user_query_args['meta_query'] = array(
+$allowed_agencies = array();
+if ( $current_agency === 'super' || cora_is_super_owner() || current_user_can( 'manage_options' ) ) {
+    if ( $is_studio_mode ) {
+        $allowed_agencies = array( 'studio', '2', 'agency_2', 'photography_studio', 'photography' );
+    } else {
+        $allowed_agencies = array( 'real-estate', '1', 'agency_1', 'real_estate', 'default', 'workspace' );
+    }
+} elseif ( function_exists( 'cora_get_agency_identifiers' ) ) {
+    $allowed_agencies = cora_get_agency_identifiers( $current_agency );
+} else {
+    $allowed_agencies = array( $current_agency );
+}
+
+$user_query_args = array(
+    'meta_query' => array(
+        'relation' => 'OR',
         array(
             'key'     => 'cora_agency_id',
-            'value'   => function_exists('cora_get_agency_identifiers') ? cora_get_agency_identifiers( $current_agency ) : $current_agency,
+            'value'   => $allowed_agencies,
             'compare' => 'IN'
         )
+    )
+);
+
+if ( cora_is_super_owner() || current_user_can( 'manage_options' ) ) {
+    $user_query_args['meta_query'][] = array(
+        'key'     => 'cora_agency_id',
+        'compare' => 'NOT EXISTS'
     );
 }
+
 $all_wp_users = get_users( $user_query_args );
+if ( empty( $all_wp_users ) ) {
+    $all_wp_users = get_users( array( 'number' => 100 ) );
+}
 
 // Filter by branch if current user is branch scoped
 $users = array();
 foreach ( $all_wp_users as $u ) {
     $u_branch = cora_normalize_branch_id( get_user_meta( $u->ID, 'cora_branch_id', true ) );
     $norm_current_branch = cora_normalize_branch_id( $current_branch );
-    if ( ! cora_is_workspace_owner() && ! empty( $current_branch ) && $u_branch !== $norm_current_branch ) {
+    if ( ! cora_is_workspace_owner() && ! cora_is_super_owner() && ! current_user_can( 'manage_options' ) && ! empty( $current_branch ) && $u_branch !== $norm_current_branch ) {
         continue;
     }
     // Set default status if missing
@@ -244,7 +268,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     }
 </style>
 
-<div id="cora-page-team-roles" class="p-0 m-0 border-0 outline-none md:space-y-6 space-y-4">
+<div class="cora-users-wrapper p-0 m-0 border-0 outline-none md:space-y-6 space-y-4">
 <?php
     $current_role = wp_get_current_user()->roles[0] ?? '';
     $is_super_or_admin = cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_manager', 'cora_branch_manager', 'cora_re_broker_owner', 'cora_re_managing_agent', 'cora_studio_owner', 'cora_studio_manager', 'cora_workspace_owner', 'owner' ) ) ;
@@ -395,7 +419,14 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         </div>
 
         <!-- ── MOBILE CARDS GRID (hidden on desktop) ── -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:hidden" id="active-members-mobile-grid">
+            <?php if ( empty( $users ) ) : ?>
+                <div class="col-span-full bg-white border border-zinc-200/80 rounded-xl p-8 text-center flex flex-col items-center justify-center gap-2">
+                    <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <p class="text-xs text-zinc-600 font-semibold">No team members found</p>
+                    <p class="text-[11px] text-zinc-400">Invite new team members or adjust your filter selection.</p>
+                </div>
+            <?php else : ?>
             <?php foreach ( $users as $u ) :
                 $u_role = ! empty( $u->roles ) ? $u->roles[0] : 'subscriber';
                 $is_super_admin_user = ( $u->ID == 1 || $u->user_login === 'cora' || $u->user_login === 'cora_admin' || $u->user_email === 'admin@cora.local' || $u->user_email === 'dravya.shs@gmail.com' || in_array( $u_role, array( 'administrator', 'cora_shruti' ), true ) );
@@ -511,6 +542,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-300 shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             <?php endforeach; ?>
+            <?php endif; ?>
         </div>
 
         <!-- ── DESKTOP: MEMBERS TABLE (hidden on mobile) ── -->
@@ -529,6 +561,17 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-100 ">
+                        <?php if ( empty( $users ) ) : ?>
+                            <tr class="cora-empty-state-row">
+                                <td colspan="7" class="px-5 py-12 text-center text-zinc-400 font-medium">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="text-zinc-300"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                        <p class="text-xs text-zinc-600 font-semibold">No team members found</p>
+                                        <p class="text-[11px] text-zinc-400">Invite new team members or adjust your filter selection.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php else : ?>
                         <?php foreach ( $users as $u ) :
                             $u_role = ! empty( $u->roles ) ? $u->roles[0] : 'subscriber';
                             $is_super_admin_user = ( $u->ID == 1 || $u->user_login === 'cora' || $u->user_login === 'cora_admin' || $u->user_email === 'admin@cora.local' || $u->user_email === 'dravya.shs@gmail.com' || in_array( $u_role, array( 'administrator', 'cora_shruti' ), true ) );
@@ -628,6 +671,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
                                 </td>
                             </tr>
                         <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

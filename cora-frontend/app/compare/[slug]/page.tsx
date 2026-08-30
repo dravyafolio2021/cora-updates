@@ -55,8 +55,31 @@ export default async function ComparisonDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  const canonical = `https://heycora.in/compare/${comp.slug}/`;
+  const schemas = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://heycora.in/' },
+        { '@type': 'ListItem', position: 2, name: 'Comparisons', item: 'https://heycora.in/compare/' },
+        { '@type': 'ListItem', position: 3, name: `Cora vs ${comp.competitorName}`, item: canonical },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: comp.faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: { '@type': 'Answer', text: faq.a },
+      })),
+    },
+  ];
+
   return (
     <main className="w-full relative pt-32 sm:pt-40 pb-24 overflow-hidden bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
       
       {/* ── Breadcrumb & Back Link ── */}
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-8">

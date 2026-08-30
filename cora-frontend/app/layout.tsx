@@ -37,8 +37,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Cora — The Transformative AI Co-Founder for Service Businesses',
-  description: 'Native AI infrastructure bridging your customer-facing Website & 24/7 AI Concierge with your admin-facing Workspace for contracts, 18% GST billing, and scheduling.',
+  title: 'Cora — Website & Business Workspace for Service Businesses',
+  description: 'Connect your website, enquiries, client workflows, documents, billing, and AI assistance in one workspace built for service businesses.',
   keywords: [
     'AI co-founder for creative studios',
     'customer facing AI concierge',
@@ -53,9 +53,6 @@ export const metadata: Metadata = {
     'wedding photography call sheets'
   ],
   metadataBase: new URL('https://heycora.in'),
-  alternates: {
-    canonical: 'https://heycora.in',
-  },
   robots: {
     index: true,
     follow: true,
@@ -75,8 +72,8 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   openGraph: {
-    title: 'Cora — The Transformative AI Co-Founder for Service Businesses',
-    description: 'Native AI infrastructure bridging your customer-facing Website & 24/7 AI Concierge with your admin-facing Workspace for contracts, 18% GST billing, and scheduling.',
+    title: 'Cora — Website & Business Workspace for Service Businesses',
+    description: 'Connect your website, enquiries, client workflows, documents, billing, and AI assistance in one workspace.',
     url: 'https://heycora.in',
     siteName: 'Cora Studio OS',
     locale: 'en_US',
@@ -92,8 +89,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cora — The Transformative AI Co-Founder for Service Businesses',
-    description: 'Native AI infrastructure bridging your customer-facing Website & 24/7 AI Concierge with your admin-facing Workspace for contracts, 18% GST billing, and scheduling.',
+    title: 'Cora — Website & Business Workspace for Service Businesses',
+    description: 'Connect your website, enquiries, client workflows, documents, billing, and AI assistance in one workspace.',
     images: ['/og-image.png'],
     creator: '@dravyafolio',
   },

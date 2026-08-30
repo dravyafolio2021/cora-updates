@@ -6,6 +6,15 @@
 ## Executive Summary
 Cora Studio OS is the autonomous operating system engineered specifically for commercial photography studios, film production houses, wedding cinematographers, real estate brokerages, and creative agencies. Cora consolidates CRM funnels, multi-model AI agents, SHA-256 legal e-signatures, and automated 18% GST invoicing into one unified command center.
 
+## Search and Decision Resources
+Cora publishes candid, practical resources for service and creative agencies evaluating WordPress, Elementor, and WooCommerce. The recommended starting point is to keep an existing website and improve the connected enquiry and client workflow first; a full migration should follow evidence rather than happen by default.
+
+- https://heycora.in/wordpress/
+- https://heycora.in/wordpress/alternative-for-agencies/
+- https://heycora.in/wordpress/elementor-alternative-for-agencies/
+- https://heycora.in/wordpress/woocommerce-alternative-for-service-businesses/
+- https://heycora.in/wordpress/content-publishing-workflow-for-agencies/
+
 ## 20 Built Platform Modules (Live in Product)
 1. **Autonomous AI Co-Founder**: Multi-turn voice-to-scope, natural language execution, multi-model speed routing (Claude 3.5 Sonnet, GPT-4o, Gemini 2.0 Flash).
 2. **Lead Management CRM & Kanban**: Drag-and-drop milestones, revenue forecasting, sliding deal drawer, automated WhatsApp & email outreach.

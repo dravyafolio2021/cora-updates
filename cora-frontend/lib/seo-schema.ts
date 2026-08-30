@@ -32,15 +32,10 @@ export function generatePlatformSchemas() {
     "@type": "WebSite",
     "@id": "https://heycora.in/#website",
     "url": "https://heycora.in",
-    "name": "Cora Studio OS",
-    "description": "The 20-in-1 Autonomous Operating System for Creative Studios, Production Houses & Agencies.",
+    "name": "Cora",
+    "description": "A connected website and business workspace for service businesses and agencies.",
     "publisher": {
       "@id": "https://heycora.in/#organization"
-    },
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://heycora.in/compare?q={search_term_string}",
-      "query-input": "required name=search_term_string"
     }
   };
 
@@ -48,17 +43,11 @@ export function generatePlatformSchemas() {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "@id": "https://heycora.in/#software",
-    "name": "Cora Studio OS",
+    "name": "Cora",
     "operatingSystem": "Web, macOS, Windows, iOS, Android (PWA)",
     "applicationCategory": "BusinessApplication, CRMApplication, FinancialApplication",
-    "description": "Cora is the autonomous AI operating system that unifies client CRM pipelines, SHA-256 legal contracts, multi-model AI voice-to-scope agents, and automated 18% GST invoicing into one command center.",
+    "description": "Cora connects a service business website with enquiries, client workflows, documents, billing, and AI assistance in one workspace.",
     "url": "https://heycora.in",
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "bestRating": "5.0",
-      "ratingCount": "142"
-    },
     "featureList": [
       "Autonomous AI Co-Founder with Voice-to-Scope Execution",
       "Frontier Multi-Model AI Routing (Claude 3.5 Sonnet, GPT-4o, Gemini 2.0 Flash)",

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Hero } from '@/components/hero/Hero';
 import { BrandTicker } from '@/components/social/BrandTicker';
 import { UnifiedHubSprawlSection } from '@/components/unified-hub/UnifiedHubSprawlSection';
@@ -12,6 +13,12 @@ import { PricingSection } from '@/components/pricing/PricingSection';
 import { ToolsBanner } from '@/components/tools/ToolsBanner';
 import { TestimonialsSection } from '@/components/testimonials/TestimonialsSection';
 import { FAQSection } from '@/components/faq/FAQSection';
+
+export const metadata: Metadata = {
+  title: { absolute: 'Cora — Website & Business Workspace for Service Businesses' },
+  description: 'Connect your website, enquiries, client workflows, documents, billing, and AI assistance in one workspace built for service businesses.',
+  alternates: { canonical: '/' },
+};
 
 export default function HomePage() {
   return (

@@ -259,6 +259,33 @@ export default async function IntegrationDetailPage({
           </div>
         </section>
 
+        {integration.slug === 'wordpress' && (
+          <section className="mt-16 sm:mt-24 pt-12 border-t border-zinc-200">
+            <span className="text-xs font-mono font-bold text-emerald-700 uppercase tracking-wider">
+              WORDPRESS DECISION GUIDES
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-950 mt-1 max-w-2xl">
+              Not sure whether to connect Cora or replace part of your stack?
+            </h2>
+            <p className="text-sm text-zinc-600 mt-3 leading-relaxed max-w-2xl">
+              Start with the bottleneck you already feel. These practical guides compare the workflows without requiring a full website migration.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-7">
+              {[
+                ['/wordpress/alternative-for-agencies/', 'WordPress alternative for agencies'],
+                ['/wordpress/elementor-alternative-for-agencies/', 'Elementor alternative for agencies'],
+                ['/wordpress/woocommerce-alternative-for-service-businesses/', 'WooCommerce alternative for service businesses'],
+                ['/wordpress/content-publishing-workflow-for-agencies/', 'A simpler agency content workflow'],
+              ].map(([href, label]) => (
+                <Link key={href} href={href} className="flex items-center justify-between rounded-2xl border border-zinc-200 p-5 text-sm font-bold hover:border-zinc-400 transition-colors">
+                  <span>{label}</span>
+                  <ArrowRight className="w-4 h-4 text-zinc-400" />
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* ── 5. Frequently Asked Questions ──────────────────────────────── */}
         <section className="mt-16 sm:mt-24 pt-12 border-t border-zinc-200">
           <div className="max-w-2xl">
