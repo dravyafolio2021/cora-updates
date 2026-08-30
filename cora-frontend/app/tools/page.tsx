@@ -94,21 +94,6 @@ export default function ToolsIndexPage() {
           })}
         </div>
 
-        {/* Bottom CTA Banner */}
-        <div className="bg-zinc-950 text-white rounded-3xl p-8 md:p-10 text-center max-w-[920px] mx-auto">
-          <h3 className="font-display text-2xl font-bold mb-2">Need a complete AI operating system?</h3>
-          <p className="text-sm text-zinc-400 max-w-[600px] mx-auto mb-6">
-            Cora orchestrates all your tools, lead pipelines, GST accounting, and multi-model AI workflows in one unified dashboard.
-          </p>
-          <a
-            href="https://app.heycora.in/workspace"
-            className="inline-flex items-center gap-2 bg-white text-zinc-950 font-semibold px-6 py-3 rounded-xl text-sm hover:bg-zinc-100 transition-all"
-          >
-            <span>Get Started Free on Cora</span>
-            <ArrowRight className="w-4 h-4" />
-          </a>
-        </div>
-
       </div>
     </div>
   );
