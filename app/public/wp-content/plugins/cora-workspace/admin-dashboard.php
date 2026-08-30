@@ -2775,27 +2775,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             border-bottom-right-radius: 16px;
         }
 
-        /* Clean outer canvas & full height flex container */
-        #cora-page-dashboard {
-            background-color: #ffffff !important;
-            background-image: none !important;
-            padding: 0px !important;
-            border: none !important;
-            box-shadow: none !important;
-            transition: background-color 0.3s ease;
-            margin-bottom: 0px !important;
-            min-height: calc(100vh - 72px) !important;
-            display: flex !important;
-            flex-direction: column !important;
-            flex: 1 1 auto !important;
-            box-sizing: border-box !important;
-        }
-        @media (min-width: 768px) {
-            #cora-page-dashboard {
-                padding: 24px 24px 80px 24px !important;
-                min-height: calc(100vh - 80px) !important;
-            }
-        }
+        /* Main content wrapper canvas */
         main.cora-main, .cora-main, .cora-content-wrapper {
             background-color: #ffffff !important;
             min-height: 100vh !important;
@@ -2805,28 +2785,59 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         .cora-content-wrapper {
             padding-bottom: 0px !important;
             flex: 1 1 auto !important;
+            display: flex !important;
+            flex-direction: column !important;
         }
 
-        /* Internal Hero Container (Beige background, zero border, zero shadow, natural blend) */
-        .cora-dashboard-hero-card {
+        /* Dashboard Page Section: Beige background, slightly rounded top, touching bottom edge */
+        #cora-page-dashboard {
             background-color: #FBFaf7 !important; /* Premium beige / warm cream background */
+            background-image: none !important;
+            border-top-left-radius: 24px !important;
+            border-top-right-radius: 24px !important;
+            border-bottom-left-radius: 0px !important;
+            border-bottom-right-radius: 0px !important;
             border: none !important;
             box-shadow: none !important;
+            padding: 20px 16px 0px 16px !important;
+            margin-bottom: 0px !important;
+            min-height: calc(100vh - 64px) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 auto !important;
+            box-sizing: border-box !important;
+            transition: background-color 0.3s ease;
+        }
+        @media (min-width: 768px) {
+            #cora-page-dashboard {
+                padding: 32px 24px 0px 24px !important;
+                border-top-left-radius: 28px !important;
+                border-top-right-radius: 28px !important;
+                min-height: calc(100vh - 72px) !important;
+            }
+        }
+        .dark #cora-page-dashboard {
+            background-color: #121214 !important;
+        }
+
+        /* Hero container inside beige dashboard section */
+        .cora-dashboard-hero-card {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0px !important;
             box-sizing: border-box !important;
             width: 100% !important;
+            margin-bottom: 28px !important;
         }
-        .dark .cora-dashboard-hero-card {
-            background-color: #18181b !important;
-            border: none !important;
-            box-shadow: none !important;
+        @media (min-width: 768px) {
+            .cora-dashboard-hero-card {
+                margin-bottom: 36px !important;
+            }
         }
 
         /* Mobile vs Desktop Scoped Rules for Dashboard */
         @media (max-width: 767px) {
-            #cora-page-dashboard {
-                background-color: #FBFaf7 !important;
-                padding: 0px !important;
-            }
             .cora-dashboard-mockup-wrapper {
                 padding: 0px !important;
                 margin-bottom: 0px !important;
@@ -2834,16 +2845,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 display: flex !important;
                 flex-direction: column !important;
                 min-height: 100% !important;
-            }
-            .cora-dashboard-hero-card {
-                border-radius: 0px !important;
-                border: none !important;
-                box-shadow: none !important;
-                margin-bottom: 0px !important;
-                flex: 1 1 auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                padding: 20px 16px 88px 16px !important;
+                padding-bottom: 88px !important; /* clearance for floating island nav */
             }
             #cora-search-container {
                 display: none !important;
@@ -2859,14 +2861,6 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         @media (min-width: 768px) {
             .cora-dashboard-mockup-wrapper {
                 padding-bottom: 40px !important;
-            }
-            .cora-dashboard-hero-card {
-                padding: 40px 32px 48px 32px !important;
-                border-radius: 32px !important;
-                border: none !important;
-                box-shadow: none !important;
-                margin-bottom: 32px !important;
-                flex: 0 0 auto !important;
             }
             #cora-search-container {
                 display: block !important;
