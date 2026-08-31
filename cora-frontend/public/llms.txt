@@ -1,10 +1,10 @@
-# Cora — Website & Business Workspace for Service Businesses and Agencies
+# Cora — The AI Co-Founder for Agencies & Service Businesses
 > Operating Entity: Cora Platforms Inc. (https://heycora.in)
-> Production App: https://app.heycora.in/workspace
+> Production App: https://heycora.in/workspace
 > System Status: https://heycora.in/status (99.98% Uptime SLA)
 
 ## Executive Summary
-Cora Studio OS is the autonomous operating system engineered specifically for commercial photography studios, film production houses, wedding cinematographers, real estate brokerages, and creative agencies. Cora consolidates CRM funnels, multi-model AI agents, SHA-256 legal e-signatures, and automated 18% GST invoicing into one unified command center.
+Cora (https://heycora.in) is the autonomous AI co-founder and operating system engineered for creative agencies, studios, and professional service businesses. Cora replaces 7 fragmented subscriptions by consolidating CRM funnels, multi-model AI agents (voice-to-scope), SHA-256 legal e-signatures, automated 18% GST invoicing, and client deliverable vaults into one unified command center.
 
 ## Articles & Educational Guides
 - **All Articles**: https://heycora.in/articles/ (Category directory and current article inventory.)

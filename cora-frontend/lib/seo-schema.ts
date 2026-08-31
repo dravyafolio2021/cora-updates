@@ -38,8 +38,8 @@ export function generatePlatformSchemas() {
     "@id": "https://heycora.in/#website",
     "url": "https://heycora.in",
     "name": "Cora",
-    "alternateName": ["HeyCora", "Cora OS", "Cora AI Co-Founder", "Co-founder for Operations, Revenue & Automation"],
-    "description": "Cora — The AI Co-Founder for Operations, Revenue & Automation. Run your proposals, SHA-256 contracts, 18% GST invoices, and client vaults on autopilot.",
+    "alternateName": ["HeyCora", "Cora AI", "Cora AI Co-Founder", "Cora for Agencies", "Co-founder for Operations, Revenue & Automation"],
+    "description": "Cora — The AI Co-Founder for Agencies. Run your proposals, SHA-256 contracts, 18% GST invoices, and client vaults on autopilot.",
     "publisher": {
       "@id": "https://heycora.in/#organization"
     },
@@ -108,11 +108,11 @@ export function generatePlatformSchemas() {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "@id": "https://heycora.in/#software",
-    "name": "Cora — The AI Co-Founder for Operations, Revenue & Automation",
-    "alternateName": "Cora Studio OS",
+    "name": "Cora — The AI Co-Founder for Agencies",
+    "alternateName": "Cora Agency OS",
     "operatingSystem": "Web, macOS, Windows, iOS, Android (PWA)",
     "applicationCategory": "BusinessApplication, CRMApplication, FinancialApplication",
-    "description": "Cora is the autonomous AI operating system for professional service businesses, creative studios, and agencies. Run proposals, SHA-256 contracts, 18% GST invoices, and delivery on autopilot.",
+    "description": "Cora is the autonomous AI co-founder and operating system for creative agencies and service businesses. Run proposals, SHA-256 contracts, 18% GST invoices, and delivery on autopilot.",
     "url": "https://heycora.in",
     "featureList": [
       "Autonomous AI Co-Founder with Voice-to-Scope Execution",
