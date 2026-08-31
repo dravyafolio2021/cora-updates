@@ -43,7 +43,9 @@ import {
   Clapperboard,
   Calculator,
   Terminal,
-  BookOpen
+  BookOpen,
+  Heart,
+  Scissors
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 import {
@@ -787,16 +789,16 @@ export function Navbar() {
                   </div>
                 )}
 
-                {/* ── DROPDOWN: INDUSTRIES (4-COLUMN PROFESSIONAL SERVICES ARCHITECTURE) ── */}
+                {/* ── DROPDOWN: INDUSTRIES (4-COLUMN CLEAN MINIMAL ARCHITECTURE) ── */}
                 {activeDropdown === 'industries' && (
                   <div key="industries-tab" className="space-y-6 animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 items-start">
 
-                      {/* Column 1: Software, Dev & IT Agencies */}
+                      {/* Column 1: Tech & Dev */}
                       <div className="space-y-1">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Software, Dev &amp; IT
+                            Tech &amp; Dev
                           </span>
                           <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60">
                             TECH &amp; DEV
@@ -806,94 +808,66 @@ export function Navbar() {
                           <Link
                             href="/use-cases#software-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Code className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Software &amp; Tech Agencies
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Sprint retainers, milestone staging &amp; vaults
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Software Agencies
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/use-cases#creative-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <LayoutTemplate className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Web &amp; App Studios
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Fixed scopes, client sign-offs &amp; SLA tracker
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Web &amp; App Studios
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/use-cases#creative-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <ShieldCheck className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  IT &amp; Managed Services (MSPs)
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Tech retainers, uptime SLAs &amp; escalations
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              IT &amp; Tech Services
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/features/ai-cofounder"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Zap className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  AI &amp; Automation Agencies
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Custom agent workflows &amp; token billing
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              AI &amp; Automation
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
                         </div>
                       </div>
 
-                      {/* Column 2: Legal, Tax & Financial Services */}
+                      {/* Column 2: Legal & Finance */}
                       <div className="space-y-1">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Legal, Tax &amp; Finance
+                            Legal &amp; Finance
                           </span>
                           <span className="text-[9px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200/60">
                             LEGAL &amp; FINANCE
@@ -903,90 +877,62 @@ export function Navbar() {
                           <Link
                             href="/use-cases#commercial-studios"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-slate-500/10 text-slate-700 border border-slate-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-slate-500/10 text-slate-700 border border-slate-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Scale className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Law Firms &amp; Legal Practices
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Client retainers, SHA-256 e-signs &amp; NDAs
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Lawyers &amp; Law Firms
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/use-cases#creative-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Receipt className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Tax &amp; Accounting (CA Firms)
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                18% GST filing, SAC codes &amp; audit vaults
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Tax &amp; CA Firms
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/use-cases#creative-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Briefcase className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Financial &amp; Wealth Advisory
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Advisory retainers &amp; wealth portfolios
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Financial Advisors
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/features/esign-vault"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 border border-purple-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 border border-purple-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Layers className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Audit &amp; Corporate Compliance
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Regulatory audit trails &amp; verified logs
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Audit &amp; Compliance
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
                         </div>
                       </div>
 
-                      {/* Column 3: Marketing, Design & Creative Agencies */}
+                      {/* Column 3: Marketing & Creative */}
                       <div className="space-y-1">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
@@ -1000,94 +946,66 @@ export function Navbar() {
                           <Link
                             href="/use-cases#creative-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-600 border border-sky-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-600 border border-sky-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <BarChart2 className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Digital Marketing &amp; SEO
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Retainer billing, SEO audits &amp; dashboards
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Marketing &amp; SEO
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/use-cases#creative-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-violet-500/10 text-violet-600 border border-violet-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-violet-500/10 text-violet-600 border border-violet-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Sparkles className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Brand &amp; UI/UX Studios
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Design sprints, asset portals &amp; approvals
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Design &amp; UI/UX
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
-                            href="/use-cases#creative-agencies"
+                            href="/use-cases#commercial-studios"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-pink-500/10 text-pink-600 border border-pink-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Cpu className="w-4 h-4 stroke-[2]" />
+                            <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                              <Camera className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Performance &amp; Ad Agencies
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Ad spend tracking, ROAS &amp; campaign briefs
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Photo &amp; Video Studios
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/use-cases#interior-design"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-600 border border-orange-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Building2 className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Architecture &amp; Engineering
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                3D CAD milestones &amp; blueprint approvals
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Architecture &amp; Interiors
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
                         </div>
                       </div>
 
-                      {/* Column 4: Consulting, Health & Specialized Services */}
+                      {/* Column 4: Services & Lifestyle */}
                       <div className="space-y-1">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Consulting &amp; Specialized
+                            Services &amp; Lifestyle
                           </span>
                           <span className="text-[9px] font-mono font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200/60">
                             SERVICES &amp; ADVISORY
@@ -1097,85 +1015,57 @@ export function Navbar() {
                           <Link
                             href="/use-cases#creative-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Briefcase className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Management &amp; Strategy
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Diagnostic audits, scopes &amp; board decks
-                              </p>
-                            </div>
-                          </Link>
-
-                          <Link
-                            href="/use-cases#real-estate-media"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Building2 className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Commercial Real Estate
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Transaction contracts &amp; property media
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Consultants &amp; Advisors
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/use-cases#creative-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <ShieldCheck className="w-4 h-4 stroke-[2]" />
+                            <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                              <Heart className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Clinics &amp; Healthcare
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Patient intake booking &amp; consent e-signs
-                              </p>
-                            </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Doctors &amp; Clinics
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
-                            href="/use-cases#commercial-studios"
+                            href="/use-cases#creative-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-600 border border-rose-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Camera className="w-4 h-4 stroke-[2]" />
+                            <div className="w-8 h-8 rounded-lg bg-pink-500/10 text-pink-600 border border-pink-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                              <Scissors className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
-                                  Commercial Media Studios
-                                </span>
-                                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                              </div>
-                              <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                                Production scopes, 4K proofing &amp; call sheets
-                              </p>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Salons, Spas &amp; Wellness
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                          </Link>
+
+                          <Link
+                            href="/use-cases#real-estate-media"
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                              <Building2 className="w-4 h-4 stroke-[2]" />
                             </div>
+                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                              Real Estate &amp; Property
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
                         </div>
                       </div>
@@ -1187,7 +1077,7 @@ export function Navbar() {
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-emerald-500" />
                         <span className="text-xs text-zinc-600 font-medium">
-                          Pre-seeded legal contracts, 18% GST tax math &amp; workflows for 16+ professional service verticals
+                          Pre-seeded contracts, 18% GST tax math &amp; workflows for 16+ business verticals
                         </span>
                       </div>
                       <Link
@@ -1195,7 +1085,7 @@ export function Navbar() {
                         onClick={() => setActiveDropdown(null)}
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all shadow-2xs group"
                       >
-                        <span>Explore All Professional Service Solutions</span>
+                        <span>Explore All Industry Workspaces</span>
                         <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
                       </Link>
                     </div>
@@ -1577,55 +1467,55 @@ export function Navbar() {
                 </div>
               )}
 
-              {/* Level 2 Submenu: Industries (Professional Service Workspaces) */}
+              {/* Level 2 Submenu: Industries (Industry Workspaces) */}
               {activeMobileSubmenu === 'industries' && (
-                <div className="space-y-2 animate-in fade-in slide-in-from-right-3 duration-150">
+                <div className="space-y-1.5 animate-in fade-in slide-in-from-right-3 duration-150">
                   <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
-                    PROFESSIONAL SERVICE WORKSPACES
+                    INDUSTRY WORKSPACES
                   </span>
-                  <Link href="/use-cases#software-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Code className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Software &amp; Tech Agencies</div><div className="text-[11px] text-zinc-500">Sprint retainers, milestone staging &amp; vaults</div></div>
+                  <Link href="/use-cases#software-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Code className="w-4 h-4 stroke-[2]" /></div>
+                    <span className="text-xs font-bold text-zinc-950">Software Agencies</span>
                   </Link>
-                  <Link href="/use-cases#commercial-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-xl bg-slate-500/10 text-slate-700 border border-slate-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Scale className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Law Firms &amp; Legal Practices</div><div className="text-[11px] text-zinc-500">Client retainers, SHA-256 e-signs &amp; NDAs</div></div>
+                  <Link href="/use-cases#commercial-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-slate-500/10 text-slate-700 border border-slate-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Scale className="w-4 h-4 stroke-[2]" /></div>
+                    <span className="text-xs font-bold text-zinc-950">Lawyers &amp; Law Firms</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Receipt className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Tax &amp; Accounting (CA Firms)</div><div className="text-[11px] text-zinc-500">18% GST filing, SAC codes &amp; audit vaults</div></div>
+                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Receipt className="w-4 h-4 stroke-[2]" /></div>
+                    <span className="text-xs font-bold text-zinc-950">Tax &amp; CA Firms</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Briefcase className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Management &amp; Strategy Consulting</div><div className="text-[11px] text-zinc-500">Diagnostic audits, scopes &amp; board decks</div></div>
+                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Briefcase className="w-4 h-4 stroke-[2]" /></div>
+                    <span className="text-xs font-bold text-zinc-950">Consultants &amp; Advisors</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-600 border border-sky-500/20 flex items-center justify-center shrink-0 shadow-2xs"><BarChart2 className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Digital Marketing &amp; SEO Agencies</div><div className="text-[11px] text-zinc-500">Retainer billing, SEO audits &amp; dashboards</div></div>
+                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-600 border border-sky-500/20 flex items-center justify-center shrink-0 shadow-2xs"><BarChart2 className="w-4 h-4 stroke-[2]" /></div>
+                    <span className="text-xs font-bold text-zinc-950">Marketing &amp; SEO Agencies</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-xl bg-violet-500/10 text-violet-600 border border-violet-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Sparkles className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Brand &amp; UI/UX Studios</div><div className="text-[11px] text-zinc-500">Design sprints, asset portals &amp; approvals</div></div>
+                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-violet-500/10 text-violet-600 border border-violet-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Sparkles className="w-4 h-4 stroke-[2]" /></div>
+                    <span className="text-xs font-bold text-zinc-950">Design &amp; UI/UX Studios</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><ShieldCheck className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">IT &amp; Managed Services (MSPs)</div><div className="text-[11px] text-zinc-500">Tech retainers, uptime SLAs &amp; escalations</div></div>
+                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Heart className="w-4 h-4 stroke-[2]" /></div>
+                    <span className="text-xs font-bold text-zinc-950">Doctors &amp; Clinics</span>
                   </Link>
-                  <Link href="/use-cases#interior-design" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-600 border border-orange-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Building2 className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Architecture &amp; Engineering</div><div className="text-[11px] text-zinc-500">3D CAD milestones &amp; blueprint approvals</div></div>
+                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-pink-500/10 text-pink-600 border border-pink-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Scissors className="w-4 h-4 stroke-[2]" /></div>
+                    <span className="text-xs font-bold text-zinc-950">Salons, Spas &amp; Wellness</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs"><ShieldCheck className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Clinics &amp; Healthcare Practices</div><div className="text-[11px] text-zinc-500">Patient intake booking &amp; consent e-signs</div></div>
+                  <Link href="/use-cases#real-estate-media" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Building2 className="w-4 h-4 stroke-[2]" /></div>
+                    <span className="text-xs font-bold text-zinc-950">Real Estate &amp; Property</span>
                   </Link>
-                  <Link href="/use-cases#real-estate-media" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Building2 className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Commercial Real Estate &amp; Media</div><div className="text-[11px] text-zinc-500">Listings catalog, property shoots &amp; MLS copy</div></div>
+                  <Link href="/use-cases#commercial-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Camera className="w-4 h-4 stroke-[2]" /></div>
+                    <span className="text-xs font-bold text-zinc-950">Photo &amp; Video Studios</span>
                   </Link>
                   <div className="pt-2">
                     <Link href="/use-cases" onClick={() => setMobileMenuOpen(false)} className="text-xs font-bold text-zinc-950 flex items-center gap-1.5 hover:text-zinc-600 transition-colors">
-                      <span>Explore all 16+ professional service schemas</span>
+                      <span>Explore all 16+ industry schemas</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
