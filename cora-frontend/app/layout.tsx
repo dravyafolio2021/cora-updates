@@ -188,15 +188,13 @@ export default function RootLayout({
                 } catch (e) {}
               })();
             `,
-          }}
-        />
-      </head>
-      <body suppressHydrationWarning className="font-sans antialiased text-zinc-950 bg-white selection:bg-zinc-950 selection:text-white">
-        <Script
-          id="json-ld"
+        <script
+          id="platform-json-ld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
         />
+      </head>
+      <body suppressHydrationWarning className="font-sans antialiased text-zinc-950 bg-white selection:bg-zinc-950 selection:text-white">
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
         <SmoothScrollProvider>
           <ToastProvider>
