@@ -114,7 +114,7 @@ export default function ToolsIndexPage() {
             {/* Quick 3-Stat Bar */}
             <div className="grid grid-cols-3 gap-3 sm:gap-6 w-full py-3 my-1 border-y border-zinc-200/70">
               <div className="space-y-0.5">
-                <div className="font-display text-lg sm:text-2xl font-extrabold text-zinc-950 tracking-tight">
+                <div className="font-display text-lg sm:text-2xl font-semibold text-zinc-950 tracking-tight">
                   6 Micro-Tools
                 </div>
                 <div className="text-[10px] sm:text-xs text-zinc-500 font-medium">
@@ -122,7 +122,7 @@ export default function ToolsIndexPage() {
                 </div>
               </div>
               <div className="space-y-0.5">
-                <div className="font-display text-lg sm:text-2xl font-extrabold text-zinc-950 tracking-tight">
+                <div className="font-display text-lg sm:text-2xl font-semibold text-zinc-950 tracking-tight">
                   0% Login Required
                 </div>
                 <div className="text-[10px] sm:text-xs text-zinc-500 font-medium">
@@ -130,7 +130,7 @@ export default function ToolsIndexPage() {
                 </div>
               </div>
               <div className="space-y-0.5">
-                <div className="font-display text-lg sm:text-2xl font-extrabold text-zinc-950 tracking-tight">
+                <div className="font-display text-lg sm:text-2xl font-semibold text-zinc-950 tracking-tight">
                   0% Gateway Fees
                 </div>
                 <div className="text-[10px] sm:text-xs text-zinc-500 font-medium">
