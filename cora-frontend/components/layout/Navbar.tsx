@@ -376,7 +376,7 @@ export function Navbar() {
           ══════════════════════════════════════════════════════════════════ */}
           {activeDropdown && activeDropdown !== 'company' && (
             <div
-              className="hidden lg:block absolute left-4 right-4 sm:left-6 sm:right-6 top-[54px] z-50 pt-3"
+              className="hidden lg:block absolute left-0 right-0 top-[54px] z-50 px-2 sm:px-4 md:px-6 pt-2"
               onMouseEnter={() => handleMouseEnter(activeDropdown)}
               onMouseLeave={handleMouseLeave}
             >
