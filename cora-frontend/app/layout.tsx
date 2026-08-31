@@ -188,6 +188,8 @@ export default function RootLayout({
                 } catch (e) {}
               })();
             `,
+          }}
+        />
         <script
           id="platform-json-ld"
           type="application/ld+json"
