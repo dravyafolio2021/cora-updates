@@ -802,7 +802,7 @@ export function Navbar() {
                         </div>
                         <div className="space-y-1">
                           <Link
-                            href="/use-cases#software-agencies"
+                            href="/use-cases/software-agencies"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -816,7 +816,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/use-cases#creative-agencies"
+                            href="/use-cases/web-app-studios"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -830,7 +830,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/use-cases#creative-agencies"
+                            href="/use-cases/it-tech-services"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -844,7 +844,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/features/ai-cofounder"
+                            href="/use-cases/ai-automation"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -871,7 +871,7 @@ export function Navbar() {
                         </div>
                         <div className="space-y-1">
                           <Link
-                            href="/use-cases#commercial-studios"
+                            href="/use-cases/lawyers-law-firms"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -885,7 +885,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/use-cases#creative-agencies"
+                            href="/use-cases/tax-ca-firms"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -899,7 +899,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/use-cases#creative-agencies"
+                            href="/use-cases/financial-advisors"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -913,7 +913,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/features/esign-vault"
+                            href="/use-cases/audit-compliance"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -940,7 +940,7 @@ export function Navbar() {
                         </div>
                         <div className="space-y-1">
                           <Link
-                            href="/use-cases#creative-agencies"
+                            href="/use-cases/marketing-seo"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -954,7 +954,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/use-cases#creative-agencies"
+                            href="/use-cases/design-uiux"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -968,7 +968,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/use-cases#commercial-studios"
+                            href="/use-cases/photo-video-studios"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -982,7 +982,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/use-cases#interior-design"
+                            href="/use-cases/architecture-interiors"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -1009,7 +1009,7 @@ export function Navbar() {
                         </div>
                         <div className="space-y-1">
                           <Link
-                            href="/use-cases#creative-agencies"
+                            href="/use-cases/consultants-advisors"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -1023,7 +1023,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/use-cases#creative-agencies"
+                            href="/use-cases/doctors-clinics"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -1037,7 +1037,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/use-cases#creative-agencies"
+                            href="/use-cases/salons-wellness"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -1051,7 +1051,7 @@ export function Navbar() {
                           </Link>
 
                           <Link
-                            href="/use-cases#real-estate-media"
+                            href="/use-cases/real-estate-property"
                             onClick={() => setActiveDropdown(null)}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                           >
@@ -1511,43 +1511,43 @@ export function Navbar() {
                   <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block mb-2">
                     INDUSTRY WORKSPACES
                   </span>
-                  <Link href="/use-cases#software-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                  <Link href="/use-cases/software-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Code className="w-4 h-4 stroke-[2]" /></div>
                     <span className="text-xs font-bold text-zinc-950">Software Agencies</span>
                   </Link>
-                  <Link href="/use-cases#commercial-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                  <Link href="/use-cases/lawyers-law-firms" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-slate-500/10 text-slate-700 border border-slate-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Scale className="w-4 h-4 stroke-[2]" /></div>
                     <span className="text-xs font-bold text-zinc-950">Lawyers &amp; Law Firms</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                  <Link href="/use-cases/tax-ca-firms" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Receipt className="w-4 h-4 stroke-[2]" /></div>
                     <span className="text-xs font-bold text-zinc-950">Tax &amp; CA Firms</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                  <Link href="/use-cases/consultants-advisors" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Briefcase className="w-4 h-4 stroke-[2]" /></div>
                     <span className="text-xs font-bold text-zinc-950">Consultants &amp; Advisors</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                  <Link href="/use-cases/marketing-seo" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-600 border border-sky-500/20 flex items-center justify-center shrink-0 shadow-2xs"><BarChart2 className="w-4 h-4 stroke-[2]" /></div>
-                    <span className="text-xs font-bold text-zinc-950">Marketing &amp; SEO Agencies</span>
+                    <span className="text-xs font-bold text-zinc-950">Marketing &amp; SEO</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                  <Link href="/use-cases/design-uiux" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-violet-500/10 text-violet-600 border border-violet-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Sparkles className="w-4 h-4 stroke-[2]" /></div>
-                    <span className="text-xs font-bold text-zinc-950">Design &amp; UI/UX Studios</span>
+                    <span className="text-xs font-bold text-zinc-950">Design &amp; UI/UX</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                  <Link href="/use-cases/doctors-clinics" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Heart className="w-4 h-4 stroke-[2]" /></div>
                     <span className="text-xs font-bold text-zinc-950">Doctors &amp; Clinics</span>
                   </Link>
-                  <Link href="/use-cases#creative-agencies" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                  <Link href="/use-cases/salons-wellness" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-pink-500/10 text-pink-600 border border-pink-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Scissors className="w-4 h-4 stroke-[2]" /></div>
                     <span className="text-xs font-bold text-zinc-950">Salons, Spas &amp; Wellness</span>
                   </Link>
-                  <Link href="/use-cases#real-estate-media" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                  <Link href="/use-cases/real-estate-property" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Building2 className="w-4 h-4 stroke-[2]" /></div>
                     <span className="text-xs font-bold text-zinc-950">Real Estate &amp; Property</span>
                   </Link>
-                  <Link href="/use-cases#commercial-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
+                  <Link href="/use-cases/photo-video-studios" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Camera className="w-4 h-4 stroke-[2]" /></div>
                     <span className="text-xs font-bold text-zinc-950">Photo &amp; Video Studios</span>
                   </Link>

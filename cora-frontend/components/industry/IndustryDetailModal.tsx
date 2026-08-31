@@ -89,19 +89,19 @@ export function IndustryDetailModal({
               Workspace Overview &amp; Architecture
             </h3>
             <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
-              {workspace.description}
+              {workspace.heroDescription}
             </p>
           </div>
 
           {/* Key Metrics */}
           <div className="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-zinc-50 border border-zinc-200/70">
-            {workspace.metrics.map((m, idx) => (
+            {workspace.stats.map((stat, idx) => (
               <div key={idx} className="text-center">
                 <span className="block text-base sm:text-lg font-mono font-bold text-zinc-950">
-                  {m.value}
+                  {stat.metric}
                 </span>
                 <span className="block text-[11px] text-zinc-500 mt-0.5">
-                  {m.label}
+                  {stat.label}
                 </span>
               </div>
             ))}

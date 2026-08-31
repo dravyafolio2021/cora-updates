@@ -33,7 +33,7 @@ export default function UseCasesPage() {
       const matchesSearch =
         ws.title.toLowerCase().includes(q) ||
         ws.tagline.toLowerCase().includes(q) ||
-        ws.description.toLowerCase().includes(q) ||
+        ws.heroDescription.toLowerCase().includes(q) ||
         ws.sacCode.toLowerCase().includes(q) ||
         ws.sectorLabel.toLowerCase().includes(q) ||
         ws.preSeededTemplates.some(t => t.toLowerCase().includes(q)) ||

@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { ArrowRight, CheckCircle2, ShieldCheck, Receipt, Sparkles, FileText, ChevronRight } from 'lucide-react';
 import { IndustryWorkspace } from '@/lib/industry-data';
 import { IndustryIcon } from './IndustryIcon';
@@ -30,22 +31,24 @@ export function IndustryCard({ workspace, onOpenDetails }: IndustryCardProps) {
         </div>
 
         {/* Title & Tagline */}
-        <h3 className="text-xl font-bold text-zinc-950 tracking-tight group-hover:text-black mb-2">
-          {workspace.title}
-        </h3>
+        <Link href={`/use-cases/${workspace.slug}`}>
+          <h3 className="text-xl font-bold text-zinc-950 tracking-tight group-hover:text-black hover:underline underline-offset-4 decoration-zinc-300 mb-2 transition-all">
+            {workspace.title}
+          </h3>
+        </Link>
         <p className="text-xs sm:text-sm text-zinc-600 font-normal leading-relaxed mb-5">
           {workspace.tagline}
         </p>
 
         {/* 3 Metric Pills */}
         <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-zinc-50/80 border border-zinc-200/60 mb-5">
-          {workspace.metrics.map((m, idx) => (
+          {workspace.stats.map((stat, idx) => (
             <div key={idx} className="text-center">
               <span className="block text-[13px] font-mono font-bold text-zinc-950 tracking-tight">
-                {m.value}
+                {stat.metric}
               </span>
               <span className="block text-[10px] text-zinc-500 leading-tight line-clamp-1 mt-0.5">
-                {m.label}
+                {stat.label}
               </span>
             </div>
           ))}
@@ -83,13 +86,13 @@ export function IndustryCard({ workspace, onOpenDetails }: IndustryCardProps) {
 
       {/* Bottom Actions */}
       <div className="pt-4 border-t border-zinc-100 flex items-center justify-between gap-3">
-        <button
-          onClick={() => onOpenDetails(workspace)}
-          className="text-xs font-semibold text-zinc-700 hover:text-zinc-950 inline-flex items-center gap-1 transition-colors cursor-pointer"
+        <Link
+          href={`/use-cases/${workspace.slug}`}
+          className="text-xs font-semibold text-zinc-700 hover:text-zinc-950 inline-flex items-center gap-1 transition-colors"
         >
-          <span>View Blueprint &amp; Math</span>
+          <span>Explore Solution Page</span>
           <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />
-        </button>
+        </Link>
 
         <a
           href={`https://app.heycora.in/workspace/login?industry=${workspace.id}&source=use_cases_card`}
