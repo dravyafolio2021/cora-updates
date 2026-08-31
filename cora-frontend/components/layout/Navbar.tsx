@@ -43,7 +43,25 @@ import {
   Clapperboard
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
-import { MODULE_GLYPH_MAP } from '@/components/features/ModuleAppGlyphs';
+import {
+  AiCofounderColorIcon,
+  VoiceScopeColorIcon,
+  ContentAiColorIcon,
+  RagMemoryColorIcon,
+  LeadCrmColorIcon,
+  CanvasBuilderColorIcon,
+  FormBuilderColorIcon,
+  ReviewPortalColorIcon,
+  EsignVaultColorIcon,
+  CrewDispatchColorIcon,
+  MasterCalendarColorIcon,
+  TaskBoardColorIcon,
+  GstInvoicingColorIcon,
+  AssetGearColorIcon,
+  MediaHubColorIcon,
+  RbacSecurityColorIcon,
+  MODULE_GLYPH_MAP
+} from '@/components/features/ModuleAppGlyphs';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -367,15 +385,15 @@ export function Navbar() {
                 {/* ── DROPDOWN: FEATURES (20 BUILT MODULES ACROSS 4 EQUAL PILLARS) ── */}
                 {activeDropdown === 'features' && (
                   <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 items-start">
 
                       {/* 1. INTELLIGENCE & AI */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between pb-2 mb-1 border-b border-zinc-100">
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
                             Intelligence &amp; AI
                           </span>
-                          <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-200/60">
+                          <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
                             FLAGSHIP
                           </span>
                         </div>
@@ -383,20 +401,37 @@ export function Navbar() {
                         <Link
                           href="/features/ai-cofounder"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <Bot className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <AiCofounderColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 AI Co-Founder
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Autonomous operations triage &amp; quotes
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Autonomous operations triage
+                            </p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/features/voice-to-scope"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                        >
+                          <VoiceScopeColorIcon className="w-9 h-9" />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
+                                Voice-to-Scope
+                              </span>
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </div>
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Audio briefs to structured contracts
                             </p>
                           </div>
                         </Link>
@@ -404,19 +439,17 @@ export function Navbar() {
                         <Link
                           href="/features/content-ai"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <Sparkles className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <ContentAiColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 Content AI &amp; GEO
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
                               3-Act viral scripts &amp; answer density
                             </p>
                           </div>
@@ -425,53 +458,30 @@ export function Navbar() {
                         <Link
                           href="/features/rag-mcp"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <BrainCircuit className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <RagMemoryColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 RAG Memory MCP
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Semantic memory &amp; IDE connection
-                            </p>
-                          </div>
-                        </Link>
-
-                        <Link
-                          href="/features/voice-to-scope"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <Zap className="w-4 h-4 stroke-[1.9]" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
-                                Voice-to-Scope
-                              </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                            </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Audio briefs to structured contracts
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Semantic memory &amp; IDE bridge
                             </p>
                           </div>
                         </Link>
                       </div>
 
-                      {/* 2. SALES & PIPELINE */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between pb-2 mb-1 border-b border-zinc-100">
+                      {/* 2. GROWTH & PIPELINE */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Sales &amp; Pipeline
+                            Growth &amp; Pipeline
                           </span>
-                          <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                          <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60">
                             GROWTH
                           </span>
                         </div>
@@ -479,20 +489,18 @@ export function Navbar() {
                         <Link
                           href="/features/lead-crm"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <Kanban className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <LeadCrmColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 Kanban Lead CRM
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Visual deal stages &amp; WhatsApp follow-up
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Deal stages &amp; WhatsApp follow-up
                             </p>
                           </div>
                         </Link>
@@ -500,20 +508,18 @@ export function Navbar() {
                         <Link
                           href="/features/canvas-builder"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <LayoutTemplate className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <CanvasBuilderColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 Funnel Builder
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              High-converting landing pages &amp; reels
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              High-converting pages &amp; reels
                             </p>
                           </div>
                         </Link>
@@ -521,20 +527,18 @@ export function Navbar() {
                         <Link
                           href="/features/form-builder"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <FormInput className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <FormBuilderColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 Visual Forms
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Dynamic briefs &amp; call-time slot intake
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Dynamic briefs &amp; call-time booking
                             </p>
                           </div>
                         </Link>
@@ -542,19 +546,17 @@ export function Navbar() {
                         <Link
                           href="/features/review-portal"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <Star className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <ReviewPortalColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 5★ Review Portal
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
                               Smart sentiment routing &amp; Google sync
                             </p>
                           </div>
@@ -562,12 +564,12 @@ export function Navbar() {
                       </div>
 
                       {/* 3. OPERATIONS & LEGAL */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between pb-2 mb-1 border-b border-zinc-100">
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
                             Operations &amp; Legal
                           </span>
-                          <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                          <span className="text-[9px] font-mono font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200/60">
                             LEGAL TECH
                           </span>
                         </div>
@@ -575,19 +577,17 @@ export function Navbar() {
                         <Link
                           href="/features/esign-vault"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <FileText className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <EsignVaultColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 SHA-256 E-Signs
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
                               5-Step legally binding digital contracts
                             </p>
                           </div>
@@ -596,19 +596,17 @@ export function Navbar() {
                         <Link
                           href="/features/crew-dispatch"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <Send className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <CrewDispatchColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 Crew Dispatch
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
                               Automated call sheets &amp; conflict matrix
                             </p>
                           </div>
@@ -617,20 +615,18 @@ export function Navbar() {
                         <Link
                           href="/features/master-calendar"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <Calendar className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <MasterCalendarColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 Master Calendar
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Multi-location shoot scheduling &amp; iCal
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Multi-location scheduling &amp; iCal
                             </p>
                           </div>
                         </Link>
@@ -638,32 +634,30 @@ export function Navbar() {
                         <Link
                           href="/features/task-board"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <CheckSquare className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <TaskBoardColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 Task Board
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Post-production milestones &amp; proofing
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Post-production sprints &amp; proofing
                             </p>
                           </div>
                         </Link>
                       </div>
 
                       {/* 4. FINANCE & ASSETS */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between pb-2 mb-1 border-b border-zinc-100">
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
                             Finance &amp; Assets
                           </span>
-                          <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                          <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
                             INDIA GST
                           </span>
                         </div>
@@ -671,19 +665,17 @@ export function Navbar() {
                         <Link
                           href="/features/gst-invoicing"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <Receipt className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <GstInvoicingColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 18% GST Invoicing
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
                               Automated CGST/SGST splitting &amp; SAC
                             </p>
                           </div>
@@ -692,20 +684,18 @@ export function Navbar() {
                         <Link
                           href="/features/asset-gear"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <Camera className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <AssetGearColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 Gear &amp; Inventory
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Equipment registry &amp; shoot reservations
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Equipment registry &amp; checkouts
                             </p>
                           </div>
                         </Link>
@@ -713,20 +703,18 @@ export function Navbar() {
                         <Link
                           href="/features/media-hub"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <Film className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <MediaHubColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 Media Hub &amp; RAW
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
-                              Workspace library &amp; client 4K galleries
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                              Workspace library &amp; 4K galleries
                             </p>
                           </div>
                         </Link>
@@ -734,19 +722,17 @@ export function Navbar() {
                         <Link
                           href="/features/rbac-system"
                           onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2 rounded-xl hover:bg-zinc-100/70 border border-transparent hover:border-zinc-200/60 transition-all group"
+                          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 group-hover:bg-zinc-950 group-hover:text-white transition-all shadow-2xs">
-                            <ShieldCheck className="w-4 h-4 stroke-[1.9]" />
-                          </div>
+                          <RbacSecurityColorIcon className="w-9 h-9" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[13px] font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
+                              <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black transition-colors tracking-tight">
                                 Multi-Tenant RBAC
                               </span>
-                              <ArrowRight className="w-3 h-3 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </div>
-                            <p className="text-[11px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
+                            <p className="text-[11.5px] text-zinc-500 line-clamp-1 font-normal group-hover:text-zinc-700 transition-colors">
                               30-Point security &amp; capability matrix
                             </p>
                           </div>
@@ -1341,112 +1327,112 @@ export function Navbar() {
 
                   {/* Pillar 1: Intelligence & AI */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-zinc-100">
+                    <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-zinc-100">
                       <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
                         Intelligence &amp; AI
                       </span>
-                      <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md">
+                      <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
                         FLAGSHIP
                       </span>
                     </div>
-                    <Link href="/features/ai-cofounder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Bot className="w-4 h-4" /></div>
+                    <Link href="/features/ai-cofounder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <AiCofounderColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">AI Co-Founder</div><div className="text-[11px] text-zinc-500">Autonomous triage &amp; quotes</div></div>
                     </Link>
-                    <Link href="/features/content-ai" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Sparkles className="w-4 h-4" /></div>
+                    <Link href="/features/voice-to-scope" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <VoiceScopeColorIcon className="w-8 h-8" />
+                      <div><div className="text-xs font-bold text-zinc-950">Voice-to-Scope</div><div className="text-[11px] text-zinc-500">Audio briefs to structured contracts</div></div>
+                    </Link>
+                    <Link href="/features/content-ai" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <ContentAiColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">Content AI &amp; GEO</div><div className="text-[11px] text-zinc-500">3-Act viral scripts &amp; SEO</div></div>
                     </Link>
-                    <Link href="/features/rag-mcp" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><BrainCircuit className="w-4 h-4" /></div>
-                      <div><div className="text-xs font-bold text-zinc-950">RAG Memory MCP</div><div className="text-[11px] text-zinc-500">Semantic memory &amp; IDE connection</div></div>
-                    </Link>
-                    <Link href="/features/voice-to-scope" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Zap className="w-4 h-4" /></div>
-                      <div><div className="text-xs font-bold text-zinc-950">Voice-to-Scope</div><div className="text-[11px] text-zinc-500">Audio briefs to structured contracts</div></div>
+                    <Link href="/features/rag-mcp" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <RagMemoryColorIcon className="w-8 h-8" />
+                      <div><div className="text-xs font-bold text-zinc-950">RAG Memory MCP</div><div className="text-[11px] text-zinc-500">Semantic memory &amp; IDE bridge</div></div>
                     </Link>
                   </div>
 
-                  {/* Pillar 2: Sales & Pipeline */}
+                  {/* Pillar 2: Growth & Pipeline */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-zinc-100">
+                    <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-zinc-100">
                       <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                        Sales &amp; Pipeline
+                        Growth &amp; Pipeline
                       </span>
-                      <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                      <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60">
                         GROWTH
                       </span>
                     </div>
-                    <Link href="/features/lead-crm" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Kanban className="w-4 h-4" /></div>
+                    <Link href="/features/lead-crm" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <LeadCrmColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">Kanban Lead CRM</div><div className="text-[11px] text-zinc-500">Visual deal stages &amp; WhatsApp</div></div>
                     </Link>
-                    <Link href="/features/canvas-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><LayoutTemplate className="w-4 h-4" /></div>
+                    <Link href="/features/canvas-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <CanvasBuilderColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">Funnel Builder</div><div className="text-[11px] text-zinc-500">Landing pages &amp; reels</div></div>
                     </Link>
-                    <Link href="/features/form-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><FormInput className="w-4 h-4" /></div>
+                    <Link href="/features/form-builder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <FormBuilderColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">Visual Forms</div><div className="text-[11px] text-zinc-500">Dynamic briefs &amp; call-time intake</div></div>
                     </Link>
-                    <Link href="/features/review-portal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Star className="w-4 h-4" /></div>
+                    <Link href="/features/review-portal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <ReviewPortalColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">5★ Review Portal</div><div className="text-[11px] text-zinc-500">Sentiment routing &amp; Google sync</div></div>
                     </Link>
                   </div>
 
                   {/* Pillar 3: Operations & Legal */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-zinc-100">
+                    <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-zinc-100">
                       <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
                         Operations &amp; Legal
                       </span>
-                      <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                      <span className="text-[9px] font-mono font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200/60">
                         LEGAL TECH
                       </span>
                     </div>
-                    <Link href="/features/esign-vault" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><FileText className="w-4 h-4" /></div>
+                    <Link href="/features/esign-vault" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <EsignVaultColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">SHA-256 E-Signs</div><div className="text-[11px] text-zinc-500">5-Step legally binding contracts</div></div>
                     </Link>
-                    <Link href="/features/crew-dispatch" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Send className="w-4 h-4" /></div>
+                    <Link href="/features/crew-dispatch" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <CrewDispatchColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">Crew Dispatch</div><div className="text-[11px] text-zinc-500">Automated call sheets &amp; conflicts</div></div>
                     </Link>
-                    <Link href="/features/master-calendar" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Calendar className="w-4 h-4" /></div>
+                    <Link href="/features/master-calendar" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <MasterCalendarColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">Master Calendar</div><div className="text-[11px] text-zinc-500">Multi-location shoot scheduling</div></div>
                     </Link>
-                    <Link href="/features/task-board" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><CheckSquare className="w-4 h-4" /></div>
+                    <Link href="/features/task-board" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <TaskBoardColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">Task Board</div><div className="text-[11px] text-zinc-500">Post-production &amp; proofing</div></div>
                     </Link>
                   </div>
 
                   {/* Pillar 4: Finance & Assets */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-zinc-100">
+                    <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-zinc-100">
                       <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
                         Finance &amp; Assets
                       </span>
-                      <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                      <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
                         INDIA GST
                       </span>
                     </div>
-                    <Link href="/features/gst-invoicing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Receipt className="w-4 h-4" /></div>
+                    <Link href="/features/gst-invoicing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <GstInvoicingColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">18% GST Invoicing</div><div className="text-[11px] text-zinc-500">CGST/SGST auto-splitting &amp; SAC</div></div>
                     </Link>
-                    <Link href="/features/asset-gear" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Camera className="w-4 h-4" /></div>
+                    <Link href="/features/asset-gear" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <AssetGearColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">Gear &amp; Inventory</div><div className="text-[11px] text-zinc-500">Equipment registry &amp; checkouts</div></div>
                     </Link>
-                    <Link href="/features/media-hub" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><Film className="w-4 h-4" /></div>
+                    <Link href="/features/media-hub" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <MediaHubColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">Media Hub &amp; RAW</div><div className="text-[11px] text-zinc-500">Library &amp; 4K client galleries</div></div>
                     </Link>
-                    <Link href="/features/rbac-system" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0"><ShieldCheck className="w-4 h-4" /></div>
+                    <Link href="/features/rbac-system" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                      <RbacSecurityColorIcon className="w-8 h-8" />
                       <div><div className="text-xs font-bold text-zinc-950">Multi-Tenant RBAC</div><div className="text-[11px] text-zinc-500">30-Point security matrix</div></div>
                     </Link>
                   </div>
