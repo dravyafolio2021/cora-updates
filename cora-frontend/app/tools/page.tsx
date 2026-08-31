@@ -16,10 +16,12 @@ import {
   Plus, 
   Minus,
   ChevronRight,
+  Layers,
   Zap
 } from 'lucide-react';
 import { TOOLS_DATA, TOOL_CATEGORIES, ToolItem } from '@/lib/tools-data';
 import { ToolCard } from '@/components/tools/ToolCard';
+import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 
 const TOOLS_FAQS = [
   {
@@ -67,62 +69,85 @@ export default function ToolsIndexPage() {
   };
 
   return (
-    <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
+    <div className="w-full bg-white text-zinc-900">
       
-      {/* ── 1. EFFORTLESS MINIMALIST HERO (CLEAN & REFINED) ── */}
-      <section className="relative w-full pt-20 sm:pt-28 pb-12 sm:pb-16 overflow-hidden bg-gradient-to-b from-zinc-50/90 via-white to-white border-b border-zinc-100">
-        
-        {/* Subtle Architectural Grid Pattern */}
-        <div 
-          className="absolute inset-0 opacity-[0.025] pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, #000 1px, transparent 0)`,
-            backgroundSize: '24px 24px'
-          }}
-        />
+      {/* ── 1. ARTISTIC HERO SECTION (COMPACT <=40VH) ── */}
+      <section className="relative w-full pt-20 sm:pt-24 pb-8 sm:pb-12 overflow-hidden border-b border-zinc-100">
+        <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6">
           
           {/* Breadcrumbs */}
-          <nav className="flex items-center gap-1.5 text-xs text-zinc-500 font-medium mb-5">
+          <nav className="flex items-center gap-1.5 text-xs text-zinc-600 font-medium overflow-x-auto whitespace-nowrap scrollbar-none py-1 mb-4">
             <Link href="/" className="hover:text-zinc-950 transition-colors">
               Home
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
-            <span className="text-zinc-950 font-semibold">
+            <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <Link href="/tools" className="text-zinc-950 font-semibold">
               Free Micro-Tools
-            </span>
+            </Link>
           </nav>
 
-          <div className="max-w-[820px] space-y-4">
-            
-            {/* Minimal Status Pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-zinc-800 border border-zinc-200/90 text-xs font-semibold shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>6 Free Turnkey Utilities</span>
-              <span className="text-zinc-300">•</span>
-              <span className="text-zinc-500 font-mono text-[11px]">Zero Login Required</span>
+          <div className="flex flex-col items-start gap-3.5 max-w-[880px]">
+            {/* Status Badge */}
+            <div className="flex items-center flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200/90 rounded-full text-xs font-semibold shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>6 Turnkey Micro-Tools</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 rounded-full text-[10px] font-mono font-bold backdrop-blur-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>100% Free Forever • Zero Login</span>
+              </span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.14]">
+            <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-semibold text-zinc-950 tracking-[-0.03em] leading-[1.24] sm:leading-[1.28]">
               Tools built for speed and precision.
             </h1>
 
             {/* Value Tagline */}
-            <p className="text-zinc-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-[680px]">
-              Instant browser-based utilities for Indian GST calculations, client retainer modeling, legal agreements, and developer embeds. 100% client-side, free forever.
+            <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[760px]">
+              Instant, browser-based financial calculators, AI prompt studios, contract generators, and developer embed builders. Pre-configured for modern professional service businesses.
             </p>
+
+            {/* Quick 3-Stat Bar */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 w-full py-3 my-1 border-y border-zinc-200/70">
+              <div className="space-y-0.5">
+                <div className="font-display text-lg sm:text-2xl font-extrabold text-zinc-950 tracking-tight">
+                  6 Micro-Tools
+                </div>
+                <div className="text-[10px] sm:text-xs text-zinc-500 font-medium">
+                  Instant Client-Side Utilities
+                </div>
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-display text-lg sm:text-2xl font-extrabold text-zinc-950 tracking-tight">
+                  0% Login Required
+                </div>
+                <div className="text-[10px] sm:text-xs text-zinc-500 font-medium">
+                  Zero Sign-up or Paywalls
+                </div>
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-display text-lg sm:text-2xl font-extrabold text-zinc-950 tracking-tight">
+                  0% Gateway Fees
+                </div>
+                <div className="text-[10px] sm:text-xs text-zinc-500 font-medium">
+                  Direct UPI Bank Settlement
+                </div>
+              </div>
+            </div>
 
           </div>
 
         </div>
       </section>
 
-      {/* ── 2. STICKY CATEGORY FILTER BAR & SEARCH ── */}
-      <section className="w-full py-4 bg-white/90 border-b border-zinc-200/70 sticky top-14 z-20 backdrop-blur-md">
+      {/* ── 2. SEARCH & CATEGORY FILTER TABS ── */}
+      <section className="w-full py-6 bg-zinc-50/70 border-b border-zinc-200/80 sticky top-14 z-20 backdrop-blur-md">
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             
             {/* Category Filter Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none w-full sm:w-auto py-1">
@@ -135,11 +160,11 @@ export default function ToolsIndexPage() {
                     className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                       isActive
                         ? 'bg-zinc-950 text-white shadow-xs'
-                        : 'bg-zinc-50 text-zinc-700 border border-zinc-200/80 hover:bg-zinc-100 hover:text-zinc-950'
+                        : 'bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-100 hover:text-zinc-950'
                     }`}
                   >
                     <span>{cat.label}</span>
-                    <span className={`text-[10px] font-mono rounded-full px-1.5 py-0.2 ${isActive ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-200/70 text-zinc-600'}`}>
+                    <span className={`text-[10px] font-mono rounded-full px-1.5 py-0.2 ${isActive ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-500'}`}>
                       {cat.count}
                     </span>
                   </button>
@@ -148,14 +173,14 @@ export default function ToolsIndexPage() {
             </div>
 
             {/* Search Input Bar */}
-            <div className="relative w-full sm:w-64">
-              <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <div className="relative w-full sm:w-72">
+              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search tools..."
-                className="w-full pl-9 pr-4 py-1.5 rounded-full bg-zinc-50 border border-zinc-200 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-950 transition-all shadow-2xs"
+                placeholder="Search micro-tools..."
+                className="w-full pl-9 pr-4 py-1.5 rounded-full bg-white border border-zinc-200 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-950 shadow-2xs"
               />
             </div>
 
