@@ -1,11 +1,11 @@
-import { Calculator, Sparkles, Code, Scale, Receipt, QrCode } from 'lucide-react';
+import { Calculator, Sparkles, Code, Scale, Receipt, QrCode, FileText, Briefcase, Zap, ShieldCheck } from 'lucide-react';
 
 export interface ToolItem {
   id: string;
   slug: string;
   title: string;
   shortTitle: string;
-  category: 'finance_tax' | 'ai_copy' | 'contracts_legal' | 'developer_embed';
+  category: 'finance_tax' | 'retainer_agency' | 'ai_copy' | 'contracts_legal' | 'developer_embed' | 'payments_upi';
   categoryLabel: string;
   badge: string;
   badgeColor: string;
@@ -16,6 +16,94 @@ export interface ToolItem {
   runs: string;
   inputPlaceholder: string;
 }
+
+export interface ToolCategoryBlock {
+  id: string;
+  title: string;
+  subtitle: string;
+  count: string;
+  iconName: string;
+  bgColor: string;
+  accentText: string;
+  featuredToolName: string;
+  featuredToolSlug: string;
+  featuredToolBadgeColor: string;
+}
+
+export const TOOL_CATEGORY_BLOCKS: ToolCategoryBlock[] = [
+  {
+    id: 'finance_tax',
+    title: 'Tax & GST',
+    subtitle: 'Solve Your GST Problems',
+    count: '5+ tools',
+    iconName: 'Calculator',
+    bgColor: 'bg-[#6366F1]',
+    accentText: 'text-[#6366F1]',
+    featuredToolName: 'GST Calculator',
+    featuredToolSlug: 'gst-calculator',
+    featuredToolBadgeColor: 'bg-indigo-50 text-indigo-700',
+  },
+  {
+    id: 'retainer_agency',
+    title: 'Retainer Math',
+    subtitle: 'Solve Your Scope Problems',
+    count: '4+ tools',
+    iconName: 'Receipt',
+    bgColor: 'bg-[#F97316]',
+    accentText: 'text-[#F97316]',
+    featuredToolName: 'Retainer Math',
+    featuredToolSlug: 'retainer-calculator',
+    featuredToolBadgeColor: 'bg-orange-50 text-orange-700',
+  },
+  {
+    id: 'ai_copy',
+    title: 'AI Studio',
+    subtitle: 'Solve Your Copy Problems',
+    count: '6+ tools',
+    iconName: 'Sparkles',
+    bgColor: 'bg-[#E11D48]',
+    accentText: 'text-[#E11D48]',
+    featuredToolName: 'Listing AI',
+    featuredToolSlug: 'listing-ai',
+    featuredToolBadgeColor: 'bg-rose-50 text-rose-700',
+  },
+  {
+    id: 'contracts_legal',
+    title: 'Legal Contracts',
+    subtitle: 'Solve Your Contract Problems',
+    count: '8+ tools',
+    iconName: 'Scale',
+    bgColor: 'bg-[#2563EB]',
+    accentText: 'text-[#2563EB]',
+    featuredToolName: 'IT Act E-Sign',
+    featuredToolSlug: 'contract-builder',
+    featuredToolBadgeColor: 'bg-blue-50 text-blue-700',
+  },
+  {
+    id: 'developer_embed',
+    title: 'Embed Widgets',
+    subtitle: 'Solve Your Lead Problems',
+    count: '5+ tools',
+    iconName: 'Code',
+    bgColor: 'bg-[#0D9488]',
+    accentText: 'text-[#0D9488]',
+    featuredToolName: 'Embed Builder',
+    featuredToolSlug: 'embed-builder',
+    featuredToolBadgeColor: 'bg-teal-50 text-teal-700',
+  },
+  {
+    id: 'payments_upi',
+    title: 'UPI & Invoicing',
+    subtitle: 'Solve Your Payment Problems',
+    count: '4+ tools',
+    iconName: 'QrCode',
+    bgColor: 'bg-[#7C3AED]',
+    accentText: 'text-[#7C3AED]',
+    featuredToolName: 'Dynamic UPI QR',
+    featuredToolSlug: 'upi-qr-generator',
+    featuredToolBadgeColor: 'bg-purple-50 text-purple-700',
+  },
+];
 
 export const TOOL_CATEGORIES = [
   { id: 'all', label: 'All Tools', count: 6 },

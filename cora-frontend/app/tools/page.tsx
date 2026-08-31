@@ -3,25 +3,25 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { 
-  Calculator, 
-  Sparkles, 
-  Code, 
-  Scale, 
-  Receipt, 
-  QrCode, 
   Search, 
   ArrowRight, 
   CheckCircle2, 
   ShieldCheck, 
   Plus, 
   Minus,
-  ChevronRight,
+  Sparkles,
+  Zap,
   Layers,
-  Zap
+  ChevronRight
 } from 'lucide-react';
-import { TOOLS_DATA, TOOL_CATEGORIES, ToolItem } from '@/lib/tools-data';
+import { 
+  TOOLS_DATA, 
+  TOOL_CATEGORY_BLOCKS, 
+  TOOL_CATEGORIES, 
+  ToolItem 
+} from '@/lib/tools-data';
 import { ToolCard } from '@/components/tools/ToolCard';
-import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
+import { ToolCategoryHeroCard } from '@/components/tools/ToolCategoryHeroCard';
 
 const TOOLS_FAQS = [
   {
@@ -43,8 +43,8 @@ const TOOLS_FAQS = [
 ];
 
 export default function ToolsIndexPage() {
-  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const filteredTools = useMemo(() => {
@@ -68,128 +68,164 @@ export default function ToolsIndexPage() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const toolsGrid = document.getElementById('tools-directory');
+    if (toolsGrid) {
+      toolsGrid.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="w-full bg-white text-zinc-900">
+    <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. ARTISTIC HERO SECTION (COMPACT <=40VH) ── */}
-      <section className="relative w-full pt-20 sm:pt-24 pb-8 sm:pb-12 overflow-hidden border-b border-zinc-100">
-        <ArtisticHeroBackground tone="neutral" />
+      {/* ── 1. CENTERED HERO INSPIRED BY USER REFERENCE ── */}
+      <section className="relative w-full pt-16 sm:pt-24 pb-12 sm:pb-16 overflow-hidden bg-gradient-to-b from-[#F8FAFC] via-white to-white">
+        
+        {/* Subtle Decorative Floating 3D Geometric Confetti Accents */}
+        <div className="absolute top-12 left-[10%] w-3 h-3 bg-rose-400 rounded-xs rotate-45 opacity-60 pointer-events-none hidden md:block" />
+        <div className="absolute top-20 right-[12%] w-4 h-4 bg-purple-500 rounded-xs rotate-12 opacity-60 pointer-events-none hidden md:block" />
+        <div className="absolute top-36 left-[6%] w-3.5 h-3.5 bg-blue-500 rounded-xs -rotate-12 opacity-50 pointer-events-none hidden md:block" />
+        <div className="absolute top-28 right-[8%] w-3 h-3 bg-amber-400 rounded-xs rotate-45 opacity-70 pointer-events-none hidden md:block" />
 
-        <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6">
+        <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
-          {/* Breadcrumbs */}
-          <nav className="flex items-center gap-1.5 text-xs text-zinc-600 font-medium overflow-x-auto whitespace-nowrap scrollbar-none py-1 mb-4">
-            <Link href="/" className="hover:text-zinc-950 transition-colors">
-              Home
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-            <Link href="/tools" className="text-zinc-950 font-semibold">
-              Free Micro-Tools
-            </Link>
-          </nav>
+          {/* Main Headline with Highlighted Blue Box */}
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.18] mb-4 max-w-[900px] mx-auto">
+            Free Tools to Make <span className="bg-[#2563EB] text-white px-3 py-0.5 rounded-xl inline-block shadow-sm">Business</span> Simple
+          </h1>
 
-          <div className="flex flex-col items-start gap-3.5 max-w-[880px]">
-            {/* Status Badge */}
-            <div className="flex items-center flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200/90 rounded-full text-xs font-semibold shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>6 Turnkey Micro-Tools</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 rounded-full text-[10px] font-mono font-bold backdrop-blur-md">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>100% Free Forever • Zero Login</span>
-              </span>
-            </div>
+          {/* Subtitle */}
+          <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[640px] mx-auto mb-8">
+            We offer GST, proposal, contract, embed and AI tools to make your agency and professional life easier
+          </p>
 
-            {/* Main Headline */}
-            <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-semibold text-zinc-950 tracking-[-0.03em] leading-[1.24] sm:leading-[1.28]">
-              Tools built for speed and precision.
-            </h1>
-
-            {/* Value Tagline */}
-            <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[760px]">
-              Instant, browser-based financial calculators, AI prompt studios, contract generators, and developer embed builders. Pre-configured for modern professional service businesses.
-            </p>
-
-            {/* Quick 3-Stat Bar */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-6 w-full py-3 my-1 border-y border-zinc-200/70">
-              <div className="space-y-0.5">
-                <div className="font-display text-lg sm:text-2xl font-semibold text-zinc-950 tracking-tight">
-                  6 Micro-Tools
-                </div>
-                <div className="text-[10px] sm:text-xs text-zinc-500 font-medium">
-                  Instant Client-Side Utilities
-                </div>
-              </div>
-              <div className="space-y-0.5">
-                <div className="font-display text-lg sm:text-2xl font-semibold text-zinc-950 tracking-tight">
-                  0% Login Required
-                </div>
-                <div className="text-[10px] sm:text-xs text-zinc-500 font-medium">
-                  Zero Sign-up or Paywalls
-                </div>
-              </div>
-              <div className="space-y-0.5">
-                <div className="font-display text-lg sm:text-2xl font-semibold text-zinc-950 tracking-tight">
-                  0% Gateway Fees
-                </div>
-                <div className="text-[10px] sm:text-xs text-zinc-500 font-medium">
-                  Direct UPI Bank Settlement
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ── 2. SEARCH & CATEGORY FILTER TABS ── */}
-      <section className="w-full py-6 bg-zinc-50/70 border-b border-zinc-200/80 sticky top-14 z-20 backdrop-blur-md">
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none w-full sm:w-auto py-1">
-              {TOOL_CATEGORIES.map((cat) => {
-                const isActive = activeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => setActiveCategory(cat.id)}
-                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                      isActive
-                        ? 'bg-zinc-950 text-white shadow-xs'
-                        : 'bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-100 hover:text-zinc-950'
-                    }`}
-                  >
-                    <span>{cat.label}</span>
-                    <span className={`text-[10px] font-mono rounded-full px-1.5 py-0.2 ${isActive ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-500'}`}>
-                      {cat.count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Search Input Bar */}
-            <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          {/* Central Elevated Search Capsule */}
+          <form 
+            onSubmit={handleSearchSubmit}
+            className="max-w-[560px] mx-auto bg-white rounded-full p-1.5 sm:p-2 border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex items-center justify-between gap-2 mb-12 sm:mb-16 focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-500/10 transition-all"
+          >
+            <div className="flex items-center gap-2.5 pl-3 flex-1">
+              <Search className="w-4 h-4 text-[#2563EB] shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search micro-tools..."
-                className="w-full pl-9 pr-4 py-1.5 rounded-full bg-white border border-zinc-200 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-950 shadow-2xs"
+                placeholder="Search tools (e.g. GST calculator, retainer math, NDA)..."
+                className="w-full bg-transparent text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
               />
+            </div>
+            <button
+              type="submit"
+              className="px-6 py-2 sm:py-2.5 rounded-full bg-[#2563EB] hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm transition-all shadow-sm cursor-pointer shrink-0"
+            >
+              Search
+            </button>
+          </form>
+
+          {/* ── 2. HORIZONTAL ROW OF VIBRANT CATEGORY CARDS ── */}
+          <div className="w-full overflow-x-auto pb-4 pt-1 scrollbar-none">
+            <div className="flex lg:grid lg:grid-cols-6 gap-3 sm:gap-4 min-w-max lg:min-w-0 justify-start lg:justify-between px-2">
+              {TOOL_CATEGORY_BLOCKS.map((block) => (
+                <ToolCategoryHeroCard key={block.id} block={block} />
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── 3. METRICS RIBBON (DUAL OPACITY NUMBERS) ── */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-2 mb-12 sm:mb-16">
+        <div className="rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-blue-50/70 border border-blue-100/80 p-6 sm:p-8 shadow-xs">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center divide-y sm:divide-y-0 sm:divide-x divide-blue-200/50">
+            
+            {/* Metric 1 */}
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
+              <div className="font-display text-3xl sm:text-4xl font-black text-[#2563EB] tracking-tight">
+                100k+
+              </div>
+              <div className="text-left">
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Active</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Users</span>
+              </div>
+            </div>
+
+            {/* Metric 2 */}
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
+              <div className="font-display text-3xl sm:text-4xl font-black text-[#2563EB] tracking-tight">
+                ₹50Cr+
+              </div>
+              <div className="text-left">
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Invoices</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Calculated</span>
+              </div>
+            </div>
+
+            {/* Metric 3 */}
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
+              <div className="font-display text-3xl sm:text-4xl font-black text-[#2563EB] tracking-tight">
+                20+
+              </div>
+              <div className="text-left">
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Online</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Tools</span>
+              </div>
+            </div>
+
+            {/* Metric 4 */}
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
+              <div className="font-display text-3xl sm:text-4xl font-black text-[#2563EB] tracking-tight">
+                100%
+              </div>
+              <div className="text-left">
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Free</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Forever</span>
+              </div>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* ── 3. TOOLS GRID (CLEAN VISUAL CARDS) ── */}
-      <section className="w-full py-12 sm:py-16 max-w-[1240px] mx-auto px-4 sm:px-6">
+      {/* ── 4. DIRECTORY & ALL TOOLS FILTER GRID ── */}
+      <section id="tools-directory" className="w-full py-12 max-w-[1240px] mx-auto px-4 sm:px-6">
+        
+        {/* Category Tabs & Header */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-4 border-b border-zinc-100">
+          <div>
+            <h2 className="font-display text-2xl font-bold text-zinc-950 tracking-tight">
+              All Micro-Tools Directory
+            </h2>
+            <span className="text-xs text-zinc-500">
+              Instant browser-based utilities with zero sign-up required
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none w-full sm:w-auto py-1">
+            {TOOL_CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-zinc-950 text-white shadow-xs'
+                      : 'bg-zinc-50 text-zinc-700 border border-zinc-200 hover:bg-zinc-100 hover:text-zinc-950'
+                  }`}
+                >
+                  <span>{cat.label}</span>
+                  <span className={`text-[10px] font-mono rounded-full px-1.5 py-0.2 ${isActive ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-200/70 text-zinc-600'}`}>
+                    {cat.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Tools Cards Grid */}
         {filteredTools.length === 0 ? (
           <div className="text-center py-16 bg-zinc-50 rounded-3xl border border-zinc-200">
             <span className="text-sm font-bold text-zinc-900 block mb-1">No tools match your search</span>
@@ -202,9 +238,10 @@ export default function ToolsIndexPage() {
             ))}
           </div>
         )}
+
       </section>
 
-      {/* ── 4. "MICRO-TOOLS VS CORA OS" TRANSFORMATION CARD ── */}
+      {/* ── 5. "MICRO-TOOLS VS CORA OS" TRANSFORMATION CARD ── */}
       <section className="w-full py-16 bg-zinc-50/80 border-t border-zinc-200/80">
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
@@ -266,7 +303,7 @@ export default function ToolsIndexPage() {
         </div>
       </section>
 
-      {/* ── 5. FREQUENTLY ASKED QUESTIONS ── */}
+      {/* ── 6. FREQUENTLY ASKED QUESTIONS ── */}
       <section className="w-full py-16 sm:py-20 max-w-[860px] mx-auto px-4 sm:px-6">
         <div className="text-center mb-10">
           <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200 mb-3 inline-block">
@@ -308,7 +345,7 @@ export default function ToolsIndexPage() {
         </div>
       </section>
 
-      {/* ── 6. MONOCHROMATIC FOOTER CTA BANNER ── */}
+      {/* ── 7. MONOCHROMATIC FOOTER CTA BANNER ── */}
       <section className="w-full py-16 sm:py-20 bg-zinc-950 text-white relative overflow-hidden">
         <div className="relative z-10 max-w-[980px] mx-auto px-4 sm:px-6 text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-mono font-semibold text-zinc-300 mb-4 shadow-sm">
