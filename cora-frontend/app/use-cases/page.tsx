@@ -18,8 +18,8 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Industry Solutions & Use Cases — Cora Studio OS',
-  description: 'Discover how commercial photography studios, real estate media agencies, film production houses, and solo creators automate operations with Cora.',
+  title: 'Industry Solutions & Use Cases — Cora OS for Professional Services',
+  description: 'Discover how software agencies, law firms, CA & tax practices, consulting firms, marketing agencies, and media studios automate operations with Cora.',
   alternates: {
     canonical: 'https://heycora.in/use-cases/',
   },
@@ -27,103 +27,84 @@ export const metadata: Metadata = {
 
 const INDUSTRIES = [
   {
-    id: 'commercial-studios',
-    title: 'Commercial Photography Studios',
-    subtitle: 'From Client Brief to 18% GST Invoicing with Zero Manual Spreadsheets',
-    desc: 'Commercial photo shoots require juggling model releases, studio bay bookings, styling crew call times, and complex corporate purchase orders. Cora automates the entire administrative pipeline so your team can focus on creating world-class imagery.',
+    id: 'software-agencies',
+    title: 'Software & Tech Agencies',
+    subtitle: 'Sprint Retainers, Fixed-Scope Milestones & Code Review Vaults',
+    desc: 'Dev agencies and IT consultancies need to manage sprint contracts, milestone escrow approvals, SLA tracking, and recurring client retainers. Cora streamlines your entire delivery pipeline from scoping to 18% GST invoicing with zero manual spreadsheets.',
     metrics: [
-      { value: '+40%', label: 'Faster shoot-to-invoice cycle' },
-      { value: '18% GST', label: 'Automated tax math & HSN/SAC tracking' },
-      { value: 'Zero', label: 'Lost model release agreements' }
+      { value: '3X Faster', label: 'Proposal to signed contract' },
+      { value: '18% GST', label: 'Automated SAC 998314 software math' },
+      { value: '100%', label: 'Milestone sign-off before deploy' }
     ],
     features: [
-      'Multi-seat crew access for lighting techs, producers, and assistants',
-      'Automated legally binding model & location releases signed on mobile',
-      'Direct UPI QR and corporate card invoicing with automated tax receipts',
-      'Integrated Google Drive RAW asset gallery proofing and approvals'
+      'Sprint retainer agreements with automated recurring invoicing',
+      'Milestone-gated client approval portals for builds and staging',
+      'SLA uptime and maintenance tracking with priority escalation',
+      'Cryptographic SHA-256 digital contracts compliant with IT Act 2000'
     ],
-    image: '/images/usecase_commercial_studio.jpg',
-    badge: 'Photography Studios'
+    image: '/images/cora_community_crowd.jpg',
+    badge: 'Software & Tech Agencies'
   },
   {
-    id: 'real-estate-media',
-    title: 'Real Estate Media Agencies',
-    subtitle: 'AI Property Copywriting, Drone Dispatch & Same-Day 4K Asset Handoff',
-    desc: 'High-velocity real estate media demands instant turnaround. Cora integrates multi-model AI to draft MLS listing descriptions from photos, dispatches drone pilots with WhatsApp call-sheets, and locks deliverables behind instant payment gates.',
+    id: 'legal-practices',
+    title: 'Law Firms & Legal Practices',
+    subtitle: 'SHA-256 E-Sign Vaults, Retainer Agreements & Client Intake Portals',
+    desc: 'Legal practices require airtight contract execution, tamper-evident document logs, and secure retainer billing. Cora provides IT Act compliant digital e-signatures, automated NDA workflows, and client intake vaults that save hundreds of admin hours every month.',
     metrics: [
-      { value: '3X Faster', label: 'Listing description generation' },
-      { value: 'Sub-400ms', label: 'Low-latency AI property copy' },
-      { value: '100%', label: 'Payment collected before download' }
-    ],
-    features: [
-      'Claude 3.5 & Gemini 2.0 Flash automated real estate listing descriptions',
-      'Automated WhatsApp pilot dispatch with GPS pin and gate code notes',
-      'Pay-to-unlock 4K virtual tour & high-res image download portals',
-      'Automated broker 5-star Google review collection on final delivery'
-    ],
-    image: '/images/usecase_realestate_agency.jpg',
-    badge: 'Real Estate Media'
-  },
-  {
-    id: 'film-production',
-    title: 'Film & Commercial Video Production Houses',
-    subtitle: 'High-Ticket Client Retainers, SHA-256 E-Signs & Automated Call-Sheets',
-    desc: 'Commercial video productions involve high stakes, multi-day shoots, and large budgets. Cora ensures every retainer milestone is escrowed, call-sheets are delivered via WhatsApp, and legal contracts have tamper-evident cryptographic validity.',
-    metrics: [
-      { value: '₹4.8Cr+', label: 'In production retainers protected' },
       { value: 'SHA-256', label: 'Cryptographic signature verification' },
-      { value: '20+ Hrs', label: 'Producer time saved per shoot' }
+      { value: '100%', label: 'IT Act 2000 compliance validity' },
+      { value: 'Zero', label: 'Paper contracts or lost agreements' }
     ],
     features: [
-      'Multi-stage payment milestones (Advance, Production Wrap, Final Cut)',
-      'Digital call-sheet generator with weather, call-times, and department notes',
-      'Tamper-evident legal e-signatures compliant with Indian IT Act 2000',
-      'Automated crew payout calculations with TDS and GST compliance'
-    ],
-    image: '/images/usecase_production_house.jpg',
-    badge: 'Production Houses'
-  },
-  {
-    id: 'solo-creators',
-    title: 'Solo Creators & Lead Photographers',
-    subtitle: 'Run Your Full Creative Business from Your Phone',
-    desc: 'You started your photography or filmmaking career to create art, not to drown in accounting and email chains. Cora turns your mobile phone into an autonomous executive assistant that drafts scopes, signs clients, and tracks revenue.',
-    metrics: [
-      { value: '2 Minutes', label: 'Setup time to send your first proposal' },
-      { value: '20+ Hrs', label: 'Reclaimed founder time every week' },
-      { value: '₹0', label: 'Spent on separate CRM and e-sign apps' }
-    ],
-    features: [
-      'One-tap proposal generation from voice notes and WhatsApp inquiries',
-      'Mobile client contract signing with instant SMS & WhatsApp confirmations',
-      'Instant UPI payment collection with zero accounting math needed',
-      'PWA mobile app that works offline and on set'
-    ],
-    image: '/images/usecase_solo_creator.jpg',
-    badge: 'Solo Creators'
-  },
-  {
-    id: 'fashion-editorial',
-    title: 'Fashion & Editorial Labs',
-    subtitle: 'Model Releases, Stylist Call Times & Bay Rentals in Sync',
-    desc: 'Editorial shoots require tight synchronization between agency bookers, stylists, makeup artists, and studio managers. Cora unifies bay booking schedules, wardrobe checklists, and image usage licensing agreements into a clean live pipeline.',
-    metrics: [
-      { value: '100%', label: 'Model usage rights digitally archived' },
-      { value: 'Zero', label: 'Double-booked studio bay conflicts' },
-      { value: 'Instant', label: 'Digital sign-off on wardrobe & prop releases' }
-    ],
-    features: [
-      'Custom image usage rights and exclusivity contract templates',
-      'Studio bay rental calendar with hourly and full-day slots',
-      'Wardrobe, stylist, and makeup artist call-sheet dispatch',
-      'White-label mood board and editorial client presentation portals'
+      '5-Step guided e-signature flow with audit trails & IP logging',
+      'Encrypted client document vault for NDAs and retainer agreements',
+      'Automated recurring legal retainer billing & GST tax receipts',
+      'Custom intake forms with conditional logic for client onboarding'
     ],
     image: '/images/bento_crew_camera.jpg',
-    badge: 'Fashion & Editorial'
+    badge: 'Legal & Law Practices'
+  },
+  {
+    id: 'tax-accounting',
+    title: 'Tax & Accounting Firms (CA Practices)',
+    subtitle: '18% GST Auto-Splitting, SAC Audits & Client Retainer Automation',
+    desc: 'Chartered accountants and tax advisory firms manage high-volume client compliance, monthly filings, and advisory retainers. Cora automates SAC code allocation, CGST/SGST tax math, and automated recurring fee collections.',
+    metrics: [
+      { value: '18% GST', label: 'Native CGST + SGST tax auto-calculation' },
+      { value: 'SAC Codes', label: 'Pre-seeded professional accounting schemas' },
+      { value: '+45%', label: 'Faster client invoice collection via UPI' }
+    ],
+    features: [
+      'Automated SAC tax classification for accounting and tax services',
+      'One-click UPI QR code and NEFT/RTGS payment collection',
+      'Monthly recurring client retainer automation with PDF generation',
+      'Secure document depository for tax filings and audit proofs'
+    ],
+    image: '/images/usecase_commercial_studio.jpg',
+    badge: 'Tax & Accounting Firms'
+  },
+  {
+    id: 'consulting',
+    title: 'Management & Strategy Consulting',
+    subtitle: 'Diagnostic Scopes, Advisory Retainers & Executive Deliverables',
+    desc: 'Consulting firms deliver high-value advisory, audits, and transformation decks. Cora unifies proposal drafting, client retainer management, milestone approvals, and board deliverable sharing under one elegant workspace.',
+    metrics: [
+      { value: '₹5L+ Avg', label: 'Advisory retainer size supported' },
+      { value: '2 Minutes', label: 'Scope generation from meeting notes' },
+      { value: 'Multi-Seat', label: 'Role-based access for advisory teams' }
+    ],
+    features: [
+      'Voice-to-scope meeting notes to structured advisory agreements',
+      'Multi-stage payment milestones (Advance, Diagnostic Wrap, Board Review)',
+      'White-label executive client presentation portals',
+      'Multi-tenant security with complete workspace data isolation'
+    ],
+    image: '/images/usecase_production_house.jpg',
+    badge: 'Management Consulting'
   },
   {
     id: 'creative-agencies',
-    title: 'Creative Marketing Agencies',
+    title: 'Digital Marketing & Creative Agencies',
     subtitle: 'Consolidate 5+ Fragmented SaaS Subscriptions into One Command Center',
     desc: 'Marketing and digital media agencies waste thousands of dollars each month across Notion, DocuSign, HoneyBook, Zapier, and ChatGPT accounts. Cora unifies client management, AI copywriting, and billing under a single branded operating system.',
     metrics: [
@@ -137,8 +118,65 @@ const INDUSTRIES = [
       'Client retainer automation with monthly auto-generated GST invoices',
       'Team permission tiers (Account Executive, Project Lead, Finance, Client)'
     ],
-    image: '/images/cora_community_crowd.jpg',
-    badge: 'Creative Agencies'
+    image: '/images/usecase_realestate_agency.jpg',
+    badge: 'Digital Marketing Agencies'
+  },
+  {
+    id: 'architecture',
+    title: 'Architecture & Engineering Studios',
+    subtitle: '3D CAD Stage Milestones, Blueprint Approvals & Milestone Billing',
+    desc: 'Architecture and engineering firms coordinate multi-phase design stages, client blueprint sign-offs, contractor draws, and milestone billings. Cora provides clear approval gates and automated progressive invoices.',
+    metrics: [
+      { value: '4-Stage', label: 'Concept to site completion milestone tracking' },
+      { value: '100%', label: 'Signed client change-order protection' },
+      { value: 'Zero', label: 'Uncollected milestone draws' }
+    ],
+    features: [
+      'Progressive milestone billing tied to design phase completion',
+      'Digital client change-order approvals with e-signatures',
+      'Integrated document depository for blueprints and CAD specs',
+      'Automated GST tax breakdown on architectural consultancy fees'
+    ],
+    image: '/images/usecase_solo_creator.jpg',
+    badge: 'Architecture & Design'
+  },
+  {
+    id: 'healthcare-clinics',
+    title: 'Clinics & Specialized Healthcare Practices',
+    subtitle: 'Client Intake Booking, Consent E-Signs & Confidential Records',
+    desc: 'Specialized wellness practices, therapy centers, and clinical consultancies require automated booking, paperless intake forms, digital patient consent, and direct payment collection.',
+    metrics: [
+      { value: '100% Digital', label: 'Paperless intake forms and consent' },
+      { value: 'Instant', label: 'Automated appointment confirmation' },
+      { value: 'Encrypted', label: 'Confidential client record storage' }
+    ],
+    features: [
+      'Dynamic client intake forms with mobile signature capture',
+      'Automated appointment slot picker with WhatsApp confirmations',
+      'Direct UPI and corporate payment links with zero friction',
+      'Encrypted client profile vault with role-based staff permissions'
+    ],
+    image: '/images/usecase_commercial_studio.jpg',
+    badge: 'Healthcare & Wellness'
+  },
+  {
+    id: 'commercial-studios',
+    title: 'Media & Commercial Production Studios',
+    subtitle: 'From Client Brief to 18% GST Invoicing with Zero Manual Spreadsheets',
+    desc: 'Commercial photo and video studios require juggling model releases, bay bookings, styling crew call times, and corporate purchase orders. Cora automates the entire administrative pipeline.',
+    metrics: [
+      { value: '+40%', label: 'Faster shoot-to-invoice cycle' },
+      { value: '18% GST', label: 'Automated tax math & HSN/SAC tracking' },
+      { value: 'Zero', label: 'Lost model release agreements' }
+    ],
+    features: [
+      'Multi-seat crew access for lighting techs, producers, and assistants',
+      'Automated legally binding model & location releases signed on mobile',
+      'Direct UPI QR and corporate card invoicing with automated tax receipts',
+      'Integrated asset gallery proofing and approvals'
+    ],
+    image: '/images/usecase_production_house.jpg',
+    badge: 'Media & Production'
   }
 ];
 
@@ -150,15 +188,15 @@ export default function UseCasesPage() {
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center mb-24 sm:mb-32">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-100 rounded-xl border border-zinc-200/90 text-xs font-semibold text-zinc-900 mb-4 shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span>Industry Solutions</span>
+          <span>Professional Service Solutions</span>
         </div>
 
-        <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl font-bold text-zinc-950 leading-[1.1] tracking-[-0.035em] max-w-[860px] mx-auto mb-5">
-          Purpose-built for modern creative operators
+        <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl font-bold text-zinc-950 leading-[1.1] tracking-[-0.035em] max-w-[920px] mx-auto mb-5">
+          Purpose-built for modern professional services &amp; agencies
         </h1>
 
-        <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed max-w-[680px] mx-auto mb-8">
-          Whether you run a 20-person commercial video production house or shoot high-end editorial campaigns solo, Cora is tailored to your exact workflow.
+        <p className="text-zinc-600 text-base sm:text-xl font-normal leading-relaxed max-w-[720px] mx-auto mb-8">
+          Whether you run a software dev studio, law practice, CA firm, consulting advisory, or creative agency — Cora unifies your client intake, e-signatures, 18% GST billing, and team operations into one connected operating system.
         </p>
 
         <div className="flex items-center justify-center flex-wrap gap-3.5">

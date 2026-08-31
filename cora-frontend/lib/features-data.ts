@@ -106,35 +106,51 @@ export interface IndustryItem {
 export const INDUSTRIES: IndustryItem[] = [
   { 
     id: 'all', 
-    label: 'All Workspaces', 
+    label: 'All Professional Services', 
     shortLabel: 'All', 
-    subtitle: 'Universal Business Stack', 
+    subtitle: 'Universal Business Operating System', 
     iconName: 'Briefcase',
     badge: 'Universal'
   },
   { 
-    id: 'photo_film', 
-    label: 'Photo & Film Production', 
-    shortLabel: 'Photo & Film', 
-    subtitle: 'Commercial, Video & Wedding Studios', 
-    iconName: 'Clapperboard',
-    badge: 'Call Sheets • Gear'
+    id: 'tech_software', 
+    label: 'Software & Tech Agencies', 
+    shortLabel: 'Tech & Dev', 
+    subtitle: 'Dev Studios, App Agencies & MSPs', 
+    iconName: 'Code',
+    badge: 'Sprints • Staging'
   },
   { 
-    id: 'real_estate', 
-    label: 'Real Estate Media', 
-    shortLabel: 'Real Estate', 
-    subtitle: 'Architecture, MLS & Drone Walkthroughs', 
-    iconName: 'Building',
-    badge: 'MLS • GEO SEO'
+    id: 'legal_finance', 
+    label: 'Legal, Tax & CA Practices', 
+    shortLabel: 'Legal & Tax', 
+    subtitle: 'Law Firms, CA Accountants & Advisory', 
+    iconName: 'Scale',
+    badge: 'SHA-256 • 18% GST'
   },
   { 
-    id: 'creative_agencies', 
-    label: 'Creative & Content Agencies', 
-    shortLabel: 'Agencies', 
-    subtitle: 'Design, Content & Social Media Teams', 
+    id: 'consulting_agencies', 
+    label: 'Management & Strategy Consulting', 
+    shortLabel: 'Consulting', 
+    subtitle: 'Advisory, Transformation & Audits', 
+    iconName: 'Briefcase',
+    badge: 'Scopes • Retainers'
+  },
+  { 
+    id: 'marketing_design', 
+    label: 'Marketing & Creative Studios', 
+    shortLabel: 'Creative & SEO', 
+    subtitle: 'SEO, Digital Media & UI/UX Teams', 
     iconName: 'Palette',
-    badge: 'Portals • White-Label'
+    badge: 'Portals • Retainers'
+  },
+  { 
+    id: 'media_studios', 
+    label: 'Media & Production Studios', 
+    shortLabel: 'Media & Film', 
+    subtitle: 'Commercial Photo & Video Studios', 
+    iconName: 'Clapperboard',
+    badge: 'Call Sheets • 4K Proofing'
   },
 ];
 

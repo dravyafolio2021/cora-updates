@@ -80,23 +80,29 @@ def main():
         print("❌ ERROR: Next.js build failed!")
         sys.exit(1)
         
-    # 2. Package out/ directory
+    # 2. Package out/ directory (Safe fast bundle)
     print("\n[2/5] Packaging out/ into tar.gz (excluding WordPress backend paths)...")
     if os.path.exists(LOCAL_TAR):
         os.remove(LOCAL_TAR)
-    with tarfile.open(LOCAL_TAR, "w:gz") as tar:
-        tar.add(LOCAL_OUT, arcname=".")
+    
+    # Exclude .DS_Store and heavy unchanged media unless needed
+    subprocess.run([
+        "tar", "-czf", LOCAL_TAR,
+        "--exclude=.DS_Store",
+        "--exclude=./images",
+        "-C", LOCAL_OUT, "."
+    ], check=True)
     print(f"Created {LOCAL_TAR} ({os.path.getsize(LOCAL_TAR)} bytes)")
 
     # 3. Upload deployment package & .htaccess to Remote Server
     print("\n[3/5] Uploading deployment package to Hostinger server...")
-    scp_cmd = ["scp", "-P", SSH_PORT, "-o", "StrictHostKeyChecking=no", LOCAL_TAR, f"{SSH_USER}@{SSH_IP}:{REMOTE_TMP}"]
+    scp_cmd = ["scp", "-O", "-P", SSH_PORT, "-o", "StrictHostKeyChecking=no", "-o", "ServerAliveInterval=10", LOCAL_TAR, f"{SSH_USER}@{SSH_IP}:{REMOTE_TMP}"]
     if not run_command_with_auth(scp_cmd):
         print("❌ ERROR: SCP upload failed!")
         sys.exit(1)
 
     print("Uploading protected hybrid .htaccess...")
-    scp_ht = ["scp", "-P", SSH_PORT, "-o", "StrictHostKeyChecking=no", LOCAL_HTACCESS, f"{SSH_USER}@{SSH_IP}:{PUBLIC_HTML}/.htaccess"]
+    scp_ht = ["scp", "-O", "-P", SSH_PORT, "-o", "StrictHostKeyChecking=no", LOCAL_HTACCESS, f"{SSH_USER}@{SSH_IP}:{PUBLIC_HTML}/.htaccess"]
     if not run_command_with_auth(scp_ht):
         print("❌ ERROR: .htaccess upload failed!")
         sys.exit(1)

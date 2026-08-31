@@ -21,7 +21,9 @@ import {
   Building,
   Heart,
   Palette,
-  Check
+  Check,
+  Code,
+  Scale
 } from 'lucide-react';
 import { CATEGORIES, INDUSTRIES, IndustryItem } from '@/lib/features-data';
 import Link from 'next/link';
@@ -42,8 +44,8 @@ interface FeaturesSidebarProps {
 }
 
 // Icon mapper for categories
-const getCategoryIcon = (id: string) => {
-  switch (id) {
+const getCategoryIcon = (categoryId: string) => {
+  switch (categoryId) {
     case 'intelligence':
       return <Bot className="w-4 h-4" />;
     case 'sales':
@@ -66,6 +68,10 @@ const getCategoryIcon = (id: string) => {
 const getIndustryIcon = (iconName: string, isSelected: boolean) => {
   const iconClass = isSelected ? 'text-white' : 'text-zinc-700';
   switch (iconName) {
+    case 'Code':
+      return <Code className={`w-4 h-4 ${iconClass}`} />;
+    case 'Scale':
+      return <Scale className={`w-4 h-4 ${iconClass}`} />;
     case 'Clapperboard':
       return <Clapperboard className={`w-4 h-4 ${iconClass}`} />;
     case 'Building':
