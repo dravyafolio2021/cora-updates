@@ -96,8 +96,8 @@ export function IntegrationsWaveSection() {
             <span>INTEGRATIONS</span>
           </div>
 
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[48px] font-bold text-zinc-950 leading-[1.1] tracking-[-0.03em] mb-4">
-            Cora makes your other tools <span className="text-zinc-400 font-semibold">better</span>
+          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[48px] font-bold leading-[1.1] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block mb-4">
+            Cora makes your other tools better
           </h2>
           <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[640px] mx-auto">
             Bring your essential business tools into one place with seamless native sync. From WhatsApp Business and UPI to Tally Prime and Google Sheets.

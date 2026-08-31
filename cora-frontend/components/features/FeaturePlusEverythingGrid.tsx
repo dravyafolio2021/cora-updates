@@ -391,8 +391,8 @@ export function FeaturePlusEverythingGrid({ feature }: FeaturePlusEverythingGrid
       
       {/* Central Headline */}
       <div className="text-center max-w-[760px] mx-auto mb-12 sm:mb-16">
-        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-zinc-950">
-          Plus, everything you need to get it <span className="text-zinc-400 font-semibold">done</span>
+        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+          Plus, everything you need to get it done
         </h2>
       </div>
 

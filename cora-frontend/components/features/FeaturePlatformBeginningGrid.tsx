@@ -310,8 +310,8 @@ export function FeaturePlatformBeginningGrid({ feature }: FeaturePlatformBeginni
         <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-600 mb-2 block">
           THE CORA PLATFORM
         </span>
-        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-zinc-950 mb-4">
-          {feature.shortTitle} is just the <span className="text-zinc-400 font-semibold">beginning</span>
+        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block mb-4">
+          {feature.shortTitle} is just the beginning
         </h2>
         <p className="text-zinc-600 text-sm sm:text-base leading-relaxed max-w-[680px] mx-auto">
           {feature.shortTitle} is the connective tissue of the Cora platform. E-Sign, 18% GST Invoicing, CRM, Call Sheets, and more in a single, converged workspace. Explore everything you unlock when your studio runs in one place.

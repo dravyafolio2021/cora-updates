@@ -177,8 +177,8 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
         
         {/* Section Heading: "A better way to work" */}
         <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-14">
-          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-zinc-950">
-            A better way to <span className="text-zinc-400 font-semibold">work</span>
+          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+            A better way to work
           </h2>
         </div>
 
@@ -232,8 +232,8 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
         
         {/* Section Heading */}
         <div className="text-center max-w-[760px] mx-auto mb-12 sm:mb-16">
-          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-zinc-950 mb-3 sm:mb-4">
-            The foundation for every <span className="text-zinc-400 font-semibold">workflow</span>
+          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block mb-3 sm:mb-4">
+            The foundation for every workflow
           </h2>
           <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
             {feature.shortTitle} powers critical operations across your workspace, keeping your projects organized, connected, and moving no matter how complex the production.
@@ -390,8 +390,8 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
       {/* ── SECTION 10: FAQS ACCORDION ── */}
       <section className="w-full max-w-[860px] mx-auto px-4 sm:px-6 mb-24 sm:mb-32">
         <div className="text-center mb-10 sm:mb-12">
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-zinc-950 tracking-tight">
-            FAQ<span className="text-zinc-400 font-semibold">s</span>
+          <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+            Frequently Asked Questions
           </h2>
         </div>
 
