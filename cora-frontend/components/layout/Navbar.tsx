@@ -772,8 +772,6 @@ export function Navbar() {
                           20 Live Modules
                         </span>
                         <span className="text-zinc-300">•</span>
-                        <span className="hidden md:inline">Single-plugin architecture with 100% MySQL tenant isolation</span>
-                        <span className="text-zinc-300 hidden md:inline">•</span>
                         <Link href="/docs" onClick={() => setActiveDropdown(null)} className="font-semibold text-zinc-900 hover:text-black underline underline-offset-4 decoration-zinc-300">
                           API Specs &amp; Docs →
                         </Link>
