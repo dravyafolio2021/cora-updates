@@ -268,7 +268,7 @@ export function Navbar() {
                   {/* ── Modern Clean Company Dropdown Card ── */}
                   {activeDropdown === 'company' && (
                     <div
-                      className="absolute top-full right-0 mt-3 w-64 rounded-2xl bg-white border border-zinc-200/90 shadow-[0px_20px_50px_rgba(0,0,0,0.1)] p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                      className="absolute top-full right-0 mt-3 w-56 rounded-2xl bg-white border border-zinc-200/90 shadow-[0px_20px_50px_rgba(0,0,0,0.1)] p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
                       onMouseEnter={() => handleMouseEnter('company')}
                       onMouseLeave={handleMouseLeave}
                     >
@@ -280,10 +280,7 @@ export function Navbar() {
                         <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                           <Sparkles className="w-4 h-4 stroke-[2]" />
                         </div>
-                        <div>
-                          <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">About Cora</div>
-                          <div className="text-[11px] text-zinc-500 font-normal">Our mission &amp; manifesto</div>
-                        </div>
+                        <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black">About Cora</span>
                       </Link>
 
                       <Link
@@ -294,10 +291,7 @@ export function Navbar() {
                         <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                           <Layers className="w-4 h-4 stroke-[2]" />
                         </div>
-                        <div>
-                          <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">Brand &amp; Assets</div>
-                          <div className="text-[11px] text-zinc-500 font-normal">Logos, tokens &amp; colors</div>
-                        </div>
+                        <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black">Brand &amp; Assets</span>
                       </Link>
 
                       <Link
@@ -308,10 +302,7 @@ export function Navbar() {
                         <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                           <ShieldCheck className="w-4 h-4 stroke-[2]" />
                         </div>
-                        <div>
-                          <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">Security &amp; Trust</div>
-                          <div className="text-[11px] text-zinc-500 font-normal">SHA-256 &amp; MySQL isolation</div>
-                        </div>
+                        <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black">Security &amp; Trust</span>
                       </Link>
 
                       <Link
@@ -322,10 +313,7 @@ export function Navbar() {
                         <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 border border-purple-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                           <MessageSquare className="w-4 h-4 stroke-[2]" />
                         </div>
-                        <div>
-                          <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">Contact &amp; Support</div>
-                          <div className="text-[11px] text-zinc-500 font-normal">Direct help &amp; partner lines</div>
-                        </div>
+                        <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black">Contact &amp; Support</span>
                       </Link>
 
                       <div className="my-1.5 border-t border-zinc-100" />
@@ -333,9 +321,9 @@ export function Navbar() {
                       <Link
                         href="/status"
                         onClick={() => setActiveDropdown(null)}
-                        className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-950 hover:bg-zinc-50 transition-colors"
+                        className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-zinc-600 hover:text-zinc-950 hover:bg-zinc-50 transition-colors"
                       >
-                        <span>System Status</span>
+                        <span className="font-semibold text-xs text-zinc-800">System Status</span>
                         <span className="flex items-center gap-1.5 text-[11px] font-mono text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                           99.98%
@@ -1677,23 +1665,26 @@ export function Navbar() {
                   </span>
                   <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
                     <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Sparkles className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">About Cora</div><div className="text-[11px] text-zinc-500">Mission, team &amp; manifesto</div></div>
+                    <div className="text-xs font-bold text-zinc-950">About Cora</div>
                   </Link>
                   <Link href="/brand" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
                     <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Layers className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Brand &amp; Design Assets</div><div className="text-[11px] text-zinc-500">Logos, tokens &amp; SVG kit</div></div>
+                    <div className="text-xs font-bold text-zinc-950">Brand &amp; Design Assets</div>
                   </Link>
                   <Link href="/security" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
                     <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs"><ShieldCheck className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Security &amp; Trust</div><div className="text-[11px] text-zinc-500">SHA-256 &amp; MySQL isolation</div></div>
-                  </Link>
-                  <Link href="/status" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
-                    <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Zap className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">System Status</div><div className="text-[11px] text-zinc-500">99.98% 90-day operational health</div></div>
+                    <div className="text-xs font-bold text-zinc-950">Security &amp; Trust</div>
                   </Link>
                   <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
                     <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 border border-purple-500/20 flex items-center justify-center shrink-0 shadow-2xs"><MessageSquare className="w-4 h-4 stroke-[2]" /></div>
-                    <div><div className="text-xs font-bold text-zinc-950">Advisory Desk &amp; Support</div><div className="text-[11px] text-zinc-500">Direct contact &amp; inquiry lines</div></div>
+                    <div className="text-xs font-bold text-zinc-950">Contact &amp; Support</div>
+                  </Link>
+                  <Link href="/status" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                    <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Zap className="w-4 h-4 stroke-[2]" /></div>
+                    <div className="text-xs font-bold text-zinc-950 flex items-center justify-between w-full pr-2">
+                      <span>System Status</span>
+                      <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">99.98%</span>
+                    </div>
                   </Link>
                 </div>
               )}
