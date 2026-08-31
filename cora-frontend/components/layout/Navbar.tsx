@@ -1092,306 +1092,127 @@ export function Navbar() {
                   </div>
                 )}
 
-                {/* ── DROPDOWN: RESOURCES (4-COLUMN CLEAN MINIMAL ARCHITECTURE) ── */}
+                {/* ── DROPDOWN: RESOURCES (3 CLEAN VISUAL CARDS) ── */}
                 {activeDropdown === 'resources' && (
-                  <div key="resources-tab" className="space-y-6 animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 items-start">
+                  <div key="resources-tab" className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
 
-                      {/* Column 1: Free Micro-Tools */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
-                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Free Tools
-                          </span>
+                    {/* Card 1: Free Micro-Tools */}
+                    <Link
+                      href="/tools"
+                      onClick={() => setActiveDropdown(null)}
+                      className="group rounded-2xl bg-zinc-50/50 hover:bg-white border border-zinc-200/80 hover:border-zinc-950 p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3.5">
+                          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <Calculator className="w-4 h-4 stroke-[2]" />
+                          </div>
                           <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
                             ZERO LOGIN
                           </span>
                         </div>
-                        <div className="space-y-1">
-                          <Link
-                            href="/tools/gst-calculator"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Calculator className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              18% GST Calculator
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/tools/listing-ai"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Sparkles className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              Listing AI Generator
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/tools/embed-builder"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <LayoutTemplate className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              Client Embed Builder
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/tools"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 border border-purple-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Layers className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              All Micro-Tools
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
+                        <h3 className="text-[15px] font-bold text-zinc-950 tracking-tight group-hover:text-black mb-3">
+                          Free Micro-Tools
+                        </h3>
+                        <div className="flex flex-wrap gap-1.5">
+                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                            18% GST Calculator
+                          </span>
+                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                            Listing AI
+                          </span>
+                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                            Embed Engine
+                          </span>
                         </div>
                       </div>
 
-                      {/* Column 2: Developer Hub & APIs */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
-                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Developer Hub
-                          </span>
+                      <div className="pt-3.5 mt-5 border-t border-zinc-200/60 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-zinc-900 group-hover:text-black inline-flex items-center gap-1.5">
+                          <span>Open Micro-Tools</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-0.5 transition-all" />
+                        </span>
+                      </div>
+                    </Link>
+
+                    {/* Card 2: Developer Hub & APIs */}
+                    <Link
+                      href="/docs"
+                      onClick={() => setActiveDropdown(null)}
+                      className="group rounded-2xl bg-zinc-50/50 hover:bg-white border border-zinc-200/80 hover:border-zinc-950 p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3.5">
+                          <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <Terminal className="w-4 h-4 stroke-[2]" />
+                          </div>
                           <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200/60">
                             25 SPECS
                           </span>
                         </div>
-                        <div className="space-y-1">
-                          <Link
-                            href="/docs/platform-architecture"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Terminal className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              Platform Architecture
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/docs/quickstart"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Zap className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              Quickstart Guide
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/docs/multi-tenant-rbac"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-slate-500/10 text-slate-700 border border-slate-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <ShieldCheck className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              MySQL RBAC Isolation
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/docs"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Code className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              All Developer Specs
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
+                        <h3 className="text-[15px] font-bold text-zinc-950 tracking-tight group-hover:text-black mb-3">
+                          Developer Hub &amp; APIs
+                        </h3>
+                        <div className="flex flex-wrap gap-1.5">
+                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                            REST API v1
+                          </span>
+                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                            MySQL Isolation
+                          </span>
+                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                            TypeScript SDK
+                          </span>
                         </div>
                       </div>
 
-                      {/* Column 3: Guides & Playbooks */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
-                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Guides &amp; Playbooks
-                          </span>
-                          <span className="text-[9px] font-mono font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200/60">
+                      <div className="pt-3.5 mt-5 border-t border-zinc-200/60 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-zinc-900 group-hover:text-black inline-flex items-center gap-1.5">
+                          <span>Browse 25 Specs</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-0.5 transition-all" />
+                        </span>
+                      </div>
+                    </Link>
+
+                    {/* Card 3: Guides & Comparisons */}
+                    <Link
+                      href="/articles"
+                      onClick={() => setActiveDropdown(null)}
+                      className="group rounded-2xl bg-zinc-50/50 hover:bg-white border border-zinc-200/80 hover:border-zinc-950 p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3.5">
+                          <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <BookOpen className="w-4 h-4 stroke-[2]" />
+                          </div>
+                          <span className="text-[9px] font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60">
                             24 GUIDES
                           </span>
                         </div>
-                        <div className="space-y-1">
-                          <Link
-                            href="/articles/studio-operations"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-violet-500/10 text-violet-600 border border-violet-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Briefcase className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              Studio Operations
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/articles/product-guides"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <FileText className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              Booking &amp; Contracts
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/articles/website-content"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-600 border border-sky-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <BarChart2 className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              SEO &amp; Growth Tactics
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/articles"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <BookOpen className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              All Product Guides
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
+                        <h3 className="text-[15px] font-bold text-zinc-950 tracking-tight group-hover:text-black mb-3">
+                          Guides &amp; Comparisons
+                        </h3>
+                        <div className="flex flex-wrap gap-1.5">
+                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                            vs HoneyBook
+                          </span>
+                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                            vs Studio Ninja
+                          </span>
+                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                            Workflows
+                          </span>
                         </div>
                       </div>
 
-                      {/* Column 4: Market Comparisons */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
-                          <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Comparisons
-                          </span>
-                          <span className="text-[9px] font-mono font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200/60">
-                            BENCHMARKS
-                          </span>
-                        </div>
-                        <div className="space-y-1">
-                          <Link
-                            href="/compare/cora-vs-honeybook"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 border border-purple-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Layers className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              vs HoneyBook
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/compare/cora-vs-studio-ninja"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Camera className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              vs Studio Ninja
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/compare/cora-vs-hubspot"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <BarChart2 className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              vs HubSpot
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-
-                          <Link
-                            href="/compare"
-                            onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-pink-500/10 text-pink-600 border border-pink-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                              <Cpu className="w-4 h-4 stroke-[2]" />
-                            </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
-                              All Comparisons
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                          </Link>
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {/* Bottom Bar */}
-                    <div className="-mx-8 -mb-8 sm:-mx-10 sm:-mb-10 mt-6 px-8 sm:px-10 py-3.5 bg-zinc-50/90 rounded-b-[28px] border-t border-zinc-100 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        <span className="text-xs text-zinc-600 font-medium">
-                          Free calculators, API documentation &amp; in-depth comparison benchmarks
+                      <div className="pt-3.5 mt-5 border-t border-zinc-200/60 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-zinc-900 group-hover:text-black inline-flex items-center gap-1.5">
+                          <span>Browse 24 Guides</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-0.5 transition-all" />
                         </span>
                       </div>
-                      <Link
-                        href="/docs"
-                        onClick={() => setActiveDropdown(null)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all shadow-2xs group"
-                      >
-                        <span>Browse Developer Hub &amp; Docs</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
-                    </div>
+                    </Link>
+
                   </div>
                 )}
 
