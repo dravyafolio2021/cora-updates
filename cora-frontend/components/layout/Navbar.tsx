@@ -144,7 +144,7 @@ export function Navbar() {
     timeoutRef.current = setTimeout(() => {
       setActiveDropdown(null);
       setIsHovered(false);
-    }, 150);
+    }, 220);
   };
 
   const hasSolidBg = isScrolled || isHovered || activeDropdown !== null || mobileMenuOpen;
@@ -181,85 +181,85 @@ export function Navbar() {
 
                 {/* 1. Features Dropdown */}
                 <div
-                  className="relative py-1.5"
+                  className="relative py-1"
                   onMouseEnter={() => handleMouseEnter('features')}
                 >
                   <button
                     type="button"
                     onClick={() => setActiveDropdown(activeDropdown === 'features' ? null : 'features')}
-                    className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors group ${
+                    className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ease-out group ${
                       activeDropdown === 'features'
-                        ? 'text-zinc-950 bg-zinc-100/90 font-bold'
-                        : 'text-zinc-800 hover:text-zinc-950 hover:bg-zinc-100/60'
+                        ? 'text-zinc-950 bg-zinc-100 font-bold shadow-2xs'
+                        : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                     }`}
                   >
                     <span>Features</span>
-                    <ChevronDown className={`w-3.5 h-3.5 stroke-[2.4] text-zinc-600 group-hover:text-zinc-950 transition-transform duration-200 ${activeDropdown === 'features' ? 'rotate-180 text-zinc-950' : ''}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 stroke-[2.2] text-zinc-500 group-hover:text-zinc-950 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeDropdown === 'features' ? 'rotate-180 text-zinc-950 scale-105' : ''}`} />
                   </button>
                 </div>
 
                 {/* 2. Industries Dropdown */}
                 <div
-                  className="relative py-1.5"
+                  className="relative py-1"
                   onMouseEnter={() => handleMouseEnter('industries')}
                 >
                   <button
                     type="button"
                     onClick={() => setActiveDropdown(activeDropdown === 'industries' ? null : 'industries')}
-                    className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors group ${
+                    className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ease-out group ${
                       activeDropdown === 'industries'
-                        ? 'text-zinc-950 bg-zinc-100/90 font-bold'
-                        : 'text-zinc-800 hover:text-zinc-950 hover:bg-zinc-100/60'
+                        ? 'text-zinc-950 bg-zinc-100 font-bold shadow-2xs'
+                        : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                     }`}
                   >
                     <span>Industries</span>
-                    <ChevronDown className={`w-3.5 h-3.5 stroke-[2.4] text-zinc-600 group-hover:text-zinc-950 transition-transform duration-200 ${activeDropdown === 'industries' ? 'rotate-180 text-zinc-950' : ''}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 stroke-[2.2] text-zinc-500 group-hover:text-zinc-950 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeDropdown === 'industries' ? 'rotate-180 text-zinc-950 scale-105' : ''}`} />
                   </button>
                 </div>
 
                 {/* 3. Resources Dropdown */}
                 <div
-                  className="relative py-1.5"
+                  className="relative py-1"
                   onMouseEnter={() => handleMouseEnter('resources')}
                 >
                   <button
                     type="button"
                     onClick={() => setActiveDropdown(activeDropdown === 'resources' ? null : 'resources')}
-                    className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors group ${
+                    className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ease-out group ${
                       activeDropdown === 'resources'
-                        ? 'text-zinc-950 bg-zinc-100/90 font-bold'
-                        : 'text-zinc-800 hover:text-zinc-950 hover:bg-zinc-100/60'
+                        ? 'text-zinc-950 bg-zinc-100 font-bold shadow-2xs'
+                        : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                     }`}
                   >
                     <span>Resources</span>
-                    <ChevronDown className={`w-3.5 h-3.5 stroke-[2.4] text-zinc-600 group-hover:text-zinc-950 transition-transform duration-200 ${activeDropdown === 'resources' ? 'rotate-180 text-zinc-950' : ''}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 stroke-[2.2] text-zinc-500 group-hover:text-zinc-950 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeDropdown === 'resources' ? 'rotate-180 text-zinc-950 scale-105' : ''}`} />
                   </button>
                 </div>
 
                 {/* 4. Direct Pricing Link */}
                 <Link
                   href="/pricing"
-                  className="px-3 py-1.5 rounded-lg text-zinc-800 hover:text-zinc-950 hover:bg-zinc-100/60 transition-colors"
+                  className="px-3.5 py-1.5 rounded-full text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70 transition-all duration-200 ease-out"
                 >
                   Pricing
                 </Link>
 
                 {/* 5. Company Dropdown */}
                 <div
-                  className="relative py-1.5"
+                  className="relative py-1"
                   onMouseEnter={() => handleMouseEnter('company')}
                 >
                   <button
                     type="button"
                     onClick={() => setActiveDropdown(activeDropdown === 'company' ? null : 'company')}
-                    className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors group ${
+                    className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ease-out group ${
                       activeDropdown === 'company'
-                        ? 'text-zinc-950 bg-zinc-100/90 font-bold'
-                        : 'text-zinc-800 hover:text-zinc-950 hover:bg-zinc-100/60'
+                        ? 'text-zinc-950 bg-zinc-100 font-bold shadow-2xs'
+                        : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                     }`}
                   >
                     <span>Company</span>
-                    <ChevronDown className={`w-3.5 h-3.5 stroke-[2.4] text-zinc-600 group-hover:text-zinc-950 transition-transform duration-200 ${activeDropdown === 'company' ? 'rotate-180 text-zinc-950' : ''}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 stroke-[2.2] text-zinc-500 group-hover:text-zinc-950 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeDropdown === 'company' ? 'rotate-180 text-zinc-950 scale-105' : ''}`} />
                   </button>
 
                   {/* ── Minimal Clean Company Dropdown ── */}
@@ -376,15 +376,15 @@ export function Navbar() {
           ══════════════════════════════════════════════════════════════════ */}
           {activeDropdown && activeDropdown !== 'company' && (
             <div
-              className="hidden lg:block absolute left-4 right-4 sm:left-6 sm:right-6 top-[62px] z-50 pt-2"
+              className="hidden lg:block absolute left-4 right-4 sm:left-6 sm:right-6 top-[54px] z-50 pt-3"
               onMouseEnter={() => handleMouseEnter(activeDropdown)}
               onMouseLeave={handleMouseLeave}
             >
-              <div className="w-full max-w-[1240px] mx-auto rounded-[28px] bg-white border border-zinc-200/90 shadow-[0px_25px_70px_rgba(0,0,0,0.12)] p-8 sm:p-10 animate-in fade-in slide-in-from-top-3 duration-200">
+              <div className="w-full max-w-[1240px] mx-auto rounded-[28px] bg-white border border-zinc-200/90 shadow-[0px_25px_70px_rgba(0,0,0,0.12)] p-8 sm:p-10 transition-all duration-300 ease-out">
 
                 {/* ── DROPDOWN: FEATURES (20 BUILT MODULES ACROSS 4 EQUAL PILLARS) ── */}
                 {activeDropdown === 'features' && (
-                  <div className="space-y-6">
+                  <div key="features-tab" className="space-y-6 animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 items-start">
 
                       {/* 1. INTELLIGENCE & AI */}
@@ -780,7 +780,7 @@ export function Navbar() {
 
                 {/* ── DROPDOWN: INDUSTRIES (4-COLUMN CLEAN MINIMALIST ARCHITECTURE) ── */}
                 {activeDropdown === 'industries' && (
-                  <div className="space-y-6">
+                  <div key="industries-tab" className="space-y-6 animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
 
                       {/* Column 1: Studio & Production */}
@@ -1044,7 +1044,7 @@ export function Navbar() {
 
                 {/* ── DROPDOWN: RESOURCES (CLEAN MONOCHROMATIC UI PREVIEW CARDS) ── */}
                 {activeDropdown === 'resources' && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                  <div key="resources-tab" className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
 
                     {/* Card 1: Free Micro-Tools & Calculators */}
                     <Link
