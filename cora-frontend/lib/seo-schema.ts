@@ -7,8 +7,11 @@ export function generatePlatformSchemas() {
     "@id": "https://heycora.in/#organization",
     "name": "Cora Platforms Inc.",
     "legalName": "Cora Platforms Inc.",
+    "alternateName": ["Cora", "HeyCora", "Cora OS", "Cora AI Co-Founder", "Co-founder for Operations, Revenue & Automation"],
     "url": "https://heycora.in",
     "logo": "https://heycora.in/apple-touch-icon.png",
+    "image": "https://heycora.in/og-image.png",
+    "description": "Cora (Co-founder for Operations, Revenue & Automation) is the autonomous AI operating system for professional service businesses, creative studios, and agencies.",
     "sameAs": [
       "https://twitter.com/dravyafolio",
       "https://linkedin.com/in/dravyafolio",
@@ -35,20 +38,81 @@ export function generatePlatformSchemas() {
     "@id": "https://heycora.in/#website",
     "url": "https://heycora.in",
     "name": "Cora",
-    "description": "A connected website and business workspace for service businesses and creative agencies.",
+    "alternateName": ["HeyCora", "Cora OS", "Cora AI Co-Founder", "Co-founder for Operations, Revenue & Automation"],
+    "description": "Cora — The AI Co-Founder for Operations, Revenue & Automation. Run your proposals, SHA-256 contracts, 18% GST invoices, and client vaults on autopilot.",
     "publisher": {
       "@id": "https://heycora.in/#organization"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://heycora.in/articles/?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
     }
+  };
+
+  const sitelinksNavigationSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": "https://heycora.in/#sitelinks",
+    "name": "Cora Primary Navigation",
+    "itemListElement": [
+      {
+        "@type": "SiteNavigationElement",
+        "position": 1,
+        "name": "Pricing",
+        "description": "Cora pricing: Free tier, Pro at ₹2,999/mo, and Enterprise plans with zero seat penalties.",
+        "url": "https://heycora.in/pricing"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 2,
+        "name": "AI Co-Founder",
+        "description": "Meet your AI Co-Founder. Autonomous operations triage, voice-to-scope audio briefs, and live RAG memory.",
+        "url": "https://heycora.in/ai-agent"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 3,
+        "name": "Features & 20 Modules",
+        "description": "Explore 20 unified modules: SHA-256 digital contracts, automated 18% GST invoicing, Kanban CRM, and crew dispatch.",
+        "url": "https://heycora.in/features"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 4,
+        "name": "Articles & Compare",
+        "description": "Educational how-to guides, Indian GST playbooks, operational benchmarks, and side-by-side competitor comparisons.",
+        "url": "https://heycora.in/articles"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 5,
+        "name": "Documentation & APIs",
+        "description": "Platform architecture guides, REST API specs, MCP gateway configuration, and developer tutorials.",
+        "url": "https://heycora.in/docs"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 6,
+        "name": "Our Story",
+        "description": "Why we built Cora: replacing 7 fragmented subscriptions with 1 intelligent AI Co-Founder.",
+        "url": "https://heycora.in/about"
+      }
+    ]
   };
 
   const softwareApplicationSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "@id": "https://heycora.in/#software",
-    "name": "Cora Studio OS",
+    "name": "Cora — The AI Co-Founder for Operations, Revenue & Automation",
+    "alternateName": "Cora Studio OS",
     "operatingSystem": "Web, macOS, Windows, iOS, Android (PWA)",
     "applicationCategory": "BusinessApplication, CRMApplication, FinancialApplication",
-    "description": "Cora connects a service business website with enquiries, client workflows, documents, billing, and AI assistance in one workspace.",
+    "description": "Cora is the autonomous AI operating system for professional service businesses, creative studios, and agencies. Run proposals, SHA-256 contracts, 18% GST invoices, and delivery on autopilot.",
     "url": "https://heycora.in",
     "featureList": [
       "Autonomous AI Co-Founder with Voice-to-Scope Execution",
@@ -72,7 +136,7 @@ export function generatePlatformSchemas() {
       {
         "@type": "Offer",
         "name": "India Studio Pro Plan",
-        "price": "3999",
+        "price": "2999",
         "priceCurrency": "INR",
         "description": "All 20 Modules, Multi-Model Frontier AI, UPI & RuPay Direct Billing, 18% GST Invoicing."
       }
@@ -85,10 +149,10 @@ export function generatePlatformSchemas() {
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "What is Cora Studio OS?",
+        "name": "What is Cora?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Cora Studio OS is a 20-in-1 autonomous operating system engineered for commercial photography studios, film production houses, wedding cinematographers, real estate brokerages, and creative agencies. It automates client proposals, SHA-256 contract signing, crew call sheets, and 18% GST invoicing."
+          "text": "Cora stands for Co-founder for Operations, Revenue & Automation. It is the autonomous AI operating system for professional service businesses, creative studios, and agencies that runs proposals, SHA-256 contracts, 18% GST invoices, crew dispatch, and client delivery on autopilot."
         }
       },
       {
@@ -110,7 +174,7 @@ export function generatePlatformSchemas() {
     ]
   };
 
-  return [organizationSchema, webSiteSchema, softwareApplicationSchema, faqSchema];
+  return [organizationSchema, webSiteSchema, sitelinksNavigationSchema, softwareApplicationSchema, faqSchema];
 }
 
 export function generateArticleSchema(article: Article) {

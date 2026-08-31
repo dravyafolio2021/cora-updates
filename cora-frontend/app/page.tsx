@@ -15,9 +15,9 @@ import { TestimonialsSection } from '@/components/testimonials/TestimonialsSecti
 import { FAQSection } from '@/components/faq/FAQSection';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Cora — Website & Business Workspace for Service Businesses' },
-  description: 'Connect your website, enquiries, client workflows, documents, billing, and AI assistance in one workspace built for service businesses.',
-  alternates: { canonical: '/' },
+  title: { absolute: 'Cora — The AI Co-Founder for Operations, Revenue & Automation' },
+  description: 'Meet Cora (Co-founder for Operations, Revenue & Automation). One AI co-founder to run your proposals, SHA-256 contracts, 18% GST invoices, crew dispatch, and client delivery on autopilot.',
+  alternates: { canonical: 'https://heycora.in/' },
 };
 
 export default function HomePage() {

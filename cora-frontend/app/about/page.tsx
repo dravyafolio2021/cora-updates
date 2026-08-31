@@ -25,10 +25,16 @@ import { CoreValuesSection } from '@/components/about/CoreValuesSection';
 import { ScrollDrivenTimeline } from '@/components/about/ScrollDrivenTimeline';
 
 export const metadata: Metadata = {
-  title: 'About Cora — The Convergence of Software, AI & Humans',
-  description: 'Meet the team behind Cora. Building the autonomous AI co-founder and operating system for modern studios, production houses, and creative agencies.',
+  title: 'Our Story & Mission — Cora AI Co-Founder',
+  description: 'Why we built Cora: replacing 7 fragmented subscriptions with 1 intelligent AI Co-Founder for professional service businesses.',
   alternates: {
-    canonical: 'https://heycora.in/about/',
+    canonical: 'https://heycora.in/about',
+  },
+  openGraph: {
+    title: 'Our Story & Mission — Cora AI Co-Founder',
+    description: 'Why we built Cora: replacing 7 fragmented subscriptions with 1 intelligent AI Co-Founder for professional service businesses.',
+    url: 'https://heycora.in/about',
+    siteName: 'Cora',
   },
 };
 

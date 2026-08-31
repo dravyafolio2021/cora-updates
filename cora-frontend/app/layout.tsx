@@ -37,20 +37,21 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Cora — Website & Business Workspace for Service Businesses',
-  description: 'Connect your website, enquiries, client workflows, documents, billing, and AI assistance in one workspace built for service businesses.',
+  title: 'Cora — The AI Co-Founder for Operations, Revenue & Automation',
+  description: 'Meet Cora (Co-founder for Operations, Revenue & Automation). One AI co-founder to run your proposals, SHA-256 contracts, 18% GST invoices, crew dispatch, and client delivery on autopilot.',
   keywords: [
-    'AI co-founder for creative studios',
-    'customer facing AI concierge',
-    'admin workspace operating system',
+    'Cora',
+    'HeyCora',
+    'AI co-founder for service businesses',
+    'operations revenue automation',
     'commercial photography CRM',
-    'film production software',
+    'creative agency operating system',
     '18% GST invoice generator',
     'SHA-256 digital signatures India',
     'HoneyBook alternative',
     'Studio Ninja alternative',
     'DocuSign alternative',
-    'wedding photography call sheets'
+    'professional services AI OS'
   ],
   metadataBase: new URL('https://heycora.in'),
   robots: {
@@ -72,25 +73,25 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   openGraph: {
-    title: 'Cora — Website & Business Workspace for Service Businesses',
-    description: 'Connect your website, enquiries, client workflows, documents, billing, and AI assistance in one workspace.',
+    title: 'Cora — The AI Co-Founder for Operations, Revenue & Automation',
+    description: 'Meet Cora (Co-founder for Operations, Revenue & Automation). Run your proposals, SHA-256 contracts, 18% GST invoices, and client vaults on autopilot.',
     url: 'https://heycora.in',
-    siteName: 'Cora Studio OS',
+    siteName: 'Cora',
     locale: 'en_US',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Cora — AI Co-Founder for Service Businesses',
+        alt: 'Cora — The AI Co-Founder for Operations, Revenue & Automation',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cora — Website & Business Workspace for Service Businesses',
-    description: 'Connect your website, enquiries, client workflows, documents, billing, and AI assistance in one workspace.',
+    title: 'Cora — The AI Co-Founder for Operations, Revenue & Automation',
+    description: 'Meet Cora (Co-founder for Operations, Revenue & Automation). Run your proposals, SHA-256 contracts, 18% GST invoices, and client vaults on autopilot.',
     images: ['/og-image.png'],
     creator: '@dravyafolio',
   },

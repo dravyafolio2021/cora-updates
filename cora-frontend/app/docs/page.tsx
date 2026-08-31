@@ -3,10 +3,16 @@ import { DOCS_DATA } from '@/lib/docs-data';
 import { DocsClient } from '@/components/docs/DocsClient';
 
 export const metadata: Metadata = {
-  title: 'Documentation — Cora Studio OS Developer Hub',
-  description: 'Complete architecture reference, API guides, and workflow documentation for Cora Studio OS.',
+  title: 'Documentation & APIs — Cora Developer Hub',
+  description: 'Platform architecture guides, REST API specs, MCP gateway configuration, and developer tutorials.',
   alternates: {
     canonical: 'https://heycora.in/docs',
+  },
+  openGraph: {
+    title: 'Documentation & APIs — Cora Developer Hub',
+    description: 'Platform architecture guides, REST API specs, MCP gateway configuration, and developer tutorials.',
+    url: 'https://heycora.in/docs',
+    siteName: 'Cora',
   },
 };
 

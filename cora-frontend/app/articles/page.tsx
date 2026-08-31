@@ -7,16 +7,17 @@ import { ArticleCard } from '@/components/articles/ArticleCard';
 import { ArticlesClientHub } from './ArticlesClientHub';
 
 export const metadata: Metadata = {
-  title: 'Articles, How-To Guides & Comparisons | Cora Studio OS',
-  description: 'Master creative studio operations, Indian 18% GST invoicing, autonomous AI agents, SHA-256 e-sign contracts, and side-by-side product comparisons.',
+  title: 'Articles & Compare — Cora Knowledge Hub',
+  description: 'Educational how-to guides, Indian GST playbooks, operational benchmarks, and side-by-side competitor comparisons.',
   openGraph: {
-    title: 'Articles, How-To Guides & Comparisons | Cora Studio OS',
-    description: 'Master creative studio operations, Indian 18% GST invoicing, autonomous AI agents, SHA-256 e-sign contracts, and side-by-side product comparisons.',
-    url: 'https://heycora.in/articles/',
+    title: 'Articles & Compare — Cora Knowledge Hub',
+    description: 'Educational how-to guides, Indian GST playbooks, operational benchmarks, and side-by-side competitor comparisons.',
+    url: 'https://heycora.in/articles',
     type: 'website',
+    siteName: 'Cora',
   },
   alternates: {
-    canonical: 'https://heycora.in/articles/',
+    canonical: 'https://heycora.in/articles',
   }
 };
 
