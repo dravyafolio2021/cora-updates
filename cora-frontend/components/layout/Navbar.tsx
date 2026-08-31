@@ -1088,124 +1088,163 @@ export function Navbar() {
                   </div>
                 )}
 
-                {/* ── DROPDOWN: RESOURCES (3 CLEAN VISUAL CARDS) ── */}
+                {/* ── DROPDOWN: RESOURCES (3 HIGH-FIDELITY CARDS WITH VECTOR ART) ── */}
                 {activeDropdown === 'resources' && (
-                  <div key="resources-tab" className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
+                  <div key="resources-tab" className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch animate-in fade-in zoom-in-[0.99] duration-200 ease-out fill-mode-forwards">
 
-                    {/* Card 1: Free Micro-Tools */}
+                    {/* Card 1: Free Micro-Tools (Emerald / Mint Theme) */}
                     <Link
                       href="/tools"
                       onClick={() => setActiveDropdown(null)}
-                      className="group rounded-2xl bg-zinc-50/50 hover:bg-white border border-zinc-200/80 hover:border-zinc-950 p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200"
+                      className="relative overflow-hidden rounded-[24px] bg-white border border-zinc-200/90 hover:border-emerald-300 p-6 sm:p-7 flex flex-col justify-between hover:shadow-lg transition-all duration-300 group"
                     >
-                      <div>
-                        <div className="flex items-center justify-between mb-3.5">
-                          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                            <Calculator className="w-4 h-4 stroke-[2]" />
+                      {/* Flowing Wave Vector Background */}
+                      <svg className="absolute -bottom-3 -right-3 w-48 h-48 pointer-events-none opacity-40 group-hover:opacity-75 transition-opacity" viewBox="0 0 200 200" fill="none">
+                        <path d="M0 200C50 160 100 180 200 120" stroke="#10B981" strokeWidth="1" strokeOpacity="0.4" />
+                        <path d="M20 200C70 150 120 170 200 100" stroke="#10B981" strokeWidth="1" strokeOpacity="0.35" />
+                        <path d="M40 200C90 140 140 160 200 80" stroke="#10B981" strokeWidth="1" strokeOpacity="0.3" />
+                        <path d="M60 200C110 130 160 150 200 60" stroke="#10B981" strokeWidth="1" strokeOpacity="0.25" />
+                        <path d="M80 200C130 120 180 140 200 40" stroke="#10B981" strokeWidth="1" strokeOpacity="0.2" />
+                      </svg>
+
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <Calculator className="w-5 h-5 stroke-[2]" />
                           </div>
-                          <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50/80 px-2.5 py-1 rounded-full border border-emerald-200/60 tracking-wider">
                             ZERO LOGIN
                           </span>
                         </div>
-                        <h3 className="text-[15px] font-bold text-zinc-950 tracking-tight group-hover:text-black mb-3">
+                        <h3 className="text-lg font-bold text-zinc-950 tracking-tight group-hover:text-black mb-4">
                           Free Micro-Tools
                         </h3>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-[12px] font-mono font-medium text-emerald-800 bg-emerald-50/40 border border-emerald-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-emerald-300 transition-colors">
                             18% GST Calculator
                           </span>
-                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                          <span className="text-[12px] font-mono font-medium text-emerald-800 bg-emerald-50/40 border border-emerald-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-emerald-300 transition-colors">
                             Listing AI
                           </span>
-                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                          <span className="text-[12px] font-mono font-medium text-emerald-800 bg-emerald-50/40 border border-emerald-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-emerald-300 transition-colors">
                             Embed Engine
                           </span>
                         </div>
                       </div>
 
-                      <div className="pt-3.5 mt-5 border-t border-zinc-200/60 flex items-center justify-between">
-                        <span className="text-xs font-semibold text-zinc-900 group-hover:text-black inline-flex items-center gap-1.5">
+                      <div className="pt-6 mt-8 relative z-10">
+                        <span className="text-sm font-bold text-emerald-700 group-hover:text-emerald-800 inline-flex items-center gap-1.5">
                           <span>Open Micro-Tools</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-0.5 transition-all" />
+                          <ArrowRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-1 transition-transform" />
                         </span>
                       </div>
                     </Link>
 
-                    {/* Card 2: Developer Hub & APIs */}
+                    {/* Card 2: Developer Hub & APIs (Indigo / Purple Theme) */}
                     <Link
                       href="/docs"
                       onClick={() => setActiveDropdown(null)}
-                      className="group rounded-2xl bg-zinc-50/50 hover:bg-white border border-zinc-200/80 hover:border-zinc-950 p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200"
+                      className="relative overflow-hidden rounded-[24px] bg-white border border-indigo-200/80 hover:border-indigo-400 p-6 sm:p-7 flex flex-col justify-between hover:shadow-lg transition-all duration-300 group ring-1 ring-indigo-500/10 shadow-[0_4px_20px_rgba(99,102,241,0.06)]"
                     >
-                      <div>
-                        <div className="flex items-center justify-between mb-3.5">
-                          <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                            <Terminal className="w-4 h-4 stroke-[2]" />
+                      {/* Flowing Wave & Particle Dot Background */}
+                      <svg className="absolute -bottom-3 -right-3 w-48 h-48 pointer-events-none opacity-50 group-hover:opacity-85 transition-opacity" viewBox="0 0 200 200" fill="none">
+                        <path d="M0 200C50 160 100 180 200 120" stroke="#6366F1" strokeWidth="1" strokeOpacity="0.4" />
+                        <path d="M20 200C70 150 120 170 200 100" stroke="#6366F1" strokeWidth="1" strokeOpacity="0.35" />
+                        <path d="M40 200C90 140 140 160 200 80" stroke="#6366F1" strokeWidth="1" strokeOpacity="0.3" />
+                        <path d="M60 200C110 130 160 150 200 60" stroke="#6366F1" strokeWidth="1" strokeOpacity="0.25" />
+                        <path d="M80 200C130 120 180 140 200 40" stroke="#6366F1" strokeWidth="1" strokeOpacity="0.2" />
+                        <circle cx="160" cy="140" r="1.5" fill="#6366F1" fillOpacity="0.5" />
+                        <circle cx="180" cy="120" r="1.5" fill="#6366F1" fillOpacity="0.5" />
+                        <circle cx="150" cy="160" r="1.5" fill="#6366F1" fillOpacity="0.4" />
+                        <circle cx="170" cy="150" r="1.5" fill="#6366F1" fillOpacity="0.4" />
+                      </svg>
+
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform font-mono font-bold text-base select-none">
+                            &gt;_
                           </div>
-                          <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200/60">
+                          <span className="text-[10px] font-mono font-bold text-indigo-700 bg-indigo-50/80 px-2.5 py-1 rounded-full border border-indigo-200/60 tracking-wider">
                             25 SPECS
                           </span>
                         </div>
-                        <h3 className="text-[15px] font-bold text-zinc-950 tracking-tight group-hover:text-black mb-3">
+                        <h3 className="text-lg font-bold text-zinc-950 tracking-tight group-hover:text-black mb-4">
                           Developer Hub &amp; APIs
                         </h3>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-[12px] font-mono font-medium text-indigo-800 bg-indigo-50/40 border border-indigo-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-indigo-300 transition-colors">
                             REST API v1
                           </span>
-                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                          <span className="text-[12px] font-mono font-medium text-indigo-800 bg-indigo-50/40 border border-indigo-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-indigo-300 transition-colors">
                             MySQL Isolation
                           </span>
-                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                          <span className="text-[12px] font-mono font-medium text-indigo-800 bg-indigo-50/40 border border-indigo-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-indigo-300 transition-colors">
                             TypeScript SDK
                           </span>
                         </div>
                       </div>
 
-                      <div className="pt-3.5 mt-5 border-t border-zinc-200/60 flex items-center justify-between">
-                        <span className="text-xs font-semibold text-zinc-900 group-hover:text-black inline-flex items-center gap-1.5">
-                          <span>Browse 25 Specs</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-0.5 transition-all" />
-                        </span>
+                      <div className="pt-6 mt-8 relative z-10">
+                        <div className="inline-flex items-center gap-2">
+                          <span className="text-sm font-bold text-indigo-600 group-hover:text-indigo-700">Browse 25 Specs</span>
+                          <span className="w-6 h-6 rounded-full bg-indigo-100/90 text-indigo-600 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                          </span>
+                        </div>
                       </div>
                     </Link>
 
-                    {/* Card 3: Guides & Comparisons */}
+                    {/* Card 3: Guides & Comparisons (Amber / Warm Gold Theme) */}
                     <Link
                       href="/articles"
                       onClick={() => setActiveDropdown(null)}
-                      className="group rounded-2xl bg-zinc-50/50 hover:bg-white border border-zinc-200/80 hover:border-zinc-950 p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200"
+                      className="relative overflow-hidden rounded-[24px] bg-white border border-zinc-200/90 hover:border-amber-300 p-6 sm:p-7 flex flex-col justify-between hover:shadow-lg transition-all duration-300 group"
                     >
-                      <div>
-                        <div className="flex items-center justify-between mb-3.5">
-                          <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                            <BookOpen className="w-4 h-4 stroke-[2]" />
+                      {/* Flowing Wave Vector Background */}
+                      <svg className="absolute -bottom-3 -right-3 w-48 h-48 pointer-events-none opacity-40 group-hover:opacity-75 transition-opacity" viewBox="0 0 200 200" fill="none">
+                        <path d="M0 200C50 160 100 180 200 120" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.4" />
+                        <path d="M20 200C70 150 120 170 200 100" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.35" />
+                        <path d="M40 200C90 140 140 160 200 80" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.3" />
+                        <path d="M60 200C110 130 160 150 200 60" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.25" />
+                        <path d="M80 200C130 120 180 140 200 40" stroke="#F59E0B" strokeWidth="1" strokeOpacity="0.2" />
+                        <circle cx="160" cy="140" r="1.5" fill="#F59E0B" fillOpacity="0.5" />
+                        <circle cx="180" cy="120" r="1.5" fill="#F59E0B" fillOpacity="0.5" />
+                        <circle cx="150" cy="160" r="1.5" fill="#F59E0B" fillOpacity="0.4" />
+                        <circle cx="170" cy="150" r="1.5" fill="#F59E0B" fillOpacity="0.4" />
+                      </svg>
+
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <BookOpen className="w-5 h-5 stroke-[2]" />
                           </div>
-                          <span className="text-[9px] font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60">
+                          <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-50/80 px-2.5 py-1 rounded-full border border-amber-200/60 tracking-wider">
                             24 GUIDES
                           </span>
                         </div>
-                        <h3 className="text-[15px] font-bold text-zinc-950 tracking-tight group-hover:text-black mb-3">
+                        <h3 className="text-lg font-bold text-zinc-950 tracking-tight group-hover:text-black mb-4">
                           Guides &amp; Comparisons
                         </h3>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-[12px] font-mono font-medium text-amber-900 bg-amber-50/40 border border-amber-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-amber-300 transition-colors">
                             vs HoneyBook
                           </span>
-                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                          <span className="text-[12px] font-mono font-medium text-amber-900 bg-amber-50/40 border border-amber-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-amber-300 transition-colors">
                             vs Studio Ninja
                           </span>
-                          <span className="text-[11px] font-mono font-medium text-zinc-600 bg-white border border-zinc-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                          <span className="text-[12px] font-mono font-medium text-amber-900 bg-amber-50/40 border border-amber-200/70 px-3 py-1.5 rounded-xl shadow-2xs group-hover:border-amber-300 transition-colors">
                             Workflows
                           </span>
                         </div>
                       </div>
 
-                      <div className="pt-3.5 mt-5 border-t border-zinc-200/60 flex items-center justify-between">
-                        <span className="text-xs font-semibold text-zinc-900 group-hover:text-black inline-flex items-center gap-1.5">
-                          <span>Browse 24 Guides</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-0.5 transition-all" />
-                        </span>
+                      <div className="pt-6 mt-8 relative z-10">
+                        <div className="inline-flex items-center gap-2">
+                          <span className="text-sm font-bold text-[#A66128] group-hover:text-[#874A1A]">Browse 24 Guides</span>
+                          <span className="w-6 h-6 rounded-full bg-amber-100/90 text-[#A66128] flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                          </span>
+                        </div>
                       </div>
                     </Link>
 
