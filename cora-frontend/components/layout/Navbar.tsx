@@ -755,25 +755,21 @@ export function Navbar() {
                     </div>
 
                     {/* ── Sleek Monochromatic Bottom Bar ── */}
-                    <div className="-mx-8 -mb-8 sm:-mx-10 sm:-mb-10 mt-8 px-8 sm:px-10 py-4 bg-zinc-50/90 rounded-b-[28px] border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                      <div className="flex items-center gap-3 text-xs text-zinc-600">
-                        <span className="flex items-center gap-1.5 font-bold text-zinc-950">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                          20 Live Modules
-                        </span>
-                        <span className="text-zinc-300">•</span>
-                        <Link href="/docs" onClick={() => setActiveDropdown(null)} className="font-semibold text-zinc-900 hover:text-black underline underline-offset-4 decoration-zinc-300">
-                          API Specs &amp; Docs →
-                        </Link>
+                    <div className="-mx-8 -mb-8 sm:-mx-10 sm:-mb-10 mt-6 px-8 sm:px-10 py-3.5 bg-zinc-50/90 rounded-b-[28px] border-t border-zinc-100 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-xs font-semibold text-zinc-900">20 Live Modules</span>
+                        <span className="text-zinc-300">·</span>
+                        <span className="text-xs text-zinc-500 font-medium">Autonomous AI, client vaults &amp; 18% GST workflows</span>
                       </div>
 
                       <div className="flex items-center gap-3">
                         <Link
-                          href="/demo"
+                          href="/docs"
                           onClick={() => setActiveDropdown(null)}
                           className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-colors"
                         >
-                          Interactive Demo
+                          API Specs &amp; Docs
                         </Link>
                         <Link
                           href="/features"
