@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { 
   Sparkles, 
@@ -22,15 +22,6 @@ import { ToolCard } from '@/components/tools/ToolCard';
 import { ToolCategoryHeroCard } from '@/components/tools/ToolCategoryHeroCard';
 import { ToolsHeroAIInput } from '@/components/tools/ToolsHeroAIInput';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
-
-const ROTATING_WORDS = [
-  'Operations',
-  'Marketing',
-  'Finance',
-  'Contracts',
-  'Productivity',
-  'Invoicing',
-];
 
 const TOOLS_FAQS = [
   {
@@ -55,21 +46,6 @@ export default function ToolsIndexPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [wordIndex, setWordIndex] = useState<number>(0);
-  const [isFlipping, setIsFlipping] = useState<boolean>(false);
-
-  // Smooth rotating highlighted word with consistent width & zero layout shift
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsFlipping(true);
-      setTimeout(() => {
-        setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length);
-        setIsFlipping(false);
-      }, 150);
-    }, 2500);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const filteredTools = useMemo(() => {
     return TOOLS_DATA.filter((tool) => {
@@ -122,22 +98,14 @@ export default function ToolsIndexPage() {
             </span>
           </div>
 
-          {/* Dynamic Highlighted Headline (Stable Layout, Rich Highlight Badge, No Wrap Flapping) */}
-          <h1 className="font-display text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.24] sm:leading-[1.18] mb-4 max-w-[960px] mx-auto">
-            <span className="inline-block">Free Tools to Make</span>{' '}
-            <span className="inline-block whitespace-nowrap">
-              <span className="inline-flex items-center justify-center px-3 sm:px-4 py-0.5 sm:py-1 rounded-xl sm:rounded-2xl bg-[#2563EB] text-white font-bold shadow-xs transition-all duration-200 min-w-[150px] sm:min-w-[210px] text-center mx-1 sm:mx-2 align-middle">
-                <span className={`transition-opacity duration-150 ${isFlipping ? 'opacity-40' : 'opacity-100'}`}>
-                  {ROTATING_WORDS[wordIndex]}
-                </span>
-              </span>
-              <span>Simple</span>
-            </span>
+          {/* Clean, Rock-Solid, SEO-Optimized Static Headline (Zero CLS, Zero Badge Bloat) */}
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.15] mb-4 max-w-[920px] mx-auto">
+            Free Tools to Make Business Operations Simple
           </h1>
 
           {/* Subtitle */}
           <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[660px] mx-auto mb-8">
-            Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and developer embeds.
+            Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and dynamic UPI QR generation.
           </p>
 
           {/* ── Central AI Copilot Input Capsule ── */}
