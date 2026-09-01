@@ -19,12 +19,14 @@ export function Footer() {
     '/sla',
     '/contact'
   ].includes(pathname || '');
+  const isToolDetailPage = pathname?.startsWith('/tools/') && pathname !== '/tools';
+  const shouldHideFooterCta = is404 || isLegalPage || isDocsPage || isToolDetailPage;
 
   return (
     <footer className="relative w-full overflow-hidden pt-12 sm:pt-16 pb-12">
       
-      {/* ── Background Landscape Horizon (Hidden on 404, Docs & Legal Pages) ── */}
-      {!is404 && !isLegalPage && !isDocsPage && (
+      {/* ── Background Landscape Horizon (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
+      {!shouldHideFooterCta && (
         <div className="absolute inset-0 pointer-events-none select-none z-0">
           <Image
             src="/images/cora_hero_landscape.jpg"
@@ -40,8 +42,8 @@ export function Footer() {
 
       <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6">
         
-        {/* ── Top Conversion CTA Banner (Hidden on 404, Docs & Legal Pages) ── */}
-        {!is404 && !isLegalPage && !isDocsPage && (
+        {/* ── Top Conversion CTA Banner (Hidden on 404, Docs, Legal & Tool Detail Pages) ── */}
+        {!shouldHideFooterCta && (
           <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20">
             {pathname?.startsWith('/tools') ? (
               <>
