@@ -11,7 +11,6 @@ import {
   Minus,
   Zap,
   Lock,
-  Flame,
   Check
 } from 'lucide-react';
 import { 
@@ -94,22 +93,22 @@ export default function ToolsIndexPage() {
   return (
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. HIGH-TRUST "TROJAN HORSE" PURE SKY HERO ── */}
-      <section className="relative w-full pt-16 sm:pt-24 pb-12 sm:pb-16 overflow-hidden border-b border-zinc-100">
+      {/* ── 1. CLEAN HIGH-AUTHORITY PURE SKY HERO ── */}
+      <section className="relative w-full pt-12 sm:pt-20 pb-10 sm:pb-16 overflow-hidden border-b border-zinc-100">
         <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
-          {/* High-Authority Status Badge */}
-          <div className="mb-4 sm:mb-5">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-zinc-900 border border-white/90 text-xs font-semibold shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Public Utility Suite for Indian Service Businesses</span>
+          {/* Streamlined Status Badge */}
+          <div className="mb-3 sm:mb-5">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-zinc-900 border border-white/90 text-[11px] sm:text-xs font-semibold shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>6 Free Turnkey Micro-Tools</span>
             </span>
           </div>
 
-          {/* Headline with Stable 2-Line Structure & Zero-Adjustment Word Lock */}
-          <h1 className="font-display text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.18] sm:leading-[1.14] mb-4 max-w-[960px] mx-auto">
+          {/* Clean 2-Line Headline (Mobile Proportions Fixed) */}
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.16] sm:leading-[1.14] mb-3 sm:mb-4 max-w-[960px] mx-auto">
             <span className="block">Free Tools to Make</span>
             <span className="block mt-1 sm:mt-2">
               <span className="inline-flex items-baseline justify-center gap-2 sm:gap-3">
@@ -117,7 +116,7 @@ export default function ToolsIndexPage() {
                   <span>{currentItem.word}</span>
                   <svg
                     key={currentItem.word}
-                    className="absolute -bottom-1 left-0 w-full h-2.5 sm:h-3.5 overflow-visible pointer-events-none animate-in fade-in zoom-in-95 duration-200"
+                    className="absolute -bottom-0.5 sm:-bottom-1 left-0 w-full h-2.5 sm:h-3.5 overflow-visible pointer-events-none animate-in fade-in zoom-in-95 duration-200"
                     viewBox="0 0 100 12"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -137,12 +136,12 @@ export default function ToolsIndexPage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[660px] mx-auto mb-6 sm:mb-8">
-            Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and dynamic UPI QR generation. 
+          <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[620px] mx-auto mb-5 sm:mb-8">
+            Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and dynamic UPI QR generation.
           </p>
 
-          {/* ── High-Trust Trojan Horse Value Pillars (Instant Confidence) ── */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-8 sm:mb-10 text-xs sm:text-sm font-medium text-zinc-700">
+          {/* ── High-Trust Value Pillars (Desktop-only to keep mobile ultra-clean) ── */}
+          <div className="hidden sm:flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-8 text-xs sm:text-sm font-medium text-zinc-700">
             <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
               <Check className="w-3.5 h-3.5 text-emerald-600 font-bold" />
               <span>100% Free Forever</span>
@@ -162,23 +161,26 @@ export default function ToolsIndexPage() {
           </div>
 
           {/* ── Central AI Copilot Input Capsule ── */}
-          <div className="mb-10 sm:mb-14">
+          <div className="mb-8 sm:mb-12">
             <ToolsHeroAIInput
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
             />
           </div>
 
-          {/* ── 2. HORIZONTAL ROW OF LUMINOUS CATEGORY CARDS ── */}
-          <div className="w-full overflow-x-auto pb-4 pt-1 scrollbar-none">
-            <div className="flex lg:grid lg:grid-cols-6 gap-3 sm:gap-4 min-w-max lg:min-w-0 justify-start lg:justify-between px-1">
-              {TOOL_CATEGORY_BLOCKS.map((block) => (
-                <ToolCategoryHeroCard key={block.id} block={block} />
-              ))}
-            </div>
-          </div>
-
         </div>
+
+        {/* ── 2. AUTONOMOUS INFINITE MARQUEE TRACK (NO MANUAL HORIZONTAL SCROLL) ── */}
+        <div className="w-full overflow-hidden select-none py-2 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+          <div className="flex min-w-full shrink-0 items-center justify-around gap-4 sm:gap-5 animate-marquee hover:[animation-play-state:paused]">
+            {TOOL_CATEGORY_BLOCKS.concat(TOOL_CATEGORY_BLOCKS).map((block, idx) => (
+              <div key={`${block.id}-${idx}`} className="shrink-0 w-[210px] sm:w-[225px]">
+                <ToolCategoryHeroCard block={block} />
+              </div>
+            ))}
+          </div>
+        </div>
+
       </section>
 
       {/* ── 3. METRICS RIBBON (CALIBRATED 1K-5K USAGE & EFFICIENCY) ── */}
