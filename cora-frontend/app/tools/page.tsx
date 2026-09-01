@@ -1,23 +1,17 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  Search, 
+  Sparkles, 
   ArrowRight, 
   CheckCircle2, 
   ShieldCheck, 
   Plus, 
   Minus,
-  Sparkles,
   Zap,
   Layers,
-  ChevronRight,
-  Calculator,
-  Receipt,
-  Scale,
-  Code,
-  QrCode
+  ChevronRight
 } from 'lucide-react';
 import { 
   TOOLS_DATA, 
@@ -27,7 +21,17 @@ import {
 } from '@/lib/tools-data';
 import { ToolCard } from '@/components/tools/ToolCard';
 import { ToolCategoryHeroCard } from '@/components/tools/ToolCategoryHeroCard';
-import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
+import { ToolsHeroAIInput } from '@/components/tools/ToolsHeroAIInput';
+
+const ROTATING_WORDS = [
+  'Operations',
+  'Marketing',
+  'Finance',
+  'Sales',
+  'Productivity',
+  'Contracts',
+  'Invoicing',
+];
 
 const TOOLS_FAQS = [
   {
@@ -52,6 +56,21 @@ export default function ToolsIndexPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [wordIndex, setWordIndex] = useState<number>(0);
+  const [isFlipping, setIsFlipping] = useState<boolean>(false);
+
+  // Auto-rotating highlighted word effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsFlipping(true);
+      setTimeout(() => {
+        setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length);
+        setIsFlipping(false);
+      }, 250);
+    }, 2400);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const filteredTools = useMemo(() => {
     return TOOLS_DATA.filter((tool) => {
@@ -74,25 +93,33 @@ export default function ToolsIndexPage() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const toolsGrid = document.getElementById('tools-directory');
-    if (toolsGrid) {
-      toolsGrid.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. SIGNATURE ATMOSPHERIC PURE SKY HERO ── */}
+      {/* ── 1. DEDICATED LUMINOUS ATMOSPHERIC HERO SECTION ── */}
       <section className="relative w-full pt-16 sm:pt-24 pb-12 sm:pb-16 overflow-hidden border-b border-zinc-100">
-        <ArtisticHeroBackground tone="neutral" />
+        
+        {/* Dedicated Soft Luminous Gradient Aura (Unique for Tools, not duplicating sky image) */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse 90% 60% at 50% -10%, rgba(99, 102, 241, 0.12) 0%, rgba(236, 72, 153, 0.05) 45%, rgba(255, 255, 255, 0) 80%), #ffffff',
+          }}
+        />
+
+        {/* Delicate Micro-Dot Grid */}
+        <div 
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, #000 1px, transparent 0)`,
+            backgroundSize: '24px 24px'
+          }}
+        />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
           {/* Breadcrumbs */}
-          <nav className="inline-flex items-center gap-1.5 text-xs text-zinc-600 font-medium mb-4">
+          <nav className="inline-flex items-center gap-1.5 text-xs text-zinc-500 font-medium mb-4">
             <Link href="/" className="hover:text-zinc-950 transition-colors">
               Home
             </Link>
@@ -104,7 +131,7 @@ export default function ToolsIndexPage() {
 
           {/* Glassmorphic Status Pill */}
           <div className="mb-4">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 backdrop-blur-md text-zinc-900 border border-white/90 text-xs font-semibold shadow-2xs">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200/80 text-xs font-semibold shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>6 Free Turnkey Utilities</span>
               <span className="text-zinc-300">•</span>
@@ -112,11 +139,15 @@ export default function ToolsIndexPage() {
             </span>
           </div>
 
-          {/* Main Headline with Glassmorphic Accent Badge */}
+          {/* Dynamic Headline with Animated Rotating Word */}
           <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.18] mb-4 max-w-[880px] mx-auto">
             Free Tools to Make{' '}
-            <span className="inline-flex items-center justify-center px-3.5 py-0.5 rounded-2xl bg-white/90 backdrop-blur-md border border-white shadow-xs text-zinc-950 font-bold mx-1">
-              Operations
+            <span 
+              className={`inline-flex items-center justify-center px-4 py-0.5 rounded-2xl bg-white/90 backdrop-blur-md border border-zinc-200/90 shadow-xs text-zinc-950 font-bold mx-1 transition-all duration-300 min-w-[140px] sm:min-w-[180px] ${
+                isFlipping ? 'opacity-0 scale-95 -translate-y-1' : 'opacity-100 scale-100 translate-y-0'
+              }`}
+            >
+              {ROTATING_WORDS[wordIndex]}
             </span>{' '}
             Simple
           </h1>
@@ -126,28 +157,13 @@ export default function ToolsIndexPage() {
             Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and developer embeds.
           </p>
 
-          {/* Central Elevated Search Capsule */}
-          <form 
-            onSubmit={handleSearchSubmit}
-            className="max-w-[560px] mx-auto bg-white/95 backdrop-blur-md rounded-full p-1.5 sm:p-2 border border-white/90 shadow-[0_12px_36px_rgba(0,0,0,0.06)] flex items-center justify-between gap-2 mb-10 sm:mb-14 focus-within:border-zinc-950 focus-within:ring-4 focus-within:ring-zinc-950/5 transition-all"
-          >
-            <div className="flex items-center gap-2.5 pl-3 flex-1">
-              <Search className="w-4 h-4 text-zinc-400 shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search tools (e.g. GST calculator, retainer math, NDA)..."
-                className="w-full bg-transparent text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none font-medium"
-              />
-            </div>
-            <button
-              type="submit"
-              className="px-6 py-2 sm:py-2.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white font-semibold text-xs sm:text-sm transition-all shadow-xs cursor-pointer shrink-0"
-            >
-              Search
-            </button>
-          </form>
+          {/* ── Central AI Copilot Input Capsule ── */}
+          <div className="mb-10 sm:mb-14">
+            <ToolsHeroAIInput
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
+          </div>
 
           {/* ── 2. HORIZONTAL ROW OF LUMINOUS CATEGORY CARDS ── */}
           <div className="w-full overflow-x-auto pb-4 pt-1 scrollbar-none">
