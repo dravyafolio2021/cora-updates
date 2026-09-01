@@ -27,9 +27,9 @@ const ROTATING_WORDS = [
   'Operations',
   'Marketing',
   'Finance',
-  'Sales',
-  'Productivity',
   'Contracts',
+  'Productivity',
+  'Invoicing',
 ];
 
 const TOOLS_FAQS = [
@@ -58,15 +58,15 @@ export default function ToolsIndexPage() {
   const [wordIndex, setWordIndex] = useState<number>(0);
   const [isFlipping, setIsFlipping] = useState<boolean>(false);
 
-  // Auto-rotating highlighted word effect with zero layout shift
+  // Smooth rotating highlighted word with consistent width & zero layout shift
   useEffect(() => {
     const interval = setInterval(() => {
       setIsFlipping(true);
       setTimeout(() => {
         setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length);
         setIsFlipping(false);
-      }, 200);
-    }, 2400);
+      }, 150);
+    }, 2500);
 
     return () => clearInterval(interval);
   }, []);
@@ -122,19 +122,17 @@ export default function ToolsIndexPage() {
             </span>
           </div>
 
-          {/* Dynamic Headline (Zero CLS, Clean Typography, No Awkward Outline) */}
-          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.18] mb-4 max-w-[880px] mx-auto">
-            Free Tools to Make{' '}
-            <span className="inline-block relative overflow-hidden align-bottom">
-              <span 
-                className={`inline-block text-zinc-950 font-extrabold transition-all duration-200 ${
-                  isFlipping ? 'opacity-0 -translate-y-2 scale-95' : 'opacity-100 translate-y-0 scale-100'
-                }`}
-              >
-                {ROTATING_WORDS[wordIndex]}
+          {/* Dynamic Highlighted Headline (Stable Layout, Rich Highlight Badge, No Wrap Flapping) */}
+          <h1 className="font-display text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.24] sm:leading-[1.18] mb-4 max-w-[960px] mx-auto">
+            <span className="inline-block">Free Tools to Make</span>{' '}
+            <span className="inline-block whitespace-nowrap">
+              <span className="inline-flex items-center justify-center px-3 sm:px-4 py-0.5 sm:py-1 rounded-xl sm:rounded-2xl bg-[#2563EB] text-white font-bold shadow-xs transition-all duration-200 min-w-[150px] sm:min-w-[210px] text-center mx-1 sm:mx-2 align-middle">
+                <span className={`transition-opacity duration-150 ${isFlipping ? 'opacity-40' : 'opacity-100'}`}>
+                  {ROTATING_WORDS[wordIndex]}
+                </span>
               </span>
-            </span>{' '}
-            Simple
+              <span>Simple</span>
+            </span>
           </h1>
 
           {/* Subtitle */}
@@ -162,7 +160,7 @@ export default function ToolsIndexPage() {
         </div>
       </section>
 
-      {/* ── 3. METRICS RIBBON (REALISTIC 1K-5K RANGE, USAGE & PRODUCTIVITY) ── */}
+      {/* ── 3. METRICS RIBBON (CALIBRATED 1K-5K USAGE & EFFICIENCY) ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-3 mb-12 sm:mb-16">
         <div className="rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-purple-50/70 border border-blue-100/80 p-6 sm:p-8 shadow-xs">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center divide-y sm:divide-y-0 sm:divide-x divide-blue-200/50">
