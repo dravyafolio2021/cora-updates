@@ -183,52 +183,52 @@ export default function ToolsIndexPage() {
 
       </section>
 
-      {/* ── 3. METRICS RIBBON (CALIBRATED 1K-5K USAGE & EFFICIENCY) ── */}
+      {/* ── 3. METRICS RIBBON (CLEAN MINIMAL CARD & PRECISE BORDERS) ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-3 mb-10 sm:mb-16">
-        <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-purple-50/70 border border-blue-100/80 p-4 sm:p-8 shadow-xs">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 items-center divide-y sm:divide-y-0 sm:divide-x divide-blue-200/50">
+        <div className="rounded-2xl sm:rounded-3xl bg-white border border-zinc-200/90 p-4 sm:p-7 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 items-center divide-y sm:divide-y-0 sm:divide-x divide-zinc-100">
             
             {/* Metric 1: Monthly Usage */}
-            <div className="flex items-center gap-2.5 sm:gap-3 pt-2 sm:pt-0 sm:px-4">
-              <div className="font-display text-xl sm:text-3xl font-bold text-blue-600 tracking-tight">
+            <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-4">
+              <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
                 3,840+
               </div>
               <div className="text-left">
-                <span className="block text-[11px] sm:text-xs font-bold text-zinc-900 leading-tight">Monthly</span>
-                <span className="block text-[10px] sm:text-[11px] text-zinc-500 leading-tight">Tools Executed</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Monthly</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Tools Executed</span>
               </div>
             </div>
 
             {/* Metric 2: Productivity Speedup */}
-            <div className="flex items-center gap-2.5 sm:gap-3 pt-2 sm:pt-0 sm:px-4">
-              <div className="font-display text-xl sm:text-3xl font-bold text-emerald-600 tracking-tight">
+            <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-4">
+              <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
                 4.8x
               </div>
               <div className="text-left">
-                <span className="block text-[11px] sm:text-xs font-bold text-zinc-900 leading-tight">Workflow</span>
-                <span className="block text-[10px] sm:text-[11px] text-zinc-500 leading-tight">Speed Up</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Workflow</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Speed Up</span>
               </div>
             </div>
 
             {/* Metric 3: Weekly Hours Saved */}
-            <div className="flex items-center gap-2.5 sm:gap-3 pt-2 sm:pt-0 sm:px-4">
-              <div className="font-display text-xl sm:text-3xl font-bold text-purple-600 tracking-tight">
+            <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-4">
+              <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
                 12+ hrs
               </div>
               <div className="text-left">
-                <span className="block text-[11px] sm:text-xs font-bold text-zinc-900 leading-tight">Time Saved</span>
-                <span className="block text-[10px] sm:text-[11px] text-zinc-500 leading-tight">Per Studio / Wk</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Time Saved</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Per Studio / Wk</span>
               </div>
             </div>
 
             {/* Metric 4: Accessibility */}
-            <div className="flex items-center gap-2.5 sm:gap-3 pt-2 sm:pt-0 sm:px-4">
-              <div className="font-display text-xl sm:text-3xl font-bold text-amber-600 tracking-tight">
+            <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-4">
+              <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
                 100%
               </div>
               <div className="text-left">
-                <span className="block text-[11px] sm:text-xs font-bold text-zinc-900 leading-tight">Free</span>
-                <span className="block text-[10px] sm:text-[11px] text-zinc-500 leading-tight">Zero Login</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Free</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Zero Login</span>
               </div>
             </div>
 
