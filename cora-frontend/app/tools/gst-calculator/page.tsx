@@ -186,56 +186,56 @@ Generated via Cora Tools (https://heycora.in/tools/gst-calculator)`;
 
         </div>
 
-        {/* Right Output Engine Card (5 Cols) */}
-        <div className="md:col-span-5 rounded-3xl bg-zinc-950 text-white p-6 shadow-sm flex flex-col justify-between border border-zinc-800">
+        {/* Right Output Engine Card (5 Cols — Clean Light Minimal Design) */}
+        <div className="md:col-span-5 rounded-3xl bg-zinc-50 border border-zinc-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-800 text-xs">
-              <span className="font-mono text-zinc-400 uppercase tracking-wider font-semibold">
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-200 text-xs">
+              <span className="font-mono text-zinc-500 uppercase tracking-wider font-semibold">
                 Invoice Summary
               </span>
-              <span className="text-[11px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/60 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-mono text-indigo-700 bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 rounded-full font-bold">
                 {gstRate}% {taxMode}
               </span>
             </div>
 
             <div className="space-y-3 font-mono text-xs">
-              <div className="flex justify-between text-zinc-300">
+              <div className="flex justify-between text-zinc-600">
                 <span>Net Base Value:</span>
-                <span className="font-bold text-white">
+                <span className="font-bold text-zinc-950">
                   ₹{baseAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </span>
               </div>
 
               {!isInterstate ? (
                 <>
-                  <div className="flex justify-between text-zinc-400">
+                  <div className="flex justify-between text-zinc-500">
                     <span>CGST ({(gstRate / 2)}%):</span>
-                    <span>₹{cgstAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                    <span className="font-medium text-zinc-800">₹{cgstAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="flex justify-between text-zinc-400">
+                  <div className="flex justify-between text-zinc-500">
                     <span>SGST ({(gstRate / 2)}%):</span>
-                    <span>₹{sgstAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                    <span className="font-medium text-zinc-800">₹{sgstAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                   </div>
                 </>
               ) : (
-                <div className="flex justify-between text-zinc-400">
+                <div className="flex justify-between text-zinc-500">
                   <span>IGST ({gstRate}%):</span>
-                  <span>₹{igstAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                  <span className="font-medium text-zinc-800">₹{igstAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                 </div>
               )}
 
-              <div className="flex justify-between text-amber-400 font-bold pt-2 border-t border-zinc-800/80">
+              <div className="flex justify-between text-indigo-600 font-bold pt-2.5 border-t border-zinc-200">
                 <span>Total Tax ({gstRate}%):</span>
                 <span>+₹{gstAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
               </div>
             </div>
 
             {/* Total Highlight */}
-            <div className="mt-6 pt-4 border-t border-zinc-800">
-              <span className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-1">
+            <div className="mt-5 pt-4 border-t border-zinc-200">
+              <span className="block text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">
                 Gross Invoice Total
               </span>
-              <div className="text-2xl sm:text-3xl font-mono font-extrabold text-white tracking-tight">
+              <div className="text-2xl sm:text-3xl font-mono font-extrabold text-zinc-950 tracking-tight">
                 ₹{totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </div>
             </div>
@@ -245,16 +245,16 @@ Generated via Cora Tools (https://heycora.in/tools/gst-calculator)`;
           <button
             type="button"
             onClick={copyBreakdown}
-            className="w-full mt-6 py-3 px-4 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
+            className="w-full mt-6 py-3 px-4 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
           >
             {copied ? (
               <>
-                <Check className="w-4 h-4 text-emerald-600" />
+                <Check className="w-4 h-4 text-emerald-400" />
                 <span>Copied to Clipboard!</span>
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4" />
+                <Copy className="w-4 h-4 text-zinc-400" />
                 <span>Copy Tax Breakdown</span>
               </>
             )}

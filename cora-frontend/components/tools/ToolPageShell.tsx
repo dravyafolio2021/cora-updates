@@ -9,9 +9,9 @@ import {
   CheckCircle2, 
   ShieldCheck, 
   Zap, 
-  Lock 
+  Lock,
+  ExternalLink
 } from 'lucide-react';
-import { TOOL_CATEGORY_BLOCKS, ToolCategoryBlock } from '@/lib/tools-data';
 
 export interface ToolPageShellProps {
   toolId: string;
@@ -74,7 +74,7 @@ export function ToolPageShell({
           {/* ══════════════════════════════════════════════════════════════
               70% LEFT SECTION (The Actual Working Interactive Tool)
               ══════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-8 space-y-8">
+          <div className="lg:col-span-8 space-y-6 sm:space-y-8">
             
             {/* The Tool Engine */}
             <div className="w-full">
@@ -85,7 +85,7 @@ export function ToolPageShell({
             <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 flex flex-wrap items-center justify-between gap-3 text-xs text-zinc-600">
               <div className="flex items-center gap-2">
                 <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="font-medium">100% Client-Side Execution (Zero data transmitted or stored)</span>
+                <span className="font-medium">100% Client-Side Execution (Zero financial or client data stored)</span>
               </div>
               <div className="flex items-center gap-2 font-mono text-[11px] text-zinc-500">
                 <Zap className="w-3 h-3 text-amber-500 shrink-0" />
@@ -117,69 +117,64 @@ export function ToolPageShell({
           </div>
 
           {/* ══════════════════════════════════════════════════════════════
-              30% RIGHT SECTION (Cora Plan Promotion & Upgrade Block)
+              30% RIGHT SECTION (High-Converting Product Advertisement Card)
               ══════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-5">
+          <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
             
-            {/* Main Cora Promotion Card */}
-            <div className="rounded-3xl bg-zinc-950 text-white p-6 sm:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative overflow-hidden border border-zinc-800">
-              {/* Subtle Atmospheric Top Glow */}
-              <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
-
-              <div className="relative z-10 space-y-5">
-                
-                {/* Header Tag */}
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-[11px] font-mono font-semibold border border-white/10">
-                  <Sparkles className="w-3 h-3 text-amber-400" />
-                  <span>Cora Autonomous OS</span>
-                </div>
-
-                {/* Promo Heading & Value */}
-                <div>
-                  <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white mb-2 leading-snug">
-                    {promoTitle}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-zinc-400 font-normal leading-relaxed">
-                    {promoSubtitle}
-                  </p>
-                </div>
-
-                {/* Highlight Checkmarks */}
-                <div className="space-y-2.5 pt-2 border-t border-zinc-800">
-                  {promoHighlights.map((hl, idx) => (
-                    <div key={idx} className="flex items-start gap-2.5 text-xs text-zinc-300 font-medium">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <span>{hl}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Direct CTA */}
-                <div className="pt-3">
-                  <a
-                    href="http://cora.local/workspace/login"
-                    className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs sm:text-sm transition-all shadow-md hover:scale-[1.02] cursor-pointer"
-                  >
-                    <span>{promoCtaText}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                  <span className="block text-center text-[11px] text-zinc-500 mt-2.5 font-medium">
-                    100% Free Forever • Setup in 2 mins
-                  </span>
-                </div>
-
+            {/* Main Sponsored Product Ad Billboard */}
+            <div className="rounded-3xl bg-gradient-to-b from-[#F4F7FF] via-[#EEF2FF] to-white border-2 border-indigo-200/90 p-6 sm:p-7 shadow-[0_16px_40px_rgba(79,70,229,0.08)] relative overflow-hidden flex flex-col justify-between">
+              
+              {/* Top Sponsor Pill */}
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider shadow-2xs">
+                  <Sparkles className="w-3 h-3 text-amber-300" />
+                  <span>Cora Platform Ad</span>
+                </span>
+                <span className="text-[10px] font-mono text-indigo-600 font-bold">
+                  Free Tier Available
+                </span>
               </div>
+
+              {/* Ad Copy */}
+              <div className="space-y-3 mb-5">
+                <h3 className="font-display text-lg sm:text-xl font-extrabold tracking-tight text-zinc-950 leading-snug">
+                  {promoTitle}
+                </h3>
+                <p className="text-xs text-zinc-600 font-normal leading-relaxed">
+                  {promoSubtitle}
+                </p>
+              </div>
+
+              {/* Feature Checklist */}
+              <div className="space-y-2.5 py-3.5 border-y border-indigo-100/90 mb-5">
+                {promoHighlights.map((hl, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-xs text-zinc-800 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                    <span>{hl}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* High-Contrast Conversion CTA Button */}
+              <div>
+                <a
+                  href="http://cora.local/workspace/login"
+                  className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:scale-[1.02] cursor-pointer"
+                >
+                  <span>{promoCtaText}</span>
+                  <ArrowRight className="w-4 h-4 text-zinc-400" />
+                </a>
+                <span className="block text-center text-[10.5px] text-zinc-500 mt-2 font-medium">
+                  Instant Access • Zero Credit Card • Setup in 2 mins
+                </span>
+              </div>
+
             </div>
 
-            {/* Secondary Trust Card */}
-            <div className="rounded-2xl bg-zinc-50 border border-zinc-200/80 p-4 text-xs text-zinc-600 space-y-2">
-              <div className="flex items-center gap-2 font-bold text-zinc-900">
-                <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
-                <span>Statutory Indian Compliance</span>
-              </div>
-              <p className="text-[11.5px] text-zinc-500 leading-relaxed">
-                Calculations conform to Section 10A IT Act 2000, SAC 9983 tax classifications, and NPCI UPI 2.0 intent specifications.
-              </p>
+            {/* Subtle Statutory Tag */}
+            <div className="rounded-2xl bg-white border border-zinc-200/80 p-3.5 text-[11px] text-zinc-500 flex items-center gap-2 shadow-2xs">
+              <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
+              <span>Compliant with Indian IT Act 2000 &amp; SAC 9983 standard.</span>
             </div>
 
           </div>
