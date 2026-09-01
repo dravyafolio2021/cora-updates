@@ -59,21 +59,32 @@ Generated via Cora Tools (https://heycora.in/tools/gst-calculator)`;
     }
   ];
 
+  const gstPainPoints = [
+    {
+      problem: 'Manual calculation & copy-pasting numbers into Canva / Word PDFs',
+      solution: 'Cora auto-generates 18% GST e-invoices directly from client chats',
+    },
+    {
+      problem: 'Chasing clients for payment screenshots & bank reference IDs',
+      solution: 'Instant 0% fee UPI QR codes with automated reconciliation',
+    },
+    {
+      problem: 'Manually calculating split CGST/SGST vs IGST for each state',
+      solution: 'Automatic state jurisdiction detection and 1-click Tally/Zoho sync',
+    },
+  ];
+
   return (
     <ToolPageShell
       toolId="gst-calculator"
       badgeTag="🇮🇳 Indian Tax Standard"
       title="Indian GST & B2B Invoice Calculator"
       subtitle="Calculate instant 18%, 12%, 5%, and 28% GST breakdowns with CGST/SGST vs IGST segregation for B2B client invoices and freelance retainers."
+      promoImage="/images/cora_gst_upi_3d.jpg"
       promoTitle="Automate GST Invoicing & Client Portals"
-      promoSubtitle="Cora auto-generates compliant SAC 9983 tax invoices, collects via 0% fee UPI QR, and reconciles payments directly in client WhatsApp portals."
-      promoHighlights={[
-        'Auto-split 18% CGST & SGST on client proposals',
-        'Instant 0% fee UPI 2.0 payment QR generation',
-        'WhatsApp milestone notifications & receipt dispatch',
-        'Direct export to Tally Prime, Zoho Books & QuickBooks',
-      ]}
-      promoCtaText="Launch Free Workspace"
+      promoSubtitle="Stop recalculating invoices manually. Cora turns client conversations into automated 18% GST proposals, digital contracts, and UPI payment links on autopilot."
+      painPoints={gstPainPoints}
+      promoCtaText="Automate Your Entire Business Free"
       faqItems={gstFaqs}
     >
       {/* ── 70% Tool Engine (Interactive 2-Card Layout) ── */}

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   ArrowLeft, 
   Sparkles, 
@@ -10,7 +11,7 @@ import {
   ShieldCheck, 
   Zap, 
   Lock,
-  ExternalLink
+  XCircle
 } from 'lucide-react';
 
 export interface ToolPageShellProps {
@@ -19,9 +20,10 @@ export interface ToolPageShellProps {
   title: string;
   subtitle: string;
   children: React.ReactNode;
+  promoImage?: string;
   promoTitle: string;
   promoSubtitle: string;
-  promoHighlights: string[];
+  painPoints: Array<{ problem: string; solution: string }>;
   promoCtaText?: string;
   faqItems?: Array<{ question: string; answer: string }>;
   relatedToolSlugs?: string[];
@@ -33,10 +35,11 @@ export function ToolPageShell({
   title,
   subtitle,
   children,
+  promoImage = '/images/cora_gst_upi_3d.jpg',
   promoTitle,
   promoSubtitle,
-  promoHighlights,
-  promoCtaText = 'Launch Free Workspace',
+  painPoints = [],
+  promoCtaText = 'Automate Your Entire Business Free',
   faqItems,
   relatedToolSlugs = [],
 }: ToolPageShellProps) {
@@ -117,64 +120,89 @@ export function ToolPageShell({
           </div>
 
           {/* ══════════════════════════════════════════════════════════════
-              30% RIGHT SECTION (High-Converting Product Advertisement Card)
+              30% RIGHT SECTION (Inspiring Borderless Ad Creative)
               ══════════════════════════════════════════════════════════════ */}
           <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
             
-            {/* Main Sponsored Product Ad Billboard */}
-            <div className="rounded-3xl bg-gradient-to-b from-[#F4F7FF] via-[#EEF2FF] to-white border-2 border-indigo-200/90 p-6 sm:p-7 shadow-[0_16px_40px_rgba(79,70,229,0.08)] relative overflow-hidden flex flex-col justify-between">
+            {/* Inspiring Ad Creative Container (No Outline, Elevated Shadow) */}
+            <div className="rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col justify-between">
               
-              {/* Top Sponsor Pill */}
-              <div className="flex items-center justify-between gap-2 mb-4">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider shadow-2xs">
-                  <Sparkles className="w-3 h-3 text-amber-300" />
-                  <span>Cora Platform Ad</span>
-                </span>
-                <span className="text-[10px] font-mono text-indigo-600 font-bold">
-                  Free Tier Available
-                </span>
+              {/* Top Hero Image Banner */}
+              <div className="relative w-full h-44 sm:h-48 overflow-hidden bg-zinc-950">
+                <Image
+                  src={promoImage}
+                  alt={promoTitle}
+                  fill
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 768px) 100vw, 400px"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-black/20" />
+                
+                {/* Floating Sponsor Pill */}
+                <div className="absolute top-3 left-3">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-zinc-950 text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">
+                    <Sparkles className="w-3 h-3 text-amber-500" />
+                    <span>Cora Autonomous OS</span>
+                  </span>
+                </div>
+
+                {/* Bottom Image Headline Overlay */}
+                <div className="absolute bottom-3 left-4 right-4">
+                  <span className="text-[10.5px] font-mono text-emerald-400 font-bold uppercase tracking-wider block mb-0.5">
+                    Upgrade to Autopilot
+                  </span>
+                  <h3 className="text-base sm:text-lg font-bold text-white leading-tight tracking-tight">
+                    {promoTitle}
+                  </h3>
+                </div>
               </div>
 
-              {/* Ad Copy */}
-              <div className="space-y-3 mb-5">
-                <h3 className="font-display text-lg sm:text-xl font-extrabold tracking-tight text-zinc-950 leading-snug">
-                  {promoTitle}
-                </h3>
-                <p className="text-xs text-zinc-600 font-normal leading-relaxed">
+              {/* Ad Creative Body */}
+              <div className="p-5 sm:p-6 space-y-4">
+                
+                {/* Subtitle */}
+                <p className="text-xs text-zinc-600 leading-relaxed font-normal">
                   {promoSubtitle}
                 </p>
+
+                {/* Pain Points vs Solutions Transformation */}
+                <div className="space-y-3 pt-2 border-t border-zinc-100">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400 block">
+                    Why Manual Tools Slow You Down:
+                  </span>
+                  
+                  {painPoints.map((item, idx) => (
+                    <div key={idx} className="space-y-1 text-xs">
+                      {/* Pain Point */}
+                      <div className="flex items-start gap-1.5 text-zinc-400 line-through decoration-zinc-300">
+                        <XCircle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
+                        <span className="text-[11px] leading-tight">{item.problem}</span>
+                      </div>
+                      {/* Cora Solution */}
+                      <div className="flex items-start gap-1.5 text-zinc-900 font-semibold pl-5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <span className="text-[11.5px] leading-tight">{item.solution}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* High-Converting Full Platform CTA */}
+                <div className="pt-2">
+                  <a
+                    href="http://cora.local/workspace/login"
+                    className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:scale-[1.02] cursor-pointer"
+                  >
+                    <span>{promoCtaText}</span>
+                    <ArrowRight className="w-4 h-4 text-zinc-400" />
+                  </a>
+                  <span className="block text-center text-[10.5px] text-zinc-500 mt-2 font-medium">
+                    100% Free Forever • Zero Setup Fees
+                  </span>
+                </div>
+
               </div>
 
-              {/* Feature Checklist */}
-              <div className="space-y-2.5 py-3.5 border-y border-indigo-100/90 mb-5">
-                {promoHighlights.map((hl, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-xs text-zinc-800 font-medium">
-                    <CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
-                    <span>{hl}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* High-Contrast Conversion CTA Button */}
-              <div>
-                <a
-                  href="http://cora.local/workspace/login"
-                  className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:scale-[1.02] cursor-pointer"
-                >
-                  <span>{promoCtaText}</span>
-                  <ArrowRight className="w-4 h-4 text-zinc-400" />
-                </a>
-                <span className="block text-center text-[10.5px] text-zinc-500 mt-2 font-medium">
-                  Instant Access • Zero Credit Card • Setup in 2 mins
-                </span>
-              </div>
-
-            </div>
-
-            {/* Subtle Statutory Tag */}
-            <div className="rounded-2xl bg-white border border-zinc-200/80 p-3.5 text-[11px] text-zinc-500 flex items-center gap-2 shadow-2xs">
-              <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
-              <span>Compliant with Indian IT Act 2000 &amp; SAC 9983 standard.</span>
             </div>
 
           </div>
