@@ -108,30 +108,32 @@ export default function ToolsIndexPage() {
             </span>
           </div>
 
-          {/* Headline with Exact Word-Fitting Curved SVG Underline (Zero Overshoot) */}
-          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.2] sm:leading-[1.18] mb-4 max-w-[960px] mx-auto">
-            <span>Free Tools to Make</span>{' '}
-            <span className="relative inline-block text-left align-baseline mx-1">
-              <span className="inline-block relative font-extrabold text-zinc-950 pb-1">
-                <span>{currentItem.word}</span>
-                <svg
-                  key={currentItem.word}
-                  className="absolute -bottom-1 left-0 w-full h-2.5 sm:h-3 overflow-visible pointer-events-none animate-in fade-in zoom-in-95 duration-200"
-                  viewBox="0 0 100 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  preserveAspectRatio="none"
-                >
-                  <path
-                    d="M2 9C30 2 70 2 98 8"
-                    stroke={currentItem.curveColor}
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-            </span>{' '}
-            <span>Simple</span>
+          {/* Headline with Stable 2-Line Structure & Exact Word-Fitting Curved SVG Underline (Zero Jump / Bounce) */}
+          <h1 className="font-display text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.18] sm:leading-[1.14] mb-4 max-w-[960px] mx-auto">
+            <span className="block">Free Tools to Make</span>
+            <span className="block mt-1 sm:mt-2">
+              <span className="relative inline-block align-baseline text-left">
+                <span className="inline-block relative font-extrabold text-zinc-950 pb-1">
+                  <span>{currentItem.word}</span>
+                  <svg
+                    key={currentItem.word}
+                    className="absolute -bottom-1 left-0 w-full h-2.5 sm:h-3.5 overflow-visible pointer-events-none animate-in fade-in zoom-in-95 duration-200"
+                    viewBox="0 0 100 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    preserveAspectRatio="none"
+                  >
+                    <path
+                      d="M2 9C30 2 70 2 98 8"
+                      stroke={currentItem.curveColor}
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+              </span>{' '}
+              <span>Simple</span>
+            </span>
           </h1>
 
           {/* Subtitle */}
