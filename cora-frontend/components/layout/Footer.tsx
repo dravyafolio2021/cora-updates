@@ -43,31 +43,61 @@ export function Footer() {
         {/* ── Top Conversion CTA Banner (Hidden on 404, Docs & Legal Pages) ── */}
         {!is404 && !isLegalPage && !isDocsPage && (
           <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20">
-            <h2 className="font-display text-3xl xs:text-4xl sm:text-[48px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-4">
-              Ready to simplify your business?
-            </h2>
-            <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[600px] mx-auto mb-8">
-              Join Indian founders managing their daily operations, GST invoices, and WhatsApp leads in one place.
-            </p>
+            {pathname?.startsWith('/tools') ? (
+              <>
+                <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl md:text-[44px] font-bold text-zinc-950 leading-[1.15] tracking-[-0.03em] mb-3">
+                  Need these micro-tools in your client portal?
+                </h2>
+                <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[540px] mx-auto mb-6 sm:mb-8">
+                  Launch your free workspace. Automated 18% GST tax invoices and digital contracts pre-seeded.
+                </p>
+                <div className="flex items-center justify-center flex-wrap gap-3">
+                  <a
+                    href="https://app.heycora.in/workspace/login?source=footer_cta_tools"
+                    onClick={() => trackEvent('cta_click', { section: 'footer_cta_tools_primary' })}
+                    className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
+                  >
+                    <span>Get started free</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  </a>
+                  <Link
+                    href="/demo"
+                    onClick={() => trackEvent('cta_click', { section: 'footer_cta_tools_demo' })}
+                    className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
+                  >
+                    <span>Explore Interactive Demo</span>
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="font-display text-3xl xs:text-4xl sm:text-[48px] font-bold text-zinc-950 leading-[1.12] tracking-[-0.03em] mb-4">
+                  Ready to simplify your business?
+                </h2>
+                <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[600px] mx-auto mb-8">
+                  Join Indian founders managing their daily operations, GST invoices, and WhatsApp leads in one place.
+                </p>
 
-            <div className="flex items-center justify-center flex-wrap gap-3.5">
-              <a
-                href="https://app.heycora.in/workspace/login?source=footer_cta"
-                onClick={() => trackEvent('cta_click', { section: 'footer_cta_primary' })}
-                className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
-              >
-                <span>Start free — no card needed</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-              </a>
+                <div className="flex items-center justify-center flex-wrap gap-3.5">
+                  <a
+                    href="https://app.heycora.in/workspace/login?source=footer_cta"
+                    onClick={() => trackEvent('cta_click', { section: 'footer_cta_primary' })}
+                    className="inline-flex items-center gap-2 bg-zinc-950 text-white px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-2xs"
+                  >
+                    <span>Start free — no card needed</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  </a>
 
-              <a
-                href="mailto:dravya.bansal@heycora.in?subject=Inquiry%20from%20Cora%20Website"
-                onClick={() => trackEvent('cta_click', { section: 'footer_cta_chat_founder' })}
-                className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
-              >
-                <span>Chat with Founder</span>
-              </a>
-            </div>
+                  <a
+                    href="mailto:dravya.bansal@heycora.in?subject=Inquiry%20from%20Cora%20Website"
+                    onClick={() => trackEvent('cta_click', { section: 'footer_cta_chat_founder' })}
+                    className="inline-flex items-center gap-2 bg-white text-zinc-950 border border-zinc-300 hover:border-zinc-400 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-50 transition-all shadow-2xs"
+                  >
+                    <span>Chat with Founder</span>
+                  </a>
+                </div>
+              </>
+            )}
           </div>
         )}
 

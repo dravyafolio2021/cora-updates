@@ -362,57 +362,6 @@ export default function ToolsIndexPage() {
         </div>
       </section>
 
-      {/* ── 7. MONOCHROMATIC FOOTER CTA BANNER ── */}
-      <section className="w-full py-16 sm:py-20 bg-zinc-950 text-white relative overflow-hidden">
-        <div className="relative z-10 max-w-[980px] mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-mono font-semibold text-zinc-300 mb-4 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Turnkey Cora Workspace</span>
-          </div>
-
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-4 max-w-[720px] mx-auto leading-tight">
-            Need all these micro-tools unified in your client portal?
-          </h2>
-
-          <p className="text-xs sm:text-sm md:text-base text-zinc-400 font-normal leading-relaxed max-w-[580px] mx-auto mb-8">
-            Launch your free workspace in 3 minutes. Automated 18% GST tax invoices, SHA-256 legal contracts, and client portals pre-seeded.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-8">
-            <a
-              href="https://app.heycora.in/workspace/login?source=tools_footer_cta"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-white text-zinc-950 text-xs sm:text-sm font-semibold hover:bg-zinc-100 transition-all shadow-sm group"
-            >
-              <span>Get Started Free Forever</span>
-              <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-
-            <Link
-              href="/demo"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 text-xs sm:text-sm font-semibold transition-all"
-            >
-              <span>Explore Interactive Architecture</span>
-            </Link>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-[11.5px] font-mono text-zinc-400">
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Zero Credit Card Required</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Pre-Seeded 18% SAC Codes</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>100% IT Act 2000 Compliant</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
     </div>
   );
 }
