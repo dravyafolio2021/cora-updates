@@ -94,21 +94,21 @@ export default function ToolsIndexPage() {
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
       {/* ── 1. CLEAN HIGH-AUTHORITY PURE SKY HERO ── */}
-      <section className="relative w-full pt-12 sm:pt-20 pb-10 sm:pb-16 overflow-hidden border-b border-zinc-100">
+      <section className="relative w-full pt-16 sm:pt-24 pb-8 sm:pb-14 overflow-hidden border-b border-zinc-100">
         <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
           {/* Streamlined Status Badge */}
           <div className="mb-3 sm:mb-5">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-zinc-900 border border-white/90 text-[11px] sm:text-xs font-semibold shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/90 backdrop-blur-md text-zinc-900 border border-white/90 text-[11px] sm:text-xs font-semibold shadow-2xs">
+              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-500" />
               <span>6 Free Turnkey Micro-Tools</span>
             </span>
           </div>
 
           {/* Clean 2-Line Headline (Mobile Proportions Fixed) */}
-          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.16] sm:leading-[1.14] mb-3 sm:mb-4 max-w-[960px] mx-auto">
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.2] sm:leading-[1.14] mb-3 sm:mb-4 max-w-[960px] mx-auto">
             <span className="block">Free Tools to Make</span>
             <span className="block mt-1 sm:mt-2">
               <span className="inline-flex items-baseline justify-center gap-2 sm:gap-3">
@@ -136,7 +136,7 @@ export default function ToolsIndexPage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[620px] mx-auto mb-5 sm:mb-8">
+          <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[580px] mx-auto mb-6 sm:mb-8 px-2">
             Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and dynamic UPI QR generation.
           </p>
 
@@ -161,7 +161,7 @@ export default function ToolsIndexPage() {
           </div>
 
           {/* ── Central AI Copilot Input Capsule ── */}
-          <div className="mb-8 sm:mb-12">
+          <div className="mb-6 sm:mb-12">
             <ToolsHeroAIInput
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
@@ -171,10 +171,10 @@ export default function ToolsIndexPage() {
         </div>
 
         {/* ── 2. AUTONOMOUS INFINITE MARQUEE TRACK (NO MANUAL HORIZONTAL SCROLL) ── */}
-        <div className="w-full overflow-hidden select-none py-2 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
-          <div className="flex min-w-full shrink-0 items-center justify-around gap-4 sm:gap-5 animate-marquee hover:[animation-play-state:paused]">
+        <div className="w-full overflow-hidden select-none py-1 sm:py-2 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+          <div className="flex min-w-full shrink-0 items-center justify-around gap-3 sm:gap-5 animate-marquee hover:[animation-play-state:paused]">
             {TOOL_CATEGORY_BLOCKS.concat(TOOL_CATEGORY_BLOCKS).map((block, idx) => (
-              <div key={`${block.id}-${idx}`} className="shrink-0 w-[210px] sm:w-[225px]">
+              <div key={`${block.id}-${idx}`} className="shrink-0 w-[175px] sm:w-[225px]">
                 <ToolCategoryHeroCard block={block} />
               </div>
             ))}
@@ -184,51 +184,51 @@ export default function ToolsIndexPage() {
       </section>
 
       {/* ── 3. METRICS RIBBON (CALIBRATED 1K-5K USAGE & EFFICIENCY) ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-3 mb-12 sm:mb-16">
-        <div className="rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-purple-50/70 border border-blue-100/80 p-6 sm:p-8 shadow-xs">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center divide-y sm:divide-y-0 sm:divide-x divide-blue-200/50">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-3 mb-10 sm:mb-16">
+        <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-purple-50/70 border border-blue-100/80 p-4 sm:p-8 shadow-xs">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 items-center divide-y sm:divide-y-0 sm:divide-x divide-blue-200/50">
             
             {/* Metric 1: Monthly Usage */}
-            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-2xl sm:text-3xl font-bold text-blue-600 tracking-tight">
+            <div className="flex items-center gap-2.5 sm:gap-3 pt-2 sm:pt-0 sm:px-4">
+              <div className="font-display text-xl sm:text-3xl font-bold text-blue-600 tracking-tight">
                 3,840+
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Monthly</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Tools Executed</span>
+                <span className="block text-[11px] sm:text-xs font-bold text-zinc-900 leading-tight">Monthly</span>
+                <span className="block text-[10px] sm:text-[11px] text-zinc-500 leading-tight">Tools Executed</span>
               </div>
             </div>
 
             {/* Metric 2: Productivity Speedup */}
-            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-2xl sm:text-3xl font-bold text-emerald-600 tracking-tight">
+            <div className="flex items-center gap-2.5 sm:gap-3 pt-2 sm:pt-0 sm:px-4">
+              <div className="font-display text-xl sm:text-3xl font-bold text-emerald-600 tracking-tight">
                 4.8x
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Workflow</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Speed Enhancement</span>
+                <span className="block text-[11px] sm:text-xs font-bold text-zinc-900 leading-tight">Workflow</span>
+                <span className="block text-[10px] sm:text-[11px] text-zinc-500 leading-tight">Speed Up</span>
               </div>
             </div>
 
             {/* Metric 3: Weekly Hours Saved */}
-            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-2xl sm:text-3xl font-bold text-purple-600 tracking-tight">
+            <div className="flex items-center gap-2.5 sm:gap-3 pt-2 sm:pt-0 sm:px-4">
+              <div className="font-display text-xl sm:text-3xl font-bold text-purple-600 tracking-tight">
                 12+ hrs
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Time Saved</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Per Studio / Week</span>
+                <span className="block text-[11px] sm:text-xs font-bold text-zinc-900 leading-tight">Time Saved</span>
+                <span className="block text-[10px] sm:text-[11px] text-zinc-500 leading-tight">Per Studio / Wk</span>
               </div>
             </div>
 
             {/* Metric 4: Accessibility */}
-            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-2xl sm:text-3xl font-bold text-amber-600 tracking-tight">
+            <div className="flex items-center gap-2.5 sm:gap-3 pt-2 sm:pt-0 sm:px-4">
+              <div className="font-display text-xl sm:text-3xl font-bold text-amber-600 tracking-tight">
                 100%
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Free</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Zero Login Required</span>
+                <span className="block text-[11px] sm:text-xs font-bold text-zinc-900 leading-tight">Free</span>
+                <span className="block text-[10px] sm:text-[11px] text-zinc-500 leading-tight">Zero Login</span>
               </div>
             </div>
 
@@ -237,12 +237,12 @@ export default function ToolsIndexPage() {
       </section>
 
       {/* ── 4. DIRECTORY & ALL TOOLS FILTER GRID ── */}
-      <section id="tools-directory" className="w-full py-10 max-w-[1240px] mx-auto px-4 sm:px-6">
+      <section id="tools-directory" className="w-full py-8 sm:py-10 max-w-[1240px] mx-auto px-4 sm:px-6">
         
         {/* Category Tabs & Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-4 border-b border-zinc-100">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8 pb-4 border-b border-zinc-100">
           <div>
-            <h2 className="font-display text-2xl font-bold text-zinc-950 tracking-tight">
+            <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
               All Micro-Tools Directory
             </h2>
             <span className="text-xs text-zinc-500">
@@ -280,7 +280,7 @@ export default function ToolsIndexPage() {
             <span className="text-xs text-zinc-500">Try clearing filters or search terms.</span>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             {filteredTools.map((tool) => (
               <ToolCard key={tool.slug} tool={tool} />
             ))}
@@ -290,13 +290,13 @@ export default function ToolsIndexPage() {
       </section>
 
       {/* ── 5. "MICRO-TOOLS VS CORA OS" TRANSFORMATION CARD ── */}
-      <section className="w-full py-16 bg-zinc-50/80 border-t border-zinc-200/80">
+      <section className="w-full py-12 sm:py-16 bg-zinc-50/80 border-t border-zinc-200/80">
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200 mb-3 inline-block">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200 mb-2.5 sm:mb-3 inline-block">
               Operational Upgrade
             </span>
-            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-950 tracking-tight mb-3">
+            <h2 className="font-display text-xl sm:text-3xl md:text-4xl font-bold text-zinc-950 tracking-tight mb-2.5 sm:mb-3">
               From Ad-Hoc Calculators to an Autonomous Workspace
             </h2>
             <p className="text-xs sm:text-sm md:text-base text-zinc-600 font-normal leading-relaxed">
@@ -304,11 +304,11 @@ export default function ToolsIndexPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {/* Column 1: Fragmented Tools */}
-            <div className="rounded-3xl bg-white border border-zinc-200/90 p-6 space-y-3">
-              <div className="w-8 h-1 bg-zinc-300 rounded-full mb-4" />
-              <h3 className="text-base font-bold text-zinc-950">
+            <div className="rounded-2xl sm:rounded-3xl bg-white border border-zinc-200/90 p-5 sm:p-6 space-y-2.5 sm:space-y-3">
+              <div className="w-8 h-1 bg-zinc-300 rounded-full mb-3 sm:mb-4" />
+              <h3 className="text-sm sm:text-base font-bold text-zinc-950">
                 Fragmented Tool Sprawl
               </h3>
               <p className="text-xs text-zinc-600 leading-relaxed font-normal">
@@ -317,9 +317,9 @@ export default function ToolsIndexPage() {
             </div>
 
             {/* Column 2: Central Cora Intelligence */}
-            <div className="rounded-3xl bg-white border border-purple-200/80 p-6 space-y-3 shadow-sm">
-              <div className="w-8 h-1 bg-purple-500 rounded-full mb-4" />
-              <h3 className="text-base font-bold text-purple-950 flex items-center gap-1.5">
+            <div className="rounded-2xl sm:rounded-3xl bg-white border border-purple-200/80 p-5 sm:p-6 space-y-2.5 sm:space-y-3 shadow-sm">
+              <div className="w-8 h-1 bg-purple-500 rounded-full mb-3 sm:mb-4" />
+              <h3 className="text-sm sm:text-base font-bold text-purple-950 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-purple-600" />
                 <span>Central Intelligence</span>
               </h3>
@@ -329,9 +329,9 @@ export default function ToolsIndexPage() {
             </div>
 
             {/* Column 3: Zero Question Chaos */}
-            <div className="rounded-3xl bg-white border border-emerald-200/80 p-6 space-y-3 shadow-sm">
-              <div className="w-8 h-1 bg-emerald-500 rounded-full mb-4" />
-              <h3 className="text-base font-bold text-emerald-950 flex items-center gap-1.5">
+            <div className="rounded-2xl sm:rounded-3xl bg-white border border-emerald-200/80 p-5 sm:p-6 space-y-2.5 sm:space-y-3 shadow-sm">
+              <div className="w-8 h-1 bg-emerald-500 rounded-full mb-3 sm:mb-4" />
+              <h3 className="text-sm sm:text-base font-bold text-emerald-950 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Zero Scope Chaos</span>
               </h3>
@@ -344,17 +344,17 @@ export default function ToolsIndexPage() {
       </section>
 
       {/* ── 6. FREQUENTLY ASKED QUESTIONS ── */}
-      <section className="w-full py-16 sm:py-20 max-w-[860px] mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200 mb-3 inline-block">
+      <section className="w-full py-12 sm:py-20 max-w-[860px] mx-auto px-4 sm:px-6">
+        <div className="text-center mb-8 sm:mb-10">
+          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200 mb-2.5 sm:mb-3 inline-block">
             Frequently Asked Questions
           </span>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
+          <h2 className="font-display text-xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
             Common questions about Cora micro-tools
           </h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           {TOOLS_FAQS.map((faq, idx) => {
             const isOpen = openFaq === idx;
             return (
@@ -375,7 +375,7 @@ export default function ToolsIndexPage() {
                 </button>
 
                 {isOpen && (
-                  <div className="px-4 sm:px-5 pb-5 text-xs sm:text-sm text-zinc-600 leading-relaxed border-t border-zinc-100 pt-3">
+                  <div className="px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-zinc-600 leading-relaxed border-t border-zinc-100 pt-3">
                     {faq.answer}
                   </div>
                 )}

@@ -174,22 +174,22 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
   };
 
   return (
-    <div className="w-full max-w-[700px] mx-auto text-left">
+    <div className="w-full max-w-[660px] mx-auto text-left">
       
-      {/* ── Main AI Input Capsule ── */}
+      {/* ── Main AI Input Capsule (Compact & Mobile-Optimized) ── */}
       <form
         onSubmit={handleFormSubmit}
-        className="bg-white/95 backdrop-blur-md rounded-3xl p-3 sm:p-4 border border-zinc-200/90 shadow-[0_16px_45px_rgba(0,0,0,0.06)] hover:border-zinc-300 focus-within:border-zinc-950 focus-within:ring-4 focus-within:ring-zinc-950/5 transition-all duration-300 relative"
+        className="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl p-2.5 sm:p-4 border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-zinc-300 focus-within:border-zinc-950 focus-within:ring-4 focus-within:ring-zinc-950/5 transition-all duration-300 relative"
       >
         {/* Top Text Input Area */}
-        <div className="flex items-center gap-3 px-2">
-          <Sparkles className="w-5 h-5 text-indigo-600 shrink-0" />
+        <div className="flex items-center gap-2 sm:gap-3 px-1.5 sm:px-2">
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={inputVal}
             onChange={handleInputChange}
-            placeholder="Ask AI Copilot or run instant tools (e.g. 'Calculate 18% GST on ₹75,000')..."
+            placeholder="Ask AI or search tools (e.g. '18% GST on ₹75,000')..."
             className="w-full bg-transparent text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
           />
           {inputVal && (
@@ -202,37 +202,37 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
               }}
               className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
         {/* Bottom Action Strip */}
-        <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-100/90 text-xs">
+        <div className="flex items-center justify-between pt-2 sm:pt-3 mt-2 sm:mt-3 border-t border-zinc-100 text-xs">
           <div className="flex items-center gap-1.5 text-zinc-500 font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-[11px] sm:text-xs">AI Copilot Active • Zero login needed</span>
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500" />
+            <span className="text-[10px] sm:text-xs">AI Copilot • Zero login</span>
           </div>
 
           <button
             type="submit"
             disabled={isLoading || !inputVal.trim()}
-            className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white font-semibold text-xs transition-all shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1 sm:gap-1.5 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 disabled:opacity-50 text-white font-semibold text-[11px] sm:text-xs transition-all shadow-2xs cursor-pointer"
           >
             {isLoading ? (
               <span>Computing...</span>
             ) : (
               <>
                 <span>Run AI</span>
-                <Send className="w-3 h-3 text-zinc-400" />
+                <Send className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-zinc-400" />
               </>
             )}
           </button>
         </div>
       </form>
 
-      {/* ── Quick Prompt Chips ── */}
-      <div className="flex items-center gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none py-2.5 px-1">
+      {/* ── Quick Prompt Chips (Desktop/Tablet Only to Keep Mobile Ultra-Clean) ── */}
+      <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none py-2.5 px-1">
         <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider mr-0.5">
           Try:
         </span>
@@ -248,19 +248,19 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
         ))}
       </div>
 
-      {/* ── Interactive Clean Light AI Response Card (Zero Neon Box) ── */}
+      {/* ── Interactive Clean Light AI Response Card ── */}
       {aiResponse && (
-        <div className="mt-3 p-5 sm:p-6 rounded-3xl bg-white text-zinc-900 shadow-[0_16px_40px_rgba(0,0,0,0.08)] border border-zinc-200/90 animate-in fade-in slide-in-from-top-2 duration-200 space-y-3">
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-100 text-xs">
+        <div className="mt-3 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white text-zinc-900 shadow-[0_16px_40px_rgba(0,0,0,0.08)] border border-zinc-200/90 animate-in fade-in slide-in-from-top-2 duration-200 space-y-2.5 sm:space-y-3">
+          <div className="flex items-center justify-between pb-2.5 border-b border-zinc-100 text-xs">
             <span className="font-bold text-zinc-950 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-indigo-600" />
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
               <span>{aiResponse.title}</span>
             </span>
             <button
               onClick={() => setAiResponse(null)}
               className="text-zinc-400 hover:text-zinc-700 p-1 transition-colors"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -269,30 +269,30 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
           </p>
 
           {aiResponse.dataSnippet && (
-            <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200/80 font-mono text-xs text-zinc-800 flex items-center justify-between gap-2">
+            <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-zinc-50 border border-zinc-200/80 font-mono text-[11px] sm:text-xs text-zinc-800 flex items-center justify-between gap-2">
               <span className="truncate">{aiResponse.dataSnippet}</span>
               <button
                 onClick={() => copySnippet(aiResponse.dataSnippet!)}
-                className="p-1.5 rounded-xl bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-950 shadow-2xs transition-colors shrink-0"
+                className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-950 shadow-2xs transition-colors shrink-0"
                 title="Copy snippet"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
               </button>
             </div>
           )}
 
-          <div className="pt-2 flex items-center justify-between">
+          <div className="pt-1.5 flex items-center justify-between">
             <Link
               href={`/tools/${aiResponse.actionToolSlug}`}
               className="text-xs font-semibold text-zinc-950 hover:text-zinc-700 inline-flex items-center gap-1 transition-colors"
             >
               <span>{aiResponse.actionToolLabel}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3 h-3" />
             </Link>
 
             <button
               onClick={() => setAiResponse(null)}
-              className="text-[11px] text-zinc-400 hover:text-zinc-600"
+              className="text-[10px] sm:text-[11px] text-zinc-400 hover:text-zinc-600"
             >
               Dismiss
             </button>
