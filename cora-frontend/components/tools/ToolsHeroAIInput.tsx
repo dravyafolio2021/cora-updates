@@ -1,21 +1,14 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { 
   Sparkles, 
   ArrowRight, 
   Send, 
-  Calculator, 
-  Receipt, 
-  Scale, 
-  Code, 
-  QrCode, 
   Check, 
   Copy, 
-  X,
-  RotateCcw,
-  Bot
+  X
 } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 
@@ -190,7 +183,7 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
       >
         {/* Top Text Input Area */}
         <div className="flex items-center gap-3 px-2">
-          <Sparkles className="w-5 h-5 text-indigo-600 shrink-0 animate-pulse" />
+          <Sparkles className="w-5 h-5 text-indigo-600 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -255,35 +248,35 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
         ))}
       </div>
 
-      {/* ── Interactive Live AI Response Card ── */}
+      {/* ── Interactive Clean Light AI Response Card (Zero Neon Box) ── */}
       {aiResponse && (
-        <div className="mt-3 p-5 rounded-3xl bg-zinc-950 text-white shadow-xl border border-zinc-800 animate-in fade-in slide-in-from-top-2 duration-200 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-zinc-800 text-xs">
-            <span className="font-bold text-emerald-400 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
-              {aiResponse.title}
+        <div className="mt-3 p-5 sm:p-6 rounded-3xl bg-white text-zinc-900 shadow-[0_16px_40px_rgba(0,0,0,0.08)] border border-zinc-200/90 animate-in fade-in slide-in-from-top-2 duration-200 space-y-3">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-100 text-xs">
+            <span className="font-bold text-zinc-950 flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-indigo-600" />
+              <span>{aiResponse.title}</span>
             </span>
             <button
               onClick={() => setAiResponse(null)}
-              className="text-zinc-400 hover:text-white"
+              className="text-zinc-400 hover:text-zinc-700 p-1 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-normal">
+          <p className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-normal">
             {aiResponse.answer}
           </p>
 
           {aiResponse.dataSnippet && (
-            <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 font-mono text-xs text-zinc-300 flex items-center justify-between gap-2">
+            <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200/80 font-mono text-xs text-zinc-800 flex items-center justify-between gap-2">
               <span className="truncate">{aiResponse.dataSnippet}</span>
               <button
                 onClick={() => copySnippet(aiResponse.dataSnippet!)}
-                className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white shrink-0 transition-colors"
+                className="p-1.5 rounded-xl bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-950 shadow-2xs transition-colors shrink-0"
                 title="Copy snippet"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               </button>
             </div>
           )}
@@ -291,7 +284,7 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
           <div className="pt-2 flex items-center justify-between">
             <Link
               href={`/tools/${aiResponse.actionToolSlug}`}
-              className="text-xs font-bold text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 transition-colors"
+              className="text-xs font-semibold text-zinc-950 hover:text-zinc-700 inline-flex items-center gap-1 transition-colors"
             >
               <span>{aiResponse.actionToolLabel}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -299,7 +292,7 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
 
             <button
               onClick={() => setAiResponse(null)}
-              className="text-[11px] text-zinc-500 hover:text-zinc-300"
+              className="text-[11px] text-zinc-400 hover:text-zinc-600"
             >
               Dismiss
             </button>

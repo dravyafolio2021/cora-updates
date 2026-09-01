@@ -10,7 +10,6 @@ import {
   Plus, 
   Minus,
   Zap,
-  Layers,
   ChevronRight
 } from 'lucide-react';
 import { 
@@ -22,6 +21,7 @@ import {
 import { ToolCard } from '@/components/tools/ToolCard';
 import { ToolCategoryHeroCard } from '@/components/tools/ToolCategoryHeroCard';
 import { ToolsHeroAIInput } from '@/components/tools/ToolsHeroAIInput';
+import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 
 const ROTATING_WORDS = [
   'Operations',
@@ -30,7 +30,6 @@ const ROTATING_WORDS = [
   'Sales',
   'Productivity',
   'Contracts',
-  'Invoicing',
 ];
 
 const TOOLS_FAQS = [
@@ -59,14 +58,14 @@ export default function ToolsIndexPage() {
   const [wordIndex, setWordIndex] = useState<number>(0);
   const [isFlipping, setIsFlipping] = useState<boolean>(false);
 
-  // Auto-rotating highlighted word effect
+  // Auto-rotating highlighted word effect with zero layout shift
   useEffect(() => {
     const interval = setInterval(() => {
       setIsFlipping(true);
       setTimeout(() => {
         setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length);
         setIsFlipping(false);
-      }, 250);
+      }, 200);
     }, 2400);
 
     return () => clearInterval(interval);
@@ -96,30 +95,14 @@ export default function ToolsIndexPage() {
   return (
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. DEDICATED LUMINOUS ATMOSPHERIC HERO SECTION ── */}
+      {/* ── 1. SIGNATURE ATMOSPHERIC PURE SKY HERO ── */}
       <section className="relative w-full pt-16 sm:pt-24 pb-12 sm:pb-16 overflow-hidden border-b border-zinc-100">
-        
-        {/* Dedicated Soft Luminous Gradient Aura (Unique for Tools, not duplicating sky image) */}
-        <div 
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse 90% 60% at 50% -10%, rgba(99, 102, 241, 0.12) 0%, rgba(236, 72, 153, 0.05) 45%, rgba(255, 255, 255, 0) 80%), #ffffff',
-          }}
-        />
-
-        {/* Delicate Micro-Dot Grid */}
-        <div 
-          className="absolute inset-0 opacity-[0.03] pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, #000 1px, transparent 0)`,
-            backgroundSize: '24px 24px'
-          }}
-        />
+        <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
           {/* Breadcrumbs */}
-          <nav className="inline-flex items-center gap-1.5 text-xs text-zinc-500 font-medium mb-4">
+          <nav className="inline-flex items-center gap-1.5 text-xs text-zinc-600 font-medium mb-4">
             <Link href="/" className="hover:text-zinc-950 transition-colors">
               Home
             </Link>
@@ -131,7 +114,7 @@ export default function ToolsIndexPage() {
 
           {/* Glassmorphic Status Pill */}
           <div className="mb-4">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200/80 text-xs font-semibold shadow-2xs">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/85 backdrop-blur-md text-zinc-900 border border-white/90 text-xs font-semibold shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>6 Free Turnkey Utilities</span>
               <span className="text-zinc-300">•</span>
@@ -139,15 +122,17 @@ export default function ToolsIndexPage() {
             </span>
           </div>
 
-          {/* Dynamic Headline with Animated Rotating Word */}
+          {/* Dynamic Headline (Zero CLS, Clean Typography, No Awkward Outline) */}
           <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.18] mb-4 max-w-[880px] mx-auto">
             Free Tools to Make{' '}
-            <span 
-              className={`inline-flex items-center justify-center px-4 py-0.5 rounded-2xl bg-white/90 backdrop-blur-md border border-zinc-200/90 shadow-xs text-zinc-950 font-bold mx-1 transition-all duration-300 min-w-[140px] sm:min-w-[180px] ${
-                isFlipping ? 'opacity-0 scale-95 -translate-y-1' : 'opacity-100 scale-100 translate-y-0'
-              }`}
-            >
-              {ROTATING_WORDS[wordIndex]}
+            <span className="inline-block relative overflow-hidden align-bottom">
+              <span 
+                className={`inline-block text-zinc-950 font-extrabold transition-all duration-200 ${
+                  isFlipping ? 'opacity-0 -translate-y-2 scale-95' : 'opacity-100 translate-y-0 scale-100'
+                }`}
+              >
+                {ROTATING_WORDS[wordIndex]}
+              </span>
             </span>{' '}
             Simple
           </h1>
@@ -177,52 +162,52 @@ export default function ToolsIndexPage() {
         </div>
       </section>
 
-      {/* ── 3. METRICS RIBBON (AIRY & REFINED) ── */}
+      {/* ── 3. METRICS RIBBON (REALISTIC 1K-5K RANGE, USAGE & PRODUCTIVITY) ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-3 mb-12 sm:mb-16">
         <div className="rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-purple-50/70 border border-blue-100/80 p-6 sm:p-8 shadow-xs">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center divide-y sm:divide-y-0 sm:divide-x divide-blue-200/50">
             
-            {/* Metric 1 */}
+            {/* Metric 1: Monthly Usage */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
               <div className="font-display text-2xl sm:text-3xl font-bold text-blue-600 tracking-tight">
-                100k+
+                3,840+
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Active</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Monthly</span>
                 <span className="block text-[11px] text-zinc-500 leading-tight">Tools Executed</span>
               </div>
             </div>
 
-            {/* Metric 2 */}
+            {/* Metric 2: Productivity Speedup */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
               <div className="font-display text-2xl sm:text-3xl font-bold text-emerald-600 tracking-tight">
-                ₹50Cr+
+                4.8x
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Invoices</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Calculated</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Workflow</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Speed Enhancement</span>
               </div>
             </div>
 
-            {/* Metric 3 */}
+            {/* Metric 3: Weekly Hours Saved */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
               <div className="font-display text-2xl sm:text-3xl font-bold text-purple-600 tracking-tight">
-                20+
+                12+ hrs
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Online</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Free Utilities</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Time Saved</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Per Studio / Week</span>
               </div>
             </div>
 
-            {/* Metric 4 */}
+            {/* Metric 4: Accessibility */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
               <div className="font-display text-2xl sm:text-3xl font-bold text-amber-600 tracking-tight">
                 100%
               </div>
               <div className="text-left">
                 <span className="block text-xs font-bold text-zinc-900 leading-tight">Free</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Zero Login</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Zero Login Required</span>
               </div>
             </div>
 
