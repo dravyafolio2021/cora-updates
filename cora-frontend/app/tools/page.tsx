@@ -94,7 +94,7 @@ export default function ToolsIndexPage() {
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
       {/* ── 1. CLEAN HIGH-AUTHORITY PURE SKY HERO ── */}
-      <section className="relative w-full pt-16 sm:pt-24 pb-8 sm:pb-14 overflow-hidden border-b border-zinc-100">
+      <section className="relative w-full pt-16 sm:pt-24 pb-10 sm:pb-16 overflow-hidden">
         <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
@@ -184,7 +184,7 @@ export default function ToolsIndexPage() {
       </section>
 
       {/* ── 3. METRICS RIBBON (CLEAN MINIMAL CARD & PRECISE BORDERS) ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-3 mb-10 sm:mb-16">
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mt-4 sm:mt-8 mb-10 sm:mb-16 relative z-10">
         <div className="rounded-2xl sm:rounded-3xl bg-white border border-zinc-200/90 p-4 sm:p-7 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 items-center divide-y sm:divide-y-0 sm:divide-x divide-zinc-100">
             
