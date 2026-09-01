@@ -79,53 +79,77 @@ export default function ToolsIndexPage() {
   return (
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. CENTERED HERO INSPIRED BY USER REFERENCE ── */}
-      <section className="relative w-full pt-16 sm:pt-24 pb-12 sm:pb-16 overflow-hidden bg-gradient-to-b from-[#F8FAFC] via-white to-white">
+      {/* ── 1. CENTERED HERO SECTION (CORA MONOCHROMATIC DESIGN SYSTEM) ── */}
+      <section className="relative w-full pt-16 sm:pt-24 pb-10 sm:pb-14 overflow-hidden bg-gradient-to-b from-zinc-50/90 via-white to-white border-b border-zinc-100">
         
-        {/* Subtle Decorative Floating 3D Geometric Confetti Accents */}
-        <div className="absolute top-12 left-[10%] w-3 h-3 bg-rose-400 rounded-xs rotate-45 opacity-60 pointer-events-none hidden md:block" />
-        <div className="absolute top-20 right-[12%] w-4 h-4 bg-purple-500 rounded-xs rotate-12 opacity-60 pointer-events-none hidden md:block" />
-        <div className="absolute top-36 left-[6%] w-3.5 h-3.5 bg-blue-500 rounded-xs -rotate-12 opacity-50 pointer-events-none hidden md:block" />
-        <div className="absolute top-28 right-[8%] w-3 h-3 bg-amber-400 rounded-xs rotate-45 opacity-70 pointer-events-none hidden md:block" />
+        {/* Subtle Architectural Dot Matrix Background */}
+        <div 
+          className="absolute inset-0 opacity-[0.025] pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, #000 1px, transparent 0)`,
+            backgroundSize: '24px 24px'
+          }}
+        />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
-          {/* Main Headline with Highlighted Blue Box */}
-          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.18] mb-4 max-w-[900px] mx-auto">
-            Free Tools to Make <span className="bg-[#2563EB] text-white px-3 py-0.5 rounded-xl inline-block shadow-sm">Business</span> Simple
+          {/* Breadcrumbs */}
+          <nav className="inline-flex items-center gap-1.5 text-xs text-zinc-500 font-medium mb-4">
+            <Link href="/" className="hover:text-zinc-950 transition-colors">
+              Home
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+            <span className="text-zinc-950 font-semibold">
+              Free Micro-Tools
+            </span>
+          </nav>
+
+          {/* Status Badge */}
+          <div className="mb-4">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-zinc-800 border border-zinc-200/90 text-xs font-semibold shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>100% Free Micro-Tools</span>
+              <span className="text-zinc-300">•</span>
+              <span className="text-zinc-500 font-mono text-[11px]">Zero Login Required</span>
+            </span>
+          </div>
+
+          {/* Main Headline */}
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.15] mb-4 max-w-[860px] mx-auto">
+            Free Tools to Make <span className="underline decoration-zinc-300 underline-offset-8">Operations</span> Simple
           </h1>
 
           {/* Subtitle */}
-          <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[640px] mx-auto mb-8">
-            We offer GST, proposal, contract, embed and AI tools to make your agency and professional life easier
+          <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[660px] mx-auto mb-8">
+            Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and developer embeds.
           </p>
 
-          {/* Central Elevated Search Capsule */}
+          {/* Central Elevated Search Capsule (Cora Monochromatic Styling) */}
           <form 
             onSubmit={handleSearchSubmit}
-            className="max-w-[560px] mx-auto bg-white rounded-full p-1.5 sm:p-2 border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex items-center justify-between gap-2 mb-12 sm:mb-16 focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-500/10 transition-all"
+            className="max-w-[540px] mx-auto bg-white rounded-full p-1.5 sm:p-2 border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex items-center justify-between gap-2 mb-10 sm:mb-14 focus-within:border-zinc-950 focus-within:ring-4 focus-within:ring-zinc-950/5 transition-all"
           >
             <div className="flex items-center gap-2.5 pl-3 flex-1">
-              <Search className="w-4 h-4 text-[#2563EB] shrink-0" />
+              <Search className="w-4 h-4 text-zinc-400 shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search tools (e.g. GST calculator, retainer math, NDA)..."
-                className="w-full bg-transparent text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
+                className="w-full bg-transparent text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none font-medium"
               />
             </div>
             <button
               type="submit"
-              className="px-6 py-2 sm:py-2.5 rounded-full bg-[#2563EB] hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm transition-all shadow-sm cursor-pointer shrink-0"
+              className="px-6 py-2 sm:py-2.5 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white font-semibold text-xs sm:text-sm transition-all shadow-xs cursor-pointer shrink-0"
             >
               Search
             </button>
           </form>
 
-          {/* ── 2. HORIZONTAL ROW OF VIBRANT CATEGORY CARDS ── */}
+          {/* ── 2. HORIZONTAL ROW OF CATEGORY CARDS ── */}
           <div className="w-full overflow-x-auto pb-4 pt-1 scrollbar-none">
-            <div className="flex lg:grid lg:grid-cols-6 gap-3 sm:gap-4 min-w-max lg:min-w-0 justify-start lg:justify-between px-2">
+            <div className="flex lg:grid lg:grid-cols-6 gap-3 sm:gap-4 min-w-max lg:min-w-0 justify-start lg:justify-between px-1">
               {TOOL_CATEGORY_BLOCKS.map((block) => (
                 <ToolCategoryHeroCard key={block.id} block={block} />
               ))}
@@ -135,52 +159,52 @@ export default function ToolsIndexPage() {
         </div>
       </section>
 
-      {/* ── 3. METRICS RIBBON (DUAL OPACITY NUMBERS) ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-2 mb-12 sm:mb-16">
-        <div className="rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-blue-50/70 border border-blue-100/80 p-6 sm:p-8 shadow-xs">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center divide-y sm:divide-y-0 sm:divide-x divide-blue-200/50">
+      {/* ── 3. METRICS RIBBON (CORA MONOCHROMATIC PALETTE) ── */}
+      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-3 mb-12 sm:mb-16">
+        <div className="rounded-3xl bg-zinc-50 border border-zinc-200/90 p-6 sm:p-8 shadow-2xs">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center divide-y sm:divide-y-0 sm:divide-x divide-zinc-200/70">
             
             {/* Metric 1 */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-3xl sm:text-4xl font-black text-[#2563EB] tracking-tight">
+              <div className="font-display text-2xl sm:text-3xl font-semibold text-zinc-950 tracking-tight">
                 100k+
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Active</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Users</span>
+                <span className="block text-xs font-semibold text-zinc-900 leading-tight">Active</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Tools Executed</span>
               </div>
             </div>
 
             {/* Metric 2 */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-3xl sm:text-4xl font-black text-[#2563EB] tracking-tight">
+              <div className="font-display text-2xl sm:text-3xl font-semibold text-zinc-950 tracking-tight">
                 ₹50Cr+
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Invoices</span>
+                <span className="block text-xs font-semibold text-zinc-900 leading-tight">Invoices</span>
                 <span className="block text-[11px] text-zinc-500 leading-tight">Calculated</span>
               </div>
             </div>
 
             {/* Metric 3 */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-3xl sm:text-4xl font-black text-[#2563EB] tracking-tight">
+              <div className="font-display text-2xl sm:text-3xl font-semibold text-zinc-950 tracking-tight">
                 20+
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Online</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Tools</span>
+                <span className="block text-xs font-semibold text-zinc-900 leading-tight">Online</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Free Utilities</span>
               </div>
             </div>
 
             {/* Metric 4 */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-3xl sm:text-4xl font-black text-[#2563EB] tracking-tight">
+              <div className="font-display text-2xl sm:text-3xl font-semibold text-zinc-950 tracking-tight">
                 100%
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Free</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Forever</span>
+                <span className="block text-xs font-semibold text-zinc-900 leading-tight">Free</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Zero Login</span>
               </div>
             </div>
 
@@ -189,7 +213,7 @@ export default function ToolsIndexPage() {
       </section>
 
       {/* ── 4. DIRECTORY & ALL TOOLS FILTER GRID ── */}
-      <section id="tools-directory" className="w-full py-12 max-w-[1240px] mx-auto px-4 sm:px-6">
+      <section id="tools-directory" className="w-full py-10 max-w-[1240px] mx-auto px-4 sm:px-6">
         
         {/* Category Tabs & Header */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-4 border-b border-zinc-100">
@@ -209,7 +233,7 @@ export default function ToolsIndexPage() {
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                     isActive
                       ? 'bg-zinc-950 text-white shadow-xs'
                       : 'bg-zinc-50 text-zinc-700 border border-zinc-200 hover:bg-zinc-100 hover:text-zinc-950'
