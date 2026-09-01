@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Sparkles, 
@@ -9,8 +9,7 @@ import {
   ShieldCheck, 
   Plus, 
   Minus,
-  Zap,
-  ChevronRight
+  Zap
 } from 'lucide-react';
 import { 
   TOOLS_DATA, 
@@ -22,6 +21,15 @@ import { ToolCard } from '@/components/tools/ToolCard';
 import { ToolCategoryHeroCard } from '@/components/tools/ToolCategoryHeroCard';
 import { ToolsHeroAIInput } from '@/components/tools/ToolsHeroAIInput';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
+
+const FLIPPING_WORDS = [
+  { word: 'Operations', textColor: 'text-indigo-600', underlineColor: 'decoration-amber-400' },
+  { word: 'Marketing', textColor: 'text-rose-600', underlineColor: 'decoration-teal-400' },
+  { word: 'Finance', textColor: 'text-emerald-600', underlineColor: 'decoration-blue-500' },
+  { word: 'Contracts', textColor: 'text-blue-600', underlineColor: 'decoration-orange-400' },
+  { word: 'Productivity', textColor: 'text-purple-600', underlineColor: 'decoration-emerald-400' },
+  { word: 'Invoicing', textColor: 'text-teal-600', underlineColor: 'decoration-purple-400' },
+];
 
 const TOOLS_FAQS = [
   {
@@ -46,6 +54,16 @@ export default function ToolsIndexPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [wordIndex, setWordIndex] = useState<number>(0);
+
+  // Smooth rotating word timer
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % FLIPPING_WORDS.length);
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const filteredTools = useMemo(() => {
     return TOOLS_DATA.filter((tool) => {
@@ -77,30 +95,35 @@ export default function ToolsIndexPage() {
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
-          {/* Breadcrumbs */}
-          <nav className="inline-flex items-center gap-1.5 text-xs text-zinc-600 font-medium mb-4">
-            <Link href="/" className="hover:text-zinc-950 transition-colors">
-              Home
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-            <span className="text-zinc-950 font-semibold">
-              Free Micro-Tools
-            </span>
-          </nav>
-
-          {/* Glassmorphic Status Pill */}
-          <div className="mb-4">
+          {/* Single-Line Concise Status Badge (No Breadcrumb, No Dot Split) */}
+          <div className="mb-4 sm:mb-5">
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/85 backdrop-blur-md text-zinc-900 border border-white/90 text-xs font-semibold shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>6 Free Turnkey Utilities</span>
-              <span className="text-zinc-300">•</span>
-              <span className="text-emerald-700 font-mono text-[11px] font-bold">Zero Login Required</span>
+              <span>6 Free Turnkey Micro-Tools</span>
             </span>
           </div>
 
-          {/* Clean, Rock-Solid, SEO-Optimized Static Headline (Zero CLS, Zero Badge Bloat) */}
-          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.15] mb-4 max-w-[920px] mx-auto">
-            Free Tools to Make Business Operations Simple
+          {/* Dynamic Colored Flipping Word with Contrasting Non-Striking Underline (Zero Layout Shift via CSS Grid Stacking) */}
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.2] sm:leading-[1.18] mb-4 max-w-[960px] mx-auto">
+            <span>Free Tools to Make</span>{' '}
+            <span className="inline-grid grid-cols-1 grid-rows-1 align-baseline text-left px-1 sm:px-1.5">
+              {FLIPPING_WORDS.map((item, idx) => {
+                const isActive = wordIndex === idx;
+                return (
+                  <span
+                    key={item.word}
+                    className={`col-start-1 row-start-1 inline-block transition-all duration-300 font-extrabold underline underline-offset-[8px] sm:underline-offset-[12px] decoration-[3px] sm:decoration-[4.5px] ${item.textColor} ${item.underlineColor} ${
+                      isActive
+                        ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                        : 'opacity-0 -translate-y-2 scale-95 pointer-events-none'
+                    }`}
+                  >
+                    {item.word}
+                  </span>
+                );
+              })}
+            </span>{' '}
+            <span>Simple</span>
           </h1>
 
           {/* Subtitle */}
