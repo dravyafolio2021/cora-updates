@@ -231,8 +231,8 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
         </div>
       </form>
 
-      {/* ── Quick Prompt Chips (Desktop/Tablet Only to Keep Mobile Ultra-Clean) ── */}
-      <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none py-2.5 px-1">
+      {/* ── Quick Prompt Chips (Desktop/Tablet Only, Flex-Wrap Centered with Zero Scrollbar) ── */}
+      <div className="hidden sm:flex flex-wrap items-center justify-center gap-1.5 py-2.5 px-1">
         <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider mr-0.5">
           Try:
         </span>

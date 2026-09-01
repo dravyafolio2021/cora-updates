@@ -73,25 +73,25 @@ export function ToolCard({ tool }: ToolCardProps) {
   return (
     <Link
       href={`/tools/${tool.slug}`}
-      className={`group rounded-2xl bg-white border border-zinc-200/80 ${theme.borderHover} p-4 sm:p-5 flex flex-col justify-between shadow-2xs hover:-translate-y-0.5 transition-all duration-200 min-h-[135px]`}
+      className={`group rounded-2xl bg-white border border-zinc-200/80 ${theme.borderHover} p-3.5 sm:p-4.5 lg:p-5 flex flex-col justify-between shadow-2xs hover:-translate-y-0.5 transition-all duration-200 min-h-[125px] sm:min-h-[140px]`}
     >
       <div>
         {/* Top Header: Icon & Top-Right Arrow */}
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div className={`w-8 h-8 rounded-xl ${theme.iconBg} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
-            <Icon className="w-4 h-4 stroke-[1.8]" />
+        <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl ${theme.iconBg} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
+            <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.8]" />
           </div>
 
-          <ArrowUpRight className="w-4 h-4 text-zinc-300 group-hover:text-zinc-950 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+          <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-300 group-hover:text-zinc-950 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
         </div>
 
         {/* Title */}
-        <h3 className="text-sm sm:text-base font-bold text-zinc-950 tracking-tight group-hover:text-black transition-colors mb-1">
+        <h3 className="text-xs sm:text-sm lg:text-[15px] font-bold text-zinc-950 tracking-tight group-hover:text-black transition-colors mb-1 line-clamp-1">
           {tool.shortTitle}
         </h3>
 
         {/* Clean, Simple 1-2 Line Description */}
-        <p className="text-xs text-zinc-500 font-normal leading-relaxed">
+        <p className="text-[11px] sm:text-xs text-zinc-500 font-normal leading-relaxed line-clamp-2">
           {cleanDesc}
         </p>
       </div>

@@ -273,14 +273,14 @@ export default function ToolsIndexPage() {
           </div>
         </div>
 
-        {/* Tools Cards Grid */}
+        {/* Tools Cards Grid (4 Columns on Desktop, 2 Columns on Mobile) */}
         {filteredTools.length === 0 ? (
           <div className="text-center py-16 bg-zinc-50 rounded-3xl border border-zinc-200">
             <span className="text-sm font-bold text-zinc-900 block mb-1">No tools match your search</span>
             <span className="text-xs text-zinc-500">Try clearing filters or search terms.</span>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
             {filteredTools.map((tool) => (
               <ToolCard key={tool.slug} tool={tool} />
             ))}
