@@ -12,7 +12,12 @@ import {
   Sparkles,
   Zap,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Calculator,
+  Receipt,
+  Scale,
+  Code,
+  QrCode
 } from 'lucide-react';
 import { 
   TOOLS_DATA, 
@@ -22,6 +27,7 @@ import {
 } from '@/lib/tools-data';
 import { ToolCard } from '@/components/tools/ToolCard';
 import { ToolCategoryHeroCard } from '@/components/tools/ToolCategoryHeroCard';
+import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 
 const TOOLS_FAQS = [
   {
@@ -79,44 +85,40 @@ export default function ToolsIndexPage() {
   return (
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. CENTERED HERO SECTION (CORA MONOCHROMATIC DESIGN SYSTEM) ── */}
-      <section className="relative w-full pt-16 sm:pt-24 pb-10 sm:pb-14 overflow-hidden bg-gradient-to-b from-zinc-50/90 via-white to-white border-b border-zinc-100">
-        
-        {/* Subtle Architectural Dot Matrix Background */}
-        <div 
-          className="absolute inset-0 opacity-[0.025] pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, #000 1px, transparent 0)`,
-            backgroundSize: '24px 24px'
-          }}
-        />
+      {/* ── 1. SIGNATURE ATMOSPHERIC PURE SKY HERO ── */}
+      <section className="relative w-full pt-16 sm:pt-24 pb-12 sm:pb-16 overflow-hidden border-b border-zinc-100">
+        <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
           {/* Breadcrumbs */}
-          <nav className="inline-flex items-center gap-1.5 text-xs text-zinc-500 font-medium mb-4">
+          <nav className="inline-flex items-center gap-1.5 text-xs text-zinc-600 font-medium mb-4">
             <Link href="/" className="hover:text-zinc-950 transition-colors">
               Home
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
             <span className="text-zinc-950 font-semibold">
               Free Micro-Tools
             </span>
           </nav>
 
-          {/* Status Badge */}
+          {/* Glassmorphic Status Pill */}
           <div className="mb-4">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-zinc-800 border border-zinc-200/90 text-xs font-semibold shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>100% Free Micro-Tools</span>
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 backdrop-blur-md text-zinc-900 border border-white/90 text-xs font-semibold shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>6 Free Turnkey Utilities</span>
               <span className="text-zinc-300">•</span>
-              <span className="text-zinc-500 font-mono text-[11px]">Zero Login Required</span>
+              <span className="text-emerald-700 font-mono text-[11px] font-bold">Zero Login Required</span>
             </span>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.15] mb-4 max-w-[860px] mx-auto">
-            Free Tools to Make <span className="underline decoration-zinc-300 underline-offset-8">Operations</span> Simple
+          {/* Main Headline with Glassmorphic Accent Badge */}
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.18] mb-4 max-w-[880px] mx-auto">
+            Free Tools to Make{' '}
+            <span className="inline-flex items-center justify-center px-3.5 py-0.5 rounded-2xl bg-white/90 backdrop-blur-md border border-white shadow-xs text-zinc-950 font-bold mx-1">
+              Operations
+            </span>{' '}
+            Simple
           </h1>
 
           {/* Subtitle */}
@@ -124,10 +126,10 @@ export default function ToolsIndexPage() {
             Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and developer embeds.
           </p>
 
-          {/* Central Elevated Search Capsule (Cora Monochromatic Styling) */}
+          {/* Central Elevated Search Capsule */}
           <form 
             onSubmit={handleSearchSubmit}
-            className="max-w-[540px] mx-auto bg-white rounded-full p-1.5 sm:p-2 border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex items-center justify-between gap-2 mb-10 sm:mb-14 focus-within:border-zinc-950 focus-within:ring-4 focus-within:ring-zinc-950/5 transition-all"
+            className="max-w-[560px] mx-auto bg-white/95 backdrop-blur-md rounded-full p-1.5 sm:p-2 border border-white/90 shadow-[0_12px_36px_rgba(0,0,0,0.06)] flex items-center justify-between gap-2 mb-10 sm:mb-14 focus-within:border-zinc-950 focus-within:ring-4 focus-within:ring-zinc-950/5 transition-all"
           >
             <div className="flex items-center gap-2.5 pl-3 flex-1">
               <Search className="w-4 h-4 text-zinc-400 shrink-0" />
@@ -147,7 +149,7 @@ export default function ToolsIndexPage() {
             </button>
           </form>
 
-          {/* ── 2. HORIZONTAL ROW OF CATEGORY CARDS ── */}
+          {/* ── 2. HORIZONTAL ROW OF LUMINOUS CATEGORY CARDS ── */}
           <div className="w-full overflow-x-auto pb-4 pt-1 scrollbar-none">
             <div className="flex lg:grid lg:grid-cols-6 gap-3 sm:gap-4 min-w-max lg:min-w-0 justify-start lg:justify-between px-1">
               {TOOL_CATEGORY_BLOCKS.map((block) => (
@@ -159,51 +161,51 @@ export default function ToolsIndexPage() {
         </div>
       </section>
 
-      {/* ── 3. METRICS RIBBON (CORA MONOCHROMATIC PALETTE) ── */}
+      {/* ── 3. METRICS RIBBON (AIRY & REFINED) ── */}
       <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-3 mb-12 sm:mb-16">
-        <div className="rounded-3xl bg-zinc-50 border border-zinc-200/90 p-6 sm:p-8 shadow-2xs">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center divide-y sm:divide-y-0 sm:divide-x divide-zinc-200/70">
+        <div className="rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-purple-50/70 border border-blue-100/80 p-6 sm:p-8 shadow-xs">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-center divide-y sm:divide-y-0 sm:divide-x divide-blue-200/50">
             
             {/* Metric 1 */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-2xl sm:text-3xl font-semibold text-zinc-950 tracking-tight">
+              <div className="font-display text-2xl sm:text-3xl font-bold text-blue-600 tracking-tight">
                 100k+
               </div>
               <div className="text-left">
-                <span className="block text-xs font-semibold text-zinc-900 leading-tight">Active</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Active</span>
                 <span className="block text-[11px] text-zinc-500 leading-tight">Tools Executed</span>
               </div>
             </div>
 
             {/* Metric 2 */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-2xl sm:text-3xl font-semibold text-zinc-950 tracking-tight">
+              <div className="font-display text-2xl sm:text-3xl font-bold text-emerald-600 tracking-tight">
                 ₹50Cr+
               </div>
               <div className="text-left">
-                <span className="block text-xs font-semibold text-zinc-900 leading-tight">Invoices</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Invoices</span>
                 <span className="block text-[11px] text-zinc-500 leading-tight">Calculated</span>
               </div>
             </div>
 
             {/* Metric 3 */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-2xl sm:text-3xl font-semibold text-zinc-950 tracking-tight">
+              <div className="font-display text-2xl sm:text-3xl font-bold text-purple-600 tracking-tight">
                 20+
               </div>
               <div className="text-left">
-                <span className="block text-xs font-semibold text-zinc-900 leading-tight">Online</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Online</span>
                 <span className="block text-[11px] text-zinc-500 leading-tight">Free Utilities</span>
               </div>
             </div>
 
             {/* Metric 4 */}
             <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4">
-              <div className="font-display text-2xl sm:text-3xl font-semibold text-zinc-950 tracking-tight">
+              <div className="font-display text-2xl sm:text-3xl font-bold text-amber-600 tracking-tight">
                 100%
               </div>
               <div className="text-left">
-                <span className="block text-xs font-semibold text-zinc-900 leading-tight">Free</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Free</span>
                 <span className="block text-[11px] text-zinc-500 leading-tight">Zero Login</span>
               </div>
             </div>
@@ -280,48 +282,40 @@ export default function ToolsIndexPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Ad-Hoc Way */}
-            <div className="rounded-3xl bg-white border border-zinc-200 p-6 sm:p-7 space-y-3.5">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500 block">
-                Standalone Web Micro-Tools
-              </span>
-              <ul className="space-y-2.5 text-xs sm:text-sm text-zinc-600">
-                <li className="flex items-start gap-2">
-                  <span className="text-zinc-400 font-bold">•</span>
-                  <span>Manual copy-pasting between calculator, word documents &amp; email clients</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-zinc-400 font-bold">•</span>
-                  <span>Zero saved client history or automated follow-up reminders</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-zinc-400 font-bold">•</span>
-                  <span>Manual generation of UPI QR codes and payment reconciliations</span>
-                </li>
-              </ul>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Column 1: Fragmented Tools */}
+            <div className="rounded-3xl bg-white border border-zinc-200/90 p-6 space-y-3">
+              <div className="w-8 h-1 bg-zinc-300 rounded-full mb-4" />
+              <h3 className="text-base font-bold text-zinc-950">
+                Fragmented Tool Sprawl
+              </h3>
+              <p className="text-xs text-zinc-600 leading-relaxed font-normal">
+                Manual copy-pasting between calculators, spreadsheets, and word docs reduces billing efficiency by up to <strong>35%</strong>.
+              </p>
             </div>
 
-            {/* Cora OS Autopilot */}
-            <div className="rounded-3xl bg-zinc-950 text-white border border-zinc-800 p-6 sm:p-7 space-y-3.5 shadow-md">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 block flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5" />
-                <span>Unified Cora Workspace OS</span>
-              </span>
-              <ul className="space-y-2.5 text-xs sm:text-sm text-zinc-300">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Proposals automatically draft IT Act 2000 contracts and e-sign links</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Invoices split 18% CGST/SGST and generate dynamic UPI QRs on autopilot</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>AI Co-Founder monitors sprint milestone staging releases and client sign-offs</span>
-                </li>
-              </ul>
+            {/* Column 2: Central Cora Intelligence */}
+            <div className="rounded-3xl bg-white border border-purple-200/80 p-6 space-y-3 shadow-sm">
+              <div className="w-8 h-1 bg-purple-500 rounded-full mb-4" />
+              <h3 className="text-base font-bold text-purple-950 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-purple-600" />
+                <span>Central Intelligence</span>
+              </h3>
+              <p className="text-xs text-zinc-600 leading-relaxed font-normal">
+                Proposals, 18% GST invoices, and SHA-256 e-sign agreements are automatically generated directly from client conversations.
+              </p>
+            </div>
+
+            {/* Column 3: Zero Question Chaos */}
+            <div className="rounded-3xl bg-white border border-emerald-200/80 p-6 space-y-3 shadow-sm">
+              <div className="w-8 h-1 bg-emerald-500 rounded-full mb-4" />
+              <h3 className="text-base font-bold text-emerald-950 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Zero Scope Chaos</span>
+              </h3>
+              <p className="text-xs text-zinc-600 leading-relaxed font-normal">
+                Save <strong>2.5 hours daily</strong> with built-in scope creep buffers, dynamic UPI QR collections, and instant milestone releases.
+              </p>
             </div>
           </div>
         </div>

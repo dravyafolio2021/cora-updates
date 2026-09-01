@@ -1,4 +1,4 @@
-import { Calculator, Sparkles, Code, Scale, Receipt, QrCode, FileText, Briefcase, Zap, ShieldCheck } from 'lucide-react';
+import { Calculator, Sparkles, Code, Scale, Receipt, QrCode } from 'lucide-react';
 
 export interface ToolItem {
   id: string;
@@ -23,11 +23,14 @@ export interface ToolCategoryBlock {
   subtitle: string;
   count: string;
   iconName: string;
-  bgColor: string;
+  cardBg: string;
+  iconBg: string;
   accentText: string;
+  borderColor: string;
+  borderHover: string;
+  badgeBg: string;
   featuredToolName: string;
   featuredToolSlug: string;
-  featuredToolBadgeColor: string;
 }
 
 export const TOOL_CATEGORY_BLOCKS: ToolCategoryBlock[] = [
@@ -37,11 +40,14 @@ export const TOOL_CATEGORY_BLOCKS: ToolCategoryBlock[] = [
     subtitle: 'Solve Your GST Problems',
     count: '5+ tools',
     iconName: 'Calculator',
-    bgColor: 'bg-[#6366F1]',
-    accentText: 'text-[#6366F1]',
+    cardBg: 'bg-gradient-to-b from-[#EEF4FF] via-[#E4EEFE] to-white',
+    iconBg: 'bg-indigo-600 text-white shadow-[0_6px_16px_rgba(79,70,229,0.25)]',
+    accentText: 'text-indigo-600',
+    borderColor: 'border-indigo-100/90',
+    borderHover: 'hover:border-indigo-400 hover:shadow-[0_16px_36px_rgba(79,70,229,0.12)]',
+    badgeBg: 'bg-indigo-100/90 text-indigo-700',
     featuredToolName: 'GST Calculator',
     featuredToolSlug: 'gst-calculator',
-    featuredToolBadgeColor: 'bg-indigo-50 text-indigo-700',
   },
   {
     id: 'retainer_agency',
@@ -49,11 +55,14 @@ export const TOOL_CATEGORY_BLOCKS: ToolCategoryBlock[] = [
     subtitle: 'Solve Your Scope Problems',
     count: '4+ tools',
     iconName: 'Receipt',
-    bgColor: 'bg-[#F97316]',
-    accentText: 'text-[#F97316]',
+    cardBg: 'bg-gradient-to-b from-[#FFF7ED] via-[#FFEDD5] to-white',
+    iconBg: 'bg-orange-500 text-white shadow-[0_6px_16px_rgba(249,115,22,0.25)]',
+    accentText: 'text-orange-600',
+    borderColor: 'border-orange-100/90',
+    borderHover: 'hover:border-orange-400 hover:shadow-[0_16px_36px_rgba(249,115,22,0.12)]',
+    badgeBg: 'bg-orange-100/90 text-orange-700',
     featuredToolName: 'Retainer Math',
     featuredToolSlug: 'retainer-calculator',
-    featuredToolBadgeColor: 'bg-orange-50 text-orange-700',
   },
   {
     id: 'ai_copy',
@@ -61,11 +70,14 @@ export const TOOL_CATEGORY_BLOCKS: ToolCategoryBlock[] = [
     subtitle: 'Solve Your Copy Problems',
     count: '6+ tools',
     iconName: 'Sparkles',
-    bgColor: 'bg-[#E11D48]',
-    accentText: 'text-[#E11D48]',
+    cardBg: 'bg-gradient-to-b from-[#FFF1F2] via-[#FFE4E6] to-white',
+    iconBg: 'bg-rose-500 text-white shadow-[0_6px_16px_rgba(244,63,94,0.25)]',
+    accentText: 'text-rose-600',
+    borderColor: 'border-rose-100/90',
+    borderHover: 'hover:border-rose-400 hover:shadow-[0_16px_36px_rgba(244,63,94,0.12)]',
+    badgeBg: 'bg-rose-100/90 text-rose-700',
     featuredToolName: 'Listing AI',
     featuredToolSlug: 'listing-ai',
-    featuredToolBadgeColor: 'bg-rose-50 text-rose-700',
   },
   {
     id: 'contracts_legal',
@@ -73,11 +85,14 @@ export const TOOL_CATEGORY_BLOCKS: ToolCategoryBlock[] = [
     subtitle: 'Solve Your Contract Problems',
     count: '8+ tools',
     iconName: 'Scale',
-    bgColor: 'bg-[#2563EB]',
-    accentText: 'text-[#2563EB]',
+    cardBg: 'bg-gradient-to-b from-[#F0F9FF] via-[#E0F2FE] to-white',
+    iconBg: 'bg-blue-600 text-white shadow-[0_6px_16px_rgba(37,99,235,0.25)]',
+    accentText: 'text-blue-600',
+    borderColor: 'border-blue-100/90',
+    borderHover: 'hover:border-blue-400 hover:shadow-[0_16px_36px_rgba(37,99,235,0.12)]',
+    badgeBg: 'bg-blue-100/90 text-blue-700',
     featuredToolName: 'IT Act E-Sign',
     featuredToolSlug: 'contract-builder',
-    featuredToolBadgeColor: 'bg-blue-50 text-blue-700',
   },
   {
     id: 'developer_embed',
@@ -85,11 +100,14 @@ export const TOOL_CATEGORY_BLOCKS: ToolCategoryBlock[] = [
     subtitle: 'Solve Your Lead Problems',
     count: '5+ tools',
     iconName: 'Code',
-    bgColor: 'bg-[#0D9488]',
-    accentText: 'text-[#0D9488]',
+    cardBg: 'bg-gradient-to-b from-[#F0FDFA] via-[#CCFBF1] to-white',
+    iconBg: 'bg-teal-600 text-white shadow-[0_6px_16px_rgba(13,148,136,0.25)]',
+    accentText: 'text-teal-600',
+    borderColor: 'border-teal-100/90',
+    borderHover: 'hover:border-teal-400 hover:shadow-[0_16px_36px_rgba(13,148,136,0.12)]',
+    badgeBg: 'bg-teal-100/90 text-teal-700',
     featuredToolName: 'Embed Builder',
     featuredToolSlug: 'embed-builder',
-    featuredToolBadgeColor: 'bg-teal-50 text-teal-700',
   },
   {
     id: 'payments_upi',
@@ -97,11 +115,14 @@ export const TOOL_CATEGORY_BLOCKS: ToolCategoryBlock[] = [
     subtitle: 'Solve Your Payment Problems',
     count: '4+ tools',
     iconName: 'QrCode',
-    bgColor: 'bg-[#7C3AED]',
-    accentText: 'text-[#7C3AED]',
+    cardBg: 'bg-gradient-to-b from-[#FAF5FF] via-[#F3E8FF] to-white',
+    iconBg: 'bg-purple-600 text-white shadow-[0_6px_16px_rgba(147,51,234,0.25)]',
+    accentText: 'text-purple-600',
+    borderColor: 'border-purple-100/90',
+    borderHover: 'hover:border-purple-400 hover:shadow-[0_16px_36px_rgba(147,51,234,0.12)]',
+    badgeBg: 'bg-purple-100/90 text-purple-700',
     featuredToolName: 'Dynamic UPI QR',
     featuredToolSlug: 'upi-qr-generator',
-    featuredToolBadgeColor: 'bg-purple-50 text-purple-700',
   },
 ];
 
