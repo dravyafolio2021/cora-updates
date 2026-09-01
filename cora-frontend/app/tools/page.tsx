@@ -108,12 +108,12 @@ export default function ToolsIndexPage() {
             </span>
           </div>
 
-          {/* Headline with Stable 2-Line Structure & Exact Word-Fitting Curved SVG Underline (Zero Jump / Bounce) */}
+          {/* Headline with Stable 2-Line Structure & Zero-Adjustment Word Lock */}
           <h1 className="font-display text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.18] sm:leading-[1.14] mb-4 max-w-[960px] mx-auto">
             <span className="block">Free Tools to Make</span>
             <span className="block mt-1 sm:mt-2">
-              <span className="relative inline-block align-baseline text-left">
-                <span className="inline-block relative font-extrabold text-zinc-950 pb-1">
+              <span className="inline-flex items-baseline justify-center gap-2 sm:gap-3">
+                <span className="relative inline-block font-extrabold text-zinc-950 pb-1">
                   <span>{currentItem.word}</span>
                   <svg
                     key={currentItem.word}
@@ -131,8 +131,8 @@ export default function ToolsIndexPage() {
                     />
                   </svg>
                 </span>
-              </span>{' '}
-              <span>Simple</span>
+                <span>Simple</span>
+              </span>
             </span>
           </h1>
 
