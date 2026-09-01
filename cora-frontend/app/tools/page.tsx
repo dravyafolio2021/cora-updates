@@ -9,7 +9,10 @@ import {
   ShieldCheck, 
   Plus, 
   Minus,
-  Zap
+  Zap,
+  Lock,
+  Flame,
+  Check
 } from 'lucide-react';
 import { 
   TOOLS_DATA, 
@@ -22,7 +25,7 @@ import { ToolCategoryHeroCard } from '@/components/tools/ToolCategoryHeroCard';
 import { ToolsHeroAIInput } from '@/components/tools/ToolsHeroAIInput';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 
-const FLIPPING_WORDS = [
+const ROTATING_ITEMS = [
   { word: 'Operations', curveColor: '#2563EB' },
   { word: 'Marketing', curveColor: '#E11D48' },
   { word: 'Finance', curveColor: '#059669' },
@@ -33,20 +36,20 @@ const FLIPPING_WORDS = [
 
 const TOOLS_FAQS = [
   {
-    question: 'Are these tools completely free to use?',
-    answer: 'Yes, 100% free forever. There are no daily usage limits, hidden paywalls, or credit card requirements. All financial calculations and AI copy generators run instantly in your browser.'
+    question: 'Are these tools really 100% free with no hidden paywalls?',
+    answer: 'Yes, absolutely free forever. There are zero daily limits, zero login gates, and no credit card is ever requested. We believe essential business utilities—like 18% GST math, IT Act contracts, and UPI links—should be open and accessible to every Indian entrepreneur.'
   },
   {
-    question: 'Do these tools store my proprietary business or client data?',
-    answer: 'No. All calculations (such as GST splits, retainer formulas, UPI intent links, and legal clauses) are executed entirely client-side inside your browser. No financial numbers or client entities are logged or stored.'
+    question: 'Do these tools store or log my financial numbers or client names?',
+    answer: 'No. All calculations (such as GST splits, retainer formulas, UPI intent links, and legal clauses) are executed 100% client-side inside your browser. No financial numbers or client entities are transmitted or stored on any server.'
   },
   {
-    question: 'How do these micro-tools connect to the full Cora Workspace?',
-    answer: 'These standalone micro-tools provide instant utility for ad-hoc tasks. Inside the Cora Workspace OS, all these capabilities are unified into an autonomous engine that automatically drafts contracts, sends invoices with dynamic UPI QR codes, and tracks milestones without manual calculation.'
+    question: 'How do these free micro-tools connect to the Cora Workspace platform?',
+    answer: 'These standalone micro-tools solve immediate ad-hoc tasks for free. When your agency grows and you want these calculations, contracts, dynamic UPI invoices, and client portals automated on autopilot, you can launch a Cora Workspace in 3 minutes.'
   },
   {
-    question: 'Are the contracts compliant with the Indian IT Act 2000?',
-    answer: 'Yes. All generated legal clauses conform to Section 10A of the Information Technology Act 2000 regarding the validity of contracts formed through electronic means, complete with SHA-256 integrity provisions.'
+    question: 'Are the contract clauses legally valid under Indian law?',
+    answer: 'Yes. All generated legal clauses conform to Section 10A of the Information Technology Act 2000 regarding the validity of contracts formed through electronic means, complete with SHA-256 tamper-evident digital signature provisions.'
   }
 ];
 
@@ -59,8 +62,8 @@ export default function ToolsIndexPage() {
   // Smooth rotating word timer
   useEffect(() => {
     const interval = setInterval(() => {
-      setWordIndex((prev) => (prev + 1) % FLIPPING_WORDS.length);
-    }, 2600);
+      setWordIndex((prev) => (prev + 1) % ROTATING_ITEMS.length);
+    }, 2500);
 
     return () => clearInterval(interval);
   }, []);
@@ -86,66 +89,75 @@ export default function ToolsIndexPage() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
+  const currentItem = ROTATING_ITEMS[wordIndex];
+
   return (
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. SIGNATURE ATMOSPHERIC PURE SKY HERO ── */}
+      {/* ── 1. HIGH-TRUST "TROJAN HORSE" PURE SKY HERO ── */}
       <section className="relative w-full pt-16 sm:pt-24 pb-12 sm:pb-16 overflow-hidden border-b border-zinc-100">
         <ArtisticHeroBackground tone="neutral" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
-          {/* Single-Line Concise Status Badge */}
+          {/* High-Authority Status Badge */}
           <div className="mb-4 sm:mb-5">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/85 backdrop-blur-md text-zinc-900 border border-white/90 text-xs font-semibold shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>6 Free Turnkey Micro-Tools</span>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-zinc-900 border border-white/90 text-xs font-semibold shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Public Utility Suite for Indian Service Businesses</span>
             </span>
           </div>
 
-          {/* Dynamic Flipping Word with Snug Curved SVG Underline (Zero Layout Shift via CSS Grid Stacking) */}
-          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-zinc-950 tracking-[-0.035em] leading-[1.2] sm:leading-[1.18] mb-4 max-w-[960px] mx-auto">
+          {/* Headline with Exact Word-Fitting Curved SVG Underline (Zero Overshoot) */}
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.2] sm:leading-[1.18] mb-4 max-w-[960px] mx-auto">
             <span>Free Tools to Make</span>{' '}
-            <span className="inline-grid grid-cols-1 grid-rows-1 align-baseline text-left px-1 relative">
-              {FLIPPING_WORDS.map((item, idx) => {
-                const isActive = wordIndex === idx;
-                return (
-                  <span
-                    key={item.word}
-                    className={`col-start-1 row-start-1 inline-block transition-all duration-300 font-extrabold text-zinc-950 relative pb-1 ${
-                      isActive
-                        ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
-                        : 'opacity-0 -translate-y-2 scale-95 pointer-events-none'
-                    }`}
-                  >
-                    <span>{item.word}</span>
-                    <svg
-                      className={`absolute -bottom-1 left-0 w-full h-2.5 sm:h-3 overflow-visible pointer-events-none transition-all duration-300 ${
-                        isActive ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-75'
-                      }`}
-                      viewBox="0 0 200 12"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      preserveAspectRatio="none"
-                    >
-                      <path
-                        d="M3 9C60 3 140 2 197 8"
-                        stroke={item.curveColor}
-                        strokeWidth="3.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </span>
-                );
-              })}
+            <span className="relative inline-block text-left align-baseline mx-1">
+              <span className="inline-block relative font-extrabold text-zinc-950 pb-1">
+                <span>{currentItem.word}</span>
+                <svg
+                  key={currentItem.word}
+                  className="absolute -bottom-1 left-0 w-full h-2.5 sm:h-3 overflow-visible pointer-events-none animate-in fade-in zoom-in-95 duration-200"
+                  viewBox="0 0 100 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d="M2 9C30 2 70 2 98 8"
+                    stroke={currentItem.curveColor}
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
             </span>{' '}
             <span>Simple</span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[660px] mx-auto mb-8">
-            Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and dynamic UPI QR generation.
+          <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[660px] mx-auto mb-6 sm:mb-8">
+            Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and dynamic UPI QR generation. 
           </p>
+
+          {/* ── High-Trust Trojan Horse Value Pillars (Instant Confidence) ── */}
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-8 sm:mb-10 text-xs sm:text-sm font-medium text-zinc-700">
+            <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
+              <Check className="w-3.5 h-3.5 text-emerald-600 font-bold" />
+              <span>100% Free Forever</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
+              <Zap className="w-3.5 h-3.5 text-amber-500" />
+              <span>Zero Login Required</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
+              <Lock className="w-3.5 h-3.5 text-blue-600" />
+              <span>100% Client-Side Privacy</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Indian IT Act &amp; SAC 9983</span>
+            </div>
+          </div>
 
           {/* ── Central AI Copilot Input Capsule ── */}
           <div className="mb-10 sm:mb-14">
