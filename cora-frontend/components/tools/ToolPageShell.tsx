@@ -12,7 +12,8 @@ import {
   Share2, 
   Check, 
   CheckCircle2, 
-  ShieldCheck 
+  ShieldCheck,
+  ChevronDown 
 } from 'lucide-react';
 import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
 import { useToast } from '@/components/ui/Toast';
@@ -38,6 +39,7 @@ export function ToolPageShell({
 }: ToolPageShellProps) {
   const { showToast } = useToast();
   const [copiedShare, setCopiedShare] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   // Retrieve dynamic AI Agent and Showcase config for this specific tool
   const agentData: ToolAgentData = TOOL_AGENT_REGISTRY[toolId] || TOOL_AGENT_REGISTRY['gst-calculator'];
@@ -104,23 +106,47 @@ export function ToolPageShell({
               </div>
             </div>
 
-            {/* Optional FAQ Accordion for the Tool */}
+            {/* Optional FAQ Accordion for the Tool (Compact Collapsible Toggles) */}
             {faqItems && faqItems.length > 0 && (
-              <div className="pt-6 border-t border-zinc-200/60 space-y-4">
-                <h3 className="font-display text-lg font-bold text-zinc-950 tracking-tight">
-                  Frequently Asked Questions
-                </h3>
-                <div className="space-y-3">
-                  {faqItems.map((faq, idx) => (
-                    <div key={idx} className="p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs">
-                      <h4 className="text-xs sm:text-sm font-bold text-zinc-900 mb-1.5">
-                        {faq.question}
-                      </h4>
-                      <p className="text-xs text-zinc-600 leading-relaxed font-normal">
-                        {faq.answer}
-                      </p>
-                    </div>
-                  ))}
+              <div className="pt-6 border-t border-zinc-200/60 space-y-3">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
+                    Frequently Asked Questions
+                  </h3>
+                  <span className="text-[11px] font-mono text-zinc-400">
+                    {faqItems.length} FAQs
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {faqItems.map((faq, idx) => {
+                    const isOpen = openFaqIndex === idx;
+                    return (
+                      <div 
+                        key={idx} 
+                        className="rounded-2xl bg-white border border-zinc-200/80 shadow-2xs overflow-hidden transition-all"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                          className="w-full p-4 text-left flex items-center justify-between gap-3 hover:bg-zinc-50/60 transition-colors cursor-pointer"
+                        >
+                          <h4 className="text-xs sm:text-sm font-bold text-zinc-900 leading-snug">
+                            {faq.question}
+                          </h4>
+                          <ChevronDown 
+                            className={`w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200 ${
+                              isOpen ? 'rotate-180 text-zinc-900' : ''
+                            }`} 
+                          />
+                        </button>
+                        {isOpen && (
+                          <div className="px-4 pb-4 pt-1 text-xs text-zinc-600 leading-relaxed font-normal border-t border-zinc-100 bg-zinc-50/30 animate-in fade-in duration-150">
+                            {faq.answer}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
