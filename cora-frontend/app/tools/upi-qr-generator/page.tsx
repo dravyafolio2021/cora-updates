@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { ArrowLeft, QrCode, Copy, Check, Sparkles, ArrowRight, ShieldCheck, Download } from 'lucide-react';
+import Image from 'next/image';
+import { QrCode, Copy, Check, Download, ShieldCheck } from 'lucide-react';
+import { ToolPageShell } from '@/components/tools/ToolPageShell';
 import { useToast } from '@/components/ui/Toast';
 
 export default function UpiQrGeneratorPage() {
@@ -23,140 +24,130 @@ export default function UpiQrGeneratorPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  return (
-    <div className="py-12 md:py-20 bg-white min-h-screen">
-      <div className="w-full max-w-[960px] mx-auto px-4 sm:px-6">
-        
-        {/* Back navigation */}
-        <Link
-          href="/tools"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 mb-8 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to all micro-tools
-        </Link>
+  const upiFaqs = [
+    {
+      question: 'Are there any transaction fees on UPI QR payments?',
+      answer: 'No. Person-to-Merchant (P2M) and Person-to-Person (P2P) bank account UPI transfers carry 0% transaction fees under NPCI guidelines, settling directly into your linked current account.'
+    },
+    {
+      question: 'Which UPI apps support these dynamic QR codes?',
+      answer: 'All standard NPCI UPI apps support dynamic intent QR codes, including Google Pay, PhonePe, Paytm, BHIM, CRED, and all major Indian banking mobile apps.'
+    },
+    {
+      question: 'Can clients pay with credit cards via UPI?',
+      answer: 'Yes, if the client has linked a RuPay credit card to their UPI app, they can seamlessly scan and settle payments directly via UPI rail.'
+    }
+  ];
 
-        {/* Tool Header */}
-        <div className="mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200 text-[11px] font-mono font-bold mb-3">
-            <QrCode className="w-3.5 h-3.5" />
-            <span>0% Gateway Fees • Direct Bank Settlement</span>
+  return (
+    <ToolPageShell
+      toolId="upi-qr-generator"
+      badgeTag="⚡ NPCI UPI 2.0 Standard"
+      title="Dynamic UPI QR & Payment Generator"
+      subtitle="Create instant UPI payment QR codes and deep links pre-filled with exact invoice amounts. Compatible with Google Pay, PhonePe, Paytm, and BHIM."
+      faqItems={upiFaqs}
+    >
+      {/* ── 70% Tool Workspace (Interactive Split Form + QR Card) ── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+        
+        {/* Left Console (7 Cols) */}
+        <div className="md:col-span-7 bg-white border border-zinc-200/90 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+          <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500 pb-2 border-b border-zinc-100">
+            Payment Parameters
+          </h3>
+
+          <div>
+            <label className="text-xs font-bold text-zinc-800 block mb-1">Payee UPI ID (VPA)</label>
+            <input
+              type="text"
+              value={vpa}
+              onChange={(e) => setVpa(e.target.value)}
+              placeholder="username@okhdfcbank"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-950"
+            />
           </div>
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-950 mb-3">
-            Dynamic UPI QR &amp; Payment Generator
-          </h1>
-          <p className="text-sm sm:text-base text-zinc-600 max-w-[700px] leading-relaxed">
-            Create instant UPI payment QR codes and deep links pre-filled with exact invoice amounts. Compatible with Google Pay, PhonePe, Paytm, and BHIM.
-          </p>
+
+          <div>
+            <label className="text-xs font-bold text-zinc-800 block mb-1">Payee Business Name</label>
+            <input
+              type="text"
+              value={payeeName}
+              onChange={(e) => setPayeeName(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-950"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-zinc-800 block mb-1">Invoice Amount (₹)</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(Math.max(0, Number(e.target.value)))}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-950"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-zinc-800 block mb-1">Transaction Note / Invoice Ref</label>
+            <input
+              type="text"
+              value={invoiceNote}
+              onChange={(e) => setInvoiceNote(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-950"
+            />
+          </div>
         </div>
 
-        {/* Main Grid: Form & Live QR Code */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Controls Form (Left) */}
-          <div className="lg:col-span-7 bg-white border border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500 pb-2 border-b border-zinc-100">
-              Payment Parameters
-            </h3>
-
-            <div>
-              <label className="text-xs font-bold text-zinc-800 block mb-1">Payee UPI ID (VPA)</label>
-              <input
-                type="text"
-                value={vpa}
-                onChange={(e) => setVpa(e.target.value)}
-                placeholder="username@okhdfcbank"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-950"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-zinc-800 block mb-1">Payee Business Name</label>
-              <input
-                type="text"
-                value={payeeName}
-                onChange={(e) => setPayeeName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-950"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-bold text-zinc-800 block mb-1">Invoice Amount (INR)</label>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(Number(e.target.value))}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-950"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-zinc-800 block mb-1">Invoice Reference / Note</label>
-                <input
-                  type="text"
-                  value={invoiceNote}
-                  onChange={(e) => setInvoiceNote(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-950"
-                />
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 text-xs text-zinc-700 space-y-1.5">
-              <div className="flex items-center gap-1.5 font-bold text-zinc-900">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Zero Intermediary Deductions</span>
-              </div>
-              <p className="text-[11.5px] text-zinc-500 leading-relaxed">
-                UPI transactions route directly into your bank account. No 2-3% payment gateway commission fees.
-              </p>
-            </div>
-          </div>
-
-          {/* QR Code & Payment Summary (Right) */}
-          <div className="lg:col-span-5 bg-zinc-950 text-white rounded-3xl p-6 sm:p-7 shadow-xl flex flex-col items-center justify-between text-center space-y-5">
+        {/* Right Output QR Canvas (5 Cols) */}
+        <div className="md:col-span-5 bg-white border border-zinc-200/90 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col justify-between items-center text-center">
+          <div className="w-full">
+            <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider block mb-3 font-semibold">
+              Live Dynamic QR
+            </span>
             
-            <div className="w-full pb-3 border-b border-zinc-800 flex items-center justify-between text-xs font-mono">
-              <span className="text-zinc-400">Scan to Pay</span>
-              <span className="text-emerald-400 font-bold">₹{amount.toLocaleString('en-IN')}</span>
-            </div>
-
-            {/* QR Card Container */}
-            <div className="bg-white p-4 rounded-2xl shadow-md">
+            {/* QR Canvas */}
+            <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200 inline-block mb-3">
               <img
                 src={qrImageUrl}
-                alt="Dynamic UPI QR Code"
-                className="w-48 h-48 object-contain rounded-lg"
+                alt="UPI QR Code"
+                width={180}
+                height={180}
+                className="rounded-lg mx-auto"
               />
             </div>
 
-            <div className="space-y-1">
-              <span className="font-mono text-xs font-bold text-white block">{payeeName}</span>
-              <span className="font-mono text-[11px] text-zinc-400 block">{vpa}</span>
+            <div className="font-mono text-lg font-bold text-zinc-950">
+              ₹{amount.toLocaleString('en-IN')}
             </div>
-
-            {/* Actions */}
-            <div className="w-full space-y-2.5 pt-2">
-              <button
-                onClick={copyUpiLink}
-                className="w-full py-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-              >
-                {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                <span>{copied ? 'UPI Link Copied!' : 'Copy UPI Intent Link'}</span>
-              </button>
-
-              <a
-                href={upiIntentUrl}
-                className="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-xs border border-zinc-700 transition-all flex items-center justify-center gap-1.5"
-              >
-                <span>Open in UPI App (Mobile)</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-              </a>
+            <div className="text-[11px] text-zinc-500 font-mono truncate max-w-[200px] mx-auto">
+              {vpa}
             </div>
-
           </div>
 
+          <div className="w-full space-y-2 mt-4 pt-4 border-t border-zinc-100">
+            <button
+              type="button"
+              onClick={copyUpiLink}
+              className="w-full py-2.5 px-4 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
+              <span>{copied ? 'Copied Deep-Link!' : 'Copy UPI Intent Link'}</span>
+            </button>
+
+            <a
+              href={qrImageUrl}
+              download="cora-upi-qr.png"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-2.5 px-4 rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-800 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+            >
+              <Download className="w-3.5 h-3.5 text-zinc-500" />
+              <span>Download QR Code Image</span>
+            </a>
+          </div>
         </div>
 
       </div>
-    </div>
+    </ToolPageShell>
   );
 }

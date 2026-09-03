@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -10,14 +10,13 @@ import {
   ExternalLink,
   Lock,
   Zap,
-  MoreHorizontal,
-  Globe,
-  ThumbsUp,
-  MessageCircle,
   Share2,
-  Star,
-  Check
+  Check,
+  CheckCircle2,
+  ShieldCheck
 } from 'lucide-react';
+import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
+import { useToast } from '@/components/ui/Toast';
 
 export interface ToolPageShellProps {
   toolId: string;
@@ -25,26 +24,6 @@ export interface ToolPageShellProps {
   title: string;
   subtitle: string;
   children: React.ReactNode;
-  
-  // Ad 1: Meta / Facebook Style Sponsored Feed Ad
-  metaAd: {
-    primaryText: string;
-    image: string;
-    headline: string;
-    description: string;
-    ctaText?: string;
-    badge?: string;
-  };
-
-  // Ad 2: Google Performance / Discovery Sponsored Ad
-  googleAd: {
-    title: string;
-    description: string;
-    sitelinks: string[];
-    ctaText?: string;
-    image?: string;
-  };
-
   faqItems?: Array<{ question: string; answer: string }>;
   relatedToolSlugs?: string[];
 }
@@ -55,11 +34,24 @@ export function ToolPageShell({
   title,
   subtitle,
   children,
-  metaAd,
-  googleAd,
   faqItems,
   relatedToolSlugs = [],
 }: ToolPageShellProps) {
+  const { showToast } = useToast();
+  const [copiedShare, setCopiedShare] = useState(false);
+
+  // Retrieve dynamic AI Agent and Showcase config for this specific tool
+  const agentData: ToolAgentData = TOOL_AGENT_REGISTRY[toolId] || TOOL_AGENT_REGISTRY['gst-calculator'];
+
+  const handleShareTool = () => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopiedShare(true);
+      showToast('Tool link copied to clipboard!');
+      setTimeout(() => setCopiedShare(false), 2200);
+    }
+  };
+
   return (
     <div className="w-full bg-[#FAFAF9] text-zinc-900 min-h-screen py-10 sm:py-16 selection:bg-zinc-900 selection:text-white">
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
@@ -137,159 +129,160 @@ export function ToolPageShell({
           </div>
 
           {/* ══════════════════════════════════════════════════════════════
-              30% RIGHT SECTION (TWO HIGH-CONVERTING SPONSORED ADS)
+              30% RIGHT SECTION (DYNAMIC AI AGENT & ECOSYSTEM SHOWCASE)
               ══════════════════════════════════════════════════════════════ */}
           <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-5">
             
             {/* ──────────────────────────────────────────────────────────
-                AD 1: META / FACEBOOK SPONSORED FEED AD CREATIVE
+                CARD 1: DYNAMIC AI AGENT SHOWCASE CARD
                 ────────────────────────────────────────────────────────── */}
             <div className="rounded-2xl bg-white border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden transition-all hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
               
-              {/* Sponsored Ad Header */}
-              <div className="p-3.5 sm:p-4 flex items-center justify-between border-b border-zinc-100">
+              {/* Dynamic AI Agent Header */}
+              <div className="p-3.5 sm:p-4 flex items-center justify-between border-b border-zinc-100 bg-zinc-50/50">
                 <div className="flex items-center gap-2.5">
-                  {/* Brand Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shadow-2xs">
-                    C
+                  {/* Agent Avatar with Live Status Pulse */}
+                  <div className="relative w-9 h-9 rounded-full overflow-hidden border border-zinc-200 shadow-2xs shrink-0">
+                    <Image
+                      src={agentData.agent.avatar}
+                      alt={agentData.agent.name}
+                      fill
+                      className="object-cover object-top"
+                      sizes="36px"
+                    />
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs font-bold text-zinc-950 leading-tight">Cora</span>
-                      <span className="text-[10px] text-blue-600 font-bold">✓</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-zinc-950 leading-tight">
+                        {agentData.agent.name}
+                      </span>
+                      <span className="px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 text-[9.5px] font-mono font-bold">
+                        AI
+                      </span>
                     </div>
-                    <div className="flex items-center gap-1 text-[10px] text-zinc-400 font-medium">
-                      <span>Sponsored</span>
-                      <span>•</span>
-                      <Globe className="w-2.5 h-2.5 text-zinc-400" />
+                    <div className="text-[10.5px] text-zinc-500 font-medium leading-tight">
+                      {agentData.agent.role}
                     </div>
                   </div>
                 </div>
-                <MoreHorizontal className="w-4 h-4 text-zinc-400 hover:text-zinc-600 cursor-pointer" />
+
+                {/* Interactive Share Tool Button */}
+                <button
+                  type="button"
+                  onClick={handleShareTool}
+                  title="Share this tool"
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer"
+                >
+                  {copiedShare ? (
+                    <Check className="w-4 h-4 text-emerald-600" />
+                  ) : (
+                    <Share2 className="w-4 h-4" />
+                  )}
+                </button>
               </div>
 
-              {/* Primary Ad Copy Text */}
-              <div className="px-3.5 sm:px-4 pt-3 pb-2.5">
+              {/* Primary Transformation Copy */}
+              <div className="px-3.5 sm:px-4 pt-3.5 pb-2.5">
                 <p className="text-xs text-zinc-800 font-normal leading-relaxed">
-                  {metaAd.primaryText}
+                  {agentData.card1.primaryText}
                 </p>
               </div>
 
-              {/* Ad Creative Image Banner */}
-              <div className="relative w-full h-44 sm:h-48 bg-zinc-900 overflow-hidden">
+              {/* Dynamic 3D Feature Visual */}
+              <div className="relative w-full h-44 sm:h-48 bg-zinc-950 overflow-hidden">
                 <Image
-                  src={metaAd.image}
-                  alt={metaAd.headline}
+                  src={agentData.card1.image}
+                  alt={agentData.card1.headline}
                   fill
                   className="object-cover object-center hover:scale-105 transition-transform duration-500"
                   sizes="(max-width: 768px) 100vw, 400px"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                 
-                {metaAd.badge && (
-                  <div className="absolute top-2.5 right-2.5">
-                    <span className="px-2.5 py-1 rounded-full bg-zinc-950/85 backdrop-blur-md text-white text-[10px] font-mono font-bold tracking-wide border border-white/20 shadow-xs">
-                      {metaAd.badge}
-                    </span>
-                  </div>
-                )}
+                {/* Dynamic Feature Badge */}
+                <div className="absolute top-2.5 right-2.5">
+                  <span className="px-2.5 py-1 rounded-full bg-zinc-950/85 backdrop-blur-md text-white text-[10px] font-mono font-bold tracking-wide border border-white/20 shadow-xs">
+                    {agentData.card1.badge}
+                  </span>
+                </div>
+
+                {/* Bottom Headline Overlay */}
+                <div className="absolute bottom-2.5 left-3.5 right-3.5">
+                  <h4 className="text-xs font-bold text-white leading-snug drop-shadow-sm">
+                    {agentData.card1.headline}
+                  </h4>
+                </div>
               </div>
 
-              {/* Ad Link Preview Footer & CTA */}
+              {/* Action Bar */}
               <div className="p-3.5 sm:p-4 bg-zinc-50 border-t border-zinc-100 flex items-center justify-between gap-3">
                 <div className="min-w-0 pr-1">
                   <span className="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider truncate">
-                    heycora.in
+                    heycora.in/workspace
                   </span>
-                  <h4 className="text-xs font-bold text-zinc-950 truncate leading-snug">
-                    {metaAd.headline}
-                  </h4>
-                  <p className="text-[11px] text-zinc-500 truncate font-normal">
-                    {metaAd.description}
+                  <p className="text-[11px] text-zinc-600 truncate font-normal">
+                    {agentData.card1.description}
                   </p>
                 </div>
                 <a
-                  href="http://cora.local/workspace/login?utm_source=meta_ad_unit"
+                  href="http://cora.local/workspace/login?utm_source=tool_agent_unit"
                   className="shrink-0 px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>{metaAd.ctaText || 'Sign Up'}</span>
-                  <ExternalLink className="w-3 h-3 text-zinc-400" />
+                  <span>{agentData.card1.ctaText}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                 </a>
-              </div>
-
-              {/* Simulated Social Engagement Bar */}
-              <div className="px-3.5 py-2 bg-white border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-500 font-medium">
-                <div className="flex items-center gap-1.5">
-                  <span className="flex -space-x-1">
-                    <span className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-[9px] text-white">👍</span>
-                    <span className="w-4 h-4 rounded-full bg-rose-500 flex items-center justify-center text-[9px] text-white">❤️</span>
-                  </span>
-                  <span>4.8k</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span>384 comments</span>
-                  <span>1.2k shares</span>
-                </div>
               </div>
 
             </div>
 
             {/* ──────────────────────────────────────────────────────────
-                AD 2: GOOGLE DISPLAY / SEARCH DISCOVERY SPONSORED AD UNIT
+                CARD 2: AUTONOMOUS ECOSYSTEM & CAPABILITY SHOWCASE
                 ────────────────────────────────────────────────────────── */}
-            <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-3 transition-all hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+            <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-3.5 transition-all hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
               
-              {/* Google Ad Badge & URL */}
+              {/* Category Header */}
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="px-1.5 py-0.5 rounded bg-amber-100/80 border border-amber-200 text-amber-900 font-bold text-[10px] font-mono leading-none">
-                    Ad
-                  </span>
-                  <span className="text-[11px] text-zinc-500 font-medium truncate">
-                    https://heycora.in/workspace/free
-                  </span>
+                <div className="inline-flex items-center gap-1.5 text-[10.5px] font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-200/80 px-2.5 py-0.5 rounded-full">
+                  <Sparkles className="w-3 h-3 text-indigo-600" />
+                  <span>Cora Autonomous OS</span>
                 </div>
-                <div className="flex items-center gap-0.5 text-amber-500">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-2.5 h-2.5 fill-current" />
-                  ))}
-                </div>
+                <span className="text-[10.5px] font-mono text-emerald-700 font-bold">
+                  100% Free Tier
+                </span>
               </div>
 
-              {/* Ad Title */}
+              {/* Title & Description */}
               <div>
-                <a
-                  href="http://cora.local/workspace/login?utm_source=google_ad_unit"
-                  className="text-sm font-bold text-blue-600 hover:underline leading-snug cursor-pointer block"
-                >
-                  {googleAd.title}
-                </a>
+                <h4 className="text-sm font-bold text-zinc-950 leading-snug">
+                  {agentData.card2.title}
+                </h4>
                 <p className="text-xs text-zinc-600 font-normal leading-relaxed mt-1">
-                  {googleAd.description}
+                  {agentData.card2.description}
                 </p>
               </div>
 
-              {/* Sitelink Extensions */}
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 text-[11px]">
-                {googleAd.sitelinks.map((link, idx) => (
-                  <div key={idx} className="flex items-center gap-1 text-zinc-700 font-medium">
-                    <Check className="w-3 h-3 text-emerald-600 shrink-0" />
-                    <span className="truncate">{link}</span>
+              {/* 4 Dynamic Capabilities */}
+              <div className="space-y-2 pt-2 border-t border-zinc-100 text-xs">
+                {agentData.card2.capabilities.map((cap, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-zinc-800 font-medium">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span className="truncate">{cap}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Big High-Converting Signup Action */}
+              {/* Primary Signup Action */}
               <div className="pt-2">
                 <a
-                  href="http://cora.local/workspace/login?utm_source=google_ad_unit_cta"
+                  href="http://cora.local/workspace/login?utm_source=tool_ecosystem_cta"
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs transition-all shadow-xs cursor-pointer"
                 >
-                  <span>{googleAd.ctaText || 'Claim Free Workspace'}</span>
+                  <span>{agentData.card2.ctaText}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                 </a>
                 <span className="block text-center text-[10px] text-zinc-400 mt-1.5 font-medium">
-                  100% Free Forever • Zero Credit Card • 90-sec Setup
+                  100% Free Forever • Zero Credit Card • Setup in 90s
                 </span>
               </div>
 
