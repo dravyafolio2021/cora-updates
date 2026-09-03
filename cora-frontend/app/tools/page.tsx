@@ -93,9 +93,9 @@ export default function ToolsIndexPage() {
   return (
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. BESPOKE ARCHITECTURAL STUDIO HERO (DISTINCT FROM HOMEPAGE SKY) ── */}
+      {/* ── 1. PRECISION TOOLS MATRIX HERO (CLEAN TECH CANVAS) ── */}
       <section className="relative w-full pt-16 sm:pt-24 pb-10 sm:pb-16 overflow-hidden">
-        <ArtisticHeroBackground tone="studio" />
+        <ArtisticHeroBackground tone="tools" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
