@@ -12,7 +12,8 @@ import {
   Share2, 
   Check, 
   ChevronDown,
-  Clock
+  Clock,
+  Flame
 } from 'lucide-react';
 import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
 import { useToast } from '@/components/ui/Toast';
@@ -174,7 +175,7 @@ export function ToolPageShell({
           <div className="lg:col-span-4 lg:sticky lg:top-24">
             
             {/* ── Immersive Full-Bleed Creative Card ── */}
-            <div className="relative rounded-[28px] overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.14)] border border-zinc-200/80 bg-zinc-950 min-h-[490px] sm:min-h-[530px] flex flex-col justify-between p-5 sm:p-6 text-white group">
+            <div className="relative rounded-[28px] overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.16)] border border-zinc-200/80 bg-zinc-950 min-h-[510px] sm:min-h-[550px] flex flex-col justify-between p-5 sm:p-6 text-white group">
               
               {/* Full-Bleed 3D Visual Artwork */}
               <Image
@@ -188,7 +189,7 @@ export function ToolPageShell({
 
               {/* Multi-Stop Dark Vignettes for Contrast & Legibility */}
               <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-black/95 via-black/80 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-84 bg-gradient-to-t from-black/98 via-black/85 to-transparent pointer-events-none" />
 
               {/* Top Right Frosted Feature Pill */}
               <div className="relative z-10 flex justify-end">
@@ -199,7 +200,7 @@ export function ToolPageShell({
               </div>
 
               {/* Bottom Content Overlay */}
-              <div className="relative z-10 space-y-3 pt-20">
+              <div className="relative z-10 space-y-3 pt-16">
                 
                 {/* 1-Liner Headline + Share Button */}
                 <div className="flex items-center justify-between gap-2.5">
@@ -227,28 +228,33 @@ export function ToolPageShell({
                   {agentData.card1.primaryText}
                 </p>
 
-                {/* Bottom Action Bar with 40% India Flash Discount & Live 10-Min Timer */}
-                <div className="flex items-center justify-between gap-2 pt-3 border-t border-white/15">
-                  <div className="min-w-0 pr-1">
-                    <div className="flex items-center gap-1.5 text-[10.5px] font-mono uppercase tracking-wider text-amber-300 font-bold">
-                      <Sparkles className="w-3 h-3 shrink-0" />
-                      <span className="truncate">40% OFF &bull; INDIA PLAN</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-[11px] font-mono text-zinc-300 font-medium mt-0.5">
-                      <Clock className="w-3 h-3 text-zinc-400 shrink-0" />
-                      <span>{formatTimer(secondsLeft)} min Left</span>
+                {/* ── HIGHLY VISIBLE 40% DISCOUNT & COUNTDOWN TIMER RIBBON ── */}
+                <div className="p-2.5 rounded-2xl bg-amber-400/20 border border-amber-400/50 backdrop-blur-md flex items-center justify-between gap-2 shadow-sm">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <Flame className="w-4 h-4 text-amber-400 shrink-0 fill-amber-400" />
+                    <div className="truncate">
+                      <span className="text-[11.5px] font-mono font-extrabold text-amber-300 tracking-wide block leading-tight">
+                        40% FLASH OFF: ₹299/mo
+                      </span>
+                      <span className="text-[9.5px] text-zinc-300 font-mono">
+                        Reg. ₹499 &bull; Save ₹2,400/yr
+                      </span>
                     </div>
                   </div>
-
-                  {/* Primary Launch & Claim Action Pill */}
-                  <Link
-                    href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-zinc-950/90 hover:bg-black text-white font-bold text-xs border border-white/25 shadow-lg backdrop-blur-md hover:scale-105 transition-all cursor-pointer shrink-0"
-                  >
-                    <span>{agentData.card1.ctaText}</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                  </Link>
+                  <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-white bg-black/60 px-2.5 py-1 rounded-xl border border-white/20 shrink-0 shadow-inner">
+                    <Clock className="w-3 h-3 text-amber-400 shrink-0" />
+                    <span>{formatTimer(secondsLeft)}</span>
+                  </div>
                 </div>
+
+                {/* Full-Width High-Contrast Primary Action Button */}
+                <Link
+                  href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
+                  className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  <span>Claim 40% Off with {agentData.agent.name.split(' ')[0]}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-zinc-950" />
+                </Link>
 
               </div>
 

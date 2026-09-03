@@ -33,7 +33,8 @@ import {
   Layers,
   Clock,
   AlertCircle,
-  RotateCcw
+  RotateCcw,
+  Flame
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 
@@ -78,13 +79,29 @@ export default function PricingPage() {
   const [showComparison, setShowComparison] = useState(false);
   const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [flashSecondsLeft, setFlashSecondsLeft] = useState(600);
 
   const topToggleRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
-  // Dynamic Coupon & URL Parameter Detection
+  // Dynamic Countdown Timer for 40% Flash Discount
+  useEffect(() => {
+    if (appliedCoupon === 'INDIA40') {
+      const timer = setInterval(() => {
+        setFlashSecondsLeft((prev) => (prev > 0 ? prev - 1 : 600));
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [appliedCoupon]);
+
+  const formatFlashTimer = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Dynamic Coupon & URL Parameter Detection + Confetti Blast
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -94,6 +111,20 @@ export default function PricingPage() {
         setAppliedCoupon('INDIA40');
         setCurrency('INR');
         setIsIndia(true);
+
+        // Trigger celebratory confetti paper blast
+        setTimeout(async () => {
+          try {
+            const confetti = (await import('canvas-confetti')).default;
+            confetti({
+              particleCount: 140,
+              spread: 90,
+              origin: { y: 0.6 },
+              colors: ['#f59e0b', '#10b981', '#6366f1', '#ec4899', '#000000', '#fbbf24']
+            });
+          } catch (e) {}
+        }, 300);
+
         if (plan === 'india_only') {
           setTimeout(() => {
             const el = document.getElementById('india-only-plan');
@@ -228,6 +259,45 @@ export default function PricingPage() {
 
         </div>
       </section>
+
+      {/* ── 40% FLASH DISCOUNT CELEBRATION TOP BANNER ── */}
+      {appliedCoupon === 'INDIA40' && (
+        <div className="w-full max-w-[1240px] mx-auto px-3.5 sm:px-6 mb-8 -mt-6 relative z-20">
+          <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white p-4 sm:p-5 shadow-2xl border-2 border-amber-300/60 flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center gap-3 text-left">
+              <span className="text-3xl sm:text-4xl shrink-0">🎉</span>
+              <div>
+                <div className="text-sm sm:text-base font-extrabold tracking-tight flex items-center gap-2 flex-wrap">
+                  <span>40% FLASH DISCOUNT UNLOCKED!</span>
+                  <span className="px-2 py-0.5 rounded-lg bg-black/40 font-mono text-xs border border-white/20">
+                    CODE: INDIA40
+                  </span>
+                </div>
+                <div className="text-xs sm:text-sm text-amber-100 font-medium mt-0.5">
+                  You unlocked the India Only Plan for <strong className="text-white font-extrabold underline decoration-white decoration-2">₹299/mo</strong> (Reg. ₹499) &bull; Save ₹2,400/yr
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 shrink-0 w-full md:w-auto justify-between md:justify-end">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/50 backdrop-blur-md border border-white/20 font-mono text-xs font-bold text-amber-200">
+                <Clock className="w-3.5 h-3.5 text-amber-300" />
+                <span>Expires in: {formatFlashTimer(flashSecondsLeft)}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('india-only-plan');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+                className="px-4 py-2 rounded-xl bg-white text-zinc-950 font-extrabold text-xs hover:bg-amber-50 transition-all shadow-md cursor-pointer shrink-0"
+              >
+                Claim Deal ↓
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════════
           ROW 1: FREE FOREVER USP SHOWCASE (MOBILE OPTIMIZED COMPACT 2-COL GRID)
@@ -1280,7 +1350,7 @@ export default function PricingPage() {
           {/* Top Row: Identity, Subsidized Price & Primary CTA */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6 pb-4 sm:pb-6 border-b border-zinc-200/80">
             
-            <div className="space-y-1.5 sm:space-y-2.5 max-w-[660px]">
+            <div className="space-y-2 sm:space-y-2.5 max-w-[660px]">
               <div className="flex flex-wrap items-center gap-2">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-100/80 border border-amber-200/80 text-[10px] sm:text-xs font-bold text-amber-900">
                   <Building2 className="w-3.5 h-3.5 text-amber-700" />
@@ -1289,10 +1359,23 @@ export default function PricingPage() {
                 {appliedCoupon === 'INDIA40' && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 text-[10px] sm:text-xs font-mono font-bold animate-pulse">
                     <Sparkles className="w-3 h-3 text-emerald-700" />
-                    <span>40% FLASH DISCOUNT APPLIED (CODE: INDIA40)</span>
+                    <span>40% FLASH DISCOUNT UNLOCKED</span>
                   </span>
                 )}
               </div>
+
+              {appliedCoupon === 'INDIA40' && (
+                <div className="p-3 rounded-2xl bg-amber-400/20 border border-amber-400/50 flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-950">
+                    <Flame className="w-4 h-4 text-amber-600 fill-amber-600 animate-bounce" />
+                    <span>FLASH TIER ACTIVE: ONLY 4 DISCOUNTED SPOTS LEFT TODAY</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-amber-950 bg-white/90 px-2.5 py-1 rounded-xl border border-amber-300/80 shadow-2xs">
+                    <Clock className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Offer Ends in: {formatFlashTimer(flashSecondsLeft)}</span>
+                  </div>
+                </div>
+              )}
 
               <h2 className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
                 India Only Plan
@@ -1312,7 +1395,7 @@ export default function PricingPage() {
                   </span>
                   <span className="text-xs text-zinc-500 font-medium">/ month</span>
                   {appliedCoupon === 'INDIA40' && (
-                    <span className="text-sm text-zinc-400 line-through ml-1 font-mono font-bold">
+                    <span className="text-base text-zinc-400 line-through ml-1 font-mono font-bold">
                       ₹499
                     </span>
                   )}
@@ -1340,9 +1423,9 @@ export default function PricingPage() {
                     ? 'https://app.heycora.in/workspace/login?plan=india_annual_299&coupon=INDIA40'
                     : 'https://app.heycora.in/workspace/login?plan=india_annual_499'
                 }
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm hover:shadow-md cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
-                <span>{appliedCoupon === 'INDIA40' ? 'Claim India Plan (₹299/mo) →' : 'Claim India Only Plan'}</span>
+                <span>{appliedCoupon === 'INDIA40' ? 'Claim 40% Discount (₹299/mo) →' : 'Claim India Only Plan'}</span>
                 <ArrowRight className="w-4 h-4 text-zinc-400" />
               </a>
             </div>
