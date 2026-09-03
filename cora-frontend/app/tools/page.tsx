@@ -93,9 +93,9 @@ export default function ToolsIndexPage() {
   return (
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. CLEAN HIGH-AUTHORITY PURE SKY HERO ── */}
+      {/* ── 1. BESPOKE ARCHITECTURAL STUDIO HERO (DISTINCT FROM HOMEPAGE SKY) ── */}
       <section className="relative w-full pt-16 sm:pt-24 pb-10 sm:pb-16 overflow-hidden">
-        <ArtisticHeroBackground tone="neutral" />
+        <ArtisticHeroBackground tone="studio" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
