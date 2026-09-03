@@ -11,8 +11,6 @@ import {
   Zap, 
   Share2, 
   Check, 
-  CheckCircle2, 
-  ShieldCheck,
   ChevronDown 
 } from 'lucide-react';
 import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
@@ -81,7 +79,7 @@ export function ToolPageShell({
           </p>
         </div>
 
-        {/* ── Master 2-Column Split Layout (Main Tool + Dynamic Right Showcase) ── */}
+        {/* ── Master 2-Column Split Layout ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* ══════════════════════════════════════════════════════════════
@@ -154,161 +152,85 @@ export function ToolPageShell({
           </div>
 
           {/* ══════════════════════════════════════════════════════════════
-              RIGHT SECTION (DYNAMIC AI AGENT & ECOSYSTEM SHOWCASE CARDS)
+              RIGHT SECTION (IMMERSIVE FULL-BLEED 3D AD CARD)
               ══════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-5">
+          <div className="lg:col-span-4 lg:sticky lg:top-24">
             
-            {/* ──────────────────────────────────────────────────────────
-                CARD 1: DYNAMIC AI AGENT SHOWCASE CARD
-                ────────────────────────────────────────────────────────── */}
-            <div className="rounded-2xl bg-white border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden transition-all hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+            {/* ── Immersive Full-Bleed Creative Card (Exact Reference Design) ── */}
+            <div className="relative rounded-[28px] overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.12)] border border-zinc-200/80 bg-zinc-950 min-h-[480px] sm:min-h-[520px] flex flex-col justify-between p-5 sm:p-6 text-white group">
               
-              {/* Dynamic AI Agent Header */}
-              <div className="p-3.5 sm:p-4 flex items-center justify-between border-b border-zinc-100 bg-zinc-50/50">
-                <div className="flex items-center gap-2.5">
-                  {/* Agent Avatar with Live Status Pulse */}
-                  <div className="relative w-9 h-9 rounded-full overflow-hidden border border-zinc-200 shadow-2xs shrink-0">
-                    <Image
-                      src={agentData.agent.avatar}
-                      alt={agentData.agent.name}
-                      fill
-                      className="object-cover object-top"
-                      sizes="36px"
-                    />
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-zinc-950 leading-tight">
-                        {agentData.agent.name}
-                      </span>
-                      <span className="px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 text-[9.5px] font-mono font-bold">
-                        AI
-                      </span>
-                    </div>
-                    <div className="text-[10.5px] text-zinc-500 font-medium leading-tight">
-                      {agentData.agent.role}
-                    </div>
-                  </div>
-                </div>
+              {/* Full-Bleed 3D Visual Artwork */}
+              <Image
+                src={agentData.card1.image}
+                alt={agentData.card1.headline}
+                fill
+                priority
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                sizes="(max-width: 768px) 100vw, 420px"
+              />
 
-                {/* Interactive Share Tool Button */}
-                <button
-                  type="button"
-                  onClick={handleShareTool}
-                  title="Share this tool"
-                  className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer"
-                >
-                  {copiedShare ? (
-                    <Check className="w-4 h-4 text-emerald-600" />
-                  ) : (
-                    <Share2 className="w-4 h-4" />
-                  )}
-                </button>
+              {/* Multi-Stop Dark Vignettes for Contrast & Legibility */}
+              <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-black/95 via-black/80 to-transparent pointer-events-none" />
+
+              {/* Top Right Frosted Badge */}
+              <div className="relative z-10 flex justify-end">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-950/80 backdrop-blur-md text-white text-[11px] font-mono font-bold tracking-wide border border-white/20 shadow-md">
+                  <span>⚡</span>
+                  <span>{agentData.card1.badge.replace(/^⚡\s*/, '')}</span>
+                </span>
               </div>
 
-              {/* Primary Transformation Copy */}
-              <div className="px-3.5 sm:px-4 pt-3.5 pb-2.5">
-                <p className="text-xs text-zinc-800 font-normal leading-relaxed">
+              {/* Bottom Content Overlay */}
+              <div className="relative z-10 space-y-3.5 pt-20">
+                
+                {/* Title and Share Action */}
+                <div className="flex items-start justify-between gap-2.5">
+                  <h3 className="font-display text-base sm:text-lg font-bold text-white tracking-tight leading-snug drop-shadow-sm">
+                    {agentData.card1.headline}
+                  </h3>
+
+                  {/* Share Tool Icon Button */}
+                  <button
+                    type="button"
+                    onClick={handleShareTool}
+                    title="Share this tool"
+                    className="p-2 rounded-xl bg-white/90 hover:bg-white text-zinc-950 transition-all cursor-pointer backdrop-blur-md shadow-sm shrink-0 hover:scale-105"
+                  >
+                    {copiedShare ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    ) : (
+                      <Share2 className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+
+                {/* Primary Description */}
+                <p className="text-xs text-zinc-200 font-normal leading-relaxed drop-shadow-xs">
                   {agentData.card1.primaryText}
                 </p>
-              </div>
 
-              {/* Dynamic 3D Feature Visual */}
-              <div className="relative w-full h-44 sm:h-48 bg-zinc-950 overflow-hidden">
-                <Image
-                  src={agentData.card1.image}
-                  alt={agentData.card1.headline}
-                  fill
-                  className="object-cover object-center hover:scale-105 transition-transform duration-500"
-                  sizes="(max-width: 768px) 100vw, 400px"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                
-                {/* Dynamic Feature Badge */}
-                <div className="absolute top-2.5 right-2.5">
-                  <span className="px-2.5 py-1 rounded-full bg-zinc-950/85 backdrop-blur-md text-white text-[10px] font-mono font-bold tracking-wide border border-white/20 shadow-xs">
-                    {agentData.card1.badge}
-                  </span>
-                </div>
-
-                {/* Bottom Headline Overlay */}
-                <div className="absolute bottom-2.5 left-3.5 right-3.5">
-                  <h4 className="text-xs font-bold text-white leading-snug drop-shadow-sm">
-                    {agentData.card1.headline}
-                  </h4>
-                </div>
-              </div>
-
-              {/* Action Bar */}
-              <div className="p-3.5 sm:p-4 bg-zinc-50 border-t border-zinc-100 flex items-center justify-between gap-3">
-                <div className="min-w-0 pr-1">
-                  <span className="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider truncate">
-                    heycora.in/workspace
-                  </span>
-                  <p className="text-[11px] text-zinc-600 truncate font-normal">
-                    {agentData.card1.description}
-                  </p>
-                </div>
-                <a
-                  href="http://cora.local/workspace/login?utm_source=tool_agent_unit"
-                  className="shrink-0 px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
-                >
-                  <span>{agentData.card1.ctaText}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                </a>
-              </div>
-
-            </div>
-
-            {/* ──────────────────────────────────────────────────────────
-                CARD 2: AUTONOMOUS ECOSYSTEM & CAPABILITY SHOWCASE
-                ────────────────────────────────────────────────────────── */}
-            <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-3.5 transition-all hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
-              
-              {/* Category Header */}
-              <div className="flex items-center justify-between">
-                <div className="inline-flex items-center gap-1.5 text-[10.5px] font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-200/80 px-2.5 py-0.5 rounded-full">
-                  <Sparkles className="w-3 h-3 text-indigo-600" />
-                  <span>Cora Autonomous OS</span>
-                </div>
-                <span className="text-[10.5px] font-mono text-emerald-700 font-bold">
-                  100% Free Tier
-                </span>
-              </div>
-
-              {/* Title & Description */}
-              <div>
-                <h4 className="text-sm font-bold text-zinc-950 leading-snug">
-                  {agentData.card2.title}
-                </h4>
-                <p className="text-xs text-zinc-600 font-normal leading-relaxed mt-1">
-                  {agentData.card2.description}
-                </p>
-              </div>
-
-              {/* 4 Dynamic Capabilities */}
-              <div className="space-y-2 pt-2 border-t border-zinc-100 text-xs">
-                {agentData.card2.capabilities.map((cap, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-zinc-800 font-medium">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span className="truncate">{cap}</span>
+                {/* Bottom Action Bar */}
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/15">
+                  <div>
+                    <span className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold">
+                      100% FREE TIER
+                    </span>
+                    <span className="block text-[11.5px] font-mono text-zinc-300 font-medium">
+                      Zero Card Required
+                    </span>
                   </div>
-                ))}
-              </div>
 
-              {/* Primary Signup Action */}
-              <div className="pt-2">
-                <a
-                  href="http://cora.local/workspace/login?utm_source=tool_ecosystem_cta"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs transition-all shadow-xs cursor-pointer"
-                >
-                  <span>{agentData.card2.ctaText}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                </a>
-                <span className="block text-center text-[10px] text-zinc-400 mt-1.5 font-medium">
-                  100% Free Forever • Zero Credit Card • Setup in 90s
-                </span>
+                  {/* Primary Launch Action Pill */}
+                  <a
+                    href="http://cora.local/workspace/login?utm_source=tool_creative_card"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-zinc-950/90 hover:bg-black text-white font-bold text-xs border border-white/25 shadow-lg backdrop-blur-md hover:scale-105 transition-all cursor-pointer shrink-0"
+                  >
+                    <span>{agentData.card1.ctaText}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  </a>
+                </div>
+
               </div>
 
             </div>
