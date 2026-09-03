@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -11,7 +11,8 @@ import {
   Zap, 
   Share2, 
   Check, 
-  ChevronDown 
+  ChevronDown,
+  Clock
 } from 'lucide-react';
 import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
 import { useToast } from '@/components/ui/Toast';
@@ -38,6 +39,22 @@ export function ToolPageShell({
   const { showToast } = useToast();
   const [copiedShare, setCopiedShare] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  // 10-minute dynamic countdown timer for 40% discount on India Only plan
+  const [secondsLeft, setSecondsLeft] = useState(600);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 600));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTimer = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Retrieve dynamic AI Agent and Showcase config for this specific tool
   const agentData: ToolAgentData = TOOL_AGENT_REGISTRY[toolId] || TOOL_AGENT_REGISTRY['gst-calculator'];
@@ -152,12 +169,12 @@ export function ToolPageShell({
           </div>
 
           {/* ══════════════════════════════════════════════════════════════
-              RIGHT SECTION (IMMERSIVE FULL-BLEED 3D AD CARD)
+              RIGHT SECTION (IMMERSIVE FULL-BLEED 3D CREATIVE CARD)
               ══════════════════════════════════════════════════════════════ */}
           <div className="lg:col-span-4 lg:sticky lg:top-24">
             
-            {/* ── Immersive Full-Bleed Creative Card (Exact Reference Design) ── */}
-            <div className="relative rounded-[28px] overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.12)] border border-zinc-200/80 bg-zinc-950 min-h-[480px] sm:min-h-[520px] flex flex-col justify-between p-5 sm:p-6 text-white group">
+            {/* ── Immersive Full-Bleed Creative Card ── */}
+            <div className="relative rounded-[28px] overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.14)] border border-zinc-200/80 bg-zinc-950 min-h-[490px] sm:min-h-[530px] flex flex-col justify-between p-5 sm:p-6 text-white group">
               
               {/* Full-Bleed 3D Visual Artwork */}
               <Image
@@ -173,7 +190,7 @@ export function ToolPageShell({
               <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
               <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-black/95 via-black/80 to-transparent pointer-events-none" />
 
-              {/* Top Right Frosted Badge */}
+              {/* Top Right Frosted Feature Pill */}
               <div className="relative z-10 flex justify-end">
                 <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-950/80 backdrop-blur-md text-white text-[11px] font-mono font-bold tracking-wide border border-white/20 shadow-md">
                   <span>⚡</span>
@@ -182,11 +199,11 @@ export function ToolPageShell({
               </div>
 
               {/* Bottom Content Overlay */}
-              <div className="relative z-10 space-y-3.5 pt-20">
+              <div className="relative z-10 space-y-3 pt-20">
                 
-                {/* Title and Share Action */}
-                <div className="flex items-start justify-between gap-2.5">
-                  <h3 className="font-display text-base sm:text-lg font-bold text-white tracking-tight leading-snug drop-shadow-sm">
+                {/* 1-Liner Headline + Share Button */}
+                <div className="flex items-center justify-between gap-2.5">
+                  <h3 className="font-display text-base sm:text-lg font-bold text-white tracking-tight leading-snug truncate drop-shadow-sm">
                     {agentData.card1.headline}
                   </h3>
 
@@ -205,30 +222,32 @@ export function ToolPageShell({
                   </button>
                 </div>
 
-                {/* Primary Description */}
-                <p className="text-xs text-zinc-200 font-normal leading-relaxed drop-shadow-xs">
+                {/* 2-Liner Description */}
+                <p className="text-xs text-zinc-200 font-normal leading-relaxed line-clamp-2 drop-shadow-xs">
                   {agentData.card1.primaryText}
                 </p>
 
-                {/* Bottom Action Bar */}
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/15">
-                  <div>
-                    <span className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold">
-                      100% FREE TIER
-                    </span>
-                    <span className="block text-[11.5px] font-mono text-zinc-300 font-medium">
-                      Zero Card Required
-                    </span>
+                {/* Bottom Action Bar with 40% India Flash Discount & Live 10-Min Timer */}
+                <div className="flex items-center justify-between gap-2 pt-3 border-t border-white/15">
+                  <div className="min-w-0 pr-1">
+                    <div className="flex items-center gap-1.5 text-[10.5px] font-mono uppercase tracking-wider text-amber-300 font-bold">
+                      <Sparkles className="w-3 h-3 shrink-0" />
+                      <span className="truncate">40% OFF &bull; INDIA PLAN</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] font-mono text-zinc-300 font-medium mt-0.5">
+                      <Clock className="w-3 h-3 text-zinc-400 shrink-0" />
+                      <span>{formatTimer(secondsLeft)} min Left</span>
+                    </div>
                   </div>
 
-                  {/* Primary Launch Action Pill */}
-                  <a
-                    href="http://cora.local/workspace/login?utm_source=tool_creative_card"
+                  {/* Primary Launch & Claim Action Pill */}
+                  <Link
+                    href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-zinc-950/90 hover:bg-black text-white font-bold text-xs border border-white/25 shadow-lg backdrop-blur-md hover:scale-105 transition-all cursor-pointer shrink-0"
                   >
                     <span>{agentData.card1.ctaText}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                  </a>
+                  </Link>
                 </div>
 
               </div>
