@@ -59,32 +59,36 @@ Generated via Cora Tools (https://heycora.in/tools/gst-calculator)`;
     }
   ];
 
-  const gstPainPoints = [
-    {
-      problem: 'Manual calculation & copy-pasting numbers into Canva / Word PDFs',
-      solution: 'Cora auto-generates 18% GST e-invoices directly from client chats',
-    },
-    {
-      problem: 'Chasing clients for payment screenshots & bank reference IDs',
-      solution: 'Instant 0% fee UPI QR codes with automated reconciliation',
-    },
-    {
-      problem: 'Manually calculating split CGST/SGST vs IGST for each state',
-      solution: 'Automatic state jurisdiction detection and 1-click Tally/Zoho sync',
-    },
-  ];
-
   return (
     <ToolPageShell
       toolId="gst-calculator"
       badgeTag="🇮🇳 Indian Tax Standard"
       title="Indian GST & B2B Invoice Calculator"
       subtitle="Calculate instant 18%, 12%, 5%, and 28% GST breakdowns with CGST/SGST vs IGST segregation for B2B client invoices and freelance retainers."
-      promoImage="/images/cora_gst_upi_3d.jpg"
-      promoTitle="Automate GST Invoicing & Client Portals"
-      promoSubtitle="Stop recalculating invoices manually. Cora turns client conversations into automated 18% GST proposals, digital contracts, and UPI payment links on autopilot."
-      painPoints={gstPainPoints}
-      promoCtaText="Automate Your Entire Business Free"
+      
+      // Ad 1: Meta / Facebook Sponsored Feed Ad
+      metaAd={{
+        primaryText: 'Stop calculating 18% GST splits and chasing client payment screenshots manually. Turn every client chat into automated tax invoices & 0% fee UPI payment links on autopilot. 🚀',
+        image: '/images/cora_gst_upi_3d.jpg',
+        headline: 'Automate GST Invoicing & Client Portals',
+        description: 'Auto-split CGST/SGST, collect via UPI, & sync to Tally.',
+        ctaText: 'Sign Up Free',
+        badge: '✨ 100% Free Forever',
+      }}
+
+      // Ad 2: Google Performance / Search Sponsored Ad
+      googleAd={{
+        title: 'Cora OS — The #1 Free Invoicing & Client OS for Indian Agencies',
+        description: 'Create compliant SAC 9983 tax invoices, digital contracts, and WhatsApp portals in 90 seconds. No credit card required.',
+        sitelinks: [
+          '18% GST Auto-Split',
+          '0% Fee UPI QR Links',
+          'WhatsApp Client Portals',
+          'Tally & Zoho Sync',
+        ],
+        ctaText: 'Claim Free Workspace →',
+      }}
+
       faqItems={gstFaqs}
     >
       {/* ── 70% Tool Engine (Interactive 2-Card Layout) ── */}
@@ -198,7 +202,7 @@ Generated via Cora Tools (https://heycora.in/tools/gst-calculator)`;
         </div>
 
         {/* Right Output Engine Card (5 Cols — Clean Light Minimal Design) */}
-        <div className="md:col-span-5 rounded-3xl bg-zinc-50 border border-zinc-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+        <div className="md:col-span-5 rounded-3xl bg-white border border-zinc-200/90 p-5 sm:p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-200 text-xs">
               <span className="font-mono text-zinc-500 uppercase tracking-wider font-semibold">

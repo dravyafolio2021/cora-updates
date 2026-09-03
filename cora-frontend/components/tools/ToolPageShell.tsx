@@ -7,11 +7,16 @@ import {
   ArrowLeft, 
   Sparkles, 
   ArrowRight, 
-  CheckCircle2, 
-  ShieldCheck, 
-  Zap, 
+  ExternalLink,
   Lock,
-  XCircle
+  Zap,
+  MoreHorizontal,
+  Globe,
+  ThumbsUp,
+  MessageCircle,
+  Share2,
+  Star,
+  Check
 } from 'lucide-react';
 
 export interface ToolPageShellProps {
@@ -20,11 +25,26 @@ export interface ToolPageShellProps {
   title: string;
   subtitle: string;
   children: React.ReactNode;
-  promoImage?: string;
-  promoTitle: string;
-  promoSubtitle: string;
-  painPoints: Array<{ problem: string; solution: string }>;
-  promoCtaText?: string;
+  
+  // Ad 1: Meta / Facebook Style Sponsored Feed Ad
+  metaAd: {
+    primaryText: string;
+    image: string;
+    headline: string;
+    description: string;
+    ctaText?: string;
+    badge?: string;
+  };
+
+  // Ad 2: Google Performance / Discovery Sponsored Ad
+  googleAd: {
+    title: string;
+    description: string;
+    sitelinks: string[];
+    ctaText?: string;
+    image?: string;
+  };
+
   faqItems?: Array<{ question: string; answer: string }>;
   relatedToolSlugs?: string[];
 }
@@ -35,16 +55,13 @@ export function ToolPageShell({
   title,
   subtitle,
   children,
-  promoImage = '/images/cora_gst_upi_3d.jpg',
-  promoTitle,
-  promoSubtitle,
-  painPoints = [],
-  promoCtaText = 'Automate Your Entire Business Free',
+  metaAd,
+  googleAd,
   faqItems,
   relatedToolSlugs = [],
 }: ToolPageShellProps) {
   return (
-    <div className="w-full bg-white text-zinc-900 min-h-screen py-10 sm:py-16 selection:bg-zinc-900 selection:text-white">
+    <div className="w-full bg-[#FAFAF9] text-zinc-900 min-h-screen py-10 sm:py-16 selection:bg-zinc-900 selection:text-white">
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         
         {/* ── Top Back Navigation ── */}
@@ -60,7 +77,7 @@ export function ToolPageShell({
 
         {/* ── Header Title & Badge ── */}
         <div className="mb-8 sm:mb-10 max-w-3xl">
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-zinc-800 px-3 py-1 bg-zinc-100 border border-zinc-200/80 rounded-full mb-3">
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-zinc-800 px-3 py-1 bg-white border border-zinc-200/80 rounded-full mb-3 shadow-2xs">
             <span>{badgeTag}</span>
           </div>
           <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.18] mb-3">
@@ -85,10 +102,10 @@ export function ToolPageShell({
             </div>
 
             {/* Privacy & Trust Bar */}
-            <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 flex flex-wrap items-center justify-between gap-3 text-xs text-zinc-600">
+            <div className="p-4 rounded-2xl bg-white border border-zinc-200/80 flex flex-wrap items-center justify-between gap-3 text-xs text-zinc-600 shadow-2xs">
               <div className="flex items-center gap-2">
                 <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="font-medium">100% Client-Side Execution (Zero financial or client data stored)</span>
+                <span className="font-medium">100% Client-Side Execution (Zero financial data transmitted or stored)</span>
               </div>
               <div className="flex items-center gap-2 font-mono text-[11px] text-zinc-500">
                 <Zap className="w-3 h-3 text-amber-500 shrink-0" />
@@ -98,7 +115,7 @@ export function ToolPageShell({
 
             {/* Optional FAQ Accordion for the Tool */}
             {faqItems && faqItems.length > 0 && (
-              <div className="pt-6 border-t border-zinc-100 space-y-4">
+              <div className="pt-6 border-t border-zinc-200/60 space-y-4">
                 <h3 className="font-display text-lg font-bold text-zinc-950 tracking-tight">
                   Frequently Asked Questions
                 </h3>
@@ -120,87 +137,160 @@ export function ToolPageShell({
           </div>
 
           {/* ══════════════════════════════════════════════════════════════
-              30% RIGHT SECTION (Inspiring Borderless Ad Creative)
+              30% RIGHT SECTION (TWO HIGH-CONVERTING SPONSORED ADS)
               ══════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
+          <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-5">
             
-            {/* Inspiring Ad Creative Container (No Outline, Elevated Shadow) */}
-            <div className="rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col justify-between">
+            {/* ──────────────────────────────────────────────────────────
+                AD 1: META / FACEBOOK SPONSORED FEED AD CREATIVE
+                ────────────────────────────────────────────────────────── */}
+            <div className="rounded-2xl bg-white border border-zinc-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden transition-all hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
               
-              {/* Top Hero Image Banner */}
-              <div className="relative w-full h-44 sm:h-48 overflow-hidden bg-zinc-950">
+              {/* Sponsored Ad Header */}
+              <div className="p-3.5 sm:p-4 flex items-center justify-between border-b border-zinc-100">
+                <div className="flex items-center gap-2.5">
+                  {/* Brand Avatar */}
+                  <div className="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shadow-2xs">
+                    C
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-bold text-zinc-950 leading-tight">Cora</span>
+                      <span className="text-[10px] text-blue-600 font-bold">✓</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px] text-zinc-400 font-medium">
+                      <span>Sponsored</span>
+                      <span>•</span>
+                      <Globe className="w-2.5 h-2.5 text-zinc-400" />
+                    </div>
+                  </div>
+                </div>
+                <MoreHorizontal className="w-4 h-4 text-zinc-400 hover:text-zinc-600 cursor-pointer" />
+              </div>
+
+              {/* Primary Ad Copy Text */}
+              <div className="px-3.5 sm:px-4 pt-3 pb-2.5">
+                <p className="text-xs text-zinc-800 font-normal leading-relaxed">
+                  {metaAd.primaryText}
+                </p>
+              </div>
+
+              {/* Ad Creative Image Banner */}
+              <div className="relative w-full h-44 sm:h-48 bg-zinc-900 overflow-hidden">
                 <Image
-                  src={promoImage}
-                  alt={promoTitle}
+                  src={metaAd.image}
+                  alt={metaAd.headline}
                   fill
-                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  className="object-cover object-center hover:scale-105 transition-transform duration-500"
                   sizes="(max-width: 768px) 100vw, 400px"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-black/20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 
-                {/* Floating Sponsor Pill */}
-                <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-zinc-950 text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">
-                    <Sparkles className="w-3 h-3 text-amber-500" />
-                    <span>Cora Autonomous OS</span>
-                  </span>
-                </div>
+                {metaAd.badge && (
+                  <div className="absolute top-2.5 right-2.5">
+                    <span className="px-2.5 py-1 rounded-full bg-zinc-950/85 backdrop-blur-md text-white text-[10px] font-mono font-bold tracking-wide border border-white/20 shadow-xs">
+                      {metaAd.badge}
+                    </span>
+                  </div>
+                )}
+              </div>
 
-                {/* Bottom Image Headline Overlay */}
-                <div className="absolute bottom-3 left-4 right-4">
-                  <span className="text-[10.5px] font-mono text-emerald-400 font-bold uppercase tracking-wider block mb-0.5">
-                    Upgrade to Autopilot
+              {/* Ad Link Preview Footer & CTA */}
+              <div className="p-3.5 sm:p-4 bg-zinc-50 border-t border-zinc-100 flex items-center justify-between gap-3">
+                <div className="min-w-0 pr-1">
+                  <span className="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider truncate">
+                    heycora.in
                   </span>
-                  <h3 className="text-base sm:text-lg font-bold text-white leading-tight tracking-tight">
-                    {promoTitle}
-                  </h3>
+                  <h4 className="text-xs font-bold text-zinc-950 truncate leading-snug">
+                    {metaAd.headline}
+                  </h4>
+                  <p className="text-[11px] text-zinc-500 truncate font-normal">
+                    {metaAd.description}
+                  </p>
+                </div>
+                <a
+                  href="http://cora.local/workspace/login?utm_source=meta_ad_unit"
+                  className="shrink-0 px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>{metaAd.ctaText || 'Sign Up'}</span>
+                  <ExternalLink className="w-3 h-3 text-zinc-400" />
+                </a>
+              </div>
+
+              {/* Simulated Social Engagement Bar */}
+              <div className="px-3.5 py-2 bg-white border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-500 font-medium">
+                <div className="flex items-center gap-1.5">
+                  <span className="flex -space-x-1">
+                    <span className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-[9px] text-white">👍</span>
+                    <span className="w-4 h-4 rounded-full bg-rose-500 flex items-center justify-center text-[9px] text-white">❤️</span>
+                  </span>
+                  <span>4.8k</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>384 comments</span>
+                  <span>1.2k shares</span>
                 </div>
               </div>
 
-              {/* Ad Creative Body */}
-              <div className="p-5 sm:p-6 space-y-4">
-                
-                {/* Subtitle */}
-                <p className="text-xs text-zinc-600 leading-relaxed font-normal">
-                  {promoSubtitle}
-                </p>
+            </div>
 
-                {/* Pain Points vs Solutions Transformation */}
-                <div className="space-y-3 pt-2 border-t border-zinc-100">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400 block">
-                    Why Manual Tools Slow You Down:
+            {/* ──────────────────────────────────────────────────────────
+                AD 2: GOOGLE DISPLAY / SEARCH DISCOVERY SPONSORED AD UNIT
+                ────────────────────────────────────────────────────────── */}
+            <div className="rounded-2xl bg-white border border-zinc-200/90 p-4 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-3 transition-all hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+              
+              {/* Google Ad Badge & URL */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="px-1.5 py-0.5 rounded bg-amber-100/80 border border-amber-200 text-amber-900 font-bold text-[10px] font-mono leading-none">
+                    Ad
                   </span>
-                  
-                  {painPoints.map((item, idx) => (
-                    <div key={idx} className="space-y-1 text-xs">
-                      {/* Pain Point */}
-                      <div className="flex items-start gap-1.5 text-zinc-400 line-through decoration-zinc-300">
-                        <XCircle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
-                        <span className="text-[11px] leading-tight">{item.problem}</span>
-                      </div>
-                      {/* Cora Solution */}
-                      <div className="flex items-start gap-1.5 text-zinc-900 font-semibold pl-5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                        <span className="text-[11.5px] leading-tight">{item.solution}</span>
-                      </div>
-                    </div>
+                  <span className="text-[11px] text-zinc-500 font-medium truncate">
+                    https://heycora.in/workspace/free
+                  </span>
+                </div>
+                <div className="flex items-center gap-0.5 text-amber-500">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-2.5 h-2.5 fill-current" />
                   ))}
                 </div>
+              </div>
 
-                {/* High-Converting Full Platform CTA */}
-                <div className="pt-2">
-                  <a
-                    href="http://cora.local/workspace/login"
-                    className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:scale-[1.02] cursor-pointer"
-                  >
-                    <span>{promoCtaText}</span>
-                    <ArrowRight className="w-4 h-4 text-zinc-400" />
-                  </a>
-                  <span className="block text-center text-[10.5px] text-zinc-500 mt-2 font-medium">
-                    100% Free Forever • Zero Setup Fees
-                  </span>
-                </div>
+              {/* Ad Title */}
+              <div>
+                <a
+                  href="http://cora.local/workspace/login?utm_source=google_ad_unit"
+                  className="text-sm font-bold text-blue-600 hover:underline leading-snug cursor-pointer block"
+                >
+                  {googleAd.title}
+                </a>
+                <p className="text-xs text-zinc-600 font-normal leading-relaxed mt-1">
+                  {googleAd.description}
+                </p>
+              </div>
 
+              {/* Sitelink Extensions */}
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 text-[11px]">
+                {googleAd.sitelinks.map((link, idx) => (
+                  <div key={idx} className="flex items-center gap-1 text-zinc-700 font-medium">
+                    <Check className="w-3 h-3 text-emerald-600 shrink-0" />
+                    <span className="truncate">{link}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Big High-Converting Signup Action */}
+              <div className="pt-2">
+                <a
+                  href="http://cora.local/workspace/login?utm_source=google_ad_unit_cta"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs transition-all shadow-xs cursor-pointer"
+                >
+                  <span>{googleAd.ctaText || 'Claim Free Workspace'}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                </a>
+                <span className="block text-center text-[10px] text-zinc-400 mt-1.5 font-medium">
+                  100% Free Forever • Zero Credit Card • 90-sec Setup
+                </span>
               </div>
 
             </div>
