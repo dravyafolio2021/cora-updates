@@ -175,7 +175,7 @@ export function ToolPageShell({
           <div className="lg:col-span-4 lg:sticky lg:top-24">
             
             {/* ── Immersive Full-Bleed Creative Card ── */}
-            <div className="relative rounded-[28px] overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.16)] border border-zinc-200/80 bg-zinc-950 min-h-[510px] sm:min-h-[550px] flex flex-col justify-between p-5 sm:p-6 text-white group">
+            <div className="relative rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.22)] border border-zinc-800 bg-zinc-950 min-h-[520px] sm:min-h-[560px] flex flex-col justify-between p-4 sm:p-5 text-white group">
               
               {/* Full-Bleed 3D Visual Artwork */}
               <Image
@@ -187,24 +187,23 @@ export function ToolPageShell({
                 sizes="(max-width: 768px) 100vw, 420px"
               />
 
-              {/* Multi-Stop Dark Vignettes for Contrast & Legibility */}
-              <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/60 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute inset-x-0 bottom-0 h-84 bg-gradient-to-t from-black/98 via-black/85 to-transparent pointer-events-none" />
+              {/* Full-Height Scrim & Deep Gradient Overlay for 100% Contrast */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/85 to-black/35 pointer-events-none" />
 
               {/* Top Right Frosted Feature Pill */}
               <div className="relative z-10 flex justify-end">
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-950/80 backdrop-blur-md text-white text-[11px] font-mono font-bold tracking-wide border border-white/20 shadow-md">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-950/90 backdrop-blur-md text-white text-[11px] font-mono font-bold tracking-wide border border-white/25 shadow-lg">
                   <span>⚡</span>
                   <span>{agentData.card1.badge.replace(/^⚡\s*/, '')}</span>
                 </span>
               </div>
 
-              {/* Bottom Content Overlay */}
-              <div className="relative z-10 space-y-3 pt-16">
+              {/* Bottom Dedicated Glassmorphic Content Card */}
+              <div className="relative z-10 p-4 sm:p-4.5 rounded-3xl bg-zinc-950/80 backdrop-blur-xl border border-white/20 shadow-2xl space-y-3 mt-auto">
                 
                 {/* 1-Liner Headline + Share Button */}
-                <div className="flex items-center justify-between gap-2.5">
-                  <h3 className="font-display text-base sm:text-lg font-bold text-white tracking-tight leading-snug truncate drop-shadow-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-display text-base font-extrabold text-white tracking-tight leading-snug truncate drop-shadow-md">
                     {agentData.card1.headline}
                   </h3>
 
@@ -213,36 +212,36 @@ export function ToolPageShell({
                     type="button"
                     onClick={handleShareTool}
                     title="Share this tool"
-                    className="p-2 rounded-xl bg-white/90 hover:bg-white text-zinc-950 transition-all cursor-pointer backdrop-blur-md shadow-sm shrink-0 hover:scale-105"
+                    className="p-1.5 rounded-xl bg-white/20 hover:bg-white text-white hover:text-zinc-950 transition-all cursor-pointer backdrop-blur-md border border-white/25 shadow-sm shrink-0 hover:scale-105"
                   >
                     {copiedShare ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
                     ) : (
                       <Share2 className="w-3.5 h-3.5" />
                     )}
                   </button>
                 </div>
 
-                {/* 2-Liner Description */}
-                <p className="text-xs text-zinc-200 font-normal leading-relaxed line-clamp-2 drop-shadow-xs">
+                {/* 2-Liner Description with High Contrast */}
+                <p className="text-xs text-zinc-200 font-medium leading-relaxed line-clamp-2 drop-shadow-sm">
                   {agentData.card1.primaryText}
                 </p>
 
-                {/* ── HIGHLY VISIBLE 40% DISCOUNT & COUNTDOWN TIMER RIBBON ── */}
-                <div className="p-2.5 rounded-2xl bg-amber-400/20 border border-amber-400/50 backdrop-blur-md flex items-center justify-between gap-2 shadow-sm">
+                {/* ── HIGH-CONTRAST 40% DISCOUNT & COUNTDOWN TIMER RIBBON ── */}
+                <div className="p-2.5 rounded-2xl bg-gradient-to-r from-amber-500/25 via-amber-500/20 to-orange-500/25 border border-amber-400/80 backdrop-blur-md flex items-center justify-between gap-2 shadow-md">
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <Flame className="w-4 h-4 text-amber-400 shrink-0 fill-amber-400" />
+                    <Flame className="w-4 h-4 text-amber-400 shrink-0 fill-amber-400 animate-pulse" />
                     <div className="truncate">
-                      <span className="text-[11.5px] font-mono font-extrabold text-amber-300 tracking-wide block leading-tight">
+                      <span className="text-xs font-mono font-extrabold text-amber-300 tracking-wide block leading-tight">
                         40% FLASH OFF: ₹299/mo
                       </span>
-                      <span className="text-[9.5px] text-zinc-300 font-mono">
+                      <span className="text-[10px] text-zinc-300 font-mono font-medium">
                         Reg. ₹499 &bull; Save ₹2,400/yr
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-white bg-black/60 px-2.5 py-1 rounded-xl border border-white/20 shrink-0 shadow-inner">
-                    <Clock className="w-3 h-3 text-amber-400 shrink-0" />
+                  <div className="flex items-center gap-1 text-xs font-mono font-extrabold text-zinc-950 bg-amber-400 px-2.5 py-1 rounded-xl shadow-md shrink-0">
+                    <Clock className="w-3 h-3 text-zinc-950 shrink-0" />
                     <span>{formatTimer(secondsLeft)}</span>
                   </div>
                 </div>
@@ -250,7 +249,7 @@ export function ToolPageShell({
                 {/* Full-Width High-Contrast Primary Action Button */}
                 <Link
                   href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
-                  className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                  className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-amber-400 text-zinc-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <span>Claim 40% Off with {agentData.agent.name.split(' ')[0]}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-950" />
