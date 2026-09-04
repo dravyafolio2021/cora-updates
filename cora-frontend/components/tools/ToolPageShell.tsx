@@ -13,8 +13,7 @@ import {
   Check, 
   ChevronDown,
   Clock,
-  Flame,
-  X
+  Flame
 } from 'lucide-react';
 import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
 import { useToast } from '@/components/ui/Toast';
@@ -44,7 +43,6 @@ export function ToolPageShell({
 
   // 10-minute dynamic countdown timer for 40% discount on India Only plan
   const [secondsLeft, setSecondsLeft] = useState(600);
-  const [mobileAdDismissed, setMobileAdDismissed] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -280,73 +278,62 @@ export function ToolPageShell({
       {/* ══════════════════════════════════════════════════════════════
           MOBILE FLOATING STICKY AD BLOCK (Custom Small Floating Card)
           ══════════════════════════════════════════════════════════════ */}
-      {!mobileAdDismissed && (
-        <aside
-          aria-label="Cora AI Co-Founder Offer"
-          className="fixed bottom-3 inset-x-3 z-40 lg:hidden animate-in fade-in slide-in-from-bottom-5 duration-300"
-        >
-          <div className="relative overflow-hidden rounded-2xl bg-zinc-950/95 backdrop-blur-xl border border-zinc-800 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] text-white">
+      <aside
+        aria-label="Cora AI Co-Founder Offer"
+        className="fixed bottom-3 inset-x-3 z-40 lg:hidden animate-in fade-in slide-in-from-bottom-5 duration-300"
+      >
+        <div className="relative overflow-hidden rounded-2xl bg-zinc-950/95 backdrop-blur-xl border border-zinc-800 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] text-white">
+          
+          {/* Subtle top ambient glow */}
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
+
+          <div className="flex items-center justify-between gap-3">
             
-            {/* Subtle top ambient glow */}
-            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
-
-            <div className="flex items-center justify-between gap-3">
-              
-              {/* Left: Thumbnail & Offer Text */}
-              <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                <div className="relative w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-white/15 bg-zinc-900">
-                  <Image
-                    src={agentData.card1.image}
-                    alt={agentData.card1.headline}
-                    fill
-                    className="object-cover"
-                    sizes="40px"
-                  />
-                  <span className="absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-zinc-950" />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-white tracking-tight truncate">
-                      {agentData.agent.name.split(' ')[0]} AI Co-Founder
-                    </span>
-                    <span className="text-[9.5px] font-mono font-extrabold text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded border border-amber-400/30 shrink-0">
-                      40% OFF
-                    </span>
-                  </div>
-                  <div className="text-[11px] text-zinc-400 truncate flex items-center gap-1 font-mono">
-                    <span className="text-white font-bold">₹299/mo</span>
-                    <span>&bull;</span>
-                    <span className="text-amber-400 font-semibold">{formatTimer(secondsLeft)}</span>
-                  </div>
-                </div>
+            {/* Left: Thumbnail & Offer Text */}
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <div className="relative w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-white/15 bg-zinc-900">
+                <Image
+                  src={agentData.card1.image}
+                  alt={agentData.card1.headline}
+                  fill
+                  className="object-cover"
+                  sizes="40px"
+                />
+                <span className="absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-zinc-950" />
               </div>
 
-              {/* Right: 1-Tap CTA & Dismiss Button */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                <Link
-                  href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
-                  className="px-3.5 py-2 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center gap-1 shadow-md active:scale-95 transition-all"
-                >
-                  <span>Claim</span>
-                  <ArrowRight className="w-3 h-3 text-zinc-950" />
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => setMobileAdDismissed(true)}
-                  aria-label="Dismiss offer"
-                  className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-white tracking-tight truncate">
+                    {agentData.agent.name.split(' ')[0]} AI Co-Founder
+                  </span>
+                  <span className="text-[9.5px] font-mono font-extrabold text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded border border-amber-400/30 shrink-0">
+                    40% OFF
+                  </span>
+                </div>
+                <div className="text-[11px] text-zinc-400 truncate flex items-center gap-1 font-mono">
+                  <span className="text-white font-bold">₹299/mo</span>
+                  <span>&bull;</span>
+                  <span className="text-amber-400 font-semibold">{formatTimer(secondsLeft)}</span>
+                </div>
               </div>
+            </div>
 
+            {/* Right: 1-Tap CTA */}
+            <div className="flex items-center shrink-0">
+              <Link
+                href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
+                className="px-4 py-2 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+              >
+                <span>Claim</span>
+                <ArrowRight className="w-3.5 h-3.5 text-zinc-950" />
+              </Link>
             </div>
 
           </div>
-        </aside>
-      )}
+
+        </div>
+      </aside>
 
     </div>
   );
