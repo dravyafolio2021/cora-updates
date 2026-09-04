@@ -111,7 +111,7 @@ export default function ContractBuilderPage() {
   return (
     <ToolPageShell
       toolId="contract-builder"
-      badgeTag="⚖️ IT Act 2000 • Section 10A"
+      badgeTag="IT Act 2000 • Section 10A"
       title="Indian Digital Contract & NDA Builder"
       subtitle="Generate court-admissible freelance contracts, MSAs, and NDAs pre-seeded with Indian Contract Act 1872 clauses, scope locks, and 18% GST terms."
       faqItems={contractFaqs}

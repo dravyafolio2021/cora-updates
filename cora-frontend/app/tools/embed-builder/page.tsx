@@ -85,7 +85,7 @@ export default function EmbedBuilderPage() {
   return (
     <ToolPageShell
       toolId="embed-builder"
-      badgeTag="⚡ Zero-Code Developer Engine"
+      badgeTag="Zero-Code Developer Engine"
       title="1-Click Website Embed & Widget Builder"
       subtitle="Generate clean, high-performance embed snippets for Framer, Webflow, WordPress, or Shopify in seconds with direct CRM sync."
       faqItems={embedFaqs}

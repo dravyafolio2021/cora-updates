@@ -62,7 +62,7 @@ Generated via Cora Tools (https://heycora.in/tools/gst-calculator)`;
   return (
     <ToolPageShell
       toolId="gst-calculator"
-      badgeTag="🇮🇳 Indian Tax Standard"
+      badgeTag="Indian Tax Standard"
       title="Indian GST & B2B Invoice Calculator"
       subtitle="Calculate instant 18%, 12%, 5%, and 28% GST breakdowns with CGST/SGST vs IGST segregation for B2B client invoices and freelance retainers."
       faqItems={gstFaqs}

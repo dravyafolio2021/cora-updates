@@ -196,7 +196,7 @@ export default function ImagesToPdfPage() {
   return (
     <ToolPageShell
       toolId="images-to-pdf"
-      badgeTag="📸 Studio Deliverables Engine"
+      badgeTag="Studio Deliverables Engine"
       title="Images to PDF Converter"
       subtitle="Convert high-res JPG, PNG, and WebP shoot photos, pitch deck slides, or scan receipts into clean, standardized multi-page PDFs with zero server uploads."
       faqItems={faqItems}

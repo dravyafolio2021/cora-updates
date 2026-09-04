@@ -36,7 +36,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/cora_gst_upi_3d.jpg',
       headline: 'Automated 18% GST Invoicing',
       description: 'Auto-split CGST/SGST, collect via UPI, & sync to Tally.',
-      badge: '⚡ Auto-Calculates SAC 9983',
+      badge: 'Auto-Calculates SAC 9983',
       ctaText: 'Launch Free with Aarav',
     },
     card2: {
@@ -65,7 +65,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/cora_ad_retainer_calculator.jpg',
       headline: 'Scope Protection & Retainers',
       description: 'Set hourly floors, lock buffers, and auto-collect fees.',
-      badge: '⚡ Scope Buffer Shield',
+      badge: 'Scope Buffer Shield',
       ctaText: 'Launch Free with Rohan',
     },
     card2: {
@@ -94,7 +94,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/cora_esign_vault_3d.jpg',
       headline: 'Section 10A Digital Contracts',
       description: 'Court-admissible e-signatures with cryptographic logs.',
-      badge: '⚡ Indian IT Act 2000 Sealed',
+      badge: 'Indian IT Act 2000 Sealed',
       ctaText: 'Launch Free with Kavya',
     },
     card2: {
@@ -123,7 +123,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/bento_gst_upi.jpg',
       headline: '0% Fee UPI Direct Settlements',
       description: 'Zero gateway cuts, instant GPay/PhonePe bank transfers.',
-      badge: '⚡ 0% Gateway Commission',
+      badge: '0% Gateway Commission',
       ctaText: 'Launch Free with Aarav',
     },
     card2: {
@@ -152,7 +152,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/cora_ad_listing_ai.jpg',
       headline: 'Multi-Model Studio AI Briefs',
       description: 'Optimized for MagicBricks, 99acres, & Instagram.',
-      badge: '⚡ Multi-Model AI Engine',
+      badge: 'Multi-Model AI Engine',
       ctaText: 'Launch Free with Tanya',
     },
     card2: {
@@ -181,7 +181,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/cora_ad_embed_builder.jpg',
       headline: '1-Click Website Embed Widgets',
       description: 'Cloudflare Edge CDN delivery with < 14KB bundle footprint.',
-      badge: '⚡ Framer & Webflow Native',
+      badge: 'Framer & Webflow Native',
       ctaText: 'Launch Free with Dev',
     },
     card2: {
@@ -210,7 +210,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/bento_esign_seal.jpg',
       headline: 'Private Client-Side PDF Merge',
       description: 'Combine contracts, pitch decks & rate cards with zero server uploads.',
-      badge: '⚡ 100% In-Memory Pure JS',
+      badge: '100% In-Memory Pure JS',
       ctaText: 'Launch Free with Kavya',
     },
     card2: {
@@ -239,7 +239,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/cora_esign_vault_3d.jpg',
       headline: 'Precision Page Splitter & Extractor',
       description: 'Extract signature pages and confidential annexures instantly.',
-      badge: '⚡ Zero Data Leakage',
+      badge: 'Zero Data Leakage',
       ctaText: 'Launch Free with Rohan',
     },
     card2: {
@@ -268,7 +268,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/card_bg_contract_seal.jpg',
       headline: 'Instant PDF Orientation Engine',
       description: 'Rotate 90°, 180°, or 270° with lossless vector preservation.',
-      badge: '⚡ Lossless Vector Rotation',
+      badge: 'Lossless Vector Rotation',
       ctaText: 'Launch Free with Dev',
     },
     card2: {
@@ -297,7 +297,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/cora_ad_listing_ai.jpg',
       headline: 'Instant Multi-Image to PDF Engine',
       description: 'Convert JPG, PNG, and WebP into print-ready A4 or Letter PDFs.',
-      badge: '⚡ Zero Cloud Uploads',
+      badge: 'Zero Cloud Uploads',
       ctaText: 'Launch Free with Tanya',
     },
     card2: {
@@ -326,7 +326,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/cora_esign_vault_3d.jpg',
       headline: 'Section 10A Digital e-Signature',
       description: 'Draw or type signatures with cryptographic timestamp stamping.',
-      badge: '⚡ Section 10A IT Act Sealed',
+      badge: 'Section 10A IT Act Sealed',
       ctaText: 'Launch Free with Kavya',
     },
     card2: {
@@ -355,7 +355,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       image: '/images/cora_ad_retainer_calculator.jpg',
       headline: 'Document Protection & Watermarking',
       description: 'Stamp custom confidentiality notices with adjustable opacity and angles.',
-      badge: '⚡ All Pages Watermarked',
+      badge: 'All Pages Watermarked',
       ctaText: 'Launch Free with Rohan',
     },
     card2: {

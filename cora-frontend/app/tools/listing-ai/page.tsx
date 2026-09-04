@@ -79,7 +79,7 @@ https://app.heycora.in/workspace`;
   return (
     <ToolPageShell
       toolId="listing-ai"
-      badgeTag="✨ AI Studio Brief Engine"
+      badgeTag="AI Studio Brief Engine"
       title="Real Estate & Studio Listing AI Generator"
       subtitle="Generate high-converting property listings, Instagram captions, and commercial shoot briefs in seconds with zero prompt engineering."
       faqItems={listingFaqs}

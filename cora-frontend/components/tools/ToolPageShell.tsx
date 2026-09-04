@@ -11,9 +11,14 @@ import {
   Zap, 
   Share2, 
   Check, 
-  ChevronDown,
-  Clock,
-  Flame
+  ChevronDown, 
+  Clock, 
+  Flame,
+  FileText,
+  Calculator,
+  Shield,
+  Code,
+  Tag
 } from 'lucide-react';
 import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
 import { useToast } from '@/components/ui/Toast';
@@ -60,6 +65,19 @@ export function ToolPageShell({
   // Retrieve dynamic AI Agent and Showcase config for this specific tool
   const agentData: ToolAgentData = TOOL_AGENT_REGISTRY[toolId] || TOOL_AGENT_REGISTRY['gst-calculator'];
 
+  // Clean badge string of any residual emojis
+  const cleanBadgeTag = badgeTag.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').trim();
+  const cleanCardBadge = agentData.card1.badge.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').trim();
+
+  // Dynamic vector category identifier icon
+  const getToolBadgeIcon = () => {
+    if (toolId.includes('pdf') || toolId.includes('contract')) return <FileText className="w-3 h-3 text-zinc-700" />;
+    if (toolId.includes('gst') || toolId.includes('retainer') || toolId.includes('upi')) return <Calculator className="w-3 h-3 text-zinc-700" />;
+    if (toolId.includes('ai') || toolId.includes('listing')) return <Sparkles className="w-3 h-3 text-zinc-700" />;
+    if (toolId.includes('embed')) return <Code className="w-3 h-3 text-zinc-700" />;
+    return <Tag className="w-3 h-3 text-zinc-700" />;
+  };
+
   const handleShareTool = () => {
     if (typeof window !== 'undefined') {
       navigator.clipboard.writeText(window.location.href);
@@ -70,11 +88,11 @@ export function ToolPageShell({
   };
 
   return (
-    <div className="w-full bg-[#FAFAF9] text-zinc-900 min-h-screen pt-[124px] sm:pt-32 pb-24 sm:pb-20 selection:bg-zinc-900 selection:text-white">
+    <div className="w-full bg-[#FAFAF9] text-zinc-900 min-h-screen pt-[116px] sm:pt-28 pb-24 sm:pb-20 selection:bg-zinc-900 selection:text-white">
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         
         {/* ── Top Back Navigation ── */}
-        <div className="mb-6 sm:mb-8">
+        <div className="mb-4 sm:mb-6">
           <Link
             href="/tools"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-colors"
@@ -84,105 +102,134 @@ export function ToolPageShell({
           </Link>
         </div>
 
-        {/* ── Intro Section: Left Title/Subtitle + Right 3D Showcase Card ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center mb-8 sm:mb-12">
+        {/* ── Compact Structured Intro Section with Dynamic Blueprint Pattern ── */}
+        <div className="relative rounded-3xl border border-zinc-200/90 bg-white shadow-xs overflow-hidden mb-6 sm:mb-8 p-5 sm:p-7 md:p-8">
           
-          {/* Left: Title, Badge, Description */}
-          <div className="lg:col-span-7 xl:col-span-8 space-y-3">
-            <div className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-zinc-800 px-3 py-1 bg-white border border-zinc-200/80 rounded-full shadow-2xs">
-              <span>{badgeTag}</span>
-            </div>
-            <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl font-semibold text-zinc-950 tracking-[-0.035em] leading-[1.16]">
-              {title}
-            </h1>
-            <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-2xl">
-              {subtitle}
-            </p>
-          </div>
+          {/* Dynamic Background Grid Pattern (Tailored subtle blueprint grid) */}
+          <div 
+            className="absolute inset-0 pointer-events-none opacity-[0.55]"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(228, 228, 231, 0.6) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(228, 228, 231, 0.6) 1px, transparent 1px)
+              `,
+              backgroundSize: '24px 24px',
+              maskImage: 'radial-gradient(ellipse 90% 80% at 75% 25%, #000 40%, transparent 100%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 90% 80% at 75% 25%, #000 40%, transparent 100%)',
+            }}
+          />
 
-          {/* Right: Immersive 3D Showcase Card (Desktop Only, nestled in Intro Header) */}
-          <div className="hidden lg:block lg:col-span-5 xl:col-span-4">
-            <div className="relative rounded-3xl overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.16)] border border-zinc-800/90 bg-zinc-950 min-h-[300px] flex flex-col justify-between p-5 text-white group">
-              
-              {/* Full-Bleed 3D Background Artwork */}
-              <Image
-                src={agentData.card1.image}
-                alt={agentData.card1.headline}
-                fill
-                priority
-                className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
-                sizes="(max-width: 768px) 100vw, 420px"
-              />
+          {/* Dynamic Ambient Accent Gradient (Subtle tint matched to domain) */}
+          <div 
+            className="absolute -top-16 -right-16 w-80 h-80 pointer-events-none rounded-full blur-3xl opacity-35"
+            style={{
+              background: toolId.includes('pdf') 
+                ? 'radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%)'
+                : toolId.includes('gst') || toolId.includes('upi')
+                ? 'radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%)'
+                : toolId.includes('ai')
+                ? 'radial-gradient(circle, rgba(244,63,94,0.2) 0%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)'
+            }}
+          />
 
-              {/* Top soft vignette for badge contrast */}
-              <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none" />
-
-              {/* Silky smooth bottom gradient melt */}
-              <div className="absolute inset-x-0 bottom-0 h-[72%] bg-gradient-to-t from-zinc-950 via-zinc-950/95 via-50% to-transparent pointer-events-none" />
-
-              {/* Top Row: Agent Identity & Feature Pill */}
-              <div className="relative z-10 flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-zinc-200 text-[11px] font-medium border border-white/15 shadow-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>{agentData.agent.name}</span>
-                </span>
-
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[10.5px] font-mono font-bold tracking-wide border border-white/20 shadow-md">
-                  <span>⚡</span>
-                  <span>{agentData.card1.badge.replace(/^⚡\s*/, '')}</span>
-                </span>
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            
+            {/* Left: Compact Title, Badge, Description */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-2.5">
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-zinc-800 px-3 py-1 bg-zinc-50 border border-zinc-200/90 rounded-full shadow-2xs">
+                {getToolBadgeIcon()}
+                <span>{cleanBadgeTag}</span>
               </div>
+              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-semibold text-zinc-950 tracking-[-0.03em] leading-tight">
+                {title}
+              </h1>
+              <p className="text-zinc-600 text-xs sm:text-sm font-normal leading-relaxed max-w-2xl">
+                {subtitle}
+              </p>
+            </div>
 
-              {/* Bottom Content Area */}
-              <div className="relative z-10 space-y-2.5 mt-auto pt-12">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-display text-base font-bold text-white tracking-tight leading-snug drop-shadow-sm truncate">
-                    {agentData.card1.headline}
-                  </h3>
+            {/* Right: Sleek, Compact 3D Ad Showcase Card (Reduced Height ~230px) */}
+            <div className="hidden lg:block lg:col-span-5 xl:col-span-4">
+              <div className="relative rounded-2xl overflow-hidden shadow-md border border-zinc-800/90 bg-zinc-950 h-[225px] flex flex-col justify-between p-4 text-white group">
+                
+                {/* Full-Bleed 3D Background Artwork */}
+                <Image
+                  src={agentData.card1.image}
+                  alt={agentData.card1.headline}
+                  fill
+                  priority
+                  className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                  sizes="(max-width: 768px) 100vw, 380px"
+                />
 
-                  <button
-                    type="button"
-                    onClick={handleShareTool}
-                    title="Share this tool"
-                    className="p-1.5 rounded-lg bg-white/15 hover:bg-white text-white hover:text-zinc-950 transition-all cursor-pointer backdrop-blur-md border border-white/20 shadow-sm shrink-0 hover:scale-105"
+                {/* Top soft vignette */}
+                <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none" />
+
+                {/* Bottom gradient melt */}
+                <div className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-zinc-950 via-zinc-950/95 via-50% to-transparent pointer-events-none" />
+
+                {/* Top Row: Agent Pill + Feature Tag (Zero emojis) */}
+                <div className="relative z-10 flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-zinc-200 text-[10.5px] font-medium border border-white/15 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>{agentData.agent.name}</span>
+                  </span>
+
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-mono font-bold tracking-wide border border-white/20 shadow-xs">
+                    <Zap className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
+                    <span>{cleanCardBadge}</span>
+                  </span>
+                </div>
+
+                {/* Bottom Row: Compact Headline, Timer Ribbon & CTA */}
+                <div className="relative z-10 space-y-2 mt-auto pt-6">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-display text-sm font-bold text-white tracking-tight leading-snug drop-shadow-sm truncate">
+                      {agentData.card1.headline}
+                    </h3>
+
+                    <button
+                      type="button"
+                      onClick={handleShareTool}
+                      title="Share this tool"
+                      className="p-1 rounded-lg bg-white/15 hover:bg-white text-white hover:text-zinc-950 transition-all cursor-pointer backdrop-blur-md border border-white/20 shadow-xs shrink-0"
+                    >
+                      {copiedShare ? (
+                        <Check className="w-3 h-3 text-emerald-400" />
+                      ) : (
+                        <Share2 className="w-3 h-3" />
+                      )}
+                    </button>
+                  </div>
+
+                  {/* 40% Flash Ribbon */}
+                  <div className="p-1.5 rounded-xl bg-amber-400/15 border border-amber-400/40 backdrop-blur-md flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1 min-w-0">
+                      <Flame className="w-3 h-3 text-amber-400 shrink-0 fill-amber-400 animate-pulse" />
+                      <span className="text-[10.5px] font-mono font-extrabold text-amber-300 tracking-wide truncate">
+                        40% OFF: ₹299/mo
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px] font-mono font-extrabold text-zinc-950 bg-amber-400 px-1.5 py-0.5 rounded-md shadow-2xs shrink-0">
+                      <Clock className="w-2.5 h-2.5 text-zinc-950 shrink-0" />
+                      <span>{formatTimer(secondsLeft)}</span>
+                    </div>
+                  </div>
+
+                  {/* Sleek CTA Button */}
+                  <Link
+                    href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
+                    className="w-full py-2 px-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.99] transition-all cursor-pointer"
                   >
-                    {copiedShare ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    ) : (
-                      <Share2 className="w-3.5 h-3.5" />
-                    )}
-                  </button>
+                    <span>Claim with {agentData.agent.name.split(' ')[0]}</span>
+                    <ArrowRight className="w-3 h-3 text-zinc-950" />
+                  </Link>
                 </div>
 
-                <p className="text-[11.5px] text-zinc-300 font-normal leading-relaxed line-clamp-1 drop-shadow-xs">
-                  {agentData.card1.primaryText}
-                </p>
-
-                {/* 40% Flash Ribbon */}
-                <div className="p-2 rounded-xl bg-amber-400/15 border border-amber-400/40 backdrop-blur-md flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0 fill-amber-400 animate-pulse" />
-                    <span className="text-[11px] font-mono font-extrabold text-amber-300 tracking-wide truncate">
-                      40% OFF: ₹299/mo
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1 text-[11px] font-mono font-extrabold text-zinc-950 bg-amber-400 px-2 py-0.5 rounded-lg shadow-xs shrink-0">
-                    <Clock className="w-3 h-3 text-zinc-950 shrink-0" />
-                    <span>{formatTimer(secondsLeft)}</span>
-                  </div>
-                </div>
-
-                {/* CTA Button */}
-                <Link
-                  href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
-                  className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
-                >
-                  <span>Claim with {agentData.agent.name.split(' ')[0]}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-zinc-950" />
-                </Link>
               </div>
-
             </div>
+
           </div>
 
         </div>

@@ -277,7 +277,7 @@ export default function SplitPdfPage() {
   return (
     <ToolPageShell
       toolId="split-pdf"
-      badgeTag="⚡ In-Memory Page Extractor"
+      badgeTag="In-Memory Page Extractor"
       title="Split & Extract PDF Pages"
       subtitle="Extract specific pages, isolate executed signature deeds, or remove unwanted sections. 100% private, client-side browser execution with zero server uploads."
       faqItems={splitFaqs}

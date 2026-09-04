@@ -188,7 +188,7 @@ export default function RotatePdfPage() {
   return (
     <ToolPageShell
       toolId="rotate-pdf"
-      badgeTag="⚡ Lossless Vector Rotation"
+      badgeTag="Lossless Vector Rotation"
       title="Rotate PDF Pages Online"
       subtitle="Correct sideways scans, invert upside-down contracts, and align landscape blueprints. Fast, lossless, and 100% private in browser memory."
       faqItems={rotateFaqs}

@@ -317,7 +317,7 @@ export default function EsignPdfPage() {
   return (
     <ToolPageShell
       toolId="esign-pdf"
-      badgeTag="⚖️ Legal Tech & IT Act 2000"
+      badgeTag="Legal Tech & IT Act 2000"
       title="Digital eSign PDF"
       subtitle="Sign shoot agreements, model releases, and vendor proposals with legally valid digital signatures and cryptographic timestamps. 100% private in browser memory."
       faqItems={esignFaqs}

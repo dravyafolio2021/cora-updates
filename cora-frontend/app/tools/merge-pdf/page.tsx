@@ -209,7 +209,7 @@ export default function MergePdfPage() {
   return (
     <ToolPageShell
       toolId="merge-pdf"
-      badgeTag="⚡ 100% Client-Side Pure JS"
+      badgeTag="100% Client-Side Pure JS"
       title="Merge PDF Files Online"
       subtitle="Combine client proposals, confidential pitch decks, and legal annexures into a single seamless document. Zero file uploads — 100% private in browser memory."
       faqItems={mergeFaqs}

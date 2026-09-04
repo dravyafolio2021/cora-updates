@@ -42,7 +42,7 @@ export default function UpiQrGeneratorPage() {
   return (
     <ToolPageShell
       toolId="upi-qr-generator"
-      badgeTag="⚡ NPCI UPI 2.0 Standard"
+      badgeTag="NPCI UPI 2.0 Standard"
       title="Dynamic UPI QR & Payment Generator"
       subtitle="Create instant UPI payment QR codes and deep links pre-filled with exact invoice amounts. Compatible with Google Pay, PhonePe, Paytm, and BHIM."
       faqItems={upiFaqs}

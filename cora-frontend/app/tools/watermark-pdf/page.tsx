@@ -138,7 +138,7 @@ export default function WatermarkPdfPage() {
   return (
     <ToolPageShell
       toolId="watermark-pdf"
-      badgeTag="🛡️ Media & Asset Security"
+      badgeTag="Media & Asset Security"
       title="Add Watermark to PDF"
       subtitle="Stamp custom diagonal or horizontal watermarks across every page of your shoot previews, proposals, and confidential proofs. 100% client-side pure JS."
       faqItems={watermarkFaqs}

@@ -60,7 +60,7 @@ Generated via Cora Tools (https://heycora.in/tools/retainer-calculator)`;
   return (
     <ToolPageShell
       toolId="retainer-calculator"
-      badgeTag="💼 Agency Financial Model"
+      badgeTag="Agency Financial Model"
       title="Service Retainer & Scope Buffer Calculator"
       subtitle="Convert your target monthly agency revenue into sustainable client retainer packages with built-in scope creep insurance and 18% GST invoice splitting."
       faqItems={retainerFaqs}
