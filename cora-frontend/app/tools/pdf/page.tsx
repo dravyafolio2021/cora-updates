@@ -36,6 +36,7 @@ import {
   Bot, 
   Languages, 
   ArrowRight, 
+  ArrowLeft,
   Plus, 
   Minus,
   CheckCircle2,
@@ -439,20 +440,27 @@ export default function MasterPdfCategoryPage() {
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        {/* ── 1. Top Breadcrumbs ── */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-zinc-500">
-          <Link href="/tools" className="hover:text-zinc-900 transition-colors font-medium">
-            Tools Directory
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />
-          <span className="text-zinc-900 font-semibold">Master PDF Suite</span>
-        </nav>
+        {/* ── Hero Header Assembly (Unboxed Blended Continuous Canvas) ── */}
+        <div className="text-center max-w-3xl mx-auto space-y-4 pt-1">
+          
+          {/* Centered Breadcrumbs Navigation */}
+          <nav aria-label="Breadcrumb" className="inline-flex items-center justify-center gap-2 text-xs text-zinc-500 mb-1">
+            <Link
+              href="/tools"
+              className="inline-flex items-center gap-1.5 font-medium text-zinc-500 hover:text-zinc-950 transition-colors group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Tools Directory</span>
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 text-zinc-300" />
+            <span className="text-zinc-950 font-semibold">Master PDF Suite</span>
+          </nav>
 
-        {/* ── 2. Hero Header Assembly (Unboxed Blended Continuous Canvas) ── */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 text-white text-xs font-semibold tracking-wide uppercase shadow-sm">
-            <Files className="w-3.5 h-3.5 text-zinc-300" />
-            <span>Master PDF Utility Suite</span>
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 text-white text-xs font-semibold tracking-wide uppercase shadow-sm">
+              <Files className="w-3.5 h-3.5 text-zinc-300" />
+              <span>Master PDF Utility Suite</span>
+            </div>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-zinc-950">
