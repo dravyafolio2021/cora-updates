@@ -749,9 +749,9 @@ export function Navbar() {
           </div>
 
           {/* ══════════════════════════════════════════════════════════════════
-              MEGA MENU DROPDOWN PANEL (FOR FEATURES, INDUSTRIES, RESOURCES, AI)
+              MEGA MENU DROPDOWN PANEL (FOR FEATURES, INDUSTRIES, RESOURCES)
           ══════════════════════════════════════════════════════════════════ */}
-          {activeDropdown && activeDropdown !== 'company' && (
+          {(activeDropdown === 'features' || activeDropdown === 'industries' || activeDropdown === 'resources') && (
             <div
               className="hidden lg:block absolute left-0 right-0 top-[64px] z-50 px-2 sm:px-4 md:px-6 pt-3"
               onMouseEnter={() => handleMouseEnter(activeDropdown)}
