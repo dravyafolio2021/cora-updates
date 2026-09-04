@@ -132,9 +132,34 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  // Suppress third-party Chrome extension runtime errors from triggering Next.js dev overlay
+                  // Suppress third-party Chrome extension runtime errors & auto-recover from stale deployment chunk errors
                   if (typeof window !== 'undefined') {
+                    var isStaleChunkError = function(err) {
+                      var msg = (err && (err.message || err.name || String(err))) || '';
+                      return msg.indexOf('ChunkLoadError') !== -1 ||
+                             msg.indexOf('Loading chunk') !== -1 ||
+                             msg.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+                             msg.indexOf('Failed to load') !== -1;
+                    };
+
+                    var handleChunkRecovery = function() {
+                      try {
+                        var lastReload = sessionStorage.getItem('cora_chunk_retry');
+                        var now = Date.now();
+                        if (!lastReload || now - parseInt(lastReload, 10) > 8000) {
+                          sessionStorage.setItem('cora_chunk_retry', String(now));
+                          window.location.reload();
+                        }
+                      } catch (e) {
+                        window.location.reload();
+                      }
+                    };
+
                     window.addEventListener('error', function(event) {
+                      if (event && isStaleChunkError(event.error || event.message)) {
+                        handleChunkRecovery();
+                        return;
+                      }
                       if (event && (
                         (event.filename && event.filename.indexOf('chrome-extension://') !== -1) ||
                         (event.message && (event.message.indexOf('M_ID') !== -1 || event.message.indexOf('chrome-extension') !== -1))
@@ -146,6 +171,10 @@ export default function RootLayout({
                     }, true);
 
                     window.addEventListener('unhandledrejection', function(event) {
+                      if (event && isStaleChunkError(event.reason)) {
+                        handleChunkRecovery();
+                        return;
+                      }
                       if (event && event.reason && event.reason.stack && event.reason.stack.indexOf('chrome-extension://') !== -1) {
                         event.stopImmediatePropagation();
                         event.preventDefault();
