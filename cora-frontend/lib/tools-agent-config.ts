@@ -149,7 +149,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
     },
     card1: {
       primaryText: 'Generate high-converting property listings, Instagram captions, and commercial shoot briefs in seconds with zero prompt engineering.',
-      image: '/images/cora_hero_realestate_cinematic.jpg',
+      image: '/images/bento_ai_seo.jpg',
       headline: 'Multi-Model Studio AI Briefs',
       description: 'Optimized for MagicBricks, 99acres, & Instagram.',
       badge: '⚡ Multi-Model AI Engine',
@@ -178,7 +178,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
     },
     card1: {
       primaryText: 'Embed booking calendars, GST calculators, and AI copilots into Framer, Webflow, WordPress, or Shopify in under 60 seconds.',
-      image: '/images/card_visual_agent.jpg',
+      image: '/images/bento_website_canvas.jpg',
       headline: '1-Click Website Embed Widgets',
       description: 'Cloudflare Edge CDN delivery with < 14KB bundle footprint.',
       badge: '⚡ Framer & Webflow Native',
