@@ -213,7 +213,7 @@ export function Navbar() {
                           : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                       }`}
                     >
-                      <span>PDF Tools</span>
+                      <span>PDF</span>
                       <ChevronDown className={`w-3.5 h-3.5 stroke-[2.2] text-zinc-500 group-hover:text-zinc-950 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeDropdown === 'tools-pdf' ? 'rotate-180 text-zinc-950 scale-105' : ''}`} />
                     </button>
 
@@ -424,7 +424,7 @@ export function Navbar() {
                     )}
                   </div>
 
-                  {/* 2. Sheets & Excel Dropdown */}
+                  {/* 2. Sheets Dropdown */}
                   <div
                     className="relative py-1"
                     onMouseEnter={() => handleMouseEnter('tools-sheets')}
@@ -438,7 +438,7 @@ export function Navbar() {
                           : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                       }`}
                     >
-                      <span>Sheets &amp; Excel</span>
+                      <span>Sheets</span>
                       <ChevronDown className={`w-3.5 h-3.5 stroke-[2.2] text-zinc-500 group-hover:text-zinc-950 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeDropdown === 'tools-sheets' ? 'rotate-180 text-zinc-950 scale-105' : ''}`} />
                     </button>
 

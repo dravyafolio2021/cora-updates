@@ -103,7 +103,7 @@ export default function ToolsIndexPage() {
           <div className="mb-4 sm:mb-6">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/95 backdrop-blur-md text-zinc-900 border border-zinc-200/80 text-xs sm:text-sm font-medium shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
-              <span>34 Free Turnkey Micro-Tools</span>
+              <span>43 Free Turnkey Micro-Tools</span>
             </span>
           </div>
 
