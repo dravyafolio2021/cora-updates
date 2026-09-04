@@ -62,7 +62,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
     },
     card1: {
       primaryText: 'Underpricing your retainer scope leads to burnout. Cora models team capacity, adds scope buffers, and bills recurring client retainers on autopilot.',
-      image: '/images/card_visual_finance.jpg',
+      image: '/images/cora_ad_retainer_calculator.jpg',
       headline: 'Scope Protection & Retainers',
       description: 'Set hourly floors, lock buffers, and auto-collect fees.',
       badge: '⚡ Scope Buffer Shield',
@@ -149,7 +149,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
     },
     card1: {
       primaryText: 'Generate high-converting property listings, Instagram captions, and commercial shoot briefs in seconds with zero prompt engineering.',
-      image: '/images/bento_ai_seo.jpg',
+      image: '/images/cora_ad_listing_ai.jpg',
       headline: 'Multi-Model Studio AI Briefs',
       description: 'Optimized for MagicBricks, 99acres, & Instagram.',
       badge: '⚡ Multi-Model AI Engine',
@@ -178,7 +178,7 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
     },
     card1: {
       primaryText: 'Embed booking calendars, GST calculators, and AI copilots into Framer, Webflow, WordPress, or Shopify in under 60 seconds.',
-      image: '/images/bento_website_canvas.jpg',
+      image: '/images/cora_ad_embed_builder.jpg',
       headline: '1-Click Website Embed Widgets',
       description: 'Cloudflare Edge CDN delivery with < 14KB bundle footprint.',
       badge: '⚡ Framer & Webflow Native',
