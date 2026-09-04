@@ -174,46 +174,46 @@ export function ToolPageShell({
               ══════════════════════════════════════════════════════════════ */}
           <div className="lg:col-span-4 lg:sticky lg:top-24">
             
-            {/* ── Prominent & Confident 3D Product Ad Card ── */}
-            <div className="rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-zinc-800 bg-zinc-950 flex flex-col group transition-all">
+            {/* ── Immersive Full-Bleed 3D Product Ad Card ── */}
+            <div className="relative rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-zinc-800/90 bg-zinc-950 min-h-[530px] sm:min-h-[580px] flex flex-col justify-between p-5 sm:p-6 text-white group">
               
-              {/* Top: 100% Bright & Unobstructed 3D Artwork Stage */}
-              <div className="relative w-full aspect-[4/3] bg-zinc-950 overflow-hidden">
-                <Image
-                  src={agentData.card1.image}
-                  alt={agentData.card1.headline}
-                  fill
-                  priority
-                  className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 768px) 100vw, 420px"
-                />
+              {/* Full-Bleed 3D Background Artwork */}
+              <Image
+                src={agentData.card1.image}
+                alt={agentData.card1.headline}
+                fill
+                priority
+                className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                sizes="(max-width: 768px) 100vw, 420px"
+              />
 
-                {/* Subtle top rim vignette for badge contrast */}
-                <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
+              {/* Top soft vignette for badge contrast */}
+              <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/75 via-black/25 to-transparent pointer-events-none" />
 
-                {/* Top Right Frosted Feature Pill */}
-                <div className="absolute top-3.5 right-3.5 z-10">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-950/85 backdrop-blur-md text-white text-[11px] font-mono font-bold tracking-wide border border-white/20 shadow-lg">
-                    <span>⚡</span>
-                    <span>{agentData.card1.badge.replace(/^⚡\s*/, '')}</span>
-                  </span>
-                </div>
+              {/* Silky smooth bottom gradient melt (Seamless transition into solid deep black) */}
+              <div className="absolute inset-x-0 bottom-0 h-[68%] bg-gradient-to-t from-zinc-950 via-zinc-950/95 via-45% to-transparent pointer-events-none" />
 
-                {/* Top Left Agent Co-Founder Pill */}
-                <div className="absolute top-3.5 left-3.5 z-10">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-950/85 backdrop-blur-md text-zinc-300 text-[11px] font-medium border border-white/15 shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>{agentData.agent.name}</span>
-                  </span>
-                </div>
+              {/* Top Row: Agent Identity & Feature Pill */}
+              <div className="relative z-10 flex items-center justify-between gap-2">
+                {/* Agent Co-Founder Pill */}
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-zinc-200 text-[11px] font-medium border border-white/15 shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>{agentData.agent.name}</span>
+                </span>
+
+                {/* Feature Pill */}
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-mono font-bold tracking-wide border border-white/20 shadow-md">
+                  <span>⚡</span>
+                  <span>{agentData.card1.badge.replace(/^⚡\s*/, '')}</span>
+                </span>
               </div>
 
-              {/* Bottom: Sleek High-Contrast Offer & Action Panel */}
-              <div className="p-5 sm:p-5.5 bg-zinc-950 text-white flex flex-col gap-3.5 border-t border-zinc-800/80">
+              {/* Bottom Content Area: Directly on the melted background */}
+              <div className="relative z-10 space-y-3.5 mt-auto pt-20">
                 
                 {/* 1-Liner Headline + Share Button */}
                 <div className="flex items-center justify-between gap-2.5">
-                  <h3 className="font-display text-base sm:text-lg font-bold text-white tracking-tight leading-snug truncate">
+                  <h3 className="font-display text-lg sm:text-xl font-bold text-white tracking-tight leading-snug drop-shadow-sm truncate">
                     {agentData.card1.headline}
                   </h3>
 
@@ -222,7 +222,7 @@ export function ToolPageShell({
                     type="button"
                     onClick={handleShareTool}
                     title="Share this tool"
-                    className="p-2 rounded-xl bg-white/10 hover:bg-white text-zinc-300 hover:text-zinc-950 transition-all cursor-pointer backdrop-blur-md border border-white/15 shadow-sm shrink-0 hover:scale-105"
+                    className="p-2 rounded-xl bg-white/15 hover:bg-white text-white hover:text-zinc-950 transition-all cursor-pointer backdrop-blur-md border border-white/20 shadow-sm shrink-0 hover:scale-105"
                   >
                     {copiedShare ? (
                       <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -233,24 +233,24 @@ export function ToolPageShell({
                 </div>
 
                 {/* 2-Liner Description */}
-                <p className="text-xs text-zinc-400 font-normal leading-relaxed line-clamp-2">
+                <p className="text-xs sm:text-[13px] text-zinc-300 font-normal leading-relaxed line-clamp-2 drop-shadow-xs">
                   {agentData.card1.primaryText}
                 </p>
 
                 {/* ── HIGH-CONTRAST 40% DISCOUNT & COUNTDOWN TIMER RIBBON ── */}
-                <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-400/40 flex items-center justify-between gap-2">
+                <div className="p-3 rounded-2xl bg-amber-400/15 border border-amber-400/40 backdrop-blur-md flex items-center justify-between gap-2 shadow-sm">
                   <div className="flex items-center gap-2 min-w-0">
                     <Flame className="w-4 h-4 text-amber-400 shrink-0 fill-amber-400 animate-pulse" />
                     <div className="truncate">
                       <span className="text-xs font-mono font-extrabold text-amber-300 tracking-wide block leading-tight">
                         40% FLASH OFF: ₹299/mo
                       </span>
-                      <span className="text-[10.5px] text-zinc-400 font-mono">
+                      <span className="text-[10.5px] text-zinc-300 font-mono">
                         Reg. ₹499 &bull; Save ₹2,400/yr
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs font-mono font-extrabold text-zinc-950 bg-amber-400 px-2.5 py-1 rounded-xl shadow-md shrink-0">
+                  <div className="flex items-center gap-1.5 text-xs font-mono font-extrabold text-zinc-950 bg-amber-400 px-2.5 py-1 rounded-xl shadow-xs shrink-0">
                     <Clock className="w-3.5 h-3.5 text-zinc-950 shrink-0" />
                     <span>{formatTimer(secondsLeft)}</span>
                   </div>
@@ -259,7 +259,7 @@ export function ToolPageShell({
                 {/* Full-Width High-Contrast Primary Action Button */}
                 <Link
                   href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
-                  className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
+                  className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
                 >
                   <span>Claim 40% Off with {agentData.agent.name.split(' ')[0]}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-950" />
