@@ -515,7 +515,501 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       ctaText: 'Claim Free Workspace →',
     },
   },
+
+  'repair-pdf': {
+    slug: 'repair-pdf',
+    agent: {
+      name: 'Vikram Malhotra',
+      role: 'Systems & PDF Infrastructure AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Damaged or unreadable PDFs stall client deals and tenders. Cora reconstructs corrupted xref tables, recovers damaged object trees, and sanitizes binary streams in your browser.',
+      image: '/images/cora_pdf_pipeline_3d.jpg',
+      headline: 'Autonomous PDF Diagnostic & Repair',
+      description: 'Reconstruct corrupted cross-reference tables & recover damaged pages.',
+      badge: 'Binary Stream Recovery',
+      ctaText: 'Launch Free with Vikram',
+    },
+    card2: {
+      title: 'Enterprise PDF Resilience & In-Memory Recovery',
+      description: 'Recover unopenable contracts, broken scans, and corrupted client submissions without sending sensitive documents across public cloud networks.',
+      capabilities: [
+        'Cross-Reference (Xref) Table Rebuilding',
+        'Damaged Trailer & Catalog Root Restoration',
+        'Orphaned Object Stream Sanitization',
+        '100% Client-Side In-Memory Execution',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'ocr-pdf': {
+    slug: 'ocr-pdf',
+    agent: {
+      name: 'Ananya Ray',
+      role: 'Document Vision & OCR AI Co-Founder',
+      avatar: '/images/cora_agent_design.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Scanned invoices, receipts, and paper contracts are trapped as dumb images. Cora extracts crisp machine-readable text and builds searchable PDFs in seconds.',
+      image: '/images/cora_smart_contract_3d.jpg',
+      headline: 'Client-Side OCR & Optical Scanner',
+      description: 'Convert scanned image PDFs into searchable, selectable vector documents.',
+      badge: 'Optical Vision Engine',
+      ctaText: 'Launch Free with Ananya',
+    },
+    card2: {
+      title: 'Turn Scanned Paper into Searchable Digital Intelligence',
+      description: 'Extract text, numbers, and tabular data from scanned documents with high-confidence optical recognition and immediate full-text copy.',
+      capabilities: [
+        'High-Accuracy Text & Numeric Extraction',
+        'Instant Full-Text Search in Scanned Files',
+        'Searchable PDF Layer Recompilation',
+        'Pure Local Browser Canvas Processing',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'translate-pdf': {
+    slug: 'translate-pdf',
+    agent: {
+      name: 'Devika Sen',
+      role: 'Localization & Multilingual AI Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Regional client agreements and tenders require fast, accurate translation. Translate contracts and proposals into Hindi, Tamil, Telugu, and 20+ global languages.',
+      image: '/images/cora_gst_upi_3d.jpg',
+      headline: 'Multilingual Document Translation',
+      description: 'Preserve formatting while translating documents across Indian & global tongues.',
+      badge: 'Vernacular & Global AI',
+      ctaText: 'Launch Free with Devika',
+    },
+    card2: {
+      title: 'Cross-Border & Vernacular Contract Translation',
+      description: 'Seamlessly convert commercial agreements, pitch decks, and invoices across languages while maintaining clause numbering and legal layout.',
+      capabilities: [
+        'Supports Hindi, Tamil, Telugu, Marathi & 20+ Languages',
+        'Side-by-Side Bilingual Document Comparison',
+        'Editable In-Browser Translation Review',
+        'Instant Clean PDF Re-Export',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'extract-pages': {
+    slug: 'extract-pages',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Operations & Document AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Extract signed execution sheets, specific annexures, or critical chapters from massive tender packets without re-rendering or quality degradation.',
+      image: '/images/cora_pdf_pipeline_3d.jpg',
+      headline: 'Precision PDF Page Extraction',
+      description: 'Isolate specific sheets or custom ranges into a pristine standalone PDF.',
+      badge: 'Lossless Vector Extract',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Laser-Focused Document Isolation',
+      description: 'Extract only what you need. Filter odd/even pages, custom ranges, or individual sheets with live visual preview and instant download.',
+      capabilities: [
+        'Interactive Page Selection & Grid Previews',
+        'Custom Range Queries (e.g. 1-3, 5, 8-12)',
+        'Lossless Vector Font & Signature Retention',
+        'Zero Cloud File Storage (Pure Browser Engine)',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'powerpoint-to-pdf': {
+    slug: 'powerpoint-to-pdf',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Presentation & Deck AI Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Messy PowerPoint files look inconsistent across client devices and OS versions. Convert PPT and PPTX pitch decks into pixel-perfect landscape PDF presentations.',
+      image: '/images/cora_smart_contract_3d.jpg',
+      headline: 'PowerPoint to PDF Deck Converter',
+      description: 'Standardize 16:9 and 4:3 pitch decks into universally readable PDF presentations.',
+      badge: 'Standard 16:9 Landscape',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Universal Client-Ready Pitch Decks',
+      description: 'Eliminate font mismatch bugs, missing media links, and slide layout breaks by compiling decks into universally readable landscape PDF decks.',
+      capabilities: [
+        'Standard 16:9 Widescreen & 4:3 Slide Framing',
+        'Pre-Formatted Executive Pitch & Portfolio Templates',
+        'Preserves Slide Numbers & Corporate Footers',
+        '100% In-Browser Privacy Protection',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'pdf-to-jpg': {
+    slug: 'pdf-to-jpg',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Creative & Media AI Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Extract high-resolution visual sheets, portfolio slides, and signed certificate pages into crisp JPG images at 2x retina clarity. 100% private in browser memory.',
+      image: '/images/cora_pdf_pipeline_3d.jpg',
+      headline: 'High-Res PDF to JPG Rasterizer',
+      description: 'Convert PDF sheets into crisp 2x retina JPG images in browser memory.',
+      badge: 'Crisp 2x Retina Render',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Lossless Visual Sheet Conversion',
+      description: 'Transform multi-page PDF documents into crystal-clear individual JPG images ready for social media, client presentations, and portfolio showcases.',
+      capabilities: [
+        'Crisp 2x Retina HTML5 Canvas Rendering',
+        'Individual Sheet or Bulk Batch Download',
+        'Configurable Image Quality & Scale Presets',
+        '100% Client-Side Pure Browser Processing',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'pdf-to-word': {
+    slug: 'pdf-to-word',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Legal & Document Automation AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Locked PDFs prevent redlining and contract revisions. Cora extracts document structure into clean, editable Microsoft Word files in browser memory.',
+      image: '/images/bento_esign_seal.jpg',
+      headline: 'PDF to Word Doc Extractor',
+      description: 'Extract structured text, headers & clauses into editable .doc files.',
+      badge: 'Structured Heading Retention',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Turn Static PDFs into Editable Contracts',
+      description: 'Preserve paragraph structure, clause numbering, and headings while converting read-only client agreements into editable Word documents.',
+      capabilities: [
+        'Smart Heading & Paragraph Structure Parsing',
+        '1-Click Export to Microsoft Word (.doc)',
+        'Full In-Browser Interactive Document Editor',
+        'Zero Cloud File Storage & Absolute Privacy',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'pdf-to-excel': {
+    slug: 'pdf-to-excel',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Finance & Tax AI Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Stop retyping invoice line items and GST tax schedules manually. Cora parses tabular PDF records into clean, structured CSV & Excel spreadsheets.',
+      image: '/images/cora_gst_upi_3d.jpg',
+      headline: 'PDF Table to Excel & CSV Parser',
+      description: 'Extract invoices, tax tables & rate cards into clean spreadsheets.',
+      badge: 'Auto Table Matrix Detection',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Automate Tabular Data Extraction',
+      description: 'Extract financial statements, client invoices, and contractor rate cards directly into Excel and CSV without manual data entry.',
+      capabilities: [
+        'Automatic Delimiter & Column Alignment Detection',
+        'Interactive In-Browser Spreadsheet Editor',
+        'Clean RFC 4180 CSV & Excel Spreadsheet Export',
+        '1-Tap Copy as TSV for Direct Sheet Pasting',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'excel-to-pdf': {
+    slug: 'excel-to-pdf',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Operations & Reporting AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Convert messy spreadsheet exports and raw financial tables into publication-ready A4 PDF documents with zebra striping and corporate headers.',
+      image: '/images/cora_ad_retainer_calculator.jpg',
+      headline: 'Excel & CSV to A4 PDF Table Maker',
+      description: 'Format spreadsheets into professional publication-ready PDF tables.',
+      badge: 'A4 Vectorized Table Layout',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Publication-Ready Financial Statements',
+      description: 'Format raw tabular numbers into crisp, boardroom-ready A4 documents with automatic pagination, custom column widths, and corporate branding.',
+      capabilities: [
+        'Portrait & Landscape A4 Page Support',
+        'Zebra Striping & High-Contrast Headers',
+        'Direct CSV Upload or Copy-Paste from Sheets',
+        'Automatic Pagination & Summary Row Math',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'pdf-to-markdown': {
+    slug: 'pdf-to-markdown',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Documentation & Knowledge AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Convert documentation, specifications, and commercial agreements into clean GitHub-flavored Markdown with headers, code blocks, and lists.',
+      image: '/images/cora_smart_contract_3d.jpg',
+      headline: 'PDF to Markdown Document Converter',
+      description: 'Extract structured text with headers, lists & code blocks into .md format.',
+      badge: 'GitHub-Flavored Markdown',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Bridge Static Docs into LLM & Dev Workflows',
+      description: 'Extract PDF contracts, whitepapers, and technical guides into clean Markdown ready for developer wikis, LLM prompts, and Notion workspaces.',
+      capabilities: [
+        'Detects Headings (# H1, ## H2, ### H3)',
+        'Structured Lists, Blockquotes & Code Snippets',
+        'Live Side-by-Side Rendered Markdown Preview',
+        '1-Click Clipboard Copy & .md File Download',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'html-to-pdf': {
+    slug: 'html-to-pdf',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Engineering & Document AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Render styled HTML templates, digital invoices, and contract markups directly into standard A4 PDF files with pixel-perfect typography.',
+      image: '/images/cora_pdf_pipeline_3d.jpg',
+      headline: 'HTML & Styled Content to PDF Compiler',
+      description: 'Convert custom HTML, CSS & invoice templates into crisp A4 PDFs.',
+      badge: 'Pixel-Perfect A4 Vector PDF',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Automated HTML Document Generation',
+      description: 'Paste HTML code or styled invoice markup to instantly generate clean, print-ready PDF files with custom margins and standard typography.',
+      capabilities: [
+        'Live Code Editor with Instant Sandboxed Preview',
+        'Built-in Studio Invoices & Agreement Templates',
+        'Standard A4 & US Letter Dimensions',
+        '100% In-Browser Zero Server Processing',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'protect-pdf': {
+    slug: 'protect-pdf',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Security & Compliance AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Protect confidential contracts, pitch decks, and financial audits with AES-256 military-grade encryption. Restrict printing, copying, and modifications without leaving your browser.',
+      image: '/images/cora_esign_vault_3d.jpg',
+      headline: 'AES-256 PDF Encryption & DRM Lock',
+      description: 'Set open passwords, deny printing, and block content copying client-side.',
+      badge: 'AES-256 Bit Encryption',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Enterprise Document Security Without Cloud Risk',
+      description: 'Cora encrypts PDF files directly in your browser memory. Set granular owner passwords and disable content extraction with zero server-side leaks.',
+      capabilities: [
+        'AES-256 Bit ISO 32000-1 Standard Cryptography',
+        'Granular Print & Copy Extraction Restrictions',
+        'Separate User & Owner Password Controls',
+        '100% In-Browser Memory (Zero Cloud Uploads)',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'unlock-pdf': {
+    slug: 'unlock-pdf',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Document Security & Finance AI Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Locked out of your own bank statements or tax filings? Remove passwords and strip restrictive print/copy permissions cleanly in seconds.',
+      image: '/images/cora_pdf_pipeline_3d.jpg',
+      headline: 'Instant PDF Password & DRM Unlock',
+      description: 'Strip owner restrictions, remove copy blocks, and decrypt securely.',
+      badge: 'Zero Server Logs',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Regain Total Control Over Your Documents',
+      description: 'Permanently remove frustrating print blocks and copy restrictions from your legitimate records, creating an unlocked, clean PDF.',
+      capabilities: [
+        'Instant Removal of Owner Print & Copy Restrictions',
+        'Client-Side AES Decryption with Known Passwords',
+        'Preserves Original Vector Quality & Formatting',
+        'Zero Data Stored or Transmitted to External Servers',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'redact-pdf': {
+    slug: 'redact-pdf',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Privacy & Legal AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Black out sensitive PAN numbers, Aadhaar IDs, bank balances, and confidential contract clauses permanently before sharing with third parties.',
+      image: '/images/cora_esign_vault_3d.jpg',
+      headline: 'Permanent In-Browser PDF Redaction',
+      description: 'Sanitize confidential data, KYC identifiers, and financial values.',
+      badge: 'Permanent Vector Redaction',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'True Redaction That Cannot Be Uncovered',
+      description: 'Unlike transparent highlighter tricks, Cora burns opaque blackout blocks into the PDF object tree, permanently sanitizing sensitive personal data.',
+      capabilities: [
+        'Preset Presets for Aadhaar, PAN & Bank Details',
+        'Interactive Canvas Drawing for Custom Blackout Boxes',
+        'Optional [CONFIDENTIAL] or [REDACTED] Text Overlays',
+        '100% Local Browser Memory Processing',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'crop-pdf': {
+    slug: 'crop-pdf',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Operations & Formatting AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Trim messy scanner borders, white margins, and unwanted printer headers across all pages uniformly with precision margin controls.',
+      image: '/images/cora_pdf_pipeline_3d.jpg',
+      headline: 'Precision PDF Border & Margin Trimmer',
+      description: 'Adjust crop boxes and trim whitespace across all pages in seconds.',
+      badge: 'Lossless CropBox Geometry',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Studio-Grade Page Margin Precision',
+      description: 'Standardize document viewports for printing or screen viewing without re-compressing or rasterizing underlying text and images.',
+      capabilities: [
+        'Interactive Top, Bottom, Left & Right Margin Sliders',
+        'One-Click Trim Presets (0.5 in, 1 in, Header/Footer)',
+        'Apply Globally or to Individual Page Ranges',
+        'Lossless Native PDF MediaBox & CropBox Geometry',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'compare-pdf': {
+    slug: 'compare-pdf',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Legal Audit & Risk AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Spot subtle clause modifications, revised milestone amounts, and stealth changes between original and revised contract revisions side-by-side.',
+      image: '/images/cora_esign_vault_3d.jpg',
+      headline: 'Side-by-Side PDF Revision Comparator',
+      description: 'Inspect differences between two document drafts with synchronous views.',
+      badge: 'Contract Revision Audit',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Audit Document Revisions in Real Time',
+      description: 'Never sign an altered agreement without checking. Upload original and revised drafts to inspect structural, dimensional, and text changes side-by-side.',
+      capabilities: [
+        'Dual-Pane Synchronized Side-by-Side Viewing',
+        'Structural Metadata & Page Count Delta Analysis',
+        'Visual Overlay & Difference Inspection Modes',
+        '100% In-Browser Memory (Client-Side Only)',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'organize-pdf': {
+    slug: 'organize-pdf',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Operations & Workflow AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Rearrange, reorder, duplicate, and rotate PDF pages visually with intuitive drag-and-drop tiles before binding client deliverables.',
+      image: '/images/cora_ad_retainer_calculator.jpg',
+      headline: 'Visual Drag-and-Drop Page Tile Organizer',
+      description: 'Rearrange page sequences, duplicate sheets, and rotate orientations.',
+      badge: 'Visual Page Sequencer',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Effortless Page Sequencing & Manipulation',
+      description: 'Prepare clean client binders and proposals. Drag tiles to reorganize page order, duplicate invoices, and rotate upside-down scans in seconds.',
+      capabilities: [
+        'Smooth Drag-and-Drop Interactive Tile Grid',
+        '1-Click Duplicate, Delete & 90° Rotate Controls',
+        'Quick Bulk Sequence Reversal & Reset Actions',
+        'Lossless Page Tree Export in Browser Memory',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
 };
+
 
 
 

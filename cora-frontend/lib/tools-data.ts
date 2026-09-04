@@ -142,8 +142,8 @@ export const TOOL_CATEGORY_BLOCKS: ToolCategoryBlock[] = [
 ];
 
 export const TOOL_CATEGORIES = [
-  { id: 'all', label: 'All Tools', count: 17 },
-  { id: 'pdf_tools', label: 'PDF Tools', count: 11 },
+  { id: 'all', label: 'All Tools', count: 34 },
+  { id: 'pdf_tools', label: 'PDF Tools', count: 28 },
   { id: 'finance_tax', label: 'Finance & Tax', count: 2 },
   { id: 'contracts_legal', label: 'Contracts & Legal', count: 1 },
   { id: 'ai_copy', label: 'AI & Copywriting', count: 1 },

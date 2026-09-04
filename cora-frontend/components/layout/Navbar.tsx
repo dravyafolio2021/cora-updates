@@ -403,6 +403,21 @@ export function Navbar() {
                             </Link>
                           </div>
                         </div>
+
+                        {/* Footer Action to Dedicated Category Page */}
+                        <div className="mt-3 pt-3 border-t border-zinc-100 flex items-center justify-between px-2">
+                          <span className="text-[11px] font-medium text-zinc-500">
+                            Looking for OCR, Repair, Protect or Excel?
+                          </span>
+                          <Link
+                            href="/tools/pdf"
+                            onClick={() => setActiveDropdown(null)}
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 hover:text-black transition-colors group/link"
+                          >
+                            <span>Explore all 25+ PDF Tools</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 transition-transform" />
+                          </Link>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -622,7 +637,7 @@ export function Navbar() {
                         : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                     }`}
                   >
-                    All Tools (17)
+                    All Tools (34)
                   </Link>
                 </nav>
               ) : (
@@ -1813,7 +1828,7 @@ export function Navbar() {
                       <div className="pt-2">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Free Micro-Tools (17)
+                            Free Micro-Tools (34)
                           </span>
                           <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
                             Zero Login
