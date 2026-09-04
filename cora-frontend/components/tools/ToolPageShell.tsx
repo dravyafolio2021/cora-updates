@@ -88,70 +88,96 @@ export function ToolPageShell({
   };
 
   return (
-    <div className="w-full bg-[#FAFAF9] text-zinc-900 min-h-screen pt-[116px] sm:pt-28 pb-24 sm:pb-20 selection:bg-zinc-900 selection:text-white">
-      <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
+    <div className="relative w-full bg-[#FAFAF9] text-zinc-900 min-h-screen pt-[108px] sm:pt-[116px] pb-24 sm:pb-20 selection:bg-zinc-900 selection:text-white overflow-hidden">
+      
+      {/* ── Seamless Full-Width Background Pattern (Blended directly from top header) ── */}
+      <div 
+        aria-hidden="true"
+        className="absolute top-0 inset-x-0 h-[480px] pointer-events-none opacity-[0.45]"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(228, 228, 231, 0.7) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(228, 228, 231, 0.7) 1px, transparent 1px)
+          `,
+          backgroundSize: '28px 28px',
+          maskImage: 'linear-gradient(to bottom, black 35%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 35%, transparent 100%)',
+        }}
+      />
+
+      {/* ── Ambient Radial Glow Matched to Tool Domain ── */}
+      <div 
+        aria-hidden="true"
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1300px] h-[380px] pointer-events-none blur-3xl opacity-30"
+        style={{
+          background: toolId.includes('pdf') 
+            ? 'radial-gradient(ellipse 60% 50% at 50% 10%, rgba(59,130,246,0.18) 0%, transparent 80%)'
+            : toolId.includes('gst') || toolId.includes('upi')
+            ? 'radial-gradient(ellipse 60% 50% at 50% 10%, rgba(16,185,129,0.18) 0%, transparent 80%)'
+            : toolId.includes('ai')
+            ? 'radial-gradient(ellipse 60% 50% at 50% 10%, rgba(244,63,94,0.18) 0%, transparent 80%)'
+            : 'radial-gradient(ellipse 60% 50% at 50% 10%, rgba(99,102,241,0.18) 0%, transparent 80%)'
+        }}
+      />
+
+      <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         
-        {/* ── Top Back Navigation ── */}
-        <div className="mb-4 sm:mb-6">
-          <Link
-            href="/tools"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to all micro-tools</span>
-          </Link>
-        </div>
-
-        {/* ── Compact Structured Intro Section with Dynamic Blueprint Pattern ── */}
-        <div className="relative rounded-3xl border border-zinc-200/90 bg-white shadow-xs overflow-hidden mb-6 sm:mb-8 p-5 sm:p-7 md:p-8">
+        {/* ── Intro Section: Unboxed & Seamlessly Structured ── */}
+        <div className="mb-8 sm:mb-10">
           
-          {/* Dynamic Background Grid Pattern (Tailored subtle blueprint grid) */}
-          <div 
-            className="absolute inset-0 pointer-events-none opacity-[0.55]"
-            style={{
-              backgroundImage: `
-                linear-gradient(to right, rgba(228, 228, 231, 0.6) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(228, 228, 231, 0.6) 1px, transparent 1px)
-              `,
-              backgroundSize: '24px 24px',
-              maskImage: 'radial-gradient(ellipse 90% 80% at 75% 25%, #000 40%, transparent 100%)',
-              WebkitMaskImage: 'radial-gradient(ellipse 90% 80% at 75% 25%, #000 40%, transparent 100%)',
-            }}
-          />
+          {/* Back Navigation Breadcrumb */}
+          <div className="mb-4 sm:mb-5">
+            <Link
+              href="/tools"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-colors group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Back to all micro-tools</span>
+            </Link>
+          </div>
 
-          {/* Dynamic Ambient Accent Gradient (Subtle tint matched to domain) */}
-          <div 
-            className="absolute -top-16 -right-16 w-80 h-80 pointer-events-none rounded-full blur-3xl opacity-35"
-            style={{
-              background: toolId.includes('pdf') 
-                ? 'radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%)'
-                : toolId.includes('gst') || toolId.includes('upi')
-                ? 'radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%)'
-                : toolId.includes('ai')
-                ? 'radial-gradient(circle, rgba(244,63,94,0.2) 0%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)'
-            }}
-          />
-
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
-            {/* Left: Compact Title, Badge, Description */}
-            <div className="lg:col-span-7 xl:col-span-8 space-y-2.5">
-              <div className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-zinc-800 px-3 py-1 bg-zinc-50 border border-zinc-200/90 rounded-full shadow-2xs">
+            {/* Left Column: Category Badge, H1 Title, Subtitle, Trust Points */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-3 pt-0.5">
+              
+              {/* Category Pill */}
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-zinc-800 px-3 py-1 bg-white/90 backdrop-blur-sm border border-zinc-200/90 rounded-full shadow-2xs">
                 {getToolBadgeIcon()}
                 <span>{cleanBadgeTag}</span>
               </div>
-              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-semibold text-zinc-950 tracking-[-0.03em] leading-tight">
+
+              {/* Main H1 Title */}
+              <h1 className="font-display text-2xl sm:text-3xl lg:text-[38px] font-bold text-zinc-950 tracking-[-0.035em] leading-[1.14]">
                 {title}
               </h1>
-              <p className="text-zinc-600 text-xs sm:text-sm font-normal leading-relaxed max-w-2xl">
+
+              {/* Subtitle */}
+              <p className="text-zinc-600 text-xs sm:text-sm lg:text-[15px] font-normal leading-relaxed max-w-2xl">
                 {subtitle}
               </p>
+
+              {/* Trust & Privacy Micro-Badges */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium text-zinc-600 bg-white/80 px-2.5 py-1 rounded-md border border-zinc-200/70 shadow-2xs">
+                  <Lock className="w-3 h-3 text-emerald-600" />
+                  100% Client-Side Private
+                </span>
+                <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium text-zinc-600 bg-white/80 px-2.5 py-1 rounded-md border border-zinc-200/70 shadow-2xs">
+                  <Zap className="w-3 h-3 text-amber-500" />
+                  Zero Server Upload
+                </span>
+                <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium text-zinc-600 bg-white/80 px-2.5 py-1 rounded-md border border-zinc-200/70 shadow-2xs">
+                  <Check className="w-3 h-3 text-zinc-800" />
+                  Free & Unlimited
+                </span>
+              </div>
+
             </div>
 
-            {/* Right: Sleek, Compact 3D Ad Showcase Card (Reduced Height ~230px) */}
+            {/* Right Column: Sleek 3D AI Card (Self-contained, perfectly proportioned ~215px) */}
             <div className="hidden lg:block lg:col-span-5 xl:col-span-4">
-              <div className="relative rounded-2xl overflow-hidden shadow-md border border-zinc-800/90 bg-zinc-950 h-[225px] flex flex-col justify-between p-4 text-white group">
+              <div className="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-800/90 bg-zinc-950 h-[215px] flex flex-col justify-between p-3.5 text-white group">
                 
                 {/* Full-Bleed 3D Background Artwork */}
                 <Image
@@ -164,10 +190,10 @@ export function ToolPageShell({
                 />
 
                 {/* Top soft vignette */}
-                <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none" />
 
                 {/* Bottom gradient melt */}
-                <div className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-zinc-950 via-zinc-950/95 via-50% to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-zinc-950 via-zinc-950/95 via-50% to-transparent pointer-events-none" />
 
                 {/* Top Row: Agent Pill + Feature Tag (Zero emojis) */}
                 <div className="relative z-10 flex items-center justify-between gap-2">
@@ -183,9 +209,9 @@ export function ToolPageShell({
                 </div>
 
                 {/* Bottom Row: Compact Headline, Timer Ribbon & CTA */}
-                <div className="relative z-10 space-y-2 mt-auto pt-6">
+                <div className="relative z-10 space-y-1.5 mt-auto pt-4">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-display text-sm font-bold text-white tracking-tight leading-snug drop-shadow-sm truncate">
+                    <h3 className="font-display text-xs sm:text-sm font-bold text-white tracking-tight leading-snug drop-shadow-sm truncate">
                       {agentData.card1.headline}
                     </h3>
 
@@ -204,14 +230,14 @@ export function ToolPageShell({
                   </div>
 
                   {/* 40% Flash Ribbon */}
-                  <div className="p-1.5 rounded-xl bg-amber-400/15 border border-amber-400/40 backdrop-blur-md flex items-center justify-between gap-2">
+                  <div className="p-1 rounded-lg bg-amber-400/15 border border-amber-400/40 backdrop-blur-md flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1 min-w-0">
                       <Flame className="w-3 h-3 text-amber-400 shrink-0 fill-amber-400 animate-pulse" />
-                      <span className="text-[10.5px] font-mono font-extrabold text-amber-300 tracking-wide truncate">
+                      <span className="text-[10px] font-mono font-extrabold text-amber-300 tracking-wide truncate">
                         40% OFF: ₹299/mo
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-[10px] font-mono font-extrabold text-zinc-950 bg-amber-400 px-1.5 py-0.5 rounded-md shadow-2xs shrink-0">
+                    <div className="flex items-center gap-1 text-[9.5px] font-mono font-extrabold text-zinc-950 bg-amber-400 px-1.5 py-0.5 rounded shadow-2xs shrink-0">
                       <Clock className="w-2.5 h-2.5 text-zinc-950 shrink-0" />
                       <span>{formatTimer(secondsLeft)}</span>
                     </div>
@@ -220,7 +246,7 @@ export function ToolPageShell({
                   {/* Sleek CTA Button */}
                   <Link
                     href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
-                    className="w-full py-2 px-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.99] transition-all cursor-pointer"
+                    className="w-full py-1.5 px-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.99] transition-all cursor-pointer"
                   >
                     <span>Claim with {agentData.agent.name.split(' ')[0]}</span>
                     <ArrowRight className="w-3 h-3 text-zinc-950" />
