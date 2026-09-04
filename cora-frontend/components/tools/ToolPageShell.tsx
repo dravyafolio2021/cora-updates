@@ -13,7 +13,8 @@ import {
   Check, 
   ChevronDown,
   Clock,
-  Flame
+  Flame,
+  X
 } from 'lucide-react';
 import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
 import { useToast } from '@/components/ui/Toast';
@@ -43,6 +44,7 @@ export function ToolPageShell({
 
   // 10-minute dynamic countdown timer for 40% discount on India Only plan
   const [secondsLeft, setSecondsLeft] = useState(600);
+  const [mobileAdDismissed, setMobileAdDismissed] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -70,7 +72,7 @@ export function ToolPageShell({
   };
 
   return (
-    <div className="w-full bg-[#FAFAF9] text-zinc-900 min-h-screen py-10 sm:py-16 selection:bg-zinc-900 selection:text-white">
+    <div className="w-full bg-[#FAFAF9] text-zinc-900 min-h-screen pt-[124px] sm:pt-32 pb-24 sm:pb-20 selection:bg-zinc-900 selection:text-white">
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         
         {/* ── Top Back Navigation ── */}
@@ -89,7 +91,7 @@ export function ToolPageShell({
           <div className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-zinc-800 px-3 py-1 bg-white border border-zinc-200/80 rounded-full mb-3 shadow-2xs">
             <span>{badgeTag}</span>
           </div>
-          <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.18] mb-3">
+          <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl font-semibold text-zinc-950 tracking-[-0.035em] leading-[1.18] mb-3">
             {title}
           </h1>
           <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed">
@@ -170,9 +172,9 @@ export function ToolPageShell({
           </div>
 
           {/* ══════════════════════════════════════════════════════════════
-              RIGHT SECTION (IMMERSIVE FULL-BLEED 3D CREATIVE CARD)
+              RIGHT SECTION (IMMERSIVE FULL-BLEED 3D CREATIVE CARD - DESKTOP ONLY)
               ══════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-4 lg:sticky lg:top-24">
+          <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-24">
             
             {/* ── Immersive Full-Bleed 3D Product Ad Card ── */}
             <div className="relative rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-zinc-800/90 bg-zinc-950 min-h-[530px] sm:min-h-[580px] flex flex-col justify-between p-5 sm:p-6 text-white group">
@@ -274,6 +276,78 @@ export function ToolPageShell({
         </div>
 
       </div>
+
+      {/* ══════════════════════════════════════════════════════════════
+          MOBILE FLOATING STICKY AD BLOCK (Custom Small Floating Card)
+          ══════════════════════════════════════════════════════════════ */}
+      {!mobileAdDismissed && (
+        <aside
+          aria-label="Cora AI Co-Founder Offer"
+          className="fixed bottom-3 inset-x-3 z-40 lg:hidden animate-in fade-in slide-in-from-bottom-5 duration-300"
+        >
+          <div className="relative overflow-hidden rounded-2xl bg-zinc-950/95 backdrop-blur-xl border border-zinc-800 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] text-white">
+            
+            {/* Subtle top ambient glow */}
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
+
+            <div className="flex items-center justify-between gap-3">
+              
+              {/* Left: Thumbnail & Offer Text */}
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <div className="relative w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-white/15 bg-zinc-900">
+                  <Image
+                    src={agentData.card1.image}
+                    alt={agentData.card1.headline}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                  />
+                  <span className="absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-zinc-950" />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-white tracking-tight truncate">
+                      {agentData.agent.name.split(' ')[0]} AI Co-Founder
+                    </span>
+                    <span className="text-[9.5px] font-mono font-extrabold text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded border border-amber-400/30 shrink-0">
+                      40% OFF
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-zinc-400 truncate flex items-center gap-1 font-mono">
+                    <span className="text-white font-bold">₹299/mo</span>
+                    <span>&bull;</span>
+                    <span className="text-amber-400 font-semibold">{formatTimer(secondsLeft)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: 1-Tap CTA & Dismiss Button */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Link
+                  href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
+                  className="px-3.5 py-2 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center gap-1 shadow-md active:scale-95 transition-all"
+                >
+                  <span>Claim</span>
+                  <ArrowRight className="w-3 h-3 text-zinc-950" />
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => setMobileAdDismissed(true)}
+                  aria-label="Dismiss offer"
+                  className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        </aside>
+      )}
+
     </div>
   );
 }
