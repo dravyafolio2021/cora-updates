@@ -9,7 +9,11 @@ import {
   Scale, 
   Code, 
   QrCode, 
-  ArrowRight 
+  ArrowRight,
+  Layers,
+  Scissors,
+  RotateCw,
+  FileText
 } from 'lucide-react';
 import { ToolCategoryBlock } from '@/lib/tools-data';
 
@@ -20,6 +24,10 @@ const ICONS_MAP: Record<string, any> = {
   Scale,
   Code,
   QrCode,
+  Layers,
+  Scissors,
+  RotateCw,
+  FileText,
 };
 
 interface ToolCategoryHeroCardProps {

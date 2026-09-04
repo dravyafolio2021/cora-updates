@@ -46,7 +46,12 @@ import {
   Terminal,
   BookOpen,
   Heart,
-  Scissors
+  Scissors,
+  Files,
+  ImageIcon,
+  FileCheck,
+  Stamp,
+  RotateCw
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 import {
@@ -188,7 +193,116 @@ export function Navbar() {
               {isToolsPage ? (
                 /* Tools Custom Menu: PDF, Finance, Contracts, AI Copy, Code & Embeds, All Tools */
                 <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold text-zinc-800 font-sans">
-                  {/* 1. Tax & GST Dropdown */}
+                  {/* 1. PDF Tools Dropdown */}
+                  <div
+                    className="relative py-1"
+                    onMouseEnter={() => handleMouseEnter('tools-pdf')}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setActiveDropdown(activeDropdown === 'tools-pdf' ? null : 'tools-pdf')}
+                      className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ease-out group ${
+                        activeDropdown === 'tools-pdf'
+                          ? 'text-zinc-950 bg-zinc-100 font-bold shadow-2xs'
+                          : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
+                      }`}
+                    >
+                      <span>PDF Tools</span>
+                      <ChevronDown className={`w-3.5 h-3.5 stroke-[2.2] text-zinc-500 group-hover:text-zinc-950 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeDropdown === 'tools-pdf' ? 'rotate-180 text-zinc-950 scale-105' : ''}`} />
+                    </button>
+
+                    {activeDropdown === 'tools-pdf' && (
+                      <div
+                        className="absolute top-full left-0 mt-3 w-80 rounded-2xl bg-white border border-zinc-200/90 shadow-[0px_20px_50px_rgba(0,0,0,0.1)] p-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                        onMouseEnter={() => handleMouseEnter('tools-pdf')}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <Link
+                          href="/tools/merge-pdf"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                            <Files className="w-4 h-4 stroke-[2]" />
+                          </div>
+                          <div>
+                            <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                              Merge PDF Files
+                              <span className="text-[9px] font-mono font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200/60">Fast</span>
+                            </div>
+                            <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Combine documents with visual reordering</p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/tools/images-to-pdf"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                            <ImageIcon className="w-4 h-4 stroke-[2]" />
+                          </div>
+                          <div>
+                            <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                              Images to PDF Converter
+                            </div>
+                            <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Convert JPG, PNG &amp; WebP to high-res PDF</p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/tools/esign-pdf"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                            <FileCheck className="w-4 h-4 stroke-[2]" />
+                          </div>
+                          <div>
+                            <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                              Digital eSign PDF
+                              <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200/60">Sec 10A</span>
+                            </div>
+                            <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Draw or type legally binding signatures</p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/tools/split-pdf"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                            <Scissors className="w-4 h-4 stroke-[2]" />
+                          </div>
+                          <div>
+                            <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                              Split &amp; Extract PDF
+                            </div>
+                            <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Extract custom page ranges &amp; single sheets</p>
+                          </div>
+                        </Link>
+
+                        <Link
+                          href="/tools/watermark-pdf"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 border border-violet-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                            <Stamp className="w-4 h-4 stroke-[2]" />
+                          </div>
+                          <div>
+                            <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                              Add Watermark to PDF
+                            </div>
+                            <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Stamp text or confidential marks</p>
+                          </div>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 2. Tax & GST Dropdown */}
                   <div
                     className="relative py-1"
                     onMouseEnter={() => handleMouseEnter('tools-tax')}
@@ -393,7 +507,7 @@ export function Navbar() {
                     )}
                   </div>
 
-                  {/* 5. Direct Link to All Tools Hub */}
+                  {/* 6. Direct Link to All Tools Hub */}
                   <Link
                     href="/tools"
                     onClick={() => setActiveDropdown(null)}
@@ -403,7 +517,7 @@ export function Navbar() {
                         : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                     }`}
                   >
-                    All Tools (6)
+                    All Tools (12)
                   </Link>
                 </nav>
               ) : (
@@ -1594,7 +1708,7 @@ export function Navbar() {
                       <div className="pt-2">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Free Micro-Tools (6)
+                            Free Micro-Tools (12)
                           </span>
                           <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
                             Zero Login
@@ -1602,6 +1716,106 @@ export function Navbar() {
                         </div>
 
                         <div className="space-y-1">
+                          {/* PDF Tools */}
+                          <Link
+                            href="/tools/merge-pdf"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 border border-rose-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <Files className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">Merge PDF Files</span>
+                                <span className="text-[9px] font-mono font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200/60">Fast</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Combine documents with visual reordering</p>
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="/tools/images-to-pdf"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <ImageIcon className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">Images to PDF Converter</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Convert JPG, PNG &amp; WebP to PDF</p>
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="/tools/esign-pdf"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <FileCheck className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">Digital eSign PDF</span>
+                                <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200/60">Sec 10A</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Draw or type legally valid signatures</p>
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="/tools/split-pdf"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <Scissors className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">Split &amp; Extract PDF</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Custom page ranges &amp; single sheets</p>
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="/tools/rotate-pdf"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <RotateCw className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">Rotate PDF Pages</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Rotate 90°, 180° or 270° permanently</p>
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="/tools/watermark-pdf"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 border border-violet-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <Stamp className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">Add Watermark to PDF</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Stamp text or confidential marks</p>
+                            </div>
+                          </Link>
+
+                          {/* Business & Tax Tools */}
                           <Link
                             href="/tools/gst-calculator"
                             onClick={() => setMobileMenuOpen(false)}
@@ -1706,7 +1920,7 @@ export function Navbar() {
                             onClick={() => setMobileMenuOpen(false)}
                             className="flex items-center justify-between p-3 rounded-2xl bg-zinc-50 hover:bg-zinc-100 transition-colors mt-2"
                           >
-                            <span className="text-sm font-bold text-zinc-950">View All 6 Micro-Tools Hub</span>
+                            <span className="text-sm font-bold text-zinc-950">View All 12 Micro-Tools Hub</span>
                             <ArrowRight className="w-4 h-4 text-zinc-400" />
                           </Link>
                         </div>

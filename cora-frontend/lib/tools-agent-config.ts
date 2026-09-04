@@ -196,4 +196,180 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       ctaText: 'Claim Free Workspace →',
     },
   },
+
+  'merge-pdf': {
+    slug: 'merge-pdf',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Legal & Document Automation AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Combine confidential proposals, pitch decks, annexures, and master service agreements into a single polished document. 100% private in browser memory.',
+      image: '/images/bento_esign_seal.jpg',
+      headline: 'Private Client-Side PDF Merge',
+      description: 'Combine contracts, pitch decks & rate cards with zero server uploads.',
+      badge: '⚡ 100% In-Memory Pure JS',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Automate Multi-Doc Proposals & Pitch Presentations',
+      description: 'Cora turns scattered pitch slide decks, master services agreements, and GST invoices into unified signature-ready client proposals with cryptographically verified seals.',
+      capabilities: [
+        'Drag-and-Drop Sequential Page Merging',
+        'Zero Server Uploads (100% Client-Side)',
+        'Automatic File Size & Page Summaries',
+        'Instant SHA-256 Audit Trail Protection',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'split-pdf': {
+    slug: 'split-pdf',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Contracts & Scope AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Isolate signed signature pages, extract project milestone annexures, or separate specific deck slides without exposing sensitive client data to third-party servers.',
+      image: '/images/cora_esign_vault_3d.jpg',
+      headline: 'Precision Page Splitter & Extractor',
+      description: 'Extract signature pages and confidential annexures instantly.',
+      badge: '⚡ Zero Data Leakage',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Extract Signature Pages & Scopes Instantly',
+      description: 'Cleanly slice 50-page vendor contracts down to the relevant statement of work and executed signatory page, ready to forward to banking or legal teams.',
+      capabilities: [
+        'Interactive Visual Page Grid Selection',
+        'Custom Page Range Syntax (e.g. 1-3, 5)',
+        '100% In-Browser Memory Processing',
+        'Instant Single-Click Extracted PDF Download',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'rotate-pdf': {
+    slug: 'rotate-pdf',
+    agent: {
+      name: 'Dev Sharma',
+      role: 'Studio Operations AI Co-Founder',
+      avatar: '/images/about_team_dev.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Fix inverted mobile scans, rotate architectural blueprints from portrait to landscape, and align orientation across all pages in under a second.',
+      image: '/images/card_bg_contract_seal.jpg',
+      headline: 'Instant PDF Orientation Engine',
+      description: 'Rotate 90°, 180°, or 270° with lossless vector preservation.',
+      badge: '⚡ Lossless Vector Rotation',
+      ctaText: 'Launch Free with Dev',
+    },
+    card2: {
+      title: 'Clean Up Scanned Client Agreements & Blueprints',
+      description: 'Correct orientation on sideways scanned GST certificates, inverted lease deeds, and landscape photo call-sheets before sending them to clients.',
+      capabilities: [
+        '90° Clockwise, 180°, and 270° Rotation',
+        'Target All Pages or Specific Page Subsets',
+        'Retains Full Font & Vector Quality',
+        'Fast Pure Client-Side WebAssembly/JS',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'images-to-pdf': {
+    slug: 'images-to-pdf',
+    agent: {
+      name: 'Tanya Sen',
+      role: 'Creative Deliverables AI Co-Founder',
+      avatar: '/images/cora_agent_marketing.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Bundle client photo proofs, portfolio decks, shoot receipts, and model scans into clean, standardized PDFs without file size limits or cloud compression.',
+      image: '/images/cora_ad_listing_ai.jpg',
+      headline: 'Instant Multi-Image to PDF Engine',
+      description: 'Convert JPG, PNG, and WebP into print-ready A4 or Letter PDFs.',
+      badge: '⚡ Zero Cloud Uploads',
+      ctaText: 'Launch Free with Tanya',
+    },
+    card2: {
+      title: 'Studio Shoot Proofing & Deliverable Packaging',
+      description: 'Streamline high-res client photo review packages, vendor receipts, and lookbooks into clean, uniform documents processed 100% inside your browser.',
+      capabilities: [
+        'Multi-Image Reordering & Thumbnail Grid',
+        'A4, US Letter, and Fit Original Aspect Presets',
+        'Configurable Page Margin Controls',
+        '100% In-Browser Memory Pure JS Execution',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'esign-pdf': {
+    slug: 'esign-pdf',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Legal & Compliance AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Sign commercial production agreements, model release deeds, and vendor invoices with legally valid digital signatures under Section 10A of the Indian IT Act 2000.',
+      image: '/images/cora_esign_vault_3d.jpg',
+      headline: 'Section 10A Digital e-Signature',
+      description: 'Draw or type signatures with cryptographic timestamp stamping.',
+      badge: '⚡ Section 10A IT Act Sealed',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Court-Admissible Digital Signatures on Any PDF',
+      description: 'Empower clients, photographers, and agency partners to sign contracts effortlessly on mobile or desktop with touch signature pads and automated audit logs.',
+      capabilities: [
+        'Smooth Touch & Mouse HTML5 Canvas Signature Pad',
+        'Typed Legal Signature Generator with Script Typography',
+        'Target Page Selection & Interactive Placement Presets',
+        'Section 10A IT Act 2000 Compliance & SHA-256 Audit Trail',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'watermark-pdf': {
+    slug: 'watermark-pdf',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Media Asset Protection AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Protect unreleased shoot proofs, confidential pitch proposals, and draft agreements with custom diagonal or horizontal watermarks across all document pages.',
+      image: '/images/cora_ad_retainer_calculator.jpg',
+      headline: 'Document Protection & Watermarking',
+      description: 'Stamp custom confidentiality notices with adjustable opacity and angles.',
+      badge: '⚡ All Pages Watermarked',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Safeguard Commercial IP Before Final Milestone Payout',
+      description: 'Prevent unauthorized client distribution of draft deliverables. Apply prominent semi-transparent watermarks to client review decks with zero quality degradation.',
+      capabilities: [
+        'Custom Text & One-Tap Presets (CONFIDENTIAL, DRAFT)',
+        'Adjustable Opacity (10% - 80%) & 45° Angle Controls',
+        'Instant Multi-Page Batch Stamping',
+        'Vector Crisp Typography with Lossless PDF Export',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
 };
+
+
