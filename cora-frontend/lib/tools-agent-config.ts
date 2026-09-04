@@ -370,6 +370,152 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       ctaText: 'Claim Free Workspace →',
     },
   },
+
+  'compress-pdf': {
+    slug: 'compress-pdf',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Operations & Optimization AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Compress heavy client proposals, portfolio decks, and shoot contracts to under 5MB for instant WhatsApp sharing and email attachments with zero quality loss.',
+      image: '/images/cora_ad_retainer_calculator.jpg',
+      headline: 'Extreme Lossless PDF Compression',
+      description: 'Downsample stream dictionaries and strip redundant metadata in browser.',
+      badge: 'Reduces up to 70% Size',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Reduce PDF File Size for Fast Distribution',
+      description: 'Eliminate file size bouncebacks on tender portals, government filings, and client WhatsApp pitches with multi-tier in-browser compression.',
+      capabilities: [
+        '3 Optimization Presets: Extreme, Recommended, Low',
+        'Live Before & After File Size Comparison Metrics',
+        'Zero Uploads to External Servers (100% In-Memory)',
+        'Lossless Text Font Preservation & Vector Crispness',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'number-pdf': {
+    slug: 'number-pdf',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Legal Documentation AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Number multi-page master agreements, technical proposals, and audit binders with customized legal pagination headers and footers in one click.',
+      image: '/images/cora_esign_vault_3d.jpg',
+      headline: 'Automated Page Numbering',
+      description: 'Add clean "Page X of Y" pagination with custom position controls.',
+      badge: 'Audit-Ready Pagination',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Format Professional Legal & Commercial Binders',
+      description: 'Stamp uniform, crisp page numbers across multi-page decks with position offsets, custom starting indexes, and format customization.',
+      capabilities: [
+        'Position Options: Bottom-Center, Bottom-Right, Top-Right',
+        'Format Types: "Page X of Y", "Page X", "Numeric Only"',
+        'Adjustable Margin Offsets & Font Sizing',
+        'Instant Multi-Page Batch Stamping in Pure JS',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'remove-pages': {
+    slug: 'remove-pages',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Document Management AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Delete unwanted draft sheets, duplicate pages, or confidential appendix sheets from client PDF deliverables with visual thumbnail selection.',
+      image: '/images/cora_ad_retainer_calculator.jpg',
+      headline: 'Delete Unwanted PDF Pages',
+      description: 'Select pages to remove or enter custom ranges with instant re-export.',
+      badge: 'Zero Quality Loss',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Trim & Purge Pages from Any PDF Document',
+      description: 'Quickly remove sensitive pages, blank sheets, or outdated annexures before sending documents to external clients or signing authorities.',
+      capabilities: [
+        'Interactive Page Badges & Range Selector',
+        'Delete Single Sheets or Multi-Page Spans',
+        'Lossless Vector Export of Surviving Pages',
+        '100% Private In-Browser Execution',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'word-to-pdf': {
+    slug: 'word-to-pdf',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Content & Publishing AI Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Convert document text, draft terms, and commercial notes into publication-ready, beautifully typeset A4 PDF documents with automated pagination.',
+      image: '/images/cora_gst_upi_3d.jpg',
+      headline: 'Instant Word to PDF Converter',
+      description: 'Transform draft text and copy into high-res vectorized PDF files.',
+      badge: 'A4 Typeset Format',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Publish Professional Documents Directly in Browser',
+      description: 'Eliminate formatting quirks. Convert raw text, proposals, or memos into standardized PDF files ready for printing or e-signing.',
+      capabilities: [
+        'Automated Word Wrap & Multi-Page Pagination',
+        'Custom Document Titles & Typographic Scaling',
+        'Vector Crisp Text Embedding with Standard Fonts',
+        'Instant 1-Click Client-Side Download',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'ai-pdf-summarizer': {
+    slug: 'ai-pdf-summarizer',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Intelligence & Clause Risk AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Scan lengthy contracts, master service agreements, and tenders in seconds. Highlight hidden indemnities, termination penalties, and payment milestones.',
+      image: '/images/cora_esign_vault_3d.jpg',
+      headline: 'AI Contract Risk & Clause Scanner',
+      description: 'Instant legal clause detection, summary insights, & action items.',
+      badge: 'Smart Clause Radar',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Autonomous Legal & Business Intelligence',
+      description: 'Upload any business document to extract critical risk factors, milestone obligations, payment terms, and confidentiality commitments in seconds.',
+      capabilities: [
+        'Commercial Clause Radar (Payment, Penalty, SLA)',
+        'Executive Summary & Risk Scoring Breakdown',
+        '1-Tap Direct Bridge to Cora AI Co-Founder',
+        '100% In-Browser Inspection (Never Sent to Third Parties)',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
 };
+
 
 

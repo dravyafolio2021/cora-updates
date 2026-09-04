@@ -51,7 +51,11 @@ import {
   ImageIcon,
   FileCheck,
   Stamp,
-  RotateCw
+  RotateCw,
+  Minimize2,
+  Hash,
+  Trash2,
+  FileType
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 import {
@@ -213,91 +217,192 @@ export function Navbar() {
 
                     {activeDropdown === 'tools-pdf' && (
                       <div
-                        className="absolute top-full left-0 mt-3 w-80 rounded-2xl bg-white border border-zinc-200/90 shadow-[0px_20px_50px_rgba(0,0,0,0.1)] p-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                        className="absolute top-full left-0 mt-3 w-[660px] rounded-3xl bg-white border border-zinc-200/90 shadow-[0px_24px_60px_rgba(0,0,0,0.12)] p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
                         onMouseEnter={() => handleMouseEnter('tools-pdf')}
                         onMouseLeave={handleMouseLeave}
                       >
-                        <Link
-                          href="/tools/merge-pdf"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
-                            <Files className="w-4 h-4 stroke-[2]" />
-                          </div>
-                          <div>
-                            <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
-                              Merge PDF Files
-                              <span className="text-[9px] font-mono font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200/60">Fast</span>
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* Column 1: ORGANIZE & OPTIMIZE */}
+                          <div className="space-y-1">
+                            <div className="px-2.5 py-1 text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                              <span>Organize &amp; Optimize</span>
+                              <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60 font-mono text-[9px]">100% Private</span>
                             </div>
-                            <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Combine documents with visual reordering</p>
-                          </div>
-                        </Link>
 
-                        <Link
-                          href="/tools/images-to-pdf"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
-                            <ImageIcon className="w-4 h-4 stroke-[2]" />
-                          </div>
-                          <div>
-                            <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
-                              Images to PDF Converter
-                            </div>
-                            <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Convert JPG, PNG &amp; WebP to high-res PDF</p>
-                          </div>
-                        </Link>
+                            <Link
+                              href="/tools/compress-pdf"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Minimize2 className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                                  Compress PDF
+                                  <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60">Popular</span>
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Reduce file size up to 70% in browser</p>
+                              </div>
+                            </Link>
 
-                        <Link
-                          href="/tools/esign-pdf"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
-                            <FileCheck className="w-4 h-4 stroke-[2]" />
-                          </div>
-                          <div>
-                            <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
-                              Digital eSign PDF
-                              <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200/60">Sec 10A</span>
-                            </div>
-                            <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Draw or type legally binding signatures</p>
-                          </div>
-                        </Link>
+                            <Link
+                              href="/tools/merge-pdf"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Files className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                                  Merge PDF Files
+                                  <span className="text-[9px] font-mono font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200/60">Fast</span>
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Combine documents with visual reordering</p>
+                              </div>
+                            </Link>
 
-                        <Link
-                          href="/tools/split-pdf"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
-                            <Scissors className="w-4 h-4 stroke-[2]" />
-                          </div>
-                          <div>
-                            <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
-                              Split &amp; Extract PDF
-                            </div>
-                            <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Extract custom page ranges &amp; single sheets</p>
-                          </div>
-                        </Link>
+                            <Link
+                              href="/tools/split-pdf"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Scissors className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Split &amp; Extract PDF
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Extract custom page ranges &amp; sheets</p>
+                              </div>
+                            </Link>
 
-                        <Link
-                          href="/tools/watermark-pdf"
-                          onClick={() => setActiveDropdown(null)}
-                          className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 border border-violet-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
-                            <Stamp className="w-4 h-4 stroke-[2]" />
+                            <Link
+                              href="/tools/remove-pages"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 border border-red-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Trash2 className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Remove Pages
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Delete unwanted sheets with 1 click</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/watermark-pdf"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 border border-violet-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Stamp className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Add Watermark to PDF
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Stamp text or confidential marks</p>
+                              </div>
+                            </Link>
                           </div>
-                          <div>
-                            <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
-                              Add Watermark to PDF
+
+                          {/* Column 2: CONVERT, SECURITY & AI */}
+                          <div className="space-y-1">
+                            <div className="px-2.5 py-1 text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                              <span>Convert &amp; Security</span>
+                              <span className="text-zinc-600 bg-zinc-100 px-1.5 py-0.2 rounded border border-zinc-200 font-mono text-[9px]">Zero Upload</span>
                             </div>
-                            <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Stamp text or confidential marks</p>
+
+                            <Link
+                              href="/tools/images-to-pdf"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 border border-teal-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <ImageIcon className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Images to PDF
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Convert JPG, PNG &amp; WebP to PDF</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/word-to-pdf"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <FileType className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                                  Word to PDF
+                                  <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200/60">New</span>
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Publish text &amp; memos into A4 PDF</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/number-pdf"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Hash className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Add Page Numbers
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Custom pagination headers &amp; footers</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/esign-pdf"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <FileCheck className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                                  Digital eSign PDF
+                                  <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200/60">Sec 10A</span>
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Draw or type legally valid signatures</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/ai-pdf-summarizer"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Bot className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                                  AI PDF Summarizer
+                                  <span className="text-[9px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200/60">AI Radar</span>
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Scan contract risks &amp; clauses</p>
+                              </div>
+                            </Link>
                           </div>
-                        </Link>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -517,7 +622,7 @@ export function Navbar() {
                         : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                     }`}
                   >
-                    All Tools (12)
+                    All Tools (17)
                   </Link>
                 </nav>
               ) : (
@@ -1708,7 +1813,7 @@ export function Navbar() {
                       <div className="pt-2">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Free Micro-Tools (12)
+                            Free Micro-Tools (17)
                           </span>
                           <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
                             Zero Login
@@ -1717,6 +1822,89 @@ export function Navbar() {
 
                         <div className="space-y-1">
                           {/* PDF Tools */}
+                          <Link
+                            href="/tools/compress-pdf"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <Minimize2 className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">Compress PDF</span>
+                                <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60">Popular</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Reduce file size up to 70% in browser</p>
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="/tools/word-to-pdf"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <FileType className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">Word to PDF</span>
+                                <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200/60">New</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Publish text &amp; copy into clean A4 PDF</p>
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="/tools/number-pdf"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <Hash className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">Add Page Numbers</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Custom pagination headers &amp; footers</p>
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="/tools/remove-pages"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 border border-red-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <Trash2 className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">Remove Pages</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Delete unwanted sheets with 1 click</p>
+                            </div>
+                          </Link>
+
+                          <Link
+                            href="/tools/ai-pdf-summarizer"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-50 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 shadow-2xs">
+                              <Bot className="w-4 h-4 stroke-[2]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-bold text-zinc-950">AI PDF Summarizer</span>
+                                <span className="text-[9px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200/60">AI</span>
+                              </div>
+                              <p className="text-xs text-zinc-500 font-normal mt-0.5">Scan contract risks &amp; extract clauses</p>
+                            </div>
+                          </Link>
+
                           <Link
                             href="/tools/merge-pdf"
                             onClick={() => setMobileMenuOpen(false)}
