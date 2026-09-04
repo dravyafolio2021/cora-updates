@@ -428,7 +428,7 @@ export default function FeaturesPage() {
                   {filteredBuiltModules.map((mod) => (
                     <Link
                       key={mod.slug}
-                      href={`/features/${mod.slug}`}
+                      href={mod.slug === 'ai-cofounder' ? '/ai-agent' : `/features/${mod.slug}`}
                       className="bg-white rounded-[28px] sm:rounded-[32px] border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer block"
                     >
                       {/* Top Tactile 3D UI Illustration Area */}
@@ -448,10 +448,10 @@ export default function FeaturesPage() {
                           </p>
                         </div>
 
-                        {/* ONLY Explore Feature CTA */}
+                        {/* ONLY Explore Feature / AI Agent CTA */}
                         <div className="pt-2 border-t border-zinc-100">
                           <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-zinc-950 group-hover:text-zinc-600 transition-colors">
-                            <span>Explore Feature</span>
+                            <span>{mod.slug === 'ai-cofounder' ? 'Explore AI Agent' : 'Explore Feature'}</span>
                             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                           </span>
                         </div>

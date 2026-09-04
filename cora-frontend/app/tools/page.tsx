@@ -94,24 +94,24 @@ export default function ToolsIndexPage() {
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
       {/* ── 1. PRECISION TOOLS MATRIX HERO (CLEAN TECH CANVAS) ── */}
-      <section className="relative w-full pt-16 sm:pt-24 pb-10 sm:pb-16 overflow-hidden">
+      <section className="relative w-full pt-28 sm:pt-36 pb-12 sm:pb-20 overflow-hidden">
         <ArtisticHeroBackground tone="tools" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
           {/* Streamlined Status Badge */}
-          <div className="mb-3 sm:mb-5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/90 backdrop-blur-md text-zinc-900 border border-white/90 text-[11px] sm:text-xs font-semibold shadow-2xs">
-              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-500" />
+          <div className="mb-4 sm:mb-6">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/95 backdrop-blur-md text-zinc-900 border border-zinc-200/80 text-xs sm:text-sm font-semibold shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
               <span>6 Free Turnkey Micro-Tools</span>
             </span>
           </div>
 
-          {/* Clean 2-Line Headline (Mobile Proportions Fixed) */}
-          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-zinc-950 tracking-[-0.035em] leading-[1.2] sm:leading-[1.14] mb-3 sm:mb-4 max-w-[960px] mx-auto">
+          {/* Clean 2-Line Headline (Punchy, Big & Confident Mobile Typography) */}
+          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold text-zinc-950 tracking-[-0.04em] leading-[1.08] sm:leading-[1.05] mb-4 sm:mb-6 max-w-[980px] mx-auto">
             <span className="block">Free Tools to Make</span>
             <span className="block mt-1 sm:mt-2">
-              <span className="inline-flex items-baseline justify-center gap-2 sm:gap-3">
+              <span className="inline-flex items-baseline justify-center gap-2 sm:gap-3.5">
                 <span className="relative inline-block font-extrabold text-zinc-950 pb-1">
                   <span>{currentItem.word}</span>
                   <svg
@@ -136,7 +136,7 @@ export default function ToolsIndexPage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-zinc-600 text-xs sm:text-base md:text-lg font-normal leading-relaxed max-w-[580px] mx-auto mb-6 sm:mb-8 px-2">
+          <p className="text-zinc-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-[620px] mx-auto mb-7 sm:mb-9 px-3">
             Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and dynamic UPI QR generation.
           </p>
 
@@ -161,7 +161,7 @@ export default function ToolsIndexPage() {
           </div>
 
           {/* ── Central AI Copilot Input Capsule ── */}
-          <div className="mb-6 sm:mb-12">
+          <div className="mb-7 sm:mb-12">
             <ToolsHeroAIInput
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
@@ -172,9 +172,9 @@ export default function ToolsIndexPage() {
 
         {/* ── 2. AUTONOMOUS INFINITE MARQUEE TRACK (NO MANUAL HORIZONTAL SCROLL) ── */}
         <div className="w-full overflow-hidden select-none py-1 sm:py-2 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
-          <div className="flex min-w-full shrink-0 items-center justify-around gap-3 sm:gap-5 animate-marquee hover:[animation-play-state:paused]">
+          <div className="flex min-w-full shrink-0 items-center justify-around gap-3.5 sm:gap-5 animate-marquee hover:[animation-play-state:paused]">
             {TOOL_CATEGORY_BLOCKS.concat(TOOL_CATEGORY_BLOCKS).map((block, idx) => (
-              <div key={`${block.id}-${idx}`} className="shrink-0 w-[175px] sm:w-[225px]">
+              <div key={`${block.id}-${idx}`} className="shrink-0 w-[205px] sm:w-[245px]">
                 <ToolCategoryHeroCard block={block} />
               </div>
             ))}

@@ -13,7 +13,7 @@ const config: Config = {
         foreground: "var(--text-primary)",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "Inter", "sans-serif"],
+        sans: ["'General Sans'", "var(--font-sans)", "Inter", "-apple-system", "sans-serif"],
         display: ["'General Sans'", "var(--font-display)", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
         heading: ["'General Sans'", "var(--font-display)", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
         mono: ["var(--font-mono)", "JetBrains Mono", "monospace"],
