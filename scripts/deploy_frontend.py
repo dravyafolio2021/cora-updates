@@ -85,11 +85,10 @@ def main():
     if os.path.exists(LOCAL_TAR):
         os.remove(LOCAL_TAR)
     
-    # Exclude .DS_Store and heavy unchanged media unless needed
+    # Exclude .DS_Store
     subprocess.run([
         "tar", "-czf", LOCAL_TAR,
         "--exclude=.DS_Store",
-        "--exclude=./images",
         "-C", LOCAL_OUT, "."
     ], check=True)
     print(f"Created {LOCAL_TAR} ({os.path.getsize(LOCAL_TAR)} bytes)")
@@ -135,6 +134,10 @@ echo "Remote deployment extraction finished successfully."
     
     endpoints = [
         ("Marketing Homepage (Next.js)", "https://heycora.in", "Cora"),
+        ("Tools Hub (Next.js)", "https://heycora.in/tools", "Zero-Login"),
+        ("GST Calculator (Next.js)", "https://heycora.in/tools/gst-calculator", "GST"),
+        ("UPI QR Generator (Next.js)", "https://heycora.in/tools/upi-qr-generator", "UPI"),
+        ("Pricing & 40% Flash Tier (Next.js)", "https://heycora.in/pricing?coupon=INDIA40", "India"),
         ("Features Page (Next.js)", "https://heycora.in/features", "Everything you need to run your business"),
         ("Integrations Hub (Next.js)", "https://heycora.in/integrations", "Autonomous Business Backend"),
         ("Embed Builder Tool (Next.js)", "https://heycora.in/tools/embed-builder", "1-Click Website Embed"),
