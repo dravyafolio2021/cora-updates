@@ -94,25 +94,25 @@ export default function ToolsIndexPage() {
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
       {/* ── 1. PRECISION TOOLS MATRIX HERO (CLEAN TECH CANVAS) ── */}
-      <section className="relative w-full pt-28 sm:pt-36 pb-12 sm:pb-20 overflow-hidden">
+      <section className="relative w-full pt-[128px] sm:pt-36 pb-12 sm:pb-20 overflow-hidden">
         <ArtisticHeroBackground tone="tools" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
           {/* Streamlined Status Badge */}
           <div className="mb-4 sm:mb-6">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/95 backdrop-blur-md text-zinc-900 border border-zinc-200/80 text-xs sm:text-sm font-semibold shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/95 backdrop-blur-md text-zinc-900 border border-zinc-200/80 text-xs sm:text-sm font-medium shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
               <span>6 Free Turnkey Micro-Tools</span>
             </span>
           </div>
 
-          {/* Clean 2-Line Headline (Punchy, Big & Confident Mobile Typography) */}
-          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold text-zinc-950 tracking-[-0.04em] leading-[1.08] sm:leading-[1.05] mb-4 sm:mb-6 max-w-[980px] mx-auto">
+          {/* Clean 2-Line Headline (Sleek, Elegant font-semibold Typography) */}
+          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-semibold text-zinc-950 tracking-[-0.035em] leading-[1.12] sm:leading-[1.08] mb-4 sm:mb-6 max-w-[980px] mx-auto">
             <span className="block">Free Tools to Make</span>
             <span className="block mt-1 sm:mt-2">
               <span className="inline-flex items-baseline justify-center gap-2 sm:gap-3.5">
-                <span className="relative inline-block font-extrabold text-zinc-950 pb-1">
+                <span className="relative inline-block font-semibold text-zinc-950 pb-1">
                   <span>{currentItem.word}</span>
                   <svg
                     key={currentItem.word}
