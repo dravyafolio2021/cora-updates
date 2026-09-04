@@ -55,7 +55,9 @@ import {
   Minimize2,
   Hash,
   Trash2,
-  FileType
+  FileType,
+  Table,
+  FileSpreadsheet
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 import {
@@ -414,7 +416,7 @@ export function Navbar() {
                             onClick={() => setActiveDropdown(null)}
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 hover:text-black transition-colors group/link"
                           >
-                            <span>Explore all 25+ PDF Tools</span>
+                            <span>Explore all 28 PDF Tools</span>
                             <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 transition-transform" />
                           </Link>
                         </div>
@@ -422,7 +424,164 @@ export function Navbar() {
                     )}
                   </div>
 
-                  {/* 2. Tax & GST Dropdown */}
+                  {/* 2. Sheets & Excel Dropdown */}
+                  <div
+                    className="relative py-1"
+                    onMouseEnter={() => handleMouseEnter('tools-sheets')}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setActiveDropdown(activeDropdown === 'tools-sheets' ? null : 'tools-sheets')}
+                      className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ease-out group ${
+                        activeDropdown === 'tools-sheets'
+                          ? 'text-zinc-950 bg-zinc-100 font-bold shadow-2xs'
+                          : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
+                      }`}
+                    >
+                      <span>Sheets &amp; Excel</span>
+                      <ChevronDown className={`w-3.5 h-3.5 stroke-[2.2] text-zinc-500 group-hover:text-zinc-950 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeDropdown === 'tools-sheets' ? 'rotate-180 text-zinc-950 scale-105' : ''}`} />
+                    </button>
+
+                    {activeDropdown === 'tools-sheets' && (
+                      <div
+                        className="absolute top-full left-0 mt-3 w-[660px] rounded-3xl bg-white border border-zinc-200/90 shadow-[0px_24px_60px_rgba(0,0,0,0.12)] p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                        onMouseEnter={() => handleMouseEnter('tools-sheets')}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* Column 1: FORMULAS & INTELLIGENCE */}
+                          <div className="space-y-1">
+                            <div className="px-2.5 py-1 text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                              <span>Formulas &amp; AI</span>
+                              <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60 font-mono text-[9px]">Zero Errors</span>
+                            </div>
+
+                            <Link
+                              href="/tools/excel-formula-generator"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Sparkles className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                                  Formula Generator
+                                  <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60">AI</span>
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Plain English to Excel &amp; Sheets formula</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/vlookup-generator"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Table className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  VLOOKUP &amp; XLOOKUP
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Interactive visual lookup formula builder</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/clean-sheet-data"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 border border-teal-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <FileCheck className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Clean Sheet Data
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Normalize phone numbers, dates &amp; names</p>
+                              </div>
+                            </Link>
+                          </div>
+
+                          {/* Column 2: CONVERT & CLEANING */}
+                          <div className="space-y-1">
+                            <div className="px-2.5 py-1 text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                              <span>Convert &amp; Operations</span>
+                              <span className="text-zinc-600 bg-zinc-100 px-1.5 py-0.2 rounded border border-zinc-200 font-mono text-[9px]">100% In-RAM</span>
+                            </div>
+
+                            <Link
+                              href="/tools/csv-to-excel"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <FileSpreadsheet className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  CSV to Excel (.xlsx)
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Convert delimited files to native workbooks</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/remove-duplicates-csv"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Trash2 className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Remove Duplicates
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Deduplicate rows by key columns</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/excel-to-json"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Code className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Excel / CSV to JSON
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Arrays, objects &amp; keyed dictionary maps</p>
+                              </div>
+                            </Link>
+                          </div>
+                        </div>
+
+                        {/* Footer Action to Dedicated Category Page */}
+                        <div className="mt-3 pt-3 border-t border-zinc-100 flex items-center justify-between px-2">
+                          <span className="text-[11px] font-medium text-zinc-500">
+                            Need to merge, split, or convert to CSV?
+                          </span>
+                          <Link
+                            href="/tools/sheets"
+                            onClick={() => setActiveDropdown(null)}
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 hover:text-black transition-colors group/link"
+                          >
+                            <span>Explore all Sheets Tools</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 transition-transform" />
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. Tax & GST Dropdown */}
                   <div
                     className="relative py-1"
                     onMouseEnter={() => handleMouseEnter('tools-tax')}
@@ -637,7 +796,7 @@ export function Navbar() {
                         : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                     }`}
                   >
-                    All Tools (34)
+                    All Tools (43)
                   </Link>
                 </nav>
               ) : (

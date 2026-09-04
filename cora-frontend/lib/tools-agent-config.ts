@@ -1008,8 +1008,265 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       ctaText: 'Claim Free Workspace →',
     },
   },
+
+  'csv-to-excel': {
+    slug: 'csv-to-excel',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Finance & Spreadsheet AI Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Stop wrestling with broken CSV encoding, missing commas, and corrupted date formats. Cora converts CSV and TSV files into native Excel spreadsheets in your browser.',
+      image: '/images/cora_gst_upi_3d.jpg',
+      headline: 'CSV to Excel Converter',
+      description: 'Convert delimited data into clean formatted .xlsx spreadsheets instantly.',
+      badge: 'Native XML .xlsx Engine',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Browser-Native Spreadsheet Compilation',
+      description: 'Transform raw delimited files into structured Excel workbooks with custom sheet naming, automatic type detection, and zero server transmission.',
+      capabilities: [
+        'Instant In-Browser Memory Parsing & XML Generation',
+        'Automatic Column Alignment & Type Detection',
+        'Interactive Live Data Table Preview',
+        '100% Private Client-Side Processing',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'excel-to-csv': {
+    slug: 'excel-to-csv',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Operations & Data AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Export spreadsheet tables and raw rows into clean RFC 4180 standard CSVs. Select custom delimiters including commas, semicolons, tabs, and pipes.',
+      image: '/images/cora_ad_retainer_calculator.jpg',
+      headline: 'Excel to CSV Delimiter Engine',
+      description: 'Convert spreadsheet grids into clean, escaped RFC 4180 CSV files.',
+      badge: 'RFC 4180 Compliant',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Clean & Compliant CSV Serialization',
+      description: 'Extract rows from spreadsheets with customizable delimiters, proper quote escaping, and 1-tap clipboard copying for developer workflows.',
+      capabilities: [
+        'Comma, Semicolon, Tab, and Pipe Delimiter Options',
+        'RFC 4180 Compliant Quote & Newline Escaping',
+        'Instant 1-Click Clipboard Copy & File Download',
+        'Zero Cloud Dependency - 100% Private in RAM',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'excel-to-json': {
+    slug: 'excel-to-json',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Engineering & Data AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Turn tabular spreadsheet data into production-ready JSON payloads. Choose between Array of Objects, 2D Arrays, or Keyed Dictionary maps in real time.',
+      image: '/images/cora_smart_contract_3d.jpg',
+      headline: 'Spreadsheet to JSON Transformer',
+      description: 'Transform Excel and CSV rows into formatted, syntax-highlighted JSON.',
+      badge: 'Multi-Schema JSON Engine',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Developer-Grade Spreadsheet to JSON',
+      description: 'Convert CSV and spreadsheet tables into clean JSON objects, 2D matrices, or indexed key-value dictionaries with automatic number coercion.',
+      capabilities: [
+        'Array of Objects, Array of Arrays, and Keyed Maps',
+        'Automatic Numeric Type Casting & Null Handling',
+        'Formatted & Syntax-Highlighted Output with 1-Click Copy',
+        'Direct .json File Export in Pure Browser Memory',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'excel-formula-generator': {
+    slug: 'excel-formula-generator',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Spreadsheet AI & Financial Modeling Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Turn plain English prompts into production-grade Excel and Google Sheets formulas. Break down complex nested logic, SUMIFS, and lookup syntax instantly.',
+      image: '/images/cora_gst_upi_3d.jpg',
+      headline: 'Natural Language Formula Generator',
+      description: 'Convert plain English intent into robust formulas with syntax breakdown.',
+      badge: 'Excel & Google Sheets',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Autonomous Spreadsheet Intelligence',
+      description: 'Stop getting stuck on nested IFs, SUMIFS, and regex text formulas. Generate bulletproof formulas with argument explanations and error guards in seconds.',
+      capabilities: [
+        'Plain English to Excel & Sheets Formula Translation',
+        'Syntax Breakdown & Argument Documentation',
+        'Multi-Condition SUMIFS, XLOOKUP & Regex Patterns',
+        '100% Private Client-Side Browser Execution',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'vlookup-generator': {
+    slug: 'vlookup-generator',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Operations & Data Modeling AI Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Build error-free VLOOKUP and modern XLOOKUP formulas without memorizing column indices or syntax quirks. Includes automatic IFERROR fallback handling.',
+      image: '/images/cora_ad_retainer_calculator.jpg',
+      headline: 'Visual VLOOKUP & XLOOKUP Builder',
+      description: 'Interactive visual builder with exact match and fallback handling.',
+      badge: 'VLOOKUP + XLOOKUP Dual Engine',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Master Spreadsheet Lookups Visually',
+      description: 'Design lookup formulas with real-time visual syntax validation. Generate both classic VLOOKUP and next-generation XLOOKUP with one click.',
+      capabilities: [
+        'Interactive Visual Range & Column Index Configurator',
+        'Dual VLOOKUP and XLOOKUP Simultaneous Generation',
+        'Built-in IFERROR & #N/A Missing Data Fallbacks',
+        'Absolute Reference Locking ($A$2:$F$500)',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'clean-sheet-data': {
+    slug: 'clean-sheet-data',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Data Sanitization & CRM AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Clean dirty spreadsheets in seconds. Standardize Indian phone numbers, convert dates to ISO, trim irregular spaces, and title-case contact names in browser RAM.',
+      image: '/images/cora_smart_contract_3d.jpg',
+      headline: 'Browser-Native Sheet Data Sanitizer',
+      description: 'Normalize phone numbers, dates, and names with instant live preview.',
+      badge: 'Zero Server Uploads',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Enterprise-Grade Data Sanitization',
+      description: 'Sanitize messy customer rosters, financial statements, and lead sheets directly in your browser memory before importing into your CRM or billing ledger.',
+      capabilities: [
+        'Trim Irregular Spaces & Remove Ghost Rows',
+        'Standardize Phone Numbers to Indian +91 Format',
+        'Convert Inconsistent Date Formats to ISO YYYY-MM-DD',
+        'Live Side-by-Side Before & After Table Preview',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'remove-duplicates-csv': {
+    slug: 'remove-duplicates-csv',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Operations & Data Integrity Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Deduplicate massive contact lists, transaction registries, and customer CSVs in seconds. Select exact key columns or compare across every field with zero cloud leakage.',
+      image: '/images/cora_ad_retainer_calculator.jpg',
+      headline: 'CSV Row Deduplication Engine',
+      description: 'Filter duplicate sheet rows by key columns with instant metrics.',
+      badge: 'Exact Column Match',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Autonomous Data Hygiene & Deduplication',
+      description: 'Purge duplicate entries from marketing lists, payroll rosters, and GST registries before imports. Features column-specific key matching and case sensitivity toggles.',
+      capabilities: [
+        'Multi-Column Key Checklist (Email, Phone, Unique ID)',
+        'Case Sensitive or Normalized Comparison Toggles',
+        'Live Duplicate Removal Count & Retention Percentage',
+        '100% In-Browser Memory Processing - Zero Data Sent to Servers',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'merge-csv': {
+    slug: 'merge-csv',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Finance & Consolidation AI Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Combine dozens of disparate CSV files into a unified master spreadsheet. Cora aligns column headers automatically and compiles consolidated tables in browser RAM.',
+      image: '/images/cora_gst_upi_3d.jpg',
+      headline: 'Multi-File CSV Consolidation Engine',
+      description: 'Merge multiple monthly spreadsheets and lead sheets into one.',
+      badge: 'Header Alignment Engine',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Master CSV Merging & Consolidation',
+      description: 'Drag and drop multiple CSV sheets from different branches, team members, or months. Cora aligns matching columns and builds a single consolidated master export.',
+      capabilities: [
+        'Multi-File Batch Drag & Drop Upload',
+        'Automated Column Header Detection & Alignment',
+        'Instant Multi-Source Row Consolidation',
+        '1-Click Master CSV & Excel Compatible Download',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'split-csv': {
+    slug: 'split-csv',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Engineering & Data Pipeline Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Break massive multi-gigabyte CSV exports into manageable files. Split by exact row count or automatically partition by unique column values like City or Vendor.',
+      image: '/images/cora_smart_contract_3d.jpg',
+      headline: 'CSV Partitioning & Split Engine',
+      description: 'Split massive datasets by row limit or unique column categories.',
+      badge: 'Dual Partitioning Modes',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'High-Volume Dataset Partitioning',
+      description: 'Bypass spreadsheet row limits and CRM batch caps. Split large datasets into chunks of 500 or 1,000 rows, or partition automatically by distinct values in any column.',
+      capabilities: [
+        'Split by Configurable Row Batch Limits',
+        'Partition by Column Value (City, Vendor, Status, Date)',
+        'Automated Clean File Naming with Row Counters',
+        '100% Private In-Browser RAM Execution',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
 };
-
-
-
-
