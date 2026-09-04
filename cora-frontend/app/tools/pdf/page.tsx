@@ -442,20 +442,6 @@ export default function MasterPdfCategoryPage() {
         
         {/* ── Hero Header Assembly (Unboxed Blended Continuous Canvas) ── */}
         <div className="text-center max-w-3xl mx-auto space-y-4 pt-1">
-          
-          {/* Centered Breadcrumbs Navigation */}
-          <nav aria-label="Breadcrumb" className="inline-flex items-center justify-center gap-2 text-xs text-zinc-500 mb-1">
-            <Link
-              href="/tools"
-              className="inline-flex items-center gap-1.5 font-medium text-zinc-500 hover:text-zinc-950 transition-colors group"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-              <span>Tools Directory</span>
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-zinc-300" />
-            <span className="text-zinc-950 font-semibold">Master PDF Suite</span>
-          </nav>
-
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 text-white text-xs font-semibold tracking-wide uppercase shadow-sm">
               <Files className="w-3.5 h-3.5 text-zinc-300" />
