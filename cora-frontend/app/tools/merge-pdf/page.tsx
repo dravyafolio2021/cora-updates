@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { ToolPageShell } from '@/components/tools/ToolPageShell';
 import { ToolOutcomeData } from '@/components/tools/ToolOutcomeRoiBanner';
+import { ToolOutcomeModalData } from '@/components/tools/ToolOutcomeDrawerModal';
 import { useToast } from '@/components/ui/Toast';
 import { mergePdfFiles, downloadPdfBlob, getPdfInfo } from '@/lib/pdf-engine';
 
@@ -45,6 +46,7 @@ export default function MergePdfPage() {
   const [isDraggingOver, setIsDraggingOver] = useState<boolean>(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [activeOutcome, setActiveOutcome] = useState<ToolOutcomeData | null>(null);
+  const [activeOutcomeModal, setActiveOutcomeModal] = useState<ToolOutcomeModalData | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
@@ -179,7 +181,7 @@ export default function MergePdfPage() {
       downloadPdfBlob(mergedBytes, fileName);
       showToast('Merged PDF successfully downloaded!');
 
-      // Trigger AI-SDR Value & ROI Milestone Banner
+      // 1. Trigger AI-SDR Value & ROI Milestone Banner
       setActiveOutcome({
         summaryTitle: `${files.length} Documents Merged (${totalPages} Pages, ${formatBytes(totalSizeBytes)})`,
         timeSavedEstimate: '~20 mins administrative formatting saved',
@@ -189,6 +191,21 @@ export default function MergePdfPage() {
           description: 'Add legally valid Section 10A digital signatures, track when the client views the document, and collect 0% fee advance UPI payments automatically.',
           ctaLabel: 'Collect Signatures & Advance with Kavya (Free)',
           ctaHref: `/workspace/login?mode=signup&ref=tofu_merged_proposal&docs=${files.length}`,
+        },
+      });
+
+      // 2. Trigger Post-Download Outcome Drawer Modal (Instant Bridge)
+      setActiveOutcomeModal({
+        summaryTitle: `Merged ${files.length} Documents (${totalPages} Pages, ${formatBytes(totalSizeBytes)})`,
+        timeSavedEstimate: '~20 mins manual document assembly saved',
+        securityProof: '100% In-Browser RAM • Zero Cloud File Storage',
+        downloadFileName: fileName,
+        suggestedNextStep: {
+          badge: 'Next Step for Proposals & Deeds',
+          headline: 'Sending this merged proposal or contract to a client?',
+          description: 'Turn this PDF into a court-admissible proposal with Section 10A signatures, real-time client open tracking, and automated 0% fee advance UPI billing on WhatsApp.',
+          ctaLabel: 'Collect Signatures & Advance with Kavya (Free)',
+          ctaHref: `/workspace/login?mode=signup&ref=tofu_modal_merged&docs=${files.length}`,
         },
       });
     } catch (err: any) {
@@ -229,6 +246,8 @@ export default function MergePdfPage() {
       subtitle="Combine client proposals, confidential pitch decks, and legal annexures into a single seamless document. Zero file uploads — 100% private in browser memory."
       faqItems={mergeFaqs}
       activeOutcome={activeOutcome}
+      activeOutcomeModal={activeOutcomeModal}
+      onCloseOutcomeModal={() => setActiveOutcomeModal(null)}
     >
       <div className="space-y-6">
         {/* Hidden File Input */}

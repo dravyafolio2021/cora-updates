@@ -20,6 +20,7 @@ import {
 import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
 import { ToolAiSdrHeroCard } from './ToolAiSdrHeroCard';
 import { ToolOutcomeRoiBanner, ToolOutcomeData } from './ToolOutcomeRoiBanner';
+import { ToolOutcomeDrawerModal, ToolOutcomeModalData } from './ToolOutcomeDrawerModal';
 
 export interface ToolPageShellProps {
   toolId: string;
@@ -30,6 +31,8 @@ export interface ToolPageShellProps {
   faqItems?: Array<{ question: string; answer: string }>;
   relatedToolSlugs?: string[];
   activeOutcome?: ToolOutcomeData | null;
+  activeOutcomeModal?: ToolOutcomeModalData | null;
+  onCloseOutcomeModal?: () => void;
 }
 
 export function ToolPageShell({
@@ -41,6 +44,8 @@ export function ToolPageShell({
   faqItems,
   relatedToolSlugs = [],
   activeOutcome = null,
+  activeOutcomeModal = null,
+  onCloseOutcomeModal,
 }: ToolPageShellProps) {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
@@ -245,10 +250,20 @@ export function ToolPageShell({
               </div>
             </div>
           )}
-
         </div>
 
       </div>
+
+      {/* ── Active Outcome Drawer Modal (Triggers when user downloads outcome) ── */}
+      {activeOutcomeModal && (
+        <ToolOutcomeDrawerModal
+          isOpen={true}
+          onClose={onCloseOutcomeModal || (() => {})}
+          toolId={toolId}
+          agentData={agentData}
+          outcome={activeOutcomeModal}
+        />
+      )}
 
       {/* ══════════════════════════════════════════════════════════════
           MOBILE PEACEFUL VALUE BAR (Non-Intrusive)

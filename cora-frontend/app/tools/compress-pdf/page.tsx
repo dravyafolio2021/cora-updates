@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { ToolPageShell } from '@/components/tools/ToolPageShell';
 import { ToolOutcomeData } from '@/components/tools/ToolOutcomeRoiBanner';
+import { ToolOutcomeModalData } from '@/components/tools/ToolOutcomeDrawerModal';
 import { useToast } from '@/components/ui/Toast';
 import { compressPdf, downloadPdfBlob, getPdfInfo } from '@/lib/pdf-engine';
 
@@ -167,6 +168,7 @@ export default function CompressPdfPage() {
   };
 
   const [activeOutcome, setActiveOutcome] = useState<ToolOutcomeData | null>(null);
+  const [activeOutcomeModal, setActiveOutcomeModal] = useState<ToolOutcomeModalData | null>(null);
 
   const handleExecuteCompression = async () => {
     if (!selectedFile) {
@@ -196,9 +198,10 @@ export default function CompressPdfPage() {
     downloadPdfBlob(compressionResult.pdfBytes, finalName);
     showToast('Download started');
 
-    // Trigger AI-SDR Value & ROI Milestone
     const originalKb = (selectedFile.size / 1024).toFixed(0);
     const newKb = (compressionResult.compressedSizeBytes / 1024).toFixed(0);
+
+    // 1. Keep Top Banner
     setActiveOutcome({
       summaryTitle: `Optimized: ${originalKb} KB down to ${newKb} KB (${compressionResult.compressionRatioPercent}% Saved)`,
       timeSavedEstimate: '~15 mins turnaround time saved',
@@ -208,6 +211,21 @@ export default function CompressPdfPage() {
         description: 'Host your deliverables in a branded, high-speed client portal with live open-tracking, feedback threads, and zero email attachment size limits.',
         ctaLabel: 'Share via Client Portal with Rohan (Free)',
         ctaHref: `/workspace/login?mode=signup&ref=tofu_compressed_deck&savings=${compressionResult.compressionRatioPercent}`,
+      },
+    });
+
+    // 2. Trigger Post-Download Outcome Modal Drawer (Instant Value-First Bridge)
+    setActiveOutcomeModal({
+      summaryTitle: `Optimized ${originalKb} KB down to ${newKb} KB (${compressionResult.compressionRatioPercent}% Space Saved)`,
+      timeSavedEstimate: '~15 mins manual optimization saved',
+      securityProof: '100% Client-Side RAM • Zero Bytes Sent to Remote Cloud',
+      downloadFileName: finalName,
+      suggestedNextStep: {
+        badge: 'Recommended Next Action for Studios',
+        headline: 'Delivering final deliverables or decks to a client?',
+        description: 'Skip messy WeTransfer links or email size limits. Deliver via a personalized client portal where clients view, approve, and sign deliverables with automated WhatsApp updates.',
+        ctaLabel: 'Deliver via Client Portal with Rohan (Free)',
+        ctaHref: `/workspace/login?mode=signup&ref=tofu_modal_compressed&savings=${compressionResult.compressionRatioPercent}`,
       },
     });
   };
@@ -220,6 +238,8 @@ export default function CompressPdfPage() {
       subtitle="Reduce PDF file size in seconds while preserving document crispness. 100% private, executed locally in your browser with zero server uploads."
       faqItems={COMPRESS_PDF_FAQS}
       activeOutcome={activeOutcome}
+      activeOutcomeModal={activeOutcomeModal}
+      onCloseOutcomeModal={() => setActiveOutcomeModal(null)}
     >
       <div className="space-y-6">
         

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { ToolPageShell } from '@/components/tools/ToolPageShell';
 import { ToolOutcomeData } from '@/components/tools/ToolOutcomeRoiBanner';
+import { ToolOutcomeModalData } from '@/components/tools/ToolOutcomeDrawerModal';
 import { useToast } from '@/components/ui/Toast';
 import { getPdfInfo, stampSignatureOnPdf, downloadPdfBlob } from '@/lib/pdf-engine';
 
@@ -51,6 +52,7 @@ export default function EsignPdfPage() {
   const [stampScale, setStampScale] = useState<number>(28); // Width % of page
   const [includeDateStamp, setIncludeDateStamp] = useState<boolean>(true);
   const [activeOutcome, setActiveOutcome] = useState<ToolOutcomeData | null>(null);
+  const [activeOutcomeModal, setActiveOutcomeModal] = useState<ToolOutcomeModalData | null>(null);
 
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
@@ -290,7 +292,7 @@ export default function EsignPdfPage() {
       downloadPdfBlob(signedBytes, `${baseName}-signed.pdf`);
       showToast(`Document successfully signed on Page ${selectedPage}!`);
 
-      // Trigger AI-SDR Legal & Advance Payment Bridge
+      // 1. Keep inline banner
       setActiveOutcome({
         summaryTitle: `Signed: ${pdfFile.name} (Sec 10A IT Act Sealed)`,
         timeSavedEstimate: '~3 business days of courier & manual signing saved',
@@ -300,6 +302,21 @@ export default function EsignPdfPage() {
           description: 'Send this agreement to your client via WhatsApp. Cora collects court-admissible dual e-signatures and routes 0% fee UPI advance payments directly to your bank.',
           ctaLabel: 'Send to Client with Kavya (Free)',
           ctaHref: `/workspace/login?mode=signup&ref=tofu_signed_contract&doc=${encodeURIComponent(baseName)}`,
+        },
+      });
+
+      // 2. Trigger Post-Download Outcome Modal Drawer (Instant Value-First Bridge)
+      setActiveOutcomeModal({
+        summaryTitle: `Signed: ${pdfFile.name} (Sec 10A IT Act Cryptographic Seal)`,
+        timeSavedEstimate: '~3 business days of courier & manual signing saved',
+        securityProof: '100% Client-Side RAM • Zero Bytes Sent to Remote Cloud',
+        downloadFileName: `${baseName}-signed.pdf`,
+        suggestedNextStep: {
+          badge: 'Contract & Advance Bridge for Studios',
+          headline: 'Need your client to sign their counterpart & deposit 50% advance?',
+          description: 'Share this agreement directly to your client via WhatsApp. Cora collects legally admissible dual e-signatures and seamlessly captures 0% transaction fee UPI advance payments directly into your account.',
+          ctaLabel: 'Send to Client with Kavya (Free)',
+          ctaHref: `/workspace/login?mode=signup&ref=tofu_modal_signed_contract&doc=${encodeURIComponent(baseName)}`,
         },
       });
     } catch (err) {
@@ -337,6 +354,8 @@ export default function EsignPdfPage() {
       subtitle="Sign shoot agreements, model releases, and vendor proposals with legally valid digital signatures and cryptographic timestamps. 100% private in browser memory."
       faqItems={esignFaqs}
       activeOutcome={activeOutcome}
+      activeOutcomeModal={activeOutcomeModal}
+      onCloseOutcomeModal={() => setActiveOutcomeModal(null)}
     >
       <div className="space-y-6">
 
