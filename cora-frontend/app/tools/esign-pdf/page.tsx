@@ -18,8 +18,9 @@ import {
   Sparkles
 } from 'lucide-react';
 import { ToolPageShell } from '@/components/tools/ToolPageShell';
-import { ToolOutcomeData } from '@/components/tools/ToolOutcomeRoiBanner';
+import { ToolOutcomeRoiBanner, ToolOutcomeData } from '@/components/tools/ToolOutcomeRoiBanner';
 import { ToolOutcomeModalData } from '@/components/tools/ToolOutcomeDrawerModal';
+import { TOOL_AGENT_REGISTRY } from '@/lib/tools-agent-config';
 import { useToast } from '@/components/ui/Toast';
 import { getPdfInfo, stampSignatureOnPdf, downloadPdfBlob } from '@/lib/pdf-engine';
 
@@ -747,6 +748,17 @@ export default function EsignPdfPage() {
             )}
           </button>
         </div>
+
+        {/* ── Direct In-Context Post-Download Outcome Banner (Right below the sign button, zero scrolling needed) ── */}
+        {activeOutcome && (
+          <div id="post-esign-outcome" className="mt-5 animate-in fade-in slide-in-from-top-3 duration-300">
+            <ToolOutcomeRoiBanner
+              toolId="esign-pdf"
+              agentData={TOOL_AGENT_REGISTRY['esign-pdf']}
+              outcome={activeOutcome}
+            />
+          </div>
+        )}
 
       </div>
     </ToolPageShell>

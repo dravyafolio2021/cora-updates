@@ -18,8 +18,9 @@ import {
   GripVertical
 } from 'lucide-react';
 import { ToolPageShell } from '@/components/tools/ToolPageShell';
-import { ToolOutcomeData } from '@/components/tools/ToolOutcomeRoiBanner';
+import { ToolOutcomeRoiBanner, ToolOutcomeData } from '@/components/tools/ToolOutcomeRoiBanner';
 import { ToolOutcomeModalData } from '@/components/tools/ToolOutcomeDrawerModal';
+import { TOOL_AGENT_REGISTRY } from '@/lib/tools-agent-config';
 import { useToast } from '@/components/ui/Toast';
 import { mergePdfFiles, downloadPdfBlob, getPdfInfo } from '@/lib/pdf-engine';
 
@@ -488,6 +489,17 @@ export default function MergePdfPage() {
                 </p>
               )}
             </div>
+
+            {/* ── Direct In-Context Post-Download Outcome Banner (Right below the merge button, zero scrolling needed) ── */}
+            {activeOutcome && (
+              <div id="post-merge-outcome" className="mt-5 animate-in fade-in slide-in-from-top-3 duration-300">
+                <ToolOutcomeRoiBanner
+                  toolId="merge-pdf"
+                  agentData={TOOL_AGENT_REGISTRY['merge-pdf']}
+                  outcome={activeOutcome}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>

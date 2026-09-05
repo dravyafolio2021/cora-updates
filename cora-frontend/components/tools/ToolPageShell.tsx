@@ -175,17 +175,6 @@ export function ToolPageShell({
 
         </div>
 
-        {/* ── Active Outcome ROI Banner (Displayed upon successful file execution) ── */}
-        {activeOutcome && (
-          <div className="mb-6 sm:mb-8">
-            <ToolOutcomeRoiBanner
-              toolId={toolId}
-              agentData={agentData}
-              outcome={activeOutcome}
-            />
-          </div>
-        )}
-
         {/* ── Full-Width Tool Engine Container ── */}
         <div className="w-full space-y-6 sm:space-y-8">
           
