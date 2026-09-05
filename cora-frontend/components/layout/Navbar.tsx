@@ -57,7 +57,9 @@ import {
   Trash2,
   FileType,
   Table,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Crop,
+  Sliders
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 import {
@@ -581,7 +583,166 @@ export function Navbar() {
                     )}
                   </div>
 
-                  {/* 3. Tax & GST Dropdown */}
+                  {/* 3. Images Dropdown */}
+                  <div
+                    className="relative py-1"
+                    onMouseEnter={() => handleMouseEnter('tools-images')}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setActiveDropdown(activeDropdown === 'tools-images' ? null : 'tools-images')}
+                      className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ease-out group ${
+                        activeDropdown === 'tools-images'
+                          ? 'text-zinc-950 bg-zinc-100 font-bold shadow-2xs'
+                          : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
+                      }`}
+                    >
+                      <span>Images</span>
+                      <ChevronDown className={`w-3.5 h-3.5 stroke-[2.2] text-zinc-500 group-hover:text-zinc-950 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeDropdown === 'tools-images' ? 'rotate-180 text-zinc-950 scale-105' : ''}`} />
+                    </button>
+
+                    {activeDropdown === 'tools-images' && (
+                      <div
+                        className="absolute top-full left-0 mt-3 w-[660px] rounded-3xl bg-white border border-zinc-200/90 shadow-[0px_24px_60px_rgba(0,0,0,0.12)] p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                        onMouseEnter={() => handleMouseEnter('tools-images')}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* Column 1: OPTIMIZATION & FORMAT */}
+                          <div className="space-y-1">
+                            <div className="px-2.5 py-1 text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                              <span>Optimization &amp; Format</span>
+                              <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60 font-mono text-[9px]">100% In-RAM</span>
+                            </div>
+
+                            <Link
+                              href="/tools/compress-image"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Minimize2 className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                                  Compress Image
+                                  <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60">Popular</span>
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Shrink JPG, PNG, WebP up to 80%</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/resize-image"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Crop className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Resize Image
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Exact dimensions &amp; social presets</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/heic-to-jpg"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <ImageIcon className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                                  HEIC to JPG
+                                  <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200/60">iPhone</span>
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Decode Apple photos in browser memory</p>
+                              </div>
+                            </Link>
+                          </div>
+
+                          {/* Column 2: AI & CREATIVE */}
+                          <div className="space-y-1">
+                            <div className="px-2.5 py-1 text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                              <span>AI &amp; Creative Studio</span>
+                              <span className="text-purple-700 bg-purple-50 px-1.5 py-0.2 rounded border border-purple-200/60 font-mono text-[9px]">Zero Upload</span>
+                            </div>
+
+                            <Link
+                              href="/tools/remove-background"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Sparkles className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black flex items-center gap-1.5">
+                                  Remove Background
+                                  <span className="text-[9px] font-mono font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200/60">AI</span>
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Isolate subjects with transparent PNG</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/profile-photo-maker"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 border border-teal-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <Sliders className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Profile Photo Maker
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Circular avatar framing &amp; studio colors</p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tools/image-to-text"
+                              onClick={() => setActiveDropdown(null)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-zinc-50 transition-all group"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5">
+                                <FileText className="w-4 h-4 stroke-[2]" />
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-bold text-zinc-900 group-hover:text-black">
+                                  Image to Text (OCR)
+                                </div>
+                                <p className="text-[11px] text-zinc-500 font-normal mt-0.5">Scan &amp; extract copy from receipts or books</p>
+                              </div>
+                            </Link>
+                          </div>
+                        </div>
+
+                        {/* Footer Action to Dedicated Category Page */}
+                        <div className="mt-3 pt-3 border-t border-zinc-100 flex items-center justify-between px-2">
+                          <span className="text-[11px] font-medium text-zinc-500">
+                            Looking for SVG, watermark, split or combine?
+                          </span>
+                          <Link
+                            href="/tools/images"
+                            onClick={() => setActiveDropdown(null)}
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 hover:text-black transition-colors group/link"
+                          >
+                            <span>Explore all 12 Image Tools</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 transition-transform" />
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 4. Tax & GST Dropdown */}
                   <div
                     className="relative py-1"
                     onMouseEnter={() => handleMouseEnter('tools-tax')}
@@ -796,7 +957,7 @@ export function Navbar() {
                         : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/70'
                     }`}
                   >
-                    All Tools (43)
+                    All Tools (55)
                   </Link>
                 </nav>
               ) : (

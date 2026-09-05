@@ -1269,4 +1269,355 @@ export const TOOL_AGENT_REGISTRY: Record<string, ToolAgentData> = {
       ctaText: 'Claim Free Workspace →',
     },
   },
+
+  'remove-background': {
+    slug: 'remove-background',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Creative Studio & Asset Pipeline Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Isolating product shots and catalog assets manually consumes hours of designer time. Cora removes backdrops in local browser memory with zero upload delays.',
+      image: '/images/cora_ad_listing_ai.jpg',
+      headline: 'Client-Side Background Removal',
+      description: 'Isolate portraits, ecommerce products, and logos with crisp alpha edges.',
+      badge: 'Zero Cloud Transmission',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Studio-Grade Background Keying in Browser RAM',
+      description: 'Process e-commerce catalog photos, client headshots, and marketing assets with precision chroma tolerance and edge feathering. Export crisp PNGs with zero server latency.',
+      capabilities: [
+        'Edge Chroma & Threshold Keying',
+        'Transparent Alpha or Solid Studio Backdrops',
+        '1-Click High-Resolution PNG Downloads',
+        '100% In-Browser Memory Privacy',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'watermark-image': {
+    slug: 'watermark-image',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Intellectual Property & Proofing Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Sending unprotected client previews risks uncredited usage and unpaid deliverables. Cora stamps custom diagonal text and logos across high-res proofs in seconds.',
+      image: '/images/cora_smart_contract_3d.jpg',
+      headline: 'Proof Watermarking Engine',
+      description: 'Protect creative deliverables with custom angled stamps and logo overlays.',
+      badge: 'Client Proofing Shield',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Protect Creative Assets Before Client Delivery',
+      description: 'Prevent unauthorized distribution of draft shoots and unapproved mockups. Apply branded text stamps or high-contrast logos with full opacity and rotation control.',
+      capabilities: [
+        'Custom Text or Secondary Logo Overlays',
+        'Repeated Tiled Grid or Centered Floating Stamp',
+        'Adjustable Opacity, Rotation & Font Sizing',
+        'Direct High-Res PNG & JPG Exports',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'combine-images': {
+    slug: 'combine-images',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Creative Operations & Layout Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Creating before-and-after comparisons or moodboard grids usually requires heavy desktop editing software. Cora stitches multiple high-res assets in browser RAM instantly.',
+      image: '/images/cora_ad_retainer_calculator.jpg',
+      headline: 'Multi-Image Stitching Engine',
+      description: 'Combine photos horizontally, vertically, or in 2x2 collage grids.',
+      badge: 'Precision Layout Stitches',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Seamless Multi-Photo Collages & Case Studies',
+      description: 'Assemble studio portfolios, before/after renovation showcases, and product colorways. Control border spacing, background canvas fill, and uniform scaling.',
+      capabilities: [
+        'Horizontal, Vertical & 2x2 Grid Stitches',
+        'Configurable Spacing & Studio Background Fills',
+        'Automatic Dimension Normalization',
+        '100% In-Memory Lossless Canvas Render',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'split-image': {
+    slug: 'split-image',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Social Media & Grid Layout Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Designing seamless swipeable Instagram carousels and 3x3 profile grids manually takes tedious cropping. Cora cuts high-res banners into perfectly aligned tiles.',
+      image: '/images/cora_ad_listing_ai.jpg',
+      headline: 'Seamless Image Slicing Engine',
+      description: 'Slice panoramas into 3-part carousels, 9-part profile grids, or custom tiles.',
+      badge: 'Pixel-Perfect Grid Slices',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Publish Seamless Carousel Panoramas & Grid Feeds',
+      description: 'Break wide portfolio shots into seamless Instagram carousel slides or produce 9-tile profile murals with zero compression artifacts or seams.',
+      capabilities: [
+        '3-Part Seamless Carousel Presets (3:1 Ratio)',
+        '9-Part Profile Feed Grids (3x3 Tiles)',
+        'Custom Row & Column Matrix Partitioning',
+        '1-Click Batch Tile Downloads with Numbered Sequencing',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'compress-image': {
+    slug: 'compress-image',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Creative Tech & Media Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Heavy images slow down your studio portfolio and drive client bounce rates up. Cora compresses JPG, PNG, and WebP assets locally in browser RAM.',
+      image: '/images/cora_ad_listing_ai.jpg',
+      headline: 'Browser-Native Image Compression',
+      description: 'Lossless & high-efficiency compression with zero server uploads.',
+      badge: 'Client-Side Canvas Engine',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Autonomous Client-Side Image Optimizer',
+      description: 'Compress high-resolution photoshoot deliverables, portfolio assets, and marketing graphics without compromising visual clarity.',
+      capabilities: [
+        '100% Client-Side In-Memory Compression',
+        'Target File Size Mode (e.g., limit to 50KB or 200KB)',
+        'Adaptive Format Transcoding (JPEG, PNG, WebP)',
+        'Zero Cloud Server Uploads or Data Storage',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'resize-image': {
+    slug: 'resize-image',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Growth & Multi-Channel Studio Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Resizing studio creatives for Instagram, YouTube, and LinkedIn shouldn\'t require heavy desktop software. Cora resizes images to precise social presets in milliseconds.',
+      image: '/images/cora_pdf_pipeline_3d.jpg',
+      headline: 'Instant Social & Multi-Channel Resizing',
+      description: 'Exact pixel dimensions and social preset scaling in your browser.',
+      badge: 'Aspect Ratio Lock Engine',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'Precision Dimension & Social Presets Engine',
+      description: 'Scale image dimensions, lock aspect ratios, and export optimized assets formatted for social media grids, stories, and advertising channels.',
+      capabilities: [
+        'Curated Presets: Instagram, YouTube, X/Twitter, LinkedIn',
+        'Bi-Directional Aspect Ratio Lock',
+        'Percentage Scaling (25%, 50%, 75%, 200%)',
+        'High-Fidelity Canvas Interpolation',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'crop-image': {
+    slug: 'crop-image',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Production & Brand Assets Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Crop photoshoot deliverables to standard commercial ratios or custom framing with sub-pixel precision directly in your browser without uploading to the cloud.',
+      image: '/images/cora_smart_contract_3d.jpg',
+      headline: 'Precision Image Crop & Ratio Engine',
+      description: 'Crop to 1:1, 4:5, 16:9, or freeform with interactive canvas preview.',
+      badge: 'Zero Upload Framing',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Instant Commercial Aspect Ratio Cropper',
+      description: 'Frame headshots, banners, product mockups, and client shoots with interactive zoom, pan, and standard aspect ratio bounding controls.',
+      capabilities: [
+        'Preset Ratios: 1:1 Square, 4:5 Portrait, 16:9 Widescreen',
+        'Interactive Zoom, Drag & Pan Controls',
+        'Circular Avatar Mode for Profile Photos',
+        'Clean PNG and High-Quality JPEG Export',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'profile-photo-maker': {
+    slug: 'profile-photo-maker',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Brand Identity & Studio Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Turn casual headshots into clean executive profile photos. Add circular framing, custom studio backdrops, and accent ring borders in seconds.',
+      image: '/images/cora_esign_vault_3d.jpg',
+      headline: 'Executive Profile Photo Studio',
+      description: 'Circular framing, custom studio backdrops, and accent rings.',
+      badge: 'Studio Backdrop Engine',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Professional Avatar & Profile Maker',
+      description: 'Create high-converting avatars for LinkedIn, WhatsApp Business, Slack, and agency portfolios with custom studio backgrounds and border rings.',
+      capabilities: [
+        'Circular Avatar Framing with Zoom & Pan Sliders',
+        'Studio Backdrops: Anthropic Cream, Pure White, Solid Dark, Gradients',
+        'Customizable Border Ring Colors and Stroke Thickness',
+        'High-Resolution 1-Click PNG Download',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'convert-image': {
+    slug: 'convert-image',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Production & Asset Pipeline Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Converting client media between JPG, PNG, and WebP manually across external sites risks data leaks. Cora converts images in local browser RAM with zero server uploads.',
+      image: '/images/cora_smart_contract_3d.jpg',
+      headline: 'Multi-Format Image Converter',
+      description: 'Batch convert between JPG, PNG, and WebP with custom alpha fill.',
+      badge: 'Zero Cloud Uploads',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Batch Format Conversion in Browser RAM',
+      description: 'Convert catalogs of client photos, website graphics, and banners between JPG, PNG, and WebP with configurable compression quality and custom transparency background fills.',
+      capabilities: [
+        'Multi-Format Conversion: JPG, PNG, WebP',
+        'Batch Processing with Instant Zip Packaging',
+        'Custom Transparent Background Fill for JPG',
+        '100% Private Client-Side In-Memory Execution',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'svg-to-png': {
+    slug: 'svg-to-png',
+    agent: {
+      name: 'Rohan Verma',
+      role: 'Vector Graphics & Web Assets Co-Founder',
+      avatar: '/images/cora_agent_operations.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Vector logos and icons often need high-resolution raster versions for slide decks and client proposals. Cora rasterizes SVGs up to 8x 300 DPI in browser memory.',
+      image: '/images/cora_ad_listing_ai.jpg',
+      headline: 'SVG to High-Res PNG Rasterizer',
+      description: 'Convert vector SVG files or raw XML code to crystal-clear raster PNGs up to 8x print resolution.',
+      badge: 'Up to 8x Print DPI',
+      ctaText: 'Launch Free with Rohan',
+    },
+    card2: {
+      title: 'Lossless Vector Rasterization',
+      description: 'Paste SVG code or drop vector files to render razor-sharp PNGs at 1x, 2x Retina, 4x Ultra HD, or 8x Print 300 DPI resolution with preserved alpha transparency.',
+      capabilities: [
+        'Drop SVG Files or Paste Raw XML Code',
+        'Multi-Scale Output: 1x, 2x, 4x, and 8x Print DPI',
+        'Live Vector Preview with Dimension Metrics',
+        '1-Click Instant High-Resolution PNG Download',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'heic-to-jpg': {
+    slug: 'heic-to-jpg',
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Mobile Media & iOS Asset Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Apple iPhone HEIC photos cannot be opened by standard Windows apps or web portals. Cora decodes HEIC and HEIF files client-side into universally compatible JPGs.',
+      image: '/images/cora_esign_vault_3d.jpg',
+      headline: 'Apple HEIC to JPG Converter',
+      description: 'Decode iPhone photos to standard JPG or PNG without uploading to remote servers.',
+      badge: 'Apple iOS Decoder',
+      ctaText: 'Launch Free with Kavya',
+    },
+    card2: {
+      title: 'iPhone Photo Conversion in Browser Memory',
+      description: 'Batch convert Apple .heic and .heif photos taken on iPhones and iPads into standard high-resolution JPG or PNG formats with preserved EXIF orientation and color fidelity.',
+      capabilities: [
+        'Native Apple HEIC & HEIF File Decoding',
+        'Instant Export to High-Quality JPG or PNG',
+        'Batch Convert Multiple Photos with 1-Click Zip',
+        '100% Private In-Browser Processing',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
+
+  'image-to-text': {
+    slug: 'image-to-text',
+    agent: {
+      name: 'Aarav Mehta',
+      role: 'Document Intelligence & OCR Co-Founder',
+      avatar: '/images/cora_agent_finance.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Re-typing invoices, tax receipts, printed agreements, and screenshots waste valuable hours. Cora extracts text and tabular data with neural OCR in local browser memory.',
+      image: '/images/cora_smart_contract_3d.jpg',
+      headline: 'Client-Side Image OCR Scanner',
+      description: 'Extract editable text from receipts, documents, and screenshots with live confidence metrics.',
+      badge: 'Neural In-Browser OCR',
+      ctaText: 'Launch Free with Aarav',
+    },
+    card2: {
+      title: 'Optical Character Recognition in Browser RAM',
+      description: 'Extract selectable, editable text from scanned receipts, contracts, business cards, and screenshots with real-time confidence ratings and instant clipboard or TXT download.',
+      capabilities: [
+        'Drop Image or Paste Directly from Clipboard (Cmd+V)',
+        'Neural Optical Glyph Extraction with Live Confidence',
+        'Formatted Editable Text Area with Search & Filter',
+        '1-Click Copy to Clipboard & Clean TXT Download',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
+  },
 };
+
+
+
