@@ -18,6 +18,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { ToolPageShell } from '@/components/tools/ToolPageShell';
+import { ToolOutcomeData } from '@/components/tools/ToolOutcomeRoiBanner';
 import { useToast } from '@/components/ui/Toast';
 import { getPdfInfo, stampSignatureOnPdf, downloadPdfBlob } from '@/lib/pdf-engine';
 
@@ -49,6 +50,7 @@ export default function EsignPdfPage() {
   const [placementPreset, setPlacementPreset] = useState<'bottom-right' | 'bottom-left' | 'bottom-center' | 'top-right'>('bottom-right');
   const [stampScale, setStampScale] = useState<number>(28); // Width % of page
   const [includeDateStamp, setIncludeDateStamp] = useState<boolean>(true);
+  const [activeOutcome, setActiveOutcome] = useState<ToolOutcomeData | null>(null);
 
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
@@ -287,6 +289,19 @@ export default function EsignPdfPage() {
       const baseName = pdfFile.name.replace(/\.[^/.]+$/, '');
       downloadPdfBlob(signedBytes, `${baseName}-signed.pdf`);
       showToast(`Document successfully signed on Page ${selectedPage}!`);
+
+      // Trigger AI-SDR Legal & Advance Payment Bridge
+      setActiveOutcome({
+        summaryTitle: `Signed: ${pdfFile.name} (Sec 10A IT Act Sealed)`,
+        timeSavedEstimate: '~3 business days of courier & manual signing saved',
+        securityProof: '0 bytes sent to external servers • 100% In-Browser RAM',
+        suggestedNextStep: {
+          headline: 'Need the client to sign their portion & pay 50% advance?',
+          description: 'Send this agreement to your client via WhatsApp. Cora collects court-admissible dual e-signatures and routes 0% fee UPI advance payments directly to your bank.',
+          ctaLabel: 'Send to Client with Kavya (Free)',
+          ctaHref: `/workspace/login?mode=signup&ref=tofu_signed_contract&doc=${encodeURIComponent(baseName)}`,
+        },
+      });
     } catch (err) {
       console.error(err);
       showToast('Failed to stamp signature onto PDF. Please try again.');
@@ -321,6 +336,7 @@ export default function EsignPdfPage() {
       title="Digital eSign PDF"
       subtitle="Sign shoot agreements, model releases, and vendor proposals with legally valid digital signatures and cryptographic timestamps. 100% private in browser memory."
       faqItems={esignFaqs}
+      activeOutcome={activeOutcome}
     >
       <div className="space-y-6">
 

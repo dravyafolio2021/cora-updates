@@ -18,6 +18,7 @@ import {
   GripVertical
 } from 'lucide-react';
 import { ToolPageShell } from '@/components/tools/ToolPageShell';
+import { ToolOutcomeData } from '@/components/tools/ToolOutcomeRoiBanner';
 import { useToast } from '@/components/ui/Toast';
 import { mergePdfFiles, downloadPdfBlob, getPdfInfo } from '@/lib/pdf-engine';
 
@@ -43,6 +44,7 @@ export default function MergePdfPage() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isDraggingOver, setIsDraggingOver] = useState<boolean>(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [activeOutcome, setActiveOutcome] = useState<ToolOutcomeData | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
@@ -176,6 +178,19 @@ export default function MergePdfPage() {
 
       downloadPdfBlob(mergedBytes, fileName);
       showToast('Merged PDF successfully downloaded!');
+
+      // Trigger AI-SDR Value & ROI Milestone Banner
+      setActiveOutcome({
+        summaryTitle: `${files.length} Documents Merged (${totalPages} Pages, ${formatBytes(totalSizeBytes)})`,
+        timeSavedEstimate: '~20 mins administrative formatting saved',
+        securityProof: '0 bytes sent to external servers • 100% In-Browser RAM',
+        suggestedNextStep: {
+          headline: 'Sending this merged proposal or contract to a client?',
+          description: 'Add legally valid Section 10A digital signatures, track when the client views the document, and collect 0% fee advance UPI payments automatically.',
+          ctaLabel: 'Collect Signatures & Advance with Kavya (Free)',
+          ctaHref: `/workspace/login?mode=signup&ref=tofu_merged_proposal&docs=${files.length}`,
+        },
+      });
     } catch (err: any) {
       console.error('Merge error:', err);
       showToast(err?.message || 'Failed to merge PDF files. Please try again.');
@@ -213,6 +228,7 @@ export default function MergePdfPage() {
       title="Merge PDF Files Online"
       subtitle="Combine client proposals, confidential pitch decks, and legal annexures into a single seamless document. Zero file uploads — 100% private in browser memory."
       faqItems={mergeFaqs}
+      activeOutcome={activeOutcome}
     >
       <div className="space-y-6">
         {/* Hidden File Input */}
@@ -255,6 +271,38 @@ export default function MergePdfPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 text-[11px] font-mono text-zinc-600 border border-zinc-200/60">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>Zero server upload &bull; 100% private in memory</span>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  // Generate 2 sample in-memory mock PDF files for instant test
+                  const { PDFDocument, rgb } = await import('pdf-lib');
+                  
+                  const doc1 = await PDFDocument.create();
+                  const p1 = doc1.addPage([595, 842]);
+                  p1.drawText('Sample Master Service Agreement - Part 1', { x: 50, y: 750, size: 18 });
+                  p1.drawText('Confidential Client Proposal - Deliverables & Scope', { x: 50, y: 720, size: 12 });
+                  const bytes1 = await doc1.save();
+                  const f1 = new File([bytes1.buffer.slice(bytes1.byteOffset, bytes1.byteOffset + bytes1.byteLength) as ArrayBuffer], 'client-master-agreement.pdf', { type: 'application/pdf' });
+
+                  const doc2 = await PDFDocument.create();
+                  const p2 = doc2.addPage([595, 842]);
+                  p2.drawText('Commercial Terms & Payment Milestone Annexure', { x: 50, y: 750, size: 18 });
+                  p2.drawText('SAC Code 9983 • Net 15 Payment Terms', { x: 50, y: 720, size: 12 });
+                  const bytes2 = await doc2.save();
+                  const f2 = new File([bytes2.buffer.slice(bytes2.byteOffset, bytes2.byteOffset + bytes2.byteLength) as ArrayBuffer], 'payment-terms-annexure.pdf', { type: 'application/pdf' });
+
+                  handleAddFiles([f1, f2]);
+                  showToast('Loaded 2 sample proposal documents for demonstration!');
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-semibold transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-zinc-700" />
+                <span>Try with Sample Documents</span>
+              </button>
             </div>
           </div>
         </div>

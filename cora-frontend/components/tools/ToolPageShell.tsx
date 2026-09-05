@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -9,19 +9,17 @@ import {
   ArrowRight, 
   Lock, 
   Zap, 
-  Share2, 
   Check, 
   ChevronDown, 
-  Clock, 
-  Flame,
   FileText,
   Calculator,
-  Shield,
   Code,
-  Tag
+  Tag,
+  ShieldCheck
 } from 'lucide-react';
 import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
-import { useToast } from '@/components/ui/Toast';
+import { ToolAiSdrHeroCard } from './ToolAiSdrHeroCard';
+import { ToolOutcomeRoiBanner, ToolOutcomeData } from './ToolOutcomeRoiBanner';
 
 export interface ToolPageShellProps {
   toolId: string;
@@ -31,6 +29,7 @@ export interface ToolPageShellProps {
   children: React.ReactNode;
   faqItems?: Array<{ question: string; answer: string }>;
   relatedToolSlugs?: string[];
+  activeOutcome?: ToolOutcomeData | null;
 }
 
 export function ToolPageShell({
@@ -41,33 +40,42 @@ export function ToolPageShell({
   children,
   faqItems,
   relatedToolSlugs = [],
+  activeOutcome = null,
 }: ToolPageShellProps) {
-  const { showToast } = useToast();
-  const [copiedShare, setCopiedShare] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
-  // 10-minute dynamic countdown timer for 40% discount on India Only plan
-  const [secondsLeft, setSecondsLeft] = useState(600);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 600));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatTimer = (totalSeconds: number) => {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  // Retrieve assigned AI co-founder agent persona
+  const agentData: ToolAgentData = TOOL_AGENT_REGISTRY[toolId] || {
+    slug: toolId,
+    agent: {
+      name: 'Kavya Patel',
+      role: 'Operations & Legal AI Co-Founder',
+      avatar: '/images/cora_agent_legal.jpg',
+      status: 'Active in Workspace',
+    },
+    card1: {
+      primaryText: 'Automate client agreements, digital milestone sign-offs, and invoices with zero busywork in your free workspace.',
+      image: '/images/cora_esign_vault_3d.jpg',
+      headline: 'Autonomous Studio Operations',
+      description: 'Zero manual client follow-ups with legally binding digital deeds.',
+      badge: 'Client Proofing Shield',
+      ctaText: 'Claim Free Workspace',
+    },
+    card2: {
+      title: 'Built as Open Digital Utility Infrastructure',
+      description: '100% private in-browser tool execution. Run unlimited operations with zero server storage and zero subscription gates.',
+      capabilities: [
+        '100% In-Browser Local RAM Execution',
+        'Zero Cloud Server Transmission or File Storage',
+        'Instant Client-Side Processing Without Waiting Queues',
+        'Free Forever Digital Infrastructure for Studios',
+      ],
+      ctaText: 'Claim Free Workspace →',
+    },
   };
 
-  // Retrieve dynamic AI Agent and Showcase config for this specific tool
-  const agentData: ToolAgentData = TOOL_AGENT_REGISTRY[toolId] || TOOL_AGENT_REGISTRY['gst-calculator'];
-
-  // Clean badge string of any residual emojis
+  // Strip emojis safely from badge
   const cleanBadgeTag = badgeTag.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').trim();
-  const cleanCardBadge = agentData.card1.badge.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').trim();
 
   // Dynamic vector category identifier icon
   const getToolBadgeIcon = () => {
@@ -78,19 +86,12 @@ export function ToolPageShell({
     return <Tag className="w-3 h-3 text-zinc-700" />;
   };
 
-  const handleShareTool = () => {
-    if (typeof window !== 'undefined') {
-      navigator.clipboard.writeText(window.location.href);
-      setCopiedShare(true);
-      showToast('Tool link copied to clipboard!');
-      setTimeout(() => setCopiedShare(false), 2200);
-    }
-  };
+  const firstName = agentData.agent.name.split(' ')[0];
 
   return (
     <div className="relative w-full bg-[#FAFAF9] text-zinc-900 min-h-screen pt-[108px] sm:pt-[116px] pb-24 sm:pb-20 selection:bg-zinc-900 selection:text-white overflow-hidden">
       
-      {/* ── Seamless Full-Width Background Pattern (Blended directly from top header) ── */}
+      {/* ── Seamless Full-Width Background Pattern ── */}
       <div 
         aria-hidden="true"
         className="absolute top-0 inset-x-0 h-[480px] pointer-events-none opacity-[0.45]"
@@ -99,24 +100,9 @@ export function ToolPageShell({
             linear-gradient(to right, rgba(228, 228, 231, 0.7) 1px, transparent 1px),
             linear-gradient(to bottom, rgba(228, 228, 231, 0.7) 1px, transparent 1px)
           `,
-          backgroundSize: '28px 28px',
-          maskImage: 'linear-gradient(to bottom, black 35%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 35%, transparent 100%)',
-        }}
-      />
-
-      {/* ── Ambient Radial Glow Matched to Tool Domain ── */}
-      <div 
-        aria-hidden="true"
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1300px] h-[380px] pointer-events-none blur-3xl opacity-30"
-        style={{
-          background: toolId.includes('pdf') 
-            ? 'radial-gradient(ellipse 60% 50% at 50% 10%, rgba(59,130,246,0.18) 0%, transparent 80%)'
-            : toolId.includes('gst') || toolId.includes('upi')
-            ? 'radial-gradient(ellipse 60% 50% at 50% 10%, rgba(16,185,129,0.18) 0%, transparent 80%)'
-            : toolId.includes('ai')
-            ? 'radial-gradient(ellipse 60% 50% at 50% 10%, rgba(244,63,94,0.18) 0%, transparent 80%)'
-            : 'radial-gradient(ellipse 60% 50% at 50% 10%, rgba(99,102,241,0.18) 0%, transparent 80%)'
+          backgroundSize: '40px 40px',
+          maskImage: 'radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 85%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 85%)',
         }}
       />
 
@@ -175,95 +161,30 @@ export function ToolPageShell({
 
             </div>
 
-            {/* Right Column: Sleek 3D AI Card (Self-contained, perfectly proportioned ~215px) */}
+            {/* Right Column: AI-SDR Value-First Hero Card */}
             <div className="hidden lg:block lg:col-span-5 xl:col-span-4">
-              <div className="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-800/90 bg-zinc-950 h-[215px] flex flex-col justify-between p-3.5 text-white group">
-                
-                {/* Full-Bleed 3D Background Artwork */}
-                <Image
-                  src={agentData.card1.image}
-                  alt={agentData.card1.headline}
-                  fill
-                  priority
-                  className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 768px) 100vw, 380px"
-                />
-
-                {/* Top soft vignette */}
-                <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none" />
-
-                {/* Bottom gradient melt */}
-                <div className="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-zinc-950 via-zinc-950/95 via-50% to-transparent pointer-events-none" />
-
-                {/* Top Row: Agent Pill + Feature Tag (Zero emojis) */}
-                <div className="relative z-10 flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-zinc-200 text-[10.5px] font-medium border border-white/15 shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>{agentData.agent.name}</span>
-                  </span>
-
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-mono font-bold tracking-wide border border-white/20 shadow-xs">
-                    <Zap className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
-                    <span>{cleanCardBadge}</span>
-                  </span>
-                </div>
-
-                {/* Bottom Row: Compact Headline, Timer Ribbon & CTA */}
-                <div className="relative z-10 space-y-1.5 mt-auto pt-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-display text-xs sm:text-sm font-bold text-white tracking-tight leading-snug drop-shadow-sm truncate">
-                      {agentData.card1.headline}
-                    </h3>
-
-                    <button
-                      type="button"
-                      onClick={handleShareTool}
-                      title="Share this tool"
-                      className="p-1 rounded-lg bg-white/15 hover:bg-white text-white hover:text-zinc-950 transition-all cursor-pointer backdrop-blur-md border border-white/20 shadow-xs shrink-0"
-                    >
-                      {copiedShare ? (
-                        <Check className="w-3 h-3 text-emerald-400" />
-                      ) : (
-                        <Share2 className="w-3 h-3" />
-                      )}
-                    </button>
-                  </div>
-
-                  {/* 40% Flash Ribbon */}
-                  <div className="p-1 rounded-lg bg-amber-400/15 border border-amber-400/40 backdrop-blur-md flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1 min-w-0">
-                      <Flame className="w-3 h-3 text-amber-400 shrink-0 fill-amber-400 animate-pulse" />
-                      <span className="text-[10px] font-mono font-extrabold text-amber-300 tracking-wide truncate">
-                        40% OFF: ₹299/mo
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 text-[9.5px] font-mono font-extrabold text-zinc-950 bg-amber-400 px-1.5 py-0.5 rounded shadow-2xs shrink-0">
-                      <Clock className="w-2.5 h-2.5 text-zinc-950 shrink-0" />
-                      <span>{formatTimer(secondsLeft)}</span>
-                    </div>
-                  </div>
-
-                  {/* Sleek CTA Button */}
-                  <Link
-                    href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
-                    className="w-full py-1.5 px-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.99] transition-all cursor-pointer"
-                  >
-                    <span>Claim with {agentData.agent.name.split(' ')[0]}</span>
-                    <ArrowRight className="w-3 h-3 text-zinc-950" />
-                  </Link>
-                </div>
-
-              </div>
+              <ToolAiSdrHeroCard toolId={toolId} agentData={agentData} />
             </div>
 
           </div>
 
         </div>
 
+        {/* ── Active Outcome ROI Banner (Displayed upon successful file execution) ── */}
+        {activeOutcome && (
+          <div className="mb-6 sm:mb-8">
+            <ToolOutcomeRoiBanner
+              toolId={toolId}
+              agentData={agentData}
+              outcome={activeOutcome}
+            />
+          </div>
+        )}
+
         {/* ── Full-Width Tool Engine Container ── */}
         <div className="w-full space-y-6 sm:space-y-8">
           
-          {/* The Tool Engine (Now 100% Full Width across the page) */}
+          {/* The Tool Engine */}
           <div className="w-full">
             {children}
           </div>
@@ -330,62 +251,41 @@ export function ToolPageShell({
       </div>
 
       {/* ══════════════════════════════════════════════════════════════
-          MOBILE FLOATING STICKY AD BLOCK (Custom Small Floating Card)
+          MOBILE PEACEFUL VALUE BAR (Non-Intrusive)
           ══════════════════════════════════════════════════════════════ */}
       <aside
-        aria-label="Cora AI Co-Founder Offer"
+        aria-label="Cora AI Co-Founder Free Guarantee"
         className="fixed bottom-3 inset-x-3 z-40 lg:hidden animate-in fade-in slide-in-from-bottom-5 duration-300"
       >
         <div className="relative overflow-hidden rounded-2xl bg-zinc-950/95 backdrop-blur-xl border border-zinc-800 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] text-white">
-          
-          {/* Subtle top ambient glow */}
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
-
           <div className="flex items-center justify-between gap-3">
             
-            {/* Left: Thumbnail & Offer Text */}
             <div className="flex items-center gap-2.5 min-w-0 flex-1">
-              <div className="relative w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-white/15 bg-zinc-900">
-                <Image
-                  src={agentData.card1.image}
-                  alt={agentData.card1.headline}
-                  fill
-                  className="object-cover"
-                  sizes="40px"
-                />
-                <span className="absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-zinc-950" />
+              <div className="relative w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-white/15 bg-zinc-900 flex items-center justify-center text-emerald-400 font-mono text-xs">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
               </div>
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-white tracking-tight truncate">
-                    {agentData.agent.name.split(' ')[0]} AI Co-Founder
-                  </span>
-                  <span className="text-[9.5px] font-mono font-extrabold text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded border border-amber-400/30 shrink-0">
-                    40% OFF
-                  </span>
+                <div className="text-xs font-bold text-white tracking-tight truncate">
+                  Free Client-Side Tool
                 </div>
-                <div className="text-[11px] text-zinc-400 truncate flex items-center gap-1 font-mono">
-                  <span className="text-white font-bold">₹299/mo</span>
-                  <span>&bull;</span>
-                  <span className="text-amber-400 font-semibold">{formatTimer(secondsLeft)}</span>
+                <div className="text-[10px] text-zinc-400 truncate font-mono">
+                  100% In-Browser RAM • Zero Sign-Up
                 </div>
               </div>
             </div>
 
-            {/* Right: 1-Tap CTA */}
             <div className="flex items-center shrink-0">
               <Link
-                href={`/pricing?coupon=INDIA40&plan=india_only&tool=${toolId}`}
-                className="px-4 py-2 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+                href={`/workspace/login?mode=signup&ref=tofu_mobile_${toolId}`}
+                className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center gap-1 shadow-md active:scale-95 transition-all cursor-pointer"
               >
-                <span>Claim</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-950" />
+                <span>Free Workspace</span>
+                <ArrowRight className="w-3 h-3 text-zinc-950" />
               </Link>
             </div>
 
           </div>
-
         </div>
       </aside>
 

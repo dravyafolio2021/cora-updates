@@ -19,6 +19,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { ToolPageShell } from '@/components/tools/ToolPageShell';
+import { ToolOutcomeData } from '@/components/tools/ToolOutcomeRoiBanner';
 import { useToast } from '@/components/ui/Toast';
 import { compressPdf, downloadPdfBlob, getPdfInfo } from '@/lib/pdf-engine';
 
@@ -165,6 +166,8 @@ export default function CompressPdfPage() {
     setTier('recommended');
   };
 
+  const [activeOutcome, setActiveOutcome] = useState<ToolOutcomeData | null>(null);
+
   const handleExecuteCompression = async () => {
     if (!selectedFile) {
       showToast('Please upload a PDF file first');
@@ -185,13 +188,28 @@ export default function CompressPdfPage() {
   };
 
   const handleDownload = () => {
-    if (!compressionResult) return;
+    if (!compressionResult || !selectedFile) return;
     const finalName = outputFileName.trim().length > 0
       ? (outputFileName.endsWith('.pdf') ? outputFileName : `${outputFileName}.pdf`)
       : 'compressed-document.pdf';
 
     downloadPdfBlob(compressionResult.pdfBytes, finalName);
     showToast('Download started');
+
+    // Trigger AI-SDR Value & ROI Milestone
+    const originalKb = (selectedFile.size / 1024).toFixed(0);
+    const newKb = (compressionResult.compressedSizeBytes / 1024).toFixed(0);
+    setActiveOutcome({
+      summaryTitle: `Optimized: ${originalKb} KB down to ${newKb} KB (${compressionResult.compressionRatioPercent}% Saved)`,
+      timeSavedEstimate: '~15 mins turnaround time saved',
+      securityProof: '0 bytes sent to external servers • 100% In-Browser RAM',
+      suggestedNextStep: {
+        headline: 'Delivering final project deliverables or portfolio decks to a client?',
+        description: 'Host your deliverables in a branded, high-speed client portal with live open-tracking, feedback threads, and zero email attachment size limits.',
+        ctaLabel: 'Share via Client Portal with Rohan (Free)',
+        ctaHref: `/workspace/login?mode=signup&ref=tofu_compressed_deck&savings=${compressionResult.compressionRatioPercent}`,
+      },
+    });
   };
 
   return (
@@ -201,6 +219,7 @@ export default function CompressPdfPage() {
       title="Compress PDF Online"
       subtitle="Reduce PDF file size in seconds while preserving document crispness. 100% private, executed locally in your browser with zero server uploads."
       faqItems={COMPRESS_PDF_FAQS}
+      activeOutcome={activeOutcome}
     >
       <div className="space-y-6">
         
