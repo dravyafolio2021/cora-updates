@@ -320,6 +320,136 @@ class Cora_Elementor_Migrator {
     }
 
     /**
+     * Import WordPress standard WXR Export XML (Tools > Export > Pages).
+     *
+     * @param string $xml_content Raw XML file contents.
+     * @param array  $args        Migration arguments.
+     * @return array|WP_Error
+     */
+    public function import_wordpress_wxr_xml( $xml_content, $args = array() ) {
+        if ( empty( $xml_content ) ) {
+            return new WP_Error( 'empty_xml', __( 'The uploaded XML file is empty.', 'cora-workspace' ) );
+        }
+
+        libxml_use_internal_errors( true );
+        $xml = simplexml_load_string( $xml_content, 'SimpleXMLElement', LIBXML_NOCDATA );
+        if ( ! $xml ) {
+            return new WP_Error( 'invalid_xml', __( 'Failed to parse WordPress XML file. Ensure it is a valid WordPress Export.', 'cora-workspace' ) );
+        }
+
+        $namespaces = $xml->getNamespaces( true );
+        $wp_ns = isset( $namespaces['wp'] ) ? $namespaces['wp'] : 'http://wordpress.org/export/1.2/';
+
+        $imported_pages = array();
+        $errors         = array();
+        $total_media    = 0;
+
+        if ( isset( $xml->channel->item ) ) {
+            foreach ( $xml->channel->item as $item ) {
+                $wp_item = $item->children( $wp_ns );
+                $post_type = (string) $wp_item->post_type;
+
+                // Only import pages or elementor library templates
+                if ( $post_type !== 'page' && $post_type !== 'elementor_library' ) {
+                    continue;
+                }
+
+                $post_status = (string) $wp_item->status;
+                if ( $post_status === 'trash' ) {
+                    continue;
+                }
+
+                $title = (string) $item->title;
+                $slug  = (string) $wp_item->post_name;
+                if ( empty( $title ) ) {
+                    $title = ! empty( $slug ) ? ucwords( str_replace( '-', ' ', $slug ) ) : 'Migrated Page';
+                }
+
+                // Look for _elementor_data in postmeta
+                $elementor_data = null;
+                $page_settings  = array();
+
+                if ( isset( $wp_item->postmeta ) ) {
+                    foreach ( $wp_item->postmeta as $meta ) {
+                        $meta_key   = (string) $meta->meta_key;
+                        $meta_value = (string) $meta->meta_value;
+
+                        if ( $meta_key === '_elementor_data' ) {
+                            $elementor_data = $meta_value;
+                        } elseif ( $meta_key === '_elementor_page_settings' ) {
+                            $page_settings = json_decode( $meta_value, true ) ?: array();
+                        }
+                    }
+                }
+
+                if ( empty( $elementor_data ) ) {
+                    // Fallback: check if the page has raw content that can be wrapped into Elementor text editor
+                    $content_ns = isset( $namespaces['content'] ) ? $namespaces['content'] : 'http://purl.org/rss/1.0/modules/content/';
+                    $raw_content = (string) $item->children( $content_ns )->encoded;
+                    if ( ! empty( $raw_content ) ) {
+                        $elementor_data = json_encode( array(
+                            array(
+                                'id'       => substr( md5( $slug . '_sec' ), 0, 7 ),
+                                'elType'   => 'section',
+                                'elements' => array(
+                                    array(
+                                        'id'       => substr( md5( $slug . '_col' ), 0, 7 ),
+                                        'elType'   => 'column',
+                                        'elements' => array(
+                                            array(
+                                                'id'         => substr( md5( $slug . '_w' ), 0, 7 ),
+                                                'elType'     => 'widget',
+                                                'widgetType' => 'text-editor',
+                                                'settings'   => array(
+                                                    'editor' => $raw_content,
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ) );
+                    }
+                }
+
+                if ( empty( $elementor_data ) ) {
+                    continue;
+                }
+
+                $page_args = $args;
+                $page_args['title'] = $title;
+                $page_args['slug']  = $slug;
+                $page_args['is_homepage'] = ( $slug === 'home' || $slug === 'homepage' || $slug === 'front-page' );
+
+                $res = $this->import_template_json( $elementor_data, $page_args );
+                if ( is_wp_error( $res ) ) {
+                    $errors[] = $title . ': ' . $res->get_error_message();
+                } else {
+                    $imported_pages[] = $res;
+                    $total_media     += ! empty( $res['media_sideloaded'] ) ? intval( $res['media_sideloaded'] ) : 0;
+                }
+            }
+        }
+
+        if ( empty( $imported_pages ) ) {
+            return new WP_Error(
+                'no_pages_imported',
+                __( 'No Elementor pages were found in the uploaded XML. Note: Cora only supports Elementor-based pages and themes.', 'cora-workspace' )
+            );
+        }
+
+        return array(
+            'success'        => true,
+            'imported_count' => count( $imported_pages ),
+            'pages'          => $imported_pages,
+            'total_media'    => $total_media,
+            'errors'         => $errors,
+            'message'        => sprintf( __( 'Successfully migrated %d pages from WordPress export.', 'cora-workspace' ), count( $imported_pages ) ),
+            'note'           => __( 'Core Elementor layouts and media were imported. Unsupported 3rd-party plugins may require minor adjustments in the Canvas Editor.', 'cora-workspace' ),
+        );
+    }
+
+    /**
      * Scan a live remote website URL to detect Elementor presence, version, and discoverable pages.
      *
      * @param string $url The website URL to inspect.

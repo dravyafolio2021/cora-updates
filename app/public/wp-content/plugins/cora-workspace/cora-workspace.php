@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.22
+ * Version: 4.8.23
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.22' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.23' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -30666,8 +30666,16 @@ function cora_ajax_elementor_upload_template() {
         }
         cora_log_activity( 'Canvas', "Imported Elementor template JSON file '{$file_name}'." );
         wp_send_json_success( $result );
+    } elseif ( $file_ext === 'xml' ) {
+        $xml_content = file_get_contents( $tmp_file );
+        $result = cora_elementor_migrator()->import_wordpress_wxr_xml( $xml_content, $args );
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+        }
+        cora_log_activity( 'Canvas', "Imported WordPress export XML with {$result['imported_count']} pages." );
+        wp_send_json_success( $result );
     } else {
-        wp_send_json_error( array( 'message' => 'Unsupported file format. Please upload an Elementor .json template or .zip Template Kit.' ) );
+        wp_send_json_error( array( 'message' => 'Unsupported file format. Please upload an Elementor .json template, .zip Template Kit, or WordPress .xml export file.' ) );
     }
 }
 }

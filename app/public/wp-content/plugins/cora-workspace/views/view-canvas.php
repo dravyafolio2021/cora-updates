@@ -371,6 +371,10 @@ function cora_get_sparkline_points( $history, $type ) {
                 
                 <!-- Action Buttons: side-by-side row on mobile, flex-row inline on desktop -->
                 <div class="flex items-center gap-2.5 w-full md:w-auto shrink-0">
+                    <button onclick="openElementorMigrationDrawer()" class="flex-1 md:flex-none justify-center px-3.5 py-1.5 border border-zinc-300 hover:border-zinc-950 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-xs whitespace-nowrap shrink-0">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0 text-zinc-800"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Migrate Website</span>
+                    </button>
                     <button onclick="openAddThemeWizard()" class="flex-1 md:flex-none justify-center px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-xs border-none whitespace-nowrap shrink-0">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>Add Theme</span>
@@ -716,6 +720,11 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                         <span>Download theme file</span>
                                     </button>
+                                    <div class="border-t border-zinc-100 my-1"></div>
+                                    <button onclick="openElementorMigrationDrawer()" class="w-full px-3 py-2 text-xs text-zinc-950 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-bold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-900 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                        <span>Migrate Elementor Pages</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -759,7 +768,12 @@ function cora_get_sparkline_points( $history, $type ) {
                         <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="text-zinc-550"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
                     <!-- Add Theme Dropdown Menu -->
-                    <div id="import-theme-dropdown" class="hidden absolute right-0 mt-1.5 w-48 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-35 text-left text-[11px] font-semibold">
+                    <div id="import-theme-dropdown" class="hidden absolute right-0 mt-1.5 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-35 text-left text-[11px] font-semibold">
+                        <button onclick="openElementorMigrationDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-950 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors font-bold">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-950 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            <span>Migrate Elementor Site</span>
+                        </button>
+                        <div class="border-t border-zinc-100 my-1"></div>
                         <button onclick="openImportKitDrawer()" class="w-full px-3.5 py-2 text-left text-zinc-800 hover:bg-zinc-50 flex items-center gap-2 cursor-pointer border-none bg-transparent transition-colors">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                             Upload ZIP file
@@ -1155,14 +1169,16 @@ function cora_get_sparkline_points( $history, $type ) {
             <div class="flex items-center gap-2">
                 <!-- Action button for Pages tab -->
                 <?php if ( ! $is_read_only ) : ?>
-                <button onclick="openElementorMigrationDrawer()" id="tab-action-migrate-elementor" class="tab-action-btn px-3 py-1.5 border border-zinc-300 hover:border-zinc-950 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-[11px] font-bold shadow-2xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0 text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    <span>Migrate Elementor</span>
-                </button>
-                <button onclick="openNewPageDrawer()" id="tab-action-pages" class="tab-action-btn px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 border-none">
-                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>Add page</span>
-                </button>
+                <div id="tab-action-pages" class="tab-action-btn flex items-center gap-2">
+                    <button onclick="openElementorMigrationDrawer()" id="tab-action-migrate-elementor" class="px-3 py-1.5 border border-zinc-300 hover:border-zinc-950 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-[11px] font-bold shadow-2xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0 text-zinc-700"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Migrate Elementor</span>
+                    </button>
+                    <button onclick="openNewPageDrawer()" id="tab-btn-add-page" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 border-none">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Add page</span>
+                    </button>
+                </div>
                 <?php endif; ?>
 
                 <!-- Action buttons for Menus tab -->
@@ -2562,10 +2578,14 @@ function cora_get_sparkline_points( $history, $type ) {
                                 </div>
                             </div>
                             <div id="cora-page-switcher-list" class="flex-1 overflow-y-auto max-h-[300px] py-1"></div>
-                            <div class="border-t border-zinc-100 shrink-0 bg-white ">
-                                <button onclick="ddOpenNewPageDrawer(event)" class="w-full text-left px-4 py-2.5 text-[11px] font-bold text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50 cursor-pointer transition-colors flex items-center gap-2">
+                            <div class="border-t border-zinc-100 shrink-0 bg-white">
+                                <button onclick="ddOpenNewPageDrawer(event)" class="w-full text-left px-4 py-2 text-[11px] font-bold text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 cursor-pointer transition-colors flex items-center gap-2">
                                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                     Add new page
+                                </button>
+                                <button onclick="openElementorMigrationDrawer()" class="w-full text-left px-4 py-2 text-[11px] font-bold text-zinc-900 hover:bg-zinc-50 cursor-pointer transition-colors flex items-center gap-2 border-t border-zinc-50">
+                                    <svg class="w-3.5 h-3.5 text-zinc-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    Migrate Elementor page
                                 </button>
                             </div>
                         </div>
@@ -2834,6 +2854,13 @@ function cora_get_sparkline_points( $history, $type ) {
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
+        <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span class="text-[11px] text-zinc-700 font-semibold">Have an existing Elementor site?</span>
+            </div>
+            <button type="button" onclick="closeNewPageDrawer(); openElementorMigrationDrawer();" class="text-[11px] font-bold text-zinc-950 hover:underline cursor-pointer">Use 1-Click Migrator →</button>
+        </div>
         <div class="space-y-4">
             <div class="space-y-2">
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Title *</label>
@@ -2877,13 +2904,24 @@ function cora_get_sparkline_points( $history, $type ) {
             <div class="space-y-1">
                 <div class="flex items-center gap-2">
                     <h3 class="text-base font-bold text-zinc-950 tracking-tight">1-Click Elementor Migrator</h3>
-                    <span class="text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 px-2 py-0.5 rounded-full uppercase">100% Fidelity</span>
+                    <span class="text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 px-2 py-0.5 rounded-full uppercase">Elementor Only</span>
                 </div>
-                <p class="text-xs text-zinc-500 font-normal">Migrate existing Elementor pages, template kits, or live sites into Cora Canvas.</p>
+                <p class="text-xs text-zinc-500 font-normal">Migrate all pages and media from your existing WordPress &amp; Elementor site into Cora Canvas.</p>
             </div>
             <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 rounded-lg hover:bg-zinc-100 transition-colors" onclick="closeElementorMigrationDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
+        </div>
+
+        <!-- Prominent Plugin Compatibility Notice -->
+        <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-start gap-3 text-left">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 text-zinc-700 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <div class="space-y-1">
+                <span class="text-xs font-bold text-zinc-950 block">Plugin Compatibility Notice</span>
+                <p class="text-[11px] text-zinc-600 leading-relaxed">
+                    Cora imports core Elementor layout structures, sections, typography, containers, and media assets. Note: We don't support all 3rd-party plugins from your current site, so the imported widgets from unsupported plugins might not be 100% accurate and can be easily adjusted in the Canvas visual editor after import.
+                </p>
+            </div>
         </div>
 
         <!-- Migration Source Tabs -->
@@ -2892,7 +2930,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 Live Website URL
             </button>
             <button type="button" onclick="switchElementorMigrateTab('upload')" id="elem-tab-btn-upload" class="flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all">
-                Upload JSON / ZIP Kit
+                Upload File (XML / ZIP / JSON)
             </button>
             <button type="button" onclick="switchElementorMigrateTab('snippet')" id="elem-tab-btn-snippet" class="flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all">
                 1-Click Exporter Bridge
@@ -2908,12 +2946,15 @@ function cora_get_sparkline_points( $history, $type ) {
                     <label class="block text-[11px] font-mono font-bold text-zinc-600 uppercase tracking-wider">Existing WordPress / Elementor URL</label>
                     <div class="flex items-center gap-2">
                         <input type="url" id="elem-migrate-url-input" placeholder="https://my-old-photography-studio.com" class="flex-1 px-3.5 py-2.5 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-zinc-950 font-medium bg-zinc-50/50">
-                        <button type="button" onclick="triggerScanElementorUrl()" id="elem-btn-scan-url" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
-                            <span>Scan Site</span>
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <button type="button" onclick="triggerOneClickMigrateAllUrl()" id="elem-btn-oneclick-migrate" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                            <span>1-Click Import All</span>
                         </button>
                     </div>
-                    <p class="text-[11px] text-zinc-400">Enter your live website URL. Cora will automatically detect Elementor layout blocks, pages, and media assets.</p>
+                    <div class="flex items-center justify-between text-[11px] pt-1">
+                        <span class="text-zinc-400">Enter your live URL. Cora extracts pages and sideloads media automatically.</span>
+                        <button type="button" onclick="triggerScanElementorUrl()" class="text-zinc-700 hover:text-zinc-950 font-bold underline cursor-pointer shrink-0">or inspect pages first →</button>
+                    </div>
                 </div>
             </div>
 
@@ -2968,8 +3009,9 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
                 <div class="space-y-1">
                     <h4 class="text-sm font-bold text-zinc-950" id="elem-success-heading">Migration Complete!</h4>
-                    <p class="text-xs text-zinc-600" id="elem-success-detail">6 Elementor pages and 24 media assets successfully migrated into Cora Canvas.</p>
+                    <p class="text-xs text-zinc-600" id="elem-success-detail">All Elementor pages and media assets successfully migrated into Cora Canvas.</p>
                 </div>
+                <p class="text-[11px] text-zinc-500">Review your pages in the Canvas Editor to adjust any custom plugin widgets.</p>
                 <div class="flex items-center justify-center gap-3 pt-2">
                     <button type="button" onclick="closeElementorMigrationDrawer()" class="px-4 py-2 border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-bold rounded-xl text-xs transition-colors cursor-pointer">
                         Done
@@ -2982,19 +3024,37 @@ function cora_get_sparkline_points( $history, $type ) {
 
         </div>
 
-        <!-- ══ TAB 2: Upload Elementor Template / Kit (.json / .zip) ══ -->
+        <!-- ══ TAB 2: Upload Elementor Template / Kit / WordPress XML ══ -->
         <div id="elem-tab-panel-upload" class="space-y-4 hidden">
-            <div class="border-2 border-dashed border-zinc-200 hover:border-zinc-400 rounded-2xl p-7 text-center transition-colors bg-zinc-50/50 cursor-pointer" onclick="document.getElementById('elem-file-input').click()">
-                <input type="file" id="elem-file-input" accept=".json,.zip" class="hidden" onchange="handleElementorFileSelected(this)">
-                <div class="w-10 h-10 rounded-full bg-zinc-100 text-zinc-700 flex items-center justify-center mx-auto mb-3">
+            <div class="border-2 border-dashed border-zinc-200 hover:border-zinc-400 rounded-2xl p-6 text-center transition-colors bg-zinc-50/50 cursor-pointer" onclick="document.getElementById('elem-file-input').click()">
+                <input type="file" id="elem-file-input" accept=".json,.zip,.xml" class="hidden" onchange="handleElementorFileSelected(this)">
+                <div class="w-10 h-10 rounded-full bg-zinc-100 text-zinc-700 flex items-center justify-center mx-auto mb-2.5">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 </div>
                 <h4 class="text-xs font-bold text-zinc-950" id="elem-file-name-label">Click to upload or drag and drop</h4>
-                <p class="text-[11px] text-zinc-400 mt-1">Elementor Page Export (.json) or Full Site Template Kit (.zip)</p>
+                <p class="text-[11px] text-zinc-400 mt-0.5">WordPress Export (.xml), Elementor Kit (.zip), or Elementor Page (.json)</p>
             </div>
 
-            <div class="flex items-center justify-between pt-2">
-                <span class="text-[11px] text-zinc-400">Strictly validates Elementor container and widget schemas.</span>
+            <!-- Effortless 2-Option Export Guide -->
+            <div class="p-3 bg-zinc-50/80 border border-zinc-200 rounded-xl text-left space-y-2">
+                <div class="text-[11px] font-bold text-zinc-800 flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                    <span>How to export all pages from your existing WordPress site:</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-zinc-600">
+                    <div class="p-2.5 bg-white border border-zinc-200 rounded-lg space-y-1">
+                        <span class="font-bold text-zinc-950 block">Option A: Native WordPress (XML)</span>
+                        <p class="text-[10px] text-zinc-500 leading-relaxed">In your WP Admin, go to <strong>Tools &gt; Export</strong>, choose <strong>Pages</strong>, and click <em>Download Export File</em>. Drop the <code>.xml</code> here.</p>
+                    </div>
+                    <div class="p-2.5 bg-white border border-zinc-200 rounded-lg space-y-1">
+                        <span class="font-bold text-zinc-950 block">Option B: Elementor Kit (ZIP)</span>
+                        <p class="text-[10px] text-zinc-500 leading-relaxed">In your WP Admin, go to <strong>Elementor &gt; Tools &gt; Import / Export Kit</strong>, click <em>Export Kit</em>. Drop the <code>.zip</code> here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+                <span class="text-[10px] text-zinc-400">Strictly validates Elementor container and widget schemas.</span>
                 <button type="button" onclick="triggerUploadElementorFile()" id="elem-btn-upload-submit" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs disabled:opacity-50" disabled>
                     Import to Canvas
                 </button>
@@ -5728,6 +5788,55 @@ add_action( 'init', function() {
         jQuery('#elem-url-step-pages, #elem-url-step-progress, #elem-url-step-success').addClass('hidden');
         jQuery('#elem-btn-scan-url').prop('disabled', false).html('<span>Scan Site</span><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>');
     }
+
+    function triggerOneClickMigrateAllUrl() {
+        const url = jQuery('#elem-migrate-url-input').val().trim();
+        if (!url) {
+            window.coraShowToast('Please enter your existing website URL.', 'error');
+            return;
+        }
+
+        const btn = jQuery('#elem-btn-oneclick-migrate');
+        btn.prop('disabled', true).html('<span class="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin inline-block mr-1"></span> Processing...');
+
+        jQuery('#elem-url-step-input').addClass('hidden');
+        jQuery('#elem-url-step-pages').addClass('hidden');
+        jQuery('#elem-url-step-progress').removeClass('hidden');
+        jQuery('#elem-progress-bar').css('width', '15%');
+        jQuery('#elem-progress-title').text('Scanning & Discovering Elementor Pages...');
+        jQuery('#elem-progress-sub').text('Checking REST API & layout structures on remote site...');
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_elementor_scan_url',
+            url: url,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg><span>1-Click Import All</span>');
+
+            if (res.success && res.data && res.data.discovered_pages && res.data.discovered_pages.length > 0) {
+                elementorScanState.url = res.data.url;
+                elementorScanState.pages = res.data.discovered_pages;
+                elementorScanState.selectedIndices = res.data.discovered_pages.map((_, i) => i);
+                elementorScanState.firstMigratedPageId = null;
+                elementorScanState.firstMigratedPostId = null;
+                elementorScanState.firstMigratedTitle = null;
+
+                window.coraShowToast(`Discovered ${res.data.discovered_pages.length} Elementor pages. Starting 1-click import...`);
+                triggerMigrateElementorPages();
+            } else {
+                jQuery('#elem-url-step-progress').addClass('hidden');
+                jQuery('#elem-url-step-input').removeClass('hidden');
+                const msg = (res.data && res.data.message) ? res.data.message : 'Could not detect Elementor on this site. Cora only supports Elementor-based themes.';
+                window.coraShowToast(msg, 'error');
+            }
+        }).fail(function() {
+            btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg><span>1-Click Import All</span>');
+            jQuery('#elem-url-step-progress').addClass('hidden');
+            jQuery('#elem-url-step-input').removeClass('hidden');
+            window.coraShowToast('Network error during scan. Ensure URL is reachable.', 'error');
+        });
+    }
+    window.triggerOneClickMigrateAllUrl = triggerOneClickMigrateAllUrl;
 
     function triggerScanElementorUrl() {
         const url = jQuery('#elem-migrate-url-input').val().trim();
