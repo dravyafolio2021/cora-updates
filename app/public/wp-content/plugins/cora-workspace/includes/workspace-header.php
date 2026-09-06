@@ -266,7 +266,7 @@ function cora_render_workspace_header( $args = array() ) {
 
         <!-- Mobile Header (Visible only on mobile) -->
         <div class="flex md:hidden items-center justify-between gap-3 mb-2 px-0 py-3 border-b border-zinc-200/60 bg-white select-none">
-            <div class="flex items-center gap-2 min-w-0">
+            <div class="flex items-center gap-2 min-w-0 flex-1">
                
                 <div class="min-w-0">
                     <h1 class="text-sm font-bold tracking-tight text-zinc-900 truncate"><?php echo esc_html( ! empty( $args['mobile_title'] ) ? $args['mobile_title'] : $args['title'] ); ?></h1>
@@ -277,7 +277,7 @@ function cora_render_workspace_header( $args = array() ) {
 
             </div>
             
-            <div class="flex items-center gap-2.5 shrink-0">
+            <div class="flex items-center gap-2 shrink-0">
                 <!-- LLM Platforms Stacked Overlapping Shortcuts (Mobile) -->
                 <?php if ( $args['ai_stack'] ) : ?>
                 <div class="cora-platform-stack flex items-center select-none mr-0.5" style="display: flex; align-items: center;">
@@ -306,7 +306,9 @@ function cora_render_workspace_header( $args = array() ) {
                 </div>
                 <?php endif; ?>
 
-                <?php if ( ! empty( $args['extra_actions_html'] ) ) : ?>
+                <?php if ( ! empty( $args['mobile_extra_actions_html'] ) ) : ?>
+                    <?php echo $args['mobile_extra_actions_html']; ?>
+                <?php elseif ( ! empty( $args['extra_actions_html'] ) && ! empty( $args['show_extra_actions_on_mobile'] ) ) : ?>
                     <?php echo $args['extra_actions_html']; ?>
                 <?php endif; ?>
                 
