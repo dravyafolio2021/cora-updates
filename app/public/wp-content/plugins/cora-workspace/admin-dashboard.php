@@ -5445,87 +5445,67 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 $team_count = is_array( $cora_users ) ? count( $cora_users ) : 1;
                 $formatted_revenue = cora_format_rupees( $dynamic_revenue_total );
 
-                if ( $cora_workspace_industry_raw === 'custom' ) {
-                    $enabled = function_exists( 'cora_get_custom_enabled_features' ) ? cora_get_custom_enabled_features() : array();
+                global $wpdb;
 
-                    $all_candidates = array(
-                        'financials' => array(
-                            'label'       => 'Pipeline Value',
-                            'value'       => $formatted_revenue,
-                            'badge'       => 'Active Deals',
-                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M6 3h12M6 8h12M9 3v10.5M9 3h3.5a5 5 0 0 1 0 10H9M9 13.5L16 21"></path></svg>',
-                        ),
-                        'leads' => array(
-                            'label'       => 'Inbound Leads',
-                            'value'       => (string) $leads_count,
-                            'badge'       => 'Speed-to-Lead AI',
-                            'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>',
-                        ),
-                        'showings' => array(
-                            'label'       => 'Appointments',
-                            'value'       => (string) $showings_count,
-                            'badge'       => 'Scheduled',
-                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-                        ),
-                        'vault' => array(
-                            'label'       => 'Secure Vault',
-                            'value'       => (string) $docs_count,
-                            'badge'       => 'E-Sign Verified',
-                            'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
-                        ),
-                        'team' => array(
-                            'label'       => 'Team Members',
-                            'value'       => (string) $team_count,
-                            'badge'       => 'Active Seats',
-                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>',
-                        ),
-                        'properties' => array(
-                            'label'       => 'Properties',
-                            'value'       => (string) $listings_count,
-                            'badge'       => 'Listings',
-                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
-                        ),
-                        'equipment' => array(
-                            'label'       => 'Equipment',
-                            'value'       => (string) $gear_count,
-                            'badge'       => 'Gear Prepped',
-                            'badge_class' => 'text-zinc-500 dark:text-zinc-400',
-                            'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>',
-                        ),
-                    );
+                // Compute counts for generic/custom/new workspace metrics
+                $active_themes_count = 0;
+                if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_canvas_themes'" ) ) {
+                    $active_themes_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live'" );
+                    if ( $active_themes_count === 0 ) {
+                        $active_themes_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes" );
+                    }
+                }
 
-                    $telemetry_metrics = array();
-                    foreach ( $enabled as $feat_key ) {
-                        if ( isset( $all_candidates[ $feat_key ] ) ) {
-                            $telemetry_metrics[] = $all_candidates[ $feat_key ];
-                            if ( count( $telemetry_metrics ) >= 4 ) {
-                                break;
-                            }
-                        }
-                    }
-                    if ( count( $telemetry_metrics ) < 4 ) {
-                        foreach ( $all_candidates as $cand_data ) {
-                            $already_in = false;
-                            foreach ( $telemetry_metrics as $existing ) {
-                                if ( $existing['label'] === $cand_data['label'] ) {
-                                    $already_in = true;
-                                    break;
-                                }
-                            }
-                            if ( ! $already_in ) {
-                                $telemetry_metrics[] = $cand_data;
-                            }
-                            if ( count( $telemetry_metrics ) >= 4 ) {
-                                break;
-                            }
-                        }
-                    }
+                $total_users_count = function_exists( 'get_users' ) ? count( get_users() ) : ( is_array( $cora_users ) ? count( $cora_users ) : 1 );
+
+                $articles_count = 0;
+                if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_content_items'" ) ) {
+                    $articles_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_content_items" );
+                }
+                if ( $articles_count === 0 ) {
+                    $articles_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}posts WHERE post_type = 'post' AND post_status IN ('publish', 'draft', 'pending', 'future')" );
+                }
+
+                $form_entries_count = 0;
+                if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_form_submissions'" ) ) {
+                    $form_entries_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions" );
+                }
+
+                $is_new_workspace = ( empty( $cora_workspace_leads ) && empty( $cora_workspace_listings ) && empty( $cora_workspace_clients ) && empty( $all_bookings ) );
+
+                $custom_default_telemetry = array(
+                    array(
+                        'label'       => 'Active Themes',
+                        'value'       => (string) $active_themes_count,
+                        'badge'       => 'Active Themes',
+                        'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                        'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>',
+                    ),
+                    array(
+                        'label'       => 'Total Users',
+                        'value'       => (string) $total_users_count,
+                        'badge'       => 'Total Users',
+                        'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
+                        'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+                    ),
+                    array(
+                        'label'       => 'Total Articles',
+                        'value'       => (string) $articles_count,
+                        'badge'       => 'Total Articles',
+                        'badge_class' => 'text-zinc-500 dark:text-zinc-400',
+                        'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>',
+                    ),
+                    array(
+                        'label'       => 'Form Entries',
+                        'value'       => (string) $form_entries_count,
+                        'badge'       => 'Form Entries',
+                        'badge_class' => 'text-emerald-600 dark:text-emerald-400 font-semibold',
+                        'icon'        => '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polyline points="9 15 11 17 15 13"></polyline></svg>',
+                    ),
+                );
+
+                if ( $cora_workspace_industry_raw === 'custom' || $is_new_workspace ) {
+                    $telemetry_metrics = $custom_default_telemetry;
                 } elseif ( $is_studio ) {
                     $telemetry_metrics = array(
                         array(
@@ -5867,47 +5847,32 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             <!-- Quick Action Shortcuts Pill Bar (3-Row Centered Layout) -->
                             <div id="cora-quick-actions-bar" class="w-full flex flex-col items-center justify-center gap-2 sm:gap-2.5 py-0 select-none">
                                 
-                                <!-- Row 1: 2 Action Chips (Upload Media & Write Article) -->
+                                <!-- Row 1: 2 Action Chips (Upload Media & Upload File) -->
                                 <div id="cora-actions-row-1" class="flex items-center justify-center gap-2 flex-nowrap">
                                     <button type="button" onclick="coraNavigateTo('media')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                         <span>Upload Media</span>
                                     </button>
-                                    <button type="button" onclick="coraNavigateTo('blogs')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                        <span>Write Article</span>
+                                    <button type="button" onclick="coraNavigateTo('vault')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>
+                                        <span>Upload File</span>
                                     </button>
                                 </div>
 
-                                <!-- Row 2: 3 Action Chips (View Crew, New Workflow, Build Form) -->
+                                <!-- Row 2: 3 Action Chips (Write Article, Build Form, Record an Expense) -->
                                 <div id="cora-actions-row-2" class="flex items-center justify-center gap-2 max-w-full overflow-x-auto no-scrollbar">
-                                    <?php if ( $is_studio ) : ?>
-                                    <button type="button" onclick="coraNavigateTo('equipment')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-                                        <span>View Crew</span>
-                                    </button>
-                                    <button type="button" onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                        <span>New Workflow</span>
+                                    <button type="button" onclick="coraNavigateTo('blogs')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                        <span>Write Article</span>
                                     </button>
                                     <button type="button" onclick="coraNavigateTo('forms')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                                         <span>Build Form</span>
                                     </button>
-                                    <?php else : ?>
-                                    <button type="button" onclick="coraNavigateTo('users')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-                                        <span>View Crew</span>
+                                    <button type="button" onclick="coraNavigateTo('financials')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="14" y2="12"></line><line x1="6" y1="16" x2="10" y2="16"></line></svg>
+                                        <span>Record an Expense</span>
                                     </button>
-                                    <button type="button" onclick="coraNavigateTo('automations')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                        <span>New Workflow</span>
-                                    </button>
-                                    <button type="button" onclick="coraNavigateTo('forms')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                        <span>Build Form</span>
-                                    </button>
-                                    <?php endif; ?>
                                 </div>
 
                                 <!-- Row 3: Custom Shortcuts Trigger Button (Centered with Purple Gradient Outline) -->
@@ -7784,7 +7749,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                         case 'forms': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>';
                         case 'settings-suite': return '<svg viewBox="0 0 24 24" '+stroke+'><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
                         case 'automations': return '<svg viewBox="0 0 24 24" '+stroke+'><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
-                        case 'vault': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>';
+                        case 'vault': return '<svg viewBox="0 0 24 24" '+stroke+'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>';
                         default: return '<svg viewBox="0 0 24 24" '+stroke+'><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
                     }
                 };
@@ -7793,50 +7758,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 var CORA_IS_CUSTOM = <?php echo ( $cora_workspace_industry_raw === 'custom' ) ? 'true' : 'false'; ?>;
                 var CORA_CUSTOM_ENABLED = <?php echo json_encode( function_exists('cora_get_custom_enabled_features') ? cora_get_custom_enabled_features() : array() ); ?>;
 
-                var CORA_DEFAULT_DYNAMIC_ACTIONS = [];
-                if (CORA_IS_STUDIO) {
-                    CORA_DEFAULT_DYNAMIC_ACTIONS = [
-                        { name: 'Create Invoice', page: 'financials' },
-                        { name: 'New Workflow', page: 'automations' },
-                        { name: 'Model Releases', page: 'vault' }
-                    ];
-                } else if (CORA_IS_CUSTOM) {
-                    var candidateMap = [
-                        { key: 'financials', name: 'Create Invoice', page: 'financials' },
-                        { key: 'automations', name: 'New Workflow', page: 'automations' },
-                        { key: 'forms', name: 'Build Form', page: 'forms' },
-                        { key: 'vault', name: 'File Manager', page: 'vault' },
-                        { key: 'leads', name: 'Client Leads', page: 'leads' },
-                        { key: 'bookings', name: 'Bookings', page: 'bookings' },
-                        { key: 'equipment', name: 'Gear Tracker', page: 'equipment' },
-                        { key: 'blogs', name: 'Write Article', page: 'blogs' }
-                    ];
-                    for (var k = 0; k < candidateMap.length; k++) {
-                        if (CORA_CUSTOM_ENABLED.indexOf(candidateMap[k].key) > -1) {
-                            CORA_DEFAULT_DYNAMIC_ACTIONS.push({ name: candidateMap[k].name, page: candidateMap[k].page });
-                            if (CORA_DEFAULT_DYNAMIC_ACTIONS.length >= 3) break;
-                        }
-                    }
-                    if (CORA_DEFAULT_DYNAMIC_ACTIONS.length < 3) {
-                        var fallbacks = [
-                            { name: 'Create Invoice', page: 'financials' },
-                            { name: 'New Workflow', page: 'automations' },
-                            { name: 'Build Form', page: 'forms' }
-                        ];
-                        for (var f = 0; f < fallbacks.length; f++) {
-                            if (!CORA_DEFAULT_DYNAMIC_ACTIONS.find(function(item) { return item.page === fallbacks[f].page; })) {
-                                CORA_DEFAULT_DYNAMIC_ACTIONS.push(fallbacks[f]);
-                                if (CORA_DEFAULT_DYNAMIC_ACTIONS.length >= 3) break;
-                            }
-                        }
-                    }
-                } else {
-                    CORA_DEFAULT_DYNAMIC_ACTIONS = [
-                        { name: 'Create Invoice', page: 'financials' },
-                        { name: 'New Workflow', page: 'automations' },
-                        { name: 'Build Form', page: 'forms' }
-                    ];
-                }
+                var CORA_DEFAULT_DYNAMIC_ACTIONS = [
+                    { name: 'Write Article', page: 'blogs' },
+                    { name: 'Build Form', page: 'forms' },
+                    { name: 'Record an Expense', page: 'financials' }
+                ];
 
                 var CORA_ALL_PAGES = [
                     {value:'bookings',label:'Bookings & Calendar'},
@@ -7852,12 +7778,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 ];
 
                 var CORA_PRESETS = [
-                    {name:'Check Financials',page:'financials'},
-                    {name:'Bookings',page:'bookings'},
-                    {name:'Add Lead',page:'leads'},
                     {name:'Upload Media',page:'media'},
-                    {name:'Document Vault',page:'vault'},
-                    {name:'New Form',page:'forms'},
+                    {name:'Upload File',page:'vault'},
+                    {name:'Write Article',page:'blogs'},
+                    {name:'Build Form',page:'forms'},
+                    {name:'Record an Expense',page:'financials'},
+                    {name:'Bookings',page:'bookings'},
+                    {name:'Client Leads',page:'leads'},
                     {name:'Automations',page:'automations'}
                 ];
 
@@ -7989,9 +7916,12 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 };
 
                 window.coraRenderCustomActions = function() {
-                    var c = document.getElementById('cora-dynamic-actions-row');
+                    var c = document.getElementById('cora-actions-row-2') || document.getElementById('cora-dynamic-actions-row');
                     if (!c) return;
                     var customActions = JSON.parse(localStorage.getItem('cora_custom_quick_actions') || '[]');
+                    if (!customActions.length) {
+                        return;
+                    }
                     
                     // Exactly 3 dynamic slots in Row 2. Custom actions replace the default dynamic actions from left to right.
                     var row2Items = [];
@@ -8005,7 +7935,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                     
                     c.innerHTML = row2Items.map(function(a) {
                         var iconHtml = window.coraGetPageIconSvg(a.page);
-                        return '<button type="button" onclick="coraNavigateTo(\'' + a.page + '\')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-[11px] sm:text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;"><span class="text-zinc-500 flex items-center shrink-0">' + iconHtml + '</span><span>' + a.name + '</span></button>';
+                        return '<button type="button" onclick="coraNavigateTo(\'' + a.page + '\')" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-zinc-50 text-zinc-900 text-xs font-medium rounded-full border border-zinc-200 shadow-3xs transition-all cursor-pointer select-none whitespace-nowrap" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;"><span class="text-zinc-500 flex items-center shrink-0">' + iconHtml + '</span><span>' + a.name + '</span></button>';
                     }).join('');
                 };
 
