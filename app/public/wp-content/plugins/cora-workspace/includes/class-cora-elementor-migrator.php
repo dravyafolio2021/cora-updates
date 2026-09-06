@@ -465,15 +465,16 @@ class Cora_Elementor_Migrator {
             return new WP_Error( 'invalid_url', __( 'Please provide a valid website URL (e.g. https://example.com).', 'cora-workspace' ) );
         }
 
-        $parsed = parse_url( $url );
+        $parsed   = parse_url( $url );
         $base_url = ( isset( $parsed['scheme'] ) ? $parsed['scheme'] : 'https' ) . '://' . ( isset( $parsed['host'] ) ? $parsed['host'] : '' );
+        $host     = isset( $parsed['host'] ) ? preg_replace( '/^www\./i', '', $parsed['host'] ) : 'Website';
 
         // 1. Fetch Homepage HTML
         $response = wp_remote_get( $url, array(
             'timeout'     => 25,
             'redirection' => 5,
             'sslverify'   => false,
-            'user-agent'  => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 CoraMigrator/1.0',
+            'user-agent'  => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 CoraMigrator/2.0',
         ) );
 
         if ( is_wp_error( $response ) ) {
@@ -487,21 +488,55 @@ class Cora_Elementor_Migrator {
             return new WP_Error( 'remote_error_status', sprintf( __( 'Remote website returned HTTP status %d.', 'cora-workspace' ), $status_code ) );
         }
 
-        // 2. Elementor Detection Diagnostics
-        $is_elementor = false;
-        $elementor_version = '3.x';
-        $is_wordpress = false;
+        // 2. Query WordPress REST API root for site info & namespaces
+        $site_name        = '';
+        $site_description = '';
+        $namespaces       = array();
+        $rest_root_res    = wp_remote_get( trailingslashit( $base_url ) . 'wp-json/', array(
+            'timeout'   => 8,
+            'sslverify' => false,
+        ) );
 
-        if ( strpos( $body, 'elementor' ) !== false || strpos( $body, 'elementor-frontend' ) !== false || strpos( $body, 'wp-content/plugins/elementor' ) !== false ) {
+        if ( ! is_wp_error( $rest_root_res ) && wp_remote_retrieve_response_code( $rest_root_res ) === 200 ) {
+            $root_data = json_decode( wp_remote_retrieve_body( $rest_root_res ), true );
+            if ( is_array( $root_data ) ) {
+                $site_name        = ! empty( $root_data['name'] ) ? html_entity_decode( $root_data['name'] ) : '';
+                $site_description = ! empty( $root_data['description'] ) ? html_entity_decode( $root_data['description'] ) : '';
+                $namespaces       = ! empty( $root_data['namespaces'] ) && is_array( $root_data['namespaces'] ) ? $root_data['namespaces'] : array();
+            }
+        }
+
+        // Fallback site name from <title>
+        if ( empty( $site_name ) ) {
+            if ( preg_match( '/<title>(.*?)<\/title>/i', $body, $title_match ) ) {
+                $raw_title = trim( strip_tags( $title_match[1] ) );
+                $parts = preg_split( '/\s*[\|\-–—]\s*/', $raw_title );
+                $site_name = ! empty( $parts[0] ) ? trim( $parts[0] ) : ucfirst( $host );
+            } else {
+                $site_name = ucfirst( $host );
+            }
+        }
+
+        // 3. WordPress & Elementor Detection Diagnostics
+        $is_elementor      = false;
+        $is_elementor_pro  = false;
+        $elementor_version = '3.x';
+        $is_wordpress      = false;
+
+        if ( strpos( $body, 'elementor' ) !== false || strpos( $body, 'elementor-frontend' ) !== false || strpos( $body, 'wp-content/plugins/elementor' ) !== false || in_array( 'elementor/v1', $namespaces, true ) ) {
             $is_elementor = true;
             $is_wordpress = true;
         }
 
-        if ( strpos( $body, 'wp-content' ) !== false || strpos( $body, 'wp-includes' ) !== false ) {
+        if ( strpos( $body, 'elementor-pro' ) !== false || in_array( 'elementor-pro/v1', $namespaces, true ) ) {
+            $is_elementor_pro = true;
+        }
+
+        if ( strpos( $body, 'wp-content' ) !== false || strpos( $body, 'wp-includes' ) !== false || ! empty( $namespaces ) ) {
             $is_wordpress = true;
         }
 
-        // Try extracting Elementor version from script tags
+        // Extract Elementor version from script tags
         if ( preg_match( '/elementor-frontend-js.*?ver=([0-9\.]+)/i', $body, $ver_match ) ) {
             $elementor_version = $ver_match[1];
         } elseif ( preg_match( '/elementor.*?ver=([0-9\.]+)/i', $body, $ver_match ) ) {
@@ -515,7 +550,168 @@ class Cora_Elementor_Migrator {
             );
         }
 
-        // 3. Try to query WordPress REST API for page index
+        // 4. Extract Active Theme Details
+        $theme_slug    = 'hello-elementor';
+        $theme_name    = 'Hello Elementor';
+        $theme_version = '';
+
+        if ( preg_match( '#wp-content/themes/([^/"\'\s\?]+)#i', $body, $theme_m ) ) {
+            $raw_theme_slug = sanitize_title( $theme_m[1] );
+            if ( ! empty( $raw_theme_slug ) ) {
+                $theme_slug = $raw_theme_slug;
+            }
+        }
+
+        // Extract theme version from stylesheet link
+        if ( preg_match( '#wp-content/themes/' . preg_quote( $theme_slug, '#' ) . '/style\.css\?ver=([0-9\.]+)#i', $body, $t_ver_m ) ) {
+            $theme_version = $t_ver_m[1];
+        }
+
+        // Known theme slug human map
+        $theme_human_map = array(
+            'hello-elementor'       => 'Hello Elementor',
+            'hello-elementor-child' => 'Hello Elementor Child',
+            'astra'                 => 'Astra',
+            'astra-child'           => 'Astra Child',
+            'oceanwp'               => 'OceanWP',
+            'generatepress'         => 'GeneratePress',
+            'kadence'               => 'Kadence',
+            'neve'                  => 'Neve',
+            'twentytwentyfour'      => 'Twenty Twenty-Four',
+            'twentytwentythree'     => 'Twenty Twenty-Three',
+            'twentytwentytwo'       => 'Twenty Twenty-Two',
+            'twentytwentyone'       => 'Twenty Twenty-One',
+        );
+
+        if ( isset( $theme_human_map[ $theme_slug ] ) ) {
+            $theme_name = $theme_human_map[ $theme_slug ];
+        } else {
+            $theme_name = ucwords( str_replace( array( '-', '_' ), ' ', $theme_slug ) );
+        }
+
+        // 5. Extract Active Plugins Roster
+        $plugin_slugs = array();
+
+        // From HTML scripts and styles
+        if ( preg_match_all( '#wp-content/plugins/([^/"\'\s\?]+)#i', $body, $plug_m ) ) {
+            foreach ( $plug_m[1] as $pslug ) {
+                $clean_pslug = sanitize_title( $pslug );
+                if ( ! empty( $clean_pslug ) && $clean_pslug !== '*' ) {
+                    $plugin_slugs[ $clean_pslug ] = true;
+                }
+            }
+        }
+
+        // From REST namespaces
+        foreach ( $namespaces as $ns ) {
+            if ( strpos( $ns, 'elementor-pro' ) !== false ) {
+                $plugin_slugs['elementor-pro'] = true;
+            } elseif ( strpos( $ns, 'elementor' ) !== false ) {
+                $plugin_slugs['elementor'] = true;
+            } elseif ( strpos( $ns, 'metform' ) !== false ) {
+                $plugin_slugs['metform'] = true;
+            } elseif ( strpos( $ns, 'contact-form-7' ) !== false ) {
+                $plugin_slugs['contact-form-7'] = true;
+            } elseif ( strpos( $ns, 'wpforms' ) !== false ) {
+                $plugin_slugs['wpforms'] = true;
+            } elseif ( strpos( $ns, 'fluentform' ) !== false ) {
+                $plugin_slugs['fluentform'] = true;
+            } elseif ( strpos( $ns, 'woocommerce' ) !== false ) {
+                $plugin_slugs['woocommerce'] = true;
+            } elseif ( strpos( $ns, 'google-site-kit' ) !== false ) {
+                $plugin_slugs['google-site-kit'] = true;
+            } elseif ( strpos( $ns, 'yoast' ) !== false ) {
+                $plugin_slugs['wordpress-seo'] = true;
+            } elseif ( strpos( $ns, 'rankmath' ) !== false ) {
+                $plugin_slugs['seo-by-rank-math'] = true;
+            }
+        }
+
+        // Format detected plugins into clean objects
+        $plugin_name_map = array(
+            'elementor'                          => 'Elementor Website Builder',
+            'elementor-pro'                      => 'Elementor Pro',
+            'metform'                            => 'MetForm Form Builder',
+            'contact-form-7'                     => 'Contact Form 7',
+            'wpforms'                            => 'WPForms',
+            'wpforms-lite'                       => 'WPForms Lite',
+            'fluentform'                         => 'Fluent Forms',
+            'woocommerce'                        => 'WooCommerce',
+            'essential-addons-for-elementor-lite'=> 'Essential Addons for Elementor',
+            'elementskit-lite'                   => 'ElementsKit Addons',
+            'elementskit'                        => 'ElementsKit Pro',
+            'premium-addons-for-elementor'       => 'Premium Addons for Elementor',
+            'happy-elementor-addons'             => 'Happy Addons for Elementor',
+            'google-site-kit'                    => 'Google Site Kit',
+            'wordpress-seo'                      => 'Yoast SEO',
+            'seo-by-rank-math'                   => 'Rank Math SEO',
+            'cora-builder'                       => 'Cora Builder',
+            'cora_crm'                           => 'Cora CRM',
+            'mobile-first-ads-landing-pages'     => 'Mobile-First Landing Pages',
+        );
+
+        $detected_plugins = array();
+        $advisory_plugins = array();
+        $has_form_plugin  = false;
+
+        foreach ( array_keys( $plugin_slugs ) as $pslug ) {
+            $pname = isset( $plugin_name_map[ $pslug ] ) ? $plugin_name_map[ $pslug ] : ucwords( str_replace( array( '-', '_' ), ' ', $pslug ) );
+
+            if ( in_array( $pslug, array( 'elementor', 'elementor-pro' ), true ) ) {
+                $detected_plugins[] = array(
+                    'slug'        => $pslug,
+                    'name'        => $pname,
+                    'status'      => 'native',
+                    'badge'       => '100% Native',
+                    'description' => 'Core layout engine, containers, sections, widgets, and responsive breakpoints.',
+                );
+            } elseif ( in_array( $pslug, array( 'metform', 'contact-form-7', 'wpforms', 'wpforms-lite', 'fluentform' ), true ) ) {
+                $has_form_plugin    = true;
+                $detected_plugins[] = array(
+                    'slug'        => $pslug,
+                    'name'        => $pname,
+                    'status'      => 'converted',
+                    'badge'       => 'Auto-Bridged',
+                    'description' => 'Form structure and fields mapped to Cora Native Form Builder without lead loss.',
+                );
+            } else {
+                $advisory_plugins[] = array(
+                    'slug'        => $pslug,
+                    'name'        => $pname,
+                    'status'      => 'advisory',
+                    'badge'       => 'Visual Continuity',
+                    'description' => 'Layout, styling, and typography will import into Canvas; fine-tune widgets in editor.',
+                );
+                $detected_plugins[] = array(
+                    'slug'        => $pslug,
+                    'name'        => $pname,
+                    'status'      => 'advisory',
+                    'badge'       => 'Visual Continuity',
+                    'description' => 'Layout, styling, and typography will import into Canvas; fine-tune widgets in editor.',
+                );
+            }
+        }
+
+        // 6. Comprehensive Compatibility Matrix ("What will import & what will not")
+        $native_features = array(
+            'Core Elementor Flexbox Containers, Sections & Inner Columns',
+            'Global Site Typography, Color Schemes & Styling Rules',
+            'Hero Sections, Headings, Subheadings & Rich Text Paragraphs',
+            'Buttons, Call-To-Action Links & Custom URL Anchors',
+            'Images, Galleries, Video Embeds & Media Carousels',
+            'Icon Boxes, Counters, Dividers, Spacers & Google Maps',
+            'Full Responsive Layouts (Mobile, Tablet, and Desktop Breakpoints)',
+        );
+
+        $converted_features = array(
+            'Navigation Menus: Automatically bridged to Cora Canvas Navigation System',
+            'Page Slugs & Permalinks: Preserved with 1:1 fidelity for zero broken links',
+        );
+        if ( $has_form_plugin ) {
+            $converted_features[] = 'Lead Forms: Captured and mapped into Cora Native Forms with instant lead capture';
+        }
+
+        // 7. Query WordPress REST API for Page Index
         $discovered_pages = array();
         $rest_endpoint = trailingslashit( $base_url ) . 'wp-json/wp/v2/pages?per_page=50&_fields=id,title,slug,link';
         $rest_res = wp_remote_get( $rest_endpoint, array( 'timeout' => 10, 'sslverify' => false ) );
@@ -539,14 +735,11 @@ class Cora_Elementor_Migrator {
             }
         }
 
-        // 4. Fallback: Parse nav links and title from Homepage HTML if REST API was blocked
+        // Fallback: Parse nav links and title from Homepage HTML if REST API was blocked
         if ( empty( $discovered_pages ) ) {
-            preg_match( '/<title>(.*?)<\/title>/i', $body, $title_match );
-            $site_title = ! empty( $title_match[1] ) ? trim( strip_tags( $title_match[1] ) ) : 'Home Page';
-
             $discovered_pages[] = array(
                 'id'          => 1,
-                'title'       => $site_title,
+                'title'       => $site_name,
                 'slug'        => 'home',
                 'url'         => $url,
                 'is_homepage' => true,
@@ -574,21 +767,41 @@ class Cora_Elementor_Migrator {
             }
         }
 
-        // Count images on page
+        // Count images on homepage
         preg_match_all( '/<img[^>]+src=["\']([^"\']+)["\']/i', $body, $img_matches );
-        $media_count = ! empty( $img_matches[1] ) ? count( array_unique( $img_matches[1] ) ) : 6;
+        $media_count = ! empty( $img_matches[1] ) ? count( array_unique( $img_matches[1] ) ) : 8;
+
+        // Draft Theme Blueprint Calculation
+        $clean_site_label  = preg_replace( '/[^A-Za-z0-9\s\-_]/', '', $site_name );
+        if ( empty( $clean_site_label ) ) {
+            $clean_site_label = ucfirst( $host );
+        }
+        $draft_theme_name  = 'Imported - ' . trim( $clean_site_label );
+        $draft_safety_note = 'Safe Mode Active: All migrated pages will be placed into a newly created Draft Theme (' . $draft_theme_name . '). Your active live theme stays 100% untouched until you review and publish.';
 
         return array(
-            'success'           => true,
-            'url'               => $url,
-            'base_url'          => $base_url,
-            'is_elementor'      => $is_elementor,
-            'is_wordpress'      => $is_wordpress,
-            'elementor_version' => $elementor_version,
-            'discovered_pages'  => $discovered_pages,
-            'total_pages'       => count( $discovered_pages ),
-            'estimated_media'   => $media_count,
-            'status_label'      => $is_elementor ? '100% Elementor Compatible' : 'Standard WordPress Compatible',
+            'success'            => true,
+            'url'                => $url,
+            'base_url'           => $base_url,
+            'site_name'          => $site_name,
+            'site_description'   => $site_description,
+            'theme_slug'         => $theme_slug,
+            'theme_name'         => $theme_name,
+            'theme_version'      => $theme_version,
+            'elementor_version'  => $elementor_version,
+            'is_elementor_pro'   => $is_elementor_pro,
+            'is_elementor'       => $is_elementor,
+            'is_wordpress'       => $is_wordpress,
+            'detected_plugins'   => $detected_plugins,
+            'advisory_plugins'   => $advisory_plugins,
+            'native_features'    => $native_features,
+            'converted_features' => $converted_features,
+            'discovered_pages'   => $discovered_pages,
+            'total_pages'        => count( $discovered_pages ),
+            'estimated_media'    => $media_count,
+            'draft_theme_name'   => $draft_theme_name,
+            'draft_safety_note'  => $draft_safety_note,
+            'status_label'       => 'Elementor Site Inspected & Ready for Safe Draft Import',
         );
     }
 

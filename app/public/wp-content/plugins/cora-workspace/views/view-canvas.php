@@ -2942,46 +2942,111 @@ function cora_get_sparkline_points( $history, $type ) {
                 <div class="space-y-1.5">
                     <label class="block text-[11px] font-mono font-bold text-zinc-600 uppercase tracking-wider">Existing WordPress / Elementor URL</label>
                     <div class="flex items-center gap-2">
-                        <input type="url" id="elem-migrate-url-input" placeholder="https://my-old-photography-studio.com" class="flex-1 px-3.5 py-2.5 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-zinc-950 font-medium bg-zinc-50/50">
-                        <button type="button" onclick="triggerOneClickMigrateAllUrl()" id="elem-btn-oneclick-migrate" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-                            <span>1-Click Import All</span>
+                        <input type="url" id="elem-migrate-url-input" placeholder="https://my-old-website.com" class="flex-1 px-3.5 py-2.5 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-zinc-950 font-medium bg-zinc-50/50" onkeydown="if(event.key==='Enter'){event.preventDefault();triggerScanElementorUrl();}">
+                        <button type="button" onclick="triggerScanElementorUrl()" id="elem-btn-scan-url" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <span>Inspect &amp; Preview Migration</span>
                         </button>
                     </div>
                     <div class="flex items-center justify-between text-[11px] pt-1">
-                        <span class="text-zinc-400">Enter your live URL. Cora extracts pages and sideloads media automatically.</span>
-                        <button type="button" onclick="triggerScanElementorUrl()" class="text-zinc-700 hover:text-zinc-950 font-bold underline cursor-pointer shrink-0">or inspect pages first →</button>
+                        <span class="text-zinc-500">Cora inspects your theme, plugins, and pages to generate a transparent pre-import draft blueprint.</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Step 2: Scanned Pages Selection -->
+            <!-- Step 2: Pre-Migration Blueprint & Inspection View -->
             <div id="elem-url-step-pages" class="space-y-4 hidden">
-                <div class="p-3.5 bg-zinc-50 border border-zinc-200/80 rounded-xl flex items-center justify-between">
-                    <div class="space-y-0.5">
+                <!-- Site Identity Bar -->
+                <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+                    <div class="space-y-0.5 min-w-0 flex-1 mr-3">
                         <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span class="text-xs font-bold text-zinc-950" id="elem-scan-site-url">example.com</span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                            <span class="text-xs font-bold text-zinc-950 truncate" id="elem-scan-site-name">Website Name</span>
+                            <span class="text-[10px] font-mono text-zinc-400 truncate" id="elem-scan-site-url">example.com</span>
                         </div>
-                        <p class="text-[11px] text-zinc-500" id="elem-scan-status-text">Detected Elementor v3.20 • 6 Pages • ~24 Images</p>
+                        <p class="text-[11px] text-zinc-500 truncate" id="elem-scan-status-text">Detected Theme • Elementor v3.x • X Pages • ~Y Images</p>
                     </div>
-                    <button type="button" onclick="resetElementorScan()" class="text-xs font-semibold text-zinc-500 hover:text-zinc-900 underline">Change URL</button>
+                    <button type="button" onclick="resetElementorScan()" class="text-xs font-semibold text-zinc-500 hover:text-zinc-900 underline shrink-0">Change URL</button>
                 </div>
 
-                <div class="space-y-2">
+                <!-- Draft Theme Target Callout -->
+                <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center text-xs shrink-0 font-bold">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </span>
+                        <div class="min-w-0">
+                            <div class="text-xs font-bold text-zinc-950 truncate">Import Destination: <span id="elem-scan-draft-name" class="font-mono font-bold text-zinc-900">Imported - Website</span></div>
+                            <div class="text-[10.5px] text-zinc-500 font-medium">Safe Mode Active: Your active live theme remains 100% untouched.</div>
+                        </div>
+                    </div>
+                    <span class="text-[9.5px] font-mono font-bold uppercase bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded-md shrink-0">Draft Theme</span>
+                </div>
+
+                <!-- Sub-Navigation Selector for Blueprint -->
+                <div class="flex items-center p-1 bg-zinc-100 rounded-xl gap-1">
+                    <button type="button" onclick="switchBlueprintTab('pages')" id="blueprint-tab-btn-pages" class="flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all bg-white text-zinc-950 shadow-2xs">
+                        <span id="blueprint-pages-tab-label">Pages to Import</span>
+                    </button>
+                    <button type="button" onclick="switchBlueprintTab('compatibility')" id="blueprint-tab-btn-compat" class="flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all">
+                        <span>What's Included &amp; Compatibility</span>
+                    </button>
+                </div>
+
+                <!-- Sub-Panel 1: Pages Selection List -->
+                <div id="blueprint-panel-pages" class="space-y-2">
                     <div class="flex items-center justify-between text-xs font-bold text-zinc-700">
-                        <span>Select Pages to Migrate:</span>
-                        <button type="button" onclick="toggleSelectAllElementorPages(this)" class="text-[11px] text-zinc-500 hover:text-zinc-900 font-semibold cursor-pointer">Deselect All</button>
+                        <span>Select Pages to Import:</span>
+                        <button type="button" onclick="toggleSelectAllElementorPages(this)" id="elem-btn-select-all" class="text-[11px] text-zinc-500 hover:text-zinc-900 font-semibold cursor-pointer">Deselect All</button>
                     </div>
                     <div class="border border-zinc-200 rounded-xl divide-y divide-zinc-100 max-h-48 overflow-y-auto" id="elem-scanned-pages-list">
                         <!-- Dynamically populated -->
                     </div>
                 </div>
 
+                <!-- Sub-Panel 2: Compatibility & Plugins Matrix -->
+                <div id="blueprint-panel-compat" class="space-y-3 hidden">
+                    <div class="p-3 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-2">
+                        <span class="text-xs font-bold text-zinc-950 flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            100% Natively Supported &amp; Replicated
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[10.5px] text-zinc-600 font-medium">
+                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Core Containers &amp; Sections</div>
+                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Typography &amp; Global Colors</div>
+                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Hero, Headings &amp; Text</div>
+                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Buttons, Links &amp; CTAs</div>
+                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Images, Galleries &amp; Videos</div>
+                            <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Mobile &amp; Tablet Breakpoints</div>
+                        </div>
+                    </div>
+
+                    <!-- Converted & Bridged Features -->
+                    <div class="p-3 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-1.5" id="blueprint-converted-wrap">
+                        <span class="text-xs font-bold text-zinc-950 flex items-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-amber-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                            Auto-Bridged to Cora Native
+                        </span>
+                        <ul class="text-[10.5px] text-zinc-600 space-y-1 pl-4 list-disc" id="blueprint-converted-list">
+                            <li>Navigation Menus bridged to Canvas Navigation</li>
+                            <li>Page URLs &amp; Slugs preserved with 1:1 fidelity</li>
+                        </ul>
+                    </div>
+
+                    <!-- Detected Plugins Breakdown -->
+                    <div class="space-y-1.5" id="blueprint-plugins-wrap">
+                        <span class="text-xs font-bold text-zinc-900 block">Detected Active Plugins:</span>
+                        <div class="flex flex-wrap gap-1.5" id="blueprint-plugins-chips">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <p class="text-[10px] text-zinc-400 pt-1">Unsupported 3rd-party widget styling is preserved; any specialized dynamic scripts can be adjusted directly in the Canvas Visual Editor.</p>
+                    </div>
+                </div>
+
                 <div class="flex items-center justify-between pt-2 border-t border-zinc-100">
-                    <span class="text-[11px] text-zinc-500 font-medium">Media assets will be automatically sideloaded into local storage.</span>
-                    <button type="button" onclick="triggerMigrateElementorPages()" id="elem-btn-start-migrate" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5">
-                        <span>1-Click Migrate All</span>
+                    <span class="text-[11px] text-zinc-500 font-medium">Sideloads media assets directly into your workspace library.</span>
+                    <button type="button" onclick="triggerMigrateElementorPages()" id="elem-btn-start-migrate" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5">
+                        <span id="elem-btn-start-migrate-label">Start Safe Migration to Draft</span>
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                     </button>
                 </div>
@@ -5745,79 +5810,44 @@ function cora_get_sparkline_points( $history, $type ) {
     }
 
     function resetElementorScan() {
-        elementorScanState = { url: '', pages: [], selectedIndices: [], firstMigratedPostId: null, firstMigratedPageId: null, firstMigratedTitle: '' };
+        elementorScanState = { url: '', pages: [], selectedIndices: [], firstMigratedPostId: null, firstMigratedPageId: null, firstMigratedTitle: '', draftThemeName: '' };
         jQuery('#elem-url-step-input').removeClass('hidden');
         jQuery('#elem-url-step-pages, #elem-url-step-progress, #elem-url-step-success').addClass('hidden');
-        jQuery('#elem-btn-scan-url').prop('disabled', false).html('<span>Scan Site</span><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>');
+        jQuery('#elem-btn-scan-url').prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span>Inspect &amp; Preview Migration</span>');
+    }
+
+    function switchBlueprintTab(tab) {
+        jQuery('#blueprint-tab-btn-pages, #blueprint-tab-btn-compat')
+            .removeClass('bg-white text-zinc-950 font-bold shadow-2xs')
+            .addClass('text-zinc-600 hover:text-zinc-950 font-semibold');
+
+        if (tab === 'pages') {
+            jQuery('#blueprint-tab-btn-pages').addClass('bg-white text-zinc-950 font-bold shadow-2xs').removeClass('text-zinc-600 hover:text-zinc-950 font-semibold');
+            jQuery('#blueprint-panel-pages').removeClass('hidden');
+            jQuery('#blueprint-panel-compat').addClass('hidden');
+        } else {
+            jQuery('#blueprint-tab-btn-compat').addClass('bg-white text-zinc-950 font-bold shadow-2xs').removeClass('text-zinc-600 hover:text-zinc-950 font-semibold');
+            jQuery('#blueprint-panel-compat').removeClass('hidden');
+            jQuery('#blueprint-panel-pages').addClass('hidden');
+        }
+    }
+    window.switchBlueprintTab = switchBlueprintTab;
+
+    function updateMigrateButtonLabel() {
+        const count = elementorScanState.selectedIndices ? elementorScanState.selectedIndices.length : 0;
+        jQuery('#elem-btn-start-migrate-label').text(`Start Safe Migration to Draft (${count} ${count === 1 ? 'Page' : 'Pages'})`);
+        jQuery('#elem-btn-start-migrate').prop('disabled', count === 0);
     }
 
     function triggerOneClickMigrateAllUrl() {
-        let url = jQuery('#elem-migrate-url-input').val().trim();
-        if (!url) {
-            window.coraShowToast('Please enter your existing website URL.', 'error');
-            return;
-        }
-        if (!/^https?:\/\//i.test(url)) {
-            url = 'https://' + url;
-            jQuery('#elem-migrate-url-input').val(url);
-        }
-
-        const btn = jQuery('#elem-btn-oneclick-migrate');
-        btn.prop('disabled', true).html('<span class="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin inline-block mr-1"></span> Processing...');
-
-        jQuery('#elem-url-step-input').addClass('hidden');
-        jQuery('#elem-url-step-pages').addClass('hidden');
-        jQuery('#elem-url-step-progress').removeClass('hidden');
-        jQuery('#elem-progress-bar').css('width', '15%');
-        jQuery('#elem-progress-title').text('Scanning & Discovering Elementor Pages...');
-        jQuery('#elem-progress-sub').text('Checking REST API & layout structures on remote site...');
-
-        jQuery.post(coraREData.ajaxUrl, {
-            action: 'cora_ajax_elementor_scan_url',
-            url: url,
-            nonce: coraREData.ajaxNonce
-        }, function(res) {
-            btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg><span>1-Click Import All</span>');
-
-            if (res.success && res.data && res.data.discovered_pages && res.data.discovered_pages.length > 0) {
-                elementorScanState.url = res.data.url;
-                elementorScanState.pages = res.data.discovered_pages;
-                elementorScanState.selectedIndices = res.data.discovered_pages.map((_, i) => i);
-                elementorScanState.firstMigratedPageId = null;
-                elementorScanState.firstMigratedPostId = null;
-                elementorScanState.firstMigratedTitle = null;
-
-                window.coraShowToast(`Discovered ${res.data.discovered_pages.length} Elementor pages. Starting 1-click import...`);
-                triggerMigrateElementorPages();
-            } else {
-                jQuery('#elem-url-step-progress').addClass('hidden');
-                jQuery('#elem-url-step-input').removeClass('hidden');
-                const msg = (res.data && res.data.message) ? res.data.message : 'Could not detect Elementor on this site. Cora only supports Elementor-based themes.';
-                window.coraShowToast(msg, 'error');
-            }
-        }).fail(function(xhr) {
-            btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg><span>1-Click Import All</span>');
-            jQuery('#elem-url-step-progress').addClass('hidden');
-            jQuery('#elem-url-step-input').removeClass('hidden');
-
-            let errorMsg = 'Network error during scan. Ensure URL is reachable.';
-            if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
-                errorMsg = xhr.responseJSON.data.message;
-            } else if (xhr.responseText) {
-                try {
-                    const parsed = JSON.parse(xhr.responseText);
-                    if (parsed.data && parsed.data.message) errorMsg = parsed.data.message;
-                } catch (e) {}
-            }
-            window.coraShowToast(errorMsg, 'error');
-        });
+        triggerScanElementorUrl();
     }
     window.triggerOneClickMigrateAllUrl = triggerOneClickMigrateAllUrl;
 
     function triggerScanElementorUrl() {
         let url = jQuery('#elem-migrate-url-input').val().trim();
         if (!url) {
-            window.coraShowToast('Please enter a valid website URL.', 'error');
+            window.coraShowToast('Please enter your website URL.', 'error');
             return;
         }
         if (!/^https?:\/\//i.test(url)) {
@@ -5826,25 +5856,37 @@ function cora_get_sparkline_points( $history, $type ) {
         }
 
         const scanBtn = jQuery('#elem-btn-scan-url');
-        scanBtn.prop('disabled', true).html('<span class="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin inline-block mr-1"></span> Scanning...');
+        scanBtn.prop('disabled', true).html('<span class="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin inline-block mr-1"></span> Inspecting Remote Site...');
 
-        window.coraShowToast('Scanning remote website for Elementor schema...');
+        window.coraShowToast('Deep inspecting website theme, plugins, and pages...');
 
         jQuery.post(coraREData.ajaxUrl, {
             action: 'cora_ajax_elementor_scan_url',
             url: url,
             nonce: coraREData.ajaxNonce
         }, function(res) {
-            scanBtn.prop('disabled', false).html('<span>Scan Site</span><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>');
+            scanBtn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span>Inspect &amp; Preview Migration</span>');
 
             if (res.success && res.data) {
                 const data = res.data;
                 elementorScanState.url = data.url;
                 elementorScanState.pages = data.discovered_pages || [];
                 elementorScanState.selectedIndices = elementorScanState.pages.map((_, i) => i);
+                elementorScanState.draftThemeName = data.draft_theme_name || 'Imported - Website';
 
-                jQuery('#elem-scan-site-url').text(data.base_url.replace(/^https?:\/\//, ''));
-                jQuery('#elem-scan-status-text').text(`Detected Elementor v${data.elementor_version || '3.x'} • ${data.total_pages} Pages • ~${data.estimated_media || 12} Images`);
+                // Update Site Details
+                jQuery('#elem-scan-site-name').text(data.site_name || 'Website');
+                jQuery('#elem-scan-site-url').text(data.base_url ? data.base_url.replace(/^https?:\/\//, '') : '');
+                jQuery('#elem-scan-draft-name').text(data.draft_theme_name || 'Imported - Website');
+                
+                const proTag = data.is_elementor_pro ? ' Pro' : '';
+                const themeTitle = data.theme_name || 'Hello Elementor';
+                const elVer = data.elementor_version ? `v${data.elementor_version}` : 'v3.x';
+                jQuery('#elem-scan-status-text').text(`Theme: ${themeTitle} • Elementor ${elVer}${proTag} • ${data.total_pages} Pages • ~${data.estimated_media || 8} Images`);
+
+                // Update tab and CTA labels
+                jQuery('#blueprint-pages-tab-label').text(`Pages to Import (${elementorScanState.pages.length})`);
+                updateMigrateButtonLabel();
 
                 // Render page items
                 const list = jQuery('#elem-scanned-pages-list');
@@ -5852,30 +5894,65 @@ function cora_get_sparkline_points( $history, $type ) {
 
                 elementorScanState.pages.forEach((p, idx) => {
                     list.append(`
-                        <label class="flex items-center justify-between p-3 hover:bg-zinc-50/80 cursor-pointer transition-colors">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" checked onchange="toggleElementorPageCheckbox(${idx}, this.checked)" class="accent-zinc-950 rounded cursor-pointer">
-                                <div>
-                                    <div class="text-xs font-bold text-zinc-900">${esc_html(p.title)}</div>
-                                    <div class="text-[10px] text-zinc-400 font-mono font-medium">${esc_html(p.url)}</div>
+                        <label class="flex items-center justify-between p-2.5 hover:bg-zinc-50/80 cursor-pointer transition-colors text-left">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
+                                <input type="checkbox" checked onchange="toggleElementorPageCheckbox(${idx}, this.checked)" class="accent-zinc-950 rounded cursor-pointer shrink-0">
+                                <div class="min-w-0">
+                                    <div class="text-xs font-bold text-zinc-900 truncate">${esc_html(p.title)}</div>
+                                    <div class="text-[10px] text-zinc-400 font-mono truncate">${esc_html(p.url)}</div>
                                 </div>
                             </div>
-                            <span class="text-[9px] font-mono font-semibold bg-zinc-100 px-2 py-0.5 rounded text-zinc-600 border border-zinc-200">
+                            <span class="text-[9px] font-mono font-semibold bg-zinc-100 px-2 py-0.5 rounded text-zinc-600 border border-zinc-200 shrink-0">
                                 ${p.is_homepage ? 'HOMEPAGE' : 'PAGE'}
                             </span>
                         </label>
                     `);
                 });
 
+                // Render converted features
+                const convList = jQuery('#blueprint-converted-list');
+                convList.empty();
+                if (data.converted_features && data.converted_features.length) {
+                    data.converted_features.forEach(feat => {
+                        convList.append(`<li>${esc_html(feat)}</li>`);
+                    });
+                    jQuery('#blueprint-converted-wrap').removeClass('hidden');
+                } else {
+                    jQuery('#blueprint-converted-wrap').addClass('hidden');
+                }
+
+                // Render detected plugins chips
+                const chips = jQuery('#blueprint-plugins-chips');
+                chips.empty();
+                if (data.detected_plugins && data.detected_plugins.length) {
+                    data.detected_plugins.forEach(p => {
+                        let badgeClass = 'bg-zinc-100 text-zinc-700 border-zinc-200';
+                        if (p.status === 'native') badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                        else if (p.status === 'converted') badgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
+                        
+                        chips.append(`
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${badgeClass} text-[10.5px] font-semibold" title="${esc_html(p.description || '')}">
+                                <span class="text-zinc-900">${esc_html(p.name)}</span>
+                                <span class="text-[9px] font-mono uppercase opacity-75 font-bold">(${esc_html(p.badge)})</span>
+                            </span>
+                        `);
+                    });
+                    jQuery('#blueprint-plugins-wrap').removeClass('hidden');
+                } else {
+                    jQuery('#blueprint-plugins-wrap').addClass('hidden');
+                }
+
+                // Switch view to blueprint
+                switchBlueprintTab('pages');
                 jQuery('#elem-url-step-input').addClass('hidden');
                 jQuery('#elem-url-step-pages').removeClass('hidden');
-                window.coraShowToast('Elementor site validated! Select pages to migrate.');
+                window.coraShowToast('Website inspected! Full draft blueprint ready for review.', 'success');
             } else {
                 const msg = (res.data && res.data.message) ? res.data.message : 'Could not detect Elementor on this site.';
                 window.coraShowToast(msg, 'error');
             }
         }).fail(function(xhr) {
-            scanBtn.prop('disabled', false).html('<span>Scan Site</span><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>');
+            scanBtn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span>Inspect &amp; Preview Migration</span>');
 
             let errorMsg = 'Network error during scan. Ensure URL is reachable.';
             if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
@@ -5898,6 +5975,7 @@ function cora_get_sparkline_points( $history, $type ) {
         } else {
             elementorScanState.selectedIndices = elementorScanState.selectedIndices.filter(i => i !== idx);
         }
+        updateMigrateButtonLabel();
     }
 
     function toggleSelectAllElementorPages(btn) {
@@ -5913,6 +5991,7 @@ function cora_get_sparkline_points( $history, $type ) {
             elementorScanState.selectedIndices = elementorScanState.pages.map((_, i) => i);
             jQuery(btn).text('Deselect All');
         }
+        updateMigrateButtonLabel();
     }
 
     function triggerMigrateElementorPages() {
@@ -5932,13 +6011,15 @@ function cora_get_sparkline_points( $history, $type ) {
 
         // Provision a new dedicated Draft Theme for this import
         const scanUrl = elementorScanState.url || '';
-        let defaultThemeName = '';
-        try {
-            if (scanUrl) {
-                const host = new URL(scanUrl).hostname;
-                defaultThemeName = 'Imported - ' + (host ? host.replace(/^www\./, '') : 'Website');
-            }
-        } catch(e) {}
+        let defaultThemeName = elementorScanState.draftThemeName || '';
+        if (!defaultThemeName) {
+            try {
+                if (scanUrl) {
+                    const host = new URL(scanUrl).hostname;
+                    defaultThemeName = 'Imported - ' + (host ? host.replace(/^www\./, '') : 'Website');
+                }
+            } catch(e) {}
+        }
 
         jQuery.post(coraREData.ajaxUrl, {
             action: 'cora_ajax_elementor_create_draft_theme',
@@ -5947,7 +6028,7 @@ function cora_get_sparkline_points( $history, $type ) {
             nonce: coraREData.ajaxNonce
         }, function(themeRes) {
             let targetThemeId = canvasState.activeThemeId;
-            let targetThemeName = 'Imported Theme';
+            let targetThemeName = defaultThemeName || 'Imported Theme';
 
             if (themeRes && themeRes.success && themeRes.data) {
                 targetThemeId = themeRes.data.theme_id;
