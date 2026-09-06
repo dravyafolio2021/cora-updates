@@ -5499,9 +5499,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 $greeting_title = $greeting_time . ', ' . $user_first_name . '.';
 
                 // Calculate telemetry metrics per industry mode
-                $cora_workspace_industry_raw = ! empty( $_COOKIE['cora_workspace_industry'] ) 
-                    ? $_COOKIE['cora_workspace_industry'] 
-                    : ( function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : get_option( 'cora_workspace_industry', 'real_estate' ) );
+                $cora_workspace_industry_raw = ! empty( $_GET['industry'] )
+                    ? sanitize_text_field( $_GET['industry'] )
+                    : ( ! empty( $_COOKIE['cora_workspace_industry'] ) 
+                        ? $_COOKIE['cora_workspace_industry'] 
+                        : ( function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : get_option( 'cora_workspace_industry', 'real_estate' ) ) );
                 $cora_industry_mode_clean = str_replace( '_', '-', strtolower( trim( $cora_workspace_industry_raw ) ) );
                 $is_studio = ( $cora_industry_mode_clean === 'photography-studio' || $cora_industry_mode_clean === 'photography' );
 
@@ -5567,15 +5569,21 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 global $wpdb;
 
                 // Compute counts for generic/custom/new workspace metrics
+                $active_agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+
+                // Compute counts for generic/custom/new workspace metrics (strictly scoped to active workspace)
                 $active_themes_count = 0;
                 if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_canvas_themes'" ) ) {
-                    $active_themes_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live'" );
+                    $active_themes_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live'", $active_agency_id ) );
                     if ( $active_themes_count === 0 ) {
-                        $active_themes_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes" );
+                        $active_themes_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d", $active_agency_id ) );
+                    }
+                    if ( $active_themes_count === 0 && function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) {
+                        $active_themes_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live'" );
                     }
                 }
 
-                $total_users_count = function_exists( 'get_users' ) ? count( get_users() ) : ( is_array( $cora_users ) ? count( $cora_users ) : 1 );
+                $total_users_count = ( is_array( $cora_users ) && ! empty( $cora_users ) ) ? count( $cora_users ) : ( function_exists( 'get_users' ) ? count( get_users() ) : 1 );
 
                 $articles_count = 0;
                 if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_content_items'" ) ) {
@@ -5587,7 +5595,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
                 $form_entries_count = 0;
                 if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_form_submissions'" ) ) {
-                    $form_entries_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions" );
+                    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_forms'" ) ) {
+                        $agency_form_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_forms WHERE agency_id = %d", $active_agency_id ) );
+                        if ( ! empty( $agency_form_ids ) ) {
+                            $in_sql = implode( ',', array_map( 'intval', $agency_form_ids ) );
+                            $form_entries_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE form_id IN ($in_sql)" );
+                        }
+                    } else {
+                        $form_entries_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions" );
+                    }
                 }
 
                 $is_new_workspace = ( empty( $cora_workspace_leads ) && empty( $cora_workspace_listings ) && empty( $cora_workspace_clients ) && empty( $all_bookings ) );
