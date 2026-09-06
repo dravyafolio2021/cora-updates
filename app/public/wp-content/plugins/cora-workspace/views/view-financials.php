@@ -78,6 +78,73 @@ $default_categories = array(
 );
 $all_expense_categories = array_values( array_unique( array_merge( $default_categories, $custom_categories ) ) );
 
+// ── Build Unified Chronological Ledger & Activity Stream ──
+$all_transactions = array();
+
+// 1. Receivables (Money In)
+foreach ( $receivables as $r ) {
+    $all_transactions[] = array(
+        'id'          => $r['id'] ?? ( $r['invoice_number'] ?? uniqid('inv_') ),
+        'title'       => ( $r['client_name'] ?? 'Client' ) . ' — ' . ( $r['package_name'] ?? 'Invoice' ),
+        'type'        => 'inflow',
+        'amount'      => floatval( $r['due_balance'] ?: ( $r['total_amount'] ?? 0 ) ),
+        'date'        => $r['due_date'] ?? date('Y-m-d'),
+        'category'    => 'Client Invoice (' . ( $r['invoice_number'] ?? 'Draft' ) . ')',
+        'status'      => $r['status'] ?? 'pending',
+        'is_overdue'  => ! empty( $r['is_overdue'] ),
+        'days_overdue'=> intval( $r['days_overdue'] ?? 0 ),
+        'invoice_num' => $r['invoice_number'] ?? '',
+        'client_name' => $r['client_name'] ?? '',
+        'action_type' => 'invoice',
+    );
+}
+
+// 2. Expenses (Money Out)
+$ledger_table = $wpdb->prefix . 'cora_ledger';
+$db_expenses = array();
+if ( $wpdb->get_var( "SHOW TABLES LIKE '{$ledger_table}'" ) === $ledger_table ) {
+    $db_expenses = $wpdb->get_results(
+        $wpdb->prepare( "SELECT * FROM {$ledger_table} WHERE agency_id = %d AND type = 'outflow' ORDER BY transaction_date DESC, id DESC LIMIT 50", $agency_id ),
+        ARRAY_A
+    ) ?: array();
+}
+if ( empty( $db_expenses ) ) {
+    $opt_ledger = get_option( "cora_workspace_ledger_{$agency_id}", array() );
+    if ( empty( $opt_ledger ) && $agency_id === 1 ) {
+        $opt_ledger = get_option( 'cora_workspace_ledger', array() );
+    }
+    foreach ( (array) $opt_ledger as $ol ) {
+        if ( ( $ol['type'] ?? '' ) === 'outflow' ) {
+            $db_expenses[] = $ol;
+        }
+    }
+}
+foreach ( (array) $db_expenses as $exp ) {
+    $amt = floatval( $exp['amount'] ?? 0 );
+    if ( isset( $exp['agency_id'] ) && $amt > 100000 && ! empty( $exp['created_at'] ) && $amt == intval($amt) && $amt % 100 === 0 ) {
+        $amt = $amt / 100.0;
+    }
+    $all_transactions[] = array(
+        'id'          => $exp['id'] ?? uniqid('exp_'),
+        'title'       => $exp['description'] ?? 'Business Expense',
+        'type'        => 'outflow',
+        'amount'      => $amt,
+        'date'        => $exp['date'] ?? ( $exp['transaction_date'] ?? date('Y-m-d') ),
+        'category'    => $exp['category'] ?? 'Operations',
+        'status'      => 'paid',
+        'is_overdue'  => false,
+        'days_overdue'=> 0,
+        'invoice_num' => '',
+        'client_name' => $exp['client_link'] ?? '',
+        'action_type' => 'expense',
+    );
+}
+
+// Chronological sort: newest first
+usort( $all_transactions, function( $a, $b ) {
+    return strtotime( $b['date'] ) <=> strtotime( $a['date'] );
+} );
+
 
 
 // Standardized Page Header
@@ -176,15 +243,15 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         .cora-sidebar.collapsed-sidebar ~ main #cora-fin-copilot-container {
             padding-left: 64px;
         }
+        /* Mobile adjustment: bottom-anchored, zero side drawer, touch friendly */
         @media (max-width: 1023px) {
             #cora-fin-copilot-container {
-                display: none !important;
-                pointer-events: none !important;
-                visibility: hidden !important;
+                padding-left: 0 !important;
+                bottom: 16px !important;
             }
         }
         #cora-fin-copilot-bar, #cora-fin-copilot-window {
-            width: calc(100% - 48px) !important;
+            width: calc(100% - 32px) !important;
             max-width: 800px !important;
             margin: 0 auto;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -215,6 +282,38 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             opacity: 1 !important;
             pointer-events: auto !important;
             transform: scale(1) !important;
+        }
+
+        /* ── High-Quality Voice Waveform Animation ── */
+        .cora-voice-wave {
+            display: inline-flex;
+            align-items: center;
+            gap: 2.5px;
+            height: 18px;
+        }
+        .cora-voice-wave-bar {
+            width: 3px;
+            background-color: #09090b;
+            border-radius: 9999px;
+            animation: coraVoicePulse 0.9s ease-in-out infinite alternate;
+        }
+        .cora-voice-wave-bar:nth-child(1) { height: 6px; animation-delay: 0.1s; }
+        .cora-voice-wave-bar:nth-child(2) { height: 16px; animation-delay: 0.25s; }
+        .cora-voice-wave-bar:nth-child(3) { height: 11px; animation-delay: 0.15s; }
+        .cora-voice-wave-bar:nth-child(4) { height: 18px; animation-delay: 0.35s; }
+        .cora-voice-wave-bar:nth-child(5) { height: 8px; animation-delay: 0.2s; }
+        @keyframes coraVoicePulse {
+            0% { height: 4px; opacity: 0.4; }
+            100% { height: 18px; opacity: 1; }
+        }
+        .cora-mic-listening {
+            box-shadow: 0 0 0 0 rgba(9, 9, 11, 0.4);
+            animation: coraMicRing 1.5s infinite;
+        }
+        @keyframes coraMicRing {
+            0% { box-shadow: 0 0 0 0 rgba(9, 9, 11, 0.5); }
+            70% { box-shadow: 0 0 0 10px rgba(9, 9, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(9, 9, 11, 0); }
         }
     </style>
 
@@ -279,187 +378,252 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </button>
     </div>
 
-    <!-- ══ SUB-NAVIGATION TABS (Zero Scrollbar, Clean & Minimal) ══ -->
-    <div class="border-b border-zinc-200 pb-3 select-none">
+    <!-- ══ SIMPLIFIED FINANCIAL NAVIGATION (Agent-First & Clear Ledger) ══ -->
+    <div class="border-b border-zinc-200 pb-3 select-none flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <!-- Core View Switcher -->
         <div class="flex items-center gap-1.5 overflow-x-auto cora-no-scrollbar py-0.5">
-            <button type="button" onclick="window.coraSwitchFinTab('fin-home')" id="tab-btn-fin-home" class="cora-fin-pill-tab active px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white cursor-pointer shrink-0 border-0">
-                Overview &amp; AI Briefing
+            <button type="button" onclick="window.coraSwitchFinTab('fin-agent')" id="tab-btn-fin-agent" class="cora-fin-pill-tab active px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white cursor-pointer shrink-0 border-0 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>Financial AI Agent</span>
             </button>
-            <button type="button" onclick="window.coraSwitchFinTab('fin-receivables')" id="tab-btn-fin-receivables" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0 flex items-center gap-1.5">
-                <span>Money In (Receivables)</span>
-                <?php if ( $overdue_count > 0 ) : ?>
-                    <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700"><?php echo $overdue_count; ?></span>
-                <?php endif; ?>
+            <button type="button" onclick="window.coraSwitchFinTab('fin-ledger')" id="tab-btn-fin-ledger" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0 flex items-center gap-1.5">
+                <span>Ledger &amp; Activity</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-700"><?php echo count($all_transactions); ?></span>
             </button>
-            <button type="button" onclick="window.coraSwitchFinTab('fin-expenses')" id="tab-btn-fin-expenses" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0">
-                Money Out &amp; Subscriptions
+        </div>
+
+        <!-- Quick Access & All Tools -->
+        <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="window.coraOpenDrawer('create-invoice')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>+ Invoice</span>
             </button>
-            <button type="button" onclick="window.coraSwitchFinTab('fin-profitability')" id="tab-btn-fin-profitability" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0">
-                Profitability &amp; Clients
+            <button type="button" onclick="window.coraOpenDrawer('add-expense')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 cursor-pointer border-0 flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>- Expense</span>
             </button>
-            <button type="button" onclick="window.coraSwitchFinTab('fin-forecast')" id="tab-btn-fin-forecast" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0">
-                Cash Flow Forecast
+            <button type="button" onclick="window.toggleFinancialActionMenu(event)" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-700 hover:bg-zinc-100 border border-zinc-200 cursor-pointer transition-colors flex items-center gap-1.5">
+                <span>All Tools</span>
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
-            <button type="button" onclick="window.coraSwitchFinTab('fin-tax')" id="tab-btn-fin-tax" class="cora-fin-pill-tab px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 cursor-pointer shrink-0 border-0">
-                Tax &amp; GST Estimates
-            </button>
+        </div>
+    </div>
+
+    <!-- ══ CORE FINANCIAL METRICS (Always Visible: Available, In, Out, Runway) ══ -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <!-- Card 1: Available Cash -->
+        <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Available Cash</span>
+                <span class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">₹</span>
+            </div>
+            <div>
+                <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $available_cash ); ?></div>
+                <div class="text-[11px] text-zinc-500 font-medium mt-0.5">Cleared funds in bank</div>
+            </div>
+            <?php 
+            if ( $monthly_rec > 0 && $available_cash > 0 ) {
+                $runway_months = round( $available_cash / $monthly_rec, 1 );
+                $buffer_badge_class = 'text-zinc-800 bg-zinc-100';
+                $buffer_badge_text = "● Buffer: ~{$runway_months} Mo Safe";
+            } elseif ( $available_cash > 0 ) {
+                $buffer_badge_class = 'text-zinc-800 bg-zinc-100';
+                $buffer_badge_text = "● Buffer: ₹" . number_format($available_cash);
+            } else {
+                $buffer_badge_class = 'text-zinc-500 bg-zinc-100';
+                $buffer_badge_text = "Ready to record";
+            }
+            ?>
+            <div class="text-[10px] font-semibold <?php echo $buffer_badge_class; ?> px-2 py-0.5 rounded-md inline-block w-fit">
+                <?php echo esc_html( $buffer_badge_text ); ?>
+            </div>
+        </div>
+
+        <!-- Card 2: Expected In (Receivables) -->
+        <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Incoming (Money In)</span>
+                <button type="button" onclick="window.coraOpenDrawer('create-invoice')" class="text-[10px] font-bold text-zinc-950 hover:underline border-0 bg-transparent cursor-pointer p-0">
+                    + Draft
+                </button>
+            </div>
+            <div>
+                <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $expected_in ); ?></div>
+                <div class="text-[11px] text-zinc-500 font-medium mt-0.5">Uncollected receivables</div>
+            </div>
+            <div class="text-[10px] font-semibold <?php echo $overdue_total > 0 ? 'text-red-700 bg-red-50' : 'text-zinc-500 bg-zinc-100'; ?> px-2 py-0.5 rounded-md inline-block w-fit">
+                <?php echo $overdue_total > 0 ? '₹' . number_format( $overdue_total ) . ' Overdue' : 'All on time'; ?>
+            </div>
+        </div>
+
+        <!-- Card 3: Expected Out (Commitments) -->
+        <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Outgoing (Money Out)</span>
+                <button type="button" onclick="window.coraOpenDrawer('add-expense')" class="text-[10px] font-bold text-zinc-950 hover:underline border-0 bg-transparent cursor-pointer p-0">
+                    - Log
+                </button>
+            </div>
+            <div>
+                <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $expected_out ); ?></div>
+                <div class="text-[11px] text-zinc-500 font-medium mt-0.5">Recurring overhead &amp; bills</div>
+            </div>
+            <div class="text-[10px] font-semibold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-md inline-block w-fit">
+                ₹<?php echo number_format( $monthly_rec ); ?>/mo Fixed
+            </div>
+        </div>
+
+        <!-- Card 4: Projected Cash -->
+        <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Projected Cash</span>
+                <span class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </span>
+            </div>
+            <div>
+                <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $projected_cash ); ?></div>
+                <div class="text-[11px] text-zinc-500 font-medium mt-0.5">After pending settlements</div>
+            </div>
+            <div class="text-[10px] font-semibold <?php echo $projected_cash >= 0 ? 'text-zinc-800 bg-zinc-100' : 'text-red-700 bg-red-50'; ?> px-2 py-0.5 rounded-md inline-block w-fit">
+                Net: <?php echo $projected_cash >= 0 ? 'Healthy Position' : 'Deficit Warning'; ?>
+            </div>
         </div>
     </div>
 
 
     <!-- ════════════════════════════════════════════════════════
-         TAB 1: OVERVIEW & AI BRIEFING
+         TAB 1: FINANCIAL AI AGENT (HERO VOICE & DISCUSSION COMMAND HUB)
+         (Also aliased to tab-fin-home for complete backward compatibility)
          ════════════════════════════════════════════════════════ -->
-    <div id="tab-fin-home" class="cora-fin-tab-panel space-y-6">
+    <div id="tab-fin-agent" class="cora-fin-tab-panel space-y-6">
 
-        <!-- 1. FINANCIAL SNAPSHOT (4 Core Numbers at Top Priority) -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <!-- Card 1: Available Cash -->
-            <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Available Cash</span>
-                    <span class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">₹</span>
-                </div>
-                <div>
-                    <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $available_cash ); ?></div>
-                    <div class="text-[11px] text-zinc-500 font-medium mt-0.5">Cleared in recorded accounts</div>
-                </div>
-                <?php 
-                if ( $monthly_rec > 0 && $available_cash > 0 ) {
-                    $runway_months = round( $available_cash / $monthly_rec, 1 );
-                    $buffer_badge_class = 'text-zinc-800 bg-zinc-100';
-                    $buffer_badge_text = "● Buffer: ~{$runway_months} Mo Safe";
-                } elseif ( $available_cash > 0 ) {
-                    $buffer_badge_class = 'text-zinc-800 bg-zinc-100';
-                    $buffer_badge_text = "● Buffer: ₹" . number_format($available_cash);
-                } else {
-                    $buffer_badge_class = 'text-zinc-500 bg-zinc-100';
-                    $buffer_badge_text = "Ready to record";
-                }
-                ?>
-                <div class="text-[10px] font-semibold <?php echo $buffer_badge_class; ?> px-2 py-0.5 rounded-md inline-block w-fit">
-                    <?php echo esc_html( $buffer_badge_text ); ?>
-                </div>
-            </div>
-
-            <!-- Card 2: Expected In (Receivables) -->
-            <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Expected In</span>
-                    <span class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-                    </span>
-                </div>
-                <div>
-                    <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $expected_in ); ?></div>
-                    <div class="text-[11px] text-zinc-500 font-medium mt-0.5">From outstanding invoices</div>
-                </div>
-                <div class="text-[10px] font-semibold <?php echo $overdue_total > 0 ? 'text-red-700 bg-red-50' : 'text-zinc-500 bg-zinc-100'; ?> px-2 py-0.5 rounded-md inline-block w-fit">
-                    <?php echo $overdue_total > 0 ? '₹' . number_format( $overdue_total ) . ' Overdue' : '0 Overdue'; ?>
-                </div>
-            </div>
-
-            <!-- Card 3: Expected Out (Commitments) -->
-            <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Expected Out</span>
-                    <span class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-                    </span>
-                </div>
-                <div>
-                    <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $expected_out ); ?></div>
-                    <div class="text-[11px] text-zinc-500 font-medium mt-0.5">Recurring bills &amp; payouts</div>
-                </div>
-                <div class="text-[10px] font-semibold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-md inline-block w-fit">
-                    ₹<?php echo number_format( $monthly_rec ); ?>/mo Fixed
-                </div>
-            </div>
-
-            <!-- Card 4: Projected Cash -->
-            <div class="cora-fin-card p-4 flex flex-col justify-between gap-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Projected Cash</span>
-                    <span class="w-6 h-6 rounded-lg bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    </span>
-                </div>
-                <div>
-                    <div class="text-2xl font-extrabold text-zinc-950 cora-mono-num">₹<?php echo number_format( $projected_cash ); ?></div>
-                    <div class="text-[11px] text-zinc-500 font-medium mt-0.5">After collections &amp; expenses</div>
-                </div>
-                <div class="text-[10px] font-semibold <?php echo $projected_cash >= 0 ? 'text-zinc-800 bg-zinc-100' : 'text-red-700 bg-red-50'; ?> px-2 py-0.5 rounded-md inline-block w-fit">
-                    Net: <?php echo $projected_cash >= 0 ? 'Healthy Position' : 'Deficit Warning'; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. FINANCIAL AGENT INSIGHT (Clean, Compact Monochromatic Card) -->
-        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200 shadow-xs space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
+        <!-- 1. HERO FINANCIAL AI AGENT DISCUSSION CARD -->
+        <div class="cora-fin-card p-5 bg-white border border-zinc-200 shadow-sm space-y-4">
+            
+            <!-- Agent Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-zinc-100">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center font-bold text-xs shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
                         C
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-zinc-900">Financial Agent</span>
-                            <span class="px-1.5 py-0.2 rounded text-[9.5px] font-semibold bg-zinc-100 text-zinc-600">Live Analysis</span>
+                            <span class="text-sm font-bold text-zinc-950">Financial AI Agent</span>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                <span>Live Ledger Connected</span>
+                            </span>
                         </div>
-                        <p class="text-xs text-zinc-600 font-medium mt-0.5" id="cora-take-headline">
-                            <?php echo esc_html( $cora_take['headline'] ?? 'Your cash buffer is healthy; collecting overdue receivables will optimize month-end position.' ); ?>
-                        </p>
+                        <div class="text-[11px] text-zinc-500 font-medium mt-0.5">
+                            Direct action-oriented discussion: log expenses by voice, draft GST invoices, evaluate deal margins, and audit runway.
+                        </div>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0">
-                    <button type="button" onclick="window.coraOpenCopilot()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 transition-all cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                        <span>Ask Cora</span>
+                    <span id="cora-voice-status-pill" class="hidden px-2.5 py-1 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-800 items-center gap-1.5">
+                        <span class="cora-voice-wave">
+                            <span class="cora-voice-wave-bar"></span>
+                            <span class="cora-voice-wave-bar"></span>
+                            <span class="cora-voice-wave-bar"></span>
+                            <span class="cora-voice-wave-bar"></span>
+                            <span class="cora-voice-wave-bar"></span>
+                        </span>
+                        <span id="cora-voice-status-text">Listening...</span>
+                    </span>
+                    <button type="button" onclick="window.coraClearAgentChat()" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 border border-zinc-200 cursor-pointer transition-colors" title="Clear Discussion">
+                        Clear Discussion
                     </button>
-                    <button type="button" onclick="window.coraRefreshFinancials()" class="w-7 h-7 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border border-zinc-200 transition-all" title="Refresh Live Data">
+                    <button type="button" onclick="window.coraRefreshFinancials()" class="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center cursor-pointer border border-zinc-200 transition-colors" title="Refresh Live Ledger">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                     </button>
                 </div>
             </div>
 
-            <!-- Bullet Points (Clean 3-column micro layout on desktop, clean compact stack on mobile) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs text-zinc-600">
-                <?php 
-                $bullets = ! empty( $cora_take['bullets'] ) ? $cora_take['bullets'] : array(
-                    'Zero outstanding overdue payments across this workspace.',
-                    'No active fixed overhead commitments recorded yet.',
-                    'Runway trajectory will calibrate automatically as project revenue is logged.'
-                );
-                foreach ( $bullets as $idx => $bullet ) : 
-                ?>
-                <div class="flex items-start gap-2 bg-zinc-50 p-2.5 rounded-xl border border-zinc-100 text-[11px] leading-relaxed">
-                    <span class="text-zinc-400 font-bold"><?php echo ($idx + 1); ?>.</span>
-                    <span class="text-zinc-700"><?php echo wp_kses_post( $bullet ); ?></span>
+            <!-- Live Speech Real-time Transcript Banner (Visible while recording) -->
+            <div id="cora-voice-live-banner" class="hidden p-3 rounded-xl bg-zinc-50 border border-zinc-200 text-xs text-zinc-800 flex items-center justify-between gap-3 animate-pulse">
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping shrink-0"></span>
+                    <span class="font-bold text-zinc-950 shrink-0">Speech In:</span>
+                    <span id="cora-voice-live-transcript" class="italic text-zinc-600 truncate">Listening... speak naturally...</span>
                 </div>
-                <?php endforeach; ?>
+                <button type="button" onclick="window.coraStopVoiceAgent()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-950 text-white hover:bg-zinc-800 shrink-0 border-0 cursor-pointer">
+                    Done Speaking
+                </button>
             </div>
+
+            <!-- Discussion Feed (Initial greeting + dynamic bubbles + Action Cards) -->
+            <div id="cora-agent-chat-feed" class="space-y-3.5 max-h-[420px] overflow-y-auto p-1 pr-2 cora-no-scrollbar">
+                <div class="flex justify-start">
+                    <div class="bg-[#FBFaf7] border border-zinc-200 rounded-2xl rounded-tl-sm p-4 text-xs text-zinc-800 max-w-[92%] sm:max-w-[85%] space-y-2.5 shadow-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-md bg-zinc-900 text-white flex items-center justify-center font-bold text-[10px]">C</span>
+                            <span class="font-bold text-zinc-950">Financial Agent</span>
+                            <span class="text-[10px] text-zinc-400">Ledger Assistant</span>
+                        </div>
+                        <div class="leading-relaxed text-zinc-700">
+                            Good day! You have <strong class="text-zinc-950 font-mono">₹<?php echo number_format( $available_cash ); ?></strong> in cleared bank funds, with <strong class="text-zinc-950 font-mono">₹<?php echo number_format( $expected_in ); ?></strong> in uncollected receivables.
+                            <?php if ( $overdue_total > 0 ) : ?>
+                                <span class="text-red-700 font-semibold">(₹<?php echo number_format($overdue_total); ?> overdue).</span>
+                            <?php endif; ?>
+                            <br><br>
+                            Tap the microphone or type below. I can log business expenses, draft GST invoices, audit runway, or simulate project deal margins for you.
+                        </div>
+                        <!-- Proactive Starter Chips -->
+                        <div class="pt-1">
+                            <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5">Action Prompts</div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button type="button" onclick="window.coraRunAgentPrompt('Log ₹4,500 gear expense')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
+                                    Log ₹4,500 gear expense
+                                </button>
+                                <button type="button" onclick="window.coraRunAgentPrompt('Draft invoice for client Rohan Verma')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
+                                    Draft invoice for client
+                                </button>
+                                <button type="button" onclick="window.coraRunAgentPrompt('Who owes me money right now?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
+                                    Who owes me money?
+                                </button>
+                                <button type="button" onclick="window.coraRunAgentPrompt('What is my cash runway?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
+                                    What is my cash runway?
+                                </button>
+                                <button type="button" onclick="window.coraRunAgentPrompt('Can I afford a ₹35k hire?')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
+                                    Can I afford a ₹35k hire?
+                                </button>
+                                <button type="button" onclick="window.coraRunAgentPrompt('Simulate a 1.5 lakh deal with 35k costs')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 cursor-pointer transition-colors">
+                                    Simulate ₹1.5L project
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice & Text Input Console (Responsive & Action-Oriented) -->
+            <div class="pt-2 border-t border-zinc-100">
+                <form onsubmit="window.coraSubmitAgentMessage(event)" class="flex items-center gap-2 bg-zinc-50 border border-zinc-200 rounded-2xl p-2 transition-all focus-within:border-zinc-900 focus-within:bg-white shadow-xs">
+                    <!-- Voice Microphone Toggle Button -->
+                    <button type="button" id="cora-agent-voice-btn" onclick="window.coraToggleVoiceAgent()" class="w-10 h-10 rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 flex items-center justify-center cursor-pointer shrink-0 transition-all border-0 shadow-xs" title="Click to speak (Web Speech)">
+                        <svg id="cora-mic-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    </button>
+
+                    <!-- Text Input -->
+                    <input type="text" id="cora-agent-text-input" placeholder="Talk or type: 'Log ₹4,500 gear expense', 'Draft invoice', 'Who owes me?'..." class="flex-1 bg-transparent border-0 text-xs font-medium text-zinc-950 placeholder:text-zinc-400 focus:outline-none px-2 py-1.5" autocomplete="off">
+
+                    <!-- Send Action Button -->
+                    <button type="submit" id="cora-agent-send-btn" class="px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs transition-colors border-0 cursor-pointer shrink-0 flex items-center gap-1.5 shadow-xs">
+                        <span>Ask Agent</span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </form>
+                <div class="flex items-center justify-between text-[10px] text-zinc-400 mt-1.5 px-1">
+                    <span>Speech Recognition available across Safari, Chrome, and mobile browsers</span>
+                    <span>Action-oriented voice commands active</span>
+                </div>
+            </div>
+
         </div>
 
-        <!-- 3. INTERACTIVE CHART: 6-Month Cash Flow & Runway Trajectory -->
-        <div class="cora-fin-card p-5 space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 pb-3">
-                <div>
-                    <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Cash Flow &amp; Runway Trajectory</h3>
-                    <p class="text-[11px] text-zinc-500">Historical inflows vs recurring costs &amp; 90-day predictive forecast</p>
-                </div>
-                <div class="flex items-center gap-3 text-xs font-semibold text-zinc-600">
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-zinc-950 inline-block"></span> Inflows</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-zinc-400 inline-block"></span> Outflows</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Net Cash</span>
-                </div>
-            </div>
-            <div class="h-64 w-full relative">
-                <canvas id="cora-fin-cashflow-chart"></canvas>
-            </div>
-        </div>
-
-        <!-- 4. "NEEDS YOUR ATTENTION" ACTION CARDS -->
+        <!-- 2. "NEEDS YOUR ATTENTION" ACTION CARDS -->
         <div class="space-y-3">
             <div class="flex items-center justify-between">
                 <div>
@@ -467,7 +631,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <span>Needs Your Attention</span>
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-zinc-100 text-zinc-700"><?php echo count($attention_cards); ?></span>
                     </h2>
-                    <p class="text-xs text-zinc-500 font-medium">Cora detected these situations that require a founder decision.</p>
+                    <p class="text-xs text-zinc-500 font-medium">Cora detected these situations that require founder action.</p>
                 </div>
             </div>
 
@@ -510,15 +674,15 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                                     <span><?php echo esc_html( $card['action_text'] ); ?></span>
                                 </button>
-                                <button type="button" onclick="window.coraSwitchFinTab('fin-receivables')" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
-                                    Review Invoices
+                                <button type="button" onclick="window.coraSwitchFinTab('fin-ledger')" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0">
+                                    View in Ledger
                                 </button>
                             <?php elseif ( ( $card['action_type'] ?? '' ) === 'view_recurring' ) : ?>
-                                <button type="button" onclick="window.coraSwitchFinTab('fin-expenses')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border-0">
+                                <button type="button" onclick="window.coraOpenDrawer('subscriptions')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border-0">
                                     <?php echo esc_html( $card['action_text'] ); ?>
                                 </button>
                             <?php else : ?>
-                                <button type="button" onclick="window.coraSwitchFinTab('fin-home')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border-0">
+                                <button type="button" onclick="window.coraSwitchFinTab('fin-agent')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border-0">
                                     <?php echo esc_html( $card['action_text'] ); ?>
                                 </button>
                             <?php endif; ?>
@@ -529,7 +693,203 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             <?php endif; ?>
         </div>
 
+        <!-- 3. COMPACT CASH FLOW & RUNWAY TRAJECTORY CHART -->
+        <div class="cora-fin-card p-5 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 pb-3">
+                <div>
+                    <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider">Cash Flow &amp; Runway Trajectory</h3>
+                    <p class="text-[11px] text-zinc-500">Historical inflows vs recurring costs &amp; 90-day predictive forecast</p>
+                </div>
+                <div class="flex items-center gap-3 text-xs font-semibold text-zinc-600">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-zinc-950 inline-block"></span> Inflows</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-zinc-400 inline-block"></span> Outflows</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Net Cash</span>
+                </div>
+            </div>
+            <div class="h-64 w-full relative">
+                <canvas id="cora-fin-cashflow-chart"></canvas>
+            </div>
+        </div>
+
     </div>
+
+    <!-- Backward compatibility alias: tab-fin-home points to tab-fin-agent -->
+    <div id="tab-fin-home" class="hidden"></div>
+
+
+    <!-- ════════════════════════════════════════════════════════
+         TAB 2: UNIFIED LEDGER & ACTIVITY STREAM
+         ════════════════════════════════════════════════════════ -->
+    <div id="tab-fin-ledger" class="cora-fin-tab-panel space-y-5 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h2 class="text-base font-bold text-zinc-950">Ledger &amp; Cash Flow Activity</h2>
+                <p class="text-xs text-zinc-500 font-medium">Unified chronological timeline of incoming receivables and business expenses.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="window.coraOpenDrawer('create-invoice')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 flex items-center gap-1.5 shadow-xs">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>+ Draft Invoice</span>
+                </button>
+                <button type="button" onclick="window.coraOpenDrawer('add-expense')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 text-zinc-900 cursor-pointer border-0 flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>- Log Expense</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="cora-fin-card p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/50">
+            <div class="flex items-center gap-1.5 overflow-x-auto cora-no-scrollbar">
+                <button type="button" onclick="window.coraFilterLedgerType('all')" id="btn-ledger-filter-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white cursor-pointer border-0 shrink-0">
+                    All Activity (<?php echo count($all_transactions); ?>)
+                </button>
+                <button type="button" onclick="window.coraFilterLedgerType('inflow')" id="btn-ledger-filter-inflow" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0 shrink-0 flex items-center gap-1.5">
+                    <span>Money In</span>
+                    <span class="font-mono text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">+₹<?php echo number_format($expected_in); ?></span>
+                </button>
+                <button type="button" onclick="window.coraFilterLedgerType('outflow')" id="btn-ledger-filter-outflow" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0 shrink-0 flex items-center gap-1.5">
+                    <span>Money Out</span>
+                    <span class="font-mono text-[10px] font-bold text-zinc-700 bg-zinc-200 px-1.5 py-0.2 rounded">-₹<?php echo number_format($expected_out); ?></span>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input type="text" id="ledger-search-input" oninput="window.coraSearchLedger(this.value)" placeholder="Search client, vendor, invoice..." class="bg-white border border-zinc-200 rounded-xl px-3 py-1.5 text-xs text-zinc-900 focus:outline-none w-full sm:w-60">
+            </div>
+        </div>
+
+        <?php if ( empty( $all_transactions ) ) : ?>
+        <div class="cora-fin-card p-10 text-center flex flex-col items-center justify-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-zinc-100 text-zinc-500 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-zinc-900">No transactions recorded yet</h3>
+                <p class="text-xs text-zinc-500 max-w-sm mx-auto mt-1">Speak to Cora or draft your first invoice or expense to start tracking cash flow.</p>
+            </div>
+        </div>
+        <?php else : ?>
+        <div class="cora-fin-card overflow-hidden">
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-left text-xs divide-y divide-zinc-200">
+                    <thead class="bg-zinc-50 text-zinc-500 font-bold text-[10px] uppercase tracking-wider">
+                        <tr>
+                            <th class="py-3 px-4">Date</th>
+                            <th class="py-3 px-4">Transaction / Description</th>
+                            <th class="py-3 px-4">Category / Reference</th>
+                            <th class="py-3 px-4">Type</th>
+                            <th class="py-3 px-4">Amount</th>
+                            <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-100 font-medium" id="cora-ledger-tbody">
+                        <?php foreach ( $all_transactions as $tx ) : 
+                            $isInflow = ( $tx['type'] === 'inflow' );
+                        ?>
+                        <tr class="cora-tx-row hover:bg-zinc-50/80 transition-colors" data-type="<?php echo esc_attr( $tx['type'] ); ?>">
+                            <td class="py-3.5 px-4 text-zinc-600 font-mono text-[11px]">
+                                <?php echo esc_html( $tx['date'] ); ?>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <div class="font-bold text-zinc-950"><?php echo esc_html( $tx['title'] ); ?></div>
+                                <?php if ( ! empty( $tx['client_name'] ) ) : ?>
+                                    <div class="text-[10px] text-zinc-400"><?php echo esc_html( $tx['client_name'] ); ?></div>
+                                <?php endif; ?>
+                            </td>
+                            <td class="py-3.5 px-4 text-zinc-600 text-[11px]">
+                                <?php echo esc_html( $tx['category'] ); ?>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <?php if ( $isInflow ) : ?>
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">Money In</span>
+                                <?php else : ?>
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-700 border border-zinc-200">Money Out</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="py-3.5 px-4 font-mono font-bold text-xs <?php echo $isInflow ? 'text-emerald-600' : 'text-zinc-950'; ?>">
+                                <?php echo $isInflow ? '+' : '-'; ?>₹<?php echo number_format( $tx['amount'] ); ?>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <?php if ( $isInflow ) : ?>
+                                    <?php if ( $tx['status'] === 'paid' ) : ?>
+                                        <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-100 text-emerald-800">Paid</span>
+                                    <?php elseif ( $tx['is_overdue'] ) : ?>
+                                        <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-red-100 text-red-800"><?php echo $tx['days_overdue']; ?>d Overdue</span>
+                                    <?php else : ?>
+                                        <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-amber-100 text-amber-800">Pending</span>
+                                    <?php endif; ?>
+                                <?php else : ?>
+                                    <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-zinc-100 text-zinc-700">Settled</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="py-3.5 px-4 text-right">
+                                <?php if ( $isInflow && $tx['status'] !== 'paid' ) : ?>
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <button type="button" onclick="window.coraMarkInvoicePaid('<?php echo esc_js($tx['id']); ?>')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-zinc-950 text-white hover:bg-zinc-800 border-0 cursor-pointer">
+                                            Mark Paid
+                                        </button>
+                                        <button type="button" onclick="window.coraDraftFollowUp('<?php echo esc_js($tx['id']); ?>')" class="px-2.5 py-1 rounded-lg text-[10px] font-semibold text-zinc-600 hover:bg-zinc-100 border-0 cursor-pointer">
+                                            Remind
+                                        </button>
+                                    </div>
+                                <?php else : ?>
+                                    <span class="text-[10px] text-zinc-400 font-mono">Recorded</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Card Stack View -->
+            <div class="md:hidden divide-y divide-zinc-100" id="cora-ledger-mobile-cards">
+                <?php foreach ( $all_transactions as $tx ) : 
+                    $isInflow = ( $tx['type'] === 'inflow' );
+                ?>
+                <div class="p-3.5 space-y-2 cora-tx-card" data-type="<?php echo esc_attr( $tx['type'] ); ?>">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-mono text-zinc-400"><?php echo esc_html( $tx['date'] ); ?></span>
+                        <?php if ( $isInflow ) : ?>
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700">Money In</span>
+                        <?php else : ?>
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-700">Money Out</span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <div class="font-bold text-xs text-zinc-950"><?php echo esc_html( $tx['title'] ); ?></div>
+                            <div class="text-[10px] text-zinc-500"><?php echo esc_html( $tx['category'] ); ?></div>
+                        </div>
+                        <div class="font-mono font-extrabold text-sm <?php echo $isInflow ? 'text-emerald-600' : 'text-zinc-950'; ?> shrink-0">
+                            <?php echo $isInflow ? '+' : '-'; ?>₹<?php echo number_format( $tx['amount'] ); ?>
+                        </div>
+                    </div>
+                    <?php if ( $isInflow && $tx['status'] !== 'paid' ) : ?>
+                    <div class="pt-2 border-t border-zinc-100 flex items-center justify-between">
+                        <span class="text-[10px] font-bold <?php echo $tx['is_overdue'] ? 'text-red-600' : 'text-amber-600'; ?>">
+                            <?php echo $tx['is_overdue'] ? 'Overdue' : 'Pending Collection'; ?>
+                        </span>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="window.coraMarkInvoicePaid('<?php echo esc_js($tx['id']); ?>')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-zinc-950 text-white border-0 cursor-pointer">
+                                Mark Paid
+                            </button>
+                            <button type="button" onclick="window.coraDraftFollowUp('<?php echo esc_js($tx['id']); ?>')" class="px-2 py-1 rounded-lg text-[10px] font-semibold text-zinc-600 border-0 cursor-pointer">
+                                Remind
+                            </button>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+
 
 
     <!-- ════════════════════════════════════════════════════════
@@ -1862,10 +2222,21 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     let profitChart = null;
 
     /* ── Tab Switcher Controller ── */
+    /* ── Tab Switcher Controller ── */
     window.coraSwitchFinTab = function(tabId, updateUrl = true) {
         if (!tabId) return;
-        const cleanId = tabId.startsWith('tab-') ? tabId : 'tab-' + tabId;
-        const shortId = tabId.replace(/^tab-/, '');
+        let cleanId = tabId.startsWith('tab-') ? tabId : 'tab-' + tabId;
+        let shortId = tabId.replace(/^tab-/, '');
+
+        // Map aliases
+        if (shortId === 'home') {
+            shortId = 'agent';
+            cleanId = 'tab-fin-agent';
+        } else if (shortId === 'receivables' || shortId === 'expenses') {
+            // If switching from a sub-tab link, show ledger
+            shortId = 'ledger';
+            cleanId = 'tab-fin-ledger';
+        }
 
         // Hide all tab panels
         document.querySelectorAll('.cora-fin-tab-panel').forEach(el => {
@@ -1891,7 +2262,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             targetBtn.classList.remove('text-zinc-600');
         }
 
-        // Synchronize active tab in URL query param and hash so refreshing preserves the exact tab
+        // Synchronize active tab in URL query param
         if (updateUrl !== false && window.history && window.history.replaceState) {
             try {
                 const url = new URL(window.location.href);
@@ -1901,7 +2272,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         }
 
         // Re-render charts when switching to tabs containing charts
-        if (cleanId === 'tab-fin-home' || cleanId === 'tab-fin-forecast') {
+        if (cleanId === 'tab-fin-agent' || cleanId === 'tab-fin-home' || cleanId === 'tab-fin-forecast') {
             setTimeout(initCashflowChart, 60);
         } else if (cleanId === 'tab-fin-profitability') {
             setTimeout(initProfitChart, 60);
@@ -1909,7 +2280,367 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     };
     window.switchFinTab = window.coraSwitchFinTab;
 
-    /* ── Floating Ask Cora Bottom Pop-up Controller ── */
+    /* ── High-Quality Voice Transcription Engine (Web Speech API) ── */
+    let speechRecognition = null;
+    let isListening = false;
+
+    window.coraToggleVoiceAgent = function() {
+        if (isListening) {
+            window.coraStopVoiceAgent();
+        } else {
+            window.coraStartVoiceRecognition();
+        }
+    };
+
+    window.coraStartVoiceRecognition = function() {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) {
+            if (window.coraShowToast) {
+                window.coraShowToast('Speech recognition not supported in this browser. Please use Chrome or Safari.', 'info');
+            }
+            const inp = document.getElementById('cora-agent-text-input');
+            if (inp) inp.focus();
+            return;
+        }
+
+        try {
+            if (speechRecognition) {
+                try { speechRecognition.abort(); } catch(e) {}
+            }
+            speechRecognition = new SpeechRec();
+            speechRecognition.continuous = false;
+            speechRecognition.interimResults = true;
+            speechRecognition.lang = 'en-IN'; // Optimized for Indian English & rupee numbers
+
+            const voiceBtn = document.getElementById('cora-agent-voice-btn');
+            const liveBanner = document.getElementById('cora-voice-live-banner');
+            const liveTranscript = document.getElementById('cora-voice-live-transcript');
+            const statusPill = document.getElementById('cora-voice-status-pill');
+            const textInput = document.getElementById('cora-agent-text-input');
+
+            speechRecognition.onstart = function() {
+                isListening = true;
+                if (voiceBtn) voiceBtn.classList.add('cora-mic-listening', 'bg-red-600', 'hover:bg-red-700');
+                if (statusPill) statusPill.classList.remove('hidden');
+                if (liveBanner) liveBanner.classList.remove('hidden');
+                if (liveTranscript) liveTranscript.innerText = 'Listening... speak naturally (e.g. "Log 4500 gear expense")...';
+                if (window.coraShowToast) window.coraShowToast('Listening... Speak your command or question', 'info');
+            };
+
+            speechRecognition.onresult = function(event) {
+                let interim = '';
+                let final = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        final += event.results[i][0].transcript;
+                    } else {
+                        interim += event.results[i][0].transcript;
+                    }
+                }
+                const currentText = (final || interim).trim();
+                if (currentText) {
+                    if (liveTranscript) liveTranscript.innerText = '"' + currentText + '"';
+                    if (textInput) textInput.value = currentText;
+                }
+            };
+
+            speechRecognition.onerror = function(e) {
+                window.coraStopVoiceAgent();
+                if (e.error === 'not-allowed') {
+                    if (window.coraShowToast) window.coraShowToast('Microphone access denied. Please enable mic permissions in site settings.', 'error');
+                } else if (e.error !== 'no-speech') {
+                    if (window.coraShowToast) window.coraShowToast('Speech recognition notice: ' + e.error, 'info');
+                }
+            };
+
+            speechRecognition.onend = function() {
+                window.coraStopVoiceAgent();
+                // If text was recorded, auto-submit after short pause
+                if (textInput && textInput.value.trim()) {
+                    setTimeout(() => {
+                        window.coraSubmitAgentMessage();
+                    }, 400);
+                }
+            };
+
+            speechRecognition.start();
+        } catch(err) {
+            window.coraStopVoiceAgent();
+            if (window.coraShowToast) window.coraShowToast('Could not initialize microphone: ' + err.message, 'error');
+        }
+    };
+
+    window.coraStopVoiceAgent = function() {
+        isListening = false;
+        if (speechRecognition) {
+            try { speechRecognition.stop(); } catch(e) {}
+        }
+        const voiceBtn = document.getElementById('cora-agent-voice-btn');
+        const liveBanner = document.getElementById('cora-voice-live-banner');
+        const statusPill = document.getElementById('cora-voice-status-pill');
+
+        if (voiceBtn) voiceBtn.classList.remove('cora-mic-listening', 'bg-red-600', 'hover:bg-red-700');
+        if (statusPill) statusPill.classList.add('hidden');
+        if (liveBanner) liveBanner.classList.add('hidden');
+    };
+
+    /* ── Action-Oriented Discussion & Chat Submitter ── */
+    window.coraRunAgentPrompt = function(promptText) {
+        const inp = document.getElementById('cora-agent-text-input');
+        if (inp) {
+            inp.value = promptText;
+            window.coraSubmitAgentMessage();
+        }
+    };
+
+    window.coraClearAgentChat = function() {
+        const feed = document.getElementById('cora-agent-chat-feed');
+        if (feed) {
+            const avail = window.coraFinanceInitialData ? Number(window.coraFinanceInitialData.availableCash || 0).toLocaleString('en-IN') : '0';
+            const expIn = window.coraFinanceInitialData ? Number(window.coraFinanceInitialData.expectedIn || 0).toLocaleString('en-IN') : '0';
+            feed.innerHTML = `
+                <div class="flex justify-start">
+                    <div class="bg-[#FBFaf7] border border-zinc-200 rounded-2xl rounded-tl-sm p-4 text-xs text-zinc-800 max-w-[92%] sm:max-w-[85%] space-y-2.5 shadow-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-md bg-zinc-900 text-white flex items-center justify-center font-bold text-[10px]">C</span>
+                            <span class="font-bold text-zinc-950">Financial Agent</span>
+                            <span class="text-[10px] text-zinc-400">Ledger Assistant</span>
+                        </div>
+                        <div class="leading-relaxed text-zinc-700">
+                            Discussion reset. Available cleared cash is <strong class="text-zinc-950 font-mono">₹${avail}</strong> with <strong class="text-zinc-950 font-mono">₹${expIn}</strong> in uncollected receivables.<br><br>
+                            Speak into the microphone or type below.
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        if (window.coraShowToast) window.coraShowToast('Discussion feed cleared.', 'info');
+    };
+
+    window.coraSubmitAgentMessage = function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const input = document.getElementById('cora-agent-text-input');
+        const query = input ? input.value.trim() : '';
+        if (!query) return;
+
+        const feed = document.getElementById('cora-agent-chat-feed');
+        const sendBtn = document.getElementById('cora-agent-send-btn');
+
+        if (feed) {
+            // Append user message bubble (Monochromatic)
+            const userBubble = document.createElement('div');
+            userBubble.className = 'flex justify-end';
+            userBubble.innerHTML = `<div class="bg-zinc-950 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-xs max-w-[85%] font-medium shadow-xs leading-relaxed">${query}</div>`;
+            feed.appendChild(userBubble);
+
+            // Append loading animation bubble
+            const loadingBubble = document.createElement('div');
+            loadingBubble.id = 'agent-temp-ai-bubble';
+            loadingBubble.className = 'flex justify-start';
+            loadingBubble.innerHTML = `
+                <div class="bg-zinc-100 text-zinc-700 rounded-2xl rounded-tl-sm px-4 py-2.5 text-xs max-w-[85%] flex items-center gap-2 animate-pulse">
+                    <span class="w-2 h-2 rounded-full bg-zinc-400 animate-ping"></span>
+                    <span>Financial Agent analyzing ledger and parsing intent...</span>
+                </div>
+            `;
+            feed.appendChild(loadingBubble);
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        if (input) input.value = '';
+        if (sendBtn) sendBtn.disabled = true;
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                action: 'cora_ajax_finance_ask_cora',
+                security: nonce,
+                query: query,
+            })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (sendBtn) sendBtn.disabled = false;
+            const tempBubble = document.getElementById('agent-temp-ai-bubble');
+            if (tempBubble) tempBubble.remove();
+
+            if (feed && res.success && res.data) {
+                let formatted = res.data.answer
+                    .replace(/### (.*?)\n/g, '<div class="font-bold text-zinc-950 text-sm mb-1">$1</div>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n\n/g, '<br><br>')
+                    .replace(/\n/g, '<br>');
+
+                let actionBtnHtml = '';
+                if (res.data.action_chip) {
+                    const chip = res.data.action_chip;
+                    const prefillStr = chip.prefill ? encodeURIComponent(JSON.stringify(chip.prefill)) : '';
+                    actionBtnHtml = `
+                        <div class="pt-2 border-t border-zinc-200/70">
+                            <button type="button" onclick="window.coraTriggerActionCard('${chip.action}', '${chip.target || ''}', '${prefillStr}')" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-2 shadow-xs transition-colors">
+                                <span>${chip.text}</span>
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                const finalAiBubble = document.createElement('div');
+                finalAiBubble.className = 'flex justify-start';
+                finalAiBubble.innerHTML = `
+                    <div class="bg-[#FBFaf7] border border-zinc-200 text-zinc-800 rounded-2xl rounded-tl-sm p-4 text-xs max-w-[92%] sm:max-w-[85%] space-y-2.5 leading-relaxed shadow-xs">
+                        <div class="font-bold text-zinc-950 flex items-center gap-1.5">
+                            <span class="w-6 h-6 rounded-md bg-zinc-950 text-white flex items-center justify-center font-bold text-[10px]">C</span>
+                            <span>Financial Agent</span>
+                        </div>
+                        <div class="text-zinc-700">${formatted}</div>
+                        ${actionBtnHtml}
+                    </div>
+                `;
+                feed.appendChild(finalAiBubble);
+                feed.scrollTop = feed.scrollHeight;
+            }
+        })
+        .catch(() => {
+            if (sendBtn) sendBtn.disabled = false;
+            const tempBubble = document.getElementById('agent-temp-ai-bubble');
+            if (tempBubble) {
+                tempBubble.innerHTML = `<div class="bg-red-50 text-red-700 rounded-2xl p-3 text-xs">Error communicating with financial AI engine.</div>`;
+            }
+        });
+    };
+
+    /* ── Action Card Trigger Bridge ── */
+    window.coraTriggerActionCard = function(action, target, prefillEncoded) {
+        let prefill = {};
+        if (prefillEncoded) {
+            try { prefill = JSON.parse(decodeURIComponent(prefillEncoded)); } catch(e) {}
+        }
+
+        if (action === 'open_expense_drawer') {
+            window.coraPrefillExpense(prefill.amount, prefill.category, prefill.description);
+        } else if (action === 'open_invoice_drawer') {
+            window.coraPrefillInvoice(prefill.amount, prefill.client_name);
+        } else if (action === 'open_income_drawer') {
+            window.coraPrefillIncome(prefill.amount, prefill.client_name);
+        } else if (action === 'open_simulator') {
+            window.coraPrefillSim(prefill.revenue, prefill.costs);
+        } else if (action === 'draft_followup') {
+            window.coraDraftFollowUp(target || 'inv_sample_01');
+        } else if (action === 'switch_tab') {
+            window.coraSwitchFinTab(target);
+        } else if (action === 'open_recurring_modal') {
+            window.coraOpenDrawer('subscriptions');
+        }
+    };
+
+    /* ── Form Prefill Helpers ── */
+    window.coraPrefillExpense = function(amount, category, description) {
+        window.coraOpenDrawer('add-expense');
+        if (amount) {
+            const amtEl = document.getElementById('exp-amount');
+            if (amtEl) amtEl.value = amount;
+        }
+        if (category) {
+            const catEl = document.getElementById('exp-category');
+            if (catEl) {
+                for (let i = 0; i < catEl.options.length; i++) {
+                    if (catEl.options[i].value.toLowerCase() === category.toLowerCase()) {
+                        catEl.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+        if (description) {
+            const descEl = document.getElementById('exp-description');
+            if (descEl) descEl.value = description;
+        }
+    };
+
+    window.coraPrefillInvoice = function(amount, clientName) {
+        window.coraOpenDrawer('create-invoice');
+        if (clientName) {
+            const clEl = document.getElementById('inv-client-name');
+            if (clEl) clEl.value = clientName;
+        }
+        if (amount) {
+            const rateEl = document.querySelector('.inv-item-rate');
+            if (rateEl) {
+                rateEl.value = amount;
+                window.coraRecalcInvoiceGST();
+            }
+        }
+    };
+
+    window.coraPrefillIncome = function(amount, clientName) {
+        window.coraOpenDrawer('record-income');
+        if (amount) {
+            const amtEl = document.getElementById('inc-amount');
+            if (amtEl) amtEl.value = amount;
+        }
+        if (clientName) {
+            const clEl = document.getElementById('inc-client-name');
+            if (clEl) clEl.value = clientName;
+        }
+    };
+
+    window.coraPrefillSim = function(revenue, costs) {
+        window.coraOpenDrawer('project-sim');
+        if (revenue) {
+            const revEl = document.getElementById('sim-revenue');
+            if (revEl) revEl.value = revenue;
+        }
+        if (costs) {
+            const costEl = document.getElementById('sim-contractor');
+            if (costEl) costEl.value = costs;
+        }
+        window.coraRecalcSim();
+    };
+
+    /* ── Unified Ledger Filter & Search ── */
+    window.coraFilterLedgerType = function(type) {
+        ['all', 'inflow', 'outflow'].forEach(t => {
+            const btn = document.getElementById('btn-ledger-filter-' + t);
+            if (btn) {
+                if (t === type) {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white cursor-pointer border-0 shrink-0';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-600 hover:bg-zinc-100 cursor-pointer border-0 shrink-0 flex items-center gap-1.5';
+                }
+            }
+        });
+
+        const rows = document.querySelectorAll('.cora-tx-row');
+        rows.forEach(r => {
+            const rType = r.getAttribute('data-type');
+            r.style.display = (type === 'all' || rType === type) ? '' : 'none';
+        });
+
+        const cards = document.querySelectorAll('.cora-tx-card');
+        cards.forEach(c => {
+            const cType = c.getAttribute('data-type');
+            c.style.display = (type === 'all' || cType === type) ? '' : 'none';
+        });
+    };
+
+    window.coraSearchLedger = function(query) {
+        const q = (query || '').toLowerCase().trim();
+        const rows = document.querySelectorAll('.cora-tx-row');
+        rows.forEach(r => {
+            const text = r.innerText.toLowerCase();
+            r.style.display = (!q || text.includes(q)) ? '' : 'none';
+        });
+        const cards = document.querySelectorAll('.cora-tx-card');
+        cards.forEach(c => {
+            const text = c.innerText.toLowerCase();
+            c.style.display = (!q || text.includes(q)) ? '' : 'none';
+        });
+    };
+
+    /* ── Floating Copilot Pop-up Controller (Retained for secondary summon) ── */
     window.coraOpenCopilot = function() {
         window.coraCloseFinPopover();
         const win = document.getElementById('cora-fin-copilot-window');
@@ -1946,7 +2677,6 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             window.coraSendCopilotChat();
         }
     };
-    window.coraSubmitAgentPrompt = window.coraSubmitCopilotPrompt;
 
     window.coraSendCopilotChat = function() {
         const input = document.getElementById('cora-fin-copilot-chat-input');
@@ -1961,13 +2691,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         if (chatPane) {
             chatPane.classList.remove('hidden');
 
-            // Append user message bubble (Monochromatic)
             const userBubble = document.createElement('div');
             userBubble.className = 'flex justify-end';
             userBubble.innerHTML = `<div class="bg-zinc-950 text-white rounded-2xl rounded-tr-sm px-4 py-2 text-xs max-w-[80%] font-medium">${query}</div>`;
             chatPane.appendChild(userBubble);
 
-            // Append loading state bubble
             const aiBubble = document.createElement('div');
             aiBubble.className = 'flex justify-start';
             aiBubble.id = 'copilot-temp-ai-bubble';
@@ -2007,7 +2735,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 let actionBtnHtml = '';
                 if (res.data.action_chip) {
                     const chip = res.data.action_chip;
-                    actionBtnHtml = `<div class="pt-2"><button type="button" onclick="window.coraHandleCopilotAction('${chip.action}', '${chip.target}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5">${chip.text} →</button></div>`;
+                    const prefillStr = chip.prefill ? encodeURIComponent(JSON.stringify(chip.prefill)) : '';
+                    actionBtnHtml = `<div class="pt-2"><button type="button" onclick="window.coraTriggerActionCard('${chip.action}', '${chip.target || ''}', '${prefillStr}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5">${chip.text} →</button></div>`;
                 }
 
                 finalAiBubble.innerHTML = `<div class="bg-zinc-50 border border-zinc-200 text-zinc-800 rounded-2xl rounded-tl-sm p-3.5 text-xs max-w-[85%] space-y-2 leading-relaxed">
@@ -2031,20 +2760,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         });
     };
 
-    window.coraSendAgentChat = window.coraSendCopilotChat;
-
-    window.coraHandleCopilotAction = function(action, target) {
-        window.coraCloseCopilot();
-        if (action === 'draft_followup') {
-            window.coraDraftFollowUp(target);
-        } else if (action === 'switch_tab') {
-            window.coraSwitchFinTab(target);
-        } else if (action === 'open_simulator') {
-            window.coraOpenDrawer('project-sim');
-        } else if (action === 'open_recurring_modal') {
-            window.coraOpenDrawer('subscriptions');
-        }
-    };
+    window.coraSendAgentChat = window.coraSubmitAgentMessage;
+    window.coraHandleCopilotAction = window.coraTriggerActionCard;
 
     /* ── Popover Controller (Precise Alignment Under Button) ── */
     window.toggleFinancialActionMenu = function(e) {
@@ -2802,8 +3519,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
     function bootFinanceModule() {
         const urlParams = new URLSearchParams(window.location.search);
         const targetTab = urlParams.get('tab') || window.location.hash.replace('#', '');
-        if (targetTab && targetTab !== 'fin-home') {
+        if (targetTab && targetTab !== 'fin-home' && targetTab !== 'home' && targetTab !== 'fin-agent') {
             window.coraSwitchFinTab(targetTab, false);
+        } else {
+            window.coraSwitchFinTab('fin-agent', false);
         }
         setTimeout(initCashflowChart, 150);
     }

@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.31
+ * Version: 4.8.32
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.31' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.32' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -41491,19 +41491,140 @@ function cora_ajax_finance_ask_cora() {
     $metrics = cora_finance_get_comprehensive_metrics();
     $q_lower = strtolower( $query );
 
-    // Intelligent Algorithmic Fast Path (Guaranteed instant response with precise numbers)
+    // Helper: Smart number extractor (e.g. 4500, 4.5k, 1.5L, 50,000)
+    $parse_rupee_amount = function( $str ) {
+        if ( preg_match( '/(?:₹|rs\.?|inr)?\s*([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?)\s*(k|thousand|lakh|lakhs|l)?\b/i', $str, $m ) ) {
+            $val = floatval( str_replace( ',', '', $m[1] ) );
+            $suffix = strtolower( $m[2] ?? '' );
+            if ( $suffix === 'k' || $suffix === 'thousand' ) {
+                $val *= 1000;
+            } elseif ( $suffix === 'l' || $suffix === 'lakh' || $suffix === 'lakhs' ) {
+                $val *= 100000;
+            }
+            return $val;
+        }
+        return 0.0;
+    };
+
+    // Intelligent Action-Oriented Fast Path (Guaranteed instant response with executable action chips)
     $answer = '';
     $action_chip = null;
 
-    if ( strpos( $q_lower, 'who owes' ) !== false || strpos( $q_lower, 'unpaid' ) !== false || strpos( $q_lower, 'overdue' ) !== false ) {
+    // 1. ACTION: Log / Add Expense
+    if ( preg_match( '/\b(log|add|spent|spend|bought|purchase|record)\b.*?\b(expense|gear|travel|food|software|bill|subscription|equipment|cost)\b/i', $query ) ||
+         preg_match( '/\b(expense|spent)\b.*?(?:₹|rs\.?|\d+)/i', $query ) ) {
+        $extracted_amt = $parse_rupee_amount( $query );
+        if ( $extracted_amt <= 0 ) $extracted_amt = 4500;
+
+        // Auto-detect category
+        $detected_cat = 'Other Operational';
+        if ( preg_match( '/\b(gear|camera|lens|audio|sound|mic|light|drone|gimbal|monitor|tech|equipment|card)\b/i', $query ) ) {
+            $detected_cat = 'Gear & Tech';
+        } elseif ( preg_match( '/\b(travel|cab|uber|ola|flight|hotel|food|dinner|lunch|coffee|tea|fuel|petrol)\b/i', $query ) ) {
+            $detected_cat = 'Food & Travel';
+        } elseif ( preg_match( '/\b(software|app|tool|saas|subscription|adobe|figma|hosting|domain|cloud)\b/i', $query ) ) {
+            $detected_cat = 'Software & Tools';
+        } elseif ( preg_match( '/\b(studio|rent|office|electric|power|clean|ops)\b/i', $query ) ) {
+            $detected_cat = 'Studio Ops & Rent';
+        } elseif ( preg_match( '/\b(marketing|ad|ads|facebook|meta|google|promo)\b/i', $query ) ) {
+            $detected_cat = 'Marketing & Ads';
+        } elseif ( preg_match( '/\b(contractor|crew|assistant|editor|freelance|gaffer|sound engineer)\b/i', $query ) ) {
+            $detected_cat = 'Contractor & Crew';
+        }
+
+        // Clean note from query
+        $clean_note = trim( preg_replace( '/\b(log|add|record|an|a|the|expense|of|for|₹|rs\.?|inr|\d+k?|spent|spend)\b/i', '', $query ) );
+        if ( empty( $clean_note ) ) $clean_note = $detected_cat . ' Purchase';
+
+        $answer = "I've structured an expense record for **₹" . number_format( $extracted_amt ) . "** under **" . esc_html( $detected_cat ) . "** (*" . esc_html( ucfirst( $clean_note ) ) . "*).\n\nTap below to review, verify ITC eligibility, and commit to your ledger.";
+        $action_chip = array(
+            'text'    => 'Review & Save ₹' . number_format( $extracted_amt ) . ' Expense',
+            'action'  => 'open_expense_drawer',
+            'prefill' => array(
+                'amount'      => $extracted_amt,
+                'category'    => $detected_cat,
+                'description' => ucfirst( $clean_note ),
+                'date'        => date('Y-m-d'),
+            ),
+        );
+
+    // 2. ACTION: Create / Draft Invoice
+    } elseif ( preg_match( '/\b(create|draft|generate|make|send|bill)\b.*?\b(invoice|bill)\b/i', $query ) ||
+               preg_match( '/\binvoice\b.*?(?:₹|rs\.?|\d+)/i', $query ) ) {
+        $extracted_amt = $parse_rupee_amount( $query );
+        if ( $extracted_amt <= 0 ) $extracted_amt = 50000;
+
+        // Extract client name
+        $client_name = 'Client';
+        if ( preg_match( '/(?:for|to|client)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/', $query, $cm ) ) {
+            $client_name = trim( $cm[1] );
+        } elseif ( preg_match( '/(?:for|to|client)\s+([a-zA-Z\s]{3,20})/i', $query, $cm ) ) {
+            $client_name = ucwords( trim( $cm[1] ) );
+        }
+
+        $answer = "I've initialized a new GST invoice for **" . esc_html( $client_name ) . "** for **₹" . number_format( $extracted_amt ) . "** with standard 18% GST calculation.\n\nTap below to review line items, place of supply, and publish directly to Document Vault.";
+        $action_chip = array(
+            'text'    => 'Complete & Send Invoice (₹' . number_format( $extracted_amt ) . ')',
+            'action'  => 'open_invoice_drawer',
+            'prefill' => array(
+                'amount'      => $extracted_amt,
+                'client_name' => $client_name !== 'Client' ? $client_name : '',
+            ),
+        );
+
+    // 3. ACTION: Record Received Payment
+    } elseif ( preg_match( '/\b(record|log|received|got)\b.*?\b(payment|income|money|transfer|funds)\b/i', $query ) ||
+               preg_match( '/\b(client paid|payment received)\b/i', $query ) ) {
+        $extracted_amt = $parse_rupee_amount( $query );
+        if ( $extracted_amt <= 0 ) $extracted_amt = 25000;
+
+        $answer = "Ready to reconcile a **₹" . number_format( $extracted_amt ) . "** received payment against your active ledger.\n\nTap below to associate it with an outstanding invoice or log as fresh income.";
+        $action_chip = array(
+            'text'    => 'Reconcile ₹' . number_format( $extracted_amt ) . ' Payment',
+            'action'  => 'open_income_drawer',
+            'prefill' => array(
+                'amount' => $extracted_amt,
+            ),
+        );
+
+    // 4. ACTION: Project / Deal Feasibility Simulator
+    } elseif ( preg_match( '/\b(deal|simulator|simulate|evaluate|quote|proposal|margin|feasibility)\b/i', $query ) ) {
+        $extracted_amt = $parse_rupee_amount( $query );
+        if ( $extracted_amt <= 0 ) $extracted_amt = 150000;
+        $est_costs = round( $extracted_amt * 0.35 );
+
+        $answer = "### Project Deal Simulator (₹" . number_format( $extracted_amt ) . ")\n\n• **Estimated Revenue**: ₹" . number_format( $extracted_amt ) . "\n• **Estimated Production Costs**: ~₹" . number_format( $est_costs ) . "\n• **Projected Net Margin**: ~**65.0%** (Healthy profit tier)\n\nTap below to run the detailed crew, gear, and travel breakdown.";
+        $action_chip = array(
+            'text'    => 'Open Deal Simulator',
+            'action'  => 'open_simulator',
+            'prefill' => array(
+                'revenue'    => $extracted_amt,
+                'contractor' => round( $extracted_amt * 0.2 ),
+                'gear'       => round( $extracted_amt * 0.1 ),
+                'travel'     => round( $extracted_amt * 0.05 ),
+            ),
+        );
+
+    // 5. QUERY: Cash Runway & Available Funds
+    } elseif ( preg_match( '/\b(runway|available cash|how much cash|safe buffer|cash balance|in bank)\b/i', $query ) ) {
+        $runway_str = $metrics['monthly_recurring_total'] > 0 
+            ? round( $metrics['available_cash'] / $metrics['monthly_recurring_total'], 1 ) . ' months' 
+            : 'Unlimited (no recurring burn recorded)';
+
+        $answer = "### Cash & Runway Summary\n\n• **Cleared Available Cash**: **₹" . number_format( $metrics['available_cash'] ) . "**\n• **Monthly Fixed Burn**: ₹" . number_format( $metrics['monthly_recurring_total'] ) . "/mo\n• **Safe Runway Buffer**: **" . $runway_str . "**\n• **Uncollected Receivables**: +₹" . number_format( $metrics['expected_in'] ) . "\n\n💡 *Cora Verdict: Your cash cushion is solid. Collecting overdue invoices will further extend your operating buffer.*";
+        $action_chip = array( 'text' => 'View Activity Ledger', 'action' => 'switch_tab', 'target' => 'fin-ledger' );
+
+    // 6. QUERY: Who Owes Me / Overdue Invoices
+    } elseif ( strpos( $q_lower, 'who owes' ) !== false || strpos( $q_lower, 'unpaid' ) !== false || strpos( $q_lower, 'overdue' ) !== false ) {
         $overdue_list = array();
         foreach ( $metrics['receivables'] as $r ) {
             if ( $r['status'] !== 'paid' ) {
                 $overdue_list[] = "• **{$r['client_name']}**: ₹" . number_format( $r['due_balance'] ) . " (" . ( $r['is_overdue'] ? "{$r['days_overdue']} days overdue" : "due on {$r['due_date']}" ) . ")";
             }
         }
-        $answer = "You have **₹" . number_format( $metrics['expected_in'] ) . "** in total outstanding receivables, with **₹" . number_format( $metrics['overdue_total'] ) . "** currently overdue:\n\n" . implode( "\n", $overdue_list ) . "\n\n💡 *Cora Recommendation: Follow up with Acme Studios today since it's 7 days past due.*";
-        $action_chip = array( 'text' => 'Draft Acme Follow-up', 'action' => 'draft_followup', 'target' => 'inv_sample_01' );
+        $answer = "You have **₹" . number_format( $metrics['expected_in'] ) . "** in total outstanding receivables, with **₹" . number_format( $metrics['overdue_total'] ) . "** currently overdue:\n\n" . ( empty( $overdue_list ) ? "• *No overdue payments currently pending!*" : implode( "\n", $overdue_list ) ) . "\n\n💡 *Cora Recommendation: Follow up with clients promptly to keep cash flow smooth.*";
+        $first_inv = ! empty( $metrics['receivables'][0]['id'] ) ? $metrics['receivables'][0]['id'] : 'inv_sample_01';
+        $action_chip = array( 'text' => 'Draft Client Follow-up', 'action' => 'draft_followup', 'target' => $first_inv );
 
     } elseif ( strpos( $q_lower, 'profit' ) !== false && ( strpos( $q_lower, 'fall' ) !== false || strpos( $q_lower, 'drop' ) !== false || strpos( $q_lower, 'why' ) !== false ) ) {
         $answer = "Your net margin is **35.0%** this period (down from 42% last month). Here is why:\n\n1. **Fixed software recurring costs** increased by ₹4,850/mo.\n2. **Studio gear rentals & maintenance** accounted for ₹28,500 in outflows.\n3. **₹80,000 in revenue from Acme Studios** is still pending collection.\n\nOnce Acme clears their invoice, your effective margin will normalize back to **44.8%**.";
