@@ -2932,9 +2932,6 @@ function cora_get_sparkline_points( $history, $type ) {
             <button type="button" onclick="switchElementorMigrateTab('upload')" id="elem-tab-btn-upload" class="flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all">
                 Upload File (XML / ZIP / JSON)
             </button>
-            <button type="button" onclick="switchElementorMigrateTab('snippet')" id="elem-tab-btn-snippet" class="flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all">
-                1-Click Exporter Bridge
-            </button>
         </div>
 
         <!-- ══ TAB 1: Live Website URL Scanner & Importer ══ -->
@@ -3059,45 +3056,6 @@ function cora_get_sparkline_points( $history, $type ) {
                     Import to Canvas
                 </button>
             </div>
-        </div>
-
-        <!-- ══ TAB 3: 1-Click Exporter Bridge Snippet ══ -->
-        <div id="elem-tab-panel-snippet" class="space-y-3 hidden">
-            <p class="text-xs text-zinc-600 leading-relaxed">
-                If your existing WordPress site is behind a firewall, staging login, or blocks external REST requests, you can export your complete Elementor site with this lightweight 1-click bridge snippet.
-            </p>
-
-            <div class="space-y-1.5">
-                <div class="flex items-center justify-between text-[11px] font-mono text-zinc-500 font-bold">
-                    <span>EXPORTER HELPER SNIPPET</span>
-                    <button type="button" onclick="copyElementorExporterSnippet()" class="text-zinc-950 hover:underline flex items-center gap-1 cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        <span id="elem-copy-label">Copy Code</span>
-                    </button>
-                </div>
-                <pre class="p-3.5 bg-zinc-950 text-zinc-300 rounded-xl text-[11px] font-mono overflow-x-auto max-h-40 border border-zinc-800 select-all" id="elem-snippet-code">
-add_action( 'init', function() {
-    if ( isset( $_GET['cora_export_elementor'] ) && isset( $_GET['token'] ) && $_GET['token'] === 'cora_migrate_secret' ) {
-        if ( ! current_user_can( 'manage_options' ) ) wp_die( 'Login as admin' );
-        $pages = get_posts( array( 'post_type' => array( 'page', 'elementor_library' ), 'posts_per_page' => -1 ) );
-        $export = array( 'site' => get_bloginfo( 'name' ), 'pages' => array() );
-        foreach ( $pages as $p ) {
-            $data = get_post_meta( $p->ID, '_elementor_data', true );
-            if ( ! empty( $data ) ) {
-                $export['pages'][] = array( 'title' => $p->post_title, 'slug' => $p->post_name, 'content' => is_string( $data ) ? json_decode( $data, true ) : $data );
-            }
-        }
-        header( 'Content-Type: application/json' );
-        echo wp_json_encode( $export ); exit;
-    }
-} );</pre>
-            </div>
-
-            <p class="text-[11px] text-zinc-500">
-                1. Paste into your old theme's <code class="bg-zinc-100 px-1 py-0.5 rounded text-zinc-800">functions.php</code>.<br>
-                2. Open <code class="bg-zinc-100 px-1 py-0.5 rounded text-zinc-800">https://yoursite.com/?cora_export_elementor=1&amp;token=cora_migrate_secret</code> to download your JSON.<br>
-                3. Upload the downloaded file in the <strong>Upload JSON</strong> tab.
-            </p>
         </div>
 
     </div>
@@ -5769,7 +5727,7 @@ add_action( 'init', function() {
 
     function switchElementorMigrateTab(tab) {
         // Tab buttons
-        jQuery('#elem-tab-btn-url, #elem-tab-btn-upload, #elem-tab-btn-snippet')
+        jQuery('#elem-tab-btn-url, #elem-tab-btn-upload')
             .removeClass('bg-white text-zinc-950 font-bold shadow-2xs')
             .addClass('text-zinc-600 hover:text-zinc-950 font-semibold');
 
@@ -5778,7 +5736,7 @@ add_action( 'init', function() {
             .removeClass('text-zinc-600 hover:text-zinc-950 font-semibold');
 
         // Tab panels
-        jQuery('#elem-tab-panel-url, #elem-tab-panel-upload, #elem-tab-panel-snippet').addClass('hidden');
+        jQuery('#elem-tab-panel-url, #elem-tab-panel-upload').addClass('hidden');
         jQuery('#elem-tab-panel-' + tab).removeClass('hidden');
     }
 
@@ -6045,17 +6003,6 @@ add_action( 'init', function() {
                 btn.prop('disabled', false).text('Import to Canvas');
                 window.coraShowToast('Upload error occurred.', 'error');
             }
-        });
-    }
-
-    function copyElementorExporterSnippet() {
-        const snippet = document.getElementById('elem-snippet-code').innerText;
-        navigator.clipboard.writeText(snippet).then(function() {
-            jQuery('#elem-copy-label').text('Copied!');
-            window.coraShowToast('1-Click Exporter snippet copied to clipboard.');
-            setTimeout(() => {
-                jQuery('#elem-copy-label').text('Copy Code');
-            }, 2000);
         });
     }
 
