@@ -855,11 +855,14 @@ export default function PricingPage() {
           </button>
         </div>
 
-        {/* ══════════════════════════════════════════════════════════════════════
-            ACCORDION COMPARISON MATRIX (PERFECTLY ALIGNED STICKY CARDS & IN-CARD CTAS)
-        ══════════════════════════════════════════════════════════════════════ */}
-        {showComparison && (
-          <div className="mt-8 sm:mt-12 bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[32px] p-3.5 sm:p-7 shadow-[0_8px_32px_rgba(0,0,0,0.03)] animate-in fade-in slide-in-from-top-3 duration-200">
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          ACCORDION COMPARISON MATRIX (FULL-WIDTH EXPANDED VIEW)
+      ══════════════════════════════════════════════════════════════════════ */}
+      {showComparison && (
+        <section className="w-full max-w-[1360px] mx-auto px-3.5 sm:px-6 mb-12 sm:mb-16">
+          <div className="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[32px] p-3.5 sm:p-7 shadow-[0_8px_32px_rgba(0,0,0,0.03)] animate-in fade-in slide-in-from-top-3 duration-200">
             
             {/* Top Heading Block */}
             <div className="text-center max-w-[700px] mx-auto mb-6 sm:mb-8 pt-1 sm:pt-2">
@@ -1351,9 +1354,8 @@ export default function PricingPage() {
             </div>
 
           </div>
-        )}
-
-      </section>
+        </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════════
           ROW 3: INDIA ONLY PLAN (CLEAN, COMPACT MOBILE & PROFESSIONAL SHOWCASE)
