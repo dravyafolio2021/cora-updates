@@ -81,6 +81,7 @@ export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [flashSecondsLeft, setFlashSecondsLeft] = useState(600);
+  const [showFreeFeatures, setShowFreeFeatures] = useState(false);
 
   const topToggleRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
@@ -353,70 +354,86 @@ export default function PricingPage() {
 
           </div>
 
-          {/* Smaller Inline Feature Chips (Zero Truncation, Perfectly Balanced) */}
-          <div className="relative z-10 pt-4">
-            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2.5 flex items-center justify-between">
-              <span>Everything Included at ₹0 with Zero Expiry:</span>
-              <span className="text-emerald-700 font-bold hidden sm:inline">100% Free Forever Guarantee</span>
+          {/* Interactive Collapsible Feature Toggle (Saves Maximum Screen Space) */}
+          <div className="relative z-10 pt-3 sm:pt-3.5">
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setShowFreeFeatures(!showFreeFeatures)}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-700 hover:text-zinc-950 transition-colors py-1 cursor-pointer group select-none"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>{showFreeFeatures ? 'Hide Free Features' : 'View What\'s Included for Free (6 Features)'}</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-900 transition-transform duration-200 ${showFreeFeatures ? 'rotate-180' : ''}`} />
+              </button>
+
+              <span className="text-[10px] font-mono text-emerald-700 font-bold hidden sm:inline">
+                100% Free Forever Guarantee
+              </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-2">
-              
-              {/* Chip 1 */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
-                <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
-                  <Layout className="w-2.5 h-2.5" />
-                </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">Website Builder</span>
-                <span className="text-[9px] sm:text-[10px] font-mono text-zinc-400 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">heycora.in/you</span>
-              </div>
+            {/* Collapsible Chips Tray */}
+            {showFreeFeatures && (
+              <div className="pt-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-2">
+                  
+                  {/* Chip 1 */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
+                    <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
+                      <Layout className="w-2.5 h-2.5" />
+                    </div>
+                    <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">Website Builder</span>
+                    <span className="text-[9px] sm:text-[10px] font-mono text-zinc-400 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">heycora.in/you</span>
+                  </div>
 
-              {/* Chip 2 */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
-                <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
-                  <ShieldCheck className="w-2.5 h-2.5" />
-                </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">Kanban CRM</span>
-                <span className="text-[9px] sm:text-[10px] font-mono text-zinc-400 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">Leads &amp; Funnel</span>
-              </div>
+                  {/* Chip 2 */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
+                    <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
+                      <ShieldCheck className="w-2.5 h-2.5" />
+                    </div>
+                    <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">Kanban CRM</span>
+                    <span className="text-[9px] sm:text-[10px] font-mono text-zinc-400 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">Leads &amp; Funnel</span>
+                  </div>
 
-              {/* Chip 3 */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
-                <div className="w-4 h-4 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
-                  <Sparkles className="w-2.5 h-2.5" />
-                </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">1,000 AI Credits</span>
-                <span className="text-[9px] sm:text-[10px] font-mono text-amber-600/80 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">Monthly</span>
-              </div>
+                  {/* Chip 3 */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
+                    <div className="w-4 h-4 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+                      <Sparkles className="w-2.5 h-2.5" />
+                    </div>
+                    <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">1,000 AI Credits</span>
+                    <span className="text-[9px] sm:text-[10px] font-mono text-amber-600/80 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">Monthly</span>
+                  </div>
 
-              {/* Chip 4 */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
-                <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
-                  <FileCheck className="w-2.5 h-2.5" />
-                </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">Digital E-Sign</span>
-                <span className="text-[9px] sm:text-[10px] font-mono text-zinc-400 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">IT Act Valid</span>
-              </div>
+                  {/* Chip 4 */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
+                    <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
+                      <FileCheck className="w-2.5 h-2.5" />
+                    </div>
+                    <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">Digital E-Sign</span>
+                    <span className="text-[9px] sm:text-[10px] font-mono text-zinc-400 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">IT Act Valid</span>
+                  </div>
 
-              {/* Chip 5 */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
-                <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
-                  <Receipt className="w-2.5 h-2.5" />
-                </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">18% GST Invoicing</span>
-                <span className="text-[9px] sm:text-[10px] font-mono text-zinc-400 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">Auto Tax Math</span>
-              </div>
+                  {/* Chip 5 */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
+                    <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
+                      <Receipt className="w-2.5 h-2.5" />
+                    </div>
+                    <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">18% GST Invoicing</span>
+                    <span className="text-[9px] sm:text-[10px] font-mono text-zinc-400 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">Auto Tax Math</span>
+                  </div>
 
-              {/* Chip 6 */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
-                <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
-                  <Globe className="w-2.5 h-2.5" />
-                </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">Cora Subdomain</span>
-                <span className="text-[9px] sm:text-[10px] font-mono text-zinc-400 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">Free Hosting</span>
-              </div>
+                  {/* Chip 6 */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-zinc-200/90 shadow-2xs hover:border-zinc-300 hover:bg-zinc-50 transition-all min-w-0">
+                    <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 shrink-0">
+                      <Globe className="w-2.5 h-2.5" />
+                    </div>
+                    <span className="text-[11px] sm:text-xs font-semibold text-zinc-900 truncate">Cora Subdomain</span>
+                    <span className="text-[9px] sm:text-[10px] font-mono text-zinc-400 border-l border-zinc-200 pl-1.5 hidden md:inline shrink-0">Free Hosting</span>
+                  </div>
 
-            </div>
+                </div>
+              </div>
+            )}
           </div>
 
         </div>
