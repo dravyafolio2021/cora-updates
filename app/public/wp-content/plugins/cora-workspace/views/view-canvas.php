@@ -2897,6 +2897,31 @@ function cora_get_sparkline_points( $history, $type ) {
 
 <!-- 2.2. 1-Click Elementor Migration Modal (Centered Notion/Shopify Popup) -->
 <div id="drawer-elementor-migration" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[2px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <script>
+    window.switchBlueprintTab = function(tab) {
+        var btnPages = document.getElementById('blueprint-tab-btn-pages');
+        var btnCompat = document.getElementById('blueprint-tab-btn-compat');
+        var panelPages = document.getElementById('blueprint-panel-pages');
+        var panelCompat = document.getElementById('blueprint-panel-compat');
+
+        if (btnPages) {
+            btnPages.className = tab === 'pages'
+                ? 'flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all bg-white text-zinc-950 shadow-2xs'
+                : 'flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all';
+        }
+        if (btnCompat) {
+            btnCompat.className = tab === 'compatibility'
+                ? 'flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all bg-white text-zinc-950 shadow-2xs'
+                : 'flex-1 py-1.5 px-3 text-xs font-semibold text-zinc-600 hover:text-zinc-950 rounded-lg transition-all';
+        }
+        if (panelPages) {
+            if (tab === 'pages') { panelPages.classList.remove('hidden'); } else { panelPages.classList.add('hidden'); }
+        }
+        if (panelCompat) {
+            if (tab === 'compatibility') { panelCompat.classList.remove('hidden'); } else { panelCompat.classList.add('hidden'); }
+        }
+    };
+    </script>
     <div class="bg-white border border-zinc-200 rounded-2xl shadow-2xl p-6 sm:p-7 w-full max-w-xl space-y-5 transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto" id="drawer-elementor-migration-card">
         
         <!-- Header -->
