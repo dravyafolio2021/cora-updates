@@ -3,7 +3,7 @@
  * Plugin Name: Cora Workspace
  * Plugin URI: https://heycora.in
  * Description: Unified Multi-Tenant SaaS Workspace Engine for Architecture, Real Estate, and Creative Studios.
- * Version: 4.8.23
+ * Version: 4.8.24
  * Author: Cora Platform Architecture Team
  * Author URI: https://heycora.in
  * Text Domain: cora-workspace
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.8.23' );
+    define( 'CORA_WORKSPACE_VERSION', '4.8.24' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', plugin_dir_url( __FILE__ ) );
@@ -30553,7 +30553,10 @@ function cora_canvas_auto_create_lovable_pages( $theme_id ) {
  */
 if ( ! function_exists( 'cora_ajax_elementor_scan_url' ) ) {
 function cora_ajax_elementor_scan_url() {
-    check_ajax_referer( 'cora_re_nonce', 'nonce' );
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+    }
     if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
     }
@@ -30578,7 +30581,10 @@ add_action( 'wp_ajax_cora_ajax_elementor_scan_url', 'cora_ajax_elementor_scan_ur
  */
 if ( ! function_exists( 'cora_ajax_elementor_migrate_url' ) ) {
 function cora_ajax_elementor_migrate_url() {
-    check_ajax_referer( 'cora_re_nonce', 'nonce' );
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+    }
     if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
     }
@@ -30617,7 +30623,10 @@ add_action( 'wp_ajax_cora_ajax_elementor_migrate_url', 'cora_ajax_elementor_migr
  */
 if ( ! function_exists( 'cora_ajax_elementor_upload_template' ) ) {
 function cora_ajax_elementor_upload_template() {
-    check_ajax_referer( 'cora_re_nonce', 'nonce' );
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+    }
     if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
     }
@@ -30686,7 +30695,10 @@ add_action( 'wp_ajax_cora_ajax_elementor_upload_template', 'cora_ajax_elementor_
  */
 if ( ! function_exists( 'cora_ajax_elementor_generate_bridge_snippet' ) ) {
 function cora_ajax_elementor_generate_bridge_snippet() {
-    check_ajax_referer( 'cora_re_nonce', 'nonce' );
+    $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+    if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_re_nonce' ) && ! wp_verify_nonce( $nonce, 'cora_nonce' ) ) {
+        wp_send_json_error( array( 'message' => 'Security token expired. Please refresh the page.' ) );
+    }
     if ( ! current_user_can( 'edit_pages' ) && ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => 'Unauthorized permissions.' ) );
     }

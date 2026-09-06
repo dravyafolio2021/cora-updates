@@ -456,7 +456,11 @@ class Cora_Elementor_Migrator {
      * @return array|WP_Error
      */
     public function scan_remote_url( $url ) {
-        $url = esc_url_raw( trim( $url ) );
+        $url = trim( $url );
+        if ( ! empty( $url ) && ! preg_match( '#^https?://#i', $url ) ) {
+            $url = 'https://' . $url;
+        }
+        $url = esc_url_raw( $url );
         if ( empty( $url ) || ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
             return new WP_Error( 'invalid_url', __( 'Please provide a valid website URL (e.g. https://example.com).', 'cora-workspace' ) );
         }
@@ -466,9 +470,10 @@ class Cora_Elementor_Migrator {
 
         // 1. Fetch Homepage HTML
         $response = wp_remote_get( $url, array(
-            'timeout'    => 15,
-            'sslverify'  => false,
-            'user-agent' => 'CoraStudioMigrator/1.0 (+https://heycora.in)',
+            'timeout'     => 25,
+            'redirection' => 5,
+            'sslverify'   => false,
+            'user-agent'  => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 CoraMigrator/1.0',
         ) );
 
         if ( is_wp_error( $response ) ) {
@@ -596,9 +601,10 @@ class Cora_Elementor_Migrator {
      */
     public function migrate_remote_page_by_url( $page_url, $args = array() ) {
         $response = wp_remote_get( $page_url, array(
-            'timeout'    => 20,
-            'sslverify'  => false,
-            'user-agent' => 'CoraStudioMigrator/1.0 (+https://heycora.in)',
+            'timeout'     => 25,
+            'redirection' => 5,
+            'sslverify'   => false,
+            'user-agent'  => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 CoraMigrator/1.0',
         ) );
 
         if ( is_wp_error( $response ) ) {

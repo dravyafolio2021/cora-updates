@@ -5748,10 +5748,14 @@ function cora_get_sparkline_points( $history, $type ) {
     }
 
     function triggerOneClickMigrateAllUrl() {
-        const url = jQuery('#elem-migrate-url-input').val().trim();
+        let url = jQuery('#elem-migrate-url-input').val().trim();
         if (!url) {
             window.coraShowToast('Please enter your existing website URL.', 'error');
             return;
+        }
+        if (!/^https?:\/\//i.test(url)) {
+            url = 'https://' + url;
+            jQuery('#elem-migrate-url-input').val(url);
         }
 
         const btn = jQuery('#elem-btn-oneclick-migrate');
@@ -5787,20 +5791,34 @@ function cora_get_sparkline_points( $history, $type ) {
                 const msg = (res.data && res.data.message) ? res.data.message : 'Could not detect Elementor on this site. Cora only supports Elementor-based themes.';
                 window.coraShowToast(msg, 'error');
             }
-        }).fail(function() {
+        }).fail(function(xhr) {
             btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg><span>1-Click Import All</span>');
             jQuery('#elem-url-step-progress').addClass('hidden');
             jQuery('#elem-url-step-input').removeClass('hidden');
-            window.coraShowToast('Network error during scan. Ensure URL is reachable.', 'error');
+
+            let errorMsg = 'Network error during scan. Ensure URL is reachable.';
+            if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+                errorMsg = xhr.responseJSON.data.message;
+            } else if (xhr.responseText) {
+                try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    if (parsed.data && parsed.data.message) errorMsg = parsed.data.message;
+                } catch (e) {}
+            }
+            window.coraShowToast(errorMsg, 'error');
         });
     }
     window.triggerOneClickMigrateAllUrl = triggerOneClickMigrateAllUrl;
 
     function triggerScanElementorUrl() {
-        const url = jQuery('#elem-migrate-url-input').val().trim();
+        let url = jQuery('#elem-migrate-url-input').val().trim();
         if (!url) {
             window.coraShowToast('Please enter a valid website URL.', 'error');
             return;
+        }
+        if (!/^https?:\/\//i.test(url)) {
+            url = 'https://' + url;
+            jQuery('#elem-migrate-url-input').val(url);
         }
 
         const scanBtn = jQuery('#elem-btn-scan-url');
@@ -5852,9 +5870,19 @@ function cora_get_sparkline_points( $history, $type ) {
                 const msg = (res.data && res.data.message) ? res.data.message : 'Could not detect Elementor on this site.';
                 window.coraShowToast(msg, 'error');
             }
-        }).fail(function() {
+        }).fail(function(xhr) {
             scanBtn.prop('disabled', false).html('<span>Scan Site</span><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>');
-            window.coraShowToast('Network error during scan. Ensure URL is reachable.', 'error');
+
+            let errorMsg = 'Network error during scan. Ensure URL is reachable.';
+            if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+                errorMsg = xhr.responseJSON.data.message;
+            } else if (xhr.responseText) {
+                try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    if (parsed.data && parsed.data.message) errorMsg = parsed.data.message;
+                } catch (e) {}
+            }
+            window.coraShowToast(errorMsg, 'error');
         });
     }
 
